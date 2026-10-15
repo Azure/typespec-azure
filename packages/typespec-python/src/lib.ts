@@ -1,10 +1,13 @@
 import {
   BrandedSdkEmitterOptions,
-  SdkContext,
-  SdkServiceOperation,
+  type SdkContext,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { createTypeSpecLibrary, JSONSchemaType } from "@typespec/compiler";
-import { PythonEmitterOptions, PythonEmitterOptionsSchema } from "@typespec/http-client-python";
+import { createTypeSpecLibrary, type JSONSchemaType } from "@typespec/compiler";
+import {
+  type PythonEmitterOptions,
+  PythonEmitterOptionsSchema,
+} from "@typespec/http-client-python";
 
 export interface PythonAzureEmitterOptions extends PythonEmitterOptions {
   "examples-dir"?: string;
@@ -38,9 +41,9 @@ const PythonAzureEmitterOptionsSchema: JSONSchemaType<PythonAzureEmitterOptions>
     "models-mode": {
       type: "string",
       nullable: true,
-      enum: ["dpg", "none"],
+      enum: ["dpg", "none", "typeddict"],
       description:
-        "What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate.",
+        "What kind of models to generate. If you pass in `none`, we won't generate models. `dpg` models are the default models we generate. If you pass in `typeddict`, we will generate models as typed dictionaries.",
     },
     "generate-sample": {
       type: "boolean",

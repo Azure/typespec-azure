@@ -1,4 +1,4 @@
-import { ModelProperty } from "@typespec/compiler";
+import type { ModelProperty } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { it } from "vitest";

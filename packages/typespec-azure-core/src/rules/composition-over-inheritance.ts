@@ -1,5 +1,6 @@
 import {
   createRule,
+  fileRef,
   getDiscriminator,
   getTypeName,
   isTemplateInstance,
@@ -9,6 +10,7 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 
 export const compositionOverInheritanceRule = createRule({
   name: "composition-over-inheritance",
+  docs: fileRef.fromPackageRoot("src/rules/composition-over-inheritance.md"),
   description:
     "Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`.",
   severity: "warning",

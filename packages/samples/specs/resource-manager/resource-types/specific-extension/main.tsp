@@ -110,15 +110,6 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
   Description = "The name of the virtual machine scale set VM"
 >;
 
-alias ServiceGroup = Extension.ExternalResource<
-  "Microsoft.Management",
-  "serviceGroups",
-  "serviceGroupName",
-  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
-  Description = "The name of the service fabric cluster",
-  ParentType = "Tenant"
->;
-
 /**
  * Operations over any scope
  * routed at: {scope}/providers/Microsoft.ContosoProviderHub/employees
@@ -159,7 +150,7 @@ interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
  * routed at: /providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees
  */
 @armResourceOperations
-interface ServiceGroups extends EmplOps<ServiceGroup> {}
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
 
 /**
  * Operations over virtual machines

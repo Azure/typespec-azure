@@ -1,5 +1,9 @@
-import { createRule, isTemplateInstance, Operation } from "@typespec/compiler";
-import { getHttpOperation, getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
+import { createRule, fileRef, isTemplateInstance, type Operation } from "@typespec/compiler";
+import {
+  getHttpOperation,
+  getResponsesForOperation,
+  type HttpOperationResponse,
+} from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
  * verify that 202 or 204 responses do not contain a response body.
@@ -7,6 +11,7 @@ import { isTemplatedInterfaceOperation } from "./utils.js";
  */
 export const noResponseBodyRule = createRule({
   name: "no-response-body",
+  docs: fileRef.fromPackageRoot("src/rules/no-response-body.md"),
   description:
     "Check that the body is empty for 202 and 204 responses, and not empty for other success (2xx) responses.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-response-body",

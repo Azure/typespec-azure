@@ -1,0 +1,71 @@
+name: Package Size Comment
+
+# Posts the package-size report produced by `package-size.yml` as a sticky PR comment.
+# Runs on `workflow_run` so it has a `pull-requests: write` token even for fork PRs,
+# while never building any untrusted PR code here.
+# See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+
+on:
+  workflow_run:
+    workflows: ["Package Size"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+  actions: read
+
+jobs:
+  comment:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download comment artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: package-size-comment
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./comment-artifact
+
+      - name: Post or update sticky comment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require("fs");
+
+            const marker = "<!-- bundle-size-report -->";
+            const prNumber = Number(
+              fs.readFileSync("./comment-artifact/pr-number.txt", "utf8").trim(),
+            );
+            const body = fs.readFileSync("./comment-artifact/comment.md", "utf8");
+
+            if (!Number.isInteger(prNumber) || prNumber <= 0) {
+              core.setFailed(`Invalid PR number: ${prNumber}`);
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body,
+              });
+            }

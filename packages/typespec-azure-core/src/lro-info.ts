@@ -24,11 +24,11 @@ import {
   isMetadata,
 } from "@typespec/http";
 import { findLroStatusProperty } from "./decorators/lro-status.js";
-import { OperationLink } from "./decorators/operation-link.js";
+import type { OperationLink } from "./decorators/operation-link.js";
 import {
+  type StatusMonitorMetadata,
   extractStatusMonitorInfo,
   isPollingLocation,
-  StatusMonitorMetadata,
 } from "./decorators/polling-location.js";
 import { getPollingOperationParameter } from "./decorators/polling-operation-parameter.js";
 import { createDiagnostic } from "./lib.js";

@@ -1,0 +1,18 @@
+import type { LinterRuleSet } from "@typespec/compiler";
+
+// Rules that apply to specs configured to emit a client SDK. Enable by extending
+// "@azure-tools/typespec-azure-rulesets/client-sdk" in tspconfig.yaml.
+export default {
+  enable: {
+    "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
+    "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
+    "@azure-tools/typespec-client-generator-core/use-union-hierarchy": true,
+    "@azure-tools/typespec-client-generator-core/get-operation-name": false,
+  },
+  disable: {
+    "@azure-tools/typespec-client-generator-core/use-create-for-put":
+      "Opt-in ARM naming guidance; data-plane PUT methods may use other verbs.",
+    "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms":
+      "Disabled until the C# emitter handles standard acronym casing.",
+  },
+} satisfies LinterRuleSet;

@@ -1,25 +1,25 @@
 import {
-  DecoratorContext,
-  EnumMember,
+  type DecoratorContext,
+  type EnumMember,
   getTypeName,
-  Interface,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
+  type Interface,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
   setTypeSpecNamespace,
-  Type,
+  type Type,
 } from "@typespec/compiler";
 import { isHeader, isQueryParam } from "@typespec/http";
 import { $added } from "@typespec/versioning";
-import {
+import type {
   TraitAddedDecorator,
   TraitContextDecorator,
   TraitDecorator,
   TraitLocationDecorator,
 } from "../generated-defs/Azure.Core.Traits.js";
-import {
+import type {
   AddTraitPropertiesDecorator,
   ApplyTraitOverrideDecorator,
   EnsureAllHeaderParamsDecorator,

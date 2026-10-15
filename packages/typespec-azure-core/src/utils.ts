@@ -1,7 +1,13 @@
 import { reportDiagnostic } from "./lib.js";
 
-import { isErrorModel, Model, ModelProperty, Operation, Program } from "@typespec/compiler";
-import { getHttpOperation, HttpOperation, isStatusCode } from "@typespec/http";
+import {
+  isErrorModel,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
+} from "@typespec/compiler";
+import { getHttpOperation, type HttpOperation, isStatusCode } from "@typespec/http";
 
 /**
  * Filter the model properties of a model, using the given predicate

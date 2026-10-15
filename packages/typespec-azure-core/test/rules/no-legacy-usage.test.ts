@@ -1,5 +1,9 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester, mockFile } from "@typespec/compiler/testing";
+import {
+  type LinterRuleTester,
+  createLinterRuleTester,
+  mockFile,
+} from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { noLegacyUsage } from "../../src/rules/no-legacy-usage.js";
 

@@ -8,7 +8,9 @@ import "./available-operations.tsp";
 import "./checkname-availability.tsp";
 import "./lro.tsp";
 import "./lropaging.tsp";
+import "./legacy.tsp";
 import "./optional-body.tsp";
+import "./paging.tsp";
 
 using Http;
 using Rest;

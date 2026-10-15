@@ -99,12 +99,9 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
 @friendlyName("Location")
 @armVirtualResource
 @resourceBaseType(BaseType)
-model ArmLocationResource<BaseType extends
-  | "Tenant"
-  | "Subscription"
-  | "ResourceGroup"
-  | "Location"
-  | "Extension" = never> {
+model ArmLocationResource<
+  BaseType extends "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension" = never
+> {
   ...LocationResourceParameter;
 }
 
@@ -284,7 +281,7 @@ model ExtensionActionScope<StringType extends string = string>
 model ArmTopParameter {
   @query("$top")
   @doc("The total number of items to return.")
-  top: int64;
+  top?: int64;
 }
 
 /**
@@ -293,7 +290,7 @@ model ArmTopParameter {
 model ArmFilterParameter {
   @query("$filter")
   @doc("The OData filter expression to apply to the list operation.")
-  filter: string;
+  filter?: string;
 }
 
 /**
@@ -302,7 +299,7 @@ model ArmFilterParameter {
 model ArmSkipParameter {
   @query("$skip")
   @doc("The number of items to skip before starting to collect the result set.")
-  skip: int64;
+  skip?: int64;
 }
 
 /**

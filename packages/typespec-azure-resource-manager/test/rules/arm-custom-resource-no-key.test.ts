@@ -1,4 +1,4 @@
-import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
 import { Tester } from "#test/tester.js";

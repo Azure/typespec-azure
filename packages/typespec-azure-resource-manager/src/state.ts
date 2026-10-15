@@ -29,6 +29,7 @@ export const ArmStateKeys = {
   customAzureResource: azureResourceManagerCreateStateSymbol("azureCustomResource"),
   armFeature: azureResourceManagerCreateStateSymbol("armFeature"),
   armFeatureSet: azureResourceManagerCreateStateSymbol("armFeatureSet"),
+  armFeatureFileSet: azureResourceManagerCreateStateSymbol("armFeatureFileSet"),
   armFeatureOptions: azureResourceManagerCreateStateSymbol("armFeatureOptions"),
 
   // private.decorator.ts
@@ -43,4 +44,7 @@ export const ArmStateKeys = {
   armExternalType: azureResourceManagerCreateStateSymbol("armExternalType"),
   inlineAzureType: azureResourceManagerCreateStateSymbol("inlineAzureType"),
   genericResource: azureResourceManagerCreateStateSymbol("genericResource"),
+
+  // base-types.ts
+  azureBaseTypes: azureResourceManagerCreateStateSymbol("azureBaseTypes"),
 };

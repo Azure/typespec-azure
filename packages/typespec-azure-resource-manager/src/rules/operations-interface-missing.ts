@@ -1,4 +1,4 @@
-import { createRule, isService, paramMessage } from "@typespec/compiler";
+import { createRule, fileRef, isService, paramMessage } from "@typespec/compiler";
 
 import { getArmProviderNamespace } from "../namespace.js";
 import { isArmOperationsListInterface } from "../private.decorators.js";
@@ -8,6 +8,7 @@ import { isArmOperationsListInterface } from "../private.decorators.js";
  */
 export const operationsInterfaceMissingRule = createRule({
   name: "missing-operations-endpoint",
+  docs: fileRef.fromPackageRoot("src/rules/missing-operations-endpoint.md"),
   severity: "warning",
   description: "Check for missing Operations interface.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-operations-endpoint",

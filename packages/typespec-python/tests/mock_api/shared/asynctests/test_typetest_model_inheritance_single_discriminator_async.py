@@ -4,17 +4,18 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
+import pytest_asyncio
 from typetest.model.singlediscriminator.aio import SingleDiscriminatorClient
-from typetest.model.singlediscriminator.models import Sparrow, Eagle, Bird, Dinosaur
+from typetest.model.singlediscriminator.models import Sparrow, Eagle, Bird, Dinosaur, Fish
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     async with SingleDiscriminatorClient() as client:
         yield client
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def valid_body():
     return Sparrow(wingspan=1)
 
@@ -29,7 +30,7 @@ async def test_put_model(client, valid_body):
     await client.put_model(valid_body)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def recursive_body():
     return Eagle(
         {
@@ -60,6 +61,16 @@ async def test_get_missing_discriminator(client):
 @pytest.mark.asyncio
 async def test_get_wrong_discriminator(client):
     assert await client.get_wrong_discriminator() == Bird(wingspan=1, kind="wrongKind")
+
+
+@pytest.mark.asyncio
+async def test_get_no_subtypes_model(client):
+    assert await client.get_no_subtypes_model() == Fish(kind="salmon", size=10)
+
+
+@pytest.mark.asyncio
+async def test_put_no_subtypes_model(client):
+    await client.put_no_subtypes_model(Fish(kind="salmon", size=10))
 
 
 @pytest.mark.asyncio

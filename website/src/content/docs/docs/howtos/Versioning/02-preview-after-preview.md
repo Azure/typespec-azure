@@ -112,6 +112,65 @@ This includes the following steps:
     + requiredProp: string;
     ```
 
+    ```diff lang=tsp
+    - @madeRequired(Versions.`2026-01-01-preview`)
+    - requiredProp: string;
+    + requiredProp?: string;
+    ```
+
+  - If a property uses the `@removed`/`@added`/`@renamedFrom` pattern to change decoration or a default value in the latest preview (see [Adding Decoration to an Existing Type](./06-evolving-apis.md#adding-decoration-to-an-existing-type)), reverse the pattern by removing both the old and new properties and restoring the original property. For example, if a property added a default value in preview:
+
+    ```diff lang=tsp
+      model Employee {
+    -   @removed(Versions.`2026-01-01-preview`)
+    -   @renamedFrom(Versions.`2026-01-01-preview`, "level")
+    -   oldLevel: int32;
+    -
+    -   @added(Versions.`2026-01-01-preview`)
+    -   level: int32 = 1;
+    +   level: int32;
+      }
+    ```
+
+    Here, `level` had a default value of `1` added in the preview. To reverse this, remove both properties (the renamed "old" version and the "new" version with the default) and restore the original property without the default.
+
+  - If an operation uses the `@removed`/`@added`/`@renamedFrom` pattern to convert from synchronous to asynchronous in the latest preview, reverse the pattern by removing both operations and restoring the original synchronous operation. For example (ARM):
+
+    ```diff lang=tsp
+      @armResourceOperations
+      interface Employees {
+    -   @removed(Versions.`2026-01-01-preview`)
+    -   @renamedFrom(Versions.`2026-01-01-preview`, "createOrUpdate")
+    -   @sharedRoute
+    -   createOrUpdateV1 is ArmResourceCreateOrReplaceSync<Employee>;
+    -
+    -   @added(Versions.`2026-01-01-preview`)
+    -   @sharedRoute
+    -   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+    +   createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+      }
+    ```
+
+    Similarly for data-plane:
+
+    ```diff lang=tsp
+      interface Widgets {
+    -   @removed(Versions.`2026-01-01-preview`)
+    -   @renamedFrom(Versions.`2026-01-01-preview`, "createOrReplaceWidget")
+    -   @sharedRoute
+    -   createOrReplaceWidgetV1 is Operations.ResourceCreateOrReplace<Widget>;
+    -
+    -   @added(Versions.`2026-01-01-preview`)
+    -   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
+    -
+    -   @added(Versions.`2026-01-01-preview`)
+    -   @sharedRoute
+    -   @pollingOperation(Widgets.getWidgetOperationStatus)
+    -   createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
+    +   createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
+      }
+    ```
+
   - If any other types are removed in the new preview (unlikely, because these would be breaking changes from the previous stable and require a breaking change review) mark these with an `@removed` decorator referencing the new version
 
     ```diff lang=tsp

@@ -14,6 +14,10 @@ import type {
   Union,
 } from "@typespec/compiler";
 
+export interface DecoratorOptions {
+  readonly scope?: string;
+}
+
 /**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
@@ -67,7 +71,7 @@ export type ClientNameDecorator = (
   context: DecoratorContext,
   target: Type,
   rename: string,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -76,22 +80,22 @@ export type ClientNameDecorator = (
  *
  * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the Java and/or C# emitters to which the decorator applies. The scope must include `java`, `csharp`, or both. Omitting the scope or excluding both languages produces a warning.
  *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ * **Supported language identifiers:** `csharp` and `java`.
  *
  * **Valid patterns:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ * - Single language: `"java"`
+ * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!java"`
  * @example Apply to a single operation
  * ```typespec
- * @convenientAPI(false)
- * op test: void;
+ * @convenientAPI(false, "java")
+ * op test(): void;
  * ```
  * @example Apply to all operations in an interface
  * ```typespec
- * @convenientAPI(false)
+ * @convenientAPI(false, "java, csharp")
  * interface MyOperations {
  *   op test1(): void;
  *   op test2(): void;
@@ -99,7 +103,7 @@ export type ClientNameDecorator = (
  * ```
  * @example Apply to all operations in a namespace
  * ```typespec
- * @convenientAPI(false)
+ * @convenientAPI(false, "csharp")
  * namespace MyService {
  *   op test1(): void;
  *   op test2(): void;
@@ -110,7 +114,7 @@ export type ConvenientAPIDecorator = (
   context: DecoratorContext,
   target: Operation | Namespace | Interface,
   flag?: boolean,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -119,22 +123,22 @@ export type ConvenientAPIDecorator = (
  *
  * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the Java and/or C# emitters to which the decorator applies. The scope must include `java`, `csharp`, or both. Omitting the scope or excluding both languages produces a warning.
  *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ * **Supported language identifiers:** `csharp` and `java`.
  *
  * **Valid patterns:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ * - Single language: `"csharp"`
+ * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!csharp"`
  * @example Apply to a single operation
  * ```typespec
- * @protocolAPI(false)
- * op test: void;
+ * @protocolAPI(false, "csharp")
+ * op test(): void;
  * ```
  * @example Apply to all operations in an interface
  * ```typespec
- * @protocolAPI(false)
+ * @protocolAPI(false, "java, csharp")
  * interface MyOperations {
  *   op test1(): void;
  *   op test2(): void;
@@ -142,7 +146,7 @@ export type ConvenientAPIDecorator = (
  * ```
  * @example Apply to all operations in a namespace
  * ```typespec
- * @protocolAPI(false)
+ * @protocolAPI(false, "java")
  * namespace MyService {
  *   op test1(): void;
  *   op test2(): void;
@@ -153,7 +157,7 @@ export type ProtocolAPIDecorator = (
   context: DecoratorContext,
   target: Operation | Namespace | Interface,
   flag?: boolean,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -162,7 +166,10 @@ export type ProtocolAPIDecorator = (
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  *
  * @param target The target namespace or interface that you want to define as a client.
- * @param options Optional configuration for the service.
+ * @param options Optional configuration for the service. `options.scope` can also be used to set the
+ * language scope instead of (or in addition to) the legacy third positional `scope` argument. If
+ * both are set with conflicting values, a warning diagnostic is reported and the `options.scope`
+ * value is used.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -197,13 +204,12 @@ export type ClientDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- *
- *
- *
- * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated. Sub clients should be represented using `@client`.
  * Define the sub client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+ *
+ * Deprecated: use `@client` instead. Sub clients should be represented using `@client`.
+ *
  * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
@@ -222,7 +228,7 @@ export type ClientDecorator = (
 export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -301,7 +307,7 @@ export type UsageDecorator = (
   context: DecoratorContext,
   target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -458,13 +464,15 @@ export type AccessDecorator = (
   context: DecoratorContext,
   target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
  * Customize a method's signature in the generated client SDK.
- * Currently, only parameter signature customization is supported.
- * This decorator allows you to specify a different method signature for the client SDK than the original definition.
+ * The override operation defines the client method parameters, but its declared return type is
+ * ignored. To intentionally replace the generated method response, pass an operation returned by
+ * `replaceResponseWithVoid` or `replaceResponseWithBytes`; these functions preserve the original
+ * HTTP response metadata.
  *
  * @param target : The target operation that you want to override.
  * @param override : The override method definition that specifies the exact client method you want
@@ -518,7 +526,7 @@ export type OverrideDecorator = (
   context: DecoratorContext,
   target: Operation,
   override: Operation,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -544,7 +552,7 @@ export type OverrideDecorator = (
 export type UseSystemTextJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -555,7 +563,10 @@ export type UseSystemTextJsonConverterDecorator = (
  * This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
  *
  * @param target The target client that you want to customize client initialization for.
- * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
+ * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options. `options.scope` can also be used to set the
+ * language scope instead of (or in addition to) the legacy third positional `scope` argument. If
+ * both are set with conflicting values, a warning diagnostic is reported and the `options.scope`
+ * value is used.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -627,7 +638,7 @@ export type ParamAliasDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   paramAlias: string,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -661,7 +672,7 @@ export type ClientNamespaceDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface | Model | Enum | Union,
   rename: string,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -750,7 +761,7 @@ export type AlternateTypeDecorator = (
   context: DecoratorContext,
   target: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -798,7 +809,7 @@ export type AlternateTypeDecorator = (
 export type ScopeDecorator = (
   context: DecoratorContext,
   target: Operation | ModelProperty,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -841,7 +852,7 @@ export type ApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value?: boolean,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -878,7 +889,7 @@ export type ClientApiVersionsDecorator = (
   context: DecoratorContext,
   target: Namespace,
   value: Enum,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -910,7 +921,7 @@ export type ClientApiVersionsDecorator = (
 export type DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -937,7 +948,7 @@ export type DeserializeEmptyStringAsNullDecorator = (
 export type ResponseAsBoolDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -1030,7 +1041,7 @@ export type ClientLocationDecorator = (
   context: DecoratorContext,
   source: Operation | ModelProperty,
   target: Interface | Namespace | Operation | string,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -1075,7 +1086,7 @@ export type ClientDocDecorator = (
   target: Type,
   documentation: string,
   mode: EnumMember,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -1090,8 +1101,10 @@ export type ClientDocDecorator = (
  *
  * @param target The type you want to apply the option to.
  * @param name The name of the option (e.g., "enableFeatureFoo").
- * @param value The value of the option. Can be any type; emitters will cast as needed.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param value The value of the option. Can be a literal value (string, boolean, number, etc.) or a
+ * reference to a TypeSpec model, in which case the referenced model (including its own decorators,
+ * such as `@alternateType`) is preserved so the scoped emitter can resolve it. Emitters will cast as needed.
+ * @param scope Specifies the target language emitters to which the decorator applies. Every use must provide an explicit scope; omitting it produces an additional warning.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
  *
@@ -1107,13 +1120,19 @@ export type ClientDocDecorator = (
  *   prop: string;
  * }
  * ```
+ * @example Apply an experimental option that references a model
+ * ```typespec
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for csharp"
+ * @clientOption("composes", OpenAICreateResponseOptions, "csharp")
+ * model FoundryCreateResponseOptions {}
+ * ```
  */
 export type ClientOptionDecorator = (
   context: DecoratorContext,
   target: Type,
   name: string,
-  value: unknown,
-  scope?: string,
+  value: Type | unknown,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
@@ -1261,6 +1280,45 @@ export type ReorderParametersFunctionImplementation = (
 ) => Operation;
 
 /**
+ * Replace the method response type of an operation with `void`, discarding the client method
+ * return value while preserving the HTTP response metadata used for the wire protocol.
+ * Use this with `@@override` when the runtime response body should no longer be surfaced
+ * to callers of the generated client method, for example when a "delete" operation returns
+ * a body today but should return nothing to the SDK consumer.
+ *
+ * @param operation The operation to transform.
+ * @returns A new operation whose method response type is `void`.
+ * @example Replace a response with void
+ * ```typespec
+ * alias DeleteResponse = replaceResponseWithVoid(MyService.delete);
+ * @@override(MyService.delete, DeleteResponse);
+ * ```
+ */
+export type ReplaceResponseWithVoidFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+) => Operation;
+
+/**
+ * Replace the method response type of an operation with the raw bytes of the HTTP response body,
+ * preserving the HTTP response metadata used for the wire protocol. Use this with `@@override`
+ * when callers of the generated client method should receive the unparsed response body instead
+ * of the modeled response type.
+ *
+ * @param operation The operation to transform.
+ * @returns A new operation whose method response type is `bytes`.
+ * @example Replace a response with the raw response bytes
+ * ```typespec
+ * alias DownloadResponse = replaceResponseWithBytes(MyService.download);
+ * @@override(MyService.download, DownloadResponse);
+ * ```
+ */
+export type ReplaceResponseWithBytesFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+) => Operation;
+
+/**
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
  *
@@ -1287,5 +1345,7 @@ export type AzureClientGeneratorCoreFunctions = {
   removeParameter: RemoveParameterFunctionImplementation;
   addParameter: AddParameterFunctionImplementation;
   reorderParameters: ReorderParametersFunctionImplementation;
+  replaceResponseWithVoid: ReplaceResponseWithVoidFunctionImplementation;
+  replaceResponseWithBytes: ReplaceResponseWithBytesFunctionImplementation;
   exact: ExactFunctionImplementation;
 };

@@ -3,16 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-# Azure-specific fixtures
-# Common fixtures (testserver, core_library, key_credential, png_data, jpg_data)
-# are inherited from the root tests/conftest.py
-
-import re
-import urllib.parse
 import pytest
-from typing import Literal, List
+import re
+from typing import Literal
 from pathlib import Path
-from azure.core.rest import HttpRequest
 
 FILE_FOLDER = Path(__file__).parent
 
@@ -52,6 +46,9 @@ def check_client_request_id_header():
 
 
 # ================== after azure-core fix, the following code can be removed (begin) ==================
+import urllib.parse
+from azure.core.rest import HttpRequest
+
 
 def update_api_version_of_status_link(status_link: str):
     request_params = {}
@@ -166,5 +163,17 @@ SPECIAL_WORDS = [
 
 
 @pytest.fixture
-def special_words() -> List[str]:
+def special_words() -> list[str]:
     return SPECIAL_WORDS
+
+
+@pytest.fixture
+def png_data() -> bytes:
+    with open(str(FILE_FOLDER / "data/image.png"), "rb") as file_in:
+        return file_in.read()
+
+
+@pytest.fixture
+def jpg_data() -> bytes:
+    with open(str(FILE_FOLDER / "data/image.jpg"), "rb") as file_in:
+        return file_in.read()

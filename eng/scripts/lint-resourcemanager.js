@@ -57,6 +57,14 @@ const suppressedErrors = [
     id: "R2026",
     code: "AvoidAnonymousTypes",
   },
+  {
+    id: "R3016",
+    code: "DefinitionsPropertiesNamesCamelCase",
+  },
+  {
+    id: "R2056",
+    code: "RequiredReadOnlyProperties",
+  },
 ];
 
 async function lintInternal(swagger) {

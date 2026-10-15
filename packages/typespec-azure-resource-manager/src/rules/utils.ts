@@ -1,19 +1,19 @@
 import {
-  DecoratorApplication,
-  DecoratorArgument,
+  type DecoratorApplication,
+  type DecoratorArgument,
   getNamespaceFullName,
-  Interface,
+  type Interface,
   isTemplateDeclaration,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { getResourceOperation } from "@typespec/rest";
-import { ArmResourceOperation } from "../operations.js";
-import { ArmResourceDetails, getArmResourceKind } from "../resource.js";
+import type { ArmResourceOperation } from "../operations.js";
+import { type ArmResourceDetails, getArmResourceKind } from "../resource.js";
 
 /**
  *
@@ -40,6 +40,33 @@ export function isResource(resourceType: Model) {
 
 export function isResourceOperation(program: Program, op: Operation) {
   return !!getResourceOperation(program, op);
+}
+
+export function isApiVersionParameterName(name: string): boolean {
+  return name === "api-version";
+}
+
+export function isCollectionPath(
+  path: string,
+  options: {
+    excludeTerminalPathParameter?: boolean;
+    excludeDefaultSegment?: boolean;
+  } = {},
+): boolean {
+  if (
+    !path.includes(".") ||
+    (options.excludeTerminalPathParameter && path.endsWith("}")) ||
+    (options.excludeDefaultSegment && path.endsWith("/default"))
+  ) {
+    return false;
+  }
+
+  const providerTail = path.split(".").at(-1);
+  return (
+    providerTail !== undefined &&
+    providerTail.includes("/") &&
+    providerTail.split("/").length % 2 === 0
+  );
 }
 
 export function getProperties(model: Model) {

@@ -3,12 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # --------------------------------------------------------------------------
-# Unbranded-specific fixtures
-# Common fixtures (testserver, core_library, key_credential, png_data, jpg_data)
-# are inherited from the root tests/conftest.py
-
 import pytest
-from typing import List
+from pathlib import Path
+
+FILE_FOLDER = Path(__file__).parent
 
 
 SPECIAL_WORDS = [
@@ -49,5 +47,17 @@ SPECIAL_WORDS = [
 
 
 @pytest.fixture
-def special_words() -> List[str]:
+def special_words() -> list[str]:
     return SPECIAL_WORDS
+
+
+@pytest.fixture
+def png_data() -> bytes:
+    with open(str(FILE_FOLDER / "data/image.png"), "rb") as file_in:
+        return file_in.read()
+
+
+@pytest.fixture
+def jpg_data() -> bytes:
+    with open(str(FILE_FOLDER / "data/image.jpg"), "rb") as file_in:
+        return file_in.read()

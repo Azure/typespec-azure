@@ -1,6 +1,7 @@
 import type { BenchmarkResult, ComparisonResult, MetricComparison, RuntimeStats } from "./types.js";
 
 const DEFAULT_THRESHOLD = 5; // percent
+const DEFAULT_MIN_CHANGE_MS = 1;
 
 export interface CompareOptions {
   /** Percentage threshold for highlighting changes (default: 5%). */
@@ -11,6 +12,14 @@ function createMetric(label: string, baseline: number, current: number): MetricC
   const change = current - baseline;
   const percentChange = baseline === 0 ? (current === 0 ? 0 : 100) : (change / baseline) * 100;
   return { label, baseline, current, change, percentChange };
+}
+
+export function isNotableMetricChange(
+  metric: MetricComparison,
+  threshold: number = DEFAULT_THRESHOLD,
+  minChangeMs: number = DEFAULT_MIN_CHANGE_MS,
+): boolean {
+  return Math.abs(metric.percentChange) >= threshold && Math.abs(metric.change) >= minChangeMs;
 }
 
 function extractRuntimeMetrics(
@@ -105,6 +114,11 @@ export function compareBenchmarks(
   current: BenchmarkResult,
   options: CompareOptions = {},
 ): ComparisonResult[] {
+  if (baseline.measurementMode !== current.measurementMode) {
+    throw new Error(
+      `Cannot compare incompatible measurement methods: ${baseline.measurementMode ?? "legacy combined"} and ${current.measurementMode ?? "legacy combined"}.`,
+    );
+  }
   const results: ComparisonResult[] = [];
   const allSpecs = new Set([...Object.keys(baseline.specs), ...Object.keys(current.specs)]);
 
@@ -145,7 +159,7 @@ export function hasNotableChanges(
 ): boolean {
   for (const comp of comparisons) {
     for (const m of comp.metrics) {
-      if (Math.abs(m.percentChange) >= threshold) {
+      if (isNotableMetricChange(m, threshold)) {
         return true;
       }
     }

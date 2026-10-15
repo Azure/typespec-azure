@@ -22,23 +22,28 @@ model Resource {
   name: string;
 }
 
-@scenario
-@scenarioDoc("""
-  Test that a HEAD operation decorated with @responseAsBool returns a boolean.
-  A successful (2xx) response should return true, and a 404 response should return false.
-  
-  Expected calls:
-  - HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
-  - HEAD /azure/client-generator-core/response-as-bool/not-exists -> 404 (returns false)
-  """)
 @route("/exists")
 namespace HeadAsBoolean {
+  @scenario
+  @scenarioDoc("""
+    Test that a HEAD operation decorated with @responseAsBool returns true for a successful (2xx) response.
+    
+    Expected call:
+    - HEAD /azure/client-generator-core/response-as-bool/exists -> 204 (returns true)
+    """)
   @global.Azure.ClientGenerator.Core.responseAsBool
   @head
   op exists(): void;
 
+  @scenario
+  @scenarioDoc("""
+    Test that a HEAD operation decorated with @responseAsBool returns false for a 404 response.
+    
+    Expected call:
+    - HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
+    """)
+  @route("/not-exists")
   @global.Azure.ClientGenerator.Core.responseAsBool
   @head
-  @route("/not-exists")
   op notExists(): void;
 }

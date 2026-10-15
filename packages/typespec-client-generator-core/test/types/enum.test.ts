@@ -1,7 +1,12 @@
 import { t } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
+import {
+  type SdkEnumType,
+  type SdkModelType,
+  type SdkUnionType,
+  UsageFlags,
+} from "../../src/interfaces.js";
 import { getClientType } from "../../src/types.js";
 import {
   AzureCoreTesterWithService,
@@ -200,7 +205,6 @@ it("union of union as enum float type", async function () {
 
 it("string fixed", async function () {
   const { program } = await AzureCoreTesterWithService.compile(`
-    #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
     @usage(Usage.input | Usage.output)
     enum DaysOfWeekFixedEnum {
       Monday,

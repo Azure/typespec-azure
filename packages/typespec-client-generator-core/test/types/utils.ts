@@ -1,5 +1,5 @@
 import { ok, strictEqual } from "assert";
-import { SdkContext, SdkModelPropertyType, SdkType } from "../../src/interfaces.js";
+import type { SdkContext, SdkModelPropertyType, SdkType } from "../../src/interfaces.js";
 
 export function getSdkModelPropertyTypeHelper(context: SdkContext): SdkModelPropertyType {
   const sdkModel = context.sdkPackage.models.find((x) => x.kind === "model");

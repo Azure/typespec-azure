@@ -1,11 +1,36 @@
+import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { it } from "vitest";
+import { getCrossLanguageDefinitionId } from "../../src/public-utils.js";
 import {
   AzureCoreTester,
   AzureCoreTesterWithService,
   createSdkContextForTester,
+  SimpleTester,
   SimpleTesterWithService,
 } from "../tester.js";
+
+it("resolves alternate type crossLanguageDefinitionId", async () => {
+  const { program, OriginalType, ReplacementType } = await SimpleTester.compile(t.code`
+    namespace TestService {
+      model ${t.model("ReplacementType")} {
+        value: string;
+      }
+
+      @alternateType(ReplacementType)
+      model ${t.model("OriginalType")} {
+        value: string;
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  strictEqual(
+    getCrossLanguageDefinitionId(context, OriginalType),
+    getCrossLanguageDefinitionId(context, ReplacementType),
+  );
+  strictEqual(getCrossLanguageDefinitionId(context, OriginalType), "TestService.ReplacementType");
+});
 
 it("parameter's crossLanguageDefinitionId", async () => {
   const { program } = await AzureCoreTesterWithService.compile(`

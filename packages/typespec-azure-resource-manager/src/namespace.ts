@@ -1,13 +1,13 @@
 import {
-  DecoratorContext,
-  Enum,
-  EnumMember,
-  EnumValue,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
+  type DecoratorContext,
+  type Enum,
+  type EnumMember,
+  type EnumValue,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
   addService,
   getNamespaceFullName,
 } from "@typespec/compiler";
@@ -16,7 +16,7 @@ import * as http from "@typespec/http";
 import { getAuthentication, setAuthentication } from "@typespec/http";
 import { unsafe_setRouteOptionsForNamespace as setRouteOptionsForNamespace } from "@typespec/http/experimental";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
-import {
+import type {
   ArmLibraryNamespaceDecorator,
   ArmProviderNamespaceDecorator,
   UseLibraryNamespaceDecorator,

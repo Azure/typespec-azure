@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { InitializedByFlags, SdkHeaderParameter } from "../../src/interfaces.js";
+import { InitializedByFlags, type SdkHeaderParameter } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";

@@ -60,19 +60,19 @@ export const scenarioTiers = {
       "Type_Union_Discriminated_NoEnvelope_CustomDiscriminator_get",
       "Type_Union_Discriminated_NoEnvelope_CustomDiscriminator_put",
 
-      // Pageable: ContinuationToken — skipped by Go, Java, JS (Python skips 1 of 6);
-      // custom continuation-token pagination; no ask in Azure yet (JS);
-      // Go tracks in https://github.com/Azure/autorest.go/issues/1494
+      // Pageable: ContinuationToken with header-based patterns — legacy Azure pattern
+      // (e.g., Cosmos DB x-ms-continuation); newer TypeSpec services use query+body instead
       "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestHeaderNestedResponseBody",
       "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestHeaderResponseBody",
       "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestHeaderResponseHeader",
-      "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestQueryNestedResponseBody",
-      "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestQueryResponseBody",
       "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestQueryResponseHeader",
+      "Payload_Pageable_ServerDrivenPagination_ContinuationToken_requestQueryNestedResponseBody",
+
+      // Pageable: nestedLink — no Azure service found using @nextLink in nested response
+      "Payload_Pageable_ServerDrivenPagination_nestedLink",
 
       // Pageable: AlternateInitialVerb — newly added (microsoft/typespec#9966);
-      // POST-based initial pagination request; no language has implemented this yet;
-      // fits the same pageable backlog pattern as ContinuationToken/link/PageSize
+      // POST-based initial pagination request; not yet broadly implemented
       "Payload_Pageable_ServerDrivenPagination_AlternateInitialVerb_post",
 
       // Azure AlternateType ExternalType — skipped by Go, Python, JS;
@@ -94,28 +94,6 @@ export const scenarioTiers = {
       // union-based auth selection; requires union support (Go); no ask in Azure yet (JS)
       "Authentication_Noauth_Union_validNoAuth",
       "Authentication_Noauth_Union_validToken",
-
-      // Pageable: Link-based pagination — skipped by Java, JS;
-      // nextLink-based pagination patterns; no ask in Azure yet (JS)
-      "Payload_Pageable_ServerDrivenPagination_link",
-      "Payload_Pageable_ServerDrivenPagination_linkString",
-      "Payload_Pageable_ServerDrivenPagination_nestedLink",
-
-      // Pageable: PageSize — skipped by Java, JS;
-      // page-size pagination; no ask in Azure yet (JS)
-      "Payload_Pageable_PageSize_listWithPageSize",
-      "Payload_Pageable_PageSize_listWithoutContinuation",
-
-      // Pageable: XML Pagination — skipped by Go, Java;
-      // XML-based pagination support incomplete in both emitters
-      "Payload_Pageable_XmlPagination_listWithContinuation",
-      "Payload_Pageable_XmlPagination_listWithNextLink",
-
-      // Response StatusCodeRange — skipped by Go, JS;
-      // status code range error handling; no ask in Azure yet (JS);
-      // Go tracks in https://github.com/Azure/autorest.go/issues/1606
-      "Response_StatusCodeRange_errorResponseStatusCodeInRange",
-      "Response_StatusCodeRange_errorResponseStatusCode404",
 
       // Type File Body — skipped by Python, JS;
       // file upload/download with specific content types; no real case received (JS)

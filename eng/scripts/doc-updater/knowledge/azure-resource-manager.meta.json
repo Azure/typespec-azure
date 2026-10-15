@@ -1,6 +1,6 @@
 {
-  "lastCommit": "c28b4645003e1b948275b7c2854911dd09d800c8",
-  "lastUpdated": "2026-04-29T04:58:33.314Z",
+  "lastCommit": "d67af1fc629e6f4787545a007ddcedb52daac040",
+  "lastUpdated": "2026-10-05T09:32:49.860Z",
   "analyzedPaths": [
     "packages/typespec-azure-resource-manager/src",
     "packages/typespec-azure-resource-manager/lib",

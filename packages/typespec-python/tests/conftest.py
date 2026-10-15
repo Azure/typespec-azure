@@ -15,9 +15,9 @@ import importlib
 from pathlib import Path
 from filelock import FileLock
 
-# Root of the typespec-python package
+# Root of the http-client-python package
 ROOT = Path(__file__).parent.parent
-DATA_FOLDER = Path(__file__).parent / "data"
+DATA_FOLDER = Path(__file__).parent / "mock_api" / "shared"
 
 # Server configuration
 SERVER_HOST = "localhost"
@@ -25,12 +25,8 @@ SERVER_PORT = 3000
 SERVER_URL = f"http://{SERVER_HOST}:{SERVER_PORT}"
 
 # Lock file for coordinating server startup across xdist workers
-LOCK_FILE = Path(tempfile.gettempdir()) / "typespec_python_test_server.lock"
-PID_FILE = Path(tempfile.gettempdir()) / "typespec_python_test_server.pid"
-
-# Global server process reference (used by hooks)
-_server_process = None
-_owns_server = False  # Track if this process started the server
+LOCK_FILE = Path(tempfile.gettempdir()) / "http_client_python_test_server.lock"
+PID_FILE = Path(tempfile.gettempdir()) / "http_client_python_test_server.pid"
 
 
 def wait_for_server(url: str, timeout: int = 60, interval: float = 0.5) -> bool:
@@ -50,23 +46,20 @@ def wait_for_server(url: str, timeout: int = 60, interval: float = 0.5) -> bool:
 
 
 def start_server_process():
-    """Start the tsp-spector mock API server."""
+    """Start the tsp-spector mock API server.
+
+    Always serves both azure-http-specs and http-specs regardless of flavor.
+    This allows azure and unbranded tests to run in parallel using the same server.
+    """
     azure_http_path = ROOT / "node_modules/@azure-tools/azure-http-specs"
     http_path = ROOT / "node_modules/@typespec/http-specs"
 
-    # Determine flavor from environment or current directory
-    flavor = os.environ.get("FLAVOR", "azure")
-
+    # Always serve both spec sets so azure and unbranded tests can run in parallel
     # Use absolute paths with forward slashes (works on all platforms including Windows)
-    if flavor == "unbranded":
-        cwd = http_path.resolve()
-        specs_path = str(cwd / "specs").replace("\\", "/")
-        cmd = f"npx tsp-spector serve {specs_path}"
-    else:
-        cwd = azure_http_path.resolve()
-        azure_specs = str(cwd / "specs").replace("\\", "/")
-        http_specs = str((http_path / "specs").resolve()).replace("\\", "/")
-        cmd = f"npx tsp-spector serve {azure_specs} {http_specs}"
+    cwd = azure_http_path.resolve()
+    azure_specs = str(cwd / "specs").replace("\\", "/")
+    http_specs = str((http_path / "specs").resolve()).replace("\\", "/")
+    cmd = f"npx tsp-spector serve {azure_specs} {http_specs}"
 
     # Add node_modules/.bin to PATH
     env = os.environ.copy()
@@ -103,91 +96,90 @@ def terminate_server_process(process):
             pass
 
 
-def pytest_configure(config):
-    """Start the mock server before any tests run.
+def graceful_stop_server(timeout: float = 30.0) -> None:
+    """Gracefully stop the mock server so it writes its coverage file.
 
-    Uses file locking to ensure only one process starts the server,
-    even when running with pytest-xdist. The controller process starts
-    the server and workers wait for it to be ready.
+    The tsp-spector server only persists spec-coverage.json from its process
+    ``exit`` handler, which is triggered by the ``tsp-spector server stop``
+    command (it posts to the ``/.admin/stop`` admin endpoint and the server then
+    calls ``process.exit(0)``). A hard kill of the process skips that handler and
+    leaves no coverage file. Stopping the server via the CLI here lets coverage
+    be written by the test run itself, so no extra pipeline step is required to
+    flush coverage before uploading it.
     """
-    global _server_process, _owns_server
-
-    # Check if server is already running (e.g., from a previous run or external process)
-    if wait_for_server(SERVER_URL, timeout=1, interval=0.1):
-        print(f"Mock API server already running at {SERVER_URL}")
+    env = os.environ.copy()
+    node_bin = str(ROOT / "node_modules" / ".bin")
+    env["PATH"] = f"{node_bin}{os.pathsep}{env.get('PATH', '')}"
+    try:
+        subprocess.run(
+            f"npx tsp-spector server stop --port {SERVER_PORT}",
+            shell=True,
+            cwd=str(ROOT),
+            env=env,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+    except Exception:
+        # Server already stopped or never started — nothing to do.
         return
 
-    # Use file lock to ensure only one process starts the server
-    # This handles both xdist workers and multiple test runs
-    lock = FileLock(str(LOCK_FILE), timeout=120)
-
-    try:
-        with lock:
-            # Double-check after acquiring lock (another process may have started it)
-            if wait_for_server(SERVER_URL, timeout=1, interval=0.1):
-                print(f"Mock API server already running at {SERVER_URL}")
-                return
-
-            # We're the first process - start the server
-            print(f"Starting mock API server...")
-            _server_process = start_server_process()
-            _owns_server = True
-
-            # Check if process started successfully
-            if _server_process.poll() is not None:
-                pytest.exit(f"Mock API server process exited immediately with code {_server_process.returncode}")
-
-            # Write PID file so other processes know who owns the server
-            PID_FILE.write_text(str(_server_process.pid))
-
-            # Wait for server to be ready
-            if not wait_for_server(SERVER_URL, timeout=60):
-                if _server_process.poll() is not None:
-                    pytest.exit(f"Mock API server process died with code {_server_process.returncode}")
-                terminate_server_process(_server_process)
-                _server_process = None
-                _owns_server = False
-                pytest.exit(f"Mock API server failed to start within 60 seconds at {SERVER_URL}")
-
-            print(f"Mock API server ready at {SERVER_URL}")
-
-    except TimeoutError:
-        # Another process is holding the lock for too long
-        # Check if server is available anyway
-        if wait_for_server(SERVER_URL, timeout=5):
-            print(f"Mock API server available at {SERVER_URL} (started by another process)")
-        else:
-            pytest.exit("Timeout waiting for server lock - another process may be stuck")
+    # Coverage is written synchronously in the server's exit handler. Wait until
+    # the server is no longer reachable to ensure the file is flushed to disk.
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            urllib.request.urlopen(SERVER_URL, timeout=1)
+        except urllib.error.HTTPError:
+            pass  # Server up but returned an error response — still running.
+        except (urllib.error.URLError, OSError):
+            return  # Server is down — coverage has been flushed.
+        time.sleep(0.3)
 
 
 def pytest_unconfigure(config):
-    """Stop the mock server after all tests complete."""
-    global _server_process, _owns_server
+    """Stop the shared mock server once the whole test session is finished.
 
-    # Only stop the server if this process started it
-    if not _owns_server:
-        return
-
-    terminate_server_process(_server_process)
-    _server_process = None
-    _owns_server = False
-
-    # Clean up PID file
-    try:
-        PID_FILE.unlink(missing_ok=True)
-    except Exception:
-        pass
+    Under pytest-xdist the server must outlive individual workers (which may
+    finish at different times), so it is intentionally not stopped in the
+    session-scoped fixture teardown. This hook runs after all workers complete:
+    only the controller process (no ``workerinput``) gracefully stops the
+    server so the coverage file is written.
+    """
+    if hasattr(config, "workerinput"):
+        return  # xdist worker — leave the shared server running for others.
+    graceful_stop_server()
 
 
 @pytest.fixture(scope="session", autouse=True)
-def testserver(request):
-    """Ensure the mock server is ready before tests run.
+def testserver():
+    """Start the mock API server, coordinated across xdist workers via file lock.
 
-    The server is started in pytest_configure (controller process).
-    This fixture just verifies the server is accessible from workers.
+    The first process to acquire the lock starts the server; others wait for it.
+    The server is intentionally NOT killed in teardown — with xdist, the owning
+    worker may finish before others, killing the server prematurely. The server
+    is cleaned up when the tox/parent process exits.
     """
+    # Check if server is already running
+    if not wait_for_server(SERVER_URL, timeout=1, interval=0.1):
+        lock = FileLock(str(LOCK_FILE), timeout=120)
+        try:
+            with lock:
+                # Double-check after acquiring lock
+                if not wait_for_server(SERVER_URL, timeout=1, interval=0.1):
+                    server = start_server_process()
+                    PID_FILE.write_text(str(server.pid))
+                    if not wait_for_server(SERVER_URL, timeout=60):
+                        terminate_server_process(server)
+                        pytest.fail(f"Mock API server failed to start at {SERVER_URL}")
+        except TimeoutError:
+            if not wait_for_server(SERVER_URL, timeout=5):
+                pytest.fail("Timeout waiting for server lock")
+
+    # Final check that server is reachable
     if not wait_for_server(SERVER_URL, timeout=30):
         pytest.fail(f"Mock API server not available at {SERVER_URL}")
+
     yield
 
 
@@ -212,12 +204,12 @@ def key_credential(core_library):
 @pytest.fixture
 def png_data() -> bytes:
     """Load PNG test data."""
-    with open(str(DATA_FOLDER / "image.png"), "rb") as file_in:
+    with open(str(DATA_FOLDER / "data/image.png"), "rb") as file_in:
         return file_in.read()
 
 
 @pytest.fixture
 def jpg_data() -> bytes:
     """Load JPG test data."""
-    with open(str(DATA_FOLDER / "image.jpg"), "rb") as file_in:
+    with open(str(DATA_FOLDER / "data/image.jpg"), "rb") as file_in:
         return file_in.read()

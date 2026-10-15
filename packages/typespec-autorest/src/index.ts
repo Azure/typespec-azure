@@ -1,6 +1,6 @@
 export * from "./decorators.js";
 export { $onEmit, getAllServicesAtAllVersions, resolveAutorestOptions } from "./emit.js";
-export { $lib, AutorestEmitterOptions } from "./lib.js";
+export { $lib, type AutorestEmitterOptions } from "./lib.js";
 export {
   getOpenAPIForService,
   sortOpenAPIDocument,

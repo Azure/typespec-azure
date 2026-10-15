@@ -30,7 +30,7 @@ namespace Azure.ResourceManager.CommonTypes;
   "privatelinks.json"
 );
 
-/** The private endpoint resource */
+/** The private link resource */
 @@armCommonDefinition(
   PrivateLinkResource,
   "PrivateLinkResource",

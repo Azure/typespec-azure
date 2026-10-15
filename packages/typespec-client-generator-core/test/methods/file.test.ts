@@ -437,9 +437,14 @@ it("file upload with multiple content types should have enum contentType header"
   strictEqual(contentTypeHeader.type.kind, "enum");
   strictEqual(contentTypeHeader.type.name, "UploadFileMultipleContentTypesContentType");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
+  // The synthesized contentType parameter and the File model's contentType property
+  // must reference the same enum instance, and that enum must be present in
+  // `sdkPackage.enums`.
+  strictEqual(sdkPackage.enums.includes(contentTypeMethodParam.type), true);
+  strictEqual(contentTypeMethodParam.type, contentTypeHeader.type);
 });
 
-it("file upload with default content type should have constant contentType header", async () => {
+it("file upload with default content type should have optional string contentType header", async () => {
   const { program } = await SimpleTester.compile(
     `
       @service
@@ -452,22 +457,22 @@ it("file upload with default content type should have constant contentType heade
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "uploadFileDefault");
-  // The contentType method parameter should be constant since */* is a single content type
+  // A file without an explicit content type defaults to application/octet-stream.
   const contentTypeMethodParam = method.parameters.find((p) => p.name === "contentType");
   ok(contentTypeMethodParam);
-  strictEqual(contentTypeMethodParam.type.kind, "constant");
-  strictEqual(contentTypeMethodParam.type.value, "*/*");
-  strictEqual(contentTypeMethodParam.type.name, "UploadFileDefaultContentType");
-  // The Content-Type header should also be constant
+  strictEqual(contentTypeMethodParam.type.kind, "string");
+  strictEqual(contentTypeMethodParam.optional, true);
+  strictEqual(contentTypeMethodParam.clientDefaultValue, "application/octet-stream");
+  // The Content-Type header should also be an optional string with the same default.
   const httpOperation = method.operation;
   const contentTypeHeader = httpOperation.parameters.find(
     (p) => p.kind === "header" && p.name === "contentType",
   );
   ok(contentTypeHeader);
-  strictEqual(contentTypeHeader.type.kind, "constant");
+  strictEqual(contentTypeHeader.type.kind, "string");
   strictEqual(contentTypeHeader.serializedName, "Content-Type");
-  strictEqual(contentTypeHeader.type.value, "*/*");
-  strictEqual(contentTypeHeader.type.name, "UploadFileDefaultContentType");
+  strictEqual(contentTypeHeader.optional, true);
+  strictEqual(contentTypeHeader.clientDefaultValue, "application/octet-stream");
 });
 
 it("file download with default content type should have constant accept header", async () => {

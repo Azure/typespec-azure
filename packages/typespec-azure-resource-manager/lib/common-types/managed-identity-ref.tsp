@@ -53,7 +53,7 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /**
- * The properties of the service-assigned identity associated with this resource.
+ * The properties of the system-assigned identity associated with this resource.
  */
 @@armCommonDefinition(
   SystemAssignedServiceIdentity,

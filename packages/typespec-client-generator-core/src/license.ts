@@ -1,4 +1,4 @@
-import { LicenseInfo, TCGCContext } from "./interfaces.js";
+import type { LicenseInfo, TCGCContext } from "./interfaces.js";
 
 export const licenseMap: { [key: string]: LicenseInfo } = {
   "MIT License": {

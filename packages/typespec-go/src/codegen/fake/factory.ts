@@ -1,0 +1,94 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+import * as go from "../../codemodel/index.js";
+import * as helpers from "../core/helpers.js";
+import { ImportManager } from "../core/imports.js";
+import { getServerName } from "./servers.js";
+
+/**
+ * Generates the contents for the *_server_factory.go file.
+ *
+ * @param pkg contains the package content
+ * @param target the codegen target for the module
+ * @returns the text for the file or the empty string
+ */
+export function generateServerFactory(pkg: go.FakePackage, target: go.CodeModelType): string {
+  // generate server factory only for ARM
+  if (target !== "azure-arm" || pkg.parent.clients.length === 0) {
+    return "";
+  }
+
+  const imports = new ImportManager(pkg);
+  const indent = new helpers.Indentation();
+
+  imports.add("errors");
+  imports.add("fmt");
+  imports.add("net/http");
+  imports.add("strings");
+  imports.add("sync");
+  imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
+
+  let text = helpers.contentPreamble(pkg);
+  text += imports.text();
+
+  const clientPkgName = go.getPackageName(pkg.parent);
+  text += `// ServerFactory is a fake server for instances of the ${clientPkgName}.ClientFactory type.\n`;
+  text += "type ServerFactory struct {\n";
+
+  // add server transports for client accessors
+  // we might remove some clients from the list
+  const finalSubClients = new Array<go.Client>();
+  for (const client of pkg.parent.clients) {
+    if (client.clientAccessors.length === 0 && helpers.clientHasNoExportedMethods(client)) {
+      // client has no client accessors and no exported methods, skip it
+      continue;
+    }
+    const serverName = getServerName(client);
+    text += `${indent.get()}// ${serverName} contains the fakes for client ${client.name}\n`;
+    text += `${indent.get()}${serverName} ${serverName}\n\n`;
+    finalSubClients.push(client);
+  }
+  text += "}\n\n";
+
+  text +=
+    "// NewServerFactoryTransport creates a new instance of ServerFactoryTransport with the provided implementation.\n";
+  text += `// The returned ServerFactoryTransport instance is connected to an instance of ${clientPkgName}.ClientFactory via the\n`;
+  text += "// azcore.ClientOptions.Transporter field in the client's constructor parameters.\n";
+  text += "func NewServerFactoryTransport(srv *ServerFactory) *ServerFactoryTransport {\n";
+  text += `${indent.get()}return &ServerFactoryTransport{\n${indent.push().get()}srv: srv,\n${indent.pop().get()}}\n}\n\n`;
+
+  text += `// ServerFactoryTransport connects instances of ${clientPkgName}.ClientFactory to instances of ServerFactory.\n`;
+  text += "// Don't use this type directly, use NewServerFactoryTransport instead.\n";
+  text += "type ServerFactoryTransport struct {\n";
+  text += `${indent.get()}srv *ServerFactory\n`;
+  text += `${indent.get()}trMu sync.Mutex\n`;
+  for (const client of finalSubClients) {
+    const serverName = getServerName(client);
+    text += `${indent.get()}tr${serverName} *${serverName}Transport\n`;
+  }
+  text += "}\n\n";
+
+  text += "// Do implements the policy.Transporter interface for ServerFactoryTransport.\n";
+  text += "func (s *ServerFactoryTransport) Do(req *http.Request) (*http.Response, error) {\n";
+  text += `${indent.get()}rawMethod := req.Context().Value(runtime.CtxAPINameKey{})\n`;
+  text += `${indent.get()}method, ok := rawMethod.(string)\n`;
+  text += `${indent.get()}if !ok {\n${indent.push().get()}return nil, nonRetriableError{errors.New("unable to dispatch request, missing value for CtxAPINameKey")}\n${indent.pop().get()}}\n\n`;
+  text += `${indent.get()}client := method[:strings.Index(method, ".")]\n`;
+  text += `${indent.get()}var resp *http.Response\n${indent.get()}var err error\n\n`;
+  text += `${indent.get()}switch client {\n`;
+  for (const client of finalSubClients) {
+    text += `${indent.get()}case "${client.name}":\n`;
+    const serverName = getServerName(client);
+    text += `${indent.push().get()}initServer(&s.trMu, &s.tr${serverName}, func() *${serverName}Transport { return New${serverName}Transport(&s.srv.${serverName}) })\n`;
+    text += `${indent.get()}resp, err = s.tr${serverName}.Do(req)\n`;
+    indent.pop();
+  }
+  text += `${indent.get()}default:\n${indent.push().get()}err = fmt.Errorf("unhandled client %s", client)\n`;
+  text += `${indent.pop().get()}}\n\n`;
+  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n\n`;
+  text += `${indent.get()}return resp, nil\n}\n\n`;
+  return text;
+}

@@ -1,14 +1,16 @@
 import {
-  CodeFix,
+  type CodeFix,
   createAddDecoratorCodeFix,
   createRule,
+  fileRef,
   listServices,
-  Namespace,
+  type Namespace,
   paramMessage,
 } from "@typespec/compiler";
 import { getVersion } from "@typespec/versioning";
 export const requireVersionedRule = createRule({
   name: "require-versioned",
+  docs: fileRef.fromPackageRoot("src/rules/require-versioned.md"),
   description: "Azure services should use the versioning library.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/require-versioned",

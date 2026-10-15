@@ -1,6 +1,6 @@
 import { AzureCoreStateKeys } from "./lib.js";
 
-import { DecoratorContext, Model, ModelProperty, Program, Type } from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Program, Type } from "@typespec/compiler";
 import { getUniqueItems } from "./decorators/unique-items.js";
 
 export const $requestParameter = (context: DecoratorContext, entity: Model, name: string) => {

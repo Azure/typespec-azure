@@ -1,5 +1,6 @@
 export const namespace = "Azure.ResourceManager";
 
+export type { ArmFeatureFileOptions } from "../generated-defs/Azure.ResourceManager.js";
 export type { ArmFeatureOptions } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 export {
   $armCommonTypesVersion,
@@ -19,6 +20,7 @@ export * from "./resource.js";
 export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
+export { getAzureBaseTypes, setAzureBaseTypes, type AzureBaseTypeInfo } from "./base-types.js";
 export { getInlineAzureType } from "./commontypes.private.decorators.js";
 export { isAzureResource } from "./private.decorators.js";
 

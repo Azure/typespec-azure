@@ -6,6 +6,7 @@ namespace Azure.ResourceManager.CommonTypes;
 /** Managed service identity (system assigned and/or user assigned identities and/or delegated identities) - internal use only. */
 @added(Versions.v4)
 model ManagedServiceIdentityWithDelegation extends ManagedServiceIdentity {
+  /** The delegated resources of the identity - internal use only. */
   delegatedResources?: DelegatedResources;
 }
 

@@ -21,4 +21,5 @@ allowedPaths:
   - website/src/content/docs/docs/libraries/azure-resource-manager/
   - packages/typespec-azure-resource-manager/lib/
   - eng/scripts/doc-updater/knowledge/
+  - .chronus/changes/
   - cspell.yaml

@@ -1,7 +1,7 @@
-import { LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { Diagnostic, Model, Program } from "@typespec/compiler";
+import { type LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
+import type { Diagnostic, Model, Program } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { HttpOperation, getAllHttpServices } from "@typespec/http";
+import { type HttpOperation, getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
 import { Tester } from "./tester.js";

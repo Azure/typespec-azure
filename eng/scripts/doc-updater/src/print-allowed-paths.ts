@@ -6,10 +6,10 @@
  * or root-level node module resolution.
  *
  * Usage:
- *   npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>
+ *   node eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>
  */
 
-import { loadConfig } from "./config.js";
+import { loadConfig } from "./config.ts";
 
 function parseArgs(): { config: string } {
   const args = process.argv.slice(2);
@@ -22,9 +22,7 @@ function parseArgs(): { config: string } {
   }
 
   if (!config) {
-    console.error(
-      "Usage: npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>",
-    );
+    console.error("Usage: node eng/scripts/doc-updater/src/print-allowed-paths.ts --config <name>");
     process.exit(1);
   }
 

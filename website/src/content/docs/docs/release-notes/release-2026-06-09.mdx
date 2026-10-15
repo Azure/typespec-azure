@@ -1,0 +1,43 @@
+---
+title: 0.69.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.12"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/release-notes/typespec-1-12-0/"
+/>
+
+# 0.69.0
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#4190](https://github.com/Azure/typespec-azure/pull/4190) Added `skip-example-copying` emitter option. When enabled, example files are not copied to the output directory and `x-ms-examples` `$ref` values point directly to the source example files via relative paths.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+- [#4530](https://github.com/Azure/typespec-azure/pull/4530) Add optional `Tag` template parameter to `Azure.ResourceManager.Legacy.Operations` to allow overriding the openapi tag value.
+
+### @azure-tools/typespec-azure-rulesets
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#4549](https://github.com/Azure/typespec-azure/pull/4549) Fix custom auth scheme models leaking into `definitions` when declared inside the service namespace. They are now emitted only under `securityDefinitions` as expected.
+- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there is no examples emitted for parameters.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4433](https://github.com/Azure/typespec-azure/pull/4433) Fix doc comment typos in ARM library: list operations incorrectly said "patched", CreateOrReplace operations said "createOrUpdate", extension operations had `>` instead of `.`, and @doc tag had malformed string interpolation.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#4567](https://github.com/Azure/typespec-azure/pull/4567) Move internal `EXACT_NAME_PREFIX` constant out of public exports to fix build failures when `skipLibCheck` is disabled.

@@ -94,7 +94,7 @@ interface ExtensionOperations<
 
   /**
    * A long-running resource Update (PATCH)
-   * @template Resource the resource being created or updated
+   * @template Resource the resource being updated
    * @template PatchModel the PATCH request model
    * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
    * @template Parameters Optional. Additional parameters after the path parameters
@@ -134,7 +134,7 @@ interface ExtensionOperations<
 
   /**
    * A synchronous resource Update (PATCH)
-   * @template Resource the resource being created or updated
+   * @template Resource the resource being updated
    * @template PatchModel the PATCH request model
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PATCH operation
@@ -215,7 +215,7 @@ interface ExtensionOperations<
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
-   * @dev Get a resource
+   * Get a resource
    * @template Resource The resource being read
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.

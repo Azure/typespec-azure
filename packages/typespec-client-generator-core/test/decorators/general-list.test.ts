@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SdkEnumValueType } from "../../src/interfaces.js";
+import type { SdkEnumValueType } from "../../src/interfaces.js";
 import {
   AzureCoreTesterWithService,
   createSdkContextForTester,
@@ -369,6 +369,41 @@ describe("azure scenario", () => {
         },
       },
     ]);
+  });
+
+  it("does not resolve model arguments for decorators other than @clientOption", async function () {
+    const { program } = await AzureCoreTesterWithService.compile(`
+      model FinalResult {
+        value: string;
+      }
+
+      model Response {
+        @Azure.Core.finalLocation(FinalResult)
+        location: string;
+      }
+
+      op test(): Response;
+    `);
+
+    const context = await createSdkContextForTester(
+      program,
+      {},
+      { additionalDecorators: ["Azure\\.Core\\.@finalLocation"] },
+    );
+
+    const response = context.sdkPackage.models.find((model) => model.name === "Response");
+    ok(response);
+    deepStrictEqual(response.properties[0].decorators, [
+      {
+        name: "Azure.Core.@finalLocation",
+        arguments: {
+          finalResult: undefined,
+        },
+      },
+    ]);
+    expectDiagnostics(context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/unsupported-generic-decorator-arg-type",
+    });
   });
 });
 

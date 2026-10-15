@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/Azure/azure-rest-api-specs.git",
+  "ref": "main",
+  "path": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+  "checkoutPath": "specification/network/resource-manager/Microsoft.Network/Network"
+}

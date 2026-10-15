@@ -1,26 +1,29 @@
-import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { type UnionEnum, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
-  BooleanLiteral,
-  Diagnostic,
-  EncodeData,
-  Enum,
-  EnumMember,
-  IntrinsicScalarName,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Namespace,
-  NumericLiteral,
-  Operation,
-  Scalar,
-  StringLiteral,
-  Tuple,
-  Type,
-  Union,
+  type BooleanLiteral,
+  type Diagnostic,
+  type EncodeData,
+  type Enum,
+  type EnumMember,
+  type IntrinsicScalarName,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type NumericLiteral,
+  type Operation,
+  type Program,
+  type Scalar,
+  type StringLiteral,
+  type Tuple,
+  type Type,
+  type Union,
+  compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
+  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -30,11 +33,13 @@ import {
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
-  Authentication,
-  HttpOperationFileBody,
-  HttpOperationMultipartBody,
-  HttpPayloadBody,
+  type Authentication,
+  type HttpOperationFileBody,
+  type HttpOperationMultipartBody,
+  type HttpPayloadBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -62,35 +67,35 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
-  AccessFlags,
-  ArrayKnownEncoding,
-  SdkArrayType,
-  SdkBuiltInKinds,
-  SdkBuiltInType,
-  SdkClientType,
-  SdkConstantType,
-  SdkCredentialParameter,
-  SdkCredentialType,
-  SdkDateTimeType,
-  SdkDictionaryType,
-  SdkDurationType,
-  SdkEnumType,
-  SdkEnumValueType,
-  SdkHeaderParameter,
-  SdkHttpOperation,
-  SdkModelPropertyType,
-  SdkModelPropertyTypeBase,
-  SdkModelType,
-  SdkNullableType,
-  SdkTupleType,
-  SdkType,
-  SdkUnionType,
-  TCGCContext,
+  type AccessFlags,
+  type ArrayKnownEncoding,
+  type SdkArrayType,
+  type SdkBuiltInKinds,
+  type SdkBuiltInType,
+  type SdkClientType,
+  type SdkConstantType,
+  type SdkCredentialParameter,
+  type SdkCredentialType,
+  type SdkDateTimeType,
+  type SdkDictionaryType,
+  type SdkDurationType,
+  type SdkEnumType,
+  type SdkEnumValueType,
+  type SdkHeaderParameter,
+  type SdkHttpOperation,
+  type SdkModelPropertyType,
+  type SdkModelPropertyTypeBase,
+  type SdkModelType,
+  type SdkNullableType,
+  type SdkTupleType,
+  type SdkType,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
-  ContextNode,
+  type ContextNode,
   createGeneratedName,
   filterPreviewVersion,
   getAvailableApiVersions,
@@ -111,6 +116,7 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -217,17 +223,30 @@ export function addEncodeInfo(
       // for model property bytes with specific content type, will change to bytes for non-text content type
       innerType.encode = "bytes";
     }
+    if (encodeData?.type) {
+      innerType.wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
+    }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (
+    isSdkIntKind(innerType.kind) ||
+    innerType.kind === "boolean" ||
+    innerType.kind === "string" ||
+    innerType.kind === "url"
+  ) {
+    // built-in types can be encoded as other types (e.g., string encoded as int32, int encoded as string)
+    const builtInType = innerType as SdkBuiltInType;
     if (encodeData) {
       if (encodeData?.encoding) {
-        (innerType as any).encode = encodeData.encoding;
+        builtInType.encode = encodeData.encoding;
       }
       if (encodeData?.type) {
+        const wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
         // if we specify the encoding type in the decorator, we set the `.encode` string
-        // to the kind of the encoding type
-        (innerType as any).encode = getSdkBuiltInType(context, encodeData.type).kind;
+        // to the kind of the encoding type when there's no explicit encoding name
+        if (!encodeData.encoding) {
+          builtInType.encode = wireType.kind;
+        }
+        builtInType.wireType = wireType;
       }
     }
   }
@@ -655,6 +674,19 @@ export function getSdkUnionWithDiagnostics(
         }
       }
     }
+
+    const sdkUnionType =
+      retval?.kind === "union"
+        ? retval
+        : retval?.kind === "nullable" && retval.type.kind === "union"
+          ? retval.type
+          : undefined;
+    const baseType = type.baseType;
+    if (sdkUnionType && baseType) {
+      sdkUnionType.baseType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, baseType, operation),
+      );
+    }
   }
 
   return diagnostics.wrap(retval);
@@ -755,42 +787,31 @@ function addDiscriminatorToModelType(
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
-            if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-constant",
-                  target: childModel,
-                  format: { discriminator: property.name },
-                }),
-              );
-            } else if (typeof property.type.value !== "string") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-string",
-                  target: type,
-                  format: {
-                    discriminator: property.name,
-                    discriminatorValue: String(property.type.value),
-                  },
-                }),
-              );
-            } else {
-              // map string value type to enum value type
-              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
-                for (const value of discriminatorType.values) {
-                  if (value.value === property.type.value) {
-                    property.type = value;
-                  }
+            compilerAssert(
+              property.type.kind === "constant" || property.type.kind === "enumvalue",
+              `Discriminator "${property.name}" has to be constant`,
+              childModel,
+            );
+            compilerAssert(
+              typeof property.type.value === "string",
+              `Value of discriminator "${property.name}" has to be a string`,
+              type,
+            );
+            // map string value type to enum value type
+            if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+              for (const value of discriminatorType.values) {
+                if (value.value === property.type.value) {
+                  property.type = value;
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
-              property.discriminator = true;
-              if (model.discriminatedSubtypes === undefined) {
-                model.discriminatedSubtypes = {};
-              }
-              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
-              discriminatorProperty = property;
             }
+            childModelSdkType.discriminatorValue = property.type.value as string;
+            property.discriminator = true;
+            if (model.discriminatedSubtypes === undefined) {
+              model.discriminatedSubtypes = {};
+            }
+            model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
+            discriminatorProperty = property;
           }
         }
       }
@@ -819,6 +840,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -832,6 +854,7 @@ function addDiscriminatorToModelType(
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
@@ -935,8 +958,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models
@@ -1018,6 +1040,7 @@ function getSdkEnumValueWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
+    isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
     enumType,
     valueType: enumType.valueType,
@@ -1081,6 +1104,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
+      isExactName: isExactClientName(context, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,
@@ -1405,7 +1429,9 @@ export function getSdkModelPropertyType(
       kind: "property",
       optional: type.optional,
       discriminator: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside serializationOptions
       serializedName: getPropertyNames(context, type)[1],
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside multipartOptions
       isMultipartFileInput: false,
       serializationOptions: {},
     };
@@ -1535,6 +1561,66 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
+/**
+ * Infers the default content type for an event type, mirroring the HTTP lib behavior:
+ * - Models → "application/json"
+ * - Scalars → "text/plain"
+ * - Literals/constants → undefined (no serialization needed)
+ */
+function inferEventContentType(program: Program, type: Type): string | undefined {
+  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
+  const hint = getMediaTypeHint(program, type);
+  if (hint) return hint;
+  if (type.kind === "Model") return "application/json";
+  if (type.kind === "Scalar") return "text/plain";
+  return undefined;
+}
+
+/**
+ * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
+ * `payloadType` based on their per-event content type. When no explicit content type is set,
+ * infers a default using the same logic as the HTTP lib (model → application/json,
+ * scalar → text/plain).
+ */
+function propagateSseEventUsage(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return;
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  for (const event of eventDefinitions) {
+    const effectiveContentType =
+      event.contentType ?? inferEventContentType(context.program, event.type);
+    const effectivePayloadContentType =
+      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType);
+
+    if (effectiveContentType) {
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.type, operation),
+      );
+      if (isMediaTypeJson(effectiveContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      }
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, [effectiveContentType]));
+    }
+    if (effectivePayloadContentType) {
+      const sdkPayloadType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.payloadType, operation),
+      );
+      if (isMediaTypeJson(effectivePayloadContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      }
+      diagnostics.pipe(
+        updateSerializationOptions(context, sdkPayloadType, [effectivePayloadContentType]),
+      );
+    }
+  }
+}
+
 export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
@@ -1617,6 +1703,12 @@ export function updateUsageOrAccess(
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
+    }
+    if (type.baseType) {
+      // A constraint must not pull in unrelated discriminated subtypes.
+      options.ignoreSubTypeStack.push(true);
+      diagnostics.pipe(updateUsageOrAccess(context, value, type.baseType, options));
+      options.ignoreSubTypeStack.pop();
     }
     return diagnostics.wrap(undefined);
   }
@@ -1720,6 +1812,23 @@ function updateTypesFromOperation(
       // Otherwise use the body type directly
       const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
       const bodyType = getHttpBodyType(httpBody);
+      // For file bodies with multiple content types, pre-warm the cache for the
+      // `contentType` property's union under the operation naming context so that
+      // the resulting SdkEnumType is named after the operation (e.g.
+      // `UploadFileMultipleContentTypesContentType`) and is the same instance later
+      // reused by both the File model's `contentType` property and the synthetic
+      // `contentType` header parameter created in `createContentTypeOrAcceptHeader`.
+      if (
+        httpBody.bodyKind === "file" &&
+        httpBody.contentTypes.length > 1 &&
+        httpBody.contentTypeProperty.type.kind === "Union"
+      ) {
+        pushNamingContext(context, "ContentType", undefined);
+        diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, httpBody.contentTypeProperty.type, operation),
+        );
+        popNamingContext(context);
+      }
       // For named unions, pass undefined so anonymous types inside get named relative
       // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
       const bodyContextType =
@@ -1757,7 +1866,16 @@ function updateTypesFromOperation(
         }
 
         // add serialization options to model type
-        updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
+        diagnostics.pipe(
+          updateSerializationOptions(
+            context,
+            sdkType,
+            httpBody.contentTypes,
+            undefined,
+            httpBody,
+            operation,
+          ),
+        );
 
         // after completion of usage calculation for httpBody, check whether it has
         // conflicting usage between multipart and regular body
@@ -1794,6 +1912,8 @@ function updateTypesFromOperation(
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      // Propagate Json usage to individual SSE event types based on per-event content type
+      propagateSseEventUsage(context, requestStreamMeta.streamType, operation, diagnostics);
     }
 
     // Push "Parameter" context for operation parameters
@@ -1833,7 +1953,7 @@ function updateTypesFromOperation(
     }
     popNamingContext(context);
 
-    const lroMetaData = getLroMetadata(program, operation);
+    const lroMetaData = getRawLroMetadata(program, operation);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -1899,12 +2019,15 @@ function updateTypesFromOperation(
             }
 
             // add serialization options to model type
-            updateSerializationOptions(
-              context,
-              sdkType,
-              innerResponse.body.contentTypes,
-              undefined,
-              innerResponse.body,
+            diagnostics.pipe(
+              updateSerializationOptions(
+                context,
+                sdkType,
+                innerResponse.body.contentTypes,
+                undefined,
+                innerResponse.body,
+                operation,
+              ),
             );
           }
           const access = getAccessOverride(context, operation) ?? "public";
@@ -1922,6 +2045,8 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+          // Propagate Json usage to individual SSE event types based on per-event content type
+          propagateSseEventUsage(context, responseStreamMeta.streamType, operation, diagnostics);
         }
       }
     }
@@ -2110,6 +2235,11 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
         currBaseModel = currBaseModel.baseModel;
       }
 
+      // Propagate serialization options to the newly added subtype.
+      // This is needed because updateSerializationOptions may have already run
+      // on the parent model before this subtype was added to discriminatedSubtypes.
+      propagateSerializationToSubtype(context, sdkType);
+
       // Filter out legacy hierarchy building properties
       sdkType.properties = sdkType.properties.filter((property) => {
         return (
@@ -2119,6 +2249,31 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+/**
+ * Propagate serialization options from a parent model to a newly added subtype.
+ * This handles the case where updateSerializationOptions already ran on the parent
+ * before the subtype was added via @hierarchyBuilding.
+ */
+function propagateSerializationToSubtype(context: TCGCContext, sdkType: SdkModelType): void {
+  // Find the nearest ancestor with serialization options to determine content types
+  let ancestor: SdkModelType | undefined = sdkType.baseModel;
+  const contentTypes: string[] = [];
+  while (ancestor) {
+    if (ancestor.serializationOptions.json) {
+      contentTypes.push("application/json");
+    }
+    if (ancestor.serializationOptions.xml) {
+      contentTypes.push("application/xml");
+    }
+    if (contentTypes.length > 0) break;
+    ancestor = ancestor.baseModel;
+  }
+
+  if (contentTypes.length > 0) {
+    updateSerializationOptions(context, sdkType, contentTypes);
+  }
 }
 
 /**
@@ -2406,8 +2561,12 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       } else {
         sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
       }
-      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      if (!context.__serviceToVersionsSdkEnum) {
+        context.__serviceToVersionsSdkEnum = new Map();
+      }
+      context.__serviceToVersionsSdkEnum.set(service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions
@@ -2436,22 +2595,31 @@ function updateSerializationOptions(
   contentTypes: string[],
   options?: PropagationOptions,
   httpBody?: HttpPayloadBody,
-) {
+  operation?: Operation,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
 
   if (options.seenTypes.has(type)) {
-    return; // avoid circular references
+    return diagnostics.wrap(undefined); // avoid circular references
   }
 
   if (type.kind === "array" || type.kind === "dict") {
+    // An array/dict only needs its own serialization options when it is a named model
+    // with explicit serialization decorators (e.g. `@Xml.name("Foo") model Foo is Bar[];`);
+    // otherwise the wrapping element name comes from the property/model that references it.
+    // Passing an empty content type list ensures only explicitly-defined info is captured,
+    // avoiding spurious names on anonymous inline arrays/dicts.
+    setSerializationOptions(context, type, []);
     updateSerializationOptions(context, type.valueType, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
-  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable") return;
+  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable")
+    return diagnostics.wrap(undefined);
 
   if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
     options.seenTypes.add(type);
@@ -2461,11 +2629,16 @@ function updateSerializationOptions(
     for (const unionType of type.variantTypes) {
       updateSerializationOptions(context, unionType, contentTypes, options);
     }
-    return;
+    if (type.baseType) {
+      options.ignoreSubTypeStack.push(true);
+      diagnostics.pipe(updateSerializationOptions(context, type.baseType, contentTypes, options));
+      options.ignoreSubTypeStack.pop();
+    }
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
     updateSerializationOptions(context, type.type, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
   // Handle file body serialization - if it's a file, set binary options and skip json/xml
@@ -2475,9 +2648,12 @@ function updateSerializationOptions(
       isFile: true,
       isText: fileBody.isText,
       contentTypes: fileBody.contentTypes,
-      filename: fileBody.filename,
+      filename:
+        fileBody.filename && operation
+          ? diagnostics.pipe(getSdkModelPropertyType(context, fileBody.filename, operation))
+          : undefined,
     };
-    return; // No need to add json/xml serialization for file types
+    return diagnostics.wrap(undefined); // No need to add json/xml serialization for file types
   }
 
   setSerializationOptions(context, type, contentTypes);
@@ -2524,38 +2700,38 @@ function updateSerializationOptions(
     updateSerializationOptions(context, property.type, contentTypes, options);
     options.ignoreSubTypeStack.pop();
   }
-  return;
+  return diagnostics.wrap(undefined);
 }
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
-    if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
+    if (isMediaTypeJson(contentType) && !type.serializationOptions?.json) {
       updateJsonSerializationOptions(context, type);
     }
 
-    if (isMediaTypeXml(contentType) && !type.serializationOptions.xml) {
+    if (isMediaTypeXml(contentType) && !type.serializationOptions?.xml) {
       updateXmlSerializationOptions(context, type);
     }
   }
   if (
-    !type.serializationOptions.json &&
+    !type.serializationOptions?.json &&
     type.__raw &&
     hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
-    !type.serializationOptions.xml &&
+    !type.serializationOptions?.xml &&
     type.__raw &&
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
   }
-  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  const defaultContentTypes = type.serializationOptions?.multipart?.defaultContentTypes;
   if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
     for (const prop of type.type.properties) {
       if (prop.kind === "property") {
@@ -2567,25 +2743,31 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.json = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.json = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/json")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
   };
 }
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.xml = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.xml = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/xml")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
     attribute: type.__raw?.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
     ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
     unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
@@ -2597,26 +2779,26 @@ function updateXmlSerializationOptions(
     type.__raw.type.kind === "Model" &&
     isArrayModelType(type.__raw.type)
   ) {
-    if (!type.serializationOptions.xml.unwrapped) {
+    if (!serializationOptions.xml.unwrapped) {
       // if wrapped, set itemsName and itemsNS according to the array item type
       const itemType = type.__raw.type.indexer.value;
       if ("name" in itemType) {
         // if the type has name then get the name
-        type.serializationOptions.xml.itemsName = resolveEncodedName(
+        serializationOptions.xml.itemsName = resolveEncodedName(
           context.program,
           itemType as Type & { name: string },
           "application/xml",
         );
-        type.serializationOptions.xml.itemsNs = getNs(context.program, itemType);
+        serializationOptions.xml.itemsNs = getNs(context.program, itemType);
       } else {
         // otherwise use the property name
-        type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-        type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+        serializationOptions.xml.itemsName = serializationOptions.xml.name;
+        serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
       }
     } else {
       // if unwrapped, always set itemName to property name
-      type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-      type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+      serializationOptions.xml.itemsName = serializationOptions.xml.name;
+      serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
     }
   }
 }

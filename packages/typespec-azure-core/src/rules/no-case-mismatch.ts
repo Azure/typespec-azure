@@ -4,6 +4,7 @@ import {
   type Namespace,
   type Union,
   createRule,
+  fileRef,
   isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
@@ -13,6 +14,7 @@ type DataType = Model | Union | Enum;
 
 export const noCaseMismatchRule = createRule({
   name: "no-case-mismatch",
+  docs: fileRef.fromPackageRoot("src/rules/no-case-mismatch.md"),
   description: "Validate that no two types have the same name with different casing.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-case-mismatch",

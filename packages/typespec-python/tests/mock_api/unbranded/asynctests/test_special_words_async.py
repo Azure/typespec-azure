@@ -4,13 +4,14 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
+import pytest_asyncio
 from specialwords.aio import SpecialWordsClient
 from specialwords.models import models
 from specialwords.modelproperties import models as model_properties_models
 from specialwords.extensiblestrings import models as extensible_strings_models
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     async with SpecialWordsClient() as client:
         yield client
@@ -71,3 +72,8 @@ async def test_model_properties_with_list(client: SpecialWordsClient):
 async def test_extensible_strings(client: SpecialWordsClient):
     for enum_value in extensible_strings_models.ExtensibleString:
         assert enum_value == await client.extensible_strings.put_extensible_string_value(body=enum_value)
+
+
+@pytest.mark.asyncio
+async def test_reserved_operation_body_params_with_items(client: SpecialWordsClient):
+    await client.reserved_operation_body_params.with_items(items=["item"])

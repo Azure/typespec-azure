@@ -213,6 +213,65 @@ describe("exact", () => {
       const client = sdkPackage.clients[0];
       const method = client.methods[0];
       strictEqual(method.name, "my_exact_op");
+      strictEqual(method.isExactName, true);
+    });
+  });
+
+  describe("exact naming on enum values", () => {
+    it("marks enum value name as exact via exact()", async () => {
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
+
+          enum Status {
+            Active,
+            Inactive,
+          }
+
+          op get(@query status: Status): void;
+          `,
+          `
+          #suppress "experimental-feature" "testing exact"
+          @@clientName(MyService.Status.Active, exact("my_active_value"));
+          `,
+        ),
+      );
+
+      const context = await createSdkContextForTester(program);
+      const sdkPackage = context.sdkPackage;
+      const enumType = sdkPackage.enums[0];
+      const activeValue = enumType.values.find((v) => v.name === "my_active_value");
+      strictEqual(activeValue?.isExactName, true);
+      const inactiveValue = enumType.values.find((v) => v.name === "Inactive");
+      strictEqual(inactiveValue?.isExactName, false);
+    });
+  });
+
+  describe("exact naming on clients", () => {
+    it("marks client name as exact via exact()", async () => {
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
+
+          @route("/test")
+          op testOp(): void;
+          `,
+          `
+          #suppress "experimental-feature" "testing exact"
+          @@clientName(MyService, exact("my_exact_client"));
+          `,
+        ),
+      );
+
+      const context = await createSdkContextForTester(program);
+      const sdkPackage = context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.name, "my_exact_client");
+      strictEqual(client.isExactName, true);
     });
   });
 });

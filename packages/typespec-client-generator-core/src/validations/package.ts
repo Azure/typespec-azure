@@ -1,7 +1,7 @@
-import { getNamespaceFullName, Namespace } from "@typespec/compiler";
+import { getNamespaceFullName, type Namespace } from "@typespec/compiler";
 import { getVersions } from "@typespec/versioning";
 import { getExplicitClientApiVersions } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
+import type { TCGCContext } from "../interfaces.js";
 import { listAllUserDefinedNamespaces } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 

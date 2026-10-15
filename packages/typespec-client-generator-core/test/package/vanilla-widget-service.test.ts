@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHeaderParameter } from "../../src/interfaces.js";
+import type { SdkHeaderParameter } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 

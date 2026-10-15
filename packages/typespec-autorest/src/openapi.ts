@@ -1,22 +1,25 @@
 import {
   FinalStateValue,
-  LroMetadata,
-  UnionEnum,
+  type LroMetadata,
+  type UnionEnum,
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
+  getEffectiveApiVersionOverride,
   getLroMetadata,
   getUnionAsEnum,
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
+import { materializeLegacyExample } from "@azure-tools/typespec-azure-examples";
 import {
-  ArmFeatureOptions,
+  type ArmFeatureFileOptions,
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
   getCustomResourceOptions,
   getExternalTypeRef,
   getFeature,
+  getFeatureFileSet,
   getInlineAzureType,
   getResourceFeatureSet,
   isArmCommonType,
@@ -29,36 +32,38 @@ import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
+  isInScope,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
-  BooleanLiteral,
-  CompilerHost,
-  Diagnostic,
-  DiagnosticTarget,
-  Enum,
-  EnumMember,
-  IntrinsicScalarName,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Namespace,
+  type BooleanLiteral,
+  type CompilerHost,
+  type Diagnostic,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
+  type IntrinsicScalarName,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   NoTarget,
-  NumericLiteral,
-  Operation,
-  PagingOperation,
-  Program,
-  Scalar,
-  Service,
-  StringLiteral,
-  StringTemplate,
-  Type,
-  TypeNameOptions,
-  Union,
-  UnionVariant,
-  Value,
+  type NumericLiteral,
+  type Operation,
+  type PagingOperation,
+  type Program,
+  type Scalar,
+  type Service,
+  type StringLiteral,
+  type StringTemplate,
+  type Type,
+  type TypeNameOptions,
+  type Union,
+  type UnionVariant,
+  type Value,
   compilerAssert,
   createDiagnosticCollector,
+  createSourceFile,
   explainStringTemplateNotSerializable,
   getAllTags,
   getAnyExtensionFromPath,
@@ -106,28 +111,29 @@ import {
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
+  sanitizePathSegment,
   serializeValueAsJson,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import { DuplicateTracker, TwoLevelMap } from "@typespec/compiler/utils";
 import {
-  AuthenticationOptionReference,
-  AuthenticationReference,
-  HttpAuth,
-  HttpAuthRef,
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationParameters,
-  HttpOperationResponse,
-  HttpPayloadBody,
-  HttpProperty,
-  HttpServiceAuthentication,
-  HttpStatusCodeRange,
-  HttpStatusCodesEntry,
-  MetadataInfo,
-  OAuth2FlowType,
+  type AuthenticationOptionReference,
+  type AuthenticationReference,
+  type HttpAuth,
+  type HttpAuthRef,
+  type HttpOperation,
+  type HttpOperationBody,
+  type HttpOperationMultipartBody,
+  type HttpOperationParameters,
+  type HttpOperationResponse,
+  type HttpPayloadBody,
+  type HttpProperty,
+  type HttpServiceAuthentication,
+  type HttpStatusCodeRange,
+  type HttpStatusCodesEntry,
+  type MetadataInfo,
+  type OAuth2FlowType,
   Visibility,
   createMetadataInfo,
   getHeaderFieldOptions,
@@ -142,7 +148,7 @@ import {
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
-  AdditionalInfo,
+  type AdditionalInfo,
   checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
@@ -154,9 +160,17 @@ import {
 import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples as getAutorestExamples, getRef } from "./decorators.js";
+import {
+  type UnifiedExamplesResult,
+  hasUnifiedExamples,
+  legacyExampleFileName,
+  loadUnifiedExamples,
+  operationKeyForId,
+  uniqueExampleKey,
+} from "./examples-unified.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
-import {
+import type {
   OpenAPI2BodyParameter,
   OpenAPI2Document,
   OpenAPI2ExternalDocs,
@@ -182,15 +196,15 @@ import {
   XmsPageable,
 } from "./openapi2-document.js";
 import {
-  LateBoundReference,
-  OpenApi2DocumentProxy,
-  PendingSchema,
-  ProcessedSchema,
   type AutorestEmitterResult,
+  LateBoundReference,
   type LoadedExample,
+  type OpenApi2DocumentProxy,
+  type PendingSchema,
+  type ProcessedSchema,
 } from "./types.js";
 import {
-  AutorestEmitterContext,
+  type AutorestEmitterContext,
   getClientName,
   isSupportedAutorestFormat,
   resolveOperationId,
@@ -254,6 +268,35 @@ export interface AutorestDocumentEmitterOptions {
    * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
    */
   readonly outputSplitting?: "legacy-feature-files";
+
+  /**
+   * When enabled, example files will not be copied to the output directory.
+   * Instead, the source example files will be referenced using relative file paths.
+   * @default false
+   */
+  readonly skipExampleCopying?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix for types outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). Default.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). Conflicts are
+   *   reported as an error.
+   * @default "namespaced"
+   */
+  readonly typeNameStrategy?: "namespaced" | "name-only";
+
+  /**
+   * Controls how the emitter sources `x-ms-examples`.
+   *
+   * - `"auto"`: Use the unified `examples.yaml` format when present, otherwise legacy JSON files.
+   * - `"legacy"`: Only load legacy per-version `x-ms-examples` JSON files.
+   * - `"unified"`: Only read the unified `examples.yaml`, materializing legacy files per version.
+   * @default "auto"
+   */
+  readonly examplesFormat?: "auto" | "legacy" | "unified";
 }
 
 type HttpParameterProperties = Extract<
@@ -271,6 +314,11 @@ export async function getOpenAPIForService(
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
+      // With the "name-only" strategy, strip every namespace so names are not prefixed by their
+      // namespace (e.g. `Foo` instead of `LiftrBase.Foo`).
+      if (options.typeNameStrategy === "name-only") {
+        return false;
+      }
       return !isService(program, ns);
     },
   };
@@ -317,16 +365,38 @@ export async function getOpenAPIForService(
 
   const operationIdsWithExample = new Set<string>();
 
-  const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
+  // Compute the example directory for resolving source example paths
+  const exampleDir = resolveExampleDir(
+    options.examplesDirectory,
+    program.projectRoot,
+    context.version,
+  );
+
+  // Load the unified `examples.yaml` format when enabled. Resolved examples are materialized into
+  // legacy `x-ms-examples` files per operation as each endpoint is emitted (see `emitOperation`).
+  const unified = await resolveUnifiedExamples(program, context, options);
+
+  // Legacy per-version `x-ms-examples` JSON files are only loaded when the unified format is not
+  // in use for this emit.
+  const [exampleMap, diagnostics] = unified.active
+    ? [new Map<string, Record<string, LoadedExample>>(), [] as readonly Diagnostic[]]
+    : await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
+  // Materialized unified example files all land in one shared `examples/` directory, so their names
+  // must be unique across every operation, not just within one.
+  const usedUnifiedFileNames = new Set<string>();
 
   const routes = httpService.operations;
-  reportIfNoRoutes(program, routes);
+  // Filter routes to only include operations in scope for this emitter
+  const inScopeRoutes = routes.filter((route) =>
+    isInScope(context.tcgcSdkContext, route.operation),
+  );
+  reportIfNoRoutes(program, inScopeRoutes);
 
   const xmlEnabled = xmlStrategy !== "none";
 
   // The set of produces/consumes values found in all operations
-  let allResponseContentTypes = routes
+  let allResponseContentTypes = inScopeRoutes
     .flatMap((route) => route.responses)
     .flatMap((res) => res.responses)
     .flatMap((res) => res.body?.contentTypes ?? [])
@@ -339,7 +409,7 @@ export async function getOpenAPIForService(
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
   const globalProduces = new Set<string>(allResponseContentTypes);
 
-  let allRequestContentTypes = routes
+  let allRequestContentTypes = inScopeRoutes
     .flatMap((route) => route.parameters)
     .flatMap((param) => param.body?.contentTypes ?? [])
     .filter(
@@ -357,7 +427,7 @@ export async function getOpenAPIForService(
     globalConsumes.size === 1 &&
     globalConsumes.has("application/xml");
 
-  routes.forEach(emitOperation);
+  inScopeRoutes.forEach(emitOperation);
 
   emitParameters();
   emitSchemas(service.type);
@@ -366,7 +436,10 @@ export async function getOpenAPIForService(
   proxy.setGlobalProduces([...globalProduces]);
 
   proxy.writeExamples(exampleMap, operationIdsWithExample);
-  return proxy.resolveDocuments(context);
+  const documents = await proxy.resolveDocuments(context);
+  return unified.active
+    ? documents.map((document) => ({ ...document, examplesGenerated: true }))
+    : documents;
 
   function resolveHost(
     program: Program,
@@ -610,12 +683,70 @@ export async function getOpenAPIForService(
       operationIdsWithExample.add(currentEndpoint.operationId);
       currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
       for (const [title, example] of Object.entries(autoExamples)) {
-        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
+        let ref: string;
+        if (options.skipExampleCopying) {
+          const sourceExamplePath = resolvePath(exampleDir, example.relativePath);
+          const outputDir = getDirectoryPath(context.outputFile);
+          ref = getRelativePathFromDirectory(outputDir, sourceExamplePath, false);
+        } else {
+          ref = `./examples/${example.relativePath}`;
+        }
+        currentEndpoint["x-ms-examples"][title] = { $ref: ref };
       }
     }
 
+    emitUnifiedExamples();
+
     // Attach additional extensions after main fields
     attachExtensions(op, currentEndpoint);
+  }
+
+  /**
+   * Materialize the unified `examples.yaml` examples applicable to the current endpoint into legacy
+   * `x-ms-examples` files. Each resolved example is flattened back into the legacy shape (using the
+   * endpoint's own body parameter name) and registered so the emitter writes it to `examples/`.
+   */
+  function emitUnifiedExamples() {
+    const operationId = currentEndpoint.operationId;
+    if (!unified.active || operationId === undefined) {
+      return;
+    }
+    const resolvedExamples = unified.byOperationKey.get(operationKeyForId(operationId));
+    if (resolvedExamples === undefined || resolvedExamples.length === 0) {
+      return;
+    }
+
+    operationIdsWithExample.add(operationId);
+    currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
+
+    const bodyParameterName = currentEndpoint.parameters.find(
+      (param): param is OpenAPI2BodyParameter => "in" in param && param.in === "body",
+    )?.name;
+
+    const record: Record<string, LoadedExample> = exampleMap.get(operationId) ?? {};
+    const usedTitles = new Set<string>();
+    for (const resolved of resolvedExamples) {
+      const doc = materializeLegacyExample(resolved, {
+        operationId,
+        apiVersion: unified.apiVersion!,
+        bodyParameterName,
+      });
+      const relativePath = legacyExampleFileName(
+        operationId,
+        resolved.title,
+        usedUnifiedFileNames,
+        resolved.legacyFilename,
+      );
+      const key = uniqueExampleKey(doc.title, usedTitles);
+      const text = JSON.stringify(doc, null, 2) + "\n";
+      record[key] = {
+        relativePath,
+        file: createSourceFile(text, relativePath),
+        data: doc,
+      };
+      currentEndpoint["x-ms-examples"][key] = { $ref: `./examples/${relativePath}` };
+    }
+    exampleMap.set(operationId, record);
   }
 
   function applyEndpointProduces() {
@@ -990,6 +1121,9 @@ export async function getOpenAPIForService(
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
     for (const httpProperty of methodParams.properties) {
+      if (!isInScope(context.tcgcSdkContext, httpProperty.property)) {
+        continue;
+      }
       const shared = params.get(httpProperty.property);
       if (shared) {
         currentEndpoint.parameters.push(shared);
@@ -1523,7 +1657,16 @@ export async function getOpenAPIForService(
     }
 
     function processUnreferencedSchemas() {
+      const authentication = resolveAuthentication(httpService);
+      const authSchemeModels = new Set<Type>(
+        authentication ? authentication.schemes.map((s) => s.model) : [],
+      );
       const addSchema = (type: Type) => {
+        if (authSchemeModels.has(type)) {
+          // Auth scheme models are emitted under securityDefinitions
+          // and should not also appear as payload schemas in definitions.
+          return;
+        }
         if (
           !processedSchemas.has(type) &&
           !indirectlyProcessedTypes.has(type) &&
@@ -1551,7 +1694,7 @@ export async function getOpenAPIForService(
       if (
         options.versionEnumStrategy !== "include" &&
         type.kind === "Enum" &&
-        isVersionEnum(program, type)
+        (isVersionEnum(program, type) || isFeatureEnum(program, serviceNamespace, type))
       ) {
         return true;
       }
@@ -1565,6 +1708,10 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
+  }
+
+  function isFeatureEnum(program: Program, serviceNamespace: Namespace, enumObj: Enum): boolean {
+    return getFeatureFileSet(program, serviceNamespace) === enumObj;
   }
 
   function getSchemaForType(
@@ -1890,6 +2037,9 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (!isInScope(context.tcgcSdkContext, prop)) {
+        continue;
+      }
       if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
         const baseProp = rawBaseModel.properties.get(prop.name);
         if (baseProp?.name === prop.name && baseProp.type === prop.type) {
@@ -2282,7 +2432,7 @@ export async function getOpenAPIForService(
     }
 
     const examples = getTypeSpecExamples(program, typespecType);
-    if (typespecType.kind === "ModelProperty" && examples.length > 0) {
+    if (typespecType.kind === "ModelProperty" && usage !== "parameter" && examples.length > 0) {
       newTarget.example = serializeValueAsJson(program, examples[0].value, typespecType);
     }
 
@@ -2799,6 +2949,34 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
+/**
+ * Resolves the example directory path, supporting `{version}` and `{version-status}` interpolation
+ * variables in the `examples-dir` option.
+ *
+ * When the examples-dir contains `{version}` or `{version-status}`, these are interpolated
+ * with the actual version values and the resulting path is used directly.
+ * Otherwise, the version is appended as a subdirectory (legacy behavior).
+ */
+function resolveExampleDir(
+  examplesDirectory: string | undefined,
+  projectRoot: string,
+  version: string | undefined,
+): string {
+  const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
+  const hasVersionInterpolation = rawDir.includes("{version}");
+  const sanitizedVersion = version && sanitizePathSegment(version);
+
+  if (hasVersionInterpolation) {
+    const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
+    return interpolatePath(rawDir, {
+      "version-status": versionStatus,
+      version: sanitizedVersion,
+    });
+  }
+
+  return sanitizedVersion ? resolvePath(rawDir, sanitizedVersion) : rawDir;
+}
+
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   try {
     return (await host.stat(dir)).isDirectory();
@@ -2834,6 +3012,52 @@ async function searchExampleJsonFiles(program: Program, exampleDir: string): Pro
   return exampleFiles;
 }
 
+/** Resolved unified examples for the current emit, grouped by unified operation key. */
+interface ResolvedUnifiedExamples {
+  /** True when the unified `examples.yaml` format is in use for this emit. */
+  readonly active: boolean;
+  /** The concrete API version the examples were resolved/materialized for. */
+  readonly apiVersion?: string;
+  /** Resolved examples grouped by unified operation key (e.g. `CaCertificates.get`). */
+  readonly byOperationKey: UnifiedExamplesResult["byOperationKey"];
+}
+
+/**
+ * Decide whether the unified `examples.yaml` format applies to this emit and, if so, load and
+ * resolve it for the emitted API version. In `"auto"` mode the unified format is used only when a
+ * `examples.yaml` / `examples/*.yaml` file is present at the project root; `"unified"` forces it and
+ * `"legacy"` disables it.
+ */
+async function resolveUnifiedExamples(
+  program: Program,
+  context: AutorestEmitterContext,
+  options: AutorestDocumentEmitterOptions,
+): Promise<ResolvedUnifiedExamples> {
+  const format = options.examplesFormat ?? "auto";
+  const baseDir = program.projectRoot;
+  const useUnified =
+    format === "unified" || (format === "auto" && (await hasUnifiedExamples(program, baseDir)));
+  if (!useUnified) {
+    return { active: false, byOperationKey: new Map() };
+  }
+
+  const apiVersion = context.version ?? resolveInfo(program, context.service.type)?.version;
+  if (apiVersion === undefined) {
+    return { active: true, byOperationKey: new Map() };
+  }
+
+  const order = context.versions ?? [apiVersion];
+  const result = await loadUnifiedExamples(program, baseDir, apiVersion, order);
+  for (const diagnostic of result.diagnostics) {
+    reportDiagnostic(program, {
+      code: "unified-example-loading",
+      format: { message: diagnostic.message },
+      target: NoTarget,
+    });
+  }
+  return { active: true, apiVersion, byOperationKey: result.byOperationKey };
+}
+
 async function loadExamples(
   program: Program,
   options: AutorestDocumentEmitterOptions,
@@ -2841,8 +3065,7 @@ async function loadExamples(
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const host = program.host;
   const diagnostics = createDiagnosticCollector();
-  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
-  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+  const exampleDir = resolveExampleDir(options.examplesDirectory, program.projectRoot, version);
 
   if (!(await checkExamplesDirExists(host, exampleDir))) {
     if (options.examplesDirectory) {
@@ -2950,6 +3173,7 @@ export function createDefaultDocumentProxy(
   const definitions = new Map<string, OpenAPI2Schema>();
   const parameters: Map<string, [ModelProperty, OpenAPI2Parameter]> = new Map();
   const operationIds = new DuplicateTracker<string, Operation>();
+  const operations: HttpOperation[] = [];
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   return {
@@ -2981,6 +3205,7 @@ export function createDefaultDocumentProxy(
     },
 
     createOrGetEndpoint(op: HttpOperation, context: AutorestEmitterContext): OpenAPI2Operation {
+      operations.push(op);
       const pathItem = initPathItem(program, op, root);
       if (!pathItem[op.verb]) {
         pathItem[op.verb] = { parameters: [] };
@@ -3024,6 +3249,7 @@ export function createDefaultDocumentProxy(
     },
     resolveDocuments(context: AutorestEmitterContext) {
       reportDuplicateOperationIds(program, operationIds);
+      applyClientApiVersionOverride(root, operations, context, service.type);
       root.definitions = {};
       for (const [name, schema] of definitions) {
         root.definitions[name] = schema;
@@ -3073,8 +3299,9 @@ export function createDefaultDocumentProxy(
 interface OpenAPI2DocumentItem {
   document: OpenAPI2Document;
   operationExamples: Map<string, LoadedExample[]>;
+  operations: HttpOperation[];
   tags: Set<string>;
-  options: ArmFeatureOptions;
+  options: ArmFeatureFileOptions;
 }
 
 function createFeatureDocumentProxy(
@@ -3136,6 +3363,7 @@ function createFeatureDocumentProxy(
     createOrGetEndpoint(op: HttpOperation, context: AutorestEmitterContext): OpenAPI2Operation {
       const options = getFeature(program, op.operation);
       const item = root.get(options.featureName.toLowerCase())!;
+      item.operations.push(op);
       const pathItem = initPathItem(program, op, item.document);
       if (!pathItem[op.verb]) {
         pathItem[op.verb] = { parameters: [] };
@@ -3196,6 +3424,13 @@ function createFeatureDocumentProxy(
         reportDuplicateOperationIds(program, tracker);
       }
       for (const [featureName, featureItem] of root.entries()) {
+        applyClientApiVersionOverride(
+          featureItem.document,
+          featureItem.operations,
+          context,
+          service.type,
+          featureItem.options.version,
+        );
         const exampleIds = operationFeatures.get(featureName) || new Set<string>();
         const featureExamples = [...exampleIds]
           .filter((id) => operationIdsWithExamples.has(id))
@@ -3216,6 +3451,9 @@ function createFeatureDocumentProxy(
           featureItem.document.definitions![defName] = defSchema;
         }
         finalizeOpenApi2Document(featureItem.document, featureItem.tags);
+        if (!hasOpenApiContent(featureItem.document)) {
+          continue;
+        }
         docs.push({
           document: featureItem.document,
           operationExamples: featureExamples,
@@ -3274,6 +3512,15 @@ function createFeatureDocumentProxy(
   }
 }
 
+function hasOpenApiContent(document: OpenAPI2Document): boolean {
+  return (
+    Object.keys(document.paths).length > 0 ||
+    Object.keys(document["x-ms-paths"] ?? {}).length > 0 ||
+    Object.keys(document.parameters ?? {}).length > 0 ||
+    Object.keys(document.definitions ?? {}).length > 0
+  );
+}
+
 function reportDuplicateOperationIds(
   program: Program,
   duplicateTracker: DuplicateTracker<string, Operation>,
@@ -3292,15 +3539,51 @@ function reportDuplicateOperationIds(
 function initializeOpenAPIDocumentItem(
   program: Program,
   service: Service,
-  options: ArmFeatureOptions,
+  options: ArmFeatureFileOptions,
   version?: string,
 ): OpenAPI2DocumentItem {
   return {
     document: initializeOpenApi2Document(program, service, version),
     operationExamples: new Map<string, LoadedExample[]>(),
+    operations: [],
     tags: new Set<string>(),
     options,
   };
+}
+
+function applyClientApiVersionOverride(
+  document: OpenAPI2Document,
+  operations: HttpOperation[],
+  context: AutorestEmitterContext,
+  diagnosticTarget: Namespace,
+  explicitVersion?: string,
+): void {
+  if (explicitVersion !== undefined) {
+    document.info.version = explicitVersion;
+    return;
+  }
+  if (operations.length === 0) return;
+
+  const overrides = operations.map((operation) =>
+    getEffectiveApiVersionOverride(context.program, operation.operation),
+  );
+  if (overrides.every((value) => value === undefined)) return;
+
+  const first = overrides[0];
+  if (first !== undefined && overrides.every((value) => value === first)) {
+    document.info.version = first;
+    return;
+  }
+
+  const values = [...new Set(overrides.map((value) => value ?? "<none>"))];
+  reportDiagnostic(context.program, {
+    code: "inconsistent-client-api-version-override",
+    format: {
+      values: values.join(", "),
+      fallback: document.info.version,
+    },
+    target: diagnosticTarget,
+  });
 }
 
 function initializeOpenApi2Document(

@@ -7,6 +7,7 @@ import { compositionOverInheritanceRule } from "./rules/composition-over-inherit
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
+import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
 import { noEnumRule } from "./rules/no-enum.js";
@@ -18,6 +19,7 @@ import { noLegacyUsage } from "./rules/no-legacy-usage.js";
 import { noMultipleDiscriminatorRule } from "./rules/no-multiple-discriminator.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
+import { noOpenapiClientExtensionsRule } from "./rules/no-openapi-client-extensions.js";
 import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
@@ -25,7 +27,7 @@ import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-name-mismatch.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
-import { noUnnamedUnionRule } from "./rules/no-unnamed-union.js";
+import { noUnnamedTypesRule } from "./rules/no-unnamed-types.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
@@ -48,6 +50,7 @@ const rules = [
   byosRule,
   casingRule,
   compositionOverInheritanceRule,
+  noBooleanRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
   noCaseMismatchRule,
@@ -62,7 +65,7 @@ const rules = [
   noResponseBodyRule,
   noRpcPathParamsRule,
   noOpenAPIRule,
-  noUnnamedUnionRule,
+  noUnnamedTypesRule,
   noHeaderExplodeRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
@@ -83,6 +86,7 @@ const rules = [
   noLegacyUsage,
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
+  noOpenapiClientExtensionsRule,
 ];
 
 export const $linter = defineLinter({

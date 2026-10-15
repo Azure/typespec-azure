@@ -1,7 +1,7 @@
 import { expectDiagnostics, extractSquiggles } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import {
+import type {
   OpenAPI2HeaderParameter,
   OpenAPI2PathParameter,
   OpenAPI2QueryParameter,
@@ -85,6 +85,13 @@ describe("path parameters", () => {
       pos: pos + offset,
       end: end + offset,
     });
+  });
+
+  it("does not emit @example on path parameters", async () => {
+    const param = await getPathParam(`
+      @get op test(@path @TypeSpec.example("testVal") myParam: string): void;
+    `);
+    strictEqual((param as any).example, undefined);
   });
 
   it("report unsupported-optional-path-param diagnostic on the parameter when using optional path parameters", async () => {

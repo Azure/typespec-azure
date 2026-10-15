@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/Azure/azure-rest-api-specs.git",
+  "ref": "main",
+  "path": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+  "checkoutPath": "specification/compute/resource-manager/Microsoft.Compute/Compute"
+}

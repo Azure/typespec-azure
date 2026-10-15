@@ -1,8 +1,8 @@
 import { Tester } from "#test/tester.js";
 import { paramMessage } from "@typespec/compiler";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";

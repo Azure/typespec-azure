@@ -1,21 +1,28 @@
 /* eslint-disable no-console */
-import { execSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { BenchmarkResult, RuntimeStats, SpecBenchmarkResult } from "./types.js";
+import { getCommitMetadata, gitCommand, type CommitMetadata } from "./utils.js";
 
 /** A single entry in the aggregated history. */
 export interface HistoryEntry {
   commit: string;
   timestamp: string;
+  commitTimestamp?: string;
+  measurementMode?: "split";
+  /** Averaged metrics across all specs */
   metrics: Record<string, number>;
+  /** Per-spec metrics (spec name → flat metrics) */
+  specMetrics: Record<string, Record<string, number>>;
 }
 
 /** The full history.json structure. */
 export interface HistoryData {
   generated: string;
   labels: string[];
+  /** All spec names found across all entries */
+  specNames: string[];
   entries: HistoryEntry[];
 }
 
@@ -43,6 +50,9 @@ function flattenRuntime(rt: RuntimeStats): Record<string, number> {
     flat["emit"] = rt.emit.total ?? 0;
     for (const [name, emitter] of Object.entries(rt.emit.emitters ?? {})) {
       flat[`emit/${name}`] = emitter.total ?? 0;
+      for (const [step, ms] of Object.entries(emitter.steps ?? {})) {
+        flat[`emit/${name}/${step}`] = ms;
+      }
     }
   }
   return flat;
@@ -68,10 +78,7 @@ function averageAcrossSpecs(specs: Record<string, SpecBenchmarkResult>): Record<
 
 function gitShow(path: string): string | null {
   try {
-    return execSync(`git show benchmark-data:${path}`, {
-      encoding: "utf-8",
-      maxBuffer: 50_000_000,
-    });
+    return gitCommand(["show", `benchmark-data:${path}`]);
   } catch {
     return null;
   }
@@ -100,10 +107,7 @@ function readFromDirectory(dir: string): ResultFile[] {
 }
 
 function readFromGitBranch(): ResultFile[] {
-  const fileList = execSync("git ls-tree --name-only benchmark-data -- results/", {
-    encoding: "utf-8",
-  })
-    .trim()
+  const fileList = gitCommand(["ls-tree", "-r", "--name-only", "benchmark-data", "--", "results/"])
     .split("\n")
     .filter(
       (f) => f.endsWith(".json") && !f.includes("latest.json") && !f.includes("history.json"),
@@ -118,24 +122,43 @@ function readFromGitBranch(): ResultFile[] {
 }
 
 /** Generate a HistoryData object from a list of result files. */
-export function buildHistory(resultFiles: ResultFile[]): HistoryData {
+export function buildHistory(
+  resultFiles: ResultFile[],
+  resolveCommits: (commits: string[]) => ReadonlyMap<string, CommitMetadata> = getCommitMetadata,
+): HistoryData {
   const entries: HistoryEntry[] = [];
+  const allSpecNames = new Set<string>();
 
   for (const { name, content } of resultFiles) {
     try {
       const result: BenchmarkResult = JSON.parse(content);
       const metrics = averageAcrossSpecs(result.specs);
+
+      const specMetrics: Record<string, Record<string, number>> = {};
+      for (const [specName, spec] of Object.entries(result.specs)) {
+        allSpecNames.add(specName);
+        specMetrics[specName] = flattenRuntime(spec.stats.runtime);
+      }
+
       entries.push({
         commit: result.commit,
         timestamp: result.timestamp,
+        measurementMode: result.measurementMode,
         metrics,
+        specMetrics,
       });
     } catch (e: any) {
       console.error(`Failed to parse ${name}: ${e.message}`);
     }
   }
 
-  entries.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  const commits = resolveCommits(entries.map((entry) => entry.commit));
+  for (const entry of entries) {
+    const metadata = commits.get(entry.commit);
+    if (!metadata) throw new Error(`Missing source commit metadata for ${entry.commit}`);
+    entry.commitTimestamp = metadata.timestamp;
+  }
+  entries.sort((a, b) => commits.get(a.commit)!.order - commits.get(b.commit)!.order);
 
   const allLabels = new Set<string>();
   for (const entry of entries) {
@@ -147,8 +170,22 @@ export function buildHistory(resultFiles: ResultFile[]): HistoryData {
   return {
     generated: new Date().toISOString(),
     labels: [...allLabels].sort(),
+    specNames: [...allSpecNames].sort(),
     entries,
   };
+}
+
+export interface GenerateHistoryOptions {
+  /** Read results from a directory instead of the benchmark-data git branch. */
+  dir?: string;
+  /** Source repository used to recover commit metadata for legacy result files. */
+  repoDir?: string;
+}
+
+/** Generate history data from result files. */
+export function generateHistory(options: GenerateHistoryOptions = {}): HistoryData {
+  const resultFiles = options.dir ? readFromDirectory(options.dir) : readFromGitBranch();
+  return buildHistory(resultFiles, (commits) => getCommitMetadata(commits, options.repoDir));
 }
 
 /** CLI entry point for generate-history. */
@@ -165,8 +202,7 @@ export function generateHistoryMain(argv: string[]): void {
     }
   }
 
-  const resultFiles = resultsDir ? readFromDirectory(resultsDir) : readFromGitBranch();
-  const history = buildHistory(resultFiles);
+  const history = generateHistory({ dir: resultsDir ?? undefined });
   const output = JSON.stringify(history, null, 2);
 
   if (outputFile) {

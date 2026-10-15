@@ -1,24 +1,24 @@
 import {
-  CallableMessage,
-  DecoratedType,
-  DiagnosticTarget,
-  Enum,
-  EnumMember,
+  type CallableMessage,
+  type DecoratedType,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
   getLocationContext,
   getNamespaceFullName,
   getTypeName,
-  Interface,
+  type Interface,
   isTemplateDeclaration,
-  LinterRuleContext,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
-  Scalar,
-  Type,
-  Union,
-  UnionVariant,
+  type LinterRuleContext,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Scalar,
+  type Type,
+  type Union,
+  type UnionVariant,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 
@@ -152,6 +152,14 @@ export function isPascalCaseWithAcceptedAcronyms(
 export function isCamelCaseNoAcronyms(name: string): boolean {
   if (name === undefined || name === null || name === "") return true;
   return /^[^a-zA-Z0-9]?[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
+}
+
+/**
+ * Checks for lowercase ASCII words separated by single underscores.
+ * Digits are allowed after the first letter, including immediately after an underscore.
+ */
+export function isSnakeCase(name: string): boolean {
+  return /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/.test(name);
 }
 
 export function checkReferenceInDisallowedNamespace(

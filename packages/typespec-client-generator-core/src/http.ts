@@ -1,9 +1,9 @@
 import {
-  Diagnostic,
-  ModelProperty,
-  Operation,
-  Type,
-  Union,
+  type Diagnostic,
+  type ModelProperty,
+  type Operation,
+  type Type,
+  type Union,
   compilerAssert,
   createDiagnosticCollector,
   getEncode,
@@ -11,12 +11,14 @@ import {
   isErrorModel,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
-  HttpOperation,
-  HttpOperationHeaderParameter,
-  HttpOperationParameter,
-  HttpOperationPathParameter,
-  HttpOperationQueryParameter,
+  type HttpOperation,
+  type HttpOperationHeaderParameter,
+  type HttpOperationParameter,
+  type HttpOperationPathParameter,
+  type HttpOperationQueryParameter,
   Visibility,
   getCookieParamOptions,
   getHeaderFieldName,
@@ -30,10 +32,11 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
-import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
+import { type StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
+import { isTerminalEvent } from "@typespec/sse";
 import { camelCase } from "change-case";
 import { getResponseAsBool, isInScope, shouldOmitSlashFromEmptyRoute } from "./decorators.js";
-import {
+import type {
   CollectionFormat,
   SdkBodyParameter,
   SdkClientType,
@@ -49,6 +52,8 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceResponseHeader,
+  SdkSseEventMetadata,
+  SdkSseMetadata,
   SdkStreamMetadata,
   SdkType,
   SerializationOptions,
@@ -87,6 +92,8 @@ import {
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
+
+const defaultFileContentType = "application/octet-stream";
 
 /**
  * Build serialization options from content types.
@@ -130,6 +137,37 @@ function buildSdkStreamMetadata(
     streamType,
     contentTypes: [...tspStreamMetadata.contentTypes],
   });
+}
+
+/**
+ * Build server-sent event (SSE) metadata for a stream. Returns `undefined` for
+ * non-event streams (e.g. JSONL), whose streamed type is not an `@events` union.
+ *
+ * Kept separate from {@link buildSdkStreamMetadata} because SSE, streaming, and events
+ * are modeled by distinct TypeSpec libraries.
+ */
+function buildSdkSseMetadata(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+): [SdkSseMetadata | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return diagnostics.wrap(undefined);
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  const events: SdkSseEventMetadata[] = eventDefinitions.map((event) => ({
+    eventType: event.eventType,
+    isTerminalEvent: isTerminalEvent(context.program, event.root),
+    isEventEnvelope: event.isEventEnvelope,
+    type: diagnostics.pipe(getClientTypeWithDiagnostics(context, event.type, operation)),
+    contentType: event.contentType,
+    payloadType: diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, event.payloadType, operation),
+    ),
+    payloadContentType: event.payloadContentType,
+  }));
+  return diagnostics.wrap({ events });
 }
 
 export function getSdkHttpOperation(
@@ -271,20 +309,11 @@ function getSdkHttpParameters(
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
-      if (bodyParam.kind !== "body") {
-        diagnostics.add(
-          createDiagnostic({
-            code: "unexpected-http-param-type",
-            target: tspBody.property,
-            format: {
-              paramName: tspBody.property.name,
-              expectedType: "body",
-              actualType: bodyParam.kind,
-            },
-          }),
-        );
-        return diagnostics.wrap(retval);
-      }
+      compilerAssert(
+        bodyParam.kind === "body",
+        `Expected parameter "${tspBody.property.name}" to be of type "body", but instead it is of type "${bodyParam.kind}"`,
+        tspBody.property,
+      );
       retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
       const type = diagnostics.pipe(
@@ -306,6 +335,7 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: isHttpBodySpread(tspBody) ? false : (tspBody.property?.optional ?? false), // optional is always false for spread body
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside methodParameterSegments
         correspondingMethodParams: [],
         methodParameterSegments: [],
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
@@ -348,6 +378,9 @@ function getSdkHttpParameters(
         retval.bodyParam.streamMetadata = diagnostics.pipe(
           buildSdkStreamMetadata(context, requestStreamMeta, httpOperation.operation),
         );
+        retval.bodyParam.sseMetadata = diagnostics.pipe(
+          buildSdkSseMetadata(context, requestStreamMeta.streamType, httpOperation.operation),
+        );
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
       }
@@ -373,6 +406,7 @@ function getSdkHttpParameters(
       ...contentTypeBase,
       kind: "header",
       serializedName: "Content-Type",
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       correspondingMethodParams: [methodParameter],
       methodParameterSegments: [[methodParameter]],
     });
@@ -396,6 +430,7 @@ function getSdkHttpParameters(
       ...acceptBase,
       kind: "header",
       serializedName: "Accept",
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       correspondingMethodParams: [methodParameter],
       methodParameterSegments: [[methodParameter]],
     });
@@ -417,6 +452,7 @@ function getSdkHttpParameters(
       (segment) => segment[segment.length - 1],
     );
   }
+
   return diagnostics.wrap(retval);
 }
 
@@ -426,6 +462,14 @@ function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
+  // @typespec/http uses */* as the unconstrained File content-type marker. For
+  // generated request clients, expose that as an optional Content-Type parameter
+  // with the binary payload default instead of sending */* as a concrete value.
+  const isDefaultFileContentType =
+    bodyObject.kind === "body" &&
+    httpOperation.parameters.body?.bodyKind === "file" &&
+    bodyObject.contentTypes?.length === 1 &&
+    bodyObject.contentTypes[0] === "*/*";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
   // Honor the content types from the HTTP library result.
   // For a single content type, create a constant.
@@ -438,7 +482,7 @@ function createContentTypeOrAcceptHeader(
   // should use `@sharedRoute` to split the operation per content type.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
-  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0) {
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0 && !isDefaultFileContentType) {
     const tk = $(context.program);
     context.__namingContextPath.push({
       name: httpOperation.operation.name,
@@ -465,18 +509,32 @@ function createContentTypeOrAcceptHeader(
         type = getSdkConstant(context, literal, httpOperation.operation);
       } else {
         // Multi content types on request → enum.
-        const union = tk.union.create(
-          bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
-        );
-        type = getClientType(context, union, httpOperation.operation);
+        // For File bodies, reuse the File model's `contentType` property type so that the
+        // synthetic `contentType` header parameter and the File model reference the same
+        // SdkEnumType instance (the cache for that union is pre-warmed under the operation
+        // naming context in `updateTypesFromOperation`, so the enum gets a name derived
+        // from the operation, e.g. `UploadFileMultipleContentTypesContentType`).
+        const fileBody =
+          bodyObject.kind === "body" && httpOperation.parameters.body?.bodyKind === "file"
+            ? httpOperation.parameters.body
+            : undefined;
+        const contentTypePropertyType = fileBody?.contentTypeProperty.type;
+        if (contentTypePropertyType && contentTypePropertyType.kind === "Union") {
+          type = getClientType(context, contentTypePropertyType, httpOperation.operation);
+        } else {
+          const union = tk.union.create(
+            bodyObject.contentTypes.map((ct) => tk.literal.createString(ct)),
+          );
+          type = getClientType(context, union, httpOperation.operation);
+        }
       }
     } finally {
       context.__namingContextPath.pop();
       context.__namingContextPath.pop();
     }
   }
-  const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // No need for clientDefaultValue because it's a constant, it only has one value
+  const optional =
+    bodyObject.kind === "body" ? bodyObject.optional || isDefaultFileContentType : false;
   return {
     type,
     name,
@@ -486,6 +544,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
+    ...(isDefaultFileContentType && { clientDefaultValue: defaultFileContentType }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
@@ -603,19 +662,11 @@ export function getSdkHttpParameter(
       explode: (httpParam as HttpOperationQueryParameter)?.explode,
     });
   }
-  if (!(isHeader(context.program, param) || location === "header")) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "unexpected-http-param-type",
-        target: param,
-        format: {
-          paramName: param.name,
-          expectedType: "path, query, header, or body",
-          actualType: param.kind,
-        },
-      }),
-    );
-  }
+  compilerAssert(
+    isHeader(context.program, param) || location === "header",
+    `Expected parameter "${param.name}" to be of type "path, query, header, or body", but instead it is of type "${param.kind}"`,
+    param,
+  );
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
@@ -647,6 +698,7 @@ function getSdkHttpResponseAndExceptions(
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
     let streamMetadata: SdkStreamMetadata | undefined;
+    let sseMetadata: SdkSseMetadata | undefined;
     let lastBodyProperty: ModelProperty | undefined;
     let lastDefaultContentType: string | undefined;
 
@@ -692,6 +744,9 @@ function getSdkHttpResponseAndExceptions(
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
           streamMetadata = diagnostics.pipe(
             buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
+          );
+          sseMetadata = diagnostics.pipe(
+            buildSdkSseMetadata(context, responseStreamMeta.streamType, httpOperation.operation),
           );
         }
       }
@@ -741,6 +796,7 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
       streamMetadata,
+      sseMetadata,
       serializationOptions: buildSerializationOptionsFromContentTypes(contentTypes),
     };
 

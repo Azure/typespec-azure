@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts", "static/**/*.ts"],
+  "compilerOptions": {
+    "module": "node16",
+    "moduleResolution": "node16",
+    // `static/` is copied verbatim into generated SDKs, so it is migrated separately.
+    "verbatimModuleSyntax": false
+  }
+}

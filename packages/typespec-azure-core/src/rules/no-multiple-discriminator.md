@@ -1,0 +1,47 @@
+Using a nested polymophic relationship is not allowed in Azure services. Most JSON serializers and deserializers do not support this feature.
+
+## Impact
+
+- **Area:** SDK, API
+
+Multiple discriminators are not supported by SDKs, nor by Swagger without extensions.
+
+#### ❌ Incorrect
+
+```tsp
+@discriminator("fishtype")
+model Fish {
+  fishtype: string;
+}
+
+@discriminator("sharktype")
+model Shark extends Fish {
+  fishtype: "shark";
+  sharktype: string;
+}
+
+model WhiteShark extends Shark {
+  sharktype: "white";
+}
+```
+
+#### ✅ Correct
+
+```tsp
+@discriminator("fishtype")
+model Fish {
+  fishtype: string;
+}
+
+model Shark extends Fish {
+  fishtype: "shark";
+}
+
+model WhiteShark extends Fish {
+  fishtype: "white-shark";
+}
+```
+
+## Suppression
+
+Suppress only with SDK approval. Use a single discriminator and refactor additional discriminators onto child or sibling properties.

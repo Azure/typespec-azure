@@ -10,7 +10,6 @@ namespace Azure.ResourceManager;
  * Resource providers must declare a private link resource type in their provider namespace if
  * they support private link resources
  * @template Description Optional. The documentary description of the private link resource name parameter.
- * @template KeyName Optional. The name of the private link resource name parameter.
  * @example
  * ```ts
  * namespace Microsoft.Contoso;
@@ -57,12 +56,10 @@ interface PrivateLinks<
   ResourceParameter extends {} = CommonTypes.PrivateLinkResourceParameter
 > {
   /**
-   * @dev List the private links to a resource
+   * List the private links to a resource
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource Optional. The PrivateLink resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template ParentName Optional. The name of the parent resource
-   * @template ParentFriendlyName Optional. The friendly name of the parent resource
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.
@@ -91,12 +88,10 @@ interface PrivateLinks<
   >;
 
   /**
-   * @dev List the private links to a resource - this should only be used for legacy operations
+   * List the private links to a resource - this should only be used for legacy operations
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource Optional. The PrivateLink resource being listed
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template ParentName Optional. The name of the parent resource
-   * @template ParentFriendlyName Optional. The friendly name of the parent resource
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.
@@ -125,7 +120,7 @@ interface PrivateLinks<
   >;
 
   /**
-   * @dev GET the a private link to a particular resource
+   * GET the a private link to a particular resource
    * @template ParentResource the parent resource of the PrivateLink
    * @template Resource the PrivateLink resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters

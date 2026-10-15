@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
+import { type SdkHttpOperation, type SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import {

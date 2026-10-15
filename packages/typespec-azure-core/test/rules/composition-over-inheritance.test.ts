@@ -1,5 +1,5 @@
 import { TesterWithService } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { compositionOverInheritanceRule } from "../../src/rules/composition-over-inheritance.js";
 

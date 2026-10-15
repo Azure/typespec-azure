@@ -78,7 +78,7 @@ it("missing-service-versions", async () => {
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/missing-service-versions",
-      severity: "warning",
+      severity: "error",
       message: `The @clientApiVersions decorator is missing one or more versions defined in My.Service. Client API must support all service versions to ensure compatibility. Missing versions: v1, v2, v3. Please update the client API to support all required service versions.`,
     },
   ]);

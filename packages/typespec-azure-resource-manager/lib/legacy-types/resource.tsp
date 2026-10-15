@@ -70,6 +70,7 @@ alias EntityTagProperty = {
  * ```
  */
 model ExtendedLocationOptionalProperty {
+  /** The extended location of the resource. */
   @visibility(Lifecycle.Read, Lifecycle.Create)
   extendedLocation?: ExtendedLocationOptional;
 }

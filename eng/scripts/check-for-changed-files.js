@@ -1,4 +1,4 @@
-import { checkForChangedFiles, coreRepoRoot, repoRoot } from "./helpers.js";
+import { checkForChangedFiles, coreRepoRoot, repoRoot, run } from "./helpers.js";
 
 if (
   (await checkForChangedFiles(coreRepoRoot, "## typespec ##")) ||

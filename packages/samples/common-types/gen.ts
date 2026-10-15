@@ -1,6 +1,6 @@
 import {
-  OpenAPI2Document,
-  OpenAPI2SchemaProperty,
+  type OpenAPI2Document,
+  type OpenAPI2SchemaProperty,
   getAllServicesAtAllVersions,
   resolveAutorestOptions,
   sortOpenAPIDocument,

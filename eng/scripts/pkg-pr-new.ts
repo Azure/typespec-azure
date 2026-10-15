@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import { readdir } from "fs/promises";
-import { listChangedFilesSince } from "../../core/eng/common/scripts/utils/git.js";
+import { listChangedFilesSince } from "../../core/eng/common/scripts/utils/git.ts";
 import { repoRoot } from "./helpers.js";
 
 const files = await listChangedFilesSince(`origin/main`, { repositoryPath: repoRoot });
