@@ -533,6 +533,12 @@ export interface SdkConstantType extends SdkTypeBase {
   isExactName: boolean;
 }
 
+export interface SdkUnionVariant<TValueType extends SdkTypeBase = SdkType> {
+  /** Declared TypeSpec variant name, without casing transformations; undefined for unnamed/default or synthesized variants. */
+  name?: string;
+  type: TValueType;
+}
+
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
@@ -542,7 +548,10 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   /** Full qualified namespace. */
   namespace: string;
   kind: "union";
+  /** SDK types of the alternatives, in the same order as `variants`. */
   variantTypes: TValueType[];
+  /** Non-null alternatives and their declared names. Distinct variants may reference the same SDK type. */
+  variants: SdkUnionVariant<TValueType>[];
   /**
    * Type declared by the union's `extends` clause. This constrains the variants but does not imply inheritance.
    * Usage, access, and serialization information propagate to this referenced type.

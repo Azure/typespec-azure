@@ -30,6 +30,7 @@ import {
   isArrayModelType,
   isErrorModel,
   isNeverType,
+  isNullType,
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -634,6 +635,7 @@ export function getSdkUnionWithDiagnostics(
           isExactName: false,
           namespace,
           variantTypes: [],
+          variants: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           access: "public",
           usage: UsageFlags.None,
@@ -664,12 +666,18 @@ export function getSdkUnionWithDiagnostics(
           };
         }
         updateReferencedTypeMap(context, type, retval);
-        const variantTypes = nonNullOptions.map((x) =>
-          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
-        );
+        const variants = [...type.variants.values()]
+          .filter((variant) => !isNullType(variant.type))
+          .map((variant) => ({
+            name: typeof variant.name === "string" ? variant.name : undefined,
+            type: diagnostics.pipe(getClientTypeWithDiagnostics(context, variant.type, operation)),
+          }));
+        const variantTypes = variants.map((variant) => variant.type);
         if (retval.kind === "nullable" && retval.type.kind === "union") {
+          retval.type.variants = variants;
           retval.type.variantTypes = variantTypes;
         } else if (retval.kind === "union") {
+          retval.variants = variants;
           retval.variantTypes = variantTypes;
         }
       }
@@ -708,6 +716,7 @@ function getEmptyUnionType(
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
+    variants: [],
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     access: "public",
     usage: UsageFlags.None,
@@ -1302,6 +1311,7 @@ function getSdkCredentialType(
       __raw: service,
       kind: "union",
       variantTypes: credentialTypes,
+      variants: credentialTypes.map((type) => ({ name: undefined, type })),
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
       isExactName: false,

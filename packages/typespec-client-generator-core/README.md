@@ -33,6 +33,12 @@ options:
     option: value
 ```
 
+## Union variant metadata
+
+`SdkUnionType.variants` exposes each non-null alternative as an `SdkUnionVariant` with its declared TypeSpec `name` and SDK `type`. Names retain their declared casing and are independent of payload type names, allowing emitters to distinguish variants that share the same payload type. Unnamed/default variants and synthesized endpoint, credential, and response variants have `name: undefined`.
+
+The existing `variantTypes` property remains available and contains the same SDK type references in the same order as `variants`. For nullable unions, the inner `SdkUnionType` exposes the non-null variants; null is represented by the `SdkNullableType` wrapper. Unions converted to enums continue to expose enum metadata instead.
+
 ## Emitter options
 
 ### `emitter-output-dir`

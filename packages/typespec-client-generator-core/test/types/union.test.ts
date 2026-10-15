@@ -26,8 +26,112 @@ it("primitive union", async function () {
   strictEqual(values.length, 2);
   strictEqual(values[0].kind, "string");
   strictEqual(values[1].kind, "int32");
+  deepStrictEqual(
+    sdkType.variants,
+    values.map((type) => ({ name: undefined, type })),
+  );
 
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
+});
+
+it.each([false, true])("named union variants with nullable=%s", async (nullable) => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: Choice;
+    }
+
+    union Choice {
+      firstOption: Payload,
+      ${nullable ? "null," : ""}
+      second_option: Payload,
+      int32,
+    }
+
+    @clientName("RenamedPayload")
+    model Payload {
+      value: string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  if (nullable) {
+    strictEqual(sdkType.kind, "nullable");
+  }
+  const unionType = sdkType.kind === "nullable" ? sdkType.type : sdkType;
+  strictEqual(unionType.kind, "union");
+  deepStrictEqual(
+    unionType.variants.map((variant) => variant.name),
+    ["firstOption", "second_option", undefined],
+  );
+  unionType.variants.forEach((variant, index) => {
+    strictEqual(variant.type, unionType.variantTypes[index]);
+  });
+  strictEqual(unionType.variants[0].type, unionType.variants[1].type);
+  strictEqual(unionType.variants[0].type.kind, "model");
+  strictEqual(unionType.variants[0].type.name, "RenamedPayload");
+  strictEqual(unionType.variants[2].type.kind, "int32");
+});
+
+it("discriminated union preserves distinct tags for the same payload type", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: Limit;
+    }
+
+    @discriminated(#{ discriminatorPropertyName: "tag", envelopePropertyName: "contents" })
+    union Limit {
+      daily: string,
+      weekly: string,
+      monthly: string,
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  deepStrictEqual(
+    sdkType.variants.map((variant) => variant.name),
+    ["daily", "weekly", "monthly"],
+  );
+  strictEqual(sdkType.variantTypes.length, 3);
+  sdkType.variants.forEach((variant, index) => {
+    strictEqual(variant.type.kind, "string");
+    strictEqual(variant.type, sdkType.variantTypes[index]);
+  });
+});
+
+it("discriminated union exposes an unnamed default variant", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: Pet;
+    }
+
+    @discriminated(#{ envelope: "none" })
+    union Pet {
+      cat: Cat,
+      UnknownPet,
+    }
+
+    model Cat {
+      name: string;
+    }
+    model UnknownPet {
+      kind: string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  deepStrictEqual(
+    sdkType.variants.map((variant) => variant.name),
+    ["cat", undefined],
+  );
+  strictEqual(sdkType.variants[0].type, sdkType.variantTypes[0]);
+  strictEqual(sdkType.variants[1].type, sdkType.variantTypes[1]);
+  strictEqual(sdkType.variants[1].type.kind, "model");
+  strictEqual(sdkType.variants[1].type.name, "UnknownPet");
 });
 
 it("nullable", async function () {

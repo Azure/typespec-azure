@@ -174,6 +174,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       access: "public",
       usage: UsageFlags.None,
       variantTypes: types,
+      variants: types.map((type) => ({ name: undefined, type })),
       name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
       isExactName: false,
