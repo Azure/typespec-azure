@@ -1,12 +1,18 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { $linter } from "@azure-tools/typespec-azure-core";
+import { createLinterRuleTester } from "@typespec/compiler/testing";
 import { it } from "vitest";
 import { Tester } from "../tester.js";
 
 it.each(["ArmResourceActionSync", "ArmResourceActionAsync"])(
   "requires named request bodies in %s",
   async (action) => {
-    const [, diagnostics] = await Tester.compileAndDiagnose(
-      `
+    const runner = await Tester.createInstance();
+    const tester = createLinterRuleTester(
+      runner,
+      $linter.rules!.find((rule) => rule.name === "no-unnamed-types")!,
+      "@azure-tools/typespec-azure-core",
+    );
+    const fixture = (body: string) => `
       using Azure.Core;
       @armProviderNamespace namespace Microsoft.Contoso;
       model Widget is TrackedResource<WidgetProperties> {
@@ -18,24 +24,15 @@ it.each(["ArmResourceActionSync", "ArmResourceActionAsync"])(
       @lroStatus union ProvisioningState { string, ResourceProvisioningState }
       model Request { name: string; }
       model Result { result: string; }
-
       @armResourceOperations interface Widgets {
-        unnamed is ${action}<Widget, { name: string; }, Result>;
-        named is ${action}<Widget, Request, Result>;
+        action is ${action}<Widget, ${body}, Result>;
       }
-      `,
-      {
-        compilerOptions: {
-          linterRuleSet: {
-            enable: { "@azure-tools/typespec-azure-core/no-unnamed-types": true },
-          },
-        },
-      },
-    );
+    `;
 
-    expectDiagnostics(diagnostics, {
+    await tester.expect(fixture("{ name: string; }")).toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/no-unnamed-types",
       message: "Anonymous model should be defined as a named model declaration.",
     });
+    await tester.expect(fixture("Request")).toBeValid();
   },
 );
