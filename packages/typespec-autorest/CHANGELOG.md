@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.73.1
+
+### Bug Fixes
+
+- [#5689](https://github.com/Azure/typespec-azure/pull/5689) Append a trailing newline to JSON examples generated from unified YAML examples, preventing formatter failures and newline-only diffs.
+
+
 ## 0.73.0
 
 ### Features
