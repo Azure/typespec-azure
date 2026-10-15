@@ -1,12 +1,16 @@
 import { getDoc, getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { getHttpOperation } from "@typespec/http";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { requireDocumentation } from "../../src/rules/require-docs.js";
 import { Tester } from "../test-host.js";
 
 let tester: LinterRuleTester;
 
+vi.mock("@typespec/http", { spy: true });
+
 beforeEach(async () => {
+  vi.clearAllMocks();
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
@@ -39,6 +43,31 @@ function diagnostic(name: string, description: string) {
 }
 
 describe("documentation-required: uninformative documentation", () => {
+  it("resolves HTTP metadata only when documentation needs an effective-name comparison", async () => {
+    await tester
+      .expect(
+        `
+        @route("/read") @get @doc(" READ. ") op read(): string;
+        @route("/absent") @get op absent(): string;
+        @route("/empty") @get @doc("") op empty(): string;
+        @route("/punctuation") @get @doc(" ... ") op punctuation(): string;
+        @route("/fetch") @get @doc("GET.") op fetch(): string;
+      `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("read", " READ. "),
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
+            "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+        },
+        diagnostic("get", "GET."),
+      ]);
+    expect(vi.mocked(getHttpOperation).mock.calls.map(([, operation]) => operation.name)).toEqual([
+      "fetch",
+    ]);
+  });
+
   it("reports source-name, verb, and missing-doc diagnostics through the unfiltered rule", async () => {
     const fullTester = createLinterRuleTester(
       await Tester.createInstance(),

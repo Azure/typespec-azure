@@ -82,15 +82,18 @@ export function createDocumentationNameValidator(
         );
         return;
       case "Operation": {
+        const doc = getDoc(context.program, target);
+        const normalizedDescription = doc === undefined ? undefined : normalize(doc);
+        if (!normalizedDescription) {
+          return;
+        }
+        if (normalizedDescription === normalize(target.name)) {
+          checkTarget(target);
+          return;
+        }
         // HTTP validation owns resolution diagnostics; this rule only checks documentation.
         const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
-        const doc = getDoc(context.program, target);
-        checkTarget(
-          target,
-          doc !== undefined && normalize(doc) === normalize(target.name)
-            ? target.name
-            : httpOperation.verb,
-        );
+        checkTarget(target, httpOperation.verb);
         return;
       }
       case "ModelProperty": {

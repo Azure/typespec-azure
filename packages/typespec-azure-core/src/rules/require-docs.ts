@@ -8,7 +8,6 @@ import {
   getDoc,
   type Discriminator,
   type Enum,
-  type LinterRuleContext,
   type Model,
   type ModelProperty,
   type Operation,
@@ -41,10 +40,6 @@ function isExcludedVersionEnum(program: Program, enumObj: Enum): boolean {
   }
   return false;
 }
-
-const documentationValidators: ((
-  context: LinterRuleContext<typeof documentationMessages>,
-) => (target: DocumentationTarget) => void)[] = [];
 
 function findDiscriminator(program: Program, model?: Model): Discriminator | undefined {
   if (!model) return undefined;
@@ -79,16 +74,12 @@ function isExcludedDiscriminator(
   return false;
 }
 
-documentationValidators.push(createDocumentationNameValidator);
-
 function getUnionName(union: Union): string | undefined {
   if (union.name !== undefined) {
     return union.name;
   }
   return undefined;
 }
-
-documentationValidators.push(createEmptyDocumentationValidator);
 
 function getVariantName(variant: UnionVariant): string | undefined {
   if (variant.name !== undefined && typeof variant.name === "string") {
@@ -108,7 +99,8 @@ export const requireDocumentation = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required",
   messages: documentationMessages,
   create(context) {
-    const validators = documentationValidators.map((createValidator) => createValidator(context));
+    const validateName = createDocumentationNameValidator(context);
+    const validateEmpty = createEmptyDocumentationValidator(context);
     const discTypes = getDiscriminatedTypes(context.program);
     const requiredTargets = new Set<DocumentationTarget>();
     const needsDocumentation = (target: DocumentationTarget) => {
@@ -227,7 +219,8 @@ export const requireDocumentation = createRule({
       },
       requiredTargets,
       (target) => {
-        for (const validate of validators) validate(target);
+        validateName(target);
+        validateEmpty(target);
       },
     );
   },
