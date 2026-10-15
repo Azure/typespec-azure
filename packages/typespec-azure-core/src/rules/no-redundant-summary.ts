@@ -29,12 +29,8 @@ export const noRedundantSummaryRule = createRule({
       model: checkSummary,
       modelProperty: checkSummary,
       scalar: checkSummary,
-      enum: (target) => {
-        checkSummary(target);
-        for (const member of target.members.values()) {
-          checkSummary(member);
-        }
-      },
+      enum: checkSummary,
+      enumMember: checkSummary,
       union: checkSummary,
       unionVariant: checkSummary,
     };
