@@ -68,6 +68,16 @@ be changed, or a client-only operation that is not part of the service's ARM
 surface. Document the reason on the operation. For new APIs, use a resource
 instance path rather than suppressing a collection or action-like PUT.
 
+Place the `#suppress` directive on the affected operation, before its decorators,
+and use the fully qualified rule name with a specific justification:
+
+```tsp
+#suppress "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put" "Reviewed legacy ARM collection PUT contract."
+@route("/providers/Microsoft.Contoso/widgets")
+@put
+op create(): void;
+```
+
 ## LintDiff Equivalent
 
 This rule corresponds to

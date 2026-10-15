@@ -88,7 +88,7 @@ model Widget is TrackedResource<{}> {
 
 @armResourceOperations
 interface Widgets {
-  createOrUpdate is ArmResourceCreateOrReplaceSync<
+  /*target*/createOrUpdate is ArmResourceCreateOrReplaceSync<
     Widget,
     Parameters = {
       @path configurationName: string;
@@ -110,22 +110,12 @@ interface Widgets {
 `,
   ];
 
-  await tester.expect(examples[0]).toEmitDiagnostics((result) => {
-    const main = [...result.program.sourceFiles.values()].find((file) =>
-      file.file.text.includes("createOrUpdate is ArmResourceCreateOrReplaceSync"),
-    );
-    const pos = main?.file.text.indexOf("createOrUpdate is ArmResourceCreateOrReplaceSync");
-    if (!main || pos === undefined || pos < 0) {
-      throw new Error("The standard createOrUpdate operation was not compiled");
-    }
-    return {
-      ...diagnostic(
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/{configurationName}",
-      ),
-      file: main.file.path,
-      pos,
-    };
-  });
+  await tester.expect(examples[0]).toEmitDiagnostics((result) => ({
+    ...diagnostic(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/{configurationName}",
+    ),
+    pos: result.pos.target.pos,
+  }));
   await tester.expect(examples[1]).toBeValid();
 });
 
@@ -160,6 +150,33 @@ it("accepts a scope-prefixed resource path", async () => {
     `,
     )
     .toBeValid();
+});
+
+it.each([
+  "/providers/Microsoft.Parent/parents/{parentName}/providers/Microsoft.Contoso/widgets/{widgetName}",
+  "/providers/Microsoft.Parent/parents/{parentName}/providers/Microsoft.Contoso/widgets/default",
+])("accepts an extension resource continuation: %s", async (path) => {
+  await tester
+    .expect(
+      `
+      @route("${path}")
+      @put op create(@path parentName: string${path.includes("{widgetName}") ? ", @path widgetName: string" : ""}): void;
+    `,
+    )
+    .toBeValid();
+});
+
+it("rejects a collection in the final extension-provider continuation", async () => {
+  const path =
+    "/providers/Microsoft.Parent/parents/{parentName}/providers/Microsoft.Contoso/widgets";
+  await tester
+    .expect(
+      `
+      @route("${path}")
+      @put op create(@path parentName: string): void;
+    `,
+    )
+    .toEmitDiagnostics(diagnostic(path));
 });
 
 it("ignores non-PUT operations", async () => {
