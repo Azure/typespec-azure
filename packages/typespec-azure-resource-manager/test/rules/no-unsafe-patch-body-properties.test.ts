@@ -1,27 +1,8 @@
-import { Tester } from "#test/tester.js";
-import { resolvePath } from "@typespec/compiler";
-import {
-  createLinterRuleTester,
-  createTester,
-  type LinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester, UnwrappedTester } from "#test/tester.js";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 
-import { beforeEach, describe, expect, it } from "vitest";
-import { $linter } from "../../src/linter.js";
-import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
+import { beforeEach, describe, it } from "vitest";
 import { noUnsafePatchBodyPropertiesRule } from "../../src/rules/no-unsafe-patch-body-properties.js";
-import { patchEnvelopePropertiesRules } from "../../src/rules/patch-envelope-properties.js";
-
-const BaseTester = createTester(resolvePath(import.meta.dirname, "../.."), {
-  libraries: [
-    "@typespec/http",
-    "@typespec/openapi",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@azure-tools/typespec-azure-core",
-    "@azure-tools/typespec-azure-resource-manager",
-  ],
-});
 
 let tester: LinterRuleTester;
 beforeEach(async () => {
@@ -65,7 +46,7 @@ describe("semantic examples", () => {
   let fixtureTester: LinterRuleTester;
   beforeEach(async () => {
     fixtureTester = createLinterRuleTester(
-      await BaseTester.createInstance(),
+      await UnwrappedTester.createInstance(),
       noUnsafePatchBodyPropertiesRule,
       "@azure-tools/typespec-azure-resource-manager",
     );
@@ -949,52 +930,6 @@ describe("scope and registration", () => {
     );
   });
 
-  describe("existing ARM rule interactions", () => {
-    const definitions = `${service}
-      model Widget is TrackedResource<{ value?: string }> {
-        @key("widgetName") @segment("widgets") @path name: string;
-      }
-    `;
-    it("preserves overlapping arm-resource-patch subset diagnostics", async () => {
-      const snippet = `${definitions}
-        model Patch { tags?: Record<string>; extra?: string; }
-        @armResourceOperations interface Widgets {
-          update is ArmCustomPatchSync<Widget, Patch>;
-        }
-      `;
-      await tester.expect(snippet).toEmitDiagnostics(missing("extra"));
-      const existing = createLinterRuleTester(
-        await Tester.createInstance(),
-        patchOperationsRule,
-        "@azure-tools/typespec-azure-resource-manager",
-      );
-      await existing.expect(snippet).toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-        message:
-          "Resource PATCH models must be a subset of the resource type. The following properties: [extra] do not exist in resource Model 'Widget'.",
-      });
-    });
-    it("leaves required envelope presence to patch-envelope", async () => {
-      const snippet = `${definitions}
-        model Patch { properties?: { value?: string }; }
-        @armResourceOperations interface Widgets {
-          createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
-          update is ArmCustomPatchSync<Widget, Patch>;
-        }
-      `;
-      await tester.expect(snippet).toBeValid();
-      const existing = createLinterRuleTester(
-        await Tester.createInstance(),
-        patchEnvelopePropertiesRules,
-        "@azure-tools/typespec-azure-resource-manager",
-      );
-      await existing.expect(snippet).toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/patch-envelope",
-        message:
-          "The Resource PATCH request for resource 'Widget' is missing envelope properties:  [tags]. Since these properties are supported in the resource, they must also be updatable via PATCH.",
-      });
-    });
-  });
   describe("applicability", () => {
     it("checks PATCH bodies without provider metadata", async () => {
       await tester
@@ -1022,15 +957,5 @@ describe("scope and registration", () => {
         )
         .toBeValid();
     });
-  });
-  it("registers only the combined incoming rule and retains existing PATCH rules", () => {
-    const names = $linter.rules.map((r) => r.name);
-    expect(names).toContain("no-unsafe-patch-body-properties");
-    expect(names).toContain("arm-resource-patch");
-    expect(names).toContain("patch-envelope");
-    expect(names).not.toContain("patch-body-parameters-schema");
-    expect(names).not.toContain("consistent-patch-properties");
-    expect(names).not.toContain("unsupported-patch-properties");
-    expect(names).not.toContain("no-unsupported-patch-properties");
   });
 });

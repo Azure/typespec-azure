@@ -1,5 +1,5 @@
 import { resolvePath } from "@typespec/compiler";
-import { createTester } from "@typespec/compiler/testing";
+import { createTester, t } from "@typespec/compiler/testing";
 import type { HttpOperationBody, HttpPayloadBody } from "@typespec/http";
 import { describe, expect, it } from "vitest";
 import {
@@ -20,13 +20,14 @@ describe("HTTP response status primitives", () => {
 
   describe("HTTP response body selection", () => {
     it("distinguishes identical and ambiguous body variants independently of their order", async () => {
-      const { program } = await createTester(resolvePath(import.meta.dirname, "../.."), {
-        libraries: [],
-      }).compile("model First { value: string; } model Second { other: string; }");
-      const models = program.getGlobalNamespaceType().models;
-      const first = models.get("First");
-      const second = models.get("Second");
-      if (first === undefined || second === undefined) throw new Error("Missing compiled models.");
+      const { First: first, Second: second } = await createTester(
+        resolvePath(import.meta.dirname, "../.."),
+        {
+          libraries: [],
+        },
+      ).compile(
+        t.code`model ${t.model("First")} { value: string; } model ${t.model("Second")} { other: string; }`,
+      );
       const json: HttpOperationBody = {
         bodyKind: "single",
         type: first,
