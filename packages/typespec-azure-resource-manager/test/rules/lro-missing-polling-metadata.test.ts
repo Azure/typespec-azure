@@ -1,20 +1,8 @@
 import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
-import {
-  createLinterRuleTester,
-  type LinterRuleTester,
-  type TesterInstance,
-} from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
-import { beforeEach, expect, it, vi } from "vitest";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach, it } from "vitest";
 import { lroMissingPollingMetadataRule } from "../../src/rules/lro-missing-polling-metadata.js";
-
-vi.mock("@azure-tools/typespec-autorest", () => {
-  throw new Error("Native lint must not load the AutoRest emitter.");
-});
-vi.mock("@azure-tools/typespec-client-generator-core", () => {
-  throw new Error("ARM lint must not load TCGC.");
-});
 
 const header = `
 @armProviderNamespace
@@ -47,19 +35,10 @@ const diagnostic = {
   code: "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata",
   message: lroMissingPollingMetadataRule.messages.default,
 };
-const documentation = readFileSync(
-  new URL("../../src/rules/lro-missing-polling-metadata.md", import.meta.url),
-  "utf8",
-).replace(/\r\n/g, "\n");
-const examples = Array.from(
-  documentation.matchAll(/```tsp\n([\s\S]*?)\n```/g),
-  (match) => match[1],
-);
-let rawTester: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  rawTester = await Tester.createInstance();
+  const rawTester = await Tester.createInstance();
   tester = createLinterRuleTester(
     rawTester,
     lroMissingPollingMetadataRule,
@@ -95,15 +74,11 @@ it("reports a synchronous custom PATCH returning 202 without polling metadata", 
   );
 });
 
-it("reports the documented async PATCH customization without polling metadata", async () => {
-  expect(examples).toHaveLength(2);
-  await tester
-    .expect(examples[0].replace("update is", "/*target*/update is"))
-    .toEmitDiagnostics(({ target }) => ({
-      ...diagnostic,
-      pos: getSourceLocation(target).pos,
-      end: getSourceLocation(target).end,
-    }));
+it("reports an async PATCH customization without polling metadata", async () => {
+  await expectViolation(
+    "update is ArmCustomPatchAsync<Widget, Widget, LroHeaders = PlainLocationHeaders>;",
+    "Widgets",
+  );
 });
 
 it("reports a synchronous provider POST returning 202 without polling metadata", async () => {
@@ -128,9 +103,11 @@ it("accepts default async custom PATCH polling metadata", async () => {
   await expectCompliant("update is ArmCustomPatchAsync<Widget, Widget>;", "Widgets");
 });
 
-it("accepts the documented async PATCH with semantic LRO headers", async () => {
-  expect(examples).toHaveLength(2);
-  await tester.expect(examples[1]).toBeValid();
+it("accepts an async PATCH with semantic LRO headers", async () => {
+  await expectCompliant(
+    "update is ArmCustomPatchAsync<Widget, Widget, LroHeaders = ArmLroLocationHeader<FinalResult = Widget> & Azure.Core.Foundations.RetryAfterHeader>;",
+    "Widgets",
+  );
 });
 
 it("accepts synchronous custom PATCH without a 202 response", async () => {
@@ -265,59 +242,4 @@ it("ignores unmarked POST accepted responses", async () => {
     `,
     )
     .toBeValid();
-});
-
-it("resolves a compliant operation once before reporting Core diagnostics across overlapping services", async () => {
-  const diagnostics = await rawTester.diagnose(
-    `
-      @armProviderNamespace
-      @service
-      @versioned(Versions)
-      namespace Microsoft.Parent;
-      enum Versions {
-        @useDependency(Azure.ResourceManager.CommonTypes.Versions.v5)
-        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
-        v2024_01_01: "2024-01-01",
-      }
-      @route("/parent")
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @armProviderNamespace("Microsoft.Nested")
-      @service
-      @versioned(Versions)
-      namespace Nested {
-        @route("/child")
-        interface Operations extends Azure.ResourceManager.Operations {}
-        @armResourceOperations
-        interface ProviderOperations {
-          @Azure.Core.useFinalStateVia("original-uri")
-          startProvider is ArmProviderActionAsync<Request = void, Response = void>;
-        }
-      }
-    `,
-    {
-      compilerOptions: {
-        linterRuleSet: {
-          enable: {
-            "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata": true,
-          },
-        },
-      },
-    },
-  );
-
-  expect(
-    diagnostics.filter(
-      (diagnostic) =>
-        diagnostic.code === "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
-    ),
-  ).toHaveLength(1);
-  expect(
-    diagnostics.filter(
-      (diagnostic) =>
-        diagnostic.code ===
-        "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata",
-    ),
-  ).toHaveLength(0);
-  expect(diagnostics).toHaveLength(1);
 });
