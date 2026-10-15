@@ -44,6 +44,20 @@ export function isPolymorphicRoot(model: tcgc.SdkModelType): boolean {
   }
 }
 
+/** narrows a literal to the subset of literals supported as a slice element type */
+export function isSliceElementLiteral(
+  literal: go.Literal,
+): literal is go.Literal<go.Constant | go.Scalar | go.String> {
+  switch (literal.type.kind) {
+    case "constant":
+    case "scalar":
+    case "string":
+      return true;
+    default:
+      return false;
+  }
+}
+
 /** narrows type to a PtrType within the conditional block */
 export function isPtrType<T extends Exclude<go.WireType, go.Ptr>>(
   type: T,
