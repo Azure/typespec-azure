@@ -278,7 +278,10 @@ unchanged.
      are verified and the resulting snapshots remain repository-relative.
      `compare:setup` does not populate these sources. Do not assume a fresh rule
      worktree already contains `test/azure-openapi-validator` or
-     `test/common-types`
+     `test/common-types`. Reuse the verified absolute fixture-source paths in
+     the readiness manifest; standalone workers verify and record them before
+     creating links. The specs common-types source is
+     `specification\common-types`, not a root-level `common-types` directory.
 5. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link

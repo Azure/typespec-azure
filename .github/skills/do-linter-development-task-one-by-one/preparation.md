@@ -238,6 +238,15 @@ readiness evidence for every layer.
    Standalone preparation-only dispatchers instead report a dependency defect
    requiring tracked edits, preserving their existing no-edits handoff contract.
 
+Record the absolute focused-fixture source paths in the readiness manifest.
+Verify the common-types source in the pinned specs checkout at
+`specification\common-types`, including `resource-management\v3\types.json`;
+do not assume a root-level `common-types` directory exists. Resolve the validator
+source from the installed package or a verified source checkout and check the
+files required by the harness. Import readiness alone does not verify these
+fixture inputs. This is a read-only preparation check: create temporary fixture
+links only in the worker's focused-validation phase.
+
 On Windows, allow up to 10 minutes for the first pnpm install; require its final
 completion output and successful process exit. A tool wait expiring is not
 process completion: read the same tracked shell and inspect that exact process,

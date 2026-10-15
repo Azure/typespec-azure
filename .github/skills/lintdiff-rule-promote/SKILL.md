@@ -617,6 +617,10 @@ library documentation following the
 - pass the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
   gate for the actual incorrect/correct snippets; preserve the diagnostic
   contrast rather than substituting an exempt default template response
+- if native tests extract the authored Markdown examples, accept both CRLF and
+  LF fence line endings and verify that the expected snippets were found before
+  compiling them; do not mistake Windows checkout line endings for missing
+  examples or replace the final snippets with separate test-only copies
 - follow the destination's authored-document conventions, including `## Impact`
   with the affected areas and `## Suppression` guidance when used by neighboring
   rules; explain when suppression is appropriate rather than only how to fix
