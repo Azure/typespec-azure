@@ -49,12 +49,17 @@ model WidgetProperties {
   provisioningState?: ResourceProvisioningState;
 }
 
+/** The envelope properties to update. */
+model WidgetPatch is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  Widget,
+  WidgetProperties
+>;
+
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<Widget>;
   create is ArmResourceCreateOrReplaceAsync<Widget>;
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-  update is ArmTagsPatchSync<Widget>;
+  update is ArmCustomPatchSync<Widget, WidgetPatch>;
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
   listByResourceGroup is ArmResourceListByParent<Widget>;
   listBySubscription is ArmListBySubscription<Widget>;

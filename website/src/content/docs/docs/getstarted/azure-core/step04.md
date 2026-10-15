@@ -41,8 +41,8 @@ interface Widgets {
   /** Fetch a Widget by name. */
   getWidget is Operations.ResourceRead<Widget>;
 
-  /** Creates or updates a Widget. */
-  createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
+  /** Creates or replaces a Widget. */
+  createOrReplaceWidget is Operations.ResourceCreateOrReplace<Widget>;
 
   /** Delete a Widget. */
   deleteWidget is Operations.ResourceDelete<Widget>;
@@ -57,13 +57,28 @@ interface Widgets {
 The `Widget` interface defines the following standard lifecycle operations:
 
 - `ResourceRead<TResource>`: Defines a "read" operation for a single resource instance.
-- `ResourceCreateOrUpdate<TResource>`: Defines an "upsert" operation which either creates or updates an instance of the resource type depending on whether it already exists.
+- `ResourceCreateOrReplace<TResource>`: Defines a PUT operation which creates a resource or replaces an existing resource with the supplied representation.
 - `ResourceDelete<TResource>`: Defines a "delete" operation to delete a specific instance of the resource.
 - `ResourceList<TResource>`: Defines an operation that lists all instances of the resource type.
 
 > **Note:** There are both instantaneous and long-running versions of "create", "update", and "delete" operations for resource types depending on what you need for a particular resource!
 
 These operations will all exist under the route path `/widgets/{widgetName}`, with the list operation generating the path `/widgets`.
+
+### Choosing PUT or PATCH
+
+For new create-or-replace APIs, use `ResourceCreateOrReplace` or
+`LongRunningResourceCreateOrReplace`. Their PUT request bodies preserve the required properties
+declared in your resource model.
+
+The PATCH templates `ResourceCreateOrUpdate`, `LongRunningResourceCreateOrUpdate`, and
+`ResourceUpdate` use deprecated implicit optionality and are not recommended for new APIs.
+If your API requires partial updates, define an explicit PATCH request model with optional
+properties and use the `Azure.Core.Foundations.ResourceOperation` building block with `@patch`.
+Do not suppress the implicit-optionality warning to start a new API.
+
+PUT and PATCH have different semantics. Do not replace an existing service's PATCH operation
+with PUT just to change templates; preserve its HTTP method, request schema, and SDK contract.
 
 ## Error response customization
 

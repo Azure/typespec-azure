@@ -68,7 +68,6 @@ Operation names should follow a consistent pattern
 
 | operation template                    | name should contain    | notes |
 | ------------------------------------- | ---------------------- | ----- |
-| ResourceCreateOrUpdate                | "Create" and "Update"  |       |
 | ResourceCreateOrReplace               | "Create" and "Replace" |       |
 | ResourceCreateWithServiceProvidedName | "Create"               |       |
 | ResourceRead                          | "Get"                  |       |
@@ -76,6 +75,12 @@ Operation names should follow a consistent pattern
 | ResourceList                          | "List"                 |       |
 | LongRunningResourceCreateOrReplace    | "Create" and "Replace" |       |
 | LongRunningResourceDelete             | "Delete"               |       |
+
+For new data-plane create-or-replace APIs, use the PUT templates above. The legacy PATCH
+templates `ResourceCreateOrUpdate`, `LongRunningResourceCreateOrUpdate`, and `ResourceUpdate`
+use deprecated implicit optionality and are not recommended for new APIs. For partial updates,
+use a custom PATCH operation with an explicit request model. See
+[Choosing PUT or PATCH](../getstarted/azure-core/step04.md#choosing-put-or-patch).
 
 ## Parameters
 

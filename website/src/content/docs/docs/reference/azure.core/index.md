@@ -25,36 +25,37 @@ The `@azure-tools/typespec-azure-core` library defines the following models:
 
 ### Operations
 
-The `@azure-tools/typespec-azure-core` library defines these standard operation templates as basic building blocks that you can expose. You can use `is` to compose the operations to meet the exact needs of your APIs.
-
-For all of these operation templates, `TResource` is the resource model and `TCustom` allows customization of the operation parameters or response. `TCustom`, if provided, must extend the `Azure.Core.Foundations.CustomizationFields` model, which looks like:
+Instantiate `Azure.Core.ResourceOperations` with your service traits and use its operation
+templates as building blocks for your APIs:
 
 ```typespec
-/** The expected shape of model types passed to the TCustom parameter of operation signatures. */
-model CustomizationFields {
-  /** An object containing custom parameters that will be included in the operation. */
-  parameters?: object;
-
-  /** An object containing custom properties that will be included in the response. */
-  response?: object;
-}
+alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+op createOrReplace is Operations.ResourceCreateOrReplace<Resource>;
 ```
+
+See [Defining standard resource operations](../../getstarted/azure-core/step04.md) for the
+service traits and interface definition. Prefer `ResourceCreateOrReplace` and
+`LongRunningResourceCreateOrReplace` for new PUT APIs. The legacy PATCH templates
+`ResourceCreateOrUpdate`, `LongRunningResourceCreateOrUpdate`, and `ResourceUpdate` use
+deprecated implicit optionality and are not recommended for new APIs. For partial updates,
+define a custom PATCH operation with an explicit request model; do not change an existing
+PATCH API to PUT without considering its API and SDK contracts.
+
+In the following table, `TResource` is the resource model and `Traits` customizes operation
+traits. Templates are members of your `ResourceOperations` instance.
 
 | Operation                                                            | Notes                                                 |
 | -------------------------------------------------------------------- | ----------------------------------------------------- |
-| ResourceCreateOrUpdate<TResource, TCustom>                           | Resource PATCH operation.                             |
-| ResourceCreateOrReplace<TResource, TCustom>                          | Resource PUT operation.                               |
-| ResourceCreateWithServiceProvidedName<TResource, TCustom>            | Resource POST operation.                              |
-| ResourceRead<TResource, TCustom>                                     | Resource GET operation.                               |
-| ResourceDelete<TResource, TCustom>                                   | Resource DELETE operation.                            |
-| ResourceList<TResource, TCustom>                                     | Resource LIST operation with server-driven paging.    |
-| NonPagedResourceList<TResource, TCustom>                             | Resource LIST operation without paging.               |
+| ResourceCreateOrReplace<TResource, Traits>                          | Resource PUT operation.                               |
+| ResourceCreateWithServiceProvidedName<TResource, Traits>            | Resource POST operation.                              |
+| ResourceRead<TResource, Traits>                                     | Resource GET operation.                               |
+| ResourceDelete<TResource, Traits>                                   | Resource DELETE operation.                            |
+| ResourceList<TResource, Traits>                                     | Resource LIST operation with server-driven paging.    |
 | ResourceAction<TResource, TParams, TResponse>                        | Perform a custom action on a specific resource.       |
 | ResourceCollectionAction<TResource, TParams, TResponse>              | Perform a custom action on a collection of resources. |
-| LongRunningResourceCreateOrReplace<TResource, TCustom>               | Long-running resource PUT operation.                  |
-| LongRunningResourceCreateOrUpdate<TResource, TCustom>                | Long-running resource PATCH operation.                |
-| LongRunningResourceCreateWithServiceProvidedName<TResource, TCustom> | Long-running resource POST operation.                 |
-| LongRunningResourceDelete<TResource, TCustom>                        | Long-running resource DELETE operation.               |
+| LongRunningResourceCreateOrReplace<TResource, Traits>               | Long-running resource PUT operation.                  |
+| LongRunningResourceCreateWithServiceProvidedName<TResource, Traits> | Long-running resource POST operation.                 |
+| LongRunningResourceDelete<TResource, Traits>                        | Long-running resource DELETE operation.               |
 
 ### Decorators
 

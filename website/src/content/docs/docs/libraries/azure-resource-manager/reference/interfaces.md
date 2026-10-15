@@ -31,6 +31,8 @@ op Azure.ResourceManager.ExtensionResourceCollectionOperations<Resource>.listByP
 ### `ExtensionResourceInstanceOperations` {#Azure.ResourceManager.ExtensionResourceInstanceOperations}
 
 A composite interface for resources that includes CRUD operations.
+Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+For new specifications, declare individual resource operations with an explicit PATCH request model.
 
 ```typespec
 interface Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Properties>
@@ -78,6 +80,8 @@ op Azure.ResourceManager.ExtensionResourceInstanceOperations<Resource, Propertie
 ### `ExtensionResourceOperations` {#Azure.ResourceManager.ExtensionResourceOperations}
 
 A composite interface for resources that include CRUD and list operations.
+Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+For new specifications, declare individual resource operations with an explicit PATCH request model.
 
 ```typespec
 interface Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>
@@ -681,6 +685,8 @@ op Azure.ResourceManager.ResourceDeleteWithoutOkAsync<Resource, BaseParameters>.
 ### `ResourceInstanceOperations` {#Azure.ResourceManager.ResourceInstanceOperations}
 
 A composite interface for resources that have CRUD operations.
+Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+For new specifications, declare individual resource operations with an explicit PATCH request model.
 
 ```typespec
 interface Azure.ResourceManager.ResourceInstanceOperations<Resource, Properties, BaseParameters, PatchModel>
@@ -777,15 +783,17 @@ op Azure.ResourceManager.ResourceListBySubscription<Resource>.listBySubscription
 ### `ResourceOperations` {#Azure.ResourceManager.ResourceOperations}
 
 :::caution
-**Deprecated**: Use Azure.ResourceManager.TrackedResourceOperations instead
+**Deprecated**: Declare individual ARM resource operations and use ArmCustomPatchSync or ArmCustomPatchAsync with an explicit PATCH request model.
 :::
 
 A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
 and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
 ListBySubscription operations. The actual route depends on the resource model.
-This is the most common API pattern for Tracked Resources to use.
+Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+For new specifications, declare individual resource operations and use `ArmCustomPatchSync`
+or `ArmCustomPatchAsync` with an explicit PATCH request model.
 
-Deprecated: use `Azure.ResourceManager.TrackedResourceOperations` instead.
+Deprecated: declare individual resource operations with the recommended ARM operation templates instead.
 
 ```typespec
 interface Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>
@@ -897,6 +905,8 @@ op Azure.ResourceManager.ResourceUpdateAsync<Resource, Properties, BaseParameter
 ### `ResourceUpdateSync` {#Azure.ResourceManager.ResourceUpdateSync}
 
 A composite interface for resources that include a synchronous update operation.
+Uses deprecated implicit optionality and is not recommended for new specifications.
+Declare an `ArmCustomPatchSync` operation with an explicit PATCH request model instead.
 
 ```typespec
 interface Azure.ResourceManager.ResourceUpdateSync<Resource, Properties, BaseParameters>
@@ -926,7 +936,9 @@ and `ResourceListByParent<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELET
 The routes are always start at root level:
 `/providers/Microsoft.XXX/...`
 
-This is the most common API pattern for Tenant Resources to use.
+Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+For new specifications, declare individual resource operations and use `ArmCustomPatchSync`
+or `ArmCustomPatchAsync` with an explicit PATCH request model.
 
 ```typespec
 interface Azure.ResourceManager.TenantResourceOperations<Resource, Properties>
@@ -984,7 +996,9 @@ op Azure.ResourceManager.TenantResourceOperations<Resource, Properties>.listByPa
 A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
 and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
 ListBySubscription operations. The actual route depends on the resource model.
-This is the most common API pattern for Tracked Resources to use.
+Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+For new specifications, declare individual resource operations and use `ArmCustomPatchSync`
+or `ArmCustomPatchAsync` with an explicit PATCH request model.
 
 ```typespec
 interface Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>
@@ -1535,6 +1549,8 @@ op Azure.ResourceManager.ArmResourceListByParent(): Response | Error
 ### `ArmResourcePatchAsync` {#Azure.ResourceManager.ArmResourcePatchAsync}
 
 A long-running resource update using the items from the resource marked with Lifecycle.Update visibility
+Uses deprecated implicit optionality and is not recommended for new specifications.
+Use `ArmCustomPatchAsync` with an explicit PATCH request model instead.
 
 ```typespec
 op Azure.ResourceManager.ArmResourcePatchAsync(properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1554,6 +1570,8 @@ op Azure.ResourceManager.ArmResourcePatchAsync(properties: Resource): Azure.Reso
 ### `ArmResourcePatchSync` {#Azure.ResourceManager.ArmResourcePatchSync}
 
 A resource update using the items from the resource marked with Lifecycle.Update visibility
+Uses deprecated implicit optionality and is not recommended for new specifications.
+Use `ArmCustomPatchSync` with an explicit PATCH request model instead.
 
 ```typespec
 op Azure.ResourceManager.ArmResourcePatchSync(properties: Resource): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1591,6 +1609,8 @@ op Azure.ResourceManager.ArmResourceRead(): Response | Error
 ### `ArmTagsPatchAsync` {#Azure.ResourceManager.ArmTagsPatchAsync}
 
 A long-running resource update that only allows updating resource tags (the minimum)
+Uses deprecated implicit optionality and is not recommended for new specifications.
+Use `ArmCustomPatchAsync` with an explicit request model containing `Foundations.TagsUpdateModel<Resource>` instead.
 
 ```typespec
 op Azure.ResourceManager.ArmTagsPatchAsync(properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.CommonTypes.ErrorResponse
@@ -1610,6 +1630,8 @@ op Azure.ResourceManager.ArmTagsPatchAsync(properties: Azure.ResourceManager.Fou
 ### `ArmTagsPatchSync` {#Azure.ResourceManager.ArmTagsPatchSync}
 
 A resource update that only allows updating resource tags (the minimum)
+Uses deprecated implicit optionality and is not recommended for new specifications.
+Use `ArmCustomPatchSync` with an explicit request model containing `Foundations.TagsUpdateModel<Resource>` instead.
 
 ```typespec
 op Azure.ResourceManager.ArmTagsPatchSync(properties: Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>): Azure.ResourceManager.ArmResponse<ResponseBody> | Azure.ResourceManager.CommonTypes.ErrorResponse

@@ -49,44 +49,46 @@ op LongRunningResourceCreateOrReplace<
 > is StandardResourceOperations.LongRunningResourceCreateOrReplace<Resource, Traits>;
 
 /**
- * DEPRECATED: Use `ResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
- * This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
- * See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+ * DEPRECATED: For new PUT APIs, use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+ * For PATCH, use `Foundations.ResourceOperation` with an explicit request model.
+ * This template uses deprecated implicit optionality. Preserve the HTTP method and request schema when migrating existing APIs.
+ * See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step04#choosing-put-or-patch for guidance.
  *
  * Operation signature to create or update a resource.
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
-#deprecated "Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance."
+#deprecated "For PUT, use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance. For PATCH, use a custom operation with an explicit request model."
 op ResourceCreateOrUpdate<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
 > is StandardResourceOperations.ResourceCreateOrUpdate<Resource, Traits>;
 
 /**
- * DEPRECATED: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
- * This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
- * See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+ * DEPRECATED: For new PUT APIs, use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+ * For PATCH, use a custom long-running operation with an explicit request model.
+ * This template uses deprecated implicit optionality. Preserve the HTTP method and request schema when migrating existing APIs.
+ * See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step04#choosing-put-or-patch for guidance.
  *
  * Long-running operation signature to create or update a resource.
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
-#deprecated "Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance."
+#deprecated "For PUT, use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance. For PATCH, use a custom long-running operation with an explicit request model."
 op LongRunningResourceCreateOrUpdate<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}
 > is StandardResourceOperations.LongRunningResourceCreateOrUpdate<Resource, Traits>;
 
 /**
- * DEPRECATED: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
- * This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
- * See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+ * DEPRECATED: For partial updates, use `Foundations.ResourceOperation` with `@patch` and an explicit request model.
+ * This template uses deprecated implicit optionality. Preserve the request schema when migrating existing APIs.
+ * See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step04#choosing-put-or-patch for guidance.
  * Operation signature to update a resource.
  * @template Resource The type of the resource.
  * @template Traits Traits to apply to the operation.
  */
-#deprecated "Use `ResourceUpdate` from a `ResourceOperations` interface instance."
+#deprecated "Use `Foundations.ResourceOperation` with `@patch` and an explicit PATCH request model."
 op ResourceUpdate<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {}

@@ -36,15 +36,17 @@ interface Operations {
  * A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
  * and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
  * ListBySubscription operations. The actual route depends on the resource model.
- * This is the most common API pattern for Tracked Resources to use.
+ * Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+ * For new specifications, declare individual resource operations and use `ArmCustomPatchSync`
+ * or `ArmCustomPatchAsync` with an explicit PATCH request model.
  *
- * Deprecated: use `Azure.ResourceManager.TrackedResourceOperations` instead.
+ * Deprecated: declare individual resource operations with the recommended ARM operation templates instead.
  * @template Resource the ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
  *
  */
-#deprecated "Use Azure.ResourceManager.TrackedResourceOperations instead"
+#deprecated "Declare individual ARM resource operations and use ArmCustomPatchSync or ArmCustomPatchAsync with an explicit PATCH request model."
 interface ResourceOperations<
   Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model,
@@ -55,7 +57,9 @@ interface ResourceOperations<
  * A composite interface for resources that include `ResourceInstanceOperations<Resource, Properties>`
  * and `ResourceCollectionOperations<Resource>`. It includes: `GET`, `PUT`, `PATCH`, `DELETE`, ListByParent,
  * ListBySubscription operations. The actual route depends on the resource model.
- * This is the most common API pattern for Tracked Resources to use.
+ * Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+ * For new specifications, declare individual resource operations and use `ArmCustomPatchSync`
+ * or `ArmCustomPatchAsync` with an explicit PATCH request model.
  * @template Resource the ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
@@ -97,7 +101,9 @@ interface ProxyResourceOperations<
  * The routes are always start at root level:
  *   `/providers/Microsoft.XXX/...`
  *
- * This is the most common API pattern for Tenant Resources to use.
+ * Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+ * For new specifications, declare individual resource operations and use `ArmCustomPatchSync`
+ * or `ArmCustomPatchAsync` with an explicit PATCH request model.
  * @template Resource the ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  */
@@ -114,6 +120,8 @@ interface TenantResourceOperations<
 
 /**
  * A composite interface for resources that have CRUD operations.
+ * Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+ * For new specifications, declare individual resource operations with an explicit PATCH request model.
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
@@ -300,6 +308,8 @@ interface ResourceUpdateAsync<
 
 /**
  * A composite interface for resources that include a synchronous update operation.
+ * Uses deprecated implicit optionality and is not recommended for new specifications.
+ * Declare an `ArmCustomPatchSync` operation with an explicit PATCH request model instead.
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  * @template BaseParameters The http parameters that are part of the request
@@ -321,6 +331,8 @@ interface ResourceUpdateSync<
 
 /**
  * A composite interface for resources that includes CRUD operations.
+ * Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+ * For new specifications, declare individual resource operations with an explicit PATCH request model.
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  */
@@ -343,6 +355,8 @@ interface ExtensionResourceCollectionOperations<Resource extends Foundations.Sim
 
 /**
  * A composite interface for resources that include CRUD and list operations.
+ * Includes `ResourceUpdateSync`, which uses deprecated implicit optionality.
+ * For new specifications, declare individual resource operations with an explicit PATCH request model.
  * @template Resource The ArmResource that provides these operations
  * @template Properties RP-specific property bag for the resource
  */

@@ -39,11 +39,16 @@ model WidgetProperties {
   ...BillingDataProperty;
 }
 
+/** The tags to update. */
+model WidgetTagsPatch {
+  ...Azure.ResourceManager.Foundations.TagsUpdateModel<Widget>;
+}
+
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<Widget>;
   create is ArmResourceCreateOrUpdateAsync<Widget>;
-  update is ArmTagsPatchSync<Widget>;
+  update is ArmCustomPatchSync<Widget, WidgetTagsPatch>;
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
   listByResourceGroup is ArmResourceListByParent<Widget>;
   listBySubscription is ArmListBySubscription<Widget>;

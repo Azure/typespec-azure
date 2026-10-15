@@ -6,7 +6,7 @@ llmstxt: true
 
 If your service uses any long-running operations (LROs; see [our guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#long-running-operations--jobs) for specifics), you will need to define a "status monitor" operation which can report the status of the operation.
 
-Let's say that we want to make our `createOrUpdateWidget` and `deleteWidget` operations long-running. Here's how we can update our `Widgets` interface to accomplish that:
+Let's say that we want to make our `createOrReplaceWidget` and `deleteWidget` operations long-running. Here's how we can update our `Widgets` interface to accomplish that:
 
 ```typespec
 import "@azure-tools/typespec-azure-core";
@@ -29,7 +29,7 @@ interface Widgets {
 
   /** Create or replace a Widget asynchronously. */
   @pollingOperation(Widgets.getWidgetOperationStatus)
-  createOrUpdateWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
+  createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 
   /** Delete a Widget asynchronously. */
   @pollingOperation(Widgets.getWidgetOperationStatus)
@@ -40,7 +40,7 @@ interface Widgets {
 }
 ```
 
-1. We change `createOrUpdateWidget` to use `LongRunningResourceCreateOrReplace<Widget>` and `deleteWidget` to use `LongRunningResourceDelete`.
+1. We change `createOrReplaceWidget` to use `LongRunningResourceCreateOrReplace<Widget>` and `deleteWidget` to use `LongRunningResourceDelete`. The create-or-replace operation remains a PUT.
 2. We define the `getWidgetOperationStatus` operation based on the `GetResourceOperationStatus` signature. This defines the operation status monitor as a child resource of the `Widget` type so that it shows up under that resource in the route hierarchy.
 3. We **must** add the `pollingOperation` decorator to both of the long-running operations and reference the `Widgets.getWidgetOperationStatus` operation. This connects the long-running operations to their associated status monitor operation to make it easier for service clients to be generated.
 

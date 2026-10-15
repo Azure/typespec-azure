@@ -339,7 +339,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/ContosoApplianceAgentTagsUpdate"
+              "$ref": "#/definitions/ApplianceAgentTagsPatch"
             }
           }
         ],
@@ -1178,7 +1178,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/ContosoPlatformAgentTagsUpdate"
+              "$ref": "#/definitions/PlatformAgentTagsPatch"
             }
           }
         ],
@@ -1841,6 +1841,19 @@
     }
   },
   "definitions": {
+    "ApplianceAgentTagsPatch": {
+      "type": "object",
+      "description": "The appliance agent tags to update.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "ApplianceConversation": {
       "type": "object",
       "description": "Model template for a Conversation child resource of an Agent.",
@@ -2331,19 +2344,6 @@
         "definition"
       ]
     },
-    "ContosoApplianceAgentTagsUpdate": {
-      "type": "object",
-      "description": "The type used for updating tags in ContosoApplianceAgent resources.",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "ContosoApplianceDefinition": {
       "type": "object",
       "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or read-only when present. The appliance owns the whole\nagent definition, so there is no `modelDeploymentRef` property in this deployment model.",
@@ -2472,19 +2472,6 @@
         "definition"
       ]
     },
-    "ContosoPlatformAgentTagsUpdate": {
-      "type": "object",
-      "description": "The type used for updating tags in ContosoPlatformAgent resources.",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "ContosoPlatformDefinition": {
       "type": "object",
       "description": "Platform deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or have default visibility when present.",
@@ -2544,6 +2531,19 @@
       "required": [
         "input"
       ]
+    },
+    "PlatformAgentTagsPatch": {
+      "type": "object",
+      "description": "The platform agent tags to update.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
     },
     "PlatformConversation": {
       "type": "object",
