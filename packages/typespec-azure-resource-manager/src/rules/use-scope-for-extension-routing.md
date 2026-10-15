@@ -2,20 +2,21 @@ For Resource Provider as a Service (RPaaS) extension-routing contracts, accept a
 arbitrary scope instead of embedding a specific parent resource URI. RPaaS does
 not forward that parent URI to the provider-side extension route.
 
-This opt-in rule warns when an operation's resolved HTTP path contains more than
+This rule warns when an operation's resolved HTTP path contains more than
 one literal, case-sensitive `/providers/` segment. It reports once per concrete
 operation, including inherited endpoints, and skips uninstantiated templates.
 It checks the supplied program, not a selected API-version projection.
 
 This is **not a general ARM path restriction**. Specific-parent extension paths
-are supported ordinary ARM endpoints. Leave this rule disabled unless the
+are supported ordinary ARM endpoints. Disable this rule unless the
 authored contract is intended for RPaaS extension routing.
 
-## Enable explicitly
+## Enable or disable
 
-The rule is disabled in the ARM library's `all` ruleset and in the general Azure
-resource-manager ruleset. Enable it for the appropriate contract in
-`tspconfig.yaml`:
+The rule is enabled by the ARM library's compiler-provided `all` ruleset. This is
+an opt-out adaptation of the legacy RPaaS-only policy, not deployment detection.
+The general Azure resource-manager ruleset still leaves it disabled. Enable it
+individually for the appropriate contract in `tspconfig.yaml`:
 
 ```yaml
 linter:
@@ -23,8 +24,20 @@ linter:
     "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": true
 ```
 
-Enablement supplies the audience decision. The rule does not detect deployment
-configuration or require provider-namespace metadata.
+The project must choose the appropriate enablement for its routing contract.
+The rule does not detect deployment configuration or require provider-namespace
+metadata.
+
+When extending ARM `all`, services that do not use RPaaS extension routing can
+disable the rule project-wide:
+
+```yaml
+linter:
+  extends:
+    - "@azure-tools/typespec-azure-resource-manager/all"
+  disable:
+    "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": "This service does not use RPaaS extension routing."
+```
 
 ## Impact
 
@@ -32,7 +45,7 @@ configuration or require provider-namespace metadata.
 
 Embedding a parent URI in a provider-side extension route can make the route
 incompatible with RPaaS routing and produce unusable client operations.
-This impact applies to opted-in RPaaS contracts, not ordinary ARM endpoints.
+This routing impact applies to RPaaS contracts, not ordinary ARM endpoints.
 
 ## ❌ Incorrect
 
@@ -99,7 +112,7 @@ interface Bindings {
 
 ## Suppression
 
-For ordinary ARM contracts, leave the rule disabled rather than suppressing
+For ordinary ARM contracts, disable the rule in `tspconfig.yaml` rather than suppressing
 supported endpoints individually. For an intentional RPaaS routing exception
 approved by the service's routing reviewers, suppress the fully qualified rule
 on the offending operation with a reason documenting that approval.

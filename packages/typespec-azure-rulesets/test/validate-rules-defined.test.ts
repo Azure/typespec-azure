@@ -73,12 +73,11 @@ describe("expect all rules to be defined", () => {
     }
   });
 
-  it("keeps RPaaS extension-routing guidance opt-in", () => {
+  it("keeps RPaaS extension-routing guidance opt-in in the general Azure rulesets", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     for (const ruleset of Object.values($linter.ruleSets ?? {})) {
       ok(!ruleset.enable?.[ruleName]);
     }
-    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], false);
   });
 });
