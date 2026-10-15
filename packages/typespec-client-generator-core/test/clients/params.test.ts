@@ -828,6 +828,38 @@ it("endpoint template argument with default value of enum member", async () => {
   strictEqual(clientTemplateArg.clientDefaultValue, "default");
 });
 
+it("endpoint template argument with default value of encoded enum member", async () => {
+  const { program } = await SimpleTester.compile(`
+    @server(
+      "{endpoint}/{region}",
+      "",
+      {
+        endpoint: url,
+        region: Region = Region.EU_WEST,
+      }
+    )
+    @service
+    namespace My.Service;
+    op myOp(): void;
+
+    enum Region {
+      @encodedName("application/json", "eu-west")
+      EU_WEST: 1,
+
+      @encodedName("application/json", "us-east")
+      US_EAST: 2,
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const parameter = context.sdkPackage.clients[0].clientInitialization.parameters[0];
+  strictEqual(parameter.type.kind, "union");
+  const templateArg = parameter.type.variantTypes[0];
+  strictEqual(templateArg.kind, "endpoint");
+  const regionTemplateArg = templateArg.templateArguments[1];
+  strictEqual(regionTemplateArg.name, "region");
+  strictEqual(regionTemplateArg.clientDefaultValue, "eu-west");
+});
+
 it("client level signatures by default", async () => {
   const { program } = await ArmTesterWithService.compile(`
     model MyProperties {

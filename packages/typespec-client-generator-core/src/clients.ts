@@ -106,7 +106,7 @@ function getEndpointTypeFromSingleServer<
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
       if (param.defaultValue) {
-        sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
+        sdkParam.clientDefaultValue = getValueTypeValue(context, param.defaultValue);
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;

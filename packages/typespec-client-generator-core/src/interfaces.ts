@@ -515,6 +515,10 @@ export interface SdkEnumValueType<
   name: string;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
+  /**
+   * Value the member is serialized as: its `@encodedName` for `application/json` if it has one,
+   * otherwise its value, otherwise its name. Api version enum members always use their value.
+   */
   value: string | number;
   enumType: SdkEnumType;
   valueType: TValueType;

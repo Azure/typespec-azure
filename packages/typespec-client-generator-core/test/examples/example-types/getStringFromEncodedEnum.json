@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringFromEncodedEnum",
+  "title": "getStringFromEncodedEnum",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "unknown"
+    }
+  }
+}
