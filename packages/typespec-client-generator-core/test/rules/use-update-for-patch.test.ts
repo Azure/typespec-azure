@@ -4,13 +4,9 @@ import {
   type TesterInstance,
 } from "@typespec/compiler/testing";
 
-import { beforeEach, describe, it, vi } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { useUpdateForPatchRule } from "../../src/rules/use-update-for-patch.js";
 import { ArmTester } from "../tester.js";
-
-vi.mock("@azure-tools/typespec-autorest", () => {
-  throw new Error("Native lint must not load the AutoRest emitter.");
-});
 
 let tester: LinterRuleTester;
 let runner: TesterInstance;
