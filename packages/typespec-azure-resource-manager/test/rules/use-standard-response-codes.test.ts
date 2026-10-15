@@ -38,12 +38,12 @@ function diagnostic(operationName: string, statusCode: number | string) {
 }
 
 it.each([200, 201, 202, 204])("accepts allowed status %s", async (status) => {
-  await tester.expect(`${header} @get op read(): { @statusCode status: ${status}; };`).toBeValid();
+  await tester.expect(`${header} @post op read(): { @statusCode status: ${status}; };`).toBeValid();
 });
 
 it.each([203, 206, 302, 400, 404, 500])("rejects disallowed status %s", async (status) => {
   await tester
-    .expect(`${header} @get op read(): { @statusCode status: ${status}; };`)
+    .expect(`${header} @post op read(): { @statusCode status: ${status}; };`)
     .toEmitDiagnostics([diagnostic("read", status)]);
 });
 
@@ -62,7 +62,7 @@ it.each([
       model Response {
         @statusCode @minValue(${start}) @maxValue(${end}) status: int32;
       }
-      @get op read(): Response;
+      @post op read(): Response;
     `,
     )
     .toEmitDiagnostics([diagnostic("read", `${start}-${end}`)]);
@@ -73,7 +73,7 @@ it("accepts a singleton allowed range", async () => {
     .expect(
       `${header}
       model Response { @statusCode @minValue(200) @maxValue(200) status: int32; }
-      @get op read(): Response;
+      @post op read(): Response;
     `,
     )
     .toBeValid();
@@ -84,7 +84,7 @@ it("rejects a singleton disallowed range", async () => {
     .expect(
       `${header}
       model Response { @statusCode @minValue(404) @maxValue(404) status: int32; }
-      @get op read(): Response;
+      @post op read(): Response;
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404)]);
@@ -96,7 +96,7 @@ it("reports each disallowed response code once across body variants", async () =
       `${header}
       model TextResponse { @statusCode status: 404; @body body: string; }
       model NumericResponse { @statusCode status: 404; @body body: int32; }
-      @get op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
+      @post op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404), diagnostic("read", 500)]);
@@ -106,7 +106,7 @@ it("reports concrete endpoints, not the shared template instance", async () => {
   await tester
     .expect(
       `${header}
-      @get op Template<T>(): { @statusCode status: 404; @body body: T; };
+      @post op Template<T>(): { @statusCode status: 404; @body body: T; };
       @route("/one") op /*read*/read is Template<string>;
       @route("/two") op /*readAgain*/readAgain is Template<string>;
     `,
@@ -122,7 +122,7 @@ it("reports concrete endpoints, not the shared template instance", async () => {
 
 it("checks ordinary namespaces without provider metadata", async () => {
   await tester
-    .expect(`@service namespace Contoso { @get op read(): { @statusCode status: 404; }; }`)
+    .expect(`@service namespace Contoso { @post op read(): { @statusCode status: 404; }; }`)
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
@@ -156,7 +156,13 @@ it("checks standard ARM read response customizations", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("read", 404)]);
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+      },
+    ]);
 });
 
 it("rejects an explicit error response on a standard ARM action", async () => {
@@ -267,9 +273,13 @@ interface Widgets {
 ];
 
 it("diagnoses the incorrect template fixture", async () => {
-  await tester
-    .expect({ "main.tsp": "", "extra.tsp": examples[0] })
-    .toEmitDiagnostics([diagnostic("read", 404)]);
+  await tester.expect({ "main.tsp": "", "extra.tsp": examples[0] }).toEmitDiagnostics([
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+    },
+  ]);
 });
 
 it("accepts the correct template fixture", async () => {

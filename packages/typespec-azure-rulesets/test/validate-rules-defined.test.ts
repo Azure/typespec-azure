@@ -77,5 +77,19 @@ describe("expect all rules to be defined", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(
+      ResourceManagerLinter.rules.filter((rule) => rule.name === "use-standard-response-codes")
+        .length,
+      1,
+    );
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "use-standard-get-response-codes"),
+    );
+    strictEqual(
+      $linter.ruleSets?.["resource-manager"].enable?.[
+        "@azure-tools/typespec-azure-resource-manager/use-standard-get-response-codes"
+      ],
+      undefined,
+    );
   });
 });
