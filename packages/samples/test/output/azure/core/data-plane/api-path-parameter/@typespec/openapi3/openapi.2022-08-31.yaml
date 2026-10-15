@@ -454,7 +454,7 @@ paths:
         content:
           application/merge-patch+json:
             schema:
-              $ref: '#/components/schemas/WidgetCreateOrUpdate'
+              $ref: '#/components/schemas/Widget'
         description: The resource instance.
     get:
       operationId: Widgets_getWidget
@@ -901,13 +901,6 @@ components:
             - $ref: '#/components/schemas/Azure.Core.eTag'
           description: The entity tag for this resource.
           readOnly: true
-      description: A widget.
-    WidgetCreateOrUpdate:
-      type: object
-      properties:
-        manufacturerId:
-          type: string
-          description: The ID of the widget's manufacturer.
       description: A widget.
   securitySchemes:
     ApiKeyAuth:
