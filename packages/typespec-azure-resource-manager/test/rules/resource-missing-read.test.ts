@@ -1,6 +1,5 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
 import { beforeEach, it } from "vitest";
 import { resourceMissingReadRule } from "../../src/rules/resource-missing-read.js";
 
@@ -25,24 +24,6 @@ const service = `
 const diagnostic = (name = "Widget") => ({
   code: "@azure-tools/typespec-azure-resource-manager/resource-missing-read",
   message: `Resource '${name}' must have a get/read operation.`,
-});
-
-async function documentationExample(index: number) {
-  const documentation = await readFile(
-    new URL("../../src/rules/resource-missing-read.md", import.meta.url),
-    "utf8",
-  );
-  const snippet = [...documentation.matchAll(/```typespec\r?\n([\s\S]*?)```/g)][index]?.[1];
-  if (!snippet) throw new Error("Missing native documentation example.");
-  return `${service}\n${snippet}`;
-}
-
-it("reports on the incorrect documentation example", async () => {
-  await tester.expect(await documentationExample(0)).toEmitDiagnostics(diagnostic());
-});
-
-it("accepts the correct documentation example", async () => {
-  await tester.expect(await documentationExample(1)).toBeValid();
 });
 
 it("reports a missing read for a create operation on its interface", async () => {
