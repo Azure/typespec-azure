@@ -5,7 +5,6 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
 import { beforeEach, it } from "vitest";
 import { lroMissingPollingMetadataRule } from "../../src/rules/lro-missing-polling-metadata.js";
 
@@ -47,13 +46,6 @@ const diagnostic = {
   code: "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata",
   message: lroMissingPollingMetadataRule.messages.default,
 };
-
-const documentationExamples = [
-  ...readFileSync(
-    new URL("../../src/rules/lro-missing-polling-metadata.md", import.meta.url),
-    "utf8",
-  ).matchAll(/```typespec\r?\n([\s\S]*?)```/g),
-].map((match) => match[1]);
 
 it.each([
   ["put", 201, "Azure-AsyncOperation"],
@@ -162,20 +154,38 @@ it("reports qualifying headers without provider metadata", async () => {
     }));
 });
 
-it("reports the incorrect documentation example", async () => {
-  const example = documentationExamples[0].replace(
-    "location?: string;",
-    "/*target*/location?: string;",
-  );
-  await tester.expect(`${header}${example}`).toEmitDiagnostics(({ target }) => ({
-    ...diagnostic,
-    pos: getSourceLocation(target).pos,
-    end: getSourceLocation(target).end,
-  }));
+it("reports a synchronous provider action with a plain polling URL", async () => {
+  await tester
+    .expect(
+      `${header}
+      model Response {
+        @statusCode statusCode: 202;
+        @header("Location") /*target*/location?: string;
+      }
+      @armResourceOperations
+      interface ProviderActions {
+        start is ArmProviderActionSync<Request = void, Response = Response>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
 });
 
-it("accepts the corrected documentation example", async () => {
-  await tester.expect(`${header}${documentationExamples[1]}`).toBeValid();
+it("accepts an asynchronous provider action with semantic polling headers", async () => {
+  await tester
+    .expect(
+      `${header}
+      @armResourceOperations
+      interface ProviderActions {
+        start is ArmProviderActionAsync<Request = void, Response = void>;
+      }
+    `,
+    )
+    .toBeValid();
 });
 
 it("rejects an async template whose semantic headers were replaced with plain headers", async () => {
