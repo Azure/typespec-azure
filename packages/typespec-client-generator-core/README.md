@@ -35,9 +35,11 @@ options:
 
 ## Union variant metadata
 
-`SdkUnionType.variants` exposes each non-null alternative as an `SdkUnionVariant` with its declared TypeSpec `name` and SDK `type`. Names retain their declared casing and are independent of payload type names, allowing emitters to distinguish variants that share the same payload type. Unnamed/default variants and synthesized endpoint, credential, and response variants have `name: undefined`.
+`SdkUnionType.variants` is a `Map<string | symbol, SdkType>` containing non-null alternatives in source order, matching the compiler's union variant keys. Named variants use their declared TypeSpec names without casing transformations, allowing direct lookup with `variants.get("variantName")` and preserving distinct names that share a payload type. Unnamed/default variants retain their compiler symbol keys; synthesized endpoint, credential, and response variants use unique symbols.
 
-The existing `variantTypes` property remains available and contains the same SDK type references in the same order as `variants`. For nullable unions, the inner `SdkUnionType` exposes the non-null variants; null is represented by the `SdkNullableType` wrapper. Unions converted to enums continue to expose enum metadata instead.
+The existing `variantTypes` property remains available and contains the same SDK type references in the same order as `[...variants.values()]`. For nullable unions, the inner `SdkUnionType` exposes the non-null variants; null is represented by the `SdkNullableType` wrapper. Unions converted to enums continue to expose enum metadata instead.
+
+The diagnostic `tcgc-output.yaml` represents the map as an ordered array of `{ name, type }` entries, omitting `name` for symbol keys so unnamed alternatives are preserved without serializing JavaScript symbols.
 
 ## Emitter options
 

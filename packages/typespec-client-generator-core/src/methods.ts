@@ -649,7 +649,7 @@ function getSdkMethodResponse(
         access: "public",
         usage: UsageFlags.Output,
         variantTypes: allResponseBodies,
-        variants: allResponseBodies.map((type) => ({ name: undefined, type })),
+        variants: new Map(allResponseBodies.map((type) => [Symbol("variant"), type])),
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
         isExactName: false,

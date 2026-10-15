@@ -534,10 +534,11 @@ it("multiple response types for one status code plus additional model for other 
   ok(methodResponseType);
   strictEqual(methodResponseType.kind, "union");
   strictEqual(methodResponseType.variantTypes.length, 2);
-  deepStrictEqual(
-    methodResponseType.variants,
-    methodResponseType.variantTypes.map((type) => ({ name: undefined, type })),
-  );
+  deepStrictEqual([...methodResponseType.variants.values()], methodResponseType.variantTypes);
+  strictEqual(methodResponseType.variants.size, 2);
+  for (const key of methodResponseType.variants.keys()) {
+    strictEqual(typeof key, "symbol");
+  }
   const [firstVariant, secondVariant] = methodResponseType.variantTypes;
   ok(firstVariant);
   ok(secondVariant);

@@ -26,10 +26,16 @@ it("primitive union", async function () {
   strictEqual(values.length, 2);
   strictEqual(values[0].kind, "string");
   strictEqual(values[1].kind, "int32");
-  deepStrictEqual(
-    sdkType.variants,
-    values.map((type) => ({ name: undefined, type })),
-  );
+  ok(sdkType.variants instanceof Map);
+  deepStrictEqual([...sdkType.variants.values()], values);
+  strictEqual(sdkType.variants.size, 2);
+  for (const key of sdkType.variants.keys()) {
+    strictEqual(typeof key, "symbol");
+  }
+  const rawUnion = sdkType.__raw;
+  ok(rawUnion);
+  strictEqual(rawUnion.kind, "Union");
+  deepStrictEqual([...sdkType.variants.keys()], [...rawUnion.variants.keys()]);
 
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
@@ -43,6 +49,7 @@ it.each([false, true])("named union variants with nullable=%s", async (nullable)
 
     union Choice {
       firstOption: Payload,
+      int32,
       ${nullable ? "null," : ""}
       second_option: Payload,
       int32,
@@ -60,17 +67,22 @@ it.each([false, true])("named union variants with nullable=%s", async (nullable)
   }
   const unionType = sdkType.kind === "nullable" ? sdkType.type : sdkType;
   strictEqual(unionType.kind, "union");
-  deepStrictEqual(
-    unionType.variants.map((variant) => variant.name),
-    ["firstOption", "second_option", undefined],
-  );
-  unionType.variants.forEach((variant, index) => {
-    strictEqual(variant.type, unionType.variantTypes[index]);
+  const keys = [...unionType.variants.keys()];
+  strictEqual(keys[0], "firstOption");
+  strictEqual(typeof keys[1], "symbol");
+  strictEqual(keys[2], "second_option");
+  strictEqual(typeof keys[3], "symbol");
+  strictEqual(unionType.variants.size, 4);
+  [...unionType.variants.values()].forEach((type, index) => {
+    strictEqual(type, unionType.variantTypes[index]);
   });
-  strictEqual(unionType.variants[0].type, unionType.variants[1].type);
-  strictEqual(unionType.variants[0].type.kind, "model");
-  strictEqual(unionType.variants[0].type.name, "RenamedPayload");
-  strictEqual(unionType.variants[2].type.kind, "int32");
+  const payload = unionType.variants.get("firstOption");
+  ok(payload);
+  strictEqual(payload, unionType.variants.get("second_option"));
+  strictEqual(payload.kind, "model");
+  strictEqual(payload.name, "RenamedPayload");
+  strictEqual(unionType.variants.get(keys[1])?.kind, "int32");
+  strictEqual(unionType.variants.get(keys[3])?.kind, "int32");
 });
 
 it("discriminated union preserves distinct tags for the same payload type", async () => {
@@ -90,14 +102,11 @@ it("discriminated union preserves distinct tags for the same payload type", asyn
   const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
-  deepStrictEqual(
-    sdkType.variants.map((variant) => variant.name),
-    ["daily", "weekly", "monthly"],
-  );
+  deepStrictEqual([...sdkType.variants.keys()], ["daily", "weekly", "monthly"]);
   strictEqual(sdkType.variantTypes.length, 3);
-  sdkType.variants.forEach((variant, index) => {
-    strictEqual(variant.type.kind, "string");
-    strictEqual(variant.type, sdkType.variantTypes[index]);
+  [...sdkType.variants.values()].forEach((type, index) => {
+    strictEqual(type.kind, "string");
+    strictEqual(type, sdkType.variantTypes[index]);
   });
 });
 
@@ -124,14 +133,16 @@ it("discriminated union exposes an unnamed default variant", async () => {
   const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
-  deepStrictEqual(
-    sdkType.variants.map((variant) => variant.name),
-    ["cat", undefined],
-  );
-  strictEqual(sdkType.variants[0].type, sdkType.variantTypes[0]);
-  strictEqual(sdkType.variants[1].type, sdkType.variantTypes[1]);
-  strictEqual(sdkType.variants[1].type.kind, "model");
-  strictEqual(sdkType.variants[1].type.name, "UnknownPet");
+  const keys = [...sdkType.variants.keys()];
+  strictEqual(sdkType.variants.size, 2);
+  strictEqual(keys[0], "cat");
+  strictEqual(typeof keys[1], "symbol");
+  strictEqual(sdkType.variants.get("cat"), sdkType.variantTypes[0]);
+  const defaultType = sdkType.variants.get(keys[1]);
+  ok(defaultType);
+  strictEqual(defaultType, sdkType.variantTypes[1]);
+  strictEqual(defaultType.kind, "model");
+  strictEqual(defaultType.name, "UnknownPet");
 });
 
 it("nullable", async function () {

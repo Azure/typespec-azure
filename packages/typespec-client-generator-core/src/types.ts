@@ -635,7 +635,7 @@ export function getSdkUnionWithDiagnostics(
           isExactName: false,
           namespace,
           variantTypes: [],
-          variants: [],
+          variants: new Map(),
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           access: "public",
           usage: UsageFlags.None,
@@ -666,13 +666,15 @@ export function getSdkUnionWithDiagnostics(
           };
         }
         updateReferencedTypeMap(context, type, retval);
-        const variants = [...type.variants.values()]
-          .filter((variant) => !isNullType(variant.type))
-          .map((variant) => ({
-            name: typeof variant.name === "string" ? variant.name : undefined,
-            type: diagnostics.pipe(getClientTypeWithDiagnostics(context, variant.type, operation)),
-          }));
-        const variantTypes = variants.map((variant) => variant.type);
+        const variants = new Map(
+          [...type.variants.values()]
+            .filter((variant) => !isNullType(variant.type))
+            .map((variant) => [
+              variant.name,
+              diagnostics.pipe(getClientTypeWithDiagnostics(context, variant.type, operation)),
+            ]),
+        );
+        const variantTypes = [...variants.values()];
         if (retval.kind === "nullable" && retval.type.kind === "union") {
           retval.type.variants = variants;
           retval.type.variantTypes = variantTypes;
@@ -716,7 +718,7 @@ function getEmptyUnionType(
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
-    variants: [],
+    variants: new Map(),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     access: "public",
     usage: UsageFlags.None,
@@ -1311,7 +1313,7 @@ function getSdkCredentialType(
       __raw: service,
       kind: "union",
       variantTypes: credentialTypes,
-      variants: credentialTypes.map((type) => ({ name: undefined, type })),
+      variants: new Map(credentialTypes.map((type) => [Symbol("variant"), type])),
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
       isExactName: false,
