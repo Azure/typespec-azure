@@ -290,7 +290,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetTagsUpdate"
+              "$ref": "#/definitions/WidgetTagsPatch"
             }
           }
         ],
@@ -571,9 +571,9 @@
         "encryption"
       ]
     },
-    "WidgetTagsUpdate": {
+    "WidgetTagsPatch": {
       "type": "object",
-      "description": "The type used for updating tags in Widget resources.",
+      "description": "The tags to update.",
       "properties": {
         "tags": {
           "type": "object",

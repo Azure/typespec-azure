@@ -40,7 +40,19 @@ model TestTrackedResource is TrackedResource<TestTrackedProperties> {
 
 @armResourceOperations(TestTrackedResource)
 interface TrackedOperations
-  extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {}
+  extends ResourceRead<TestTrackedResource>,
+    ResourceCreate<TestTrackedResource>,
+    ResourceDeleteWithoutOkAsync<TestTrackedResource> {
+  update is ArmCustomPatchSync<TestTrackedResource, TestTrackedPatch>;
+  listByResourceGroup is ArmResourceListByParent<TestTrackedResource>;
+  listBySubscription is ArmListBySubscription<TestTrackedResource>;
+}
+
+/** The tracked resource properties to update. */
+model TestTrackedPatch is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  TestTrackedResource,
+  TestTrackedProperties
+>;
 
 @doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties {

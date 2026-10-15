@@ -295,7 +295,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TestTrackedResourceUpdate"
+              "$ref": "#/definitions/TestTrackedPatch"
             }
           }
         ],
@@ -340,9 +340,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Resource deleted successfully."
-          },
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
@@ -699,6 +696,19 @@
         "value"
       ]
     },
+    "TestTrackedPatch": {
+      "type": "object",
+      "description": "The tracked resource properties to update.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "TestTrackedProperties": {
       "type": "object",
       "description": "rp-specific properties for the resource with all envelope properties",
@@ -762,19 +772,6 @@
       "required": [
         "value"
       ]
-    },
-    "TestTrackedResourceUpdate": {
-      "type": "object",
-      "description": "The type used for update operations of the TestTrackedResource.",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "parameters": {}

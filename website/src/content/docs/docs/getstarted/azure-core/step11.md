@@ -15,6 +15,7 @@ You can define a singleton resource (a resource type with only one instance) by 
 @parentResource(Widget)
 model WidgetAnalytics {
   @key("analyticsId")
+  @visibility(Lifecycle.Read)
   id: "current";
 
   /** The number of uses of the widget. */
@@ -40,7 +41,7 @@ alias ServiceTraits = SupportsRepeatableRequests &
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 op getAnalytics is Operations.ResourceRead<WidgetAnalytics>;
-op updateAnalytics is Operations.ResourceCreateOrUpdate<WidgetAnalytics>;
+op createOrReplaceAnalytics is Operations.ResourceCreateOrReplace<WidgetAnalytics>;
 ```
 
 By using a literal value of `"current"` for `"id"`, the route path for these operations will be the following:

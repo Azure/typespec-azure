@@ -290,7 +290,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetTagsUpdate"
+              "$ref": "#/definitions/WidgetPatch"
             }
           }
         ],
@@ -514,6 +514,35 @@
         "value"
       ]
     },
+    "WidgetPatch": {
+      "type": "object",
+      "description": "The envelope properties to update.",
+      "properties": {
+        "managedBy": {
+          "type": "string",
+          "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
+        },
+        "identity": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "plan": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
+          "description": "Details of the resource plan."
+        },
+        "sku": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
+          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "WidgetProperties": {
       "type": "object",
       "description": "Widget Resource Properties.",
@@ -535,19 +564,6 @@
       "required": [
         "color"
       ]
-    },
-    "WidgetTagsUpdate": {
-      "type": "object",
-      "description": "The type used for updating tags in Widget resources.",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "parameters": {}

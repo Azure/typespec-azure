@@ -191,10 +191,9 @@ interface Widgets {
   getWidgetDeleteOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   // Widget Operations
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-  @doc("Creates or updates a Widget asynchronously")
+  @doc("Creates or replaces a Widget asynchronously")
   @pollingOperation(Widgets.getWidgetOperationStatus)
-  createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+  createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 
   @doc("Get a Widget")
   getWidget is Operations.ResourceRead<Widget>;
@@ -213,9 +212,8 @@ interface Widgets {
   @doc("Get a WidgetAnalytics")
   getAnalytics is Operations.ResourceRead<WidgetAnalytics>;
 
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-  @doc("Creates or updates a WidgetAnalytics")
-  updateAnalytics is Operations.ResourceCreateOrUpdate<WidgetAnalytics>;
+  @doc("Creates or replaces a WidgetAnalytics")
+  createOrReplaceAnalytics is Operations.ResourceCreateOrReplace<WidgetAnalytics>;
 
   // Widget Repair Operations
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a custom operation status endpoint."

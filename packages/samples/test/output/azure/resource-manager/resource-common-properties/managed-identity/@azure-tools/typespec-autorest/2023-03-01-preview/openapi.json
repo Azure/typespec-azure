@@ -290,7 +290,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetTagsUpdate"
+              "$ref": "#/definitions/WidgetPatch"
             }
           }
         ],
@@ -438,6 +438,23 @@
         "value"
       ]
     },
+    "WidgetPatch": {
+      "type": "object",
+      "description": "The envelope properties to update.",
+      "properties": {
+        "identity": {
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "WidgetProperties": {
       "type": "object",
       "description": "Widget Resource Properties.",
@@ -459,19 +476,6 @@
       "required": [
         "color"
       ]
-    },
-    "WidgetTagsUpdate": {
-      "type": "object",
-      "description": "The type used for updating tags in Widget resources.",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "parameters": {}

@@ -34,7 +34,19 @@ model TestTrackedResource is TrackedResource<TestTrackedProperties> {
  */
 @armResourceOperations(TestTrackedResource)
 interface TrackedOperations
-  extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {}
+  extends ResourceRead<TestTrackedResource>,
+    ResourceCreate<TestTrackedResource>,
+    ResourceDeleteWithoutOkAsync<TestTrackedResource> {
+  update is ArmCustomPatchSync<TestTrackedResource, TestTrackedPatch>;
+  listByResourceGroup is ArmResourceListByParent<TestTrackedResource>;
+  listBySubscription is ArmListBySubscription<TestTrackedResource>;
+}
+
+/** The tracked resource properties to update. */
+model TestTrackedPatch is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  TestTrackedResource,
+  TestTrackedProperties
+>;
 
 @doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties {
@@ -82,9 +94,15 @@ model TestTenantResource is ProxyResource<TestTenantProperties> {
 }
 
 @armResourceOperations(TestTenantResource)
-interface TenantOperations
-  extends ProxyResourceOperations<TestTenantResource>,
-    ResourceUpdate<TestTenantResource, TestTenantProperties> {}
+interface TenantOperations extends ProxyResourceOperations<TestTenantResource> {
+  update is ArmCustomPatchSync<TestTenantResource, TestTenantPatch>;
+}
+
+/** The tenant resource properties to update. */
+model TestTenantPatch is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  TestTenantResource,
+  TestTenantProperties
+>;
 
 @doc("rp-specific properties for the resource")
 model TestTenantProperties {
@@ -108,9 +126,15 @@ model TestExtensionResource is ExtensionResource<TestExtensionProperties> {
 }
 
 @armResourceOperations(TestExtensionResource)
-interface ExtensionOperations
-  extends ProxyResourceOperations<TestExtensionResource>,
-    ResourceUpdate<TestExtensionResource, TestExtensionProperties> {}
+interface ExtensionOperations extends ProxyResourceOperations<TestExtensionResource> {
+  update is ArmCustomPatchSync<TestExtensionResource, TestExtensionPatch>;
+}
+
+/** The extension resource properties to update. */
+model TestExtensionPatch is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  TestExtensionResource,
+  TestExtensionProperties
+>;
 
 @doc("rp-specific properties for the resource")
 model TestExtensionProperties {

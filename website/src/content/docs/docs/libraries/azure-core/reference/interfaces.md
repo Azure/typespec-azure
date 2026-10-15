@@ -54,6 +54,9 @@ op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningReso
 #### `ResourceOperations.ResourceCreateOrUpdate` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateOrUpdate}
 
 Create or update operation template.
+Uses deprecated implicit optionality and is not recommended for new APIs.
+Use `ResourceCreateOrReplace` for PUT, or `Foundations.ResourceOperation` with
+`@patch` and an explicit request model for partial updates.
 
 ```typespec
 op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 201 } | { statusCode: 200 } | ErrorResponse
@@ -69,6 +72,9 @@ op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateO
 #### `ResourceOperations.LongRunningResourceCreateOrUpdate` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateOrUpdate}
 
 Long-running resource create or update operation template.
+Uses deprecated implicit optionality and is not recommended for new APIs.
+Use `LongRunningResourceCreateOrReplace` for PUT, or a custom long-running
+PATCH operation with an explicit request model for partial updates.
 
 ```typespec
 op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | { statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
@@ -84,6 +90,9 @@ op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningReso
 #### `ResourceOperations.ResourceUpdate` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceUpdate}
 
 Resource update operation template.
+Uses deprecated implicit optionality and is not recommended for new APIs.
+For partial updates, use `Foundations.ResourceOperation` with `@patch` and
+an explicit request model instead.
 
 ```typespec
 op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): { statusCode: 200 } | ErrorResponse
@@ -360,12 +369,13 @@ op Azure.Core.LongRunningResourceCreateOrReplace(apiVersion: string, resource: R
 ### `LongRunningResourceCreateOrUpdate` {#Azure.Core.LongRunningResourceCreateOrUpdate}
 
 :::caution
-**Deprecated**: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
+**Deprecated**: For PUT, use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance. For PATCH, use a custom long-running operation with an explicit request model.
 :::
 
-DEPRECATED: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
-This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
-See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+DEPRECATED: For new PUT APIs, use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+For PATCH, use a custom long-running operation with an explicit request model.
+This template uses deprecated implicit optionality. Preserve the HTTP method and request schema when migrating existing APIs.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step04#choosing-put-or-patch for guidance.
 
 Long-running operation signature to create or update a resource.
 
@@ -510,12 +520,13 @@ op Azure.Core.ResourceCreateOrReplace(apiVersion: string, resource: Resource): {
 ### `ResourceCreateOrUpdate` {#Azure.Core.ResourceCreateOrUpdate}
 
 :::caution
-**Deprecated**: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+**Deprecated**: For PUT, use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance. For PATCH, use a custom operation with an explicit request model.
 :::
 
-DEPRECATED: Use `ResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
-This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
-See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+DEPRECATED: For new PUT APIs, use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance.
+For PATCH, use `Foundations.ResourceOperation` with an explicit request model.
+This template uses deprecated implicit optionality. Preserve the HTTP method and request schema when migrating existing APIs.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step04#choosing-put-or-patch for guidance.
 
 Operation signature to create or update a resource.
 
@@ -613,12 +624,12 @@ op Azure.Core.ResourceRead(apiVersion: string): {} | Azure.Core.Foundations.Erro
 ### `ResourceUpdate` {#Azure.Core.ResourceUpdate}
 
 :::caution
-**Deprecated**: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
+**Deprecated**: Use `Foundations.ResourceOperation` with `@patch` and an explicit PATCH request model.
 :::
 
-DEPRECATED: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
-This can be done by instantiating your own version with the traits you want `alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;`.
-See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step05#defining-the-operation-interface for details on how to use.
+DEPRECATED: For partial updates, use `Foundations.ResourceOperation` with `@patch` and an explicit request model.
+This template uses deprecated implicit optionality. Preserve the request schema when migrating existing APIs.
+See https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step04#choosing-put-or-patch for guidance.
 Operation signature to update a resource.
 
 ```typespec

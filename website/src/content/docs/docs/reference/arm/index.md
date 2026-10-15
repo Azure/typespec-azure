@@ -68,28 +68,31 @@ The following models are used for different purposes:
 
 ## Interfaces
 
-The `@azure-tools/typespec-azure-resource-manager` library defines these standard interfaces as basic building blocks that you can expose. You can use `extends` to compose the operations to meet the exact needs of your APIs.
-
-For tracked resources, it is expected to implement the full `ResourceOperations` interface.
-For other resource types, you can use these basic interfaces to compose desired APIs. Certain linting rules may apply.
+For new specifications, declare resource operations explicitly with the recommended
+[ARM resource operation templates](../../howtos/ARM/resource-operations.md).
+For PATCH, use `ArmCustomPatchSync` or `ArmCustomPatchAsync` with an explicit request model.
+The older `ResourceUpdateSync` interface, its `ResourceUpdate` alias, and composite interfaces
+that include it rely on deprecated implicit optionality and are not recommended for new
+specifications.
 
 ```typespec
-model Employee is TrackedResource<EmployeeProperties>
-...
+/** The properties to update. */
+model EmployeePatch
+  is Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>;
 
 @armResourceOperations
-interface Employees extends TrackedResourceOperations<Employee, EmployeeProperties> {}
-
-------
-model Widget is ProxyResource<WidgetProperties>
-...
-
-@armResourceOperations
-interface Widgets extends extends ResourceRead<Widget>,
- ResourceCreate<Widget>,
- ResourceDelete<Widget> {}
-
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<Employee, EmployeePatch>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+}
 ```
+
+The following interface catalog includes older composition patterns for reference, not as
+recommendations for new specifications.
 
 | Interface                                                    | Notes                                                                                                                                                                                                                                                      |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

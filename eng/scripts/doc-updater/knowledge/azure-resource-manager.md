@@ -38,7 +38,7 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 Rule documentation is authored beside each rule in `packages/typespec-azure-resource-manager/src/rules/*.md` and associated with the rule through its `docs` field. `pnpm regen-docs` passes `--rules-dir ../rules` and generates the website rule pages under `website/src/content/docs/docs/libraries/azure-resource-manager/rules/`. That website directory is ignored by Git and must not be edited manually.
 
-The `use-relationship-required-properties`, `use-api-version`, `use-operation-decorator`, and `use-interface` rules currently have adjacent Markdown source but no `docs` field in their TypeScript rule definitions. `regen-docs` therefore warns that their documentation is missing and emits description-only rule pages. Fixing those associations requires an edit under `src/`.
+The `use-relationship-required-properties`, `use-api-version`, and `use-interface` rules currently have adjacent Markdown source but no `docs` field in their TypeScript rule definitions. `regen-docs` therefore warns that their documentation is missing and emits description-only rule pages. Fixing those associations requires an edit under `src/`.
 
 ## Reference Documentation Generation
 
@@ -83,13 +83,13 @@ Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `ope
 
 ## Operation Templates (Not Deprecated)
 
-`ArmResourcePatchAsync` and `ArmResourcePatchSync` exist and are not deprecated, though they are noted as "not recommended" in resource-operations.md. `ArmCustomPatchSync` and `ArmCustomPatchAsync` are the preferred alternatives.
+`ArmResourcePatchAsync` and `ArmResourcePatchSync` exist and are not marked `#deprecated`, but they rely on deprecated implicit optionality. Recommend `ArmCustomPatchSync` and `ArmCustomPatchAsync` with an explicit PATCH request model in all new examples. For tags-only PATCH, pass a named model spreading `Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>`. For general updates, use a dedicated model matching the API contract or derive one with `Azure.ResourceManager.Foundations.ResourceUpdateModel<Resource, Properties>`.
 
-`TrackedResourceOperations` interface is current. `ResourceOperations` is deprecated (use `TrackedResourceOperations` instead).
+`TrackedResourceOperations` is not marked `#deprecated`, but includes `ResourceUpdateSync`, which uses deprecated implicit optionality. `ResourceOperations` is deprecated. Do not recommend these composite interfaces for new specifications; declare individual resource operations and use `ArmCustomPatch*` for PATCH.
 
-## ArmTagsPatch Suppress Requirement
+## Legacy PATCH Templates
 
-`ArmTagsPatchSync`, `ArmTagsPatchAsync`, `ArmResourcePatchSync`, and `ArmResourcePatchAsync` use `@patch(#{ implicitOptionality: true })` which triggers a deprecation warning. Users must add `#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"` at the usage site. This is documented in `resource-operations.md`.
+`ArmTagsPatchSync`, `ArmTagsPatchAsync`, `ArmResourcePatchSync`, `ArmResourcePatchAsync`, and `ResourceUpdateSync.update` use `@patch(#{ implicitOptionality: true })`. Do not recommend suppressing the warning or use these templates in new examples. Existing API migrations must preserve property optionality, nested schemas, and SDK request body parameter names.
 
 ## Getting-Started Guide Style
 

@@ -336,6 +336,8 @@ op ArmResourceCreateOrReplaceAsync<
 
 /**
  * A long-running resource update that only allows updating resource tags (the minimum)
+ * Uses deprecated implicit optionality and is not recommended for new specifications.
+ * Use `ArmCustomPatchAsync` with an explicit request model containing `Foundations.TagsUpdateModel<Resource>` instead.
  * @template Resource the resource being patched
  * @template Properties Optional. Exists for parallelism with ArmResourcePatch.
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -372,6 +374,8 @@ op ArmTagsPatchAsync<
 
 /**
  * A long-running resource update using the items from the resource marked with Lifecycle.Update visibility
+ * Uses deprecated implicit optionality and is not recommended for new specifications.
+ * Use `ArmCustomPatchAsync` with an explicit PATCH request model instead.
  * @template Resource the resource being patched
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -447,6 +451,8 @@ op ArmCustomPatchAsync<
 
 /**
  * A resource update that only allows updating resource tags (the minimum)
+ * Uses deprecated implicit optionality and is not recommended for new specifications.
+ * Use `ArmCustomPatchSync` with an explicit request model containing `Foundations.TagsUpdateModel<Resource>` instead.
  * @template Resource the resource being patched
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -473,6 +479,8 @@ op ArmTagsPatchSync<
 
 /**
  * A resource update using the items from the resource marked with Lifecycle.Update visibility
+ * Uses deprecated implicit optionality and is not recommended for new specifications.
+ * Use `ArmCustomPatchSync` with an explicit PATCH request model instead.
  * @template Resource the resource being patched
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters

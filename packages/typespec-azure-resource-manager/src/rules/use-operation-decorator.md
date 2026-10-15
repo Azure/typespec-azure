@@ -51,11 +51,17 @@ interface FooResources {
 Using standard ARM resource operation templates (recommended):
 
 ```tsp
+/** The properties to update. */
+model FooResourcePatch is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  FooResource,
+  FooResourceProperties
+>;
+
 @armResourceOperations
 interface FooResources {
   get is ArmResourceRead<FooResource>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<FooResource>;
-  update is ArmResourcePatchAsync<FooResource, FooResourceProperties>;
+  update is ArmCustomPatchAsync<FooResource, FooResourcePatch>;
   delete is ArmResourceDeleteWithoutOkAsync<FooResource>;
   list is ArmResourceListByParent<FooResource>;
 }

@@ -68,8 +68,9 @@ op createOrUpdate is ArmResourceCreateOrReplaceAsync<
 
 ## Update (PATCH)
 
-The `ArmCustomPatchAsync` template uses `ArmLroLocationHeader` by default with the resource as the
-final result.
+Use `ArmCustomPatchAsync` with an explicit PATCH request model. It uses `ArmLroLocationHeader`
+by default with the resource as the final result. Define `MyResourcePatch` as described in
+[Resource Update Operations (PATCH)](./resource-operations.md#resource-update-operations-patch).
 
 ### Default
 
