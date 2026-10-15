@@ -1268,6 +1268,42 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_LroMetadata_analyze
+
+- Endpoint: `post /azure/client-generator-core/lro-metadata/analyzers/{analyzerId}:analyze`
+
+Verifies that `@lroOperationId("lastPathSegment")` exposes the server-issued operation ID from
+the status-monitor URI without changing the polling protocol.
+
+The generated LRO method should expose `analysis-123`, derived from the final path segment of
+`Operation-Location`.
+
+Expected calls:
+
+- POST `/analyzers/document-1:analyze` returns 202 with
+  `Operation-Location: {endpoint}/analyzerResults/analysis-123`
+- GET `/analyzerResults/analysis-123` returns a running status
+- GET `/analyzerResults/analysis-123` returns a succeeded status with the analysis result
+
+### Azure_ClientGenerator_Core_LroMetadata_translate
+
+- Endpoint: `post /azure/client-generator-core/lro-metadata/documents/{documentId}:translate`
+
+Verifies that property-level `@lroPollingMetadata` exposes a status-monitor property with its
+exact SDK type and serialization metadata.
+
+The generated LRO method should expose optional `int32` polling metadata named `percentComplete`,
+serialized on the wire as `percent_complete`.
+
+Expected calls:
+
+- POST `/documents/document-1:translate` returns 202 with
+  `Operation-Location: {endpoint}/documentTranslationJobs/translation-123`
+- GET `/documentTranslationJobs/translation-123` returns a running status with
+  `percent_complete: 50`
+- GET `/documentTranslationJobs/translation-123` returns a succeeded status with
+  `percent_complete: 100` and the translation result
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`
