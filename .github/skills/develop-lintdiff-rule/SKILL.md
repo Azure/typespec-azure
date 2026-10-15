@@ -345,6 +345,13 @@ from unresolved gaps.
 Apply the [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
 to native unit tests. Keep framework-only migration evidence in the fixture or
 comparison harness rather than duplicating it in each rule suite.
+Record required acceptance claims, including those promised in the PR, through
+the shared [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix).
+Follow its setup, typed-extraction, and exact-target guidance. Preserve required
+registered execution, suppression, cross-rule, package-isolation, and actual
+published-example proof in the appropriate layers rather than deleting it as
+unit-test cleanup. This mapping supplements, not replaces, required focused
+fixture, build, and corpus evidence.
 
 Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
 to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
@@ -525,6 +532,11 @@ same external files, document that limit instead of adding a broader heuristic.
 
 When evidence requires a rule update:
 
+- first reproduce the alleged defect with an offending case and a nearby valid
+  control under the shared
+  [discriminating coverage gate](../typespec-lint-validate/SKILL.md#contract-driven-coverage);
+  if existing logic already passes, add useful regression evidence without
+  inventing a production rewrite
 - change the production TypeSpec rule
 - add directly related violating, compliant, and regression fixtures
 - for an emission-dependent rule, cover each distinct supported native matrix
@@ -877,6 +889,14 @@ The reviewer must:
   independently of Swagger parity
 - reject framework-only native unit tests; require a distinct rule-owned
   predicate, target, or regression for each retained case
+- verify the acceptance-claim mapping, shared setup, typed extraction, and exact
+  targets; preserve required non-unit evidence in its proper layer and reject
+  vacuous regressions that never reach the relevant rule decision
+- apply the shared
+  [final contract consistency sweep](../typespec-lint-implement/SKILL.md#final-contract-consistency),
+  including stale helpers/scaffolding, actual published snippets, suppression,
+  applicable manual guidance and SDK impact, and task-owned unreleased entries;
+  verify direct wiring and cheap guards where the implementation warrants them
 - for custom model traversal implemented by the rule, cover relevant cycles,
   shared siblings, shared models across operations, and diagnostic targets;
   assert the intended diagnostic

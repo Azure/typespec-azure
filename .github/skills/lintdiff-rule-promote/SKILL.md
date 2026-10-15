@@ -512,6 +512,16 @@ semantic tests or introducing ARM coupling into shared Core test setup. For SDK
 naming, prove common versus language-scoped override behavior and the intended
 name domain.
 
+Classify every required acceptance claim with the shared
+[test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix), including
+promises in the development and promotion PR descriptions. Follow its setup,
+typed-extraction, and exact-target guidance. The behavior-suite instructions
+below apply to individual-rule diagnostics, not every acceptance claim:
+preserve required registered execution/suppression, cross-rule interactions,
+registration/legacy names, package loading/isolation, and published-example
+proof in the appropriate existing layers. Do not silently drop that evidence
+when removing framework-only unit cases.
+
 Create:
 
 - `packages/<target>/test/rules/<rule-name>.test.ts`
@@ -570,10 +580,15 @@ Use this standard fixture-to-native-test mapping:
   native `it("...")` test title or titles that replace it, or an explicit
   `Not ported (framework-only)` disposition and reason; do not paraphrase test
   titles in mapping tables or PR notes
+- include each fixture's acceptance claim and destination layer in that mapping.
+  For relocated integration, package, or documentation evidence, name the exact
+  test title/evidence location instead of marking the claim framework-only.
+  Record justified removal only when the proof is genuinely redundant.
 
-Prefer direct TypeSpec snippets and expected diagnostics over OpenAPI output
+For behavior tests, prefer direct TypeSpec snippets and expected diagnostics over OpenAPI output
 snapshots. If a lintdiff fixture depends on unrelated diagnostics or
-suppressions, adapt the snippet so the promoted rule is tested directly.
+suppressions, adapt the behavior snippet so the promoted rule is tested directly,
+without erasing required interaction or suppression evidence in other layers.
 
 ### 6. Move rule documentation
 
@@ -974,6 +989,16 @@ promotion diff. The review should inspect:
 - adherence to the rule-test responsibility boundary: remove framework-only
   cases, raw-source architecture assertions, and emitted-reference-only matrices;
   preserve distinct native rule coverage and explain fixtures not ported
+- acceptance-claim mapping and preservation of promised non-unit evidence in its
+  proper layer; shared setup, typed extraction, exact targets, and discriminating
+  offending/valid controls must preserve relevant identity, visibility, and LRO
+  preconditions rather than merely compile
+- the shared
+  [final contract consistency sweep](../typespec-lint-implement/SKILL.md#final-contract-consistency),
+  including obsolete helpers/scaffolding, manual guidance, exact suppression
+  examples, SDK impact, legacy mappings, and stale unreleased descriptions;
+  assess fixed-validator wiring and metadata costs without removing necessary
+  helpers, deduplication, or exemptions
 - docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
   section

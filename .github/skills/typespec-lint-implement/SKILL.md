@@ -45,6 +45,14 @@ discovery rather than silently choosing different semantics.
 - Use the narrowest semantic layer that answers the question: a type-only check
   need not resolve HTTP operations; an HTTP policy still needs HTTP metadata.
   Prefer supported TypeKit/compiler predicates over custom scalar-name checks.
+- Normalize input and apply cheap, semantics-preserving exclusions before
+  expensive semantic metadata resolution. Where this ordering addresses a
+  regression, prove both the unchanged diagnostic behavior and the avoided
+  resolution path; do not skip metadata needed to decide the rule.
+- Prefer direct construction and calls for a small fixed set of validators
+  over a mutable registry/map/dispatcher without an actual extension need.
+  Retain focused helpers, deduplication, and exemptions when they serve the
+  contract; simplicity is not a blanket ban on helper files.
 - Compare helper behavior before sharing it. Serialized parameter-name equality,
   for example, is not equivalent to checking the parameter's common-type origin.
   Share equivalent predicates; keep distinct policies separate. Name helpers
@@ -56,6 +64,8 @@ discovery rather than silently choosing different semantics.
 - Require a supported-input regression case for added complexity. Keep a scope
   guard or SDK-name resolver when the contract requires it; do not remove it
   solely to reduce code. Compare related rules' scope and name-resolution policy.
+  Apply the [discriminating coverage gate](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
+  before rewriting logic for an alleged miss.
 - Report each independently actionable violation on its authored target. Avoid
   redundant aggregate diagnostics for the same finding; define fallback targets
   for missing constructs. Keep messages concise and move compatibility impact
@@ -131,6 +141,28 @@ audience: a shared Core rule can still need an ARM resource example.
 Apply the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
 gate to the actual published snippets. This authoring policy does not require
 rewriting focused semantic unit tests around ARM templates.
+
+### Final contract consistency
+
+Before publication, reconcile the final diff and PR acceptance claims with the
+native contract and [test-claim mapping](../typespec-lint-validate/SKILL.md#test-claim-matrix):
+
+- Remove task-related unused helpers/imports, obsolete scaffolding, vacuous
+  cases, and redundant permutations without losing distinct semantic controls
+  or required acceptance evidence.
+- Check final scope, defaults, exclusions, exceptions, diagnostic targets, and
+  native-versus-legacy differences across implementation, actual published
+  examples, authored/generated references, manual guides, and legacy mappings.
+- Recheck SDK impact and compatibility guidance. Show the fully qualified rule
+  ID and correct placement in suppression examples; when registered suppression
+  is an acceptance claim, preserve its control in integration coverage.
+- Reconcile task-owned unreleased Chronus entries with the final public
+  behavior rather than accumulating stale intermediate fix descriptions.
+  Consolidate only entries for the same unreleased feature/package where
+  appropriate; retain distinct package and release classifications.
+- Evaluate reviewer suggestions against current code, the contract, and PR
+  promises before turning them into policy. Do not impose blanket bans on
+  isolated testers, integration tests, Markdown compilation, or helpers.
 
 ## Deliverable
 

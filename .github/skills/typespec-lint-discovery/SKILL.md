@@ -68,6 +68,12 @@ Record these decisions in the brief before implementation:
   message. Extra diagnostics and suppressed duplicates are behavior decisions.
 - **Public naming:** use a short native name consistent with sibling rules.
   Define domain terms in user documentation and non-obvious helper contracts.
+- **Acceptance evidence:** record required standalone-example, registered
+  execution/suppression, interaction, registration, and dependency-isolation
+  claims when applicable, including promises in an existing PR description.
+  Map them to the [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix)
+  without requiring every layer for every rule; reconcile the mapping at the
+  final head.
 
 For naming rules, explicitly distinguish source names, common SDK names,
 language-specific overrides, and serialized operation IDs. Select the name
