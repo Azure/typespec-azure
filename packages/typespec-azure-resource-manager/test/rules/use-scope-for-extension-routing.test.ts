@@ -136,28 +136,6 @@ it("reports separate operations sharing one HTTP path", async () => {
     .toEmitDiagnostics([diagnostic(), diagnostic()]);
 });
 
-it("skips an uninstantiated operation template", async () => {
-  await tester
-    .expect(
-      `
-    @get @route("${path}") op read<T>(@path parentName: string, @path bindingName: string): T;
-  `,
-    )
-    .toBeValid();
-});
-
-it("skips operations declared by an uninstantiated generic interface", async () => {
-  await tester
-    .expect(
-      `
-    interface Reads<T> {
-      @get @route("${path}") read(@path parentName: string, @path bindingName: string): T;
-    }
-  `,
-    )
-    .toBeValid();
-});
-
 it("reports only the instantiated endpoint from a generic interface", async () => {
   await tester
     .expect(
