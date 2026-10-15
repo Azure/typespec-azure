@@ -96,6 +96,7 @@ export const noOperationGroupNameConflictRule = createRule({
             const discriminator = getDiscriminator(context.program, model);
             if (discriminator) {
               const [alternatives, diagnostics] = getDiscriminatedUnionFromInheritance(
+                context.program,
                 model,
                 discriminator,
               );
