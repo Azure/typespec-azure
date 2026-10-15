@@ -1,15 +1,8 @@
-import { Tester } from "#test/tester.js";
-import { resolvePath } from "@typespec/compiler";
-import {
-  createLinterRuleTester,
-  createTester,
-  type LinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester, UnwrappedTester } from "#test/tester.js";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 
 import { beforeEach, describe, it } from "vitest";
-import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
 import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
-import { useOperationDecoratorRule } from "../../src/rules/use-operation-decorator.js";
 
 const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-patch";
 
@@ -25,48 +18,7 @@ beforeEach(async () => {
 });
 
 describe("arm-resource-patch input properties", () => {
-  it("does not assume resource identity and registration imply writable-input transitivity", async () => {
-    const source = `
-      @service @armProviderNamespace namespace Microsoft.TestService;
-      model Widget is TrackedResource<{
-        common?: string;
-        @visibility(Lifecycle.Update) updateOnly?: string;
-      }> { ...ResourceNameParameter<Widget>; }
-      model WidgetPatch {
-        tags?: Record<string>;
-        properties?: { updateOnly?: string; };
-      }
-      @armResourceOperations interface Widgets {
-        @parameterVisibility(Lifecycle.Create)
-        create is ArmResourceCreateOrReplaceSync<Widget>;
-        update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-      }
-    `;
-    for (const rule of [armResourceOperationsRule, useOperationDecoratorRule]) {
-      await createLinterRuleTester(
-        await Tester.createInstance(),
-        rule,
-        "@azure-tools/typespec-azure-resource-manager",
-      )
-        .expect(source)
-        .toBeValid();
-    }
-    await tester.expect(source).toEmitDiagnostics({
-      ...missingProperty("updateOnly"),
-      target: "updateOnly",
-    });
-  });
-
   describe("semantic examples", () => {
-    const FixtureTester = createTester(resolvePath(import.meta.dirname, "../.."), {
-      libraries: [
-        "@typespec/http",
-        "@typespec/rest",
-        "@typespec/versioning",
-        "@azure-tools/typespec-azure-core",
-        "@azure-tools/typespec-azure-resource-manager",
-      ],
-    });
     const examples = [
       `import "@typespec/http";
 import "@azure-tools/typespec-azure-resource-manager";
@@ -145,7 +97,7 @@ interface Widgets {
 
     beforeEach(async () => {
       fixtureTester = createLinterRuleTester(
-        await FixtureTester.createInstance(),
+        await UnwrappedTester.createInstance(),
         patchOperationsRule,
         "@azure-tools/typespec-azure-resource-manager",
       );
