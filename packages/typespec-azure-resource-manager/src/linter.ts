@@ -44,6 +44,7 @@ import { operationsInterfaceMissingRule } from "./rules/operations-interface-mis
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
+import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
@@ -60,6 +61,7 @@ const rules = [
   useRelationshipRequiredPropertiesRule,
   armNoRecordRule,
   armNoPathCasingConflictsRule,
+  scopePathSegmentCasingRule,
   noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
