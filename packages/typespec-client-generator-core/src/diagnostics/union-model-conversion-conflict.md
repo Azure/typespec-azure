@@ -2,7 +2,7 @@ This diagnostic is issued when an inline-discriminated union's discriminator pro
 
 ## Impact
 
-- **Area:** SDK union type conversion. Generation continues with the union representation instead of overwriting conflicting discriminator metadata.
+- **Area:** SDK union type conversion. The union resolves to its declared base SDK model, but incompatible discriminator metadata prevents generating a valid polymorphic hierarchy. TCGC reports an error instead of overwriting existing discriminator metadata.
 - **Not affected:** The TypeSpec union declaration, service routes, and wire payloads are unchanged.
 
 ## ❌ Incorrect Usage
@@ -33,7 +33,7 @@ op get(): Pet;
 TCGC reports:
 
 ```text
-Cannot convert discriminated union 'Pet' to a model hierarchy because its discriminator metadata conflicts with another union or model using the same hierarchy. The union is preserved. Set convertDiscriminatedUnionsToModels to false to retain union representations.
+Discriminated union 'Pet' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set convertDiscriminatedUnionsToModels to false to retain union representations.
 ```
 
 ## ✅ How to Fix

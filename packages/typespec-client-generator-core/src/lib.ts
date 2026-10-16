@@ -173,9 +173,9 @@ export const $lib = createTypeSpecLibrary({
   diagnostics: {
     "union-model-conversion-conflict": {
       ...doc("union-model-conversion-conflict"),
-      severity: "warning",
+      severity: "error",
       messages: {
-        default: paramMessage`Cannot convert discriminated union '${"unionName"}' to a model hierarchy because its discriminator metadata conflicts with another union or model using the same hierarchy. The union is preserved. Set convertDiscriminatedUnionsToModels to false to retain union representations.`,
+        default: paramMessage`Discriminated union '${"unionName"}' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set convertDiscriminatedUnionsToModels to false to retain union representations.`,
       },
     },
     "union-null": {

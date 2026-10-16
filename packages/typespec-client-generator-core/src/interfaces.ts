@@ -68,10 +68,7 @@ export interface TCGCContext {
   enableLegacyHierarchyBuilding?: boolean;
   convertDiscriminatedUnionsToModels?: boolean;
 
-  __discriminatedUnionModels?: Map<Union, Model | undefined>;
-  __discriminatedUnionConversionDepth?: number;
-  __deferDiscriminatedUnionConversion?: boolean;
-  __pendingDiscriminatedUnionConversion?: boolean;
+  __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
