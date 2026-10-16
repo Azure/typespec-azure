@@ -73,6 +73,15 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps the existing ARM response rule enabled after consolidating PUT body checks", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
+    ok(ResourceManagerLinter.rules.some((rule) => rule.name === "arm-resource-operation-response"));
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "put-resource-schema-consistency"),
+    );
+  });
+
   it("keeps redundant summary guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
