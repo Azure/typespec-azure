@@ -1,7 +1,9 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
+import { createTCGCContext } from "../../src/context.js";
 import { type SdkArrayType, type SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
+import { getSdkModel, getSdkUnion } from "../../src/types.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
@@ -124,6 +126,88 @@ describe("inline discriminated union conversion", () => {
     strictEqual(nullable.kind, "nullable");
     strictEqual(nullable.type, base);
     strictEqual(context.sdkPackage.models.find((x) => x.name === "Cat")?.discriminatorValue, "cat");
+  });
+
+  it("does not reshape a used model because of an unhandled union outside the service", async () => {
+    const { program } = await SimpleTester.compile(`
+      namespace Definitions {
+        model PetBase { name: string; }
+        model Cat extends PetBase { meows: boolean; }
+        @discriminated(#{ envelope: "none" })
+        union UnusedPet extends PetBase { cat: Cat }
+      }
+      @service namespace TestService {
+        op get(): Definitions.PetBase;
+      }
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+    ok(base);
+    strictEqual(base.discriminatorProperty, undefined);
+    strictEqual(base.discriminatedSubtypes, undefined);
+    strictEqual(
+      context.sdkPackage.models.some((model) => model.name === "Cat"),
+      false,
+    );
+  });
+
+  it("updates previously handled model properties and HTTP types to the projected base", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      model PetBase { name: string; }
+      model Cat extends PetBase { meows: boolean; }
+      @discriminated(#{ envelope: "none" })
+      union Pet extends PetBase { cat: Cat }
+      model Holder { pet: Pet; }
+      @route("/base") op getBase(): PetBase;
+      @route("/holder") @post op echo(@body body: Holder): Holder;
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const [getBase, echo] = context.sdkPackage.clients[0].methods;
+    const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+    const holder = context.sdkPackage.models.find((model) => model.name === "Holder");
+    ok(base);
+    ok(holder);
+    strictEqual(getBase.response.type, base);
+    strictEqual(getBase.operation.responses[0].type, base);
+    strictEqual(echo.parameters[0].type, holder);
+    strictEqual(echo.operation.bodyParam?.type, holder);
+    strictEqual(holder.properties[0].type, base);
+    strictEqual(base.discriminatedSubtypes?.cat.discriminatorValue, "cat");
+  });
+
+  it("preserves standalone SDK union conversion after the base is already cached", async () => {
+    const { program, PetBase, Pet } = await SimpleTesterWithService.compile(t.code`
+      model ${t.model("PetBase")} { name: string; }
+      model Cat extends PetBase { meows: boolean; }
+      @discriminated(#{ envelope: "none" })
+      union ${t.union("Pet")} extends PetBase { cat: Cat }
+    `);
+    const context = createTCGCContext(program, "@azure-tools/typespec-test", {
+      mutateNamespace: false,
+    });
+    const base = getSdkModel(context, PetBase);
+    const projected = getSdkUnion(context, Pet);
+    strictEqual(projected, base);
+    strictEqual(base.discriminatedSubtypes?.cat.discriminatorValue, "cat");
+    strictEqual(base.properties.filter((property) => property.discriminator).length, 1);
+  });
+
+  it("discovers instantiated union templates during normal type handling", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      model PetBase { name: string; }
+      model Cat extends PetBase { meows: boolean; }
+      @discriminated(#{ envelope: "none" })
+      union Pet<T extends PetBase> extends PetBase { cat: T }
+      op get(): Pet<Cat>;
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+    ok(base);
+    strictEqual(context.sdkPackage.clients[0].methods[0].response.type, base);
+    strictEqual(base.discriminatedSubtypes?.cat.discriminatorValue, "cat");
   });
 
   it("uses wire tags independently of client names", async () => {
@@ -257,6 +341,38 @@ describe("inline discriminated union conversion", () => {
     strictEqual(context.sdkPackage.models.filter((x) => x.name === "PetBase").length, 1);
   });
 
+  it("propagates combined usage, access, and serialization after shared-base conversion", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      model PetBase { name: string; }
+      model Cat extends PetBase { meows: boolean; }
+      model Dog extends PetBase { barks: boolean; }
+      @discriminated(#{ envelope: "none" })
+      union IndoorPet extends PetBase { cat: Cat }
+      @discriminated(#{ envelope: "none" })
+      union OutdoorPet extends PetBase { dog: Dog }
+      @access(Access.internal)
+      @route("/indoor") @post
+      op indoor(@header contentType: "application/xml", @body body: IndoorPet): void;
+      @route("/outdoor") op outdoor(): OutdoorPet;
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+    ok(base);
+    deepStrictEqual(Object.keys(base.discriminatedSubtypes ?? {}), ["cat", "dog"]);
+    for (const variant of Object.values(base.discriminatedSubtypes ?? {})) {
+      strictEqual(
+        variant.usage,
+        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json | UsageFlags.Xml,
+      );
+      strictEqual(variant.access, "public");
+      ok(variant.serializationOptions.json);
+      ok(variant.serializationOptions.xml);
+    }
+    strictEqual(context.sdkPackage.clients[0].methods[0].operation.bodyParam?.type, base);
+    strictEqual(context.sdkPackage.clients[0].methods[1].response.type, base);
+  });
+
   it("retains all unions connected to a conflicting hierarchy", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       model AnimalBase { name: string; }
@@ -315,6 +431,7 @@ describe("inline discriminated union conversion", () => {
       union Pet extends PetBase { cat: Cat }
       @discriminated(#{ envelope: "none" })
       union Animal extends PetBase { feline: Cat }
+      @route("/base") op base(): PetBase;
       @route("/pet") op pet(): Pet;
       @route("/animal") op animal(): Animal;
     `);
@@ -325,9 +442,9 @@ describe("inline discriminated union conversion", () => {
       { code: "@azure-tools/typespec-client-generator-core/union-model-conversion-conflict" },
       { code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind" },
     ]);
-    context.sdkPackage.clients[0].methods.forEach((method) =>
-      strictEqual(method.response.type?.kind, "union"),
-    );
+    context.sdkPackage.clients[0].methods
+      .slice(1)
+      .forEach((method) => strictEqual(method.response.type?.kind, "union"));
     strictEqual(
       context.sdkPackage.models.find((x) => x.name === "PetBase")?.discriminatorProperty,
       undefined,

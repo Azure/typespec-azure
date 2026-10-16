@@ -31,7 +31,6 @@ import {
   isErrorModel,
   isNeverType,
   isTemplateDeclaration,
-  navigateType,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { isEvents } from "@typespec/events";
@@ -558,30 +557,22 @@ export function getSdkUnionWithDiagnostics(
   type: Union,
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
+  const [sdkType, diagnostics] = withDiscriminatedUnionConversion(context, () =>
+    getSdkUnionWithDiagnosticsInternal(context, type, operation),
+  );
+  return [getProjectedUnion(context, sdkType), diagnostics];
+}
+
+function getSdkUnionWithDiagnosticsInternal(
+  context: TCGCContext,
+  type: Union,
+  operation?: Operation,
+): [SdkType, readonly Diagnostic[]] {
   let retval: SdkType | undefined = context.__referencedTypeCache.get(type);
   const diagnostics = createDiagnosticCollector();
-  initializeDiscriminatedUnionModels(context);
-  if (
-    !retval &&
-    context.__discriminatedUnionModels?.has(type) &&
-    context.__discriminatedUnionModels.get(type) === undefined
-  ) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "union-model-conversion-conflict",
-        target: type,
-        format: { unionName: type.name ?? "(anonymous)" },
-      }),
-    );
-  }
-  const baseModel = context.__discriminatedUnionModels?.get(type);
-  if (baseModel) {
-    const model = diagnostics.pipe(getSdkModelWithDiagnostics(context, baseModel, operation));
-    updateReferencedTypeMap(context, type, model);
-    return diagnostics.wrap(model);
-  }
 
   if (!retval) {
+    registerDiscriminatedUnionModel(context, type);
     const nonNullOptions = getNonNullOptions(type);
     const nullOption = getNullOption(type);
 
@@ -618,10 +609,11 @@ export function getSdkUnionWithDiagnostics(
         // judge if the union can be converted to enum
         // if language does not need flatten union as enum
         // filter the case that union is composed of union or enum
-        context.flattenUnionAsEnum ||
-        ![...type.variants.values()].some((variant) => {
-          return variant.type.kind === "Union" || variant.type.kind === "Enum";
-        })
+        !context.__discriminatedUnionModels?.has(type) &&
+        (context.flattenUnionAsEnum ||
+          ![...type.variants.values()].some((variant) => {
+            return variant.type.kind === "Union" || variant.type.kind === "Enum";
+          }))
       ) {
         const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
         if (unionAsEnum) {
@@ -713,61 +705,94 @@ export function getSdkUnionWithDiagnostics(
   return diagnostics.wrap(retval);
 }
 
-function initializeDiscriminatedUnionModels(context: TCGCContext): void {
-  if (context.__discriminatedUnionModels || context.convertDiscriminatedUnionsToModels === false) {
+function registerDiscriminatedUnionModel(context: TCGCContext, union: Union): void {
+  if (context.convertDiscriminatedUnionsToModels === false) {
     return;
   }
-  const models = (context.__discriminatedUnionModels = new Map());
-  navigateType(
-    context.getMutatedGlobalNamespace(),
-    {
-      union(union) {
-        const base = union.baseType;
-        if (
-          isTemplateDeclaration(union) ||
-          isEvents(context.program, union) ||
-          base?.kind !== "Model" ||
-          !base.name ||
-          isArrayModelType(base) ||
-          base.indexer ||
-          union.variants.size === 0 ||
-          getAlternateType(context, union) ||
-          walkBaseChain(base).some(
-            (model) =>
-              getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
-          )
-        ) {
-          return;
-        }
-        const discriminated = $(context.program).union.getDiscriminatedUnion(union);
-        if (
-          !discriminated ||
-          discriminated.options.envelope !== "none" ||
-          discriminated.defaultVariant
-        ) {
-          return;
-        }
-        for (const variant of union.variants.values()) {
-          if (
-            typeof variant.name !== "string" ||
-            variant.type.kind !== "Model" ||
-            variant.type === base ||
-            !walkBaseChain(variant.type).includes(base) ||
-            walkBaseChain(variant.type).some(
-              (model) =>
-                getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
-            )
-          ) {
-            return;
-          }
-        }
-        models.set(union, base);
-      },
-    },
-    {},
-  );
-  const conflicts = new Set<Union>();
+  const base = union.baseType;
+  if (
+    isTemplateDeclaration(union) ||
+    isEvents(context.program, union) ||
+    base?.kind !== "Model" ||
+    !base.name ||
+    isArrayModelType(base) ||
+    base.indexer ||
+    union.variants.size === 0 ||
+    getAlternateType(context, union) ||
+    walkBaseChain(base).some(
+      (model) => getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
+    )
+  ) {
+    return;
+  }
+  const discriminated = $(context.program).union.getDiscriminatedUnion(union);
+  if (!discriminated || discriminated.options.envelope !== "none" || discriminated.defaultVariant) {
+    return;
+  }
+  for (const variant of union.variants.values()) {
+    if (
+      typeof variant.name !== "string" ||
+      variant.type.kind !== "Model" ||
+      variant.type === base ||
+      !walkBaseChain(variant.type).includes(base) ||
+      walkBaseChain(variant.type).some(
+        (model) => getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
+      )
+    ) {
+      return;
+    }
+  }
+  (context.__discriminatedUnionModels ??= new Map()).set(union, base);
+  context.__pendingDiscriminatedUnionConversion = true;
+}
+
+function withDiscriminatedUnionConversion<T extends SdkType>(
+  context: TCGCContext,
+  convert: () => [T, readonly Diagnostic[]],
+): [T, readonly Diagnostic[]] {
+  if (
+    context.__deferDiscriminatedUnionConversion ||
+    context.convertDiscriminatedUnionsToModels === false
+  ) {
+    return convert();
+  }
+  context.__discriminatedUnionConversionDepth =
+    (context.__discriminatedUnionConversionDepth ?? 0) + 1;
+  try {
+    const diagnostics = createDiagnosticCollector();
+    const sdkType = diagnostics.pipe(convert());
+    if (
+      context.__discriminatedUnionConversionDepth === 1 &&
+      !context.__deferDiscriminatedUnionConversion
+    ) {
+      diagnostics.pipe(finalizeDiscriminatedUnionModels(context, sdkType));
+    }
+    return diagnostics.wrap(sdkType);
+  } finally {
+    context.__discriminatedUnionConversionDepth--;
+  }
+}
+
+function getProjectedUnion(context: TCGCContext, type: SdkType): SdkType {
+  return type.kind === "union" && type.__raw
+    ? (context.__referencedTypeCache.get(type.__raw) ?? type)
+    : type;
+}
+
+function finalizeDiscriminatedUnionModels(
+  context: TCGCContext,
+  root?: SdkType,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const models = context.__discriminatedUnionModels;
+  if (!context.__pendingDiscriminatedUnionConversion || !models) {
+    return diagnostics.wrap(undefined);
+  }
+  context.__pendingDiscriminatedUnionConversion = false;
   const candidates = [...models.entries()];
+  const conflicts = new Set(
+    candidates.filter(([, base]) => base === undefined).map(([union]) => union),
+  );
   for (const [union, base] of candidates) {
     if (!base) continue;
     const discriminated = $(context.program).union.getDiscriminatedUnion(union)!;
@@ -836,8 +861,86 @@ function initializeDiscriminatedUnionModels(context: TCGCContext): void {
     }
   }
   for (const union of conflicts) {
+    if (models.get(union) === undefined) continue;
     models.set(union, undefined);
+    diagnostics.add(
+      createDiagnostic({
+        code: "union-model-conversion-conflict",
+        target: union,
+        format: { unionName: union.name ?? "(anonymous)" },
+      }),
+    );
+    diagnostics.pipe(getUnionAsEnum(union));
   }
+  const replacements = new Map<SdkType, SdkModelType>();
+  for (const [union, base] of models) {
+    if (!base) continue;
+    const sdkUnion = context.__referencedTypeCache.get(union);
+    const sdkBase = context.__referencedTypeCache.get(base);
+    compilerAssert(sdkUnion && sdkBase?.kind === "model", "Union conversion types must be cached.");
+    if (sdkUnion.kind !== "union") continue;
+    replacements.set(sdkUnion, sdkBase);
+  }
+  if (replacements.size === 0) return diagnostics.wrap(undefined);
+
+  for (const [rawType, sdkType] of context.__referencedTypeCache) {
+    if (rawType.kind === "Model" && sdkType.kind === "model") {
+      diagnostics.pipe(addUnionDiscriminatorToModel(context, rawType, sdkType));
+    }
+  }
+
+  // Resolve aliases only after all handled unions have participated in conflict detection.
+  const seen = new Set<SdkType>();
+  function replace(type: SdkType): SdkType {
+    const replacement = replacements.get(type);
+    if (replacement) return replacement;
+    if (seen.has(type)) return type;
+    seen.add(type);
+    switch (type.kind) {
+      case "model":
+        for (const property of type.properties) property.type = replace(property.type);
+        if (type.additionalProperties)
+          type.additionalProperties = replace(type.additionalProperties);
+        break;
+      case "union":
+        type.variantTypes = type.variantTypes.map(replace);
+        if (type.baseType) type.baseType = replace(type.baseType);
+        break;
+      case "nullable":
+        type.type = replace(type.type);
+        break;
+      case "array":
+      case "dict":
+        type.valueType = replace(type.valueType);
+        break;
+      case "tuple":
+        type.valueTypes = type.valueTypes.map(replace);
+        break;
+    }
+    return type;
+  }
+  for (const [rawType, sdkType] of context.__referencedTypeCache) {
+    updateReferencedTypeMap(context, rawType, replace(sdkType));
+  }
+  for (const sdkType of context.__arrayDictionaryCache.values()) replace(sdkType);
+  for (const property of context.__modelPropertyCache.values())
+    property.type = replace(property.type);
+  for (const parameter of context.__methodParameterCache.values())
+    parameter.type = replace(parameter.type);
+  for (const header of context.__responseHeaderCache.values()) header.type = replace(header.type);
+  for (const parameters of context.__clientParametersCache.values()) {
+    for (const parameter of parameters) parameter.type = replace(parameter.type);
+  }
+  if (root) replace(root);
+  for (const model of new Set(replacements.values())) {
+    diagnostics.pipe(updateUsageOrAccess(context, model.usage, model));
+    if (model.__accessSet) diagnostics.pipe(updateUsageOrAccess(context, model.access, model));
+    const contentTypes: string[] = [];
+    if (model.serializationOptions.json) contentTypes.push("application/json");
+    if (model.serializationOptions.xml) contentTypes.push("application/xml");
+    diagnostics.pipe(updateSerializationOptions(context, model, contentTypes));
+  }
+  return diagnostics.wrap(undefined);
 }
 
 function addUnionDiscriminatorToModel(
@@ -1134,8 +1237,17 @@ export function getSdkModelWithDiagnostics(
   type: Model,
   operation?: Operation,
 ): [SdkModelType, readonly Diagnostic[]] {
+  return withDiscriminatedUnionConversion(context, () =>
+    getSdkModelWithDiagnosticsInternal(context, type, operation),
+  );
+}
+
+function getSdkModelWithDiagnosticsInternal(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation,
+): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  initializeDiscriminatedUnionModels(context);
   let sdkType = context.__referencedTypeCache.get(type) as SdkModelType | undefined;
 
   if (!sdkType) {
@@ -1155,11 +1267,6 @@ export function getSdkModelWithDiagnostics(
       serializationOptions: {},
     };
     updateReferencedTypeMap(context, type, sdkType);
-    for (const [union, base] of context.__discriminatedUnionModels ?? []) {
-      if (base === type) {
-        updateReferencedTypeMap(context, union, sdkType);
-      }
-    }
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
@@ -1238,7 +1345,6 @@ export function getSdkModelWithDiagnostics(
       }
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
-    diagnostics.pipe(addUnionDiscriminatorToModel(context, type, sdkType));
     updateReferencedTypeMap(context, type, sdkType);
   }
   return diagnostics.wrap(sdkType);
@@ -1416,6 +1522,17 @@ export function getSdkUnionEnumWithDiagnostics(
 }
 
 export function getClientTypeWithDiagnostics(
+  context: TCGCContext,
+  type: Type,
+  operation?: Operation,
+): [SdkType, readonly Diagnostic[]] {
+  const [sdkType, diagnostics] = withDiscriminatedUnionConversion(context, () =>
+    getClientTypeWithDiagnosticsInternal(context, type, operation),
+  );
+  return [getProjectedUnion(context, sdkType), diagnostics];
+}
+
+function getClientTypeWithDiagnosticsInternal(
   context: TCGCContext,
   type: Type,
   operation?: Operation,
@@ -2788,6 +2905,16 @@ export function getAllReferencedTypes(
 }
 
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
+  const deferred = context.__deferDiscriminatedUnionConversion;
+  context.__deferDiscriminatedUnionConversion = true;
+  try {
+    return handleAllTypesInternal(context);
+  } finally {
+    context.__deferDiscriminatedUnionConversion = deferred;
+  }
+}
+
+function handleAllTypesInternal(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
   for (const client of listClients(context)) {
@@ -2836,6 +2963,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   }
   // update for orphan models/enums/unions
   diagnostics.pipe(handleServiceOrphanTypes(context));
+  diagnostics.pipe(finalizeDiscriminatedUnionModels(context));
   // update access
   diagnostics.pipe(updateAccessOverride(context));
   // update usage

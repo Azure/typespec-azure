@@ -245,7 +245,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 #### Inline-discriminated union conversion
 
-An inline-discriminated union is converted when it uses `@discriminated(#{ envelope: "none" })`, explicitly extends a named model, and every alternative is a named variant whose model nominally inherits from that base, directly or transitively:
+An inline-discriminated union handled by the SDK context is converted when it uses `@discriminated(#{ envelope: "none" })`, explicitly extends a named model, and every alternative is a named variant whose model nominally inherits from that base, directly or transitively. Unhandled unions do not reshape otherwise-used models.
 
 ```tsp
 model PetBase {
