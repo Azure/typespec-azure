@@ -66,7 +66,9 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
+  convertDiscriminatedUnionsToModels?: boolean;
 
+  __discriminatedUnionModels?: Map<Union, Model | undefined>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;

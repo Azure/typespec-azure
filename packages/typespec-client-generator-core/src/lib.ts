@@ -171,6 +171,13 @@ function doc(code: string) {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "union-model-conversion-conflict": {
+      ...doc("union-model-conversion-conflict"),
+      severity: "warning",
+      messages: {
+        default: paramMessage`Cannot convert discriminated union '${"unionName"}' to a model hierarchy because its discriminator metadata conflicts with another union or model using the same hierarchy. The union is preserved. Set convertDiscriminatedUnionsToModels to false to retain union representations.`,
+      },
+    },
     "union-null": {
       ...doc("union-null"),
       severity: "warning",

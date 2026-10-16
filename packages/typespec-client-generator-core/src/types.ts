@@ -31,6 +31,7 @@ import {
   isErrorModel,
   isNeverType,
   isTemplateDeclaration,
+  navigateType,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { isEvents } from "@typespec/events";
@@ -559,6 +560,26 @@ export function getSdkUnionWithDiagnostics(
 ): [SdkType, readonly Diagnostic[]] {
   let retval: SdkType | undefined = context.__referencedTypeCache.get(type);
   const diagnostics = createDiagnosticCollector();
+  initializeDiscriminatedUnionModels(context);
+  if (
+    !retval &&
+    context.__discriminatedUnionModels?.has(type) &&
+    context.__discriminatedUnionModels.get(type) === undefined
+  ) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "union-model-conversion-conflict",
+        target: type,
+        format: { unionName: type.name ?? "(anonymous)" },
+      }),
+    );
+  }
+  const baseModel = context.__discriminatedUnionModels?.get(type);
+  if (baseModel) {
+    const model = diagnostics.pipe(getSdkModelWithDiagnostics(context, baseModel, operation));
+    updateReferencedTypeMap(context, type, model);
+    return diagnostics.wrap(model);
+  }
 
   if (!retval) {
     const nonNullOptions = getNonNullOptions(type);
@@ -690,6 +711,254 @@ export function getSdkUnionWithDiagnostics(
   }
 
   return diagnostics.wrap(retval);
+}
+
+function initializeDiscriminatedUnionModels(context: TCGCContext): void {
+  if (context.__discriminatedUnionModels || context.convertDiscriminatedUnionsToModels === false) {
+    return;
+  }
+  const models = (context.__discriminatedUnionModels = new Map());
+  navigateType(
+    context.getMutatedGlobalNamespace(),
+    {
+      union(union) {
+        const base = union.baseType;
+        if (
+          isTemplateDeclaration(union) ||
+          isEvents(context.program, union) ||
+          base?.kind !== "Model" ||
+          !base.name ||
+          isArrayModelType(base) ||
+          base.indexer ||
+          union.variants.size === 0 ||
+          getAlternateType(context, union) ||
+          walkBaseChain(base).some(
+            (model) =>
+              getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
+          )
+        ) {
+          return;
+        }
+        const discriminated = $(context.program).union.getDiscriminatedUnion(union);
+        if (
+          !discriminated ||
+          discriminated.options.envelope !== "none" ||
+          discriminated.defaultVariant
+        ) {
+          return;
+        }
+        for (const variant of union.variants.values()) {
+          if (
+            typeof variant.name !== "string" ||
+            variant.type.kind !== "Model" ||
+            variant.type === base ||
+            !walkBaseChain(variant.type).includes(base) ||
+            walkBaseChain(variant.type).some(
+              (model) =>
+                getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
+            )
+          ) {
+            return;
+          }
+        }
+        models.set(union, base);
+      },
+    },
+    {},
+  );
+  const conflicts = new Set<Union>();
+  const candidates = [...models.entries()];
+  for (const [union, base] of candidates) {
+    if (!base) continue;
+    const discriminated = $(context.program).union.getDiscriminatedUnion(union)!;
+    const propertyName = discriminated.options.discriminatorPropertyName;
+    const existingDiscriminator = getDiscriminator(context.program, base);
+    if (existingDiscriminator && existingDiscriminator.propertyName !== propertyName) {
+      conflicts.add(union);
+    }
+    for (const model of [base, ...discriminated.variants.values()]) {
+      if (model.kind !== "Model") continue;
+      const property = walkBaseChain(model)
+        .map((ancestor) => ancestor.properties.get(propertyName))
+        .find((property) => property !== undefined);
+      if (
+        property &&
+        resolveEncodedName(context.program, property, "application/json") !== propertyName
+      ) {
+        conflicts.add(union);
+      }
+    }
+    for (const [otherUnion, otherBase] of candidates) {
+      const other = $(context.program).union.getDiscriminatedUnion(otherUnion)!;
+      if (base === otherBase && propertyName !== other.options.discriminatorPropertyName) {
+        conflicts.add(union);
+        conflicts.add(otherUnion);
+      }
+      for (const [tag, variant] of discriminated.variants) {
+        for (const [otherTag, otherVariant] of other.variants) {
+          if (
+            (variant === otherVariant &&
+              (tag !== otherTag || propertyName !== other.options.discriminatorPropertyName)) ||
+            (base === otherBase && tag === otherTag && variant !== otherVariant)
+          ) {
+            conflicts.add(union);
+            conflicts.add(otherUnion);
+          }
+        }
+      }
+    }
+  }
+  // A retained union must not reference models reshaped by another conflicting conversion.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    const affectedModels = new Set<Model>();
+    for (const [union, base] of candidates) {
+      if (!conflicts.has(union)) continue;
+      for (const model of [base, ...[...union.variants.values()].map((variant) => variant.type)]) {
+        if (model?.kind !== "Model") continue;
+        for (const ancestor of walkBaseChain(model)) affectedModels.add(ancestor);
+      }
+    }
+    for (const [union, base] of candidates) {
+      if (
+        !conflicts.has(union) &&
+        ((base && walkBaseChain(base).some((model) => affectedModels.has(model))) ||
+          [...union.variants.values()].some(
+            (variant) =>
+              variant.type.kind === "Model" &&
+              walkBaseChain(variant.type).some((model) => affectedModels.has(model)),
+          ))
+      ) {
+        conflicts.add(union);
+        changed = true;
+      }
+    }
+  }
+  for (const union of conflicts) {
+    models.set(union, undefined);
+  }
+}
+
+function addUnionDiscriminatorToModel(
+  context: TCGCContext,
+  rawModel: Model,
+  model: SdkModelType,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  for (const [union, base] of context.__discriminatedUnionModels ?? []) {
+    if (!base) continue;
+    const discriminated = $(context.program).union.getDiscriminatedUnion(union)!;
+    const propertyName = discriminated.options.discriminatorPropertyName;
+    if (rawModel === base) {
+      let property = findDiscriminatorProperty(model, propertyName);
+      if (!property) {
+        const inheritedProperty = findInheritedDiscriminatorProperty(model, propertyName);
+        property = createDiscriminatorProperty(
+          model,
+          inheritedProperty?.name ?? propertyName,
+          inheritedProperty?.type ?? getTypeSpecBuiltInType(context, "string"),
+          propertyName,
+        );
+        property.serializationOptions.json = { name: propertyName };
+        model.properties.unshift(property);
+      }
+      property.optional = false;
+      property.discriminator = true;
+      model.discriminatorProperty = property;
+      model.discriminatedSubtypes ??= {};
+      for (const [tag, variant] of discriminated.variants) {
+        compilerAssert(variant.kind === "Model", "Converted union variants must be models.", union);
+        model.discriminatedSubtypes[tag] = diagnostics.pipe(
+          getSdkModelWithDiagnostics(context, variant),
+        );
+      }
+    } else {
+      for (const [tag, variant] of discriminated.variants) {
+        if (variant !== rawModel) continue;
+        let property = findDiscriminatorProperty(model, propertyName);
+        const inheritedProperty = findInheritedDiscriminatorProperty(model, propertyName);
+        if (!property) {
+          const constant: SdkConstantType = {
+            kind: "constant",
+            value: tag,
+            valueType: getTypeSpecBuiltInType(context, "string"),
+            name: `${model.name}${pascalCase(propertyName)}`,
+            isGeneratedName: true,
+            isExactName: false,
+            decorators: [],
+          };
+          property = createDiscriminatorProperty(
+            model,
+            inheritedProperty?.name ?? propertyName,
+            constant,
+            propertyName,
+          );
+          property.serializationOptions.json = { name: propertyName };
+          model.properties.unshift(property);
+        }
+        if (property.type.kind === "constant" && inheritedProperty?.type.kind === "enum") {
+          const value = inheritedProperty.type.values.find((value) => value.value === tag);
+          if (value) property.type = value;
+        }
+        property.optional = false;
+        property.discriminator = true;
+        model.discriminatorValue = tag;
+      }
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
+function findDiscriminatorProperty(
+  model: SdkModelType,
+  name: string,
+): SdkModelPropertyType | undefined {
+  return model.properties.find(
+    (property) =>
+      (property.__raw?.name ?? property.serializationOptions.json?.name ?? property.name) === name,
+  );
+}
+
+function findInheritedDiscriminatorProperty(
+  model: SdkModelType,
+  name: string,
+): SdkModelPropertyType | undefined {
+  for (let parent = model.baseModel; parent; parent = parent.baseModel) {
+    const property = findDiscriminatorProperty(parent, name);
+    if (property) return property;
+  }
+  return undefined;
+}
+
+function createDiscriminatorProperty(
+  model: SdkModelType,
+  name: string,
+  type: SdkType,
+  serializedName: string,
+): SdkModelPropertyType {
+  return {
+    kind: "property",
+    doc: `Discriminator property for ${model.name}.`,
+    optional: false,
+    discriminator: true,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    serializedName,
+    serializationOptions: {},
+    type,
+    name,
+    isGeneratedName: false,
+    isExactName: false,
+    onClient: false,
+    apiVersions: model.apiVersions,
+    isApiVersionParam: false,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    isMultipartFileInput: false,
+    flatten: false,
+    crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
+    decorators: [],
+    access: "public",
+  };
 }
 
 function getEmptyUnionType(
@@ -835,32 +1104,17 @@ function addDiscriminatorToModelType(
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
-    const discriminatorPropertyType: SdkModelPropertyType = {
-      kind: "property",
-      doc: `Discriminator property for ${model.name}.`,
-      optional: false,
-      discriminator: true,
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      serializedName: discriminatorProperty
+    const discriminatorPropertyType = createDiscriminatorProperty(
+      model,
+      name,
+      discriminatorType!,
+      discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
-      serializationOptions: {},
-      type: discriminatorType!,
-      name,
-      isGeneratedName: false,
-      isExactName: false,
-      onClient: false,
-      apiVersions: discriminatorProperty
-        ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
-        : model.apiVersions,
-      isApiVersionParam: false,
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      isMultipartFileInput: false, // discriminator property cannot be a file
-      flatten: false, // discriminator properties can not be flattened
-      crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
-      decorators: [],
-      access: "public",
-    };
+    );
+    discriminatorPropertyType.apiVersions = discriminatorProperty
+      ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
+      : model.apiVersions;
     model.properties.splice(0, 0, discriminatorPropertyType);
     model.discriminatorProperty = discriminatorPropertyType;
   }
@@ -881,6 +1135,7 @@ export function getSdkModelWithDiagnostics(
   operation?: Operation,
 ): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  initializeDiscriminatedUnionModels(context);
   let sdkType = context.__referencedTypeCache.get(type) as SdkModelType | undefined;
 
   if (!sdkType) {
@@ -900,6 +1155,11 @@ export function getSdkModelWithDiagnostics(
       serializationOptions: {},
     };
     updateReferencedTypeMap(context, type, sdkType);
+    for (const [union, base] of context.__discriminatedUnionModels ?? []) {
+      if (base === type) {
+        updateReferencedTypeMap(context, union, sdkType);
+      }
+    }
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
@@ -978,6 +1238,7 @@ export function getSdkModelWithDiagnostics(
       }
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
+    diagnostics.pipe(addUnionDiscriminatorToModel(context, type, sdkType));
     updateReferencedTypeMap(context, type, sdkType);
   }
   return diagnostics.wrap(sdkType);
@@ -2095,14 +2356,16 @@ function updateTypesFromOperation(
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // set access for all orphan model without override
-  for (const sdkType of context.__referencedTypeCache.values()) {
-    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
+  for (const [rawType, sdkType] of context.__referencedTypeCache) {
+    if (rawType.kind !== "Model" && rawType.kind !== "Enum" && rawType.kind !== "Union") continue;
+    const accessOverride = getAccessOverride(context, rawType);
     if (!sdkType.__accessSet && accessOverride === undefined) {
       diagnostics.pipe(updateUsageOrAccess(context, "public", sdkType));
     }
   }
-  for (const sdkType of context.__referencedTypeCache.values()) {
-    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
+  for (const [rawType, sdkType] of context.__referencedTypeCache) {
+    if (rawType.kind !== "Model" && rawType.kind !== "Enum" && rawType.kind !== "Union") continue;
+    const accessOverride = getAccessOverride(context, rawType);
     if (accessOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, accessOverride, sdkType, { isOverride: true }));
     }
@@ -2112,8 +2375,9 @@ function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[
 
 function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  for (const sdkType of context.__referencedTypeCache.values()) {
-    const usageOverride = getUsageOverride(context, sdkType.__raw as any);
+  for (const [rawType, sdkType] of context.__referencedTypeCache) {
+    if (rawType.kind !== "Model" && rawType.kind !== "Enum" && rawType.kind !== "Union") continue;
+    const usageOverride = getUsageOverride(context, rawType);
     if (usageOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }));
       if (usageOverride & UsageFlags.Json) {
