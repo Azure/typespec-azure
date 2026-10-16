@@ -1,5 +1,5 @@
-import { resolvePath } from "@typespec/compiler";
-import { createTester, t } from "@typespec/compiler/testing";
+import { CompilerTester } from "#test/tester.js";
+import { t } from "@typespec/compiler/testing";
 import type { HttpOperationBody, HttpPayloadBody } from "@typespec/http";
 import { describe, expect, it } from "vitest";
 import {
@@ -20,14 +20,26 @@ describe("HTTP response status primitives", () => {
 
   describe("HTTP response body selection", () => {
     it("distinguishes identical and ambiguous body variants independently of their order", async () => {
-      const { First: first, Second: second } = await createTester(
-        resolvePath(import.meta.dirname, "../.."),
-        {
-          libraries: [],
-        },
-      ).compile(
-        t.code`model ${t.model("First")} { value: string; } model ${t.model("Second")} { other: string; }`,
+      const {
+        First: first,
+        Second: second,
+        ContentType: contentType,
+        Filename: filename,
+        Contents: contents,
+      } = await CompilerTester.compile(
+        t.code`
+          model ${t.model("First")} {
+            value: string;
+            ${t.modelProperty("ContentType")}: string;
+            ${t.modelProperty("Filename")}: string;
+            ${t.modelProperty("Contents")}: string;
+          }
+          model ${t.model("Second")} { other: string; }
+        `,
       );
+      if (contents.type.kind !== "Scalar") {
+        throw new Error("Expected scalar file contents in the compiler-only fixture.");
+      }
       const json: HttpOperationBody = {
         bodyKind: "single",
         type: first,
@@ -41,7 +53,15 @@ describe("HTTP response status primitives", () => {
       const alternatives: HttpPayloadBody[] = [
         { ...xml, type: second },
         { ...xml, isExplicit: false },
-        { bodyKind: "file", type: first, isText: true, contentTypes: ["text/plain"] },
+        {
+          bodyKind: "file",
+          type: first,
+          isText: true,
+          contentTypes: ["text/plain"],
+          contentTypeProperty: contentType,
+          filename,
+          contents: { ...contents, type: contents.type },
+        },
       ];
       for (const alternative of alternatives) {
         expect(selectResponseBody([json, alternative])).toEqual({ kind: "ambiguous" });
