@@ -62,7 +62,11 @@ Record these decisions in the brief before implementation:
   prove that requirement. Separate rule-owned decisions from guarantees supplied
   by those APIs or the linter framework; apply the
   [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
-  when planning coverage. Mark unresolved API questions explicitly.
+  when planning coverage. Establish why the native guideline requires custom
+  traversal, SDK setup or a public API, not merely why the proposed architecture
+  uses it. Apply the
+  [simplification review guidance](../typespec-lint-implement/SKILL.md#simplification-and-review)
+  when feedback challenges that architecture. Mark unresolved API questions explicitly.
 - **Diagnostic contract:** specify the unit (property, operation, model, etc.),
   authored target, expected multiplicity, exemptions, and concise corrective
   message. Extra diagnostics and suppressed duplicates are behavior decisions.

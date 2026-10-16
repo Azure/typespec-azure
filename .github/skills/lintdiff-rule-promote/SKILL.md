@@ -520,7 +520,10 @@ below apply to individual-rule diagnostics, not every acceptance claim:
 preserve required registered execution/suppression, cross-rule interactions,
 registration/legacy names, package loading/isolation, and published-example
 proof in the appropriate existing layers. Do not silently drop that evidence
-when removing framework-only unit cases.
+when removing framework-only unit cases. Establish which claims need
+rule-specific evidence first: delete generic suppression/enablement proof
+without replacement, retaining concrete rule-owned interactions and regressions.
+Reconcile stale PR promises rather than treating them as independent requirements.
 
 Create:
 
@@ -617,10 +620,12 @@ library documentation following the
 - pass the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
   gate for the actual incorrect/correct snippets; preserve the diagnostic
   contrast rather than substituting an exempt default template response
-- if native tests extract the authored Markdown examples, accept both CRLF and
-  LF fence line endings and verify that the expected snippets were found before
-  compiling them; do not mistake Windows checkout line endings for missing
-  examples or replace the final snippets with separate test-only copies
+- do not add, retain or relocate bespoke per-rule Markdown parsers. Keep literal
+  semantic tests and validate actual published snippets through existing shared
+  infrastructure or recorded one-time execution. State whether the evidence is
+  continuous or one-time; do not claim copied fixtures validate the published
+  document. When existing shared tooling extracts snippets, handle CRLF and LF
+  and require an unambiguous match
 - follow the destination's authored-document conventions, including `## Impact`
   with the affected areas and `## Suppression` guidance when used by neighboring
   rules; explain when suppression is appropriate rather than only how to fix

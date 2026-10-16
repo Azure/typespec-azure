@@ -353,8 +353,15 @@ the shared [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-mat
 Follow its setup, typed-extraction, and exact-target guidance. Preserve required
 registered execution, suppression, cross-rule, package-isolation, and actual
 published-example proof in the appropriate layers rather than deleting it as
-unit-test cleanup. This mapping supplements, not replaces, required focused
-fixture, build, and corpus evidence.
+unit-test cleanup. First establish that these claims require rule-specific
+evidence: delete generic suppression/enablement proof without replacement and
+reconcile stale PR promises, while retaining concrete rule-owned interactions
+and regressions. For published examples, follow the shared
+[documentation validation guidance](../typespec-lint-validate/SKILL.md#documentation-example-validation):
+remove bespoke per-rule parsers rather than relocating them, and distinguish
+existing shared continuous coverage from recorded one-time execution.
+This mapping supplements, not replaces, required focused fixture, build, and
+corpus evidence.
 
 Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
 to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
