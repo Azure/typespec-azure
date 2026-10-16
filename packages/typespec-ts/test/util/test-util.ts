@@ -1,5 +1,12 @@
 import { listAllServiceNamespaces } from "@azure-tools/typespec-client-generator-core";
-import { EmitContext, getDirectoryPath, NodeHost, Program, resolvePath } from "@typespec/compiler";
+import {
+  type CompilerOptions,
+  EmitContext,
+  getDirectoryPath,
+  NodeHost,
+  Program,
+  resolvePath,
+} from "@typespec/compiler";
 import { createTester } from "@typespec/compiler/testing";
 import { appendFileSync } from "fs";
 import path from "path";
@@ -69,19 +76,24 @@ export interface CompiledTypeSpec {
 /**
  * Compiles `main.tsp` (plus any sibling files) through the shared tester. The
  * input already contains its own `import`/`using` statements, so we don't use
- * the tester's `.import()`/`.using()` builders. `warningAsError: false` matches
- * the prior `TestHost.compile` behavior; callers inspect `program.diagnostics`
- * themselves, so we use `compileAndDiagnose` (which never throws on
- * diagnostics).
+ * the tester's `.import()`/`.using()` builders. Per-scenario compiler options
+ * allow opting into features without changing other scenarios. By default,
+ * `warningAsError: false` matches the prior `TestHost.compile` behavior; callers
+ * inspect `program.diagnostics` themselves, so we use `compileAndDiagnose`
+ * (which never throws on diagnostics).
  */
-async function compileWithSharedTester(files: Record<string, string>): Promise<CompiledTypeSpec> {
+async function compileWithSharedTester(
+  files: Record<string, string>,
+  compilerOptions: CompilerOptions = {},
+): Promise<CompiledTypeSpec> {
   const [result] = await sharedTester.compileAndDiagnose(files, {
-    compilerOptions: { warningAsError: false },
+    compilerOptions: { warningAsError: false, ...compilerOptions },
   });
   return { program: result.program };
 }
 
 export interface RLCEmitterOptions {
+  compilerOptions?: CompilerOptions;
   needNamespaces?: boolean;
   needAzureCore?: boolean;
   needTCGC?: boolean;
@@ -123,8 +135,8 @@ const TCGC_USAGE =
  * Compile-once-per-scenario cache: within a single scenario, every output
  * code block recompiles the *same* input TypeSpec. This cache memoizes the
  * compiled program keyed by the exact compiler input (source + imports +
- * any example files), so repeated blocks reuse one compile instead of paying
- * the full TypeSpec checker cost each time.
+ * any example files and compiler options), so repeated blocks reuse one compile
+ * instead of paying the full TypeSpec checker cost each time.
  *
  * The cache is cleared after every scenario by the scenario runner
  * (`clearCompileCache` in an `afterAll`) so retention stays bounded to a single
@@ -181,6 +193,7 @@ export function clearCompileCache(): void {
 export async function rlcEmitterFor(
   code: string,
   {
+    compilerOptions = {},
     needNamespaces = true,
     needAzureCore = false,
     needTCGC = false,
@@ -234,16 +247,23 @@ ${
 }
 ${code}
 `;
-  return compileAndCache(`rlc\u0000${content}\u0000${JSON.stringify(exampleJson)}`, async () => {
-    const files: Record<string, string> = { "main.tsp": content };
-    for (const example in exampleJson) {
-      files[`./examples/${example}.json`] = exampleJson[example];
-    }
-    return compileWithSharedTester(files);
-  });
+  return compileAndCache(
+    `rlc\u0000${content}\u0000${JSON.stringify(exampleJson)}\u0000${JSON.stringify(compilerOptions)}`,
+    async () => {
+      const files: Record<string, string> = { "main.tsp": content };
+      for (const example in exampleJson) {
+        files[`./examples/${example}.json`] = exampleJson[example];
+      }
+      return compileWithSharedTester(files, compilerOptions);
+    },
+  );
 }
 
-export async function compileTypeSpecFor(code: string, examples: ExampleJson[] = []) {
+export async function compileTypeSpecFor(
+  code: string,
+  examples: ExampleJson[] = [],
+  compilerOptions: CompilerOptions = {},
+) {
   let prefix = "";
   if (!code.includes("import")) {
     prefix = prefix + importStatement(code);
@@ -252,13 +272,13 @@ export async function compileTypeSpecFor(code: string, examples: ExampleJson[] =
     }
   }
   return compileAndCache(
-    `compile\u0000${prefix}${code}\u0000${JSON.stringify(examples)}`,
+    `compile\u0000${prefix}${code}\u0000${JSON.stringify(examples)}\u0000${JSON.stringify(compilerOptions)}`,
     async () => {
       const files: Record<string, string> = { "main.tsp": `${prefix}${code}` };
       for (const example of examples) {
         files[`./examples/2021-10-01-preview/${example.filename}.json`] = example.rawContent;
       }
-      return compileWithSharedTester(files);
+      return compileWithSharedTester(files, compilerOptions);
     },
   );
 }
