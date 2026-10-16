@@ -52,6 +52,7 @@ import { useInterfaceRule } from "./rules/use-interface.js";
 import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -104,6 +105,7 @@ const rules = [
   retryAfterRule,
   unsupportedTypeRule,
   useModelRequestBodyRule,
+  useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
