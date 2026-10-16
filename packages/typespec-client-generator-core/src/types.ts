@@ -720,6 +720,7 @@ function getSdkDiscriminatedUnionModel(
     [...discriminated.variants.values()].some(
       (variant) =>
         variant.kind !== "Model" ||
+        variant === base ||
         !walkBaseChain(variant).includes(base) ||
         walkBaseChain(variant).some(
           (model) => getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
@@ -732,20 +733,14 @@ function getSdkDiscriminatedUnionModel(
   (context.__discriminatedUnionModels ??= new Map()).set(union, base);
   const model = diagnostics.pipe(getSdkModelWithDiagnostics(context, base, operation));
   updateReferencedTypeMap(context, union, model);
-  // The base is represented by the hierarchy's fallback, not by a subtype of itself.
-  const variants = [...discriminated.variants]
-    .filter(([, variant]) => variant !== base)
-    .map(([tag, variant]) => {
-      compilerAssert(
-        variant.kind === "Model",
-        "Inline discriminated union variants must be models.",
-      );
-      return {
-        tag,
-        raw: variant,
-        model: diagnostics.pipe(getSdkModelWithDiagnostics(context, variant, operation)),
-      };
-    });
+  const variants = [...discriminated.variants].map(([tag, variant]) => {
+    compilerAssert(variant.kind === "Model", "Inline discriminated union variants must be models.");
+    return {
+      tag,
+      raw: variant,
+      model: diagnostics.pipe(getSdkModelWithDiagnostics(context, variant, operation)),
+    };
+  });
   const propertyName = discriminated.options.discriminatorPropertyName;
   // A payload model can have only one tag. Existing hierarchies must also agree on
   // the discriminator's wire name and on tags introduced by other unions.

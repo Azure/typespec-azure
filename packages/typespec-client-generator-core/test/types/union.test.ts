@@ -72,7 +72,7 @@ describe("inline discriminated union conversion", () => {
   );
 
   it.each([false, true])(
-    "allows a base alternative with other subtypes=%s",
+    "does not convert a union containing its base with other subtypes=%s",
     async (withSubtype) => {
       const { program } = await SimpleTesterWithService.compile(`
       model PetBase { name: string; }
@@ -82,13 +82,33 @@ describe("inline discriminated union conversion", () => {
       @post op echo(@body body: Pet): Pet;
     `);
       const context = await createSdkContextForTester(program);
-      expectDiagnostics(context.diagnostics, []);
+      expectDiagnostics(
+        context.diagnostics,
+        Array.from({ length: withSubtype ? 2 : 1 }, () => ({
+          code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+          severity: "warning" as const,
+        })),
+      );
       const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
       ok(base);
-      strictEqual(context.sdkPackage.clients[0].methods[0].parameters[0].type, base);
-      strictEqual(context.sdkPackage.clients[0].methods[0].response.type, base);
+      const union = context.sdkPackage.unions[0];
+      ok(union);
+      strictEqual(union.kind, "union");
+      strictEqual(union.baseType, base);
+      strictEqual(union.discriminatedOptions?.envelope, "none");
+      strictEqual(context.sdkPackage.clients[0].methods[0].parameters[0].type, union);
+      strictEqual(context.sdkPackage.clients[0].methods[0].response.type, union);
+      deepStrictEqual(union.variantTypes, [
+        base,
+        ...(withSubtype ? [context.sdkPackage.models.find((model) => model.name === "Cat")] : []),
+      ]);
+      strictEqual(base.discriminatorProperty, undefined);
       strictEqual(base.discriminatorValue, undefined);
-      deepStrictEqual(Object.keys(base.discriminatedSubtypes ?? {}), withSubtype ? ["cat"] : []);
+      strictEqual(base.discriminatedSubtypes, undefined);
+      strictEqual(
+        context.sdkPackage.models.find((model) => model.name === "Cat")?.discriminatorValue,
+        undefined,
+      );
     },
   );
 
