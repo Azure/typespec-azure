@@ -48,7 +48,6 @@ const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
  * base so the libraries resolve from this package's dependencies.
  */
 const sharedTester = createTester(resolvePath(__dirname, "..", ".."), {
-  features: ["union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
