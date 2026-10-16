@@ -81,4 +81,11 @@ describe("expect all rules to be defined", () => {
       !ResourceManagerLinter.rules.some((rule) => rule.name === "put-resource-schema-consistency"),
     );
   });
+
+  it("keeps redundant summary guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
 });

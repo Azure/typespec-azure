@@ -1009,7 +1009,8 @@ function getUnionAsEnumValueType(
   union: Union,
 ): [SdkBuiltInType | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const nonNullOptions = getNonNullOptions(union);
+  const nonNullOptions =
+    union.baseType?.kind === "Scalar" ? [union.baseType] : getNonNullOptions(union);
   for (const option of nonNullOptions) {
     if (option.kind === "Union") {
       const ret = diagnostics.pipe(getUnionAsEnumValueType(context, option));
