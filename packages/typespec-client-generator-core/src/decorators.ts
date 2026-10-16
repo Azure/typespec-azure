@@ -27,6 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getAuthentication,
   getHttpOperation,
@@ -49,6 +50,8 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  LroOperationIdDecorator,
+  LroPollingMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -88,6 +91,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -103,6 +107,65 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+interface ScopedLroDecorator {
+  scope?: string;
+  target: DiagnosticTarget;
+}
+
+interface ScopedLroOperationIdDecorator extends ScopedLroDecorator {
+  strategy: "lastPathSegment";
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+const lroPollingMetadataKey = createStateSymbol("lroPollingMetadata");
+const [getLroOperationIdEntries, setLroOperationIdEntries] = useStateMap<
+  Operation,
+  ScopedLroOperationIdDecorator[]
+>(lroOperationIdKey);
+const [getLroPollingMetadataEntries, setLroPollingMetadataEntries] = useStateMap<
+  ModelProperty,
+  ScopedLroDecorator[]
+>(lroPollingMetadataKey);
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  strategy: "lastPathSegment",
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries = getLroOperationIdEntries(context.program, target) ?? [];
+  entries.unshift({ strategy, scope: normalizeScope(scope), target: context.decoratorTarget });
+  setLroOperationIdEntries(context.program, target, entries);
+};
+
+export const $lroPollingMetadata: LroPollingMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries = getLroPollingMetadataEntries(context.program, target) ?? [];
+  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
+  setLroPollingMetadataEntries(context.program, target, entries);
+};
+
+export function getLroOperationIdDecorators(
+  context: TCGCContext,
+  target: Operation,
+): ScopedLroOperationIdDecorator[] {
+  return (getLroOperationIdEntries(context.program, target) ?? []).filter(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
+
+export function getLroPollingMetadataDecorators(
+  context: TCGCContext,
+  target: ModelProperty,
+): ScopedLroDecorator[] {
+  return (getLroPollingMetadataEntries(context.program, target) ?? []).filter(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
 
 /**
  * The set of emitters a scope string effectively selects.

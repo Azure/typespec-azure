@@ -19,6 +19,37 @@ export interface DecoratorOptions {
 }
 
 /**
+ * Exposes the server-issued SDK long-running operation identifier derived from the status-monitor
+ * URI. With the `lastPathSegment` strategy, `/analyzerResults/abc123` produces `abc123`. This
+ * identifier does not drive polling and is distinct from a caller-supplied `Operation-Id` API
+ * parameter. Emitters choose their idiomatic accessor and storage and must not assume
+ * percent-decoding.
+ *
+ * @param target The native long-running operation.
+ * @param strategy The strategy used to extract the operation identifier from the status-monitor URI.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  strategy: "lastPathSegment",
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Exposes a status-monitor model property as typed SDK polling metadata when the property is used
+ * directly or through inheritance by a native long-running operation.
+ *
+ * @param target The status-monitor model property.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroPollingMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -1136,6 +1167,8 @@ export type ClientOptionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
+  lroOperationId: LroOperationIdDecorator;
+  lroPollingMetadata: LroPollingMetadataDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;

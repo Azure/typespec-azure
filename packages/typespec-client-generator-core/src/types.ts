@@ -117,6 +117,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getRawLroMetadata } from "./lro-metadata.js";
+import { resolveLroPollingMetadata } from "./lro-polling-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -1955,6 +1956,9 @@ function updateTypesFromOperation(
     popNamingContext(context);
 
     const lroMetaData = getRawLroMetadata(program, operation);
+    const lroPollingMetadata = diagnostics.pipe(
+      resolveLroPollingMetadata(context, operation, isVisibleSdkProperty),
+    );
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2069,6 +2073,19 @@ function updateTypesFromOperation(
         UsageFlags.LroPolling,
         "PollingResponse",
       );
+    }
+
+    if (lroMetaData) {
+      for (const property of lroPollingMetadata?.properties ?? []) {
+        pushNamingContext(context, `PollingMetadata${pascalCase(property.name)}`, undefined);
+        const sdkProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+        popNamingContext(context);
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
+        const access =
+          getAccessOverride(context, property) ?? getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkProperty.type));
+        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
+      }
     }
   } finally {
     popNamingContext(context); // pop operation
@@ -2399,14 +2416,19 @@ function reconcilePropertiesAfterRebase(
  * Apply the same predicates as `addPropertiesToModelType` so our view of the
  * SDK-observable property set stays aligned with the actual SDK shape.
  */
-function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
+export type SdkPropertyVisibilityPredicate = (
+  context: TCGCContext,
+  property: ModelProperty,
+) => boolean;
+
+export const isVisibleSdkProperty: SdkPropertyVisibilityPredicate = (context, property) => {
   return (
     !isStatusCode(context.program, property) &&
     !isNeverOrVoidType(property.type) &&
     !hasNoneVisibility(context, property) &&
     isInScope(context, property)
   );
-}
+};
 
 /**
  * Check if two property types are incompatible during `@hierarchyBuilding`

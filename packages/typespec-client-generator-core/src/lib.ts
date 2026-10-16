@@ -199,6 +199,43 @@ export const $lib = createTypeSpecLibrary({
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
+    "lro-operation-id-non-lro": {
+      ...doc("lro-operation-id-non-lro"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId can only be applied to a native long-running operation with status-monitor metadata.",
+      },
+    },
+    "lro-operation-id-duplicate": {
+      ...doc("lro-operation-id-duplicate"),
+      severity: "error",
+      messages: {
+        default: "@lroOperationId is specified more than once in the active emitter scope.",
+      },
+    },
+    "lro-operation-id-missing-link": {
+      ...doc("lro-operation-id-missing-link"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId requires a status-monitor URI supplied by a response header or URL-valued body property.",
+      },
+    },
+    "lro-polling-metadata-duplicate": {
+      ...doc("lro-polling-metadata-duplicate"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@lroPollingMetadata is applied more than once to property '${"propertyName"}' in the active emitter scope.`,
+      },
+    },
+    "lro-polling-metadata-name-conflict": {
+      ...doc("lro-polling-metadata-name-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Polling metadata has more than one entry with the projected client name '${"clientName"}'.`,
+      },
+    },
     "conflicting-multipart-model-usage": {
       ...doc("conflicting-multipart-model-usage"),
       severity: "error",

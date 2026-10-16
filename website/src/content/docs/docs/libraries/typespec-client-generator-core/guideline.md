@@ -341,6 +341,42 @@ The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
+#### LRO polling metadata
+
+TCGC-only `@lroOperationId` and `@lroPollingMetadata` decorators let an SDK expose status-monitor
+metadata without changing Azure.Core polling protocol semantics or the normal method response:
+
+```typespec
+model OperationStatus {
+  status: OperationState;
+
+  @lroPollingMetadata
+  percentComplete?: int32;
+
+  @lroPollingMetadata
+  requestId?: string;
+}
+
+@lroOperationId("lastPathSegment")
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains the exact `SdkOperationLink` used by the status monitor
+and the selected `lastPathSegment` strategy. For example, `/analyzerResults/abc123` produces
+`abc123`. This is the server-issued operation ID represented by the final status-monitor URL path
+segment. It does not drive polling and is distinct from a caller-supplied `Operation-Id` API
+parameter. The strategy does not promise percent-decoding, storage, or a common runtime lifecycle;
+each emitter implements an idiomatic accessor while preserving that semantic.
+
+`SdkLroServiceMetadata.pollingMetadata` contains the exact cached `SdkModelPropertyType` objects
+from the polling response model, in deterministic direct-then-inherited model/property order.
+Consequently, client and wire names, optionality, decorators, serialization, and property types
+are preserved. Each active decorated direct or inherited property applies to every LRO that uses
+that status-monitor model. Nested properties are not scanned; decorate the direct property to
+expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC
+retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`,
+and inclusion or negation on each property.
+
 ### HTTP Operation Parameters Handling
 
 The HTTP operation's parameters are inferred from TypeSpec HTTP lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different HTTP parameters are handled by specific logic based on the info from TypeSpec HTTP lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).

@@ -853,6 +853,50 @@ model MyModel {
 }
 ```
 
+### `@lroOperationId` {#@Azure.ClientGenerator.Core.lroOperationId}
+
+Exposes the server-issued SDK long-running operation identifier derived from the status-monitor
+URI. With the `lastPathSegment` strategy, `/analyzerResults/abc123` produces `abc123`. This
+identifier does not drive polling and is distinct from a caller-supplied `Operation-Id` API
+parameter. Emitters choose their idiomatic accessor and storage and must not assume
+percent-decoding.
+
+```typespec
+@Azure.ClientGenerator.Core.lroOperationId(strategy: valueof "lastPathSegment", scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The native long-running operation.
+`Operation`
+
+#### Parameters
+
+| Name     | Type                                                            | Description                                                                        |
+| -------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| strategy | `valueof "lastPathSegment"`                                     | The strategy used to extract the operation identifier from the status-monitor URI. |
+| scope    | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                                            |
+
+### `@lroPollingMetadata` {#@Azure.ClientGenerator.Core.lroPollingMetadata}
+
+Exposes a status-monitor model property as typed SDK polling metadata when the property is used
+directly or through inheritance by a native long-running operation.
+
+```typespec
+@Azure.ClientGenerator.Core.lroPollingMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The status-monitor model property.
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Define the sub client generated in the client SDK.
