@@ -10,6 +10,7 @@ export default {
     "@azure-tools/typespec-azure-core/casing-style": true,
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
     "@azure-tools/typespec-azure-core/no-boolean": false,
+    "@azure-tools/typespec-azure-core/no-redundant-summary": false,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
     "@azure-tools/typespec-azure-core/no-case-mismatch": true,
@@ -58,6 +59,7 @@ export default {
     // Azure resource manager
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
     "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": true,
+    "@azure-tools/typespec-azure-resource-manager/scope-path-segment-casing": false,
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
