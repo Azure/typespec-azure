@@ -25,7 +25,7 @@ execFileSync(
     "--ignore-scripts",
     "--no-audit",
     "--no-fund",
-    "@azure-typespec/http-client-csharp@latest",
+    "@azure-typespec/http-client-csharp@1.0.0-alpha.20261015.2",
   ],
   { stdio: "inherit", shell: process.platform === "win32" },
 );
