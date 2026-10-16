@@ -42,7 +42,6 @@ specs:
   special-words: { options: { module: specialwordsgroup } }
   # Receive only; send is skipped: https://github.com/Azure/typespec-azure/issues/4934
   "streaming/jsonl": { options: { module: streamingjsonlgroup } }
-  "streaming/sse": { options: { module: streamingssegroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
   "type/dictionary": { options: { module: dictionarygroup } }
   "type/enum/extensible": { options: { module: extensiblegroup } }
