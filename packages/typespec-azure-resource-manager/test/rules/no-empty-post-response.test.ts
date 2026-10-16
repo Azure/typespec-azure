@@ -1,11 +1,13 @@
 import { Tester } from "#test/tester.js";
-import { getSourceLocation, type Operation } from "@typespec/compiler";
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { getSourceLocation, type Entity } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { getArmResources } from "../../src/resource.js";
 import { noEmptyPostResponseRule } from "../../src/rules/no-empty-post-response.js";
 
 const header = `
@@ -38,7 +40,10 @@ function action(response: string, verb = "post") {
   `;
 }
 
-function expected(operation: Operation) {
+function expected(operation: Entity) {
+  if (operation.entityKind !== "Type" || operation.kind !== "Operation") {
+    throw new Error("Expected an operation diagnostic target.");
+  }
   const location = getSourceLocation(operation);
   return {
     code: "@azure-tools/typespec-azure-resource-manager/no-empty-post-response",
@@ -117,7 +122,18 @@ describe("no-empty-post-response", () => {
         }
       `,
       )
-      .toBeValid();
+      .toEmitDiagnostics(({ program }) => {
+        const operation = getArmResources(program)[0].operations.actions.hire;
+        expect(getLroMetadata(program, operation.operation)).toBeDefined();
+        expect(
+          operation.httpOperation.responses.some(
+            (response) =>
+              response.statusCodes === 200 &&
+              response.responses.some((variant) => variant.body === undefined),
+          ),
+        ).toBe(true);
+        return [];
+      });
   });
 
   it("rejects an explicit void body in the synchronous ARM action response", async () => {
