@@ -9,6 +9,10 @@ packages:
   - "!core/packages/http-client-python/**"
   - "!core/packages/typespec-vs"
 
+autoInstallPeers: true
+engineStrict: true
+pmOnFail: download
+
 # Disable pnpm 11's "verify deps before run" (default `install`), which auto-installs
 # on every `pnpm run`. With the nested `core/` workspace this races during parallel
 # turbo builds and fails with ERR_PNPM_ENOTEMPTY.
