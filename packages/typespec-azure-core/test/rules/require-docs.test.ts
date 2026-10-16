@@ -19,6 +19,47 @@ async function checkDocRequired(code: string, message: string) {
 }
 
 describe("emit `documentation-required` when documentation is missing", () => {
+  it("reports missing and blank documentation together without duplicate diagnostics", async () => {
+    await tester
+      .expect(
+        `
+      @doc(" ") model Widget {
+        @doc("\\t") name: string;
+        missing: string;
+      }
+    `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
+            "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
+            "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
+            "The ModelProperty named 'missing' should have a documentation or description, use doc comment /** */ to provide it.",
+        },
+      ]);
+  });
+
+  it("does not newly require namespace, interface, or scalar documentation", async () => {
+    await tester
+      .expect(
+        `
+      namespace Widgets {}
+      interface Empty {}
+      scalar Label extends string;
+    `,
+      )
+      .toBeValid();
+  });
+
   it("on model", async () =>
     await checkDocRequired(
       "/*loc*/model Foo {}",

@@ -2249,27 +2249,27 @@
           {
             "name": "Black",
             "value": "Black",
-            "description": "Black"
+            "description": "The widget is black."
           },
           {
             "name": "White",
             "value": "White",
-            "description": "White"
+            "description": "The widget is white."
           },
           {
             "name": "Red",
             "value": "Red",
-            "description": "Red"
+            "description": "The widget is red."
           },
           {
             "name": "Green",
             "value": "Green",
-            "description": "Green"
+            "description": "The widget is green."
           },
           {
             "name": "Blue",
             "value": "Blue",
-            "description": "Blue"
+            "description": "The widget is blue."
           }
         ]
       }

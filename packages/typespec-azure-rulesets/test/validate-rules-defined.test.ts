@@ -72,4 +72,18 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("enables the strengthened documentation-required rule without a separate quality rule", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/documentation-required";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], true);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/no-uninformative-doc"
+        ],
+        undefined,
+      );
+    }
+    ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-uninformative-doc"));
+  });
 });
