@@ -8,6 +8,54 @@ llmstxt: true
 
 ## Azure.Core
 
+### `@azureServiceEnvironments` {#@Azure.Core.azureServiceEnvironments}
+
+Associates named deployment data with an Entra authentication model.
+Environments reference audience member names, not duplicate resource values.
+The optional default environment must use the default audience.
+Authority and tenant configuration remain the credential's responsibility.
+
+```typespec
+@Azure.Core.azureServiceEnvironments(authentication: Model, environments: valueof Record<Azure.Core.AzureServiceEnvironment>, defaultEnvironment?: valueof string)
+```
+
+#### Target
+
+The namespace or interface using the authentication model.
+`Namespace | Interface`
+
+#### Parameters
+
+| Name               | Type                                                 | Description                                       |
+| ------------------ | ---------------------------------------------------- | ------------------------------------------------- |
+| authentication     | `Model`                                              | The annotated Entra authentication model.         |
+| environments       | `valueof Record<Azure.Core.AzureServiceEnvironment>` | The named audience and optional endpoint records. |
+| defaultEnvironment | `valueof string`                                     | The name of the default environment, if any.      |
+
+### `@azureTokenAuthentication` {#@Azure.Core.azureTokenAuthentication}
+
+Adds audience or named challenge semantics to an existing OAuth authentication model.
+An Entra audience is a string enum or union of resource values, with an optional open
+`string` branch for custom resources. Every OAuth flow must already use the scope
+derived from the named default member. Resource values are preserved exactly.
+Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
+
+```typespec
+@Azure.Core.azureTokenAuthentication(profile: valueof Azure.Core.AzureTokenAuthenticationOptions, audienceType?: unknown)
+```
+
+#### Target
+
+The OAuth authentication model.
+`Model`
+
+#### Parameters
+
+| Name         | Type                                                                                                    | Description                                             |
+| ------------ | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| profile      | [valueof `AzureTokenAuthenticationOptions`](./data-types.md#Azure.Core.AzureTokenAuthenticationOptions) | The Entra default-scope or named challenge profile.     |
+| audienceType | `unknown`                                                                                               | The resource-valued enum or union for an Entra profile. |
+
 ### `@finalLocation` {#@Azure.Core.finalLocation}
 
 Identifies a ModelProperty as containing the final location for the operation result.

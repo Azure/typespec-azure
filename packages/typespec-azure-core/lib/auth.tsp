@@ -11,6 +11,36 @@ using Azure.Core.Traits.Private;
 
 namespace Azure.Core;
 
+/** Additional token-request semantics for an existing OAuth authentication model. */
+union AzureTokenAuthenticationOptions {
+  /** Derive an Entra scope by appending `/.default` to the selected resource. */
+  entraDefaultScope: {
+    /** The token-request profile. */
+    kind: "entraDefaultScope",
+
+    /** The name of the default member in the audience enum or union. */
+    defaultAudience: string,
+  },
+
+  /** Delegate challenge processing to a named SDK runtime contract. */
+  challengeBased: {
+    /** The token-request profile. */
+    kind: "challengeBased",
+
+    /** The versioned runtime contract, for example `azure.keyVaultChallenge/v1`. */
+    challengeContract: string,
+  },
+}
+
+/** A service deployment's audience and optional default HTTP endpoint. */
+model AzureServiceEnvironment {
+  /** A member name from the authentication model's audience enum or union. */
+  audience: string;
+
+  /** An absolute HTTP or HTTPS endpoint, independent of the audience resource. */
+  defaultEndpoint?: string;
+}
+
 /**
  * Azure Active Directory (AAD) Token Authentication Flow
  * @template AuthUrl The authorization URL.

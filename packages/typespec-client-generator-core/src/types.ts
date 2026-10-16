@@ -1,4 +1,10 @@
-import { type UnionEnum, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import {
+  type UnionEnum,
+  getAzureServiceEnvironmentAuthenticationModels,
+  getAzureServiceEnvironments,
+  getAzureTokenAuthentication,
+  getUnionAsEnum,
+} from "@azure-tools/typespec-azure-core";
 import {
   type BooleanLiteral,
   type Diagnostic,
@@ -37,6 +43,7 @@ import { isEvents } from "@typespec/events";
 import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   type Authentication,
+  type HttpAuth,
   type HttpOperationFileBody,
   type HttpOperationMultipartBody,
   type HttpPayloadBody,
@@ -70,8 +77,10 @@ import {
   type AccessFlags,
   type ArrayKnownEncoding,
   type SdkArrayType,
+  type SdkAzureAuthentication,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
+  type SdkClient,
   type SdkClientType,
   type SdkConstantType,
   type SdkCredentialParameter,
@@ -1287,11 +1296,16 @@ function getSdkCredentialType(
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
+      // Projection diagnostics and audience usage are collected by handleAllTypes.
+      const azureAuthentication = ignoreDiagnostics(
+        getSdkAzureAuthentication(context, client.__raw, scheme),
+      );
       credentialTypes.push({
         // Multiple services only deal with the first server config
         __raw: client.__raw.services[0],
         kind: "credential",
         scheme: scheme,
+        ...(azureAuthentication === undefined ? {} : { azureAuthentication }),
         decorators: [],
       });
     }
@@ -1341,6 +1355,64 @@ export function getSdkCredentialParameter(
     access: "public",
     flatten: false,
   };
+}
+
+function getSdkAzureAuthentication(
+  context: TCGCContext,
+  client: SdkClient,
+  scheme: HttpAuth,
+): [SdkAzureAuthentication | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (scheme.type !== "oauth2") return diagnostics.wrap(undefined);
+  const profile = getAzureTokenAuthentication(context.program, scheme.model);
+  if (!profile) return diagnostics.wrap(undefined);
+  const service = client.services[0];
+  const serviceEnvironments = getAzureServiceEnvironments(context.program, service, scheme.model);
+  let environments = serviceEnvironments;
+  for (let current: SdkClient | undefined = client; current; current = current.parent) {
+    if (!current.type) continue;
+    const candidate = getAzureServiceEnvironments(context.program, current.type, scheme.model);
+    // The getter caches declarations; inherited service defaults must wait for SDK parents.
+    if (candidate && candidate !== serviceEnvironments) {
+      environments = candidate;
+      break;
+    }
+  }
+  const deployment = {
+    environments: environments?.environments.map((environment) => ({ ...environment })) ?? [],
+    ...(environments?.defaultEnvironment === undefined
+      ? {}
+      : { defaultEnvironment: environments.defaultEnvironment }),
+  };
+  if (profile.kind === "challengeBased") {
+    return diagnostics.wrap({ profile: { ...profile }, ...deployment });
+  }
+  const type = diagnostics.pipe(getClientTypeWithDiagnostics(context, profile.audience.type));
+  if (type.kind !== "enum") {
+    diagnostics.add(
+      createDiagnostic({
+        code: "azure-authentication-invalid",
+        target: profile.audience.type,
+        format: {
+          reason:
+            "The audience family must project to an SDK enum; nested audience unions require union-as-enum flattening.",
+        },
+      }),
+    );
+    return diagnostics.wrap(undefined);
+  }
+  return diagnostics.wrap({
+    profile: {
+      kind: "entraDefaultScope",
+      audience: {
+        ...profile.audience,
+        knownAudiences: { ...profile.audience.knownAudiences },
+        type,
+      },
+      defaultScopes: [...profile.defaultScopes],
+    },
+    ...deployment,
+  });
 }
 
 export function getSdkModelPropertyTypeBase(
@@ -2526,6 +2598,38 @@ export function getAllReferencedTypes(
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
+  for (const client of context.getClients()) {
+    const service = client.services[0];
+    const target = client.type ?? service;
+    const authentication = getAuthentication(context.program, service);
+    const schemes = authentication?.options.flatMap((option) => option.schemes) ?? [];
+    const environmentModels = new Set([
+      ...getAzureServiceEnvironmentAuthenticationModels(context.program, target),
+      ...getAzureServiceEnvironmentAuthenticationModels(context.program, service),
+    ]);
+    for (const model of environmentModels) {
+      if (!schemes.some((scheme) => scheme.model === model)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "azure-authentication-invalid",
+            target,
+            format: {
+              reason: `Service environments reference '${model.name}', which is not an authentication alternative of this client.`,
+            },
+          }),
+        );
+      }
+    }
+    for (const scheme of schemes) {
+      const metadata = diagnostics.pipe(getSdkAzureAuthentication(context, client, scheme));
+      if (metadata?.profile.kind === "entraDefaultScope") {
+        diagnostics.pipe(
+          updateUsageOrAccess(context, UsageFlags.Input, metadata.profile.audience.type),
+        );
+        diagnostics.pipe(updateUsageOrAccess(context, "public", metadata.profile.audience.type));
+      }
+    }
+  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInClient(context, client)) {
       // operations on a client

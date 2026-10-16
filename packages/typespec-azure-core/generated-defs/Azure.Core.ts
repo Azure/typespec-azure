@@ -3,13 +3,20 @@ import type {
   DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
+  Interface,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+
+export interface AzureServiceEnvironment {
+  readonly audience: string;
+  readonly defaultEndpoint?: string;
+}
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -44,6 +51,51 @@ export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   options?: Type,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Adds audience or named challenge semantics to an existing OAuth authentication model.
+ * An Entra audience is a string enum or union of resource values, with an optional open
+ * `string` branch for custom resources. Every OAuth flow must already use the scope
+ * derived from the named default member. Resource values are preserved exactly.
+ * Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
+ *
+ * @param target The OAuth authentication model.
+ * @param profile The Entra default-scope or named challenge profile.
+ * @param audienceType The resource-valued enum or union for an Entra profile.
+ */
+export type AzureTokenAuthenticationDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  profile:
+    | {
+        readonly kind: "entraDefaultScope";
+        readonly defaultAudience: string;
+      }
+    | {
+        readonly kind: "challengeBased";
+        readonly challengeContract: string;
+      },
+  audienceType?: Type,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Associates named deployment data with an Entra authentication model.
+ * Environments reference audience member names, not duplicate resource values.
+ * The optional default environment must use the default audience.
+ * Authority and tenant configuration remain the credential's responsibility.
+ *
+ * @param target The namespace or interface using the authentication model.
+ * @param authentication The annotated Entra authentication model.
+ * @param environments The named audience and optional endpoint records.
+ * @param defaultEnvironment The name of the default environment, if any.
+ */
+export type AzureServiceEnvironmentsDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  authentication: Model,
+  environments: Record<string, AzureServiceEnvironment>,
+  defaultEnvironment?: string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -197,6 +249,8 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
+  azureTokenAuthentication: AzureTokenAuthenticationDecorator;
+  azureServiceEnvironments: AzureServiceEnvironmentsDecorator;
   previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
