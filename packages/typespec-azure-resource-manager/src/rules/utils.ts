@@ -10,7 +10,7 @@ import {
   type Operation,
   type Program,
 } from "@typespec/compiler";
-import { SyntaxKind } from "@typespec/compiler/ast";
+import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { getResourceOperation } from "@typespec/rest";
 import type { ArmResourceOperation } from "../operations.js";
 import { type ArmResourceDetails, getArmResourceKind } from "../resource.js";
@@ -106,6 +106,25 @@ export function getSourceProperty(property: ModelProperty): ModelProperty {
   }
 
   return currProperty ?? property;
+}
+
+export function hasSuppression(node: Node | undefined, code: string): boolean {
+  let current = node;
+  while (current !== undefined) {
+    for (const directive of current.directives ?? []) {
+      const firstArgument = directive.arguments[0];
+      if (
+        directive.target.sv === "suppress" &&
+        firstArgument !== undefined &&
+        ((firstArgument.kind === SyntaxKind.StringLiteral && firstArgument.value === code) ||
+          (firstArgument.kind === SyntaxKind.Identifier && firstArgument.sv === code))
+      ) {
+        return true;
+      }
+    }
+    current = current.parent;
+  }
+  return false;
 }
 
 export function isInternalTypeSpec(
