@@ -1,8 +1,6 @@
 import { createRule, fileRef, paramMessage } from "@typespec/compiler";
-import { getAllHttpServices } from "@typespec/http";
 import { createTCGCContext } from "../context.js";
-import { AllScopes } from "../internal-utils.js";
-import { getLibraryName } from "../public-utils.js";
+import { getOperationsWithIncorrectVerbPrefix } from "./verb-prefix.js";
 
 export const useCreateForPutRule = createRule({
   name: "use-create-for-put",
@@ -22,24 +20,15 @@ export const useCreateForPutRule = createRule({
 
     return {
       root: () => {
-        const [services] = getAllHttpServices(context.program);
-        for (const service of services) {
-          for (const { operation, verb } of service.operations) {
-            if (verb !== "put") {
-              continue;
-            }
-
-            // Check the common SDK name, leaving emitter-specific overrides to emitter rules.
-            const operationName = getLibraryName(tcgcContext, operation, AllScopes);
-            if (operationName.toLowerCase().startsWith("create")) {
-              continue;
-            }
-
-            context.reportDiagnostic({
-              target: operation,
-              format: { operationName },
-            });
-          }
+        for (const { operation, operationName } of getOperationsWithIncorrectVerbPrefix(
+          tcgcContext,
+          "put",
+          "create",
+        )) {
+          context.reportDiagnostic({
+            target: operation,
+            format: { operationName },
+          });
         }
       },
     };
