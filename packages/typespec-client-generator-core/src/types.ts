@@ -720,7 +720,6 @@ function getSdkDiscriminatedUnionModel(
     [...discriminated.variants.values()].some(
       (variant) =>
         variant.kind !== "Model" ||
-        variant === base ||
         !walkBaseChain(variant).includes(base) ||
         walkBaseChain(variant).some(
           (model) => getAlternateType(context, model) || getLegacyHierarchyBuilding(context, model),
@@ -733,17 +732,25 @@ function getSdkDiscriminatedUnionModel(
   (context.__discriminatedUnionModels ??= new Map()).set(union, base);
   const model = diagnostics.pipe(getSdkModelWithDiagnostics(context, base, operation));
   updateReferencedTypeMap(context, union, model);
-  const variants = [...discriminated.variants].map(([tag, variant]) => {
-    compilerAssert(variant.kind === "Model", "Inline discriminated union variants must be models.");
-    return {
-      tag,
-      raw: variant,
-      model: diagnostics.pipe(getSdkModelWithDiagnostics(context, variant, operation)),
-    };
-  });
+  // The base is represented by the hierarchy's fallback, not by a subtype of itself.
+  const variants = [...discriminated.variants]
+    .filter(([, variant]) => variant !== base)
+    .map(([tag, variant]) => {
+      compilerAssert(
+        variant.kind === "Model",
+        "Inline discriminated union variants must be models.",
+      );
+      return {
+        tag,
+        raw: variant,
+        model: diagnostics.pipe(getSdkModelWithDiagnostics(context, variant, operation)),
+      };
+    });
   const propertyName = discriminated.options.discriminatorPropertyName;
+  // A payload model can have only one tag. Existing hierarchies must also agree on
+  // the discriminator's wire name and on tags introduced by other unions.
   if (
-    new Set(variants.map((variant) => variant.model)).size !== variants.length ||
+    new Set(variants.map((variant) => variant.raw)).size !== variants.length ||
     (model.discriminatorProperty &&
       (model.discriminatorProperty.serializationOptions.json?.name ??
         model.discriminatorProperty.__raw?.name ??
@@ -761,7 +768,8 @@ function getSdkDiscriminatedUnionModel(
       (variant) =>
         (variant.model.discriminatorValue !== undefined &&
           variant.model.discriminatorValue !== variant.tag) ||
-        (model.discriminatedSubtypes?.[variant.tag] !== undefined &&
+        (model.discriminatedSubtypes &&
+          Object.hasOwn(model.discriminatedSubtypes, variant.tag) &&
           model.discriminatedSubtypes[variant.tag] !== variant.model),
     )
   ) {
@@ -777,7 +785,10 @@ function getSdkDiscriminatedUnionModel(
   model.discriminatorProperty = diagnostics.pipe(
     getUnionDiscriminatorProperty(context, base, model, propertyName),
   );
-  model.discriminatedSubtypes ??= {};
+  model.discriminatedSubtypes = Object.assign(
+    Object.create(null) as Record<string, SdkModelType>,
+    model.discriminatedSubtypes,
+  );
   for (const variant of variants) {
     diagnostics.pipe(
       getUnionDiscriminatorProperty(
@@ -835,6 +846,7 @@ function getUnionDiscriminatorProperty(
             decorators: [],
           };
     property = createDiscriminatorProperty(model, source?.name ?? name, type, name);
+    property.__raw = rawProperty;
     model.properties.unshift(property);
   }
   if (
@@ -2272,6 +2284,17 @@ function updateTypesFromOperation(
 
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const overrides = new Map<SdkType, AccessFlags>();
+  for (const [rawType, sdkType] of context.__referencedTypeCache) {
+    if (rawType.kind !== "Model" && rawType.kind !== "Enum" && rawType.kind !== "Union") continue;
+    const access = getAccessOverride(context, rawType);
+    if (access && (access === "public" || !overrides.has(sdkType))) overrides.set(sdkType, access);
+  }
+  // Seed orphan hierarchies from all aliases before a raw base or subtype gets a
+  // public default. Already-inferred access still participates in conflict checks below.
+  for (const [sdkType, access] of overrides) {
+    if (!sdkType.__accessSet) diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+  }
   // set access for all orphan model without override
   for (const [rawType, sdkType] of context.__referencedTypeCache) {
     if (rawType.kind !== "Model" && rawType.kind !== "Enum" && rawType.kind !== "Union") continue;

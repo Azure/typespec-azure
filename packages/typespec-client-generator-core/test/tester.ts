@@ -88,6 +88,7 @@ ${x}
  * XML tester with XML library support
  */
 export const XmlTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",

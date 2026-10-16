@@ -30,7 +30,11 @@ export function getAllDiscriminatedValues(
     // Check if this model is a subtype of the given discriminator property
     if (
       !!discriminatorProperty &&
-      model.baseModel?.discriminatorProperty?.name === discriminatorProperty?.name
+      getAllAncestors(model).some(
+        (ancestor) =>
+          ancestor.kind === "model" &&
+          ancestor.discriminatorProperty?.name === discriminatorProperty.name,
+      )
     ) {
       values.push(model.discriminatorValue);
       if (model.discriminatorProperty?.name === discriminatorProperty.name) {
