@@ -1,13 +1,13 @@
-import { resolvePath } from "@typespec/compiler";
-import { createTester, t } from "@typespec/compiler/testing";
+import { t } from "@typespec/compiler/testing";
 import type { HttpOperationBody, HttpPayloadBody } from "@typespec/http";
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import {
   containsStatusCode,
   isStatusCodeAllowed,
   matchesStatusCode,
   selectResponseBody,
 } from "../../src/rules/http-response-utils.js";
+import { CompilerTester } from "../tester.js";
 
 describe("HTTP response status primitives", () => {
   it("matches literals and singleton ranges exactly", () => {
@@ -20,14 +20,21 @@ describe("HTTP response status primitives", () => {
 
   describe("HTTP response body selection", () => {
     it("distinguishes identical and ambiguous body variants independently of their order", async () => {
-      const { First: first, Second: second } = await createTester(
-        resolvePath(import.meta.dirname, "../.."),
-        {
-          libraries: [],
-        },
-      ).compile(
-        t.code`model ${t.model("First")} { value: string; } model ${t.model("Second")} { other: string; }`,
-      );
+      const {
+        First: first,
+        Second: second,
+        ContentType,
+        Filename,
+        Contents,
+      } = await CompilerTester.compile(t.code`
+          model ${t.model("First")} {
+            ${t.modelProperty("ContentType")}: string;
+            ${t.modelProperty("Filename")}: string;
+            ${t.modelProperty("Contents")}: string;
+          }
+          model ${t.model("Second")} { other: string; }
+        `);
+      assert(Contents.type.kind === "Scalar");
       const json: HttpOperationBody = {
         bodyKind: "single",
         type: first,
@@ -41,7 +48,15 @@ describe("HTTP response status primitives", () => {
       const alternatives: HttpPayloadBody[] = [
         { ...xml, type: second },
         { ...xml, isExplicit: false },
-        { bodyKind: "file", type: first, isText: true, contentTypes: ["text/plain"] },
+        {
+          bodyKind: "file",
+          type: first,
+          isText: true,
+          contentTypes: ["text/plain"],
+          contentTypeProperty: ContentType,
+          filename: Filename,
+          contents: { ...Contents, type: Contents.type },
+        },
       ];
       for (const alternative of alternatives) {
         expect(selectResponseBody([json, alternative])).toEqual({ kind: "ambiguous" });
