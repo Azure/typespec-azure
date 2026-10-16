@@ -62,8 +62,9 @@ discovery rather than silently choosing different semantics.
   `options.name` for wire-name policies, and target the authored `property`.
   Verify the repository's installed API rather than copying an obsolete shape.
 - Require a supported-input regression case for added complexity. Keep a scope
-  guard or SDK-name resolver when the contract requires it; do not remove it
-  solely to reduce code. Compare related rules' scope and name-resolution policy.
+  guard or SDK-name resolver when an independently justified native requirement
+  needs it, not merely because the current implementation and tests use it.
+  Compare related rules' scope and name-resolution policy.
   Apply the [discriminating coverage gate](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
   before rewriting logic for an alleged miss.
 - Report each independently actionable violation on its authored target. Avoid
@@ -75,6 +76,34 @@ discovery rather than silently choosing different semantics.
   registered-but-inactive behavior accurately; availability is not activation.
 - Apply the [native rule documentation contract](#native-rule-documentation)
   when writing or updating user-facing rule documentation.
+
+## Simplification and review
+
+A rule brief and PR description record the proposed design, not a requirement
+that overrides review asking to simplify, revert or consolidate it.
+
+- Record the requested direction and compare the smallest alternative using
+  existing native mechanisms before defending the current architecture.
+  For each behavior that would change, distinguish a required native guideline,
+  verified released compatibility, legacy parity and a choice introduced by
+  the proposal. Tests of that choice do not establish an independent requirement.
+- A behavior difference is a tradeoff to assess, not by itself a reason to
+  reject simplification. Prefer extending an existing rule when its native
+  responsibility remains coherent; assess actual enablement and suppression
+  effects separately, distinguishing proposed IDs/APIs from released contracts.
+- Name any specific unresolved policy choice, explicit request for another
+  maintainer's input or missing authorization. Do not invent a decision gate
+  solely because the reviewer challenges the proposed contract, and do not
+  accept a suggestion solely on reviewer authority.
+- Keep permissions, required validation and source-immutability boundaries.
+  When the recommendation requires authorized source repair, report that
+  handoff separately from the design recommendation; do not silently diverge
+  in the promoted copy. Update the brief, tests, docs and PR claims together
+  when an in-scope redesign is authorized.
+- Track replying separately from satisfying the request. An explanation of the
+  current design is not evidence that a simplification concern was addressed;
+  identify the implemented change, outstanding action or evidence-backed
+  qualified rejection without implying reviewer agreement.
 
 ## Native rule documentation
 
@@ -154,15 +183,18 @@ native contract and [test-claim mapping](../typespec-lint-validate/SKILL.md#test
   native-versus-legacy differences across implementation, actual published
   examples, authored/generated references, manual guides, and legacy mappings.
 - Recheck SDK impact and compatibility guidance. Show the fully qualified rule
-  ID and correct placement in suppression examples; when registered suppression
-  is an acceptance claim, preserve its control in integration coverage.
+  ID and correct placement in suppression examples. Retain registered
+  suppression coverage only for a concrete rule-owned interaction or
+  demonstrated regression, not merely because it was promised in the PR.
 - Reconcile task-owned unreleased Chronus entries with the final public
   behavior rather than accumulating stale intermediate fix descriptions.
   Consolidate only entries for the same unreleased feature/package where
   appropriate; retain distinct package and release classifications.
 - Evaluate reviewer suggestions against current code, the contract, and PR
-  promises before turning them into policy. Do not impose blanket bans on
-  isolated testers, integration tests, Markdown compilation, or helpers.
+  promises using the [simplification review guidance](#simplification-and-review).
+  Do not impose blanket bans on isolated testers, integration tests, compiling
+  examples or helpers. For Swagger/LintDiff migrations, apply the specific
+  [no-bespoke-parser guidance](../typespec-lint-validate/SKILL.md#documentation-example-validation).
 
 ## Deliverable
 

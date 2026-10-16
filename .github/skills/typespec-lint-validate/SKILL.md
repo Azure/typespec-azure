@@ -50,6 +50,12 @@ These are placement rules, not a mandatory set of suites for every rule.
 Use the repository's existing harnesses and organization; a distinct layer need
 not mean a new file per rule or a new general-purpose harness.
 
+First establish that a claim needs rule-specific evidence. A PR promise alone
+does not make generic suppression or enablement a rule-owned requirement.
+Delete framework-only cases without replacement; do not relocate them merely
+to preserve a checklist. Retain concrete rule-caused interactions, authored-node
+deduplication and demonstrated regressions. Update stale PR claims accordingly.
+
 Relocate required acceptance evidence instead of silently deleting it during
 unit-test cleanup. A registration or interaction test is not a framework-only
 test merely because it is unnecessary in the single-rule suite. Retain it in
@@ -108,8 +114,8 @@ linter framework, or shared test harness in every rule suite.
   authored locations without asserting compiler object identity or traversal
   internals.
 - When updating an existing suite, remove framework-only cases within the task's
-  scope; retain any distinct rule assertion in a simpler case. If a genuine
-  framework regression needs coverage, place it in the owning framework/helper
+  scope without replacement; retain any distinct rule assertion in a simpler
+  case. If a genuine framework regression needs coverage, place it in the owning framework/helper
   suite rather than duplicating it across rules. Do not edit unrelated PRs unless
   that cleanup is explicitly part of the task.
   First account for required non-unit acceptance evidence through the
@@ -188,17 +194,23 @@ first. The dimensions below are not an unconditional test matrix for every rule:
 
 ### Documentation example validation
 
-Keep literal behavior fixtures independent of Markdown layout. In a dedicated
-documentation test or existing example workflow, select the actual published
+Keep literal behavior fixtures independent of Markdown layout. For Swagger/LintDiff
+migrations, do not add bespoke per-rule Markdown parsers or relocate
+them into a separate suite. Remove such parsers while retaining useful literal
+semantic cases; a shared documentation-testing system belongs in a separate task.
+
+Use existing shared documentation/example infrastructure or a one-time scratch
+execution against the actual published snippets. Record the document revision
+or content hash, setup, command and diagnostic evidence in the validation
+handoff or PR notes. A one-time receipt is not continuous documentation coverage.
+When existing infrastructure extracts examples, select the actual published
 snippets by semantic section or stable identity, requiring an unambiguous match.
 Do not assert global fence counts, use positional fence indexes, or compile only
-copied text while claiming to validate the published document. Markdown
-compilation is useful evidence in its own layer, not a reason to couple every
-rule case to documentation parsing.
+copied text while claiming to validate the published document.
 
 Validate the actual incorrect/correct snippets through the repository's existing
-example or focused test workflow, adding only the imports and service/resource
-setup needed to compile them. Record that setup so the result is reproducible;
+example workflow or one-time execution, adding only the imports and
+service/resource setup needed to compile them. Record that setup so the result is reproducible;
 do not replace the published operation or response shape with an easier test.
 
 - Explicitly enable the target rule, including when its ruleset entry defaults
@@ -216,8 +228,8 @@ do not replace the published operation or response shape with an easier test.
   require a documented template limitation for any handwritten fallback.
 - Record the example audience, chosen template/customization or justified
   handwritten exception, and diagnostic evidence in the validation handoff or
-  PR notes. Reuse existing example infrastructure or a scratch workflow instead
-  of forcing ARM dependencies into a Core unit-test suite. If no suitable
+  PR notes. Reuse existing shared example infrastructure or one-time execution
+  instead of forcing ARM dependencies into a Core unit-test suite. If no suitable
   workflow is available, report the missing evidence rather than claiming this
   gate passed; do not add a new general-purpose harness just for the examples.
 
