@@ -62,6 +62,8 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 TCGC provides flags to control the client type graph style, such as enabling or disabling convenience and protocol APIs for Java and C# emitters. Other emitters should not set `generate-convenience-methods` or `generate-protocol-methods`; TCGC reports an `unnecessary-emitter-option` warning when either option is explicitly set for another language. See the [documentation](../reference/emitter/#emitter-options) for details.
 
+By default, `createSdkContext` converts eligible inline-discriminated unions to the existing polymorphic model representation. Emitters that use native discriminated unions, such as Rust, can opt out with `{ convertDiscriminatedUnionsToModels: false }` in the third argument to `createSdkContext`.
+
 ## TCGC Raw Types and Helpers
 
 In order to introduce the client concept, TCGC introduces some new raw types and helper functions.
@@ -240,6 +242,36 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
 - When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
+
+#### Inline-discriminated union conversion
+
+An inline-discriminated union handled by the SDK context is converted when it uses `@discriminated(#{ envelope: "none" })`, explicitly extends a named model, and every alternative is a named variant whose model nominally inherits from that base, directly or transitively. Unhandled unions do not reshape otherwise-used models.
+
+```tsp
+model PetBase {
+  name: string;
+}
+model Cat extends PetBase {
+  meows: boolean;
+}
+model Dog extends PetBase {
+  barks: boolean;
+}
+
+@discriminated(#{ envelope: "none" })
+union Pet extends PetBase {
+  cat: Cat,
+  dog: Dog,
+}
+
+@post op echo(@body pet: Pet): Pet;
+```
+
+References to `Pet` resolve to the existing `PetBase` SDK model, including operation parameters/responses, model properties, containers, and nullable uses. The base's `discriminatorProperty` and `discriminatedSubtypes`, plus each variant's `discriminatorValue` and discriminator property, describe the inline tags. Missing discriminator properties are synthesized; the compiler type graph is not changed. The projected model retains the base model's name and identity rather than introducing a model named after the union.
+
+Ordinary unions, object-envelope unions, structural-only variants, unions without a model constraint, and unions containing defaults or the base model itself as an alternative are not converted. Alternate types and legacy hierarchy rebasing retain their existing handling. Eligible unions always resolve to their base SDK model. Conflicting discriminator metadata produces a `union-model-conversion-conflict` error rather than overwriting an existing hierarchy or falling back to a union representation.
+
+Compatible unions sharing the same base share its SDK model and combined subtype map; the polymorphic representation does not enforce each union's subset separately. Synthesized inline discriminator properties also appear on directly used SDK variants. Disable conversion when an emitter needs union-specific serialization or exact alternative-set information.
 
 **Model Types:**
 
