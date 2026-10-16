@@ -130,7 +130,7 @@ op CreateOrReplaceAsync<
 @doc("Update a {name} PrivateEndpointConnection", ParentResource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(ParentResource, Foundations.Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 op CustomPatchAsync<
   ParentResource extends Foundations.SimpleResource,
   Resource extends PrivateEndpointConnectionResource,
@@ -173,7 +173,7 @@ op CustomPatchAsync<
 @doc("Update a {name} PrivateEndpointConnection", ParentResource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(ParentResource, Foundations.Resource)
-@patch(#{ implicitOptionality: false })
+@patch
 op CustomPatchSync<
   ParentResource extends Foundations.SimpleResource,
   Resource extends PrivateEndpointConnectionResource,

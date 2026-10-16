@@ -430,8 +430,8 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
     undefined,
   );
 });
-it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
-  const openapi: any = await compileOpenAPI(
+it("preserves declared optionality for resource patch of common resource envelope mixins", async () => {
+  const openapi = await compileOpenAPI(
     `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -470,7 +470,6 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<AllPropertiesResource, AllPropertiesProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -478,7 +477,6 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
-        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<SystemAssignedResource, SystemAssignedProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
@@ -486,32 +484,36 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
     { preset: "azure" },
   );
 
-  const all = openapi.definitions?.["AllPropertiesResourceUpdate"];
-  const system = openapi.definitions?.["SystemAssignedResourceUpdate"];
+  const basePath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PatchTest";
+  const allBody = openapi.paths[
+    `${basePath}/allPropertiesResources/{allPropertiesResourceName}`
+  ].patch!.parameters.find((param) => "in" in param && param.in === "body");
+  const systemBody = openapi.paths[
+    `${basePath}/systemAssignedResources/{systemAssignedResourceName}`
+  ].patch!.parameters.find((param) => "in" in param && param.in === "body");
+  deepStrictEqual(allBody?.schema, { $ref: "#/definitions/AllPropertiesResource" });
+  deepStrictEqual(systemBody?.schema, { $ref: "#/definitions/SystemAssignedResource" });
+
+  const all = openapi.definitions?.["AllPropertiesResource"];
+  const system = openapi.definitions?.["SystemAssignedResource"];
   ok(all);
   ok(system);
-  deepStrictEqual(
-    all?.["properties"]?.["plan"]?.["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate",
-  );
-  deepStrictEqual(
-    all?.["properties"]?.["sku"]?.["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate",
-  );
-  deepStrictEqual(
-    all?.["properties"]?.["identity"]?.["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
-  );
-  deepStrictEqual(
-    system?.["properties"]?.["identity"]?.["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate",
-  );
-  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
-  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
-  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
-  ok(
-    openapi.definitions?.["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"],
-  );
+  expect(all.properties?.plan).toMatchObject({
+    $ref: "../../common-types/resource-management/v5/types.json#/definitions/Plan",
+  });
+  expect(all.properties?.sku).toMatchObject({
+    $ref: "../../common-types/resource-management/v5/types.json#/definitions/Sku",
+  });
+  expect(all.properties?.identity).toMatchObject({
+    $ref: "../../common-types/resource-management/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
+  });
+  expect(system.properties?.identity).toMatchObject({
+    $ref: "../../common-types/resource-management/v5/managedidentity.json#/definitions/SystemAssignedServiceIdentity",
+  });
+  deepStrictEqual(all.required, ["encryption"]);
+  deepStrictEqual(openapi.definitions?.["AllPropertiesProperties"].required, ["reqProperty"]);
+  deepStrictEqual(openapi.definitions?.["SystemAssignedProperties"].required, ["reqProperty"]);
 });
 it("can split resources and operations by feature", async () => {
   const { privateLink, privateEndpoint } = await CompileOpenApiWithFeatures(

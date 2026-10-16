@@ -155,11 +155,10 @@ interface ResourceOperations<
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @Foundations.Private.ensureVerb("ResourceCreateOrUpdate", "PATCH")
   @createsOrUpdatesResource(Resource)
   @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
-  @patch(#{ implicitOptionality: true }) // For legacy reasons
+  @patch
   ResourceCreateOrUpdate<
     Resource extends TypeSpec.Reflection.Model,
     Traits extends TypeSpec.Reflection.Model = {}
@@ -192,11 +191,10 @@ interface ResourceOperations<
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @Foundations.Private.ensureVerb("LongRunningResourceCreateOrUpdate", "PATCH")
   @createsOrUpdatesResource(Resource)
   @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
-  @patch(#{ implicitOptionality: true }) // For legacy reasons
+  @patch
   LongRunningResourceCreateOrUpdate<
     Resource extends TypeSpec.Reflection.Model,
     Traits extends TypeSpec.Reflection.Model = {}
@@ -230,10 +228,9 @@ interface ResourceOperations<
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
   @Foundations.Private.ensureVerb("ResourceUpdate", "PATCH")
   @updatesResource(Resource)
-  @patch(#{ implicitOptionality: true }) // For legacy reasons
+  @patch
   ResourceUpdate<
     Resource extends TypeSpec.Reflection.Model,
     Traits extends TypeSpec.Reflection.Model = {}

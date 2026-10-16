@@ -313,8 +313,7 @@ interface ResourceUpdateSync<
   /**
    * Update a resource using the synchronous call pattern.
    */
-  #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-  @patch(#{ implicitOptionality: true })
+  @patch
   @doc("Update a {name}", Resource)
   update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
