@@ -230,6 +230,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Enumeration Types:**
 
 - [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- For a union converted to an enum, an explicit scalar `extends` constraint determines `SdkEnumType.valueType` and the value type of its known variants, taking precedence over scalar variants and literal-based inference. For example, `union Priority extends int64 { low: 1, high: 2 }` has an `int64` value type rather than an inferred `int32`. The constraint does not make the enum extensible: `isFixed` remains `true` unless the union includes an open scalar variant, directly or through a nested union.
 
 **Literal Types:**
 

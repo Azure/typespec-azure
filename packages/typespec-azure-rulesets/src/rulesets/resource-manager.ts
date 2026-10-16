@@ -59,6 +59,7 @@ export default {
     // Azure resource manager
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
     "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": true,
+    "@azure-tools/typespec-azure-resource-manager/scope-path-segment-casing": false,
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
