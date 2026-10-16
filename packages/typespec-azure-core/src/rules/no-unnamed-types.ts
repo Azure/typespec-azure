@@ -1,15 +1,23 @@
 import {
   createRule,
+  fileRef,
+  getEffectiveModelType,
+  getLocationContext,
+  ignoreDiagnostics,
   isNullType,
+  isTemplateDeclaration,
+  isTemplateInstance,
   type Model,
   type ModelProperty,
   paramMessage,
   type Program,
+  type Type,
   type Union,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import {
   getHeaderFieldName,
+  getHttpOperation,
   isBody,
   isBodyRoot,
   isHeader,
@@ -17,9 +25,11 @@ import {
   isMultipartBodyProperty,
   isStatusCode,
 } from "@typespec/http";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
+  docs: fileRef.fromPackageRoot("src/rules/no-unnamed-types.md"),
   description:
     "Azure services should not have anonymous models, union expressions, enum expressions, or scalar expressions. Define them as named declarations.",
   severity: "warning",
@@ -34,7 +44,7 @@ export const noUnnamedTypesRule = createRule({
     const excludedUnions = new Set<Union>();
     const invalidUnions = new Set<Union>();
 
-    // Models: only flag anonymous models used as property types (inline in model properties).
+    // Models: collect anonymous property types, request bodies and implicit responses.
     const invalidModels = new Set<Model>();
     const excludedModels = new Set<Model>();
 
@@ -55,10 +65,7 @@ export const noUnnamedTypesRule = createRule({
 
         // Flag anonymous models used as property types.
         if (
-          type.kind === "Model" &&
-          type.name === "" &&
-          type.properties.size > 0 &&
-          !isHttpEnvelope(program, type) &&
+          needsModelName(program, type) &&
           !isInsideTemplateArgument(type) &&
           !isMultipartBodyProperty(program, prop)
         ) {
@@ -79,6 +86,53 @@ export const noUnnamedTypesRule = createRule({
         // Exclude the top-level return type union (response envelope).
         if (operation.returnType.kind === "Union") {
           excludedUnions.add(operation.returnType);
+        }
+
+        const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
+        const { body } = httpOperation.parameters;
+        if (
+          body?.bodyKind === "single" &&
+          body.property !== undefined &&
+          needsModelName(program, body.type) &&
+          isInsideTemplateArgument(body.type)
+        ) {
+          invalidModels.add(body.type);
+        }
+
+        if (
+          isTemplateInstance(operation) ||
+          isTemplateDeclaration(operation) ||
+          isTemplatedInterfaceOperation(operation) ||
+          getLocationContext(program, operation).type !== "project"
+        ) {
+          return;
+        }
+
+        const originals = new Set(getModelConstituents(operation.returnType));
+        for (const response of httpOperation.responses) {
+          for (const content of response.responses) {
+            // Explicit bodies are already checked as property types.
+            if (!content.body || content.body.property) {
+              continue;
+            }
+            for (const bodyType of getModelConstituents(content.body.type)) {
+              if (
+                bodyType.properties.size === 0 ||
+                getEffectiveModelType(
+                  program,
+                  bodyType,
+                  (property) => !isHeader(program, property) && !isStatusCode(program, property),
+                ).name !== ""
+              ) {
+                continue;
+              }
+              for (const responseType of getOriginalModels(bodyType, originals)) {
+                if (responseType.name === "") {
+                  invalidModels.add(responseType);
+                }
+              }
+            }
+          }
         }
       },
       union: (union) => {
@@ -101,6 +155,44 @@ export const noUnnamedTypesRule = createRule({
     };
   },
 });
+
+function* getModelConstituents(type: Type, visited = new Set<Type>()): Iterable<Model> {
+  if (visited.has(type)) return;
+  visited.add(type);
+  if (type.kind === "Model") {
+    yield type;
+  } else if (type.kind === "Union") {
+    for (const variant of type.variants.values()) {
+      yield* getModelConstituents(variant.type, visited);
+    }
+  }
+}
+
+function* getOriginalModels(
+  model: Model,
+  originals: Set<Model>,
+  visited = new Set<Model>(),
+): Iterable<Model> {
+  if (visited.has(model)) return;
+  visited.add(model);
+  if (originals.has(model)) {
+    yield model;
+  } else {
+    // HTTP-filtered payloads preserve their original model in compiler provenance.
+    for (const source of model.sourceModels) {
+      yield* getOriginalModels(source.model, originals, visited);
+    }
+  }
+}
+
+function needsModelName(program: Program, type: Type): type is Model {
+  return (
+    type.kind === "Model" &&
+    type.name === "" &&
+    type.properties.size > 0 &&
+    !isHttpEnvelope(program, type)
+  );
+}
 
 /** Check if the type's source node is inside a template argument position */
 function isInsideTemplateArgument(type: { node?: { kind: SyntaxKind; parent?: any } }): boolean {

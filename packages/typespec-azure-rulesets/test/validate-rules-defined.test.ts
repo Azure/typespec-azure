@@ -72,4 +72,24 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("keeps redundant summary guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
+  it.each(["data-plane", "resource-manager"])(
+    "uses the existing unnamed-types rule for %s response bodies",
+    (rulesetName) => {
+      const ruleset = $linter.ruleSets?.[rulesetName];
+      strictEqual(ruleset?.enable?.["@azure-tools/typespec-azure-core/no-unnamed-types"], true);
+      strictEqual(
+        ruleset?.enable?.["@azure-tools/typespec-azure-core/no-unnamed-response-bodies"],
+        undefined,
+      );
+      ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-unnamed-response-bodies"));
+    },
+  );
 });

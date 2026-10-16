@@ -1,7 +1,11 @@
 import { Tester } from "#test/test-host.js";
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  expectDiagnostics,
+  type LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { noUnnamedResponseBodiesRule } from "../../src/rules/no-unnamed-response-bodies.js";
+import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.js";
 
 let tester: LinterRuleTester;
 
@@ -9,20 +13,15 @@ beforeEach(async () => {
   const runner = await Tester.wrap(
     (code) => `@service namespace Service { ${code} }`,
   ).createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    noUnnamedResponseBodiesRule,
-    "@azure-tools/typespec-azure-core",
-  );
+  tester = createLinterRuleTester(runner, noUnnamedTypesRule, "@azure-tools/typespec-azure-core");
 });
 
 const diagnostic = {
-  code: "@azure-tools/typespec-azure-core/no-unnamed-response-bodies",
-  message:
-    "Operation response body should use a named model instead of an anonymous inline model expression.",
+  code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+  message: "Anonymous model should be defined as a named model declaration.",
 };
 
-describe("no-unnamed-response-bodies", () => {
+describe("no-unnamed-types response bodies", () => {
   it.each([
     "@get op read(): { value: string };",
     "@get op read(): { @statusCode status: 200; value: string };",
@@ -42,8 +41,6 @@ describe("no-unnamed-response-bodies", () => {
     "model Base { value: string; } model Result is Base; @get op read(): Result;",
     "model Fields { value: string; } @get op read(): { ...Fields };",
     "model Fields { value: string; } @get op read(): { @statusCode status: 200; ...Fields };",
-    "@get op read(): { @body body: { value: string } };",
-    "@get op read(): { @bodyRoot body: { value: string } };",
     "@get op read(): { @statusCode status: 204 };",
     "@get op read(): {};",
     "@get op read(): void;",
@@ -53,6 +50,63 @@ describe("no-unnamed-response-bodies", () => {
     "model Result { values: Record<{ value: string }> } @get op read(): Result;",
   ])("accepts named responses and bodies outside the rule's scope: %s", async (code) => {
     await tester.expect(code).toBeValid();
+  });
+
+  it.each(["body", "bodyRoot"])("reports an explicit @%s body once", async (decorator) => {
+    await tester
+      .expect(`@get op read(): { @${decorator} body: /*target*/{ value: string } };`)
+      .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+  });
+
+  it("reports a shared property, request and response model only once", async () => {
+    await tester
+      .expect(
+        `
+        alias Shared = /*target*/{ value: string };
+        model Container { nested: Shared; }
+        @post @route("/write") op write(@body body: Shared): Shared;
+        @get @route("/read") op read(): Shared;
+        `,
+      )
+      .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+  });
+
+  it("runs the registered existing rule for implicit and explicit response bodies", async () => {
+    const [, diagnostics] = await Tester.compileAndDiagnose(
+      `
+      @service namespace Service;
+      @get @route("/implicit") op implicit(): { value: string };
+      @get @route("/explicit") op explicit(): { @body body: { value: string } };
+      model Named { value: string; }
+      @get @route("/named") op named(): Named;
+      `,
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: { "@azure-tools/typespec-azure-core/no-unnamed-types": true },
+          },
+        },
+      },
+    );
+    expectDiagnostics(diagnostics, [diagnostic, diagnostic]);
+  });
+
+  it("honors the existing rule's suppression for an implicit response", async () => {
+    const [, diagnostics] = await Tester.compileAndDiagnose(
+      `
+      @service namespace Service;
+      #suppress "@azure-tools/typespec-azure-core/no-unnamed-types" "Existing API contract"
+      @get op read(): { value: string };
+      `,
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: { "@azure-tools/typespec-azure-core/no-unnamed-types": true },
+          },
+        },
+      },
+    );
+    expectDiagnostics(diagnostics, []);
   });
 
   it("reports distinct response declarations separately", async () => {
@@ -106,13 +160,13 @@ describe("no-unnamed-response-bodies", () => {
         name: "explicit body first",
         declarations: "",
         result: `{ @header contentType: "application/json"; @body body: ${first} } | ${xml}`,
-        targets: [xml],
+        targets: [xml, first],
       },
       {
         name: "explicit body last",
         declarations: "",
         result: `${xml} | { @header contentType: "application/json"; @bodyRoot body: ${first} }`,
-        targets: [xml],
+        targets: [xml, first],
       },
       {
         name: "nested shared unions",
@@ -148,7 +202,7 @@ alias Result = ${result};
           .createInstance();
         tester = createLinterRuleTester(
           runner,
-          noUnnamedResponseBodiesRule,
+          noUnnamedTypesRule,
           "@azure-tools/typespec-azure-core",
         );
       });
@@ -221,7 +275,7 @@ alias Result = { ...Fields; ${outside} ${addPayload ? "extra: string;" : ""} };`
           .createInstance();
         tester = createLinterRuleTester(
           runner,
-          noUnnamedResponseBodiesRule,
+          noUnnamedTypesRule,
           "@azure-tools/typespec-azure-core",
         );
       });
@@ -265,7 +319,7 @@ alias Result = { ...Fields; ${outside} ${addPayload ? "extra: string;" : ""} };`
         .createInstance();
       tester = createLinterRuleTester(
         runner,
-        noUnnamedResponseBodiesRule,
+        noUnnamedTypesRule,
         "@azure-tools/typespec-azure-core",
       );
     });
