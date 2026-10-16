@@ -12,9 +12,9 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 let analyzePollCount = 0;
 let translatePollCount = 0;
 
-Scenarios.Azure_ClientGenerator_Core_LroMetadata_analyze = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyze = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro-metadata/analyzers/document-1:analyze",
+    uri: "/azure/client-generator-core/lro/metadata/analyzers/document-1:analyze",
     method: "post",
     request: {
       query: {
@@ -24,7 +24,7 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_analyze = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro-metadata/analyzerResults/analysis-123`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123`,
       },
     },
     handler: (req: MockRequest) => {
@@ -33,14 +33,14 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_analyze = passOnSuccess([
       return {
         status: 202,
         headers: {
-          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro-metadata/analyzerResults/analysis-123`,
+          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123`,
         },
       };
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro-metadata/analyzerResults/analysis-123",
+    uri: "/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123",
     method: "get",
     request: {
       query: {
@@ -58,7 +58,7 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_analyze = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro-metadata/analyzerResults/analysis-123",
+    uri: "/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123",
     method: "get",
     request: {
       query: {
@@ -80,9 +80,9 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_analyze = passOnSuccess([
   },
 ]);
 
-Scenarios.Azure_ClientGenerator_Core_LroMetadata_translate = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_translate = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro-metadata/documents/document-1:translate",
+    uri: "/azure/client-generator-core/lro/metadata/documents/document-1:translate",
     method: "post",
     request: {
       query: {
@@ -92,7 +92,7 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_translate = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro-metadata/documentTranslationJobs/translation-123`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123`,
       },
     },
     handler: (req: MockRequest) => {
@@ -101,14 +101,14 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_translate = passOnSuccess([
       return {
         status: 202,
         headers: {
-          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro-metadata/documentTranslationJobs/translation-123`,
+          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123`,
         },
       };
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro-metadata/documentTranslationJobs/translation-123",
+    uri: "/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123",
     method: "get",
     request: {
       query: {
@@ -127,7 +127,7 @@ Scenarios.Azure_ClientGenerator_Core_LroMetadata_translate = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro-metadata/documentTranslationJobs/translation-123",
+    uri: "/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123",
     method: "get",
     request: {
       query: {

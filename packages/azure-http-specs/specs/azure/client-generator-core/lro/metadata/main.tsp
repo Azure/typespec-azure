@@ -14,17 +14,20 @@ using TypeSpec.Versioning;
 
 @doc("Tests client metadata exposed for Azure long-running operations.")
 @scenarioService(
-  "/azure/client-generator-core/lro-metadata",
+  "/azure/client-generator-core/lro/metadata",
   {
     versioned: Versions,
   }
 )
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.lrometadata", "java")
 @global.Azure.ClientGenerator.Core.clientNamespace(
-  "specs.azure.clientgenerator.core.lrometadata",
+  "azure.clientgenerator.core.lro.metadata",
+  "java"
+)
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.lro.metadata",
   "python"
 )
-namespace _Specs_.Azure.ClientGenerator.Core.LroMetadata;
+namespace _Specs_.Azure.ClientGenerator.Core.Lro.Metadata;
 
 enum Versions {
   v2022_12_01_preview: "2022-12-01-preview",
@@ -54,10 +57,10 @@ op getAnalyzerResultStatus is ResourceOperations.ResourceRead<AnalyzerResultStat
 @scenarioDoc("""
   Verifies that `@lroOperationId("lastPathSegment")` exposes the server-issued operation ID from
   the status-monitor URI without changing the polling protocol.
-
+  
   The generated LRO method should expose `analysis-123`, derived from the final path segment of
   `Operation-Location`.
-
+  
   Expected calls:
   - POST `/analyzers/document-1:analyze` returns 202 with
     `Operation-Location: {endpoint}/analyzerResults/analysis-123`
@@ -96,10 +99,10 @@ op getDocumentTranslationStatus is ResourceOperations.ResourceRead<DocumentTrans
 @scenarioDoc("""
   Verifies that property-level `@lroPollingMetadata` exposes a status-monitor property with its
   exact SDK type and serialization metadata.
-
+  
   The generated LRO method should expose optional `int32` polling metadata named `percentComplete`,
   serialized on the wire as `percent_complete`.
-
+  
   Expected calls:
   - POST `/documents/document-1:translate` returns 202 with
     `Operation-Location: {endpoint}/documentTranslationJobs/translation-123`

@@ -1268,9 +1268,9 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_LroMetadata_analyze
+### Azure_ClientGenerator_Core_Lro_Metadata_analyze
 
-- Endpoint: `post /azure/client-generator-core/lro-metadata/analyzers/{analyzerId}:analyze`
+- Endpoint: `post /azure/client-generator-core/lro/metadata/analyzers/{analyzerId}:analyze`
 
 Verifies that `@lroOperationId("lastPathSegment")` exposes the server-issued operation ID from
 the status-monitor URI without changing the polling protocol.
@@ -1285,9 +1285,9 @@ Expected calls:
 - GET `/analyzerResults/analysis-123` returns a running status
 - GET `/analyzerResults/analysis-123` returns a succeeded status with the analysis result
 
-### Azure_ClientGenerator_Core_LroMetadata_translate
+### Azure_ClientGenerator_Core_Lro_Metadata_translate
 
-- Endpoint: `post /azure/client-generator-core/lro-metadata/documents/{documentId}:translate`
+- Endpoint: `post /azure/client-generator-core/lro/metadata/documents/{documentId}:translate`
 
 Verifies that property-level `@lroPollingMetadata` exposes a status-monitor property with its
 exact SDK type and serialization metadata.
