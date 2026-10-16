@@ -238,6 +238,78 @@ it("finds service environments for a customized client outside the service names
   });
 });
 
+it.each([
+  ["virtual", false],
+  ["virtual", true],
+  ["auto-merged", false],
+  ["auto-merged", true],
+])(
+  "inherits customized environments for %s children with service defaults: %s",
+  async (kind, serviceDefaults) => {
+    const { program } = await AzureCoreTester.compile(`
+      ${definitions}
+      ${
+        serviceDefaults
+          ? '@azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://service.example.com"}}, "Public")'
+          : ""
+      }
+      @useAuth(ResourceAuth)
+      @service namespace Service {
+        interface Operations { @get @route("/child") read(): void; }
+      }
+      @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: "Public", defaultEndpoint: "https://custom.example.com"}}, "Private")
+      @client({name: "Customized", service: Service, autoMergeService: true})
+      namespace Clients.Customized {}
+      ${kind === "virtual" ? '@@clientLocation(Service.Operations.read, "Moved");' : ""}
+    `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
+    const client = context.sdkPackage.clients[0];
+    const child = client.children?.find(
+      (candidate) => candidate.name === (kind === "virtual" ? "Moved" : "Operations"),
+    );
+    if (!child) throw new Error("Missing sub-client");
+    expect(child.__raw.type?.kind).toBe(kind === "virtual" ? undefined : "Interface");
+    const credential = getCredential(child);
+    if (credential.type.kind !== "credential") throw new Error("Missing credential type");
+    expect(credential.type.azureAuthentication).toMatchObject({
+      defaultEnvironment: "Private",
+      environments: [{ name: "Private", defaultEndpoint: "https://custom.example.com" }],
+    });
+  },
+);
+
+it("preserves child-local environments over a customized SDK parent", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    ${definitions}
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://service.example.com"}}, "Public")
+    @useAuth(ResourceAuth)
+    @service namespace Service {
+      @azureServiceEnvironments(ResourceAuth, #{Local: #{audience: "Government", defaultEndpoint: "https://child.example.com"}})
+      interface Operations { @get op read(): void; }
+    }
+    @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: "Public", defaultEndpoint: "https://custom.example.com"}}, "Private")
+    @client({name: "Customized", service: Service, autoMergeService: true})
+    namespace Clients.Customized {}
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const client = context.sdkPackage.clients[0];
+  const child = client.children?.[0];
+  if (!child) throw new Error("Missing sub-client");
+  const credential = getCredential(child);
+  if (credential.type.kind !== "credential") throw new Error("Missing credential type");
+  expect(credential.type.azureAuthentication?.environments).toEqual([
+    {
+      name: "Local",
+      audienceName: "Government",
+      audience: "https://search.azure.us",
+      defaultEndpoint: "https://child.example.com",
+    },
+  ]);
+  expect(credential.type.azureAuthentication?.defaultEnvironment).toBeUndefined();
+});
+
 it("diagnoses environments referencing an authentication alternative the client does not use", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}

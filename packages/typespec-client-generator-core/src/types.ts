@@ -1366,9 +1366,17 @@ function getSdkAzureAuthentication(
   const profile = getAzureTokenAuthentication(context.program, scheme.model);
   if (!profile) return diagnostics.wrap(undefined);
   const service = client.services[0];
-  const environments =
-    getAzureServiceEnvironments(context.program, client.type ?? service, scheme.model) ??
-    getAzureServiceEnvironments(context.program, service, scheme.model);
+  const serviceEnvironments = getAzureServiceEnvironments(context.program, service, scheme.model);
+  let environments = serviceEnvironments;
+  for (let current: SdkClient | undefined = client; current; current = current.parent) {
+    if (!current.type) continue;
+    const candidate = getAzureServiceEnvironments(context.program, current.type, scheme.model);
+    // The getter caches declarations; inherited service defaults must wait for SDK parents.
+    if (candidate && candidate !== serviceEnvironments) {
+      environments = candidate;
+      break;
+    }
+  }
   const deployment = {
     environments: environments?.environments.map((environment) => ({ ...environment })) ?? [],
     ...(environments?.defaultEnvironment === undefined
