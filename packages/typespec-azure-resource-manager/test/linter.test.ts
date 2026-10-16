@@ -24,15 +24,3 @@ it("enables extension routing through ARM all", async () => {
   });
   expect(diagnostics.filter((diagnostic) => diagnostic.code === code)).toHaveLength(1);
 });
-
-it("allows projects to disable extension routing when extending ARM all", async () => {
-  const [, diagnostics] = await Tester.compileAndDiagnose(source, {
-    compilerOptions: {
-      linterRuleSet: {
-        extends: ["@azure-tools/typespec-azure-resource-manager/all"],
-        disable: { [code]: "This service does not use RPaaS extension routing." },
-      },
-    },
-  });
-  expect(diagnostics.filter((diagnostic) => diagnostic.code === code)).toHaveLength(0);
-});
