@@ -1,6 +1,6 @@
-import { compile, type CompilerHost, type Program, NodeHost } from "@typespec/compiler";
-import { fileURLToPath } from "url";
+import { compile, NodeHost, type CompilerHost, type Program } from "@typespec/compiler";
 import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 
 /**
  * Options for compiling a TypeSpec entry point.

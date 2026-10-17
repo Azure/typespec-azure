@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 import { formatDiagnostic, type Program } from "@typespec/compiler";
 import { mkdir, stat, writeFile } from "fs/promises";
@@ -73,10 +74,20 @@ export interface CliOptions {
   omitTitle?: boolean;
 }
 
+export interface CliOutput {
+  log(message: string): void;
+  error(message: string): void;
+}
+
+const consoleOutput: CliOutput = {
+  log: (message) => console.log(message),
+  error: (message) => console.error(message),
+};
+
 /**
  * Parse CLI arguments into CliOptions.
  */
-export function parseArgs(args: string[]): CliOptions {
+export function parseArgs(args: string[], output: CliOutput = consoleOutput): CliOptions {
   const options: CliOptions = {
     entry: "",
     format: "console",
@@ -134,7 +145,7 @@ export function parseArgs(args: string[]): CliOptions {
         break;
       case "--help":
       case "-h":
-        printUsage();
+        printUsage(output);
         process.exit(0);
         break;
       default:
@@ -148,8 +159,8 @@ export function parseArgs(args: string[]): CliOptions {
   return options;
 }
 
-function printUsage(): void {
-  console.log(`
+function printUsage(output: CliOutput): void {
+  output.log(`
 Usage: typespec-breaking-change [options] <spec-folder>
 
 Analyze a TypeSpec specification for breaking changes.
@@ -232,21 +243,21 @@ async function ensureParentDir(filePath: string): Promise<void> {
 /**
  * Main CLI entry point.
  */
-export async function main(args: string[]): Promise<number> {
-  const options = parseArgs(args);
+export async function main(args: string[], output: CliOutput = consoleOutput): Promise<number> {
+  const options = parseArgs(args, output);
 
   if (!options.entry) {
-    console.error(
+    output.error(
       "Error: No entry point specified. Use --entry <path> or provide a positional argument.",
     );
-    console.error("Run with --help for usage information.");
+    output.error("Run with --help for usage information.");
     return 2;
   }
 
   const analysisOptions: AnalysisOptions = {
     serviceName: options.service,
     phase: options.phase,
-    log: (message: string) => console.log(message),
+    log: (message: string) => output.log(message),
   };
 
   let baseCheckoutCleanup: (() => Promise<void>) | undefined;
@@ -289,7 +300,17 @@ export async function main(args: string[]): Promise<number> {
       // only) analysis rather than failing with an ENOENT compile error.
       const baseExistsAtRevision = await stat(mappedBasePath)
         .then(() => true)
-        .catch(() => false);
+        .catch((error: unknown) => {
+          if (
+            typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            error.code === "ENOENT"
+          ) {
+            return false;
+          }
+          throw error;
+        });
       if (baseExistsAtRevision) {
         options.base = mappedBasePath;
       }
@@ -318,8 +339,7 @@ export async function main(args: string[]): Promise<number> {
     }
 
     // Console output
-    const output = formatResult(result, options);
-    console.log(output);
+    output.log(formatResult(result, options));
 
     // JSON file output
     if (options.jsonOutput) {
@@ -350,7 +370,7 @@ export async function main(args: string[]): Promise<number> {
 
     // GitHub annotations
     if (options.githubAnnotations) {
-      emitGithubAnnotations(result);
+      emitGithubAnnotations(result, output);
     }
 
     // Exit code: fail if there are unsuppressed breaking changes OR new suppressions
@@ -362,7 +382,7 @@ export async function main(args: string[]): Promise<number> {
     return hasErrors ? 1 : 0;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`Analysis failed: ${message}`);
+    output.error(`Analysis failed: ${message}`);
     return 2;
   } finally {
     if (baseCheckoutCleanup) {
@@ -374,7 +394,7 @@ export async function main(args: string[]): Promise<number> {
 /**
  * Emit GitHub Actions annotations for each unsuppressed error finding.
  */
-function emitGithubAnnotations(result: AnalysisResult): void {
+function emitGithubAnnotations(result: AnalysisResult, output: CliOutput): void {
   const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
   for (const finding of errors) {
     const location = finding.diff.headSourceLocation ?? finding.diff.baseSourceLocation;
@@ -384,7 +404,7 @@ function emitGithubAnnotations(result: AnalysisResult): void {
       : "";
     const locStr = filePart ? ` ${filePart}${linePart}` : "";
     const title = `Breaking change: ${finding.diff.kind}`;
-    console.log(`::error${locStr ? " " + locStr.trim() : ""}::${title} - ${finding.diff.message}`);
+    output.log(`::error${locStr ? " " + locStr.trim() : ""}::${title} - ${finding.diff.message}`);
   }
 }
 
