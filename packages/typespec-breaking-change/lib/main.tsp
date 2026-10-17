@@ -1,3 +1,3 @@
 import "../dist/src/tsp-index.js";
 
-import "./decorators.tsp";
+import "@azure-tools/typespec-azure-core";

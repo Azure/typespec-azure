@@ -44,6 +44,7 @@
     "yargs": "catalog:"
   },
   "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/http-canonicalization": "workspace:^",

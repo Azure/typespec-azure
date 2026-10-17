@@ -75,6 +75,14 @@ Available ruleSets:
 
 ## Decorators
 
+Breaking-change approvals are declared in `Azure.Core`. Specs only need to import
+`@azure-tools/typespec-azure-core`; the analysis tool reads the stored metadata.
+Use `@approvedBreakingChange("reason", #{ kind: "ResponsePropertyRemoved", since: "2025-01-01" })`
+for cross-version approvals and `@approvedUnversionedChange("reason", #{ kind: "ResponsePropertyRemoved" })`
+for same-version approvals. The optional `path` selects a finding relative to the
+decorated declaration. Invalid `kind` values produce a warning containing the value
+and do not register an approval.
+
 ### Azure.Core
 
 - [`@finalLocation`](#@finallocation)
