@@ -28,7 +28,18 @@ export interface ResolvedOperation {
  * "/subscriptions/{subscriptionId}/providers/{rpName}" → "/subscriptions/{}/providers/{}"
  */
 export function normalizePath(path: string): string {
-  return path.replace(/\{[^}]+\}/g, "{}");
+  const parts: string[] = [];
+  let position = 0;
+  while (position < path.length) {
+    const open = path.indexOf("{", position);
+    if (open === -1) break;
+    const close = path.indexOf("}", open + 1);
+    if (close === -1) break;
+    parts.push(path.slice(position, open), "{}");
+    position = close + 1;
+  }
+  parts.push(path.slice(position));
+  return parts.join("");
 }
 
 /**
