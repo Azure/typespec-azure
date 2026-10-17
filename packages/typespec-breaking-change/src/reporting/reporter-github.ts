@@ -2,7 +2,9 @@ import type { AnalysisResult, Finding } from "../types.js";
 import { isOperationIdentity } from "../types.js";
 
 export function formatGithubReport(result: AnalysisResult): string {
-  const errors = result.findings.filter((finding) => finding.severity === "error" && !finding.suppressed);
+  const errors = result.findings.filter(
+    (finding) => finding.severity === "error" && !finding.suppressed,
+  );
   const suppressed = result.findings.filter((finding) => finding.suppressed);
   const lines = [
     "## Breaking Change Analysis",
@@ -76,5 +78,5 @@ function formatDuration(ms: number): string {
 }
 
 function escapeCell(value: string): string {
-  return value.replace(/\|/g, "\\|").replace(/\r?\n/g, "<br>");
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\r?\n/g, "<br>");
 }
