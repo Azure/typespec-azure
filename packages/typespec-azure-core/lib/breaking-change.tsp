@@ -1,6 +1,6 @@
 using TypeSpec.Reflection;
 
-namespace Azure.BreakingChange;
+namespace Azure.Core;
 
 /**
  * Options for the approvedBreakingChange decorator.
@@ -8,8 +8,10 @@ namespace Azure.BreakingChange;
 model ApprovedBreakingChangeOptions {
   /** Optional DiffKind filter (e.g., "ResponsePropertyRemoved"). */
   kind?: string;
+
   /** Optional version lower bound — suppression applies when head version >= since. */
   since?: string;
+
   /**
    * Identity path from the suppression site to the violation target.
    * Required when the suppression is not on the target node itself.
@@ -41,7 +43,7 @@ extern dec approvedBreakingChange(
     | Interface
     | Namespace,
   reason: valueof string,
-  options?: valueof ApprovedBreakingChangeOptions,
+  options?: valueof ApprovedBreakingChangeOptions
 );
 
 /**
@@ -50,6 +52,7 @@ extern dec approvedBreakingChange(
 model ApprovedUnversionedChangeOptions {
   /** Optional DiffKind filter (e.g., "ResponsePropertyRemoved"). */
   kind?: string;
+
   /**
    * Identity path from the suppression site to the violation target.
    * Required when the suppression is not on the target node itself.
@@ -82,5 +85,5 @@ extern dec approvedUnversionedChange(
     | Interface
     | Namespace,
   reason: valueof string,
-  options?: valueof ApprovedUnversionedChangeOptions,
+  options?: valueof ApprovedUnversionedChangeOptions
 );

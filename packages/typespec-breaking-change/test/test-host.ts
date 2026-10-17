@@ -10,12 +10,13 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
 export const TesterWithSuppressions = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
+    "@typespec/rest",
     "@typespec/versioning",
-    "@azure-tools/typespec-breaking-change",
+    "@azure-tools/typespec-azure-core",
   ],
 })
   .importLibraries()
-  .using("Http", "Versioning", "Azure.BreakingChange");
+  .using("Http", "Versioning", "Azure.Core");
 
 export const TesterWithArm = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
@@ -29,11 +30,4 @@ export const TesterWithArm = createTester(resolvePath(import.meta.dirname, "..")
   ],
 })
   .importLibraries()
-  .using(
-    "Http",
-    "Rest",
-    "Versioning",
-    "Azure.Core",
-    "Azure.ResourceManager",
-    "Azure.BreakingChange",
-  );
+  .using("Http", "Rest", "Versioning", "Azure.Core", "Azure.ResourceManager");

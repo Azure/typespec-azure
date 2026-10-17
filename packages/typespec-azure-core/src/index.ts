@@ -3,7 +3,9 @@ export const namespace = "Azure.Core";
 export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
+export { diffKinds, isDiffKind, type DiffKind } from "./breaking-change-kinds.js";
 export * from "./decorators.js";
+export * from "./decorators/breaking-change.js";
 export { extractLroStates } from "./decorators/lro-status.js";
 export {
   getOperationLinks,
@@ -21,6 +23,7 @@ export {
 } from "./decorators/private/embedding-vector.js";
 export { getParameterizedNextLinkArguments } from "./decorators/private/parameterized-next-link-config.js";
 export { getUnionAsEnum, type UnionEnum } from "./helpers/union-enums.js";
+export { AzureCoreStateKeys as BreakingChangeStateKeys } from "./lib.js";
 export * from "./lro-helpers.js";
 export * from "./rules/prevent-rest-library.js";
 export * from "./rules/use-standard-operations.js";
