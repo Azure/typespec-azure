@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
-import {
-  resolveOperationIdentities,
-  normalizePath,
-  getOperationIdentity,
-  identityKey,
-} from "../src/diff/operation-identity.js";
+import { normalizePath, resolveOperationIdentities } from "../src/diff/operation-identity.js";
+import { createVersionedView, enumerateVersions } from "../src/pipeline/versions.js";
 import { matchOperations } from "../src/suppression/match.js";
-import { enumerateVersions, createVersionedView } from "../src/pipeline/versions.js";
 import { Tester } from "./test-host.js";
 
 describe("normalizePath", () => {
+  it("preserves embedded parameters and malformed paths without backtracking", () => {
+    expect(normalizePath("/widgets/prefix-{id}.{format}/{}")).toBe("/widgets/prefix-{}.{}/{}");
+    expect(normalizePath("/widgets/{{id}")).toBe("/widgets/{}");
+    const unmatched = "/widgets/" + "{".repeat(100_000);
+    expect(normalizePath(unmatched)).toBe(unmatched);
+  });
   it("replaces parameter names with {}", () => {
     expect(normalizePath("/widgets/{widgetId}")).toBe("/widgets/{}");
   });

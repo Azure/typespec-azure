@@ -12,8 +12,8 @@ import {
 } from "@typespec/compiler";
 import type { HttpCanonicalization } from "@typespec/http-canonicalization";
 import type { DiffKind } from "../diff-kind.js";
-import { resolveOrigin } from "./origin.js";
 import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "../types.js";
+import { resolveOrigin } from "./origin.js";
 
 export interface DiffContext {
   operation: OperationIdentity;
@@ -76,6 +76,21 @@ export function compareTypes(baseType: Type, headType: Type, ctx: DiffContext): 
 }
 
 function compareModels(base: Model, head: Model, ctx: DiffContext): ApiDiff[] {
+  if (
+    Boolean(base.indexer) !== Boolean(head.indexer) ||
+    isArrayModelType(base) !== isArrayModelType(head)
+  ) {
+    return [
+      makeDiff(
+        typeKindChangedKind(ctx),
+        ctx,
+        ctx.elementPath,
+        base,
+        head,
+        `${componentLabel(ctx.component)} indexed model shape changed at ${ctx.elementPath}.`,
+      ),
+    ];
+  }
   if (isArrayModelType(base) && isArrayModelType(head)) {
     // Array item type changes — the violation is about the array model, not the inner item type
     const diffs = compareTypes(base.indexer.value, head.indexer.value, ctx);
@@ -91,6 +106,21 @@ function compareModels(base: Model, head: Model, ctx: DiffContext): ApiDiff[] {
   }
 
   const diffs: ApiDiff[] = [];
+
+  if (base.indexer && head.indexer) {
+    diffs.push(...compareTypes(base.indexer.key, head.indexer.key, ctx));
+    const valueDiffs = compareTypes(base.indexer.value, head.indexer.value, ctx);
+    for (const diff of valueDiffs) {
+      if (diff.headType === head.indexer.value || diff.baseType === base.indexer.value) {
+        diff.baseType = base;
+        diff.headType = head;
+        diff.baseSourceLocation = getTypeSourceLocation(base);
+        diff.headSourceLocation = getTypeSourceLocation(head);
+        diff.origin = resolveOrigin(head);
+      }
+    }
+    diffs.push(...valueDiffs);
+  }
 
   for (const [name, baseProp] of base.properties) {
     const headProp = head.properties.get(name);
@@ -405,6 +435,8 @@ function getTypeKey(type: Type): string {
 }
 
 function getNamedTypeKey(type: Type): string | undefined {
+  // Different instantiations of Record<T> and Array<T> share their declared name.
+  if (type.kind === "Model" && type.indexer) return undefined;
   switch (type.kind) {
     case "Model":
     case "Scalar":
@@ -415,7 +447,9 @@ function getNamedTypeKey(type: Type): string | undefined {
         ? `${getTypeKey(type.model)}.properties.${type.name}`
         : `${type.kind}:${type.name}`;
     case "Union":
-      return type.name ? qualifiedName(type.namespace, type.name) ?? `${type.kind}:${type.name}` : undefined;
+      return type.name
+        ? (qualifiedName(type.namespace, type.name) ?? `${type.kind}:${type.name}`)
+        : undefined;
     case "UnionVariant":
       return typeof type.name === "string"
         ? `${getTypeKey(type.union)}.variants.${type.name}`
@@ -449,7 +483,9 @@ function propertyMadeOptionalKind(component: DiffComponent): DiffKind {
 
 function typeChangedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeChanged" : "ResponsePropertyTypeChanged";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeChanged"
+      : "ResponsePropertyTypeChanged";
   }
 
   return ctx.component === "request" ? "RequestTypeChanged" : "ResponseTypeChanged";
@@ -457,7 +493,9 @@ function typeChangedKind(ctx: DiffContext): DiffKind {
 
 function typeNarrowedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeNarrowed" : "ResponsePropertyTypeNarrowed";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeNarrowed"
+      : "ResponsePropertyTypeNarrowed";
   }
 
   return ctx.component === "request" ? "RequestTypeNarrowed" : "ResponseTypeNarrowed";
@@ -465,7 +503,9 @@ function typeNarrowedKind(ctx: DiffContext): DiffKind {
 
 function typeWidenedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeWidened" : "ResponsePropertyTypeWidened";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeWidened"
+      : "ResponsePropertyTypeWidened";
   }
 
   return ctx.component === "request" ? "RequestTypeWidened" : "ResponseTypeWidened";
@@ -473,7 +513,9 @@ function typeWidenedKind(ctx: DiffContext): DiffKind {
 
 function typeKindChangedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeChanged" : "ResponsePropertyTypeChanged";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeChanged"
+      : "ResponsePropertyTypeChanged";
   }
 
   return ctx.component === "request" ? "RequestTypeKindChanged" : "ResponseTypeKindChanged";
@@ -526,7 +568,8 @@ function qualifiedName(
     if (current.name) {
       namespaceParts.unshift(current.name);
     }
-    current = current.namespace as { name: string; namespace?: { name: string; namespace?: unknown } } | undefined;
+    current = current.namespace as
+      { name: string; namespace?: { name: string; namespace?: unknown } } | undefined;
   }
 
   namespaceParts.push(name);
@@ -553,7 +596,9 @@ function describeType(type: Type): string {
     case "Enum":
       return qualifiedName(type.namespace, type.name) ?? type.name;
     case "Union":
-      return type.name ? qualifiedName(type.namespace, type.name) ?? type.name : "anonymous-union";
+      return type.name
+        ? (qualifiedName(type.namespace, type.name) ?? type.name)
+        : "anonymous-union";
     case "String":
       return JSON.stringify(type.value);
     case "Number":
