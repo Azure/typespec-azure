@@ -207,7 +207,7 @@ function isClientForOtherScopeOnly(
   return getScopedDecoratorData(tcgcContext, clientKey, container, scope) === undefined;
 }
 
-export function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {
+function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {
   const languageScopes = new Set<string | typeof AllScopes>();
   const impacted = [...program.stateMap(clientNameKey).values()];
   impacted.push(...program.stateMap(clientLocationKey).values());
@@ -249,11 +249,14 @@ function validateClientNamesPerNamespace(
   movedTo: Map<Namespace | Interface, Operation[]>,
   namespace: Namespace,
 ) {
-  // Check for duplicate client names for models, enums, and unions
+  // Top-level declarations share a name space, regardless of their TypeSpec kind.
   validateClientNamesCore(tcgcContext, scope, [
     ...namespace.models.values(),
     ...namespace.enums.values(),
     ...namespace.unions.values(),
+    ...namespace.interfaces.values(),
+    ...namespace.scalars.values(),
+    ...namespace.namespaces.values(),
   ]);
 
   // Check for duplicate client names for operations
@@ -271,15 +274,6 @@ function validateClientNamesPerNamespace(
       adjustOperations(item.operations.values(), moved, movedTo, item),
     );
   }
-
-  // Check for duplicate client names for interfaces
-  validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
-
-  // Check for duplicate client names for scalars
-  validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
-
-  // Check for duplicate client names for namespaces
-  validateClientNamesCore(tcgcContext, scope, namespace.namespaces.values());
 
   // Check for duplicate client names for model properties
   for (const model of namespace.models.values()) {

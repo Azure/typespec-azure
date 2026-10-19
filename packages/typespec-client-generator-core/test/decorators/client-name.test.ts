@@ -1,6 +1,7 @@
+import { getSourceLocation } from "@typespec/compiler";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { it } from "vitest";
+import { describe, it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
 import {
   createClientCustomizationInput,
@@ -593,6 +594,15 @@ it("duplicate enum and model within nested namespace for all language scopes", a
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "B" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
         'Client name: "B" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
@@ -665,4 +675,171 @@ it("duplicate model client name with multiple language scopes", async () => {
         'Client name: "Test" is defined somewhere causing naming conflicts in language scope: "python"',
     },
   ]);
+});
+
+describe("top-level client names across declaration kinds", () => {
+  const declarations = [
+    "model First {}",
+    "scalar First extends string;",
+    "enum First { one }",
+    'union First { one: "one" }',
+    "interface First {}",
+    "namespace First {}",
+  ];
+  const duplicate = (name: string, scope = "AllScopes", renamed = true) => ({
+    code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+    severity: "error" as const,
+    message: renamed
+      ? `Client name: "${name}" is duplicated in language scope: "${scope}"`
+      : `Client name: "${name}" is defined somewhere causing naming conflicts in language scope: "${scope}"`,
+  });
+
+  it.each(
+    declarations.flatMap((left, index) =>
+      declarations.slice(index + 1).map((right) => [left, right.replace("First", "Second")]),
+    ),
+  )("compares %s with %s in the same namespace", async (left, right) => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service namespace Example;
+      @clientName("Shared") ${left}
+      @clientName("Shared") ${right}
+    `);
+    expectDiagnostics(diagnostics, [duplicate("Shared"), duplicate("Shared")]);
+  });
+
+  it("targets both the authored type and the conflicting clientName decorator", async () => {
+    const [{ Widget, Group }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+      @service namespace Example;
+      model ${t.model("Widget")} {}
+      @clientName("Widget") interface ${t.interface("Group")} { op read(): Widget; }
+    `);
+    const decorator = Group.decorators.find((x) => x.definition?.name === "@clientName")?.node;
+    ok(decorator);
+    const typeLocation = getSourceLocation(Widget);
+    const decoratorLocation = getSourceLocation(decorator);
+    expectDiagnostics(diagnostics, [
+      {
+        ...duplicate("Widget", "AllScopes", false),
+        pos: typeLocation.pos,
+        end: typeLocation.end,
+      },
+      { ...duplicate("Widget"), pos: decoratorLocation.pos, end: decoratorLocation.end },
+    ]);
+  });
+
+  it.each(["csharp", "java", "python", "javascript"])(
+    "checks cross-kind names in the %s scope",
+    async (scope) => {
+      const diagnostics = await SimpleTester.diagnose(`
+        @service namespace Example;
+        @clientName("Item", "${scope}") model Widget {}
+        @clientName("Item", "${scope}") interface Group { op read(): Widget; }
+      `);
+      expectDiagnostics(diagnostics, [duplicate("Item", scope), duplicate("Item", scope)]);
+    },
+  );
+
+  it("does not combine names from different language scopes", async () => {
+    await SimpleTester.compile(`
+      @service namespace Example;
+      @clientName("Item", "csharp") model Widget {}
+      @clientName("Item", "java") interface Group { op read(): Widget; }
+    `);
+  });
+
+  it("uses common fallback names within a language scope", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service namespace Example;
+      @clientName("Item") model Widget {}
+      @clientName("Item", "csharp") interface Group { op read(): Widget; }
+    `);
+    expectDiagnostics(diagnostics, [duplicate("Item", "csharp"), duplicate("Item", "csharp")]);
+  });
+
+  it("honors negated scopes without mixing names", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service namespace Example;
+      @clientName("Item", "!csharp") model Widget {}
+      @clientName("Item", "java") interface Group { op read(): Widget; }
+    `);
+    expectDiagnostics(diagnostics, [duplicate("Item", "java"), duplicate("Item", "java")]);
+    await SimpleTester.compile(`
+      @service namespace Example;
+      @clientName("Item", "!csharp") model Widget {}
+      @clientName("Item", "csharp") interface Group { op read(): Widget; }
+    `);
+  });
+
+  it.each(["Widget_Admin", "widget"])(
+    "preserves complete case-sensitive names: %s",
+    async (name) => {
+      await SimpleTester.compile(`
+      @service namespace Example;
+      model Widget {}
+      @clientName("${name}") interface Group { op read(): Widget; }
+    `);
+    },
+  );
+
+  it("checks unused declarations and nested namespaces without following operation results", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service namespace Example;
+      namespace Nested {
+        model Widget {}
+        @clientName("Widget") interface Group { op read(): string; }
+      }
+    `);
+    expectDiagnostics(diagnostics, [duplicate("Widget", "AllScopes", false), duplicate("Widget")]);
+  });
+
+  it("does not flatten declarations or traverse model graphs across namespaces", async () => {
+    await SimpleTester.compile(`
+      @service namespace Example;
+      namespace Types {
+        @discriminator("kind") model Base { kind: string; }
+        model Widget extends Base { kind: "widget"; child?: Widget; }
+        model Container { child: Widget; }
+      }
+      @clientName("Widget") interface Group {
+        @route("/base") op read(): Types.Base;
+        @route("/container") op readContainer(): Types.Container;
+      }
+    `);
+    await SimpleTester.compile(`
+      @service namespace Example;
+      model Widget {}
+      namespace Operations {
+        @clientName("Widget") interface Group { op read(): Example.Widget; }
+      }
+    `);
+  });
+
+  it("does not compare root operations or virtual client names with type declarations", async () => {
+    await SimpleTester.compile(`
+      @service namespace Example;
+      model Widget {}
+      @route("/root") op Widget_Read(): Widget;
+      @clientLocation("Widget") @route("/moved") op read(): Widget;
+    `);
+  });
+
+  it("reports each declaration once per conflicting scope, not once per operation", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service namespace Example;
+      @clientName("Item", "csharp") model Widget {}
+      @clientName("Item", "csharp") interface Group {
+        @route("/one") op one(): Widget;
+        @route("/two") op two(): Widget;
+      }
+    `);
+    expectDiagnostics(diagnostics, [duplicate("Item", "csharp"), duplicate("Item", "csharp")]);
+  });
+
+  it("retains declaration-name validation rather than introducing friendly-name resolution", async () => {
+    await SimpleTester.compile(`
+      @service namespace Example;
+      @friendlyName("Item") model Widget {}
+      @clientName("Item") interface Group { op read(): Widget; }
+    `);
+  });
 });
