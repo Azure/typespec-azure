@@ -5,7 +5,7 @@ import {
   type TesterInstance,
 } from "@typespec/compiler/testing";
 
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { useStandardErrorRule } from "../../src/rules/use-standard-error.js";
 
 let runner: TesterInstance;
@@ -44,25 +44,24 @@ const diagnostic = {
   message: useStandardErrorRule.messages.default,
 };
 
-describe("use-standard-error", () => {
-  it("accepts common-type errors, aliases, and nullable standard errors", async () => {
-    await tester
-      .expect(
-        `${header}
+it("accepts common-type errors, aliases, and nullable standard errors", async () => {
+  await tester
+    .expect(
+      `${header}
         alias StandardError = CommonTypes.ErrorResponse;
         @route("/standard") op standard is Request<CommonTypes.ErrorResponse>;
         @route("/alias") op aliasError is Request<StandardError>;
         @route("/nullable") op nullable is Request<CommonTypes.ErrorResponse | null>;
         @route("/nullable-alias") op nullableAlias is Request<StandardError | null>;
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("accepts the standard error from ARM templates", async () => {
-    await tester
-      .expect(
-        `
+it("accepts the standard error from ARM templates", async () => {
+  await tester
+    .expect(
+      `
         @armProviderNamespace
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         namespace Microsoft.Contoso;
@@ -75,18 +74,18 @@ describe("use-standard-error", () => {
           action is ArmResourceActionAsync<Widget, void, void>;
         }
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it.each([
-    "{ ...CommonTypes.ErrorResponse; @statusCode status: 400; @header requestId: string; }",
-    "SpreadError",
-    "CopiedError",
-  ])("rejects implicit standard error wrappers with HTTP metadata: %s", async (response) => {
-    await tester
-      .expect(
-        `${header}
+it.each([
+  "{ ...CommonTypes.ErrorResponse; @statusCode status: 400; @header requestId: string; }",
+  "SpreadError",
+  "CopiedError",
+])("rejects implicit standard error wrappers with HTTP metadata: %s", async (response) => {
+  await tester
+    .expect(
+      `${header}
         model SpreadError {
           ...CommonTypes.ErrorResponse;
           @statusCode status: 400;
@@ -99,14 +98,14 @@ describe("use-standard-error", () => {
         @route("/wrapped") @post
         op wrapped(): Accepted | ${response};
       `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
 
-  it("accepts direct and explicit standard error bodies with HTTP metadata", async () => {
-    await tester
-      .expect(
-        `${header}
+it("accepts direct and explicit standard error bodies with HTTP metadata", async () => {
+  await tester
+    .expect(
+      `${header}
         model ExplicitError {
           @statusCode status: 400;
           @header requestId: string;
@@ -117,30 +116,30 @@ describe("use-standard-error", () => {
         @route("/explicit") @post
         op explicit(): Accepted | ExplicitError;
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it.each(["Copy", "CopyAgain", "CopyAgain | null", "Spread", "{ ...CommonTypes.ErrorResponse; }"])(
-    "rejects unchanged copies and spreads of the standard error: %s",
-    async (payload) => {
-      await tester
-        .expect(
-          `${header}
+it.each(["Copy", "CopyAgain", "CopyAgain | null", "Spread", "{ ...CommonTypes.ErrorResponse; }"])(
+  "rejects unchanged copies and spreads of the standard error: %s",
+  async (payload) => {
+    await tester
+      .expect(
+        `${header}
           model Copy is CommonTypes.ErrorResponse;
           model CopyAgain is Copy;
           model Spread { ...CommonTypes.ErrorResponse; }
           @route("/copy") op copy is Request<${payload}>;
         `,
-        )
-        .toEmitDiagnostics([diagnostic]);
-    },
-  );
+      )
+      .toEmitDiagnostics([diagnostic]);
+  },
+);
 
-  it("rejects a custom error supplied to an ARM template", async () => {
-    await tester
-      .expect(
-        `
+it("rejects a custom error supplied to an ARM template", async () => {
+  await tester
+    .expect(
+      `
         @armProviderNamespace
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         namespace Microsoft.Contoso;
@@ -155,25 +154,25 @@ describe("use-standard-error", () => {
           action is ArmResourceActionAsync<Widget, void, void, Error = CustomError>;
         }
       `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
 
-  it("rejects a same-named model with the standard shape in a different namespace", async () => {
-    await tester
-      .expect(
-        `${header}
+it("rejects a same-named model with the standard shape in a different namespace", async () => {
+  await tester
+    .expect(
+      `${header}
         model ErrorResponse { error?: CommonTypes.ErrorDetail; }
         @route("/custom") op custom is Request<ErrorResponse>;
       `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
 
-  it("rejects custom model reference shapes", async () => {
-    await tester
-      .expect(
-        `${header}
+it("rejects custom model reference shapes", async () => {
+  await tester
+    .expect(
+      `${header}
         model Named { code: string; }
         model Derived extends CommonTypes.ErrorResponse {}
         model Spread { ...CommonTypes.ErrorResponse; extra: string; }
@@ -182,14 +181,14 @@ describe("use-standard-error", () => {
         @route("/spread") op spread is Request<Spread>;
         @route("/effective") op effective is Request<{ ...Named; }>;
       `,
-      )
-      .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
+});
 
-  it("rejects named scalar, enum, union, collection, generic, and nullable custom errors", async () => {
-    await tester
-      .expect(
-        `${header}
+it("rejects named scalar, enum, union, collection, generic, and nullable custom errors", async () => {
+  await tester
+    .expect(
+      `${header}
         scalar CustomScalar extends string;
         enum CustomEnum { bad }
         union CustomUnion { bad: "bad", worse: "worse" }
@@ -207,23 +206,23 @@ describe("use-standard-error", () => {
         @route("/friendly") op friendlyError is Request<Friendly<string>>;
         @route("/nullable") op nullableError is Request<Custom | null>;
       `,
-      )
-      .toEmitDiagnostics([
-        diagnostic,
-        diagnostic,
-        diagnostic,
-        diagnostic,
-        diagnostic,
-        diagnostic,
-        diagnostic,
-        diagnostic,
-      ]);
-  });
+    )
+    .toEmitDiagnostics([
+      diagnostic,
+      diagnostic,
+      diagnostic,
+      diagnostic,
+      diagnostic,
+      diagnostic,
+      diagnostic,
+      diagnostic,
+    ]);
+});
 
-  it("rejects inline, primitive, literal, tuple, unknown, and bytes error payloads", async () => {
-    await tester
-      .expect(
-        `${header}
+it("rejects inline, primitive, literal, tuple, unknown, and bytes error payloads", async () => {
+  await tester
+    .expect(
+      `${header}
         model Generic<T> { value: T; }
         enum Codes { bad }
         @route("/model") op modelBody is Request<{ code: string; }>;
@@ -241,14 +240,14 @@ describe("use-standard-error", () => {
         @route("/unknown") op unknownBody is Request<unknown>;
         @route("/bytes") op bytesBody is Request<bytes>;
       `,
-      )
-      .toEmitDiagnostics(Array.from({ length: 14 }, () => diagnostic));
-  });
+    )
+    .toEmitDiagnostics(Array.from({ length: 14 }, () => diagnostic));
+});
 
-  it("rejects binary and multipart error payloads", async () => {
-    await tester
-      .expect(
-        `${header}
+it("rejects binary and multipart error payloads", async () => {
+  await tester
+    .expect(
+      `${header}
         @route("/binary") @post
         op binary(): Accepted |
           { @statusCode statusCode: 500; @header contentType: "application/octet-stream"; @body body: bytes; };
@@ -256,14 +255,14 @@ describe("use-standard-error", () => {
         op multipart(): Accepted |
           { @statusCode statusCode: 500; @multipartBody body: { part: HttpPart<string>; }; };
       `,
-      )
-      .toEmitDiagnostics([diagnostic, diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic, diagnostic]);
+});
 
-  it("checks default, explicit, and ranged error status codes", async () => {
-    await tester
-      .expect(
-        `${header}
+it("checks default, explicit, and ranged error status codes", async () => {
+  await tester
+    .expect(
+      `${header}
         @error model DefaultError { code: string; }
         @route("/default") @post
         op defaultError(): Accepted | DefaultError;
@@ -273,145 +272,144 @@ describe("use-standard-error", () => {
         op rangedError(): Accepted |
           { @statusCode @minValue(400) @maxValue(499) statusCode: int32; @body body: string; };
       `,
-      )
-      .toEmitDiagnostics([diagnostic, diagnostic, diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic, diagnostic, diagnostic]);
+});
 
-  it("reports once across multiple error responses", async () => {
-    await tester
-      .expect(
-        `${header}
+it("reports once across multiple error responses", async () => {
+  await tester
+    .expect(
+      `${header}
         @error model Custom { code: string; }
         @route("/run") @post
         op run(): Accepted | Custom |
           { @statusCode statusCode: 400; @body body: string; } |
           { @statusCode statusCode: 500; @body body: string; };
       `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
 
-  it("rejects a long-running operation without an error response", async () => {
-    await tester
-      .expect(
-        `${header}
+it("rejects a long-running operation without an error response", async () => {
+  await tester
+    .expect(
+      `${header}
         @route("/status")
         op poll is Azure.Core.Foundations.GetOperationStatus<ErrorResponse = CommonTypes.ErrorResponse>;
         @Azure.Core.pollingOperation(poll) @route("/no-error") @post
         op noError(): Accepted;
       `,
-      )
-      .toEmitDiagnostics([
-        {
-          ...diagnostic,
-          message: useStandardErrorRule.messages.missingErrorResponse,
-        },
-      ]);
-  });
+    )
+    .toEmitDiagnostics([
+      {
+        ...diagnostic,
+        message: useStandardErrorRule.messages.missingErrorResponse,
+      },
+    ]);
+});
 
-  it("ignores success bodies when errors use the standard contract", async () => {
-    await tester
-      .expect(
-        `${header}
+it("ignores success bodies when errors use the standard contract", async () => {
+  await tester
+    .expect(
+      `${header}
         @route("/success") @post
         op success(): Accepted | { @statusCode statusCode: 200; @body body: string; } |
           Failure<CommonTypes.ErrorResponse>;
       `,
-      )
-      .toBeValid();
-  });
-  it.each(["get", "post", "put", "patch", "delete"])(
-    "checks synchronous %s error responses",
-    async (verb) => {
-      await tester
-        .expect(
-          `${header}
+    )
+    .toBeValid();
+});
+it.each(["get", "post", "put", "patch", "delete"])(
+  "checks synchronous %s error responses",
+  async (verb) => {
+    await tester
+      .expect(
+        `${header}
         @route("/sync") @${verb} op sync(): Accepted | Failure<string>;
       `,
-        )
-        .toEmitDiagnostics(diagnostic);
-    },
-  );
-  it.each(["get", "post", "put", "patch", "delete", "head"])(
-    "requires an error response on synchronous %s operations",
-    async (verb) => {
-      await tester
-        .expect(
-          `${header}
-        @route("/sync") @${verb} op sync(): Accepted;
-      `,
-        )
-        .toEmitDiagnostics({
-          ...diagnostic,
-          message: useStandardErrorRule.messages.missingErrorResponse,
-        });
-    },
-  );
-  it.each(["get", "post", "put", "patch", "delete"])("rejects bodyless %s errors", async (verb) => {
-    await tester
-      .expect(
-        `${header}
-      @route("/sync") @${verb} op sync(): Accepted | { @statusCode statusCode: 400; };
-    `,
       )
       .toEmitDiagnostics(diagnostic);
-  });
-  it.each(["get", "post", "put", "patch", "delete"])(
-    "accepts standard synchronous %s errors",
-    async (verb) => {
-      await tester
-        .expect(
-          `${header}
-      @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
-    `,
-        )
-        .toBeValid();
-    },
-  );
-
-  it.each([400, 404, 500])("accepts bodyless HEAD %s errors", async (status) => {
+  },
+);
+it.each(["get", "post", "put", "patch", "delete", "head"])(
+  "requires an error response on synchronous %s operations",
+  async (verb) => {
     await tester
       .expect(
         `${header}
+        @route("/sync") @${verb} op sync(): Accepted;
+      `,
+      )
+      .toEmitDiagnostics({
+        ...diagnostic,
+        message: useStandardErrorRule.messages.missingErrorResponse,
+      });
+  },
+);
+it.each(["get", "post", "put", "patch", "delete"])("rejects bodyless %s errors", async (verb) => {
+  await tester
+    .expect(
+      `${header}
+      @route("/sync") @${verb} op sync(): Accepted | { @statusCode statusCode: 400; };
+    `,
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+it.each(["get", "post", "put", "patch", "delete"])(
+  "accepts standard synchronous %s errors",
+  async (verb) => {
+    await tester
+      .expect(
+        `${header}
+      @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
+    `,
+      )
+      .toBeValid();
+  },
+);
+
+it.each([400, 404, 500])("accepts bodyless HEAD %s errors", async (status) => {
+  await tester
+    .expect(
+      `${header}
         @head @route("/exists")
         op exists(): { @statusCode statusCode: 204; } |
           { @statusCode statusCode: ${status}; };
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("accepts a bodyless default HEAD error", async () => {
-    await tester
-      .expect(
-        `${header}
+it("accepts a bodyless default HEAD error", async () => {
+  await tester
+    .expect(
+      `${header}
         @error model HeadError { @header requestId?: string; }
         @head @route("/exists")
         op exists(): { @statusCode statusCode: 204; } | HeadError;
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("checks operations without a service decorator", async () => {
-    await tester
-      .expect(
-        `${header.replace("@service", "")}
+it("checks operations without a service decorator", async () => {
+  await tester
+    .expect(
+      `${header.replace("@service", "")}
         @route("/custom") op custom is Request<string>;
       `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
 
-  it("reports a shared operation declaration once across template instantiations", async () => {
-    await tester
-      .expect(
-        `${header}
+it("reports a shared operation declaration once across template instantiations", async () => {
+  await tester
+    .expect(
+      `${header}
         interface Actions<T> { @route("/run") op run is Request<T>; }
         @route("/one") interface One extends Actions<string> {}
         @route("/two") interface Two extends Actions<int32> {}
       `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic]);
 });
