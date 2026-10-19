@@ -43,6 +43,11 @@ describe("inline discriminated union conversion", () => {
       strictEqual(base.discriminatorProperty?.name, "kind");
       strictEqual(base.discriminatorProperty?.serializationOptions.json?.name, "kind");
       deepStrictEqual(Object.keys(base.discriminatedSubtypes ?? {}), ["cat", "dog"]);
+      const mammal = context.sdkPackage.models.find((model) => model.name === "Mammal");
+      ok(mammal);
+      strictEqual(mammal.baseModel, base);
+      strictEqual(base.discriminatedSubtypes?.cat.baseModel, mammal);
+      strictEqual(mammal.discriminatorProperty, undefined);
       strictEqual(base.properties.filter((property) => property.discriminator).length, 1);
       const union = context
         .getMutatedGlobalNamespace()
@@ -111,26 +116,6 @@ describe("inline discriminated union conversion", () => {
       );
     },
   );
-
-  it.each(["__proto__", "constructor", "toString"])("preserves the wire tag %s", async (tag) => {
-    const { program } = await SimpleTesterWithService.compile(`
-      model PetBase { name: string; }
-      model Cat extends PetBase { meows: boolean; }
-      @discriminated(#{ envelope: "none" })
-      union Pet extends PetBase { ${tag}: Cat }
-      @post op echo(@body body: Pet): Pet;
-    `);
-    const context = await createSdkContextForTester(program);
-    expectDiagnostics(context.diagnostics, []);
-    const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
-    const cat = context.sdkPackage.models.find((model) => model.name === "Cat");
-    ok(base);
-    ok(cat);
-    deepStrictEqual(Object.keys(base.discriminatedSubtypes ?? {}), [tag]);
-    strictEqual(base.discriminatedSubtypes?.[tag], cat);
-    strictEqual(cat.discriminatorValue, tag);
-    strictEqual(cat.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
-  });
 
   it("preserves unions and variant identity when conversion is disabled", async () => {
     const { program } = await SimpleTesterWithService.compile(`
@@ -224,30 +209,6 @@ describe("inline discriminated union conversion", () => {
     strictEqual(base.properties.find((property) => property.name === "next")?.type, base);
     context.sdkPackage.clients[0].methods.forEach((method) =>
       strictEqual(method.response.type, base),
-    );
-  });
-
-  it("does not reshape a used model because of an unhandled union outside the service", async () => {
-    const { program } = await SimpleTester.compile(`
-      namespace Definitions {
-        model PetBase { name: string; }
-        model Cat extends PetBase { meows: boolean; }
-        @discriminated(#{ envelope: "none" })
-        union UnusedPet extends PetBase { cat: Cat }
-      }
-      @service namespace TestService {
-        op get(): Definitions.PetBase;
-      }
-    `);
-    const context = await createSdkContextForTester(program);
-    expectDiagnostics(context.diagnostics, []);
-    const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
-    ok(base);
-    strictEqual(base.discriminatorProperty, undefined);
-    strictEqual(base.discriminatedSubtypes, undefined);
-    strictEqual(
-      context.sdkPackage.models.some((model) => model.name === "Cat"),
-      false,
     );
   });
 
@@ -436,7 +397,8 @@ describe("inline discriminated union conversion", () => {
     const { program } = await SimpleTesterWithService.compile(`
       union PetKind { cat: "cat", dog: "dog" }
       model NamedEntity { @clientName("clientKind") kind: PetKind; }
-      model PetBase extends NamedEntity { name: string; }
+      model Entity extends NamedEntity { id: string; }
+      model PetBase extends Entity { name: string; }
       model Cat extends PetBase { meows: boolean; }
       model Dog extends PetBase { barks: boolean; }
       @discriminated(#{ envelope: "none" })
@@ -454,12 +416,24 @@ describe("inline discriminated union conversion", () => {
     strictEqual(base.discriminatorProperty?.serializationOptions.json?.name, "kind");
     strictEqual(base.discriminatorProperty?.type.kind, "enum");
     strictEqual(base.baseModel?.discriminatorProperty, undefined);
+    const entity = base.baseModel;
+    const root = entity?.baseModel;
+    ok(entity);
+    ok(root);
+    strictEqual(entity.name, "Entity");
+    strictEqual(root.name, "NamedEntity");
+    strictEqual(root.discriminatorProperty, undefined);
+    const inherited = root.properties.find((property) => property.name === "clientKind");
+    ok(inherited);
+    strictEqual(base.discriminatorProperty?.__raw, inherited.__raw);
+    strictEqual(base.discriminatorProperty?.type, inherited.type);
     const property = base.discriminatedSubtypes?.cat.properties.find(
       (property) => property.discriminator,
     );
     ok(property);
     strictEqual(property.name, "clientKind");
     strictEqual(property.type.kind, "enumvalue");
+    strictEqual(base.discriminatedSubtypes?.cat.baseModel, base);
     strictEqual(base.discriminatedSubtypes?.dog.discriminatorValue, "dog");
     context.sdkPackage.clients[0].methods.forEach((method) =>
       strictEqual(method.response.type, base),

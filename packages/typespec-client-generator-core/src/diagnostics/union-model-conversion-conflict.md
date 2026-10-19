@@ -33,7 +33,7 @@ op get(): Pet;
 TCGC reports:
 
 ```text
-Discriminated union 'Pet' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set convertDiscriminatedUnionsToModels to false to retain union representations.
+Discriminated union 'Pet' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set `convertDiscriminatedUnionsToModels` to `false` to retain union representations.
 ```
 
 ## ✅ How to Fix
