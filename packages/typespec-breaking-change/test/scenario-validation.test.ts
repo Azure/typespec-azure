@@ -345,6 +345,10 @@ describe("scenario validation: ARM end-to-end", () => {
       expect(finding!.diff.origin?.declarationPath).toBe(
         "Microsoft.Contoso.EmployeeProperties.pooling",
       );
+      expect(result.summary.versionComparisons[0]).toMatchObject({
+        findingCount: 1,
+        rawFindingCount: 2,
+      });
 
       const json = JSON.parse(formatJsonReport({ ...result, findings: [finding!] }));
       expect(json.findings[0]).toMatchObject({
@@ -354,7 +358,10 @@ describe("scenario validation: ARM end-to-end", () => {
 
       const markdown = renderMarkdownSummary({ ...result, findings: [finding!] });
       expect(markdown).toContain("Microsoft.Contoso.EmployeeProperties.pooling");
-      expect(markdown).toContain(`wire: \`${finding!.diff.identity.element}\``);
+      expect(markdown).toContain(`\`${finding!.diff.identity.element}\``);
+      expect(markdown).toContain(
+        "| Kind | Source declaration | Wire identity | Source | Suppression |",
+      );
     }, 30_000);
   });
 

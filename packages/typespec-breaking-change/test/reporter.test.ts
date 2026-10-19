@@ -373,7 +373,7 @@ describe("markdown reporter", () => {
     expect(md).toContain("ResponsePropertyRemoved");
   });
 
-  it("renders source identity with wire identity as secondary detail", () => {
+  it("renders source declaration and wire identity in separate columns", () => {
     const result = createResult();
     result.findings[0].diff.origin = {
       declarationPath: "Contoso.Models.Widget.legacyStatus",
@@ -382,8 +382,10 @@ describe("markdown reporter", () => {
     };
 
     const md = renderMarkdownSummary(result);
+    expect(md).toContain("| Kind | Source declaration | Wire identity | Source | Suppression |");
     expect(md).toContain("Contoso.Models.Widget.legacyStatus");
-    expect(md).toContain("wire: `body.properties.legacyStatus`");
+    expect(md).toContain("`body.properties.legacyStatus`");
+    expect(md).toContain("`main.tsp:");
     expect(md).toContain("### New Suppressed Breaking Changes");
   });
 
@@ -433,10 +435,23 @@ describe("markdown reporter", () => {
   it("renders a version comparisons section", () => {
     const md = renderMarkdownSummary(createResult());
     expect(md).toContain("<summary>Version Comparisons</summary>");
-    expect(md).toContain("| Service | Version Pair | Phase | Result |");
+    expect(md).toContain("| Service | Version Pair | Phase | Unique findings | Raw occurrences |");
     expect(md).toContain("Contoso.WidgetManager");
     expect(md).toContain("2024-01-01 → 2025-01-01");
-    expect(md).toContain("❌ 2 findings");
+    expect(md).toContain("| Cross-version | ❌ 2 | 2 |");
+  });
+
+  it("renders repository-relative project paths and distinct raw occurrence counts", () => {
+    const result = createResult();
+    result.summary.versionComparisons[0].rawFindingCount = 4;
+    const md = renderMarkdownSummary(result, {
+      specPaths: ["C:\\repo\\specification\\widget\\Contoso.Widget"],
+      workspacePath: "C:\\repo",
+    });
+
+    expect(md).toContain("### specification/widget/Contoso.Widget");
+    expect(md).not.toContain("C:\\repo");
+    expect(md).toContain("| Cross-version | ❌ 2 | 4 |");
   });
 
   it("includes timing when showTiming is true", () => {

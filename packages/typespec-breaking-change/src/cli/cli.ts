@@ -333,13 +333,15 @@ export async function main(args: string[]): Promise<number> {
     if (options.markdownOutput) {
       const mdPath = resolve(options.markdownOutput);
       await ensureParentDir(mdPath);
+      const workspacePath =
+        process.env.GITHUB_WORKSPACE ?? (await getRepoRoot(options.entry).catch(() => undefined));
       const mdOptions: MarkdownReportOptions = {
         specPaths: [options.entry],
         showTiming: true,
         githubServerUrl: process.env.GITHUB_SERVER_URL,
         githubRepository: process.env.GITHUB_REPOSITORY,
         githubSha: process.env.GITHUB_SHA,
-        workspacePath: process.env.GITHUB_WORKSPACE,
+        workspacePath,
         violationsReferenceUrl: process.env.VIOLATIONS_REFERENCE_URL,
         reportTitle: options.reportTitle,
         omitTitle: options.omitTitle,
