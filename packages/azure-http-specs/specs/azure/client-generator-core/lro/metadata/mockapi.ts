@@ -83,7 +83,7 @@ Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyze = passOnSuccess([
 
 Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/metadata/contentAnalyzers/analyzer-1:analyze",
+    uri: "/azure/client-generator-core/lro/metadata/analyzers/analyzer-1:analyze",
     method: "post",
     request: {
       query: {

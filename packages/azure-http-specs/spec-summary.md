@@ -1273,7 +1273,7 @@ Expected response body:
 - Endpoint: `post /azure/client-generator-core/lro/metadata/documentModels/{modelId}:analyze`
 
 Declares a Document Intelligence-shaped flow for emitter tests of
-`@lroOperationId("lastPathSegment")`.
+`@lroOperationId` on the status-monitor operation ID path parameter.
 
 The service returns the complete opaque status-monitor URI, including its API-version query.
 Polling must continue with that URI. Emitter-specific client tests can separately assert that
@@ -1288,17 +1288,17 @@ Expected calls:
 
 ### Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage
 
-- Endpoint: `post /azure/client-generator-core/lro/metadata/contentAnalyzers/{analyzerId}:analyze`
+- Endpoint: `post /azure/client-generator-core/lro/metadata/analyzers/{analyzerId}:analyze`
 
 Declares a Content Understanding-shaped flow for emitter tests of property-level
-`@lroPollingMetadata`.
+`@lroStatusMetadata`.
 
 The optional `usage` value is a typed nested model with optional numeric fields and a token
 dictionary. Emitter-specific client tests can assert the generated public type and runtime value.
 
 Expected calls:
 
-- POST `/contentAnalyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+- POST `/analyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
 - GET the status-monitor URI returns a running status with nested `usage`
 - GET the status-monitor URI returns a succeeded status with nested `usage` and the result
 

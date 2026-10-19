@@ -40,15 +40,27 @@ model DocumentAnalysisResult {
   summary: string;
 }
 
+@route("/documentModels/{modelId}/analyzeResults/{resultId}")
+@get
+op getDocumentAnalysisStatus(
+  @path modelId: string,
+
+  @lroOperationId
+  @path
+  resultId: string,
+
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): DocumentAnalysisStatus;
+
 @scenario
 @scenarioDoc("""
   Declares a Document Intelligence-shaped flow for emitter tests of
-  `@lroOperationId("lastPathSegment")`.
-
+  `@lroOperationId` on the status-monitor operation ID path parameter.
+  
   The service returns the complete opaque status-monitor URI, including its API-version query.
   Polling must continue with that URI. Emitter-specific client tests can separately assert that
   the server-issued ID `analysis-123` is exposed from the final non-empty path segment.
-
+  
   Expected calls:
   - POST `/documentModels/document-1:analyze` returns 202 with
     `Operation-Location: {endpoint}/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`
@@ -57,7 +69,7 @@ model DocumentAnalysisResult {
   """)
 @route("/documentModels/{modelId}:analyze")
 @post
-@lroOperationId("lastPathSegment")
+@pollingOperation(getDocumentAnalysisStatus)
 op analyze(
   @path modelId: string,
   ...global.Azure.Core.Foundations.ApiVersionParameter,
@@ -73,7 +85,7 @@ model ContentAnalysisStatus {
   id: string;
   status: global.Azure.Core.Foundations.OperationState;
 
-  @lroPollingMetadata
+  @lroStatusMetadata
   usage?: UsageDetails;
 
   result?: ContentAnalysisResult;
@@ -83,21 +95,29 @@ model ContentAnalysisResult {
   contents: string;
 }
 
+@route("/analyzerResults/{operationId}")
+@get
+op getContentAnalysisStatus(
+  @path operationId: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): ContentAnalysisStatus;
+
 @scenario
 @scenarioDoc("""
   Declares a Content Understanding-shaped flow for emitter tests of property-level
-  `@lroPollingMetadata`.
-
+  `@lroStatusMetadata`.
+  
   The optional `usage` value is a typed nested model with optional numeric fields and a token
   dictionary. Emitter-specific client tests can assert the generated public type and runtime value.
-
+  
   Expected calls:
-  - POST `/contentAnalyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+  - POST `/analyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
   - GET the status-monitor URI returns a running status with nested `usage`
   - GET the status-monitor URI returns a succeeded status with nested `usage` and the result
   """)
-@route("/contentAnalyzers/{analyzerId}:analyze")
+@route("/analyzers/{analyzerId}:analyze")
 @post
+@pollingOperation(getContentAnalysisStatus)
 op analyzeWithUsage(
   @path analyzerId: string,
   ...global.Azure.Core.Foundations.ApiVersionParameter,
