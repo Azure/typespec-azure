@@ -139,6 +139,10 @@ Pulls the fix in from core; **no version bump**. Example:
    moving the submodule pointer.
 2. **Sync tests from core.** Run `pnpm sync-tests`: it copies the tests/specs from the pinned core
    commit.
+   Run `pwsh -File eng/versioning/Sync-Versions.ps1` to align the test POM's shared dependencies
+   and plugins with that commit (`-WhatIf` previews changes). This leaves Azure-specific tooling
+   and generated sample POMs unchanged. Test the script offline with
+   `pwsh -File eng/versioning/Sync-Versions.Tests.ps1`.
 3. **Add a `fix` changelog entry** for the fix (`pnpm change add`).
 
 Open the PR against `release/<sprint>` (not `main`) and merge it. _(Optional)_ Before merging,
