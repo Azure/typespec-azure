@@ -71,7 +71,10 @@ op getAnalyzerResultStatus is ResourceOperations.ResourceRead<AnalyzerResultStat
 @post
 @pollingOperation(getAnalyzerResultStatus)
 @lroOperationId("lastPathSegment")
-op analyze(@path analyzerId: string): global.Azure.Core.Foundations.AcceptedResponse &
+op analyze(
+  @path analyzerId: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): global.Azure.Core.Foundations.AcceptedResponse &
   global.Azure.Core.Foundations.LongRunningStatusLocation<AnalyzerResult>;
 
 @resource("documentTranslationJobs")
@@ -114,5 +117,8 @@ op getDocumentTranslationStatus is ResourceOperations.ResourceRead<DocumentTrans
 @route("/documents/{documentId}:translate")
 @post
 @pollingOperation(getDocumentTranslationStatus)
-op translate(@path documentId: string): global.Azure.Core.Foundations.AcceptedResponse &
+op translate(
+  @path documentId: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): global.Azure.Core.Foundations.AcceptedResponse &
   global.Azure.Core.Foundations.LongRunningStatusLocation<TranslationResult>;
