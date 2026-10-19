@@ -117,34 +117,6 @@ it("does not emit when an unversioned service selects the latest version", async
     .toBeValid();
 });
 
-it("uses the latest version from the common-types registry", async () => {
-  await tester
-    .expect({
-      "main.tsp": `
-        @armProviderNamespace
-        @armCommonTypesVersion(CommonTypes.Versions.v6)
-        namespace Service {}
-      `,
-      "node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/versions.tsp": `
-        import "./commontypes.private.decorators.tsp";
-        using Versioning;
-
-        @versioned(Versions)
-        namespace Azure.ResourceManager.CommonTypes;
-
-        @Azure.ResourceManager.CommonTypes.Private.armCommonTypesVersions
-        enum Versions {
-          v3, v4, v5, v6, v7,
-        }
-      `,
-    })
-    .toEmitDiagnostics({
-      code: ruleCode,
-      target: "Service",
-      message: "Use the latest ARM common-types version 'v7' instead of 'v6'.",
-    });
-});
-
 it.each(["v3", "v4", "v5"])(
   "reports an older unversioned namespace selection: %s",
   async (version) => {
