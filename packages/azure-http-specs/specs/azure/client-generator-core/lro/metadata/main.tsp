@@ -1,18 +1,15 @@
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-client-generator-core";
-import "@typespec/rest";
 import "@typespec/spector";
 import "@typespec/versioning";
 
 using Azure.ClientGenerator.Core;
 using Azure.Core;
-using Azure.Core.Traits;
 using Spector;
 using TypeSpec.Http;
-using TypeSpec.Rest;
 using TypeSpec.Versioning;
 
-@doc("Tests client metadata exposed for Azure long-running operations.")
+@doc("Defines service-shaped HTTP flows for testing client LRO metadata.")
 @scenarioService(
   "/azure/client-generator-core/lro/metadata",
   {
@@ -33,92 +30,76 @@ enum Versions {
   v2022_12_01_preview: "2022-12-01-preview",
 }
 
-alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
-  NoRepeatableRequests &
-  NoClientRequestId>;
-
-@resource("analyzerResults")
-model AnalyzerResultStatus {
-  @key
-  @visibility(Lifecycle.Read)
+model DocumentAnalysisStatus {
   id: string;
-
   status: global.Azure.Core.Foundations.OperationState;
-  result?: AnalyzerResult;
+  result?: DocumentAnalysisResult;
 }
 
-model AnalyzerResult {
+model DocumentAnalysisResult {
   summary: string;
 }
 
-op getAnalyzerResultStatus is ResourceOperations.ResourceRead<AnalyzerResultStatus>;
+@scenario
+@scenarioDoc("""
+  Declares a Document Intelligence-shaped flow for emitter tests of
+  `@lroOperationId("lastPathSegment")`.
+
+  The service returns the complete opaque status-monitor URI, including its API-version query.
+  Polling must continue with that URI. Emitter-specific client tests can separately assert that
+  the server-issued ID `analysis-123` is exposed from the final non-empty path segment.
+
+  Expected calls:
+  - POST `/documentModels/document-1:analyze` returns 202 with
+    `Operation-Location: {endpoint}/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`
+  - GET that exact status-monitor URI returns a running status
+  - GET that exact status-monitor URI returns a succeeded status with the analysis result
+  """)
+@route("/documentModels/{modelId}:analyze")
+@post
+@lroOperationId("lastPathSegment")
+op analyze(
+  @path modelId: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): global.Azure.Core.Foundations.AcceptedResponse &
+  global.Azure.Core.Foundations.LongRunningStatusLocation<DocumentAnalysisStatus>;
+
+model UsageDetails {
+  documentPagesBasic?: int32;
+  tokens?: Record<int32>;
+}
+
+model ContentAnalysisStatus {
+  id: string;
+  status: global.Azure.Core.Foundations.OperationState;
+
+  @lroPollingMetadata
+  usage?: UsageDetails;
+
+  result?: ContentAnalysisResult;
+}
+
+model ContentAnalysisResult {
+  contents: string;
+}
 
 @scenario
 @scenarioDoc("""
-  Verifies that `@lroOperationId("lastPathSegment")` exposes the server-issued operation ID from
-  the status-monitor URI without changing the polling protocol.
-  
-  The generated LRO method should expose `analysis-123`, derived from the final path segment of
-  `Operation-Location`.
-  
+  Declares a Content Understanding-shaped flow for emitter tests of property-level
+  `@lroPollingMetadata`.
+
+  The optional `usage` value is a typed nested model with optional numeric fields and a token
+  dictionary. Emitter-specific client tests can assert the generated public type and runtime value.
+
   Expected calls:
-  - POST `/analyzers/document-1:analyze` returns 202 with
-    `Operation-Location: {endpoint}/analyzerResults/analysis-123`
-  - GET `/analyzerResults/analysis-123` returns a running status
-  - GET `/analyzerResults/analysis-123` returns a succeeded status with the analysis result
+  - POST `/contentAnalyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+  - GET the status-monitor URI returns a running status with nested `usage`
+  - GET the status-monitor URI returns a succeeded status with nested `usage` and the result
   """)
-@route("/analyzers/{analyzerId}:analyze")
+@route("/contentAnalyzers/{analyzerId}:analyze")
 @post
-@pollingOperation(getAnalyzerResultStatus)
-@lroOperationId("lastPathSegment")
-op analyze(
+op analyzeWithUsage(
   @path analyzerId: string,
   ...global.Azure.Core.Foundations.ApiVersionParameter,
 ): global.Azure.Core.Foundations.AcceptedResponse &
-  global.Azure.Core.Foundations.LongRunningStatusLocation<AnalyzerResult>;
-
-@resource("documentTranslationJobs")
-model DocumentTranslationStatus {
-  @key
-  @visibility(Lifecycle.Read)
-  id: string;
-
-  status: global.Azure.Core.Foundations.OperationState;
-
-  @encodedName("application/json", "percent_complete")
-  @lroPollingMetadata
-  percentComplete?: int32;
-
-  result?: TranslationResult;
-}
-
-model TranslationResult {
-  translatedDocumentUrl: url;
-}
-
-op getDocumentTranslationStatus is ResourceOperations.ResourceRead<DocumentTranslationStatus>;
-
-@scenario
-@scenarioDoc("""
-  Verifies that property-level `@lroPollingMetadata` exposes a status-monitor property with its
-  exact SDK type and serialization metadata.
-  
-  The generated LRO method should expose optional `int32` polling metadata named `percentComplete`,
-  serialized on the wire as `percent_complete`.
-  
-  Expected calls:
-  - POST `/documents/document-1:translate` returns 202 with
-    `Operation-Location: {endpoint}/documentTranslationJobs/translation-123`
-  - GET `/documentTranslationJobs/translation-123` returns a running status with
-    `percent_complete: 50`
-  - GET `/documentTranslationJobs/translation-123` returns a succeeded status with
-    `percent_complete: 100` and the translation result
-  """)
-@route("/documents/{documentId}:translate")
-@post
-@pollingOperation(getDocumentTranslationStatus)
-op translate(
-  @path documentId: string,
-  ...global.Azure.Core.Foundations.ApiVersionParameter,
-): global.Azure.Core.Foundations.AcceptedResponse &
-  global.Azure.Core.Foundations.LongRunningStatusLocation<TranslationResult>;
+  global.Azure.Core.Foundations.LongRunningStatusLocation<ContentAnalysisStatus>;

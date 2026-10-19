@@ -9,42 +9,43 @@ import {
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
+const apiVersion = "2022-12-01-preview";
 let analyzePollCount = 0;
-let translatePollCount = 0;
+let analyzeWithUsagePollCount = 0;
 
 Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyze = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/metadata/analyzers/document-1:analyze",
+    uri: "/azure/client-generator-core/lro/metadata/documentModels/document-1:analyze",
     method: "post",
     request: {
       query: {
-        "api-version": "2022-12-01-preview",
+        "api-version": apiVersion,
       },
     },
     response: {
       status: 202,
       headers: {
-        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro/metadata/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`,
       },
     },
     handler: (req: MockRequest) => {
-      req.expect.containsQueryParam("api-version", "2022-12-01-preview");
+      req.expect.containsQueryParam("api-version", apiVersion);
       analyzePollCount = 0;
       return {
         status: 202,
         headers: {
-          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123`,
+          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro/metadata/documentModels/document-1/analyzeResults/analysis-123?api-version=${apiVersion}`,
         },
       };
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123",
+    uri: "/azure/client-generator-core/lro/metadata/documentModels/document-1/analyzeResults/analysis-123",
     method: "get",
     request: {
       query: {
-        "api-version": "2022-12-01-preview",
+        "api-version": apiVersion,
       },
     },
     response: {
@@ -58,11 +59,11 @@ Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyze = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro/metadata/analyzerResults/analysis-123",
+    uri: "/azure/client-generator-core/lro/metadata/documentModels/document-1/analyzeResults/analysis-123",
     method: "get",
     request: {
       query: {
-        "api-version": "2022-12-01-preview",
+        "api-version": apiVersion,
       },
     },
     response: {
@@ -80,78 +81,89 @@ Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyze = passOnSuccess([
   },
 ]);
 
-Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_translate = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/metadata/documents/document-1:translate",
+    uri: "/azure/client-generator-core/lro/metadata/contentAnalyzers/analyzer-1:analyze",
     method: "post",
     request: {
       query: {
-        "api-version": "2022-12-01-preview",
+        "api-version": apiVersion,
       },
     },
     response: {
       status: 202,
       headers: {
-        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/client-generator-core/lro/metadata/analyzerResults/usage-123?api-version=2022-12-01-preview`,
       },
     },
     handler: (req: MockRequest) => {
-      req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-      translatePollCount = 0;
+      req.expect.containsQueryParam("api-version", apiVersion);
+      analyzeWithUsagePollCount = 0;
       return {
         status: 202,
         headers: {
-          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123`,
+          "operation-location": `${req.baseUrl}/azure/client-generator-core/lro/metadata/analyzerResults/usage-123?api-version=${apiVersion}`,
         },
       };
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123",
+    uri: "/azure/client-generator-core/lro/metadata/analyzerResults/usage-123",
     method: "get",
     request: {
       query: {
-        "api-version": "2022-12-01-preview",
+        "api-version": apiVersion,
       },
     },
     response: {
       status: 200,
       body: json({
-        id: "translation-123",
+        id: "usage-123",
         status: "Running",
-        percent_complete: 50,
-      }),
-    },
-    handler: translateLroHandler,
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/lro/metadata/documentTranslationJobs/translation-123",
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2022-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json({
-        id: "translation-123",
-        status: "Succeeded",
-        percent_complete: 100,
-        result: {
-          translatedDocumentUrl: "https://example.org/documents/document-1.fr",
+        usage: {
+          documentPagesBasic: 1,
+          tokens: {
+            input: 10,
+          },
         },
       }),
     },
-    handler: translateLroHandler,
+    handler: analyzeWithUsageLroHandler,
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/lro/metadata/analyzerResults/usage-123",
+    method: "get",
+    request: {
+      query: {
+        "api-version": apiVersion,
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        id: "usage-123",
+        status: "Succeeded",
+        usage: {
+          documentPagesBasic: 1,
+          tokens: {
+            input: 10,
+            output: 4,
+          },
+        },
+        result: {
+          contents: "The document contains three sections.",
+        },
+      }),
+    },
+    handler: analyzeWithUsageLroHandler,
     kind: "MockApiDefinition",
   },
 ]);
 
 function analyzeLroHandler(req: MockRequest) {
-  req.expect.containsQueryParam("api-version", "2022-12-01-preview");
+  req.expect.containsQueryParam("api-version", apiVersion);
   const response =
     analyzePollCount > 0
       ? {
@@ -169,23 +181,34 @@ function analyzeLroHandler(req: MockRequest) {
   return { status: 200, body: json(response) };
 }
 
-function translateLroHandler(req: MockRequest) {
-  req.expect.containsQueryParam("api-version", "2022-12-01-preview");
+function analyzeWithUsageLroHandler(req: MockRequest) {
+  req.expect.containsQueryParam("api-version", apiVersion);
   const response =
-    translatePollCount > 0
+    analyzeWithUsagePollCount > 0
       ? {
-          id: "translation-123",
+          id: "usage-123",
           status: "Succeeded",
-          percent_complete: 100,
+          usage: {
+            documentPagesBasic: 1,
+            tokens: {
+              input: 10,
+              output: 4,
+            },
+          },
           result: {
-            translatedDocumentUrl: "https://example.org/documents/document-1.fr",
+            contents: "The document contains three sections.",
           },
         }
       : {
-          id: "translation-123",
+          id: "usage-123",
           status: "Running",
-          percent_complete: 50,
+          usage: {
+            documentPagesBasic: 1,
+            tokens: {
+              input: 10,
+            },
+          },
         };
-  translatePollCount += 1;
+  analyzeWithUsagePollCount += 1;
   return { status: 200, body: json(response) };
 }

@@ -1270,39 +1270,37 @@ Expected response body:
 
 ### Azure_ClientGenerator_Core_Lro_Metadata_analyze
 
-- Endpoint: `post /azure/client-generator-core/lro/metadata/analyzers/{analyzerId}:analyze`
+- Endpoint: `post /azure/client-generator-core/lro/metadata/documentModels/{modelId}:analyze`
 
-Verifies that `@lroOperationId("lastPathSegment")` exposes the server-issued operation ID from
-the status-monitor URI without changing the polling protocol.
+Declares a Document Intelligence-shaped flow for emitter tests of
+`@lroOperationId("lastPathSegment")`.
 
-The generated LRO method should expose `analysis-123`, derived from the final path segment of
-`Operation-Location`.
-
-Expected calls:
-
-- POST `/analyzers/document-1:analyze` returns 202 with
-  `Operation-Location: {endpoint}/analyzerResults/analysis-123`
-- GET `/analyzerResults/analysis-123` returns a running status
-- GET `/analyzerResults/analysis-123` returns a succeeded status with the analysis result
-
-### Azure_ClientGenerator_Core_Lro_Metadata_translate
-
-- Endpoint: `post /azure/client-generator-core/lro/metadata/documents/{documentId}:translate`
-
-Verifies that property-level `@lroPollingMetadata` exposes a status-monitor property with its
-exact SDK type and serialization metadata.
-
-The generated LRO method should expose optional `int32` polling metadata named `percentComplete`,
-serialized on the wire as `percent_complete`.
+The service returns the complete opaque status-monitor URI, including its API-version query.
+Polling must continue with that URI. Emitter-specific client tests can separately assert that
+the server-issued ID `analysis-123` is exposed from the final non-empty path segment.
 
 Expected calls:
 
-- POST `/documents/document-1:translate` returns 202 with
-  `Operation-Location: {endpoint}/documentTranslationJobs/translation-123`
-- GET `/documentTranslationJobs/translation-123` returns a running status with
-  `percent_complete: 50`
-- GET `/documentTranslationJobs/translation-123` returns a succeeded status with
-  `percent_complete: 100` and the translation result
+- POST `/documentModels/document-1:analyze` returns 202 with
+  `Operation-Location: {endpoint}/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status
+- GET that exact status-monitor URI returns a succeeded status with the analysis result
+
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/contentAnalyzers/{analyzerId}:analyze`
+
+Declares a Content Understanding-shaped flow for emitter tests of property-level
+`@lroPollingMetadata`.
+
+The optional `usage` value is a typed nested model with optional numeric fields and a token
+dictionary. Emitter-specific client tests can assert the generated public type and runtime value.
+
+Expected calls:
+
+- POST `/contentAnalyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+- GET the status-monitor URI returns a running status with nested `usage`
+- GET the status-monitor URI returns a succeeded status with nested `usage` and the result
 
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
