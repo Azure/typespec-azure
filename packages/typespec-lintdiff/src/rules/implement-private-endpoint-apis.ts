@@ -1,12 +1,17 @@
-import { createRule, paramMessage, type Interface, type Model, type Operation } from "@typespec/compiler";
 import {
-  getArmResources,
-  type ArmResourceDetails,
+  getArmResourceOperationData,
+  getResourceOperation,
   type ArmResourceOperation,
 } from "@azure-tools/typespec-azure-resource-manager";
+import {
+  createRule,
+  navigateProgram,
+  paramMessage,
+  type Interface,
+  type Operation,
+} from "@typespec/compiler";
 
-const privateEndpointConnectionPathRegExp =
-  /^(.*)\/privateEndpointConnections\/\{[^/]+\}$/i;
+const privateEndpointConnectionPathRegExp = /^(.*)\/privateEndpointConnections\/\{[^/]+\}$/i;
 const privateEndpointConnectionsPathRegExp = /^(.*)\/privateEndpointConnections$/i;
 const privateLinkResourcesPathRegExp = /^(.*)\/privateLinkResources$/i;
 
@@ -23,18 +28,18 @@ export const implementPrivateEndpointApisRule = createRule({
       root: (program) => {
         const supportedResources = new Map<string, PrivateEndpointApiSet>();
 
-        for (const armResource of getArmResources(program)) {
-          collectPaths(
-            supportedResources,
-            armResource,
-            Object.values(armResource.operations.lifecycle),
-          );
-          collectPaths(
-            supportedResources,
-            armResource,
-            Object.values(armResource.operations.lists),
-          );
-        }
+        navigateProgram(program, {
+          operation(operation) {
+            if (getArmResourceOperationData(program, operation) === undefined) {
+              return;
+            }
+
+            const resourceOperation = getResourceOperation(program, operation);
+            if (resourceOperation !== undefined) {
+              collectPath(supportedResources, resourceOperation);
+            }
+          },
+        });
 
         for (const [basePath, apiSet] of supportedResources.entries()) {
           const target = getDiagnosticTarget(apiSet);
@@ -76,37 +81,28 @@ interface PrivateEndpointApiSet {
   privateLinkResourcesPath?: PrivateEndpointApiTarget;
 }
 
-type PrivateEndpointApiTarget = Interface | Model | Operation;
+type PrivateEndpointApiTarget = Interface | Operation;
 
-function collectPaths(
+function collectPath(
   supportedResources: Map<string, PrivateEndpointApiSet>,
-  armResource: ArmResourceDetails,
-  operations: Array<ArmResourceOperation | undefined>,
+  operation: ArmResourceOperation,
 ): void {
-  for (const operation of operations) {
-    if (operation === undefined) {
-      continue;
-    }
+  const target = operation.operation.interface ?? operation.operation;
+  const pointPath = operation.path.match(privateEndpointConnectionPathRegExp);
+  if (pointPath !== null) {
+    getOrCreateApiSet(supportedResources, pointPath[1]).privateEndpointConnectionPath ??= target;
+    return;
+  }
 
-    const pointPath = operation.path.match(privateEndpointConnectionPathRegExp);
-    if (pointPath !== null) {
-      getOrCreateApiSet(supportedResources, pointPath[1]).privateEndpointConnectionPath ??=
-        getTarget(armResource, operation);
-      continue;
-    }
+  const listPath = operation.path.match(privateEndpointConnectionsPathRegExp);
+  if (listPath !== null) {
+    getOrCreateApiSet(supportedResources, listPath[1]).privateEndpointConnectionsPath ??= target;
+    return;
+  }
 
-    const listPath = operation.path.match(privateEndpointConnectionsPathRegExp);
-    if (listPath !== null) {
-      getOrCreateApiSet(supportedResources, listPath[1]).privateEndpointConnectionsPath ??=
-        getTarget(armResource, operation);
-      continue;
-    }
-
-    const privateLinkPath = operation.path.match(privateLinkResourcesPathRegExp);
-    if (privateLinkPath !== null) {
-      getOrCreateApiSet(supportedResources, privateLinkPath[1]).privateLinkResourcesPath ??=
-        getTarget(armResource, operation);
-    }
+  const privateLinkPath = operation.path.match(privateLinkResourcesPathRegExp);
+  if (privateLinkPath !== null) {
+    getOrCreateApiSet(supportedResources, privateLinkPath[1]).privateLinkResourcesPath ??= target;
   }
 }
 
@@ -121,13 +117,6 @@ function getOrCreateApiSet(
   }
 
   return apiSet;
-}
-
-function getTarget(
-  resource: ArmResourceDetails,
-  operation: ArmResourceOperation,
-): PrivateEndpointApiTarget {
-  return operation.operation.interface ?? operation.operation ?? resource.typespecType;
 }
 
 function getDiagnosticTarget(apiSet: PrivateEndpointApiSet): PrivateEndpointApiTarget {
