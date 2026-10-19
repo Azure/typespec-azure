@@ -19,10 +19,13 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 `core/packages/http-client-java`.
 
 Only `src/options.ts` (the Azure-specific emitter options) is committed in this package. The rest of
-the emitter TypeScript (and tests) is copied from `core/packages/http-client-java/emitter/{src,test}`
+the emitter TypeScript and test support files are copied from `core/packages/http-client-java/emitter/{src,test}`
 at build time by `eng/scripts/copy-sources.ts` (excluding `options.ts`). The Java `emitter.jar` is
 built by `eng/scripts/build-generator.ts` from a patched copy of `core/packages/http-client-java/generator`
 (see below) and staged into `generator/http-client-generator/target/`.
+
+Upstream `.test.ts` files and their snapshots are excluded from the branded copy; they run in the
+upstream repository. Stale copies are removed on each build.
 
 ### Azure customization patch
 
@@ -136,6 +139,10 @@ Pulls the fix in from core; **no version bump**. Example:
    moving the submodule pointer.
 2. **Sync tests from core.** Run `pnpm sync-tests`: it copies the tests/specs from the pinned core
    commit.
+   Run `pwsh -File eng/versioning/Sync-Versions.ps1` to align the test POM's shared dependencies
+   and plugins with that commit (`-WhatIf` previews changes). This leaves Azure-specific tooling
+   and generated sample POMs unchanged. Test the script offline with
+   `pwsh -File eng/versioning/Sync-Versions.Tests.ps1`.
 3. **Add a `fix` changelog entry** for the fix (`pnpm change add`).
 
 Open the PR against `release/<sprint>` (not `main`) and merge it. _(Optional)_ Before merging,
