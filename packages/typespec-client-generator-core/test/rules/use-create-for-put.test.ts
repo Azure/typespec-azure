@@ -1,5 +1,5 @@
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { useCreateForPutRule } from "../../src/rules/use-create-for-put.js";
 import { ArmTester } from "../tester.js";
 
@@ -36,165 +36,164 @@ function diagnostic(operationName: string, target = operationName) {
   };
 }
 
-describe("use-create-for-put", () => {
-  it("accepts an unscoped client name override", async () => {
-    await tester
-      .expect(`${header} @clientName("createWidget") @put @route("/item") op set(): string;`)
-      .toBeValid();
-  });
+it("accepts an unscoped client name override", async () => {
+  await tester
+    .expect(`${header} @clientName("createWidget") @put @route("/item") op set(): string;`)
+    .toBeValid();
+});
 
-  it("reports an invalid unscoped client name on the authored operation", async () => {
-    await tester
-      .expect(`${header} @clientName("replaceWidget") @put @route("/item") op create(): string;`)
-      .toEmitDiagnostics([diagnostic("replaceWidget", "create")]);
-  });
+it("reports an invalid unscoped client name on the authored operation", async () => {
+  await tester
+    .expect(`${header} @clientName("replaceWidget") @put @route("/item") op create(): string;`)
+    .toEmitDiagnostics([diagnostic("replaceWidget", "create")]);
+});
 
-  it("ignores emitter-scoped overrides of a compliant default name", async () => {
-    await tester
-      .expect(
-        `${header} @clientName("setWidget", "csharp") @put @route("/item") op create(): string;`,
-      )
-      .toBeValid();
-  });
+it("ignores emitter-scoped overrides of a compliant default name", async () => {
+  await tester
+    .expect(
+      `${header} @clientName("setWidget", "csharp") @put @route("/item") op create(): string;`,
+    )
+    .toBeValid();
+});
 
-  it("does not let an emitter-scoped override mask an invalid default name", async () => {
-    await tester
-      .expect(
-        `${header} @clientName("createWidget", "python") @put @route("/item") op set(): string;`,
-      )
-      .toEmitDiagnostics([diagnostic("set")]);
-  });
+it("does not let an emitter-scoped override mask an invalid default name", async () => {
+  await tester
+    .expect(
+      `${header} @clientName("createWidget", "python") @put @route("/item") op set(): string;`,
+    )
+    .toEmitDiagnostics([diagnostic("set")]);
+});
 
-  it("uses the unscoped name when scoped and unscoped overrides coexist", async () => {
-    await tester
-      .expect(
-        `${header}
+it("uses the unscoped name when scoped and unscoped overrides coexist", async () => {
+  await tester
+    .expect(
+      `${header}
         @clientName("createWidget")
         @clientName("setWidget", "csharp")
         @put @route("/item") op set(): string;`,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("honors client names on standard ARM template aliases", async () => {
-    await tester
-      .expect(
-        `${header}
+it("honors client names on standard ARM template aliases", async () => {
+  await tester
+    .expect(
+      `${header}
         ${widget}
         @armResourceOperations interface Widgets {
           @clientName("createOrUpdate")
           set is ArmResourceCreateOrReplaceAsync<Widget>;
         }`,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("normalizes exact client names", async () => {
-    await tester
-      .expect(
-        `${header}
+it("normalizes exact client names", async () => {
+  await tester
+    .expect(
+      `${header}
         @clientName(exact("CreateWidget"))
         @put @route("/item") op set(): string;`,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("uses the friendly name fallback", async () => {
-    await tester
-      .expect(
-        `${header}
+it("uses the friendly name fallback", async () => {
+  await tester
+    .expect(
+      `${header}
         @friendlyName("createWidget")
         @put @route("/item") op set(): string;`,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  // cspell:ignore creat
-  it.each(["set", "put", "recreate", "replace", "c", "creat"])(
-    "rejects PUT name %s",
-    async (name) => {
-      await tester
-        .expect(`${header} @put @route("/item") op ${name}(): string;`)
-        .toEmitDiagnostics([diagnostic(name)]);
-    },
-  );
-
-  it.each(["create", "createOrUpdate", "createOrReplace", "createWidget", "CreateWidget"])(
-    "accepts native create prefix %s",
-    async (name) => {
-      await tester.expect(`${header} @put @route("/item") op ${name}(): string;`).toBeValid();
-    },
-  );
-
-  it.each(["get", "post", "patch", "delete", "head"])("ignores HTTP verb %s", async (verb) => {
+// cspell:ignore creat
+it.each(["set", "put", "recreate", "replace", "c", "creat"])(
+  "rejects PUT name %s",
+  async (name) => {
     await tester
-      .expect(`${header} @${verb} @route("/item") op set(): { @statusCode code: 204 };`)
-      .toBeValid();
-  });
+      .expect(`${header} @put @route("/item") op ${name}(): string;`)
+      .toEmitDiagnostics([diagnostic(name)]);
+  },
+);
 
-  it.each([200, 201, 202, 204])(
-    "checks PUT names independently of response code %s",
-    async (code) => {
-      await tester
-        .expect(`${header} @put @route("/item") op replace(): { @statusCode code: ${code} };`)
-        .toEmitDiagnostics([diagnostic("replace")]);
-    },
-  );
+it.each(["create", "createOrUpdate", "createOrReplace", "createWidget", "CreateWidget"])(
+  "accepts native create prefix %s",
+  async (name) => {
+    await tester.expect(`${header} @put @route("/item") op ${name}(): string;`).toBeValid();
+  },
+);
 
-  it("does not diagnose generic operation declarations or instantiations", async () => {
+it.each(["get", "post", "patch", "delete", "head"])("ignores HTTP verb %s", async (verb) => {
+  await tester
+    .expect(`${header} @${verb} @route("/item") op set(): { @statusCode code: 204 };`)
+    .toBeValid();
+});
+
+it.each([200, 201, 202, 204])(
+  "checks PUT names independently of response code %s",
+  async (code) => {
     await tester
-      .expect(
-        `${header}
+      .expect(`${header} @put @route("/item") op replace(): { @statusCode code: ${code} };`)
+      .toEmitDiagnostics([diagnostic("replace")]);
+  },
+);
+
+it("does not diagnose generic operation declarations or instantiations", async () => {
+  await tester
+    .expect(
+      `${header}
         @put op PutTemplate<T>(@body body: T): T;
         @route("/item") op create is PutTemplate<string>;
         interface Templates<T> {
           @put op put(@body body: T): T;
         }
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("checks concrete template aliases and inherited interface endpoints once each", async () => {
-    await tester
-      .expect(
-        `${header}
+it("checks concrete template aliases and inherited interface endpoints once each", async () => {
+  await tester
+    .expect(
+      `${header}
         @put op PutTemplate<T>(@body body: T): T;
         interface Templates<T> { @put op set(@body body: T): T; }
         @route("/alias") op replace is PutTemplate<string>;
         @route("/inherited") interface Items extends Templates<string> {}
       `,
-      )
-      .toEmitDiagnostics([diagnostic("replace"), diagnostic("set")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("replace"), diagnostic("set")]);
+});
 
-  it("checks endpoints inside nested ARM namespaces", async () => {
-    await tester
-      .expect(
-        `${header}
+it("checks endpoints inside nested ARM namespaces", async () => {
+  await tester
+    .expect(
+      `${header}
         namespace Nested {
           @route("/item") interface Items { @put op set(): string; }
         }
       `,
-      )
-      .toEmitDiagnostics([diagnostic("set")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("set")]);
+});
 
-  it("does not let the interface name or underscores mask a non-create operation", async () => {
-    await tester
-      .expect(
-        `${header}
+it("does not let the interface name or underscores mask a non-create operation", async () => {
+  await tester
+    .expect(
+      `${header}
         @route("/item") interface CreateWidgets { @put op set(): string; }
         @route("/other") interface Widgets { @put op set_Create(): string; }
       `,
-      )
-      .toEmitDiagnostics([diagnostic("set"), diagnostic("set_Create")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("set"), diagnostic("set_Create")]);
+});
 
-  it("retains historical operations but does not simulate historical names", async () => {
-    await tester
-      .expect(
-        `
+it("retains historical operations but does not simulate historical names", async () => {
+  await tester
+    .expect(
+      `
         @service @armProviderNamespace @versioned(Versions)
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         namespace Arm;
@@ -202,26 +201,26 @@ describe("use-create-for-put", () => {
         @removed(Versions.v2) @route("/old") @put op set(): string;
         @renamedFrom(Versions.v2, "replace") @route("/renamed") @put op create(): string;
       `,
-      )
-      .toEmitDiagnostics([diagnostic("set")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("set")]);
+});
 
-  it("checks ordinary service namespaces without provider metadata", async () => {
-    await tester
-      .expect(
-        `
+it("checks ordinary service namespaces without provider metadata", async () => {
+  await tester
+    .expect(
+      `
         @service namespace Contoso {
           @put @route("/item") op set(): string;
         }
       `,
-      )
-      .toEmitDiagnostics([diagnostic("set")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("set")]);
+});
 
-  it("checks nested service namespaces without provider metadata", async () => {
-    await tester
-      .expect(
-        `
+it("checks nested service namespaces without provider metadata", async () => {
+  await tester
+    .expect(
+      `
         namespace Contoso {
           @service namespace Management {
             namespace Nested {
@@ -230,14 +229,14 @@ describe("use-create-for-put", () => {
           }
         }
       `,
-      )
-      .toEmitDiagnostics([diagnostic("replace")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("replace")]);
+});
 
-  it("ignores non-service helpers and Azure library declarations", async () => {
-    await tester
-      .expect(
-        `
+it("ignores non-service helpers and Azure library declarations", async () => {
+  await tester
+    .expect(
+      `
         @put @route("/outside") op set(): string;
         namespace Customizations { @put op replace(): string; }
         namespace Azure.Core { @put op PutTemplate<T>(@body body: T): T; }
@@ -246,14 +245,14 @@ describe("use-create-for-put", () => {
           @put @route("/item") op create(): string;
         }
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("reports the authored setWidgetConfig name despite an explicit operationId", async () => {
-    await tester
-      .expect(
-        `
+it("reports the authored setWidgetConfig name despite an explicit operationId", async () => {
+  await tester
+    .expect(
+      `
         ${header}
         @TypeSpec.OpenAPI.operationId("Widgets_Create")
         @route("/config") @put
@@ -262,45 +261,44 @@ describe("use-create-for-put", () => {
           @body result: { config: string };
         };
       `,
-      )
-      .toEmitDiagnostics([diagnostic("setWidgetConfig")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("setWidgetConfig")]);
+});
 
-  it("reports a standard ARM create template aliased as set", async () => {
-    await tester
-      .expect(
-        `${header}
+it("reports a standard ARM create template aliased as set", async () => {
+  await tester
+    .expect(
+      `${header}
         ${widget}
         @armResourceOperations interface Widgets {
           set is ArmResourceCreateOrReplaceAsync<Widget>;
         }
       `,
-      )
-      .toEmitDiagnostics([diagnostic("set")]);
-  });
+    )
+    .toEmitDiagnostics([diagnostic("set")]);
+});
 
-  it("allows a standard ARM create template aliased as createOrUpdate", async () => {
-    await tester
-      .expect(
-        `${header}
+it("allows a standard ARM create template aliased as createOrUpdate", async () => {
+  await tester
+    .expect(
+      `${header}
         ${widget}
         @armResourceOperations interface Widgets {
           createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         }
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("ignores explicit operationId overrides of a compliant authored name", async () => {
-    await tester
-      .expect(
-        `
+it("ignores explicit operationId overrides of a compliant authored name", async () => {
+  await tester
+    .expect(
+      `
         ${header}
         @TypeSpec.OpenAPI.operationId("Widgets_Set")
         @put @route("/item") op create(): string;
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
 });
