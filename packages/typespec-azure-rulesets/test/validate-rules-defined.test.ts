@@ -79,4 +79,13 @@ describe("expect all rules to be defined", () => {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }
   });
+
+  it("keeps private endpoint API completeness guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    const rule = ResourceManagerLinter.rules.find(
+      (candidate) => candidate.name === "private-endpoint-apis-missing",
+    );
+    ok(rule);
+  });
 });

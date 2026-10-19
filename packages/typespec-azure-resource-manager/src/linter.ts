@@ -41,6 +41,7 @@ import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
@@ -100,6 +101,7 @@ const rules = [
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
+  privateEndpointApisMissingRule,
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
