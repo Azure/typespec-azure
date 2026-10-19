@@ -49,6 +49,13 @@ This creates:
 - `packages/<pkg>/src/rules/<rule-name>.md` — docs skeleton (referenced from the rule via `docs: fileRef.fromPackageRoot(...)`)
 - Updates `packages/<pkg>/src/linter.ts` — registers the rule
 
+Scaffold only a genuinely new rule. When extending or consolidating into an
+existing rule, locate its canonical suite by the imported rule object and extend
+it, even when its historical filename differs from the public rule name.
+Apply the shared [suite and grouping policy](../typespec-lint-validate/SKILL.md#canonical-suite-ownership-and-grouping):
+remove a generated top-level wrapper that merely repeats the rule name, retaining
+file-scope cases or meaningful scenario groups and their scoped setup.
+
 ## Step 3: WRITE FAILING TESTS FIRST (TDD)
 
 Edit `packages/<pkg>/test/rules/<rule-name>.test.ts`:
@@ -65,7 +72,9 @@ Edit `packages/<pkg>/test/rules/<rule-name>.test.ts`:
 4. Apply the [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary).
    Do not add library-exclusion, alias/template traversal, or inheritance tests
    solely to re-prove framework behavior. Cover those forms only when they
-   exercise custom logic owned by the rule.
+   exercise custom logic owned by the rule. Follow the shared
+   [public-API fixture guidance](../typespec-lint-validate/SKILL.md#setup-extraction-and-exact-targets)
+   rather than using private namespaces or decorators to manufacture cases.
 
 Test API reference:
 
@@ -165,6 +174,11 @@ pnpm --filter "@azure-tools/typespec-<pkg>" regen-docs
 ```
 
 ## Step 8: CREATE CHANGESET
+
+First apply the shared [unreleased change-entry policy](../typespec-lint-implement/SKILL.md#unreleased-change-entries).
+Reuse or update task-owned coverage when it already exists; run the command
+below only when a new entry is needed. Do not add internal review-cleanup entries
+alongside a feature/fix entry for the same package and unreleased change.
 
 ```bash
 pnpm change add

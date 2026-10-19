@@ -33,7 +33,9 @@ If the semantics are still fuzzy, use `/typespec-lint-discovery` first.
    target kinds, and diagnostics, following the
    [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary).
    Do not copy neighboring framework-only tests or add production guards merely
-   to justify such tests.
+   to justify such tests. Follow the shared
+   [canonical suite and grouping policy](../typespec-lint-validate/SKILL.md#canonical-suite-ownership-and-grouping)
+   and [public-API fixture guidance](../typespec-lint-validate/SKILL.md#setup-extraction-and-exact-targets).
 6. Hand off to `/typespec-lint-validate` with a clear statement of what should now be proven.
 
 ## Implementation checkpoints
@@ -179,6 +181,9 @@ native contract and [test-claim mapping](../typespec-lint-validate/SKILL.md#test
 - Remove task-related unused helpers/imports, obsolete scaffolding, vacuous
   cases, and redundant permutations without losing distinct semantic controls
   or required acceptance evidence.
+- Check canonical suite ownership, meaningful scenario grouping, and public
+  fixture APIs under the shared validation guidance. Reject relocated duplicate
+  rule suites and bespoke Markdown parsers, not legitimate utility/package tests.
 - Check final scope, defaults, exclusions, exceptions, diagnostic targets, and
   native-versus-legacy differences across implementation, actual published
   examples, authored/generated references, manual guides, and legacy mappings.
@@ -186,15 +191,30 @@ native contract and [test-claim mapping](../typespec-lint-validate/SKILL.md#test
   ID and correct placement in suppression examples. Retain registered
   suppression coverage only for a concrete rule-owned interaction or
   demonstrated regression, not merely because it was promised in the PR.
-- Reconcile task-owned unreleased Chronus entries with the final public
-  behavior rather than accumulating stale intermediate fix descriptions.
-  Consolidate only entries for the same unreleased feature/package where
-  appropriate; retain distinct package and release classifications.
+- Apply the [unreleased change-entry policy](#unreleased-change-entries):
+  describe final shipped behavior rather than accumulating review-history entries.
 - Evaluate reviewer suggestions against current code, the contract, and PR
   promises using the [simplification review guidance](#simplification-and-review).
   Do not impose blanket bans on isolated testers, integration tests, compiling
   examples or helpers. For Swagger/LintDiff migrations, apply the specific
   [no-bespoke-parser guidance](../typespec-lint-validate/SKILL.md#documentation-example-validation).
+
+### Unreleased change entries
+
+Before adding a Chronus entry, inspect the task-owned unreleased entries for
+each affected package. Ensure coverage, not a new file per commit or review
+round. Update the existing feature/fix description to match final shipped
+behavior instead of adding an internal entry for review cleanup, helper reuse,
+test changes, formatting, or syncing with the base branch.
+
+Remove redundant task-owned internal coverage when that package already has
+a feature/fix entry for the same unreleased change. For a multi-package entry,
+remove only the redundant package and retain genuinely needed coverage for
+other packages. Preserve distinct release classifications, unrelated entries,
+and separate disabled-registration coverage for a rulesets package without a
+feature/fix entry for that change. Validate Chronus normally; do not add entries
+merely to satisfy package detection. See the
+[changelog feedback on #5502](https://github.com/Azure/typespec-azure/pull/5502#discussion_r4294559315).
 
 ## Deliverable
 
