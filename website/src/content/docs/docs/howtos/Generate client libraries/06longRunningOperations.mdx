@@ -282,6 +282,12 @@ The decorators in this section are in the `Azure.ClientGenerator.Core.Legacy` na
 
 If you have an operation that should be treated as a long-running operation but isn't recognized as one by default, you can force it using `@markAsLro`. The operation's return type must be a `Model`.
 
+Use `@markAsLro` only for an operation that does not already have Azure.Core long-running-operation
+metadata. Applying it to a native LRO has no effect and reports the `mark-as-lro-ineffective`
+warning. For an ordinary operation, the decorator creates only the client-side LRO shape; the
+operation's response remains a normal output model rather than a native initial, polling, or final
+envelope model.
+
 ```tsp
 import "@azure-tools/typespec-client-generator-core";
 
