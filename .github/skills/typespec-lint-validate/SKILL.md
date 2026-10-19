@@ -36,15 +36,15 @@ test layer, harness, and exact test title or evidence location in the existing
 brief, fixture mapping, migration note, or PR notes. Include promises made in
 the PR description, not only the rule's predicate branches.
 
-| Claim                                                                               | Layer                        | Harness and evidence                                                                                                                                                                             |
-| ----------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Helper semantics or type identity                                                   | Compiler/helper tests        | Minimal compiler setup and typed extraction; use Azure libraries only when the helper needs them.                                                                                                |
-| One rule's predicate, message, count, or authored target                            | Rule behavior tests          | Existing single-rule tester, such as `LinterRuleTester`, with literal TypeSpec fixtures and exact diagnostic assertions.                                                                         |
-| Registered execution, suppression, cross-rule interaction, or metadata side effects | Integration tests            | Activate the real registered linter and relevant rules; prove the otherwise-offending preconditions and expected interaction.                                                                    |
-| Exported rules, legacy names, registration, or ruleset activation                   | Package/registration tests   | Exercise the actual public registration surface using existing package infrastructure.                                                                                                           |
-| Public-entry loading or dependency isolation                                        | Package-isolation tests      | Load the real public entry point; for isolation, block the relevant dependency. Execute native linting when execution independence is the claim. Do not substitute raw-source import inspection. |
-| Published examples compile and demonstrate the rule                                 | Documentation tests          | Compile the actual published snippets, explicitly enable the rule, and assert the incorrect/correct diagnostic contrast.                                                                         |
-| Swagger parity or corpus population differences                                     | Migration/comparison harness | Keep emitted-output snapshots, population attribution, and parity evidence outside native rule behavior suites.                                                                                  |
+| Claim                                                                               | Layer                        | Harness and evidence                                                                                                                                                                     |
+| ----------------------------------------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Helper semantics or type identity                                                   | Compiler/helper tests        | Minimal compiler setup and typed extraction; use Azure libraries only when the helper needs them.                                                                                        |
+| One rule's predicate, message, count, or authored target                            | Rule behavior tests          | Existing single-rule tester, such as `LinterRuleTester`, with literal TypeSpec fixtures and exact diagnostic assertions.                                                                 |
+| Registered execution, suppression, cross-rule interaction, or metadata side effects | Integration tests            | Activate the real registered linter and relevant rules; prove the otherwise-offending preconditions and expected interaction.                                                            |
+| Exported rules, legacy names, registration, or ruleset activation                   | Package/registration tests   | Exercise the actual public registration surface using existing package infrastructure.                                                                                                   |
+| Public-entry loading or dependency isolation                                        | Package-isolation tests      | Load the real public entry point and block the relevant dependency when needed. Do not rerun individual rule diagnostics under import guards or substitute raw-source import inspection. |
+| Published examples compile and demonstrate the rule                                 | Documentation tests          | Compile the actual published snippets, explicitly enable the rule, and assert the incorrect/correct diagnostic contrast.                                                                 |
+| Swagger parity or corpus population differences                                     | Migration/comparison harness | Keep emitted-output snapshots, population attribution, and parity evidence outside native rule behavior suites.                                                                          |
 
 These are placement rules, not a mandatory set of suites for every rule.
 Use the repository's existing harnesses and organization; a distinct layer need
@@ -56,12 +56,38 @@ Delete framework-only cases without replacement; do not relocate them merely
 to preserve a checklist. Retain concrete rule-caused interactions, authored-node
 deduplication and demonstrated regressions. Update stale PR claims accordingly.
 
-Relocate required acceptance evidence instead of silently deleting it during
-unit-test cleanup. A registration or interaction test is not a framework-only
-test merely because it is unnecessary in the single-rule suite. Retain it in
-the appropriate layer when the contract or a demonstrated regression requires
-it. Truly redundant framework proof needs no replacement. Record the destination
-or justified removal before deleting a case.
+Preserve distinct required acceptance evidence during cleanup, applying
+[canonical suite ownership](#canonical-suite-ownership-and-grouping) before
+choosing a file. Keep rule-owned interaction and deduplication cases in the
+canonical rule suite; use existing package infrastructure for genuine
+registration or public-entry claims. A PR promise does not justify another
+per-rule integration/isolation suite or re-testing unchanged sibling rules.
+Record the destination or justified removal before deleting a case.
+
+### Canonical suite ownership and grouping
+
+- Keep one canonical behavior-test file per public rule in each owning package.
+  Locate it by the imported rule object, not only the current public name:
+  an existing rule can have a historical test filename. Extend that suite when
+  consolidating or promoting behavior into the rule; create a file only for a
+  genuinely new rule.
+- Do not split the same rule's cases into response-, verb-, interaction-, or
+  isolation-specific files, even under `test/integration` or `test/package`.
+  Preserve unique rule-owned scenarios, diagnostic targets/counts, and
+  regressions in focused groups in the canonical suite. Drop assertions of
+  unchanged sibling diagnostics made solely to demonstrate coexistence.
+- Independent utility tests and genuine package/registration tests may remain
+  separate. A public-entry loading test checks the package API; running the same
+  rule again with an emitter import guard is not a new utility or package claim.
+  Check architectural dependency constraints through review and existing tooling.
+- Use file-scope cases or meaningful scenario groups such as `response bodies`
+  or `standard ARM operations`. Remove top-level wrappers and group-name prefixes
+  that merely repeat the filename or rule name. Preserve meaningful scoped
+  setup and isolation when flattening or moving cases; do not ban `describe`.
+
+These conventions follow the [single-suite feedback on #5556](https://github.com/Azure/typespec-azure/pull/5556#discussion_r4294665647),
+the [isolation-suite feedback on #5665](https://github.com/Azure/typespec-azure/pull/5665#discussion_r4294741752),
+and the [scenario-group feedback on #5673](https://github.com/Azure/typespec-azure/pull/5673#discussion_r4294616795).
 
 ### Setup, extraction, and exact targets
 
@@ -74,6 +100,12 @@ or justified removal before deleting a case.
   assume names such as `UnwrappedTester` or `ArmBaseTester` already exist.
 - Keep compiler-only helper fixtures compiler-only, such as `libraries: []`
   where supported. Do not add ARM initialization solely for setup uniformity.
+- Use supported public APIs in test setup and TypeSpec snippets, including
+  imported decorator files. Do not use exposed `Private` namespaces or private
+  registration decorators to manufacture a fixture. Redesign or remove an
+  artificial private-only case while retaining public-API coverage; document
+  any remaining evidence limitation without changing production scope to make
+  the test possible. See the [private-API feedback on #5502](https://github.com/Azure/typespec-azure/pull/5502#discussion_r4294575142).
 - Prefer supported typed extraction markers such as `t.model`, `t.union`,
   `t.op`, and `t.modelProperty` to namespace/interface walks. For example, with
   the installed compiler's `t` helper:

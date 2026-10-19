@@ -515,19 +515,18 @@ name domain.
 Classify every required acceptance claim with the shared
 [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix), including
 promises in the development and promotion PR descriptions. Follow its setup,
-typed-extraction, and exact-target guidance. The behavior-suite instructions
-below apply to individual-rule diagnostics, not every acceptance claim:
-preserve required registered execution/suppression, cross-rule interactions,
-registration/legacy names, package loading/isolation, and published-example
-proof in the appropriate existing layers. Do not silently drop that evidence
-when removing framework-only unit cases. Establish which claims need
-rule-specific evidence first: delete generic suppression/enablement proof
-without replacement, retaining concrete rule-owned interactions and regressions.
-Reconcile stale PR promises rather than treating them as independent requirements.
-
-Create:
-
-- `packages/<target>/test/rules/<rule-name>.test.ts`
+typed-extraction, exact-target, and public-API fixture guidance. Apply
+[canonical suite ownership and grouping](../typespec-lint-validate/SKILL.md#canonical-suite-ownership-and-grouping):
+locate and extend the existing suite by its imported rule object, retaining
+historical filenames when behavior is folded into an existing rule. Create
+`packages/<target>/test/rules/<rule-name>.test.ts` only for a new rule.
+Keep meaningful rule-owned interaction/deduplication cases there, not in extra
+integration or import-guard suites. Preserve independent utility, genuine
+package/registration, and actual published-example evidence through existing
+infrastructure or the documented one-time example workflow. Delete generic
+suppression/enablement and unchanged-sibling coexistence proof without
+replacement; reconcile stale PR promises rather than treating them as
+independent requirements.
 
 Use `createLinterRuleTester` and cover:
 
@@ -709,9 +708,12 @@ description or remediation.
 
 Run or plan to run the rulesets build and test after updating the lists.
 
-### 8. Add a Chronus change
+### 8. Ensure Chronus change coverage
 
-Add a change entry for every touched official package:
+Inspect existing task-owned unreleased entries first, following the shared
+[unreleased change-entry policy](../typespec-lint-implement/SKILL.md#unreleased-change-entries).
+Update or reuse valid coverage; add an entry only when coverage is missing for
+a touched official package:
 
 - the destination: `@azure-tools/typespec-azure-core`,
   `@azure-tools/typespec-azure-resource-manager`, or
@@ -733,7 +735,8 @@ Choose the change kind separately for each package:
   that user-facing ruleset change accordingly instead of using this
   internal-only guidance.
 
-Use `pnpm change add` and verify that the expected change files were created.
+When a new entry is needed, use `pnpm change add` and verify that the expected
+change files were created.
 Before any package changes are committed, Chronus can report
 `No package changed. Exiting.` even with explicit package, kind and message
 arguments. A zero exit status in that case does not satisfy the change-entry
@@ -1002,6 +1005,10 @@ promotion diff. The review should inspect:
   proper layer; shared setup, typed extraction, exact targets, and discriminating
   offending/valid controls must preserve relevant identity, visibility, and LRO
   preconditions rather than merely compile
+- canonical suite ownership, meaningful test groups, and public fixture APIs
+  under the shared validation guidance; reject duplicate rule suites even when
+  relocated to integration/package folders, and enforce the existing prohibition
+  on bespoke Markdown parsers while preserving actual example evidence
 - the shared
   [final contract consistency sweep](../typespec-lint-implement/SKILL.md#final-contract-consistency),
   including obsolete helpers/scaffolding, manual guidance, exact suppression
@@ -1025,7 +1032,9 @@ promotion diff. The review should inspect:
   unless the user explicitly approved immediate enablement
 - changelog classification and wording match the actual ruleset enablement:
   disabled-only registration has a separate `internal` rulesets entry, uses the
-  official TypeSpec rule name, and says "Register ... as disabled," not "Enable"
+  official TypeSpec rule name, and says "Register ... as disabled," not "Enable";
+  apply the shared unreleased change-entry policy rather than adding redundant
+  destination-package internal entries for review iterations
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.

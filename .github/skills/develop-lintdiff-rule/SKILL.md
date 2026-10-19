@@ -350,13 +350,14 @@ to native unit tests. Keep framework-only migration evidence in the fixture or
 comparison harness rather than duplicating it in each rule suite.
 Record required acceptance claims, including those promised in the PR, through
 the shared [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix).
-Follow its setup, typed-extraction, and exact-target guidance. Preserve required
-registered execution, suppression, cross-rule, package-isolation, and actual
-published-example proof in the appropriate layers rather than deleting it as
-unit-test cleanup. First establish that these claims require rule-specific
-evidence: delete generic suppression/enablement proof without replacement and
-reconcile stale PR promises, while retaining concrete rule-owned interactions
-and regressions. For published examples, follow the shared
+Follow its setup, typed-extraction, exact-target, and public-API fixture guidance.
+Apply [canonical suite ownership and grouping](../typespec-lint-validate/SKILL.md#canonical-suite-ownership-and-grouping)
+to native tests: retain meaningful rule-owned interactions and regressions in
+the established rule suite, not additional integration/isolation files.
+Preserve independent utility and genuine package/registration evidence in
+existing infrastructure. Delete generic suppression/enablement and unchanged
+sibling coexistence proof without replacement and reconcile stale PR promises.
+For published examples, follow the shared
 [documentation validation guidance](../typespec-lint-validate/SKILL.md#documentation-example-validation):
 remove bespoke per-rule parsers rather than relocating them, and distinguish
 existing shared continuous coverage from recorded one-time execution.
@@ -902,6 +903,10 @@ The reviewer must:
 - verify the acceptance-claim mapping, shared setup, typed extraction, and exact
   targets; preserve required non-unit evidence in its proper layer and reject
   vacuous regressions that never reach the relevant rule decision
+- enforce the shared canonical-suite, meaningful-grouping, and public-fixture
+  guidance for native tests; reject duplicate rule suites and bespoke Markdown
+  parsers even when moved outside `test/rules`, without removing independent
+  utility/package tests or actual published-example evidence
 - apply the shared
   [final contract consistency sweep](../typespec-lint-implement/SKILL.md#final-contract-consistency),
   including stale helpers/scaffolding, actual published snippets, suppression,
