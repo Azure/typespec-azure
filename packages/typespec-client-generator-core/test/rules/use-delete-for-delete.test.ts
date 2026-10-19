@@ -13,7 +13,7 @@ function diagnostic(operationName: string, target = operationName) {
   };
 }
 
-describe("use-delete-for-delete", () => {
+describe("HTTP SDK names", () => {
   let tester: LinterRuleTester;
   const header = "@service namespace Test;";
 
@@ -269,7 +269,7 @@ describe("use-delete-for-delete", () => {
   });
 });
 
-describe("use-delete-for-delete with standard ARM operations", () => {
+describe("standard ARM operations", () => {
   let tester: LinterRuleTester;
   const resource = `
     @armProviderNamespace @service

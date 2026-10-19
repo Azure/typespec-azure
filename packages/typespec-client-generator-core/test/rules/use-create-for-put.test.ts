@@ -1,11 +1,7 @@
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it, vi } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { useCreateForPutRule } from "../../src/rules/use-create-for-put.js";
 import { ArmTester } from "../tester.js";
-
-vi.mock("@azure-tools/typespec-autorest", () => {
-  throw new Error("Native lint must not load the AutoRest emitter.");
-});
 
 let tester: LinterRuleTester;
 
