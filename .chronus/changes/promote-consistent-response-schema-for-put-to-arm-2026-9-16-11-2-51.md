@@ -1,8 +1,7 @@
 ---
 changeKind: internal
 packages:
-  - "@azure-tools/typespec-azure-resource-manager"
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Synchronize with main while preserving consolidated PUT validation and opt-in ruleset coverage.
+Preserve opt-in ruleset coverage alongside current main rule registrations.
