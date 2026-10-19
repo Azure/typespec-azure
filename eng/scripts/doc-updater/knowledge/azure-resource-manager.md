@@ -164,7 +164,9 @@ Identity paths are matched case-insensitively for literal segments and by positi
 - `no-query-in-point-op` allows only `api-version` (case-insensitively) on GET, PUT, PATCH, and DELETE resource-instance paths.
 - `no-query-in-post` allows only `api-version` on POST operations; other inputs belong in the request body.
 - `list-operation-missing-pageable` requires collection GET operations to use TypeSpec paging metadata with a continuation link. Standard ARM list operation templates supply this metadata.
-- `list-response-envelope` requires collection GET response models to contain exactly `value` and `nextLink`.
+- `list-response-envelope` validates ARM-provider collection GET responses and authored `@list` operations with paging next-link metadata, including POST actions and operations without provider metadata. HTTP 200 response envelopes must contain an array-valued `value` and canonical `nextLink`, with no additional properties; inherited properties are included.
+- `resource-missing-read` requires a resource with a registered createOrUpdate or update operation to also have a registered read operation. It reports once per resource, prefers the create interface as its target, does not accept a collection list as a read, and exempts delete-only resources and resources with a discriminator ancestor.
+- `scope-path-segment-casing` checks every complete path segment case-insensitively and requires exact `subscriptions` and `resourceGroups` casing. It does not inspect parameter names or collection names that merely share those prefixes.
 - `use-application-json-content-type` requires `application/json` request and response bodies in ARM provider namespaces.
 - `use-model-request-body` requires non-multipart request bodies to use plain models without indexers.
 - `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
