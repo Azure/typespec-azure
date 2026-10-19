@@ -256,6 +256,19 @@ describe("reporters", () => {
     expect(report.timing).toEqual(createResult().timing);
   });
 
+  it("serializes source declaration identity independently from wire identity", () => {
+    const result = createResult();
+    result.findings[0].diff.origin = {
+      declarationPath: "Contoso.Models.Widget.legacyStatus",
+      type: {} as any,
+      sourceLocation: createLocation("src/main.tsp", 45) as any,
+    };
+
+    const report = JSON.parse(formatJsonReport(result));
+    expect(report.findings[0].element).toBe("body.properties.legacyStatus");
+    expect(report.findings[0].sourceElementPath).toBe("Contoso.Models.Widget.legacyStatus");
+  });
+
   it("formats a JSON report with requiresAction=false when no errors", () => {
     const result = createResult();
     result.findings = result.findings.filter((f) => f.severity !== "error" || f.suppressed);
@@ -358,6 +371,19 @@ describe("markdown reporter", () => {
     expect(md).toContain("1 suppressed");
     expect(md).toContain("### Unsuppressed Breaking Changes");
     expect(md).toContain("ResponsePropertyRemoved");
+  });
+
+  it("renders source identity with wire identity as secondary detail", () => {
+    const result = createResult();
+    result.findings[0].diff.origin = {
+      declarationPath: "Contoso.Models.Widget.legacyStatus",
+      type: {} as any,
+      sourceLocation: createLocation("src/main.tsp", 45) as any,
+    };
+
+    const md = renderMarkdownSummary(result);
+    expect(md).toContain("Contoso.Models.Widget.legacyStatus");
+    expect(md).toContain("wire: `body.properties.legacyStatus`");
     expect(md).toContain("### New Suppressed Breaking Changes");
   });
 

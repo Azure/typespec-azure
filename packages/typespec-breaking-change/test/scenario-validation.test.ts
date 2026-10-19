@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
+import { formatJsonReport } from "../src/reporting/reporter-json.js";
+import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
 import { Tester, TesterWithArm } from "./test-host.js";
 
 /**
@@ -148,6 +150,11 @@ const CONTOSO_PR4 = `
     listBySubscription is ArmListBySubscription<Employee>;
   }
 `;
+
+const CONTOSO_PROPERTY_ADDED = CONTOSO_BASE.replace(
+  "model EmployeeProperties {\n    age?: int32;",
+  "model EmployeeProperties {\n    pooling?: boolean;\n    age?: int32;",
+);
 
 describe("scenario validation: ARM end-to-end", () => {
   describe("Phase A: anonymous unions across independently compiled programs", () => {
@@ -318,6 +325,36 @@ describe("scenario validation: ARM end-to-end", () => {
         expect(f.versionPair.baseVersion).toBe(f.versionPair.headVersion);
         expect(f.phase).toBe("same-version");
       }
+    }, 30_000);
+
+    it("reports both source declaration and wire identities for a resource property addition", async () => {
+      const { program: baseProgram } = await TesterWithArm.compile(CONTOSO_BASE);
+      const { program: headProgram } = await TesterWithArm.compile(CONTOSO_PROPERTY_ADDED);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+      const finding = result.findings.find(
+        (candidate) =>
+          candidate.diff.kind === "ResourcePropertyAdded" &&
+          candidate.diff.identity.element.endsWith(".pooling"),
+      );
+
+      expect(finding).toBeDefined();
+      expect(finding!.diff.identity.element).toContain("properties");
+      expect(finding!.diff.origin?.declarationPath).toBe(
+        "Microsoft.Contoso.EmployeeProperties.pooling",
+      );
+
+      const json = JSON.parse(formatJsonReport({ ...result, findings: [finding!] }));
+      expect(json.findings[0]).toMatchObject({
+        element: finding!.diff.identity.element,
+        sourceElementPath: "Microsoft.Contoso.EmployeeProperties.pooling",
+      });
+
+      const markdown = renderMarkdownSummary({ ...result, findings: [finding!] });
+      expect(markdown).toContain("Microsoft.Contoso.EmployeeProperties.pooling");
+      expect(markdown).toContain(`wire: \`${finding!.diff.identity.element}\``);
     }, 30_000);
   });
 

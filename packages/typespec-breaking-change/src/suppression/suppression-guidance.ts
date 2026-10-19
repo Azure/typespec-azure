@@ -1,7 +1,8 @@
 import type { SourceLocation } from "@typespec/compiler";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 import type { Finding, OriginDeclaration } from "../types.js";
 import { isOperationIdentity } from "../types.js";
-import { resolveFindingLocation } from "../pipeline/resolve-location.js";
+import { resolveSuppressionTarget } from "./target.js";
 
 /**
  * Suppression guidance for a finding — tells the user exactly how to suppress
@@ -23,11 +24,7 @@ export interface SuppressionGuidance {
  * Tells the user what decorator to use and where to place it.
  */
 export function formatSuppressionGuidance(finding: Finding): SuppressionGuidance {
-  const kind = finding.diff.kind;
-  const decoratorName =
-    finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
-
-  const decorator = `${decoratorName}("your reason here", #{ kind: "${kind}" })`;
+  const decorator = buildDecorator(finding, "your reason here");
   const placement = getPlacementDescription(finding);
   const file = getTargetFile(finding);
   const example = buildExample(finding, decorator);
@@ -39,18 +36,20 @@ export function formatSuppressionGuidance(finding: Finding): SuppressionGuidance
  * Get a one-line suppression hint suitable for console/annotation output.
  */
 export function formatSuppressionHint(finding: Finding): string {
-  const decoratorName =
-    finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
+  const usesParentModelFallback =
+    finding.diff.headSourceTraceLevel === "parentModel" ||
+    (finding.diff.headSourceTraceLevel === undefined && !finding.diff.headType);
 
-  // For Phase A removals, include path option to target the removed property
-  if (finding.phase === "same-version" && finding.diff.origin) {
+  // Removed Phase A properties no longer have a declaration in the head program,
+  // so place the decorator on the parent model and identify the property by path.
+  if (finding.phase === "same-version" && finding.diff.origin && usesParentModelFallback) {
     const propertyPath = getPropertyPath(finding.diff.origin);
     if (propertyPath) {
-      return `${decoratorName}("your reason here", #{ kind: "${finding.diff.kind}", path: "${propertyPath}" })`;
+      return buildDecorator(finding, "your reason here", propertyPath);
     }
   }
 
-  return `${decoratorName}("your reason here", #{ kind: "${finding.diff.kind}" })`;
+  return buildDecorator(finding, "your reason here");
 }
 
 /**
@@ -65,7 +64,7 @@ function getPlacementDescription(finding: Finding): string {
   // For operation-level changes, place on the operation
   if (isOperationIdentity(finding.diff.identity)) {
     const op = finding.diff.identity.operation;
-    return `On the operation: ${op.method} ${op.path} (or on the affected model/property)`;
+    return `On the operation: ${op.method} ${op.path}`;
   }
 
   // Service-level changes
@@ -102,28 +101,17 @@ function buildExample(finding: Finding, decorator: string): string {
 
     if (isPropertyLevel && parts.length > 1) {
       const parentName = parts[parts.length - 2];
-      return [
-        `model ${parentName} {`,
-        `  ${decorator}`,
-        `  ${name}: ...;`,
-        `}`,
-      ].join("\n");
+      return [`model ${parentName} {`, `  ${decorator}`, `  ${name}: ...;`, `}`].join("\n");
     }
 
     // Type-level origin
-    return [
-      `${decorator}`,
-      `model ${name} { ... }`,
-    ].join("\n");
+    return [`${decorator}`, `model ${name} { ... }`].join("\n");
   }
 
   // Operation-level
   if (isOperationIdentity(finding.diff.identity)) {
     const opName = finding.diff.identity.operation.name ?? "myOperation";
-    return [
-      `${decorator}`,
-      `op ${opName}(...): ...;`,
-    ].join("\n");
+    return [`${decorator}`, `op ${opName}(...): ...;`].join("\n");
   }
 
   // Fallback
@@ -138,8 +126,6 @@ function buildExample(finding: Finding, decorator: string): string {
  * targets the parent model declaration since the property no longer exists.
  */
 export function formatSuppressionDiff(finding: Finding): string {
-  const decoratorName =
-    finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
   const hasDirectHeadLocation =
     finding.diff.headSourceTraceLevel === "direct" ||
     (finding.diff.headSourceTraceLevel === undefined && !!finding.diff.headType);
@@ -148,7 +134,7 @@ export function formatSuppressionDiff(finding: Finding): string {
   // Case 1: Property still exists in head (versioned changes, or non-removal diffs)
   // Decorator goes directly on the element.
   if (finding.diff.headSourceLocation && hasDirectHeadLocation) {
-    const decorator = `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
+    const decorator = buildDecorator(finding, "reason");
     return buildDiffFromLocation(finding.diff.headSourceLocation, decorator);
   }
 
@@ -156,14 +142,12 @@ export function formatSuppressionDiff(finding: Finding): string {
   // Decorator must go on the parent model with path option targeting the property.
   if ((hasParentModelHeadLocation || finding.phase === "same-version") && finding.diff.origin) {
     const propertyPath = getPropertyPath(finding.diff.origin);
-    const decorator = propertyPath
-      ? `${decoratorName}("reason", #{ kind: "${finding.diff.kind}", path: "${propertyPath}" })`
-      : `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
+    const decorator = buildDecorator(finding, "reason", propertyPath);
     return buildRemovedPropertyDiff(finding.diff.origin, decorator);
   }
 
   // Case 3: Origin exists (e.g., cross-version with origin from base)
-  const decorator = `${decoratorName}("reason", #{ kind: "${finding.diff.kind}" })`;
+  const decorator = buildDecorator(finding, "reason");
   if (finding.diff.origin?.sourceLocation) {
     return buildDiffFromLocation(finding.diff.origin.sourceLocation, decorator);
   }
@@ -175,6 +159,14 @@ export function formatSuppressionDiff(finding: Finding): string {
 
   // Final fallback: just show the decorator
   return `+ ${decorator}`;
+}
+
+function buildDecorator(finding: Finding, reason: string, path?: string): string {
+  const decoratorName =
+    finding.phase === "same-version" ? "@approvedUnversionedChange" : "@approvedBreakingChange";
+  const suppressionPath = path ?? resolveSuppressionTarget(finding).path;
+  const pathOption = suppressionPath ? `, path: "${suppressionPath}"` : "";
+  return `${decoratorName}("${reason}", #{ kind: "${finding.diff.kind}"${pathOption} })`;
 }
 
 /**
@@ -229,13 +221,4 @@ function getLineAtPos(text: string, pos: number): string {
   let lineEnd = text.indexOf("\n", pos);
   if (lineEnd === -1) lineEnd = text.length;
   return text.substring(lineStart, lineEnd);
-}
-
-/** Get the 1-based line number for a character offset. */
-function getLineNumber(text: string, pos: number): number {
-  let line = 1;
-  for (let i = 0; i < pos; i++) {
-    if (text[i] === "\n") line++;
-  }
-  return line;
 }

@@ -1,12 +1,13 @@
 import type { Program, Type } from "@typespec/compiler";
+import type { Finding } from "../types.js";
+import { isOperationIdentity } from "../types.js";
 import {
   findSuppressions,
   findUnversionedSuppressions,
   scanAllUnversionedSuppressions,
   type ResolvedSuppression,
 } from "./decorators.js";
-import { isOperationIdentity } from "../types.js";
-import type { Finding, OperationDiffIdentity } from "../types.js";
+import { composeFullIdentityPath } from "./target.js";
 
 /**
  * Scan the head program's unversioned suppression state map for Phase A
@@ -32,7 +33,7 @@ export function applySuppressions(findings: Finding[], program: Program): Findin
       return finding;
     }
 
-    const targetType = finding.diff.headType ?? finding.diff.baseType;
+    const targetType = finding.diff.headType ?? finding.diff.baseType ?? finding.diff.operationType;
     if (!targetType) {
       return finding;
     }
@@ -79,8 +80,7 @@ function collectSuppressions(
   program: Program,
   targetType: Type,
 ): ResolvedSuppression[] {
-  const finder =
-    finding.phase === "same-version" ? findUnversionedSuppressions : findSuppressions;
+  const finder = finding.phase === "same-version" ? findUnversionedSuppressions : findSuppressions;
 
   const suppressions = [...finder(program, targetType)];
 
@@ -164,14 +164,6 @@ function matchesPathOrDirect(
  * - Request elements: request.{element} (e.g., request.body.properties.tags, request.query.filter)
  * - Response elements: responses.{statusCode}.{element} (e.g., responses.200.body.properties.name)
  */
-export function composeFullIdentityPath(identity: OperationDiffIdentity): string {
-  if (identity.component === "request") {
-    return `request.${identity.element}`;
-  }
-  const statusCode = identity.statusCode ?? "*";
-  return `responses.${statusCode}.${identity.element}`;
-}
-
 /**
  * Match a suppression path against the finding's identity.
  *

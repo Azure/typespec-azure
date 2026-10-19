@@ -1,4 +1,5 @@
 import type { SourceLocation } from "@typespec/compiler";
+import { getFindingIdentity } from "../finding-identity.js";
 import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 import {
   formatSuppressionDiff,
@@ -222,14 +223,16 @@ function fmtKindLink(
 
 /** Format the identity as a link to the source file, or plain text if no link available. */
 function fmtIdentityLink(finding: Finding, options?: MarkdownReportOptions): string {
-  const element = finding.diff.identity.element;
+  const identity = getFindingIdentity(finding);
   const resolvedLocation = resolveFindingLocation(finding);
   const url = buildSourceUrl(resolvedLocation?.location, options);
+  const primary = url ? `[\`${esc(identity.primary)}\`](${url})` : `\`${esc(identity.primary)}\``;
+  const wire =
+    identity.source && identity.source !== identity.wire
+      ? `<br><sub>wire: \`${esc(identity.wire)}\`</sub>`
+      : "";
 
-  if (url) {
-    return `[\`${esc(element)}\`](${url})`;
-  }
-  return `\`${esc(element)}\``;
+  return `${primary}${wire}`;
 }
 
 /** Build a GitHub source URL from a SourceLocation. */
@@ -273,24 +276,12 @@ function getLineNumber(location: SourceLocation): number {
   return text.split("\n").length;
 }
 
-function fmtVer(finding: Finding): string {
-  return `${finding.versionPair.baseVersion} → ${finding.versionPair.headVersion}`;
-}
-
 function fmtMs(ms: number): string {
   return ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`;
 }
 
 function esc(value: string): string {
   return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
-}
-
-function escHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 /** Group findings by version pair, returning label → findings entries. */
