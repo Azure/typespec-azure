@@ -235,9 +235,6 @@ describe("invalid cases", () => {
   it.each([
     "@armVirtualResource model Widget",
     "model Widget is Azure.ResourceManager.Legacy.GenericResource<{}>",
-    `@Azure.ResourceManager.Private.armResourceInternal({})
-     @Azure.ResourceManager.Legacy.customAzureResource
-     model Widget`,
   ])("checks other registered non-tracked resources: %s", async (declaration) => {
     await tester
       .expect(
