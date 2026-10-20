@@ -10,20 +10,53 @@ import type {
   Operation,
 } from "@typespec/compiler";
 
+/**
+ * Options for customizing the behavior of a custom azure resource
+ */
 export interface CustomResourceOptions {
+  /**
+   * Should the resource be marked as an Azure resource
+   */
   readonly isAzureResource?: boolean;
 }
 
+/**
+ * Route options for an operation
+ */
 export interface ArmOperationOptions {
+  /**
+   * Should a static route be used
+   */
   readonly useStaticRoute?: boolean;
+  /**
+   * The status route for operations to use
+   */
   readonly route?: string;
 }
 
+/**
+ * Options for defining a feature and the associated file
+ */
 export interface ArmFeatureOptions {
+  /**
+   * The feature name
+   */
   readonly featureName: string;
+  /**
+   * The associated file name for the features
+   */
   readonly fileName: string;
+  /**
+   * The feature description in Swagger
+   */
   readonly description: string;
+  /**
+   * The feature title in Swagger
+   */
   readonly title?: string;
+  /**
+   * The feature terms of service in Swagger
+   */
   readonly termsOfService?: string;
 }
 

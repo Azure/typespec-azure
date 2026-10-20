@@ -42,6 +42,7 @@ import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
@@ -53,6 +54,7 @@ import { useInterfaceRule } from "./rules/use-interface.js";
 import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -103,6 +105,7 @@ const rules = [
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   resourceNameRule,
+  resourceMissingReadRule,
   retryAfterRule,
   unsupportedTypeRule,
   useModelRequestBodyRule,
@@ -111,6 +114,7 @@ const rules = [
   noReservedResourcePropertyRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
+  useResourcePathForPutRule,
 ];
 
 export const $linter = defineLinter({

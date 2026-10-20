@@ -253,9 +253,7 @@ export async function createSdkContext<
     }
   }
   sdkContext.sdkPackage = diagnostics.pipe(await createSdkPackage(sdkContext));
-  for (const client of sdkContext.sdkPackage.clients) {
-    diagnostics.pipe(await handleClientExamples(sdkContext, client));
-  }
+  diagnostics.pipe(await handleClientExamples(sdkContext, sdkContext.sdkPackage.clients));
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   // Validate duplicate operation names in clients (e.g., from multi-service merge or sub-client merge).
