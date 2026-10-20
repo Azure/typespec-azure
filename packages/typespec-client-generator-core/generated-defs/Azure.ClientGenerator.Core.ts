@@ -14,27 +14,24 @@ import type {
   Union,
 } from "@typespec/compiler";
 
-/**
- * Common typed options bag for the `scope` argument accepted by scoped TCGC decorators.
- *
- * Every scoped decorator's own options model can extend this base so new, decorator-specific
- * settings can be added over time without breaking the legacy plain-string scope argument.
- *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language
- * emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
- *
- * **Valid patterns for `scope`:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
- */
 export interface DecoratorOptions {
-  /**
-   * Specifies the target language emitters that a decorator should apply to. If not set, the
-   * decorator applies to all language emitters by default.
-   */
   readonly scope?: string;
 }
+
+/**
+ * Exposes an auxiliary status-monitor model property as typed SDK operation metadata. The property
+ * does not affect polling, status evaluation, errors, or final-result extraction and may only be
+ * available from the terminal response. Emitters expose it through their idiomatic operation or
+ * poller state.
+ *
+ * @param target The status-monitor model property.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
@@ -1154,6 +1151,7 @@ export type ClientOptionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
+  lroStatusMetadata: LroStatusMetadataDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;

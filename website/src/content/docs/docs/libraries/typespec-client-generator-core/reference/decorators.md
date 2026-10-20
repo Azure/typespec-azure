@@ -853,6 +853,28 @@ model MyModel {
 }
 ```
 
+### `@lroStatusMetadata` {#@Azure.ClientGenerator.Core.lroStatusMetadata}
+
+Exposes an auxiliary status-monitor model property as typed SDK operation metadata. The property
+does not affect polling, status evaluation, errors, or final-result extraction and may only be
+available from the terminal response. Emitters expose it through their idiomatic operation or
+poller state.
+
+```typespec
+@Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The status-monitor model property.
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Define the sub client generated in the client SDK.
