@@ -9,18 +9,27 @@ const source = `
   op read(@path parentName: string, @path bindingName: string): void;
 `;
 
-it("uses the compiler-provided all ruleset", () => {
-  expect($linter.ruleSets?.all).toBeUndefined();
-  expect($linter.rules.some((rule) => rule.name === "use-scope-for-extension-routing")).toBe(true);
+it("keeps only RPaaS-specific routing outside the general ARM all ruleset", () => {
+  for (const rule of $linter.rules) {
+    expect(
+      $linter.ruleSets?.all.enable?.[`@azure-tools/typespec-azure-resource-manager/${rule.name}`],
+    ).toBe(rule.name !== "use-scope-for-extension-routing");
+  }
 });
 
-it("enables extension routing through ARM all", async () => {
-  const [, diagnostics] = await Tester.compileAndDiagnose(source, {
-    compilerOptions: {
-      linterRuleSet: {
-        extends: ["@azure-tools/typespec-azure-resource-manager/all"],
+it.each([false, true])(
+  "selects RPaaS routing explicitly rather than through ARM all: %s",
+  async (explicitlyEnabled) => {
+    const [, diagnostics] = await Tester.compileAndDiagnose(source, {
+      compilerOptions: {
+        linterRuleSet: {
+          extends: ["@azure-tools/typespec-azure-resource-manager/all"],
+          enable: explicitlyEnabled ? { [code]: true } : {},
+        },
       },
-    },
-  });
-  expect(diagnostics.filter((diagnostic) => diagnostic.code === code)).toHaveLength(1);
-});
+    });
+    expect(diagnostics.filter((diagnostic) => diagnostic.code === code)).toHaveLength(
+      explicitlyEnabled ? 1 : 0,
+    );
+  },
+);

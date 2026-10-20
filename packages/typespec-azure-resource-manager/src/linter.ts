@@ -119,4 +119,14 @@ const rules = [
 
 export const $linter = defineLinter({
   rules,
+  ruleSets: {
+    all: {
+      enable: Object.fromEntries(
+        rules.map((rule) => [
+          `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+          rule !== useScopeForExtensionRoutingRule,
+        ]),
+      ),
+    },
+  },
 });

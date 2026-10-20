@@ -10,6 +10,8 @@ It checks the supplied program, not a selected API-version projection.
 This is **not a general ARM path restriction**. Specific-parent extension paths
 are supported ordinary ARM endpoints. This guidance applies to contracts intended
 for RPaaS extension routing; it does not identify a service's deployment audience.
+Managed RPaaS configurations select this rule explicitly. The general ARM `all`
+and Azure resource-manager rulesets do not enable this RPaaS-specific policy.
 
 ## Impact
 
