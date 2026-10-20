@@ -25,6 +25,17 @@ model DecoratorOptions {
 }
 
 /**
+ * Exposes an auxiliary status-monitor model property as typed SDK operation metadata. The property
+ * does not affect polling, status evaluation, errors, or final-result extraction and may only be
+ * available from the terminal response. Emitters expose it through their idiomatic operation or
+ * poller state.
+ *
+ * @param target The status-monitor model property.
+ * @param scope Specifies the target language emitters.
+ */
+extern dec lroStatusMetadata(target: ModelProperty, scope?: valueof DecoratorOptions | string);
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *

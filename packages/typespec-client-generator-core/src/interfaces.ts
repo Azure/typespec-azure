@@ -1214,6 +1214,19 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * Auxiliary status-monitor properties marked with `@lroStatusMetadata`, in deterministic
+   * direct-then-inherited model/property order.
+   */
+  statusMetadata?: SdkLroStatusMetadata[];
+}
+
+export interface SdkLroStatusMetadata {
+  /**
+   * Exact effective property from `pollingInfo.responseModel`. The value is auxiliary operation
+   * state, not the LRO status, error, logical result, or a polling/final location.
+   */
+  property: SdkModelPropertyType;
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {

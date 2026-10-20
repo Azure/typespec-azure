@@ -1268,6 +1268,24 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/analyzers/{analyzerId}:analyze`
+
+Declares a Content Understanding-shaped flow for emitter tests of property-level
+`@lroStatusMetadata`.
+
+The optional `usage` value is a typed nested model with optional numeric fields and a token
+dictionary. The standard status-monitor `id` remains part of the response model and is not
+selected as auxiliary status metadata. Emitter-specific client tests can assert the generated
+public usage type and runtime value.
+
+Expected calls:
+
+- POST `/analyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+- GET the status-monitor URI returns a running status with nested `usage`
+- GET the status-monitor URI returns a succeeded status with nested `usage` and the result
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`

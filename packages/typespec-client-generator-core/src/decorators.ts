@@ -27,6 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getAuthentication,
   getHttpOperation,
@@ -49,6 +50,7 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -88,6 +90,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -103,6 +106,36 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+interface ScopedLroDecorator {
+  scope?: string;
+  target: DiagnosticTarget;
+}
+
+const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
+const [getLroStatusMetadataEntries, setLroStatusMetadataEntries] = useStateMap<
+  ModelProperty,
+  ScopedLroDecorator[]
+>(lroStatusMetadataKey);
+
+export const $lroStatusMetadata: LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries = getLroStatusMetadataEntries(context.program, target) ?? [];
+  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
+  setLroStatusMetadataEntries(context.program, target, entries);
+};
+
+export function getLroStatusMetadataDecorators(
+  context: TCGCContext,
+  target: ModelProperty,
+): ScopedLroDecorator[] {
+  return (getLroStatusMetadataEntries(context.program, target) ?? []).filter(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
 
 /**
  * The set of emitters a scope string effectively selects.
