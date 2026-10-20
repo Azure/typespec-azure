@@ -11,14 +11,14 @@ using Azure.Core.Traits.Private;
 
 namespace Azure.Core;
 
-/** Additional token-request semantics for an existing OAuth authentication model. */
+/** Shared service token-request semantics, independent of native SDK API shape. */
 union AzureTokenAuthenticationOptions {
   /** Derive an Entra scope by appending `/.default` to the selected resource. */
   entraDefaultScope: {
     /** The token-request profile. */
     kind: "entraDefaultScope",
 
-    /** The name of the default member in the audience enum or union. */
+    /** The name of the default member in the known-audience enum. */
     defaultAudience: string,
   },
 
@@ -32,9 +32,9 @@ union AzureTokenAuthenticationOptions {
   },
 }
 
-/** An optional endpoint default bound to a member of the same audience family. */
+/** Shared cloud data binding an optional endpoint default to a declared audience resource. */
 model AzureServiceEnvironment {
-  /** A member name from the authentication model's audience enum or union. */
+  /** A member name from the authentication model's known-audience enum. */
   audience: string;
 
   /** An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. */

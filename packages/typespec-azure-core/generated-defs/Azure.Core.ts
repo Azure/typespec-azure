@@ -56,7 +56,9 @@ export type PollingLocationDecorator = (
 /**
  * Adds audience selection or named challenge semantics to an existing OAuth authentication model.
  *
- * An Entra audience is a string enum or union of resource values; a union's `string` branch permits custom resources. Open and closed families use the same resource-to-scope binding and may have optional endpoint defaults through `@azureServiceEnvironments`.
+ * An Entra audience enum lists known resource values. Use the same enum for every language; it does not restrict custom audience input or prescribe a native SDK enum.
+ *
+ * Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Optional endpoint defaults use `@azureServiceEnvironments` with the same resource-to-scope binding.
  *
  * Every OAuth flow must already use the scope derived from the named default member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
  *
@@ -64,7 +66,7 @@ export type PollingLocationDecorator = (
  *
  * @param target The OAuth authentication model.
  * @param profile The Entra default-scope or named challenge profile.
- * @param audienceType The resource-valued enum or union for an Entra profile.
+ * @param audienceType The enum of known resource values for an Entra profile.
  */
 export type AzureTokenAuthenticationDecorator = (
   context: DecoratorContext,
@@ -78,13 +80,13 @@ export type AzureTokenAuthenticationDecorator = (
         readonly kind: "challengeBased";
         readonly challengeContract: string;
       },
-  audienceType?: Type,
+  audienceType?: Enum,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
  * Adds optional endpoint defaults to the same Entra audience-selection profile.
  *
- * Environments reference audience member names, not duplicate resource values, and work with either open or closed audience families.
+ * Environments reference audience member names, not duplicate resource values. They declare shared cloud data, not a required native SDK cloud or options API.
  *
  * An explicit client endpoint overrides an environment endpoint without changing its audience. When no endpoint default is declared, ordinary service endpoint configuration applies; an audience resource does not identify a service instance.
  *

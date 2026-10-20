@@ -4,7 +4,6 @@ import {
   type Model,
   type Namespace,
   type Program,
-  type Union,
   isTemplateDeclaration,
   typespecTypeToJson,
   validateDecoratorUniqueOnNode,
@@ -14,16 +13,14 @@ import type {
   AzureServiceEnvironmentsDecorator,
   AzureTokenAuthenticationDecorator,
 } from "../../generated-defs/Azure.Core.js";
-import { getUnionAsEnum } from "../helpers/union-enums.js";
 import { AzureCoreStateKeys, reportDiagnostic } from "../lib.js";
 
-/** An open or closed family of Entra resources, independent of HTTP endpoints. */
+/** Known Entra resources, independent of native audience API shape, custom input, or endpoints. */
 export interface AzureAuthenticationAudience {
-  type: Enum | Union;
+  type: Enum;
   defaultAudienceName: string;
   defaultAudience: string;
   knownAudiences: Record<string, string>;
-  allowCustomAudience: boolean;
 }
 
 /** Additional semantics for an existing OAuth authentication model. */
@@ -53,7 +50,7 @@ export interface AzureServiceEnvironments {
 
 interface TokenDeclaration {
   profile: Parameters<AzureTokenAuthenticationDecorator>[2];
-  audienceType?: Enum | Union;
+  audienceType?: Enum;
   validated?: boolean;
   metadata?: AzureTokenAuthentication;
 }
@@ -82,10 +79,6 @@ export const $azureTokenAuthentication: AzureTokenAuthenticationDecorator = (
   audienceType,
 ) => {
   if (!validateDecoratorUniqueOnNode(context, target, $azureTokenAuthentication)) return;
-  if (audienceType && audienceType.kind !== "Enum" && audienceType.kind !== "Union") {
-    invalid(context.program, target, "The audience type must be a string enum or union.");
-    return;
-  }
   setTokenDeclaration(context.program, target, { profile, audienceType });
 };
 
@@ -121,6 +114,14 @@ export function getAzureTokenAuthentication(
     declaration.metadata = validateTokenAuthentication(program, authentication, declaration);
   }
   return declaration.metadata;
+}
+
+export function isAzureAuthenticationAudience(program: Program, type: Enum): boolean {
+  return [...getTokenDeclarations(program)].some(
+    ([authentication, declaration]) =>
+      declaration.audienceType === type &&
+      getAzureTokenAuthentication(program, authentication)?.kind === "entraDefaultScope",
+  );
 }
 
 /** Gets the nearest optional endpoint bindings for the specified audience profile. */
@@ -167,7 +168,7 @@ export function validateAzureAuthentication(program: Program): void {
 
 function invalid(
   program: Program,
-  target: Model | Namespace | Interface | Enum | Union,
+  target: Model | Namespace | Interface | Enum,
   reason: string,
 ): undefined {
   reportDiagnostic(program, {
@@ -219,7 +220,7 @@ function validateTokenAuthentication(
       return invalid(
         program,
         authentication,
-        "Only an Entra default-scope profile accepts an audience type.",
+        "Only an Entra default-scope profile accepts an audience enum.",
       );
     }
     if (!profile.challengeContract.trim()) {
@@ -235,7 +236,7 @@ function validateTokenAuthentication(
     return invalid(
       program,
       authentication,
-      "An Entra default-scope profile requires an audience type.",
+      "An Entra default-scope profile requires an audience enum.",
     );
   }
   const audience = getAudience(program, audienceType, profile.defaultAudience);
@@ -253,38 +254,25 @@ function validateTokenAuthentication(
 
 function getAudience(
   program: Program,
-  type: Enum | Union,
+  type: Enum,
   defaultAudienceName: string,
 ): AzureAuthenticationAudience | undefined {
-  let members: [string | symbol, string][];
-  let allowCustomAudience = false;
-  if (type.kind === "Enum") {
-    members = [];
-    for (const member of type.members.values()) {
-      const value = member.value ?? member.name;
-      if (typeof value !== "string") {
-        return invalid(program, type, "Audience members must be string resources.");
-      }
-      members.push([member.name, value]);
+  const members: [string, string][] = [];
+  for (const member of type.members.values()) {
+    const value = member.value ?? member.name;
+    if (typeof value !== "string") {
+      return invalid(program, type, "Audience members must be string resources.");
     }
-  } else {
-    const [union, diagnostics] = getUnionAsEnum(type);
-    if (!union || diagnostics.length > 0 || union.kind !== "string" || union.nullable) {
-      return invalid(program, type, "An audience must be a non-nullable string enum or union.");
+    if (!value || value.trim() !== value) {
+      return invalid(
+        program,
+        type,
+        "Audience resources must be non-empty strings without surrounding whitespace.",
+      );
     }
-    members = [...union.flattenedMembers].map(([name, member]) => [name, member.value]);
-    allowCustomAudience = union.open;
+    members.push([member.name, value]);
   }
-  if (members.some(([, value]) => !value || value.trim() !== value)) {
-    return invalid(
-      program,
-      type,
-      "Audience resources must be non-empty strings without surrounding whitespace.",
-    );
-  }
-  const knownAudiences = Object.fromEntries(
-    members.filter((entry): entry is [string, string] => typeof entry[0] === "string"),
-  );
+  const knownAudiences = Object.fromEntries(members);
   if (!Object.hasOwn(knownAudiences, defaultAudienceName)) {
     return invalid(
       program,
@@ -297,7 +285,6 @@ function getAudience(
     defaultAudienceName,
     defaultAudience: knownAudiences[defaultAudienceName],
     knownAudiences,
-    allowCustomAudience,
   };
 }
 

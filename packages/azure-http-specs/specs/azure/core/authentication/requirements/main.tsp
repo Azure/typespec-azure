@@ -11,9 +11,8 @@ using global.Azure.Core;
 @useAuth([ServiceAuth, ApiKeyAuth<ApiKeyLocation.header, "api-key">] | NoAuth)
 namespace _Specs_.Azure.Core.Authentication.Requirements;
 
-union ResourceAudience {
+enum ResourceAudience {
   Public: "https://service.azure.com",
-  string,
 }
 
 @azureTokenAuthentication(

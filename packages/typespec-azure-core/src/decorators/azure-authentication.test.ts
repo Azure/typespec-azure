@@ -7,10 +7,9 @@ import {
 } from "./azure-authentication.js";
 
 const audience = `
-  union Audience {
+  enum Audience {
     Government: "https://search.azure.us",
     Public: "https://search.azure.com",
-    string,
   }
 `;
 const authentication = `
@@ -22,10 +21,9 @@ const authentication = `
 describe("Azure token authentication", () => {
   it("uses a named default rather than declaration order and preserves OAuth flow defaults", async () => {
     const { program, Auth, Audience } = await Tester.compile(t.code`
-      union ${t.union("Audience")} {
+      enum ${t.enum("Audience")} {
         Government: "https://search.azure.us",
         Public: "https://search.azure.com",
-        string,
       }
       @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
       model ${t.model("Auth")} is OAuth2Auth<[
@@ -50,13 +48,12 @@ describe("Azure token authentication", () => {
           Government: "https://search.azure.us",
           Public: "https://search.azure.com",
         },
-        allowCustomAudience: true,
       },
       defaultScopes: ["https://search.azure.com/.default"],
     });
   });
 
-  it("keeps a closed enum's trailing slash when deriving its scope", async () => {
+  it("keeps a resource's trailing slash when deriving its scope", async () => {
     const { program, Auth } = await Tester.compile(t.code`
       enum Audience { Public: "https://monitor.azure.com/" }
       @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
@@ -66,7 +63,6 @@ describe("Azure token authentication", () => {
       kind: "entraDefaultScope",
       audience: {
         defaultAudience: "https://monitor.azure.com/",
-        allowCustomAudience: false,
       },
       defaultScopes: ["https://monitor.azure.com//.default"],
     });
@@ -104,6 +100,31 @@ describe("Azure token authentication", () => {
 
   it.each([
     {
+      name: "an open union",
+      declaration: 'union Audience { Public: "https://search.azure.com", string }',
+    },
+    {
+      name: "a closed union",
+      declaration: 'union Audience { Public: "https://search.azure.com" }',
+    },
+    {
+      name: "a nullable union",
+      declaration: 'union Audience { Public: "https://search.azure.com", null }',
+    },
+    { name: "a model", declaration: "model Audience {}" },
+  ])("rejects $name as the audience catalog", async ({ declaration }) => {
+    expectDiagnostics(
+      await Tester.diagnose(`
+        ${declaration}
+        @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
+        model Auth is AadOauth2Auth<["https://search.azure.com/.default"]>;
+      `),
+      { code: "invalid-argument" },
+    );
+  });
+
+  it.each([
+    {
       name: "an unknown default member",
       code: `${audience}
         @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Missing"}, Audience)
@@ -111,19 +132,11 @@ describe("Azure token authentication", () => {
       message: "The default audience 'Missing' must name an audience member.",
     },
     {
-      name: "a missing audience type",
+      name: "a missing audience enum",
       code: `
         @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"})
         model Auth is AadOauth2Auth<["https://search.azure.com/.default"]>;`,
-      message: "An Entra default-scope profile requires an audience type.",
-    },
-    {
-      name: "a model instead of an audience enum or union",
-      code: `
-        model Audience {}
-        @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
-        model Auth is AadOauth2Auth<["https://search.azure.com/.default"]>;`,
-      message: "The audience type must be a string enum or union.",
+      message: "An Entra default-scope profile requires an audience enum.",
     },
     {
       name: "a numeric audience",
@@ -134,12 +147,12 @@ describe("Azure token authentication", () => {
       message: "Audience members must be string resources.",
     },
     {
-      name: "a nullable audience",
+      name: "an empty resource",
       code: `
-        union Audience { Public: "https://search.azure.com", null }
+        enum Audience { Public: "" }
         @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
         model Auth is AadOauth2Auth<["https://search.azure.com/.default"]>;`,
-      message: "An audience must be a non-nullable string enum or union.",
+      message: "Audience resources must be non-empty strings without surrounding whitespace.",
     },
     {
       name: "a whitespace-padded resource",
@@ -205,7 +218,7 @@ describe("Azure token authentication", () => {
       code: `${audience}
         @azureTokenAuthentication(#{kind: "challengeBased", challengeContract: "azure.keyVaultChallenge/v1"}, Audience)
         model Auth is AadOauth2Auth<[]>;`,
-      message: "Only an Entra default-scope profile accepts an audience type.",
+      message: "Only an Entra default-scope profile accepts an audience enum.",
     },
   ])("rejects $name", async ({ code, message }) => {
     expectDiagnostics(await Tester.diagnose(code), {
@@ -216,50 +229,45 @@ describe("Azure token authentication", () => {
 });
 
 describe("Azure service environments", () => {
-  it.each(["open", "closed"])(
-    "adds optional endpoint defaults to the same %s audience profile",
-    async (family) => {
-      const { program, Auth, Service } = await Tester.compile(t.code`
-        ${family === "open" ? "union" : "enum"} Audience {
-          Government: "https://search.azure.us",
-          Public: "https://search.azure.com",
-          ${family === "open" ? "string," : ""}
+  it("binds optional endpoint defaults to known audience enum members", async () => {
+    const { program, Auth, Service } = await Tester.compile(t.code`
+        enum Audience {
+          Government: "https://government.example.com",
+          Public: "https://service.example.com",
         }
         @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
-        model ${t.model("Auth")} is AadOauth2Auth<["https://search.azure.com/.default"]>;
+        model ${t.model("Auth")} is AadOauth2Auth<["https://service.example.com/.default"]>;
         @azureServiceEnvironments(Auth, #{
           Public: #{audience: "Public"},
-          Government: #{audience: "Government", defaultEndpoint: "https://instance.search.azure.us"}
+          Government: #{audience: "Government", defaultEndpoint: "https://government.example.com/api"}
         }, "Public")
         namespace ${t.namespace("Service")} {}
       `);
-      expect(getAzureTokenAuthentication(program, Auth)).toMatchObject({
-        kind: "entraDefaultScope",
-        audience: {
-          defaultAudienceName: "Public",
-          defaultAudience: "https://search.azure.com",
-          allowCustomAudience: family === "open",
+    expect(getAzureTokenAuthentication(program, Auth)).toMatchObject({
+      kind: "entraDefaultScope",
+      audience: {
+        defaultAudienceName: "Public",
+        defaultAudience: "https://service.example.com",
+      },
+      defaultScopes: ["https://service.example.com/.default"],
+    });
+    expect(getAzureServiceEnvironments(program, Service, Auth)).toEqual({
+      environments: [
+        {
+          name: "Public",
+          audienceName: "Public",
+          audience: "https://service.example.com",
         },
-        defaultScopes: ["https://search.azure.com/.default"],
-      });
-      expect(getAzureServiceEnvironments(program, Service, Auth)).toEqual({
-        environments: [
-          {
-            name: "Public",
-            audienceName: "Public",
-            audience: "https://search.azure.com",
-          },
-          {
-            name: "Government",
-            audienceName: "Government",
-            audience: "https://search.azure.us",
-            defaultEndpoint: "https://instance.search.azure.us",
-          },
-        ],
-        defaultEnvironment: "Public",
-      });
-    },
-  );
+        {
+          name: "Government",
+          audienceName: "Government",
+          audience: "https://government.example.com",
+          defaultEndpoint: "https://government.example.com/api",
+        },
+      ],
+      defaultEnvironment: "Public",
+    });
+  });
 
   it("inherits deployment data and allows a more specific declaration", async () => {
     const { program, Auth, Service, Operations } = await Tester.compile(t.code`

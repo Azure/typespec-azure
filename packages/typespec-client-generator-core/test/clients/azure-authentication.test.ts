@@ -3,10 +3,10 @@ import { type SdkClientType, UsageFlags } from "../../src/interfaces.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const definitions = `
-  union ResourceAudience {
+  enum ResourceAudience {
     Government: "https://search.azure.us",
     Public: "https://search.azure.com",
-    string,
+    China: "https://search.azure.cn",
   }
   @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
   model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
@@ -20,27 +20,21 @@ function getCredential(client: SdkClientType) {
   return credential;
 }
 
-it.each([
-  { family: "open", endpointDefaults: false },
-  { family: "open", endpointDefaults: true },
-  { family: "closed", endpointDefaults: false },
-  { family: "closed", endpointDefaults: true },
-])(
-  "keeps $family audiences independent of endpoint configuration with defaults: $endpointDefaults",
-  async ({ family, endpointDefaults }) => {
+it.each([false, true])(
+  "projects a known-resource enum independently of endpoint defaults: %s",
+  async (endpointDefaults) => {
     const { program } = await AzureCoreTester.compile(`
-      ${family === "open" ? "union" : "enum"} ResourceAudience {
-        Government: "https://search.azure.us",
-        Public: "https://search.azure.com",
-        ${family === "open" ? "string," : ""}
+      enum ResourceAudience {
+        Government: "https://government.example.com",
+        Public: "https://service.example.com",
       }
       @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
-      model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
+      model ResourceAuth is AadOauth2Auth<["https://service.example.com/.default"]>;
       ${
         endpointDefaults
           ? `@azureServiceEnvironments(ResourceAuth, #{
-              Public: #{audience: "Public", defaultEndpoint: "https://instance.search.windows.net"},
-              Government: #{audience: "Government", defaultEndpoint: "https://instance.search.azure.us"}
+              Public: #{audience: "Public", defaultEndpoint: "https://service.example.com/api"},
+              Government: #{audience: "Government", defaultEndpoint: "https://government.example.com/api"}
             }, "Public")`
           : ""
       }
@@ -55,23 +49,22 @@ it.each([
     if (credential.type.kind !== "credential") throw new Error("Missing credential type");
     const metadata = credential.type.azureAuthentication;
     if (metadata?.profile.kind !== "entraDefaultScope") throw new Error("Missing Entra profile");
-    expect(metadata.profile.audience.allowCustomAudience).toBe(family === "open");
-    expect(metadata.profile.audience.type.isFixed).toBe(family === "closed");
-    expect(metadata.profile.defaultScopes).toEqual(["https://search.azure.com/.default"]);
+    expect(metadata.profile.audience.type.isFixed).toBe(true);
+    expect(metadata.profile.defaultScopes).toEqual(["https://service.example.com/.default"]);
     expect(metadata.environments).toEqual(
       endpointDefaults
         ? [
             {
               name: "Public",
               audienceName: "Public",
-              audience: "https://search.azure.com",
-              defaultEndpoint: "https://instance.search.windows.net",
+              audience: "https://service.example.com",
+              defaultEndpoint: "https://service.example.com/api",
             },
             {
               name: "Government",
               audienceName: "Government",
-              audience: "https://search.azure.us",
-              defaultEndpoint: "https://instance.search.azure.us",
+              audience: "https://government.example.com",
+              defaultEndpoint: "https://government.example.com/api",
             },
           ]
         : [],
@@ -89,17 +82,14 @@ it.each([
 );
 
 it.each(["python", "csharp", "java", "go", "ts"])(
-  "projects typed audiences onto the exact OAuth alternative for %s",
+  "projects one shared known-audience enum onto the exact OAuth alternative for %s",
   async (language) => {
     const { program } = await AzureCoreTester.compile(`
     ${definitions}
     @@clientName(ResourceAudience, "CloudAudience");
     @@clientName(ResourceAudience.Public, "AzurePublic");
     model OtherAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
-    @azureServiceEnvironments(ResourceAuth, #{
-      Public: #{audience: "Public", defaultEndpoint: "https://instance.search.windows.net"},
-      Government: #{audience: "Government"}
-    }, "Public")
+    @server("{endpoint}", "Service instance endpoint", {endpoint: url})
     @useAuth(ResourceAuth | OtherAuth | ApiKeyAuth<ApiKeyLocation.header, "api-key"> | NoAuth)
     @service namespace Search { @get op read(): void; }
   `);
@@ -118,29 +108,34 @@ it.each(["python", "csharp", "java", "go", "ts"])(
     expect(metadata.profile.audience).toMatchObject({
       defaultAudienceName: "Public",
       defaultAudience: "https://search.azure.com",
-      allowCustomAudience: true,
+      knownAudiences: {
+        Government: "https://search.azure.us",
+        Public: "https://search.azure.com",
+        China: "https://search.azure.cn",
+      },
     });
     expect(metadata.profile.defaultScopes).toEqual(["https://search.azure.com/.default"]);
     const audience = metadata.profile.audience.type;
     expect(audience.name).toBe("CloudAudience");
-    expect(audience.values.map((value) => value.name)).toEqual(["Government", "AzurePublic"]);
-    expect(audience.isFixed).toBe(false);
+    expect(audience.values.map((value) => value.name)).toEqual([
+      "Government",
+      "AzurePublic",
+      "China",
+    ]);
+    expect(audience.isFixed).toBe(true);
+    expect(metadata.profile.audience).not.toHaveProperty("allowCustomAudience");
     expect(audience.usage & UsageFlags.Input).toBeTruthy();
     expect(context.sdkPackage.enums).toContain(audience);
-    expect(metadata.environments).toEqual([
-      {
-        name: "Public",
-        audienceName: "Public",
-        audience: "https://search.azure.com",
-        defaultEndpoint: "https://instance.search.windows.net",
-      },
-      {
-        name: "Government",
-        audienceName: "Government",
-        audience: "https://search.azure.us",
-      },
+    expect(metadata.environments).toEqual([]);
+    expect(metadata.defaultEnvironment).toBeUndefined();
+    const endpoint = client.clientInitialization.parameters.find(
+      (parameter) => parameter.kind === "endpoint",
+    );
+    if (endpoint?.type.kind !== "endpoint") throw new Error("Missing service instance endpoint");
+    expect(endpoint.type.serverUrl).toBe("{endpoint}");
+    expect(endpoint.type.templateArguments).toMatchObject([
+      { name: "endpoint", optional: false, clientDefaultValue: undefined },
     ]);
-    expect(metadata.defaultEnvironment).toBe("Public");
     expect(types.slice(1).every((type) => type.azureAuthentication === undefined)).toBe(true);
     expect(
       client.authentication?.options.map((option) => option.schemes.map((scheme) => scheme.type)),
@@ -233,7 +228,7 @@ it("keeps ordinary multi-flow scopes unchanged and carries only the named challe
   });
 });
 
-it("projects closed audience enums without normalizing resource slashes", async () => {
+it("projects known audience enums without normalizing resource slashes", async () => {
   const { program } = await AzureCoreTester.compile(`
     enum ResourceAudience { Public: "https://monitor.azure.com/" }
     @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
@@ -247,7 +242,6 @@ it("projects closed audience enums without normalizing resource slashes", async 
   if (credential.type.kind !== "credential") throw new Error("Missing credential type");
   const profile = credential.type.azureAuthentication?.profile;
   if (profile?.kind !== "entraDefaultScope") throw new Error("Missing Entra profile");
-  expect(profile.audience.allowCustomAudience).toBe(false);
   expect(profile.audience.type.isFixed).toBe(true);
   expect(profile.audience.type.values.map((value) => value.value)).toEqual([
     "https://monitor.azure.com/",
@@ -419,19 +413,19 @@ it("validates environment associations on sub-clients", async () => {
 
 it("reports unsupported audience projection instead of silently dropping its metadata", async () => {
   const { program } = await AzureCoreTester.compile(`
-    union BaseAudience { Public: "https://search.azure.com" }
-    union ResourceAudience { BaseAudience, string }
+    enum ResourceAudience { Public: "https://search.azure.com" }
+    @@alternateType(ResourceAudience, string);
     @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
     model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
     @useAuth(ResourceAuth)
     @service namespace Service { @get op read(): void; }
   `);
-  const context = await createSdkContextForTester(program, {}, { flattenUnionAsEnum: false });
+  const context = await createSdkContextForTester(program);
   expect(context.diagnostics).toEqual([
     expect.objectContaining({
       code: "@azure-tools/typespec-client-generator-core/azure-authentication-invalid",
       message:
-        "Cannot project Azure authentication: The audience family must project to an SDK enum; nested audience unions require union-as-enum flattening.",
+        "Cannot project Azure authentication: The known-audience enum must project to an SDK enum.",
     }),
   ]);
 });
@@ -443,11 +437,10 @@ it.each(["1", "2"])(
     @versioned(AuthDefinitions.Versions)
     namespace AuthDefinitions {
       enum Versions { v1: "1", v2: "2" }
-      union ResourceAudience {
+      enum ResourceAudience {
         @added(Versions.v2)
         Government: "https://search.azure.us",
         Public: "https://search.azure.com",
-        string,
       }
       @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
       model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;

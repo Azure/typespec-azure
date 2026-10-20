@@ -1393,8 +1393,7 @@ function getSdkAzureAuthentication(
         code: "azure-authentication-invalid",
         target: profile.audience.type,
         format: {
-          reason:
-            "The audience family must project to an SDK enum; nested audience unions require union-as-enum flattening.",
+          reason: "The known-audience enum must project to an SDK enum.",
         },
       }),
     );

@@ -623,8 +623,9 @@ export interface SdkCredentialType extends SdkTypeBase {
   azureAuthentication?: SdkAzureAuthentication;
 }
 
-/** An open or closed Entra resource family, independent of endpoint defaults. */
+/** Known service resources, independent of native audience APIs, custom input, or endpoints. */
 export interface SdkAzureAuthenticationAudience extends Omit<AzureAuthenticationAudience, "type"> {
+  /** Known-value catalog; its fixed members do not constrain the native audience input type. */
   type: SdkEnumType;
 }
 

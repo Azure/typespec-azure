@@ -88,7 +88,7 @@ model Azure.Core.AzureApiKeyAuthentication
 
 ### `AzureServiceEnvironment` {#Azure.Core.AzureServiceEnvironment}
 
-An optional endpoint default bound to a member of the same audience family.
+Shared cloud data binding an optional endpoint default to a declared audience resource.
 
 ```typespec
 model Azure.Core.AzureServiceEnvironment
@@ -98,7 +98,7 @@ model Azure.Core.AzureServiceEnvironment
 
 | Name             | Type     | Description                                                                               |
 | ---------------- | -------- | ----------------------------------------------------------------------------------------- |
-| audience         | `string` | A member name from the authentication model's audience enum or union.                     |
+| audience         | `string` | A member name from the authentication model's known-audience enum.                        |
 | defaultEndpoint? | `string` | An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. |
 
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
@@ -498,7 +498,7 @@ union Azure.Core.ArmResourceDeploymentScope
 
 ### `AzureTokenAuthenticationOptions` {#Azure.Core.AzureTokenAuthenticationOptions}
 
-Additional token-request semantics for an existing OAuth authentication model.
+Shared service token-request semantics, independent of native SDK API shape.
 
 ```typespec
 union Azure.Core.AzureTokenAuthenticationOptions

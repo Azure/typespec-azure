@@ -6,4 +6,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add Azure OAuth audience selection with open or closed resource families and optional endpoint defaults, plus named challenge-contract metadata. Project these through TCGC without inferring service endpoints from audience resources, and add shared authentication Spector scenarios.
+Add enum-based known Azure OAuth resources, defaults, optional cloud endpoint bindings, and named challenge-contract metadata. Project the same service facts through TCGC for every language while leaving native audience APIs and input compatibility to emitters. Allow authentication resource catalogs in the no-enum rule, and add shared authentication Spector scenarios without inferring service endpoints from audience resources.

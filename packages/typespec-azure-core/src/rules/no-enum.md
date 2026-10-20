@@ -26,7 +26,7 @@ union PetKind {
 }
 ```
 
-Ok. Enum is allowed for versioning purposes.
+Enums are allowed for versioning purposes.
 
 ```tsp
 enum Version {
@@ -34,6 +34,8 @@ enum Version {
   2022_01_01: "2022-01-01",
 }
 ```
+
+Enums referenced by `@azureTokenAuthentication` are also allowed: they list known audience resources rather than define a closed API input. Language emitters choose the native audience API and custom-input behavior.
 
 ## Suppression
 
