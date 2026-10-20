@@ -172,6 +172,10 @@ Determine whether and how to emit x-ms-long-running-operation-options for lro re
 
 Determine whether and how to emit schemas for common-types rather than referencing them
 
+When an operation uses a shared common parameter from common-types, the emitted OpenAPI may reference that shared parameter definition instead of emitting a locally customized copy. This is expected: local augmentations on the parameter, such as a custom `pattern` or length constraint, should not be expected to appear automatically in generated Swagger or downstream documentation.
+
+If you need those constraints to be emitted, define and use a service-specific parameter instead of the shared common parameter. Use the shared common parameter only when its standard emitted shape is acceptable.
+
 ### `xml-strategy`
 
 **Type:** `"xml-service" | "none"`
