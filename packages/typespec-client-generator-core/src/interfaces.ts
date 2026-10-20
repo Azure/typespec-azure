@@ -1222,6 +1222,12 @@ export interface SdkLroServiceMetadata {
    * in continuation tokens; the next poll repopulates them after rehydration.
    */
   statusMetadata?: SdkLroStatusMetadata[];
+  /**
+   * Server-issued SDK long-running operation identifier selected from the linked status-monitor
+   * operation, when requested with `@lroOperationId`. This does not drive polling and is distinct
+   * from a caller-supplied `Operation-Id` API parameter.
+   */
+  operationId?: SdkLroOperationIdMetadata;
 }
 
 export interface SdkLroStatusMetadata {
@@ -1230,6 +1236,13 @@ export interface SdkLroStatusMetadata {
    * state, not the LRO status, error, logical result, or a polling/final location.
    */
   property: SdkModelPropertyType;
+}
+
+export interface SdkLroOperationIdMetadata {
+  /** Exact URI link from the status-monitor step. */
+  source: SdkOperationLink;
+  /** Exact path parameter selected from the linked status-monitor operation. */
+  pathParameter: SdkPathParameter;
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
@@ -1264,6 +1277,8 @@ export interface SdkNextOperationLink extends SdkLogicalOperationStep {
   kind: "nextOperationLink";
   responseModel: SdkModelType;
   target: SdkOperationLink;
+  /** Explicitly linked polling operation, when one was declared. */
+  operation?: SdkServiceOperation;
 }
 
 /**

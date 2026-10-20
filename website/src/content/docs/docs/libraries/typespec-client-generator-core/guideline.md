@@ -410,6 +410,40 @@ Separate `@lroStatusMetadata` declarations on one property may use disjoint emit
 
 Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
 
+#### Legacy URI-derived LRO operation identity
+
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service
+that returns a server-issued identifier only as part of its status-monitor URI:
+
+```typespec
+model OperationStatus {
+  status: OperationState;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains the exact `SdkOperationLink` used by the status monitor
+and the exact `SdkPathParameter` selected from the explicitly linked polling operation. It does not
+drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters bind the
+selected path parameter from the returned polling URI and choose an idiomatic accessor and runtime
+lifecycle. An LRO with only an opaque polling URI and no modeled polling operation cannot expose
+operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API,
+including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator.
+`@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is
+not a standard polling mechanism.
+
 ### HTTP Operation Parameters Handling
 
 The HTTP operation's parameters are inferred from TypeSpec HTTP lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different HTTP parameters are handled by specific logic based on the info from TypeSpec HTTP lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).

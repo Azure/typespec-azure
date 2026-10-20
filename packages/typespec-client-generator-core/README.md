@@ -146,6 +146,7 @@ Available ruleSets:
 - [`@clientOption`](#@clientoption)
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
+- [`@lroOperationId`](#@lrooperationid)
 - [`@lroStatusMetadata`](#@lrostatusmetadata)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
@@ -1000,6 +1001,29 @@ model MyModel {
   prop: stringlike;
 }
 ```
+
+#### `@lroOperationId`
+
+Identifies the status-monitor path parameter containing a server-issued long-running operation
+identifier for a legacy service that exposes the identifier only through the returned polling
+URI. This compatibility metadata does not drive polling and is distinct from a caller-supplied
+`Operation-Id` API parameter. Conforming services with modeled operation identity do not need
+this decorator. Emitters choose their idiomatic accessor and storage.
+
+```typespec
+@Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The operation identifier path parameter on the linked status-monitor operation.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
 
 #### `@lroStatusMetadata`
 

@@ -50,6 +50,7 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  LroOperationIdDecorator,
   LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -144,6 +145,42 @@ export function getLroStatusMetadataDecorator(
   target: ModelProperty,
 ): ScopedLroDecorator | undefined {
   return getLroStatusMetadataEntries(context.program, target)?.find(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+const [getLroOperationIdEntries, setLroOperationIdEntries, getLroOperationIdMap] = useStateMap<
+  ModelProperty,
+  ScopedLroDecorator[]
+>(lroOperationIdKey);
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries = getLroOperationIdEntries(context.program, target) ?? [];
+  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
+  setLroOperationIdEntries(context.program, target, entries);
+};
+
+export function validateLroDecoratorTargets(program: Program): void {
+  for (const [target, entries] of getLroOperationIdMap(program)) {
+    if (!isPathParam(program, target)) {
+      reportDiagnostic(program, {
+        code: "lro-operation-id-not-path",
+        target: entries[0].target,
+      });
+    }
+  }
+}
+
+export function getLroOperationIdDecorators(
+  context: TCGCContext,
+  target: ModelProperty,
+): ScopedLroDecorator[] {
+  return (getLroOperationIdEntries(context.program, target) ?? []).filter(
     (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
   );
 }
