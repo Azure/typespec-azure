@@ -46,6 +46,7 @@
     "specs:generate": "node --import tsx/esm test/harness/spec-dataset.ts",
     "specs:staging": "node --import tsx/esm test/harness/staging-validator-results.ts",
     "specs:typespec": "node --import tsx/esm test/harness/typespec-results.ts",
+    "coverage:native": "node --import tsx/esm test/harness/native-coverage.ts",
     "specs:coverage": "node --import tsx/esm test/harness/refresh-coverage.ts",
     "audit:coverage": "node --import tsx/esm test/harness/audit-coverage.ts",
     "audit:metadata": "node --import tsx/esm test/harness/audit-metadata.ts",

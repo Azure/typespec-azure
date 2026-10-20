@@ -413,11 +413,16 @@ export function keepOutputFileInsideEmitterDirectory(content: string): string {
   return content.replace(/(output-file:\s*["']?)(?:(?:\.\.\/)+|\{project-root\}\/)+(.*)/, "$1$2");
 }
 
-function buildTempConfig(project: ArmProject, outputDir: string, commonTypesDir: string): string {
+export function buildTempConfig(
+  project: ArmProject,
+  outputDir: string,
+  commonTypesDir: string,
+): string {
   let content = fs.readFileSync(project.tspConfigPath, "utf8");
   const yamlOutputDir = normalizeRelative(outputDir);
   content = updateAutorestOption(content, "emitter-output-dir", yamlOutputDir);
   content = updateAutorestOption(content, "arm-types-dir", normalizeRelative(commonTypesDir));
+  content = updateAutorestOption(content, "service-yaml", "never");
 
   // Keep every emitter output inside the dataset, even when a service normally
   // writes generated Swagger outside its TypeSpec project directory.
@@ -781,6 +786,12 @@ export function parseViolations(
   return violations;
 }
 
+export function getValidatorExtensionReference(specsRepo: string): string {
+  return pathToFileURL(
+    path.join(specsRepo, "node_modules", "@microsoft.azure", "openapi-validator") + path.sep,
+  ).href;
+}
+
 async function validateProject(
   config: Config,
   project: ArmProject,
@@ -801,12 +812,7 @@ async function validateProject(
     };
   }
 
-  const validatorDependency = path.join(
-    config.specsRepo,
-    "node_modules",
-    "@microsoft.azure",
-    "openapi-validator",
-  );
+  const validatorDependency = getValidatorExtensionReference(config.specsRepo);
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   const rawFiles: string[] = [];
   const violations: ValidatorViolation[] = [];

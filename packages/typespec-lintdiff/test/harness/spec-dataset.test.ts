@@ -1,6 +1,12 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   aggregateResults,
+  buildTempConfig,
+  getValidatorExtensionReference,
   keepOutputFileInsideEmitterDirectory,
   parseViolations,
   selectLatestApiVersion,
@@ -15,6 +21,34 @@ const project = {
 };
 
 describe("spec dataset results", () => {
+  it("disables source service metadata writes in the temporary emitter configuration", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "lintdiff-config-test-"));
+    try {
+      const config = path.join(directory, "tspconfig.yaml");
+      const original = 'emit: ["@azure-tools/typespec-autorest"]\n';
+      fs.writeFileSync(config, original);
+      const temporary = buildTempConfig(
+        { ...project, projectDir: directory, tspConfigPath: config },
+        path.join(directory, "swagger"),
+        path.join(directory, "common-types"),
+      );
+      expect(fs.readFileSync(temporary, "utf8")).toContain('service-yaml: "never"');
+      expect(fs.readFileSync(config, "utf8")).toBe(original);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("passes local validator paths as file URLs instead of package-name references", () => {
+    const root = path.resolve("specs with spaces");
+    const reference = getValidatorExtensionReference(root);
+    expect(reference).toMatch(/^file:\/\//);
+    expect(reference).toContain("specs%20with%20spaces");
+    expect(fileURLToPath(reference)).toBe(
+      path.join(root, "node_modules", "@microsoft.azure", "openapi-validator") + path.sep,
+    );
+  });
+
   it("keeps validator violations and ignores other AutoRest output", () => {
     const stdout = [
       JSON.stringify({ level: "information", message: "starting" }),
