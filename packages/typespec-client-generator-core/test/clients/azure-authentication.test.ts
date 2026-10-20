@@ -1,3 +1,4 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { expect, it } from "vitest";
 import { type SdkClientType, UsageFlags } from "../../src/interfaces.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
@@ -8,7 +9,7 @@ const definitions = `
     Public: "https://search.azure.com",
     China: "https://search.azure.cn",
   }
-  @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+  @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: ResourceAudience.Public})
   model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
 `;
 
@@ -21,6 +22,90 @@ function getCredential(client: SdkClientType) {
 }
 
 it.each([false, true])(
+  "validates non-default audience resources across merged services: conflict=%s",
+  async (conflict) => {
+    const [{ program }, diagnostics] = await AzureCoreTester.compileAndDiagnose(`
+      @service @useAuth(First.ResourceAuth)
+      namespace First {
+        ${definitions}
+        @get @route("/first") op readFirst(): void;
+      }
+      @service @useAuth(Second.ResourceAuth)
+      namespace Second {
+        ${conflict ? definitions.replace("https://search.azure.us", "https://other.example.com") : definitions}
+        @get @route("/second") op readSecond(): void;
+      }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    expectDiagnostics(
+      diagnostics,
+      conflict
+        ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
+        : [],
+    );
+    if (!conflict) {
+      const context = await createSdkContextForTester(program);
+      expect(context.diagnostics).toEqual([]);
+      expect(context.sdkPackage.clients).toHaveLength(1);
+      const credential = getCredential(context.sdkPackage.clients[0]);
+      expect(credential.type).toMatchObject({
+        kind: "credential",
+        azureAuthentication: {
+          profile: {
+            audience: { knownAudiences: { Government: "https://search.azure.us" } },
+          },
+        },
+      });
+    }
+  },
+);
+
+it.each([undefined, "azure.otherChallenge/v1"])(
+  "rejects merged services with missing or conflicting challenge metadata: %s",
+  async (contract) => {
+    const diagnostics = await AzureCoreTester.diagnose(`
+      @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.challengeBased, challengeContract: "azure.keyVaultChallenge/v1"})
+      model FirstAuth is AadOauth2Auth<[]>;
+      ${contract ? `@azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.challengeBased, challengeContract: "${contract}"})` : ""}
+      model SecondAuth is AadOauth2Auth<[]>;
+      @service @useAuth(FirstAuth)
+      namespace First { @get @route("/first") op readFirst(): void; }
+      @service @useAuth(SecondAuth)
+      namespace Second { @get @route("/second") op readSecond(): void; }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
+    ]);
+  },
+);
+
+it.each([false, true])(
+  "validates environment bindings across merged services sharing an auth model: conflict=%s",
+  async (conflict) => {
+    const diagnostics = await AzureCoreTester.diagnose(`
+      ${definitions}
+      @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://first.example.com"}}, "Public")
+      @service @useAuth(ResourceAuth)
+      namespace First { @get @route("/first") op readFirst(): void; }
+      @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://${conflict ? "second" : "first"}.example.com"}}, "Public")
+      @service @useAuth(ResourceAuth)
+      namespace Second { @get @route("/second") op readSecond(): void; }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    expectDiagnostics(
+      diagnostics,
+      conflict
+        ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
+        : [],
+    );
+  },
+);
+
+it.each([false, true])(
   "projects a known-resource enum independently of endpoint defaults: %s",
   async (endpointDefaults) => {
     const { program } = await AzureCoreTester.compile(`
@@ -28,13 +113,13 @@ it.each([false, true])(
         Government: "https://government.example.com",
         Public: "https://service.example.com",
       }
-      @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+      @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: ResourceAudience.Public})
       model ResourceAuth is AadOauth2Auth<["https://service.example.com/.default"]>;
       ${
         endpointDefaults
           ? `@azureServiceEnvironments(ResourceAuth, #{
-              Public: #{audience: "Public", defaultEndpoint: "https://service.example.com/api"},
-              Government: #{audience: "Government", defaultEndpoint: "https://government.example.com/api"}
+              Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://service.example.com/api"},
+              Government: #{audience: ResourceAudience.Government, defaultEndpoint: "https://government.example.com/api"}
             }, "Public")`
           : ""
       }
@@ -146,10 +231,10 @@ it.each(["python", "csharp", "java", "go", "ts"])(
 it("keeps environment data client-local when services share an authentication model", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
-    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://one.example.com"}}, "Public")
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://one.example.com"}}, "Public")
     @useAuth(ResourceAuth)
     @service namespace One { @get op read(): void; }
-    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://two.example.com"}}, "Public")
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://two.example.com"}}, "Public")
     @useAuth(ResourceAuth)
     @service namespace Two { @get op read(): void; }
   `);
@@ -166,11 +251,11 @@ it("keeps environment data client-local when services share an authentication mo
 it("inherits environments and supports an interface-local override", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
-    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://parent.example.com"}}, "Public")
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://parent.example.com"}}, "Public")
     @useAuth(ResourceAuth)
     @service namespace Service {
       @get op read(): void;
-      @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: "Public", defaultEndpoint: "https://private.example.com"}})
+      @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: ResourceAudience.Public, defaultEndpoint: "https://private.example.com"}})
       interface Operations { @get @route("/child") read(): void; }
     }
   `);
@@ -206,7 +291,7 @@ it("keeps ordinary multi-flow scopes unchanged and carries only the named challe
         scopes: ["write", "read"];
       }
     ]>;
-    @azureTokenAuthentication(#{kind: "challengeBased", challengeContract: "azure.keyVaultChallenge/v1"})
+    @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.challengeBased, challengeContract: "azure.keyVaultChallenge/v1"})
     model ChallengeAuth is AadOauth2Auth<[]>;
     @useAuth(ExplicitAuth | ChallengeAuth)
     @service namespace Service { @get op read(): void; }
@@ -231,7 +316,7 @@ it("keeps ordinary multi-flow scopes unchanged and carries only the named challe
 it("projects known audience enums without normalizing resource slashes", async () => {
   const { program } = await AzureCoreTester.compile(`
     enum ResourceAudience { Public: "https://monitor.azure.com/" }
-    @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+    @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: ResourceAudience.Public})
     model ResourceAuth is AadOauth2Auth<["https://monitor.azure.com//.default"]>;
     @useAuth(ResourceAuth)
     @service namespace Service { @get op read(): void; }
@@ -282,7 +367,7 @@ it("preserves OR-of-AND requirements, legacy credentials, and initialization ord
 it("finds service environments for a customized client outside the service namespace", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
-    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://service.example.com"}}, "Public")
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://service.example.com"}}, "Public")
     @useAuth(ResourceAuth)
     @service namespace Service { @get op read(): void; }
     @client({name: "Customized", service: Service})
@@ -312,14 +397,14 @@ it.each([
       ${definitions}
       ${
         serviceDefaults
-          ? '@azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://service.example.com"}}, "Public")'
+          ? '@azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://service.example.com"}}, "Public")'
           : ""
       }
       @useAuth(ResourceAuth)
       @service namespace Service {
         interface Operations { @get @route("/child") read(): void; }
       }
-      @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: "Public", defaultEndpoint: "https://custom.example.com"}}, "Private")
+      @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: ResourceAudience.Public, defaultEndpoint: "https://custom.example.com"}}, "Private")
       @client({name: "Customized", service: Service, autoMergeService: true})
       namespace Clients.Customized {}
       ${kind === "virtual" ? '@@clientLocation(Service.Operations.read, "Moved");' : ""}
@@ -344,13 +429,13 @@ it.each([
 it("preserves child-local environments over a customized SDK parent", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
-    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public", defaultEndpoint: "https://service.example.com"}}, "Public")
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public, defaultEndpoint: "https://service.example.com"}}, "Public")
     @useAuth(ResourceAuth)
     @service namespace Service {
-      @azureServiceEnvironments(ResourceAuth, #{Local: #{audience: "Government", defaultEndpoint: "https://child.example.com"}})
+      @azureServiceEnvironments(ResourceAuth, #{Local: #{audience: ResourceAudience.Government, defaultEndpoint: "https://child.example.com"}})
       interface Operations { @get op read(): void; }
     }
-    @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: "Public", defaultEndpoint: "https://custom.example.com"}}, "Private")
+    @azureServiceEnvironments(ResourceAuth, #{Private: #{audience: ResourceAudience.Public, defaultEndpoint: "https://custom.example.com"}}, "Private")
     @client({name: "Customized", service: Service, autoMergeService: true})
     namespace Clients.Customized {}
   `);
@@ -376,7 +461,7 @@ it("diagnoses environments referencing an authentication alternative the client 
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
     model OtherAuth is AadOauth2Auth<["other.read"]>;
-    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: "Public"}}, "Public")
+    @azureServiceEnvironments(ResourceAuth, #{Public: #{audience: ResourceAudience.Public}}, "Public")
     @useAuth(OtherAuth)
     @service namespace Service { @get op read(): void; }
   `);
@@ -393,11 +478,11 @@ it("diagnoses environments referencing an authentication alternative the client 
 it("validates environment associations on sub-clients", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
-    @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+    @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: ResourceAudience.Public})
     model OtherAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
     @useAuth(ResourceAuth)
     @service namespace Service {
-      @azureServiceEnvironments(OtherAuth, #{Public: #{audience: "Public"}})
+      @azureServiceEnvironments(OtherAuth, #{Public: #{audience: ResourceAudience.Public}})
       interface Operations { @get op read(): void; }
     }
   `);
@@ -415,7 +500,7 @@ it("reports unsupported audience projection instead of silently dropping its met
   const { program } = await AzureCoreTester.compile(`
     enum ResourceAudience { Public: "https://search.azure.com" }
     @@alternateType(ResourceAudience, string);
-    @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+    @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: ResourceAudience.Public})
     model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
     @useAuth(ResourceAuth)
     @service namespace Service { @get op read(): void; }
@@ -442,13 +527,13 @@ it.each(["1", "2"])(
         Government: "https://search.azure.us",
         Public: "https://search.azure.com",
       }
-      @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+      @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: ResourceAudience.Public})
       model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
     }
     @service
     @versioned(Service.Versions)
     @useAuth(AuthDefinitions.ResourceAuth)
-    @azureServiceEnvironments(AuthDefinitions.ResourceAuth, #{Public: #{audience: "Public"}}, "Public")
+    @azureServiceEnvironments(AuthDefinitions.ResourceAuth, #{Public: #{audience: AuthDefinitions.ResourceAudience.Public}}, "Public")
     namespace Service {
       enum Versions {
         @useDependency(AuthDefinitions.Versions.v1)

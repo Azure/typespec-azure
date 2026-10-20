@@ -12,7 +12,7 @@ using global.Azure.Core;
 namespace _Specs_.Azure.Core.Authentication.Challenge;
 
 @azureTokenAuthentication(#{
-  kind: "challengeBased",
+  kind: AzureTokenAuthenticationKind.challengeBased,
   challengeContract: "azure.keyVaultChallenge/v1",
 })
 model ServiceAuth is AadOauth2Auth<[]>;

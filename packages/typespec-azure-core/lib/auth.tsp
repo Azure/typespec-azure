@@ -11,21 +11,30 @@ using Azure.Core.Traits.Private;
 
 namespace Azure.Core;
 
+/** Shared service token-request profiles, independent of native SDK API shape. */
+enum AzureTokenAuthenticationKind {
+  /** Derive an Entra scope from the selected resource. */
+  entraDefaultScope,
+
+  /** Delegate challenge processing to a named SDK runtime contract. */
+  challengeBased,
+}
+
 /** Shared service token-request semantics, independent of native SDK API shape. */
 union AzureTokenAuthenticationOptions {
   /** Derive an Entra scope by appending `/.default` to the selected resource. */
   entraDefaultScope: {
     /** The token-request profile. */
-    kind: "entraDefaultScope",
+    kind: AzureTokenAuthenticationKind.entraDefaultScope,
 
-    /** The name of the default member in the known-audience enum. */
-    defaultAudience: string,
+    /** The default member of the known-audience enum, which also identifies the catalog. */
+    defaultAudience: TypeSpec.Reflection.EnumMember,
   },
 
   /** Delegate challenge processing to a named SDK runtime contract. */
   challengeBased: {
     /** The token-request profile. */
-    kind: "challengeBased",
+    kind: AzureTokenAuthenticationKind.challengeBased,
 
     /** The versioned runtime contract, for example `azure.keyVaultChallenge/v1`. */
     challengeContract: string,
@@ -34,8 +43,8 @@ union AzureTokenAuthenticationOptions {
 
 /** Shared cloud data binding an optional endpoint default to a declared audience resource. */
 model AzureServiceEnvironment {
-  /** A member name from the authentication model's known-audience enum. */
-  audience: string;
+  /** A member of the authentication model's known-audience enum. */
+  audience: TypeSpec.Reflection.EnumMember;
 
   /** An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. */
   defaultEndpoint?: string;

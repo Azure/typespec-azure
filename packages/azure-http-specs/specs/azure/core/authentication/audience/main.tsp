@@ -18,10 +18,10 @@ enum ResourceAudience {
   China: "https://search.azure.cn",
 }
 
-@azureTokenAuthentication(
-  #{ kind: "entraDefaultScope", defaultAudience: "Public" },
-  ResourceAudience
-)
+@azureTokenAuthentication(#{
+  kind: AzureTokenAuthenticationKind.entraDefaultScope,
+  defaultAudience: ResourceAudience.Public,
+})
 model ServiceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
 
 // Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-python/blob/1f24b9905f9ed7c96b5bdd18c95e031309e5aec4/sdk/search/azure-search-documents/azure/search/documents/_configuration.py#L42-L81) defaults token authentication to the public-cloud scope. All language emitters consume this same service declaration; native audience API shapes and existing input compatibility are emitter choices.

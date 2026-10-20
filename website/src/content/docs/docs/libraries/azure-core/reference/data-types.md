@@ -96,10 +96,10 @@ model Azure.Core.AzureServiceEnvironment
 
 #### Properties
 
-| Name             | Type     | Description                                                                               |
-| ---------------- | -------- | ----------------------------------------------------------------------------------------- |
-| audience         | `string` | A member name from the authentication model's known-audience enum.                        |
-| defaultEndpoint? | `string` | An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. |
+| Name             | Type         | Description                                                                               |
+| ---------------- | ------------ | ----------------------------------------------------------------------------------------- |
+| audience         | `EnumMember` | A member of the authentication model's known-audience enum.                               |
+| defaultEndpoint? | `string`     | An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. |
 
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
@@ -487,6 +487,19 @@ model Azure.Core.TopQueryParameter
 | Name | Type    | Description                           |
 | ---- | ------- | ------------------------------------- |
 | top? | `int32` | The number of result items to return. |
+
+### `AzureTokenAuthenticationKind` {#Azure.Core.AzureTokenAuthenticationKind}
+
+Shared service token-request profiles, independent of native SDK API shape.
+
+```typespec
+enum Azure.Core.AzureTokenAuthenticationKind
+```
+
+| Name              | Value | Description                                                    |
+| ----------------- | ----- | -------------------------------------------------------------- |
+| entraDefaultScope |       | Derive an Entra scope from the selected resource.              |
+| challengeBased    |       | Delegate challenge processing to a named SDK runtime contract. |
 
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 

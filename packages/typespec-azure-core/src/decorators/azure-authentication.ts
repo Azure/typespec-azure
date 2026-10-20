@@ -1,5 +1,6 @@
 import {
   type Enum,
+  type EnumMember,
   type Interface,
   type Model,
   type Namespace,
@@ -50,7 +51,6 @@ export interface AzureServiceEnvironments {
 
 interface TokenDeclaration {
   profile: Parameters<AzureTokenAuthenticationDecorator>[2];
-  audienceType?: Enum;
   validated?: boolean;
   metadata?: AzureTokenAuthentication;
 }
@@ -76,10 +76,9 @@ export const $azureTokenAuthentication: AzureTokenAuthenticationDecorator = (
   context,
   target,
   profile,
-  audienceType,
 ) => {
   if (!validateDecoratorUniqueOnNode(context, target, $azureTokenAuthentication)) return;
-  setTokenDeclaration(context.program, target, { profile, audienceType });
+  setTokenDeclaration(context.program, target, { profile });
 };
 
 export const $azureServiceEnvironments: AzureServiceEnvironmentsDecorator = (
@@ -119,7 +118,8 @@ export function getAzureTokenAuthentication(
 export function isAzureAuthenticationAudience(program: Program, type: Enum): boolean {
   return [...getTokenDeclarations(program)].some(
     ([authentication, declaration]) =>
-      declaration.audienceType === type &&
+      "defaultAudience" in declaration.profile &&
+      declaration.profile.defaultAudience.value.enum === type &&
       getAzureTokenAuthentication(program, authentication)?.kind === "entraDefaultScope",
   );
 }
@@ -214,15 +214,8 @@ function validateTokenAuthentication(
 ): AzureTokenAuthentication | undefined {
   const flows = getOAuthScopes(program, authentication);
   if (!flows) return undefined;
-  const { profile, audienceType } = declaration;
-  if (profile.kind === "challengeBased") {
-    if (audienceType) {
-      return invalid(
-        program,
-        authentication,
-        "Only an Entra default-scope profile accepts an audience enum.",
-      );
-    }
+  const { profile } = declaration;
+  if ("challengeContract" in profile) {
     if (!profile.challengeContract.trim()) {
       return invalid(
         program,
@@ -232,14 +225,7 @@ function validateTokenAuthentication(
     }
     return { kind: "challengeBased", challengeContract: profile.challengeContract };
   }
-  if (!audienceType) {
-    return invalid(
-      program,
-      authentication,
-      "An Entra default-scope profile requires an audience enum.",
-    );
-  }
-  const audience = getAudience(program, audienceType, profile.defaultAudience);
+  const audience = getAudience(program, profile.defaultAudience.value);
   if (!audience) return undefined;
   const scope = `${audience.defaultAudience}/.default`;
   if (flows.some((scopes) => scopes.length !== 1 || scopes[0] !== scope)) {
@@ -254,9 +240,10 @@ function validateTokenAuthentication(
 
 function getAudience(
   program: Program,
-  type: Enum,
-  defaultAudienceName: string,
+  defaultAudience: EnumMember,
 ): AzureAuthenticationAudience | undefined {
+  const type = defaultAudience.enum;
+  const defaultAudienceName = defaultAudience.name;
   const members: [string, string][] = [];
   for (const member of type.members.values()) {
     const value = member.value ?? member.name;
@@ -306,11 +293,16 @@ function validateEnvironments(
   }
   const environments: AzureServiceEnvironment[] = [];
   for (const [name, options] of Object.entries(declaration.environments)) {
-    if (!name.trim() || !Object.hasOwn(profile.audience.knownAudiences, options.audience)) {
+    const member = options.audience.value;
+    if (
+      !name.trim() ||
+      member.enum !== profile.audience.type ||
+      !Object.hasOwn(profile.audience.knownAudiences, member.name)
+    ) {
       return invalid(
         program,
         target,
-        `Environment '${name}' must reference a named audience member.`,
+        `Environment '${name}' must reference a member of the authentication audience enum.`,
       );
     }
     if (options.defaultEndpoint !== undefined && !isServiceEndpoint(options.defaultEndpoint)) {
@@ -322,8 +314,8 @@ function validateEnvironments(
     }
     environments.push({
       name,
-      audienceName: options.audience,
-      audience: profile.audience.knownAudiences[options.audience],
+      audienceName: member.name,
+      audience: profile.audience.knownAudiences[member.name],
       ...(options.defaultEndpoint === undefined
         ? {}
         : { defaultEndpoint: options.defaultEndpoint }),

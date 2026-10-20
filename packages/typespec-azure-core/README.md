@@ -99,7 +99,7 @@ Available ruleSets:
 
 Adds optional endpoint defaults to the same Entra audience-selection profile.
 
-Environments reference audience member names, not duplicate resource values. They declare shared cloud data, not a required native SDK cloud or options API.
+Environments reference members of the authentication model's audience enum, not duplicate resource values. They declare shared cloud data, not a required native SDK cloud or options API.
 
 An explicit client endpoint overrides an environment endpoint without changing its audience. When no endpoint default is declared, ordinary service endpoint configuration applies; an audience resource does not identify a service instance.
 
@@ -130,12 +130,12 @@ An Entra audience enum lists known resource values. Use the same enum for every 
 
 Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Optional endpoint defaults use `@azureServiceEnvironments` with the same resource-to-scope binding.
 
-Every OAuth flow must already use the scope derived from the named default member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
+The default audience references an enum member and identifies the known-resource catalog. Every OAuth flow must already use the scope derived from that member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
 
 Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
 
 ```typespec
-@Azure.Core.azureTokenAuthentication(profile: valueof Azure.Core.AzureTokenAuthenticationOptions, audienceType?: Enum)
+@Azure.Core.azureTokenAuthentication(profile: valueof Azure.Core.AzureTokenAuthenticationOptions)
 ```
 
 ##### Target
@@ -145,10 +145,9 @@ The OAuth authentication model.
 
 ##### Parameters
 
-| Name         | Type                                                                          | Description                                             |
-| ------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
-| profile      | [valueof `AzureTokenAuthenticationOptions`](#azuretokenauthenticationoptions) | The Entra default-scope or named challenge profile.     |
-| audienceType | `Enum`                                                                        | The enum of known resource values for an Entra profile. |
+| Name    | Type                                                                          | Description                                         |
+| ------- | ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| profile | [valueof `AzureTokenAuthenticationOptions`](#azuretokenauthenticationoptions) | The Entra default-scope or named challenge profile. |
 
 #### `@finalLocation`
 

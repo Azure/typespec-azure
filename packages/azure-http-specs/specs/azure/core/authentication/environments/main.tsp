@@ -14,8 +14,11 @@ using global.Azure.Core;
 @azureServiceEnvironments(
   ServiceAuth,
   #{
-    Public: #{ audience: "Public", defaultEndpoint: "http://localhost:3000/public" },
-    Government: #{ audience: "Government", defaultEndpoint: "http://localhost:3000/government" },
+    Public: #{ audience: ResourceAudience.Public, defaultEndpoint: "http://localhost:3000/public" },
+    Government: #{
+      audience: ResourceAudience.Government,
+      defaultEndpoint: "http://localhost:3000/government",
+    },
   },
   "Public"
 )
@@ -26,10 +29,10 @@ enum ResourceAudience {
   Public: "https://api.loganalytics.io",
 }
 
-@azureTokenAuthentication(
-  #{ kind: "entraDefaultScope", defaultAudience: "Public" },
-  ResourceAudience
-)
+@azureTokenAuthentication(#{
+  kind: AzureTokenAuthenticationKind.entraDefaultScope,
+  defaultAudience: ResourceAudience.Public,
+})
 model ServiceAuth is AadOauth2Auth<["https://api.loganalytics.io/.default"]>;
 
 // Service analogue: [Azure Monitor Logs](https://github.com/Azure/azure-sdk-for-go/blob/6aee0433368c2c3901003b9689b9ce9899e66854/sdk/monitor/query/azlogs/custom_client.go#L27-L45) defaults to AzurePublic and obtains its endpoint and audience from a cloud service configuration. This fixture retains the real resource values but substitutes local endpoints. The same cloud data applies to all emitters without requiring Go's native Cloud API.

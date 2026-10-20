@@ -28,6 +28,7 @@ import {
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import {
+  type Authentication,
   getAuthentication,
   getHttpOperation,
   getServers,
@@ -291,7 +292,7 @@ export const $client: ClientDecorator = (
     services = serviceConfig.values;
     // validate all services has same server definition
     let servers = undefined;
-    let auth = undefined;
+    let auth: { authentication: Authentication; service: Namespace } | undefined;
     let isSame = true;
     for (const svc of services) {
       const currentServers = getServers(context.program, svc);
@@ -309,9 +310,9 @@ export const $client: ClientDecorator = (
       const currentAuth = getAuthentication(context.program, svc);
       if (currentAuth === undefined) continue;
       if (auth === undefined) {
-        auth = currentAuth;
+        auth = { authentication: currentAuth, service: svc };
       } else {
-        isSame = isSameAuth(auth, currentAuth);
+        isSame = isSameAuth(context.program, auth.authentication, currentAuth, auth.service, svc);
         if (!isSame) {
           break;
         }
