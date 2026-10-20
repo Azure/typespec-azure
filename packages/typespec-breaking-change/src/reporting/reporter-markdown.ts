@@ -1,4 +1,5 @@
 import type { SourceLocation } from "@typespec/compiler";
+import { getFindingIdentity } from "../finding-identity.js";
 import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 import {
   formatSuppressionDiff,
@@ -63,7 +64,7 @@ export function renderMarkdownSummary(
   // analyzed under the same phase/title read as subsections of one report.
   if (options?.specPaths && options.specPaths.length > 0) {
     for (const sp of options.specPaths) {
-      lines.push(`### ${sp}`);
+      lines.push(`### ${displaySpecPath(sp, options)}`);
     }
     lines.push("");
   }
@@ -113,14 +114,16 @@ export function renderMarkdownSummary(
       lines.push("");
       lines.push(`#### ${versionLabel}`);
       lines.push("");
-      lines.push("| Kind | Identity | Suppression |");
-      lines.push("|------|----------|-------------|");
+      lines.push("| Kind | Source declaration | Wire identity | Source | Suppression |");
+      lines.push("| --- | --- | --- | --- | --- |");
       for (const finding of findings) {
         suppressionIndex++;
         const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
-        const identity = fmtIdentityLink(finding, options);
+        const identity = fmtIdentityCells(finding, options);
         const hint = formatSuppressionHint(finding);
-        lines.push(`| ${kind} | ${identity} | \`${esc(hint)}\` |`);
+        lines.push(
+          `| ${kind} | ${identity.sourceDeclaration} | ${identity.wireIdentity} | ${identity.source} | \`${esc(hint)}\` |`,
+        );
         const diffSnippet = formatSuppressionDiff(finding);
         const element = finding.diff.identity.element;
         const shortElement = element.split(".").pop() ?? element;
@@ -162,13 +165,15 @@ export function renderMarkdownSummary(
       lines.push("");
       lines.push(`#### ${versionLabel}`);
       lines.push("");
-      lines.push("| Kind | Identity | Reason |");
-      lines.push("|------|----------|--------|");
+      lines.push("| Kind | Source declaration | Wire identity | Source | Reason |");
+      lines.push("| --- | --- | --- | --- | --- |");
       for (const finding of findings) {
         const kind = fmtKindLink(finding.diff.kind, finding.phase, options);
-        const identity = fmtIdentityLink(finding, options);
+        const identity = fmtIdentityCells(finding, options);
         const reason = esc(finding.suppressionReason ?? "—");
-        lines.push(`| ${kind} | ${identity} | ${reason} |`);
+        lines.push(
+          `| ${kind} | ${identity.sourceDeclaration} | ${identity.wireIdentity} | ${identity.source} | ${reason} |`,
+        );
       }
     }
   }
@@ -178,11 +183,11 @@ export function renderMarkdownSummary(
     lines.push("<details>");
     lines.push("<summary>Version Comparisons</summary>");
     lines.push("");
-    lines.push("| Service | Version Pair | Phase | Result |");
-    lines.push("|---------|-------------|-------|--------|");
+    lines.push("| Service | Version Pair | Phase | Unique findings | Raw occurrences |");
+    lines.push("| --- | --- | --- | ---: | ---: |");
     for (const comparison of result.summary.versionComparisons) {
       lines.push(
-        `| ${esc(comparison.serviceName)} | ${esc(formatComparisonPair(comparison.phase, comparison.baseVersion, comparison.headVersion))} | ${formatPhaseLabel(comparison.phase)} | ${formatComparisonResult(comparison.findingCount)} |`,
+        `| ${esc(comparison.serviceName)} | ${esc(formatComparisonPair(comparison.phase, comparison.baseVersion, comparison.headVersion))} | ${formatPhaseLabel(comparison.phase)} | ${formatComparisonCount(comparison.findingCount)} | ${comparison.rawFindingCount ?? comparison.findingCount} |`,
       );
     }
     lines.push("");
@@ -220,16 +225,39 @@ function fmtKindLink(
   return `[\`${esc(kind)}\`](${baseUrl}${anchor})`;
 }
 
-/** Format the identity as a link to the source file, or plain text if no link available. */
-function fmtIdentityLink(finding: Finding, options?: MarkdownReportOptions): string {
-  const element = finding.diff.identity.element;
+function fmtIdentityCells(
+  finding: Finding,
+  options?: MarkdownReportOptions,
+): { sourceDeclaration: string; wireIdentity: string; source: string } {
+  const identity = getFindingIdentity(finding);
   const resolvedLocation = resolveFindingLocation(finding);
   const url = buildSourceUrl(resolvedLocation?.location, options);
+  return {
+    sourceDeclaration: identity.source ? `\`${esc(identity.source)}\`` : "—",
+    wireIdentity: `\`${esc(identity.wire)}\``,
+    source: formatSourceLocation(resolvedLocation?.location, url),
+  };
+}
 
-  if (url) {
-    return `[\`${esc(element)}\`](${url})`;
+function formatSourceLocation(location: SourceLocation | undefined, url?: string): string {
+  if (!location?.file?.path) return "Unavailable";
+  const normalized = location.file.path.replace(/\\/g, "/");
+  const file = normalized.split("/").pop() ?? normalized;
+  const line = getLineNumber(location);
+  const label = line > 0 ? `${file}:${line}` : file;
+  return url ? `[${label}](${url})` : `\`${esc(label)}\``;
+}
+
+function displaySpecPath(specPath: string, options?: MarkdownReportOptions): string {
+  const normalized = specPath.replace(/\\/g, "/");
+  const workspace = options?.workspacePath?.replace(/\\/g, "/").replace(/\/$/, "");
+  if (workspace && normalized.startsWith(`${workspace}/`)) {
+    return normalized.slice(workspace.length + 1);
   }
-  return `\`${esc(element)}\``;
+  if (normalized.startsWith("specification/")) return normalized;
+  const specification = normalized.indexOf("/specification/");
+  if (specification >= 0) return normalized.slice(specification + 1);
+  return normalized.split("/").pop() ?? normalized;
 }
 
 /** Build a GitHub source URL from a SourceLocation. */
@@ -273,24 +301,12 @@ function getLineNumber(location: SourceLocation): number {
   return text.split("\n").length;
 }
 
-function fmtVer(finding: Finding): string {
-  return `${finding.versionPair.baseVersion} → ${finding.versionPair.headVersion}`;
-}
-
 function fmtMs(ms: number): string {
   return ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`;
 }
 
 function esc(value: string): string {
   return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
-}
-
-function escHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 /** Group findings by version pair, returning label → findings entries. */
@@ -331,10 +347,8 @@ function formatComparisonPair(phase: string, baseVersion: string, headVersion: s
   return `${baseVersion} → ${headVersion}`;
 }
 
-function formatComparisonResult(findingCount: number): string {
-  return findingCount === 0
-    ? "✅ No changes"
-    : `❌ ${findingCount} finding${findingCount === 1 ? "" : "s"}`;
+function formatComparisonCount(findingCount: number): string {
+  return findingCount === 0 ? "✅ 0" : `❌ ${findingCount}`;
 }
 
 /** Format a comparison phase as a human-readable label for the Version Comparisons table. */

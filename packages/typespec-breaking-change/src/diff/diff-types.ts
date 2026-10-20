@@ -12,8 +12,8 @@ import {
 } from "@typespec/compiler";
 import type { HttpCanonicalization } from "@typespec/http-canonicalization";
 import type { DiffKind } from "../diff-kind.js";
-import { resolveOrigin } from "./origin.js";
 import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "../types.js";
+import { resolveOrigin } from "./origin.js";
 
 export interface DiffContext {
   operation: OperationIdentity;
@@ -415,7 +415,9 @@ function getNamedTypeKey(type: Type): string | undefined {
         ? `${getTypeKey(type.model)}.properties.${type.name}`
         : `${type.kind}:${type.name}`;
     case "Union":
-      return type.name ? qualifiedName(type.namespace, type.name) ?? `${type.kind}:${type.name}` : undefined;
+      return type.name
+        ? (qualifiedName(type.namespace, type.name) ?? `${type.kind}:${type.name}`)
+        : undefined;
     case "UnionVariant":
       return typeof type.name === "string"
         ? `${getTypeKey(type.union)}.variants.${type.name}`
@@ -426,6 +428,8 @@ function getNamedTypeKey(type: Type): string | undefined {
       return `${type.kind}:${type.valueAsString}`;
     case "Boolean":
       return `${type.kind}:${String(type.value)}`;
+    case "Intrinsic":
+      return `${type.kind}:${type.name}`;
     default:
       return undefined;
   }
@@ -449,7 +453,9 @@ function propertyMadeOptionalKind(component: DiffComponent): DiffKind {
 
 function typeChangedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeChanged" : "ResponsePropertyTypeChanged";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeChanged"
+      : "ResponsePropertyTypeChanged";
   }
 
   return ctx.component === "request" ? "RequestTypeChanged" : "ResponseTypeChanged";
@@ -457,7 +463,9 @@ function typeChangedKind(ctx: DiffContext): DiffKind {
 
 function typeNarrowedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeNarrowed" : "ResponsePropertyTypeNarrowed";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeNarrowed"
+      : "ResponsePropertyTypeNarrowed";
   }
 
   return ctx.component === "request" ? "RequestTypeNarrowed" : "ResponseTypeNarrowed";
@@ -465,7 +473,9 @@ function typeNarrowedKind(ctx: DiffContext): DiffKind {
 
 function typeWidenedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeWidened" : "ResponsePropertyTypeWidened";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeWidened"
+      : "ResponsePropertyTypeWidened";
   }
 
   return ctx.component === "request" ? "RequestTypeWidened" : "ResponseTypeWidened";
@@ -473,7 +483,9 @@ function typeWidenedKind(ctx: DiffContext): DiffKind {
 
 function typeKindChangedKind(ctx: DiffContext): DiffKind {
   if (isPropertyElement(ctx.elementPath)) {
-    return ctx.component === "request" ? "RequestPropertyTypeChanged" : "ResponsePropertyTypeChanged";
+    return ctx.component === "request"
+      ? "RequestPropertyTypeChanged"
+      : "ResponsePropertyTypeChanged";
   }
 
   return ctx.component === "request" ? "RequestTypeKindChanged" : "ResponseTypeKindChanged";
@@ -526,7 +538,8 @@ function qualifiedName(
     if (current.name) {
       namespaceParts.unshift(current.name);
     }
-    current = current.namespace as { name: string; namespace?: { name: string; namespace?: unknown } } | undefined;
+    current = current.namespace as
+      { name: string; namespace?: { name: string; namespace?: unknown } } | undefined;
   }
 
   namespaceParts.push(name);
@@ -553,7 +566,9 @@ function describeType(type: Type): string {
     case "Enum":
       return qualifiedName(type.namespace, type.name) ?? type.name;
     case "Union":
-      return type.name ? qualifiedName(type.namespace, type.name) ?? type.name : "anonymous-union";
+      return type.name
+        ? (qualifiedName(type.namespace, type.name) ?? type.name)
+        : "anonymous-union";
     case "String":
       return JSON.stringify(type.value);
     case "Number":
