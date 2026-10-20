@@ -20,6 +20,12 @@ describe("operation span errors", () => {
       @get @route("/headers")
       op headers(): { @header value: string; };
 
+      @get @route("/collision")
+      op collision(@query resp: string): Widget;
+
+      @get @route("/multiple-collisions")
+      op multipleCollisions(@query resp: string, @query response: string, @query response_0: string): Widget;
+
       @delete @route("/empty")
       op empty(): void;
 
@@ -38,16 +44,25 @@ describe("operation span errors", () => {
     );
     const client = files.get("zz_spans_client.go");
     expect(client).toBeDefined();
-    for (const operation of ["Modeled", "Headers", "Empty", "Exists", "createWidget"]) {
+    const responseVars = new Map([
+      ["Modeled", "resp"],
+      ["Headers", "resp"],
+      ["Collision", "response"],
+      ["MultipleCollisions", "response_0"],
+    ]);
+    for (const operation of [...responseVars.keys(), "Empty", "Exists", "createWidget"]) {
       const method = client?.match(
         new RegExp(`func \\(client \\*SpansClient\\) ${operation}\\([\\s\\S]*?\\n\\}`),
       )?.[0];
       expect(method).toBeDefined();
       if (injectSpans) {
         expect(method).toContain("defer func() { endSpan(err) }()");
-        if (operation === "Modeled" || operation === "Headers") {
-          expect(method).toMatch(/resp, err := client\.\w+HandleResponse\(httpResp, /);
-          expect(method).toContain("return resp, err");
+        if (responseVars.has(operation)) {
+          const responseVar = responseVars.get(operation);
+          expect(method).toMatch(
+            new RegExp(`${responseVar}, err := client\\.\\w+HandleResponse\\(httpResp, `),
+          );
+          expect(method).toContain(`return ${responseVar}, err`);
         } else {
           expect(method).toContain("err = runtime.NewResponseError(httpResp)");
           expect(method).toMatch(/return (?:nil|SpansClient\w+Response\{\}), err/);
@@ -55,7 +70,7 @@ describe("operation span errors", () => {
       } else {
         expect(method).not.toContain("endSpan");
         expect(method).not.toContain("err = runtime.NewResponseError(httpResp)");
-        if (operation === "Modeled" || operation === "Headers") {
+        if (responseVars.has(operation)) {
           expect(method).toMatch(/return client\.\w+HandleResponse\(httpResp, /);
         } else {
           expect(method).toMatch(

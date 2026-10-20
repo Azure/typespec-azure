@@ -796,8 +796,12 @@ function generateOperation(
     // methods that return a modeled type, headers, or both call the method's response handler
     const responseCall = `client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`;
     if (options["inject-spans"]) {
-      text += `${indent.get()}resp, err := ${responseCall}\n`;
-      text += `${indent.get()}return resp, err\n`;
+      const responseVar = helpers.getUniqueVarName(helpers.getMethodParameters(method), [
+        "resp",
+        "response",
+      ]);
+      text += `${indent.get()}${responseVar}, err := ${responseCall}\n`;
+      text += `${indent.get()}return ${responseVar}, err\n`;
     } else {
       text += `${indent.get()}return ${responseCall}\n`;
     }
