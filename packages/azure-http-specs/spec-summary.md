@@ -1473,24 +1473,6 @@ Select Government and explicitly override the endpoint with http://localhost:300
 
 Select the Government environment without an endpoint override. Its pair selects http://localhost:3000/government and resource https://api.loganalytics.us. Use a recording credential that echoes requested scopes as its access token. Expect scope https://api.loganalytics.us/.default, request path /government/azure/core/authentication/environments/government, and response 204.
 
-### Azure_Core_Authentication_Requirements_anonymous
-
-- Endpoint: `get /azure/core/authentication/requirements/anonymous`
-
-Select the NoAuth alternative. Supply no credentials and send neither api-key nor Authorization headers. Expect response 204. The Azure profile on the authenticated alternative must not introduce token requests for anonymous access.
-
-### Azure_Core_Authentication_Requirements_combinedCredentials
-
-- Endpoint: `get /azure/core/authentication/requirements/combined`
-
-Select the authenticated alternative and supply both key valid-key and a recording token credential that echoes requested scopes as its access token. Expect both api-key: valid-key and Authorization: Bearer https://service.azure.com/.default. Neither credential alone satisfies this alternative. Expect response 204.
-
-### Azure_Core_Authentication_Scopes_explicitScopes
-
-- Endpoint: `get /azure/core/authentication/scopes/explicit`
-
-Use a recording credential that echoes requested scopes joined by a space as its access token. Expect exactly [https://service.example.com/read, https://service.example.com/write], in that order, with no /.default completion. Expect the matching Bearer authorization header and response 204.
-
 ### Azure_Core_Basic_createOrReplace
 
 - Endpoint: `get /azure/core/basic`
