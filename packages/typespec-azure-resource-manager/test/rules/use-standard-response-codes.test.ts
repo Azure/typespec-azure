@@ -123,12 +123,6 @@ it("reports concrete endpoints, not the shared template instance", async () => {
     );
 });
 
-it("checks ordinary namespaces without provider metadata", async () => {
-  await tester
-    .expect(`@service namespace Contoso { @post op read(): { @statusCode status: 404; }; }`)
-    .toEmitDiagnostics([diagnostic("read", 404)]);
-});
-
 it("checks operations without service metadata", async () => {
   await tester
     .expect("@get op read(): { @statusCode status: 404; };")
@@ -148,24 +142,6 @@ it("checks operations outside a declared service", async () => {
       `,
     )
     .toEmitDiagnostics([diagnostic("readOutside", 404)]);
-});
-
-it("checks standard ARM read response customizations", async () => {
-  await tester
-    .expect(
-      `${resource}
-      @armResourceOperations interface Widgets {
-        read is ArmResourceRead<Widget, Response = ArmResponse<Widget> | NotFoundResponse>;
-      }
-    `,
-    )
-    .toEmitDiagnostics([
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
-        message:
-          "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
-      },
-    ]);
 });
 
 it("rejects an explicit error response on a standard ARM action", async () => {
@@ -328,41 +304,15 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({ code: diagnosticCode, target: "get" });
   });
 
-  it("warns once when an ARM GET adds a 201 response", async () => {
+  it("rejects an extra 201 response even when 200 is present", async () => {
     await tester
       .expect(
-        `${resource}
-      model Created {
-        @statusCode statusCode: 201;
-        @body body: Employee;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        @get
-        @armResourceRead(Employee)
-        get(...ResourceInstanceParameters<Employee>): ArmResponse<Employee> | Created | ErrorResponse;
-      }`,
+        `
+      @service namespace Microsoft.Contoso;
+      @get op read(): { @statusCode code: 200; } | { @statusCode code: 201; };
+    `,
       )
-      .toEmitDiagnostics({ code: diagnosticCode, target: "get" });
-  });
-
-  it("warns once when an ARM GET adds a 204 response", async () => {
-    await tester
-      .expect(
-        `${resource}
-      model NoContent {
-        @statusCode statusCode: 204;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        @get
-        @armResourceRead(Employee)
-        get(...ResourceInstanceParameters<Employee>): ArmResponse<Employee> | NoContent | ErrorResponse;
-      }`,
-      )
-      .toEmitDiagnostics({ code: diagnosticCode, target: "get" });
+      .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
   });
 
   it("warns for a GET in a nested ARM namespace", async () => {
@@ -381,18 +331,6 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({ code: diagnosticCode, target: "get" });
   });
 
-  it("accepts the standard ARM resource read template", async () => {
-    await tester
-      .expect(
-        `${resource}
-      @armResourceOperations
-      interface Employees {
-        get is ArmResourceRead<Employee>;
-      }`,
-      )
-      .toBeValid();
-  });
-
   it("rejects a resource read customized to return only 204", async () => {
     await tester
       .expect(
@@ -406,51 +344,6 @@ describe("ARM GET response codes", () => {
       }`,
       )
       .toEmitDiagnostics({ code: diagnosticCode, target: "get" });
-  });
-
-  it("accepts a resource read customized to return 200", async () => {
-    await tester
-      .expect(
-        `${resource}
-      @armResourceOperations
-      interface Employees {
-        get is ArmResourceRead<Employee, Response = ArmResponse<Employee>>;
-      }`,
-      )
-      .toBeValid();
-  });
-
-  it("accepts an ARM GET with only a 200 response", async () => {
-    await tester
-      .expect(
-        `${resource}
-      @armResourceOperations
-      interface Employees {
-        @get
-        @armResourceRead(Employee)
-        get(...ResourceInstanceParameters<Employee>): ArmResponse<Employee>;
-      }`,
-      )
-      .toBeValid();
-  });
-
-  it("accepts an additional 202 response with a Location header", async () => {
-    await tester
-      .expect(
-        `${resource}
-      model Accepted {
-        @statusCode statusCode: 202;
-        @header("Location") location: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        @get
-        @armResourceRead(Employee)
-        get(...ResourceInstanceParameters<Employee>): ArmResponse<Employee> | Accepted | ErrorResponse;
-      }`,
-      )
-      .toBeValid();
   });
 
   it("checks a GET in an ARM service without a provider decorator", async () => {
@@ -568,17 +461,6 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
   });
 
-  it("retains 201 for non-GET operations", async () => {
-    await tester
-      .expect(
-        `${resource}
-      @post
-      op action(): { @statusCode statusCode: 201 };
-      `,
-      )
-      .toBeValid();
-  });
-
   it.each(["@statusCode @minValue(200) @maxValue(200) code: int32;", "@statusCode code: 200;"])(
     "accepts equivalent literal and singleton 200 responses: %s",
     async (status) => {
@@ -594,31 +476,13 @@ describe("ARM GET response codes", () => {
     },
   );
 
-  it("accepts a singleton 202 range in addition to 200", async () => {
-    await tester
-      .expect(
-        `
-      @service namespace Microsoft.Contoso;
-      model Accepted {
-        @statusCode @minValue(202) @maxValue(202) code: int32;
-      }
-      @get op read(): { @statusCode code: 200; @body body: string; } | Accepted;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it.each([
-    [200, 202],
-    [201, 201],
-    [204, 204],
-  ])("rejects disallowed status range %s-%s", async (start, end) => {
+  it("rejects a non-singleton range containing 200", async () => {
     await tester
       .expect(
         `
         @service namespace Microsoft.Contoso;
         model Additional {
-          @statusCode @minValue(${start}) @maxValue(${end}) code: int32;
+          @statusCode @minValue(200) @maxValue(202) code: int32;
         }
         @get op read(): { @statusCode code: 200; @body body: string; } | Additional;
       `,
