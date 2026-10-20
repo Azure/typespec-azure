@@ -1,6 +1,6 @@
 ---
 name: analyze-native-lint-coverage
-description: Run an official TypeSpec Azure lint from a merged or unmerged build against real Azure specs and compare its observed coverage with a Swagger validator. Resolve fresh inputs at run start, inject candidate packages, retain raw diagnostics, and investigate gaps without assuming equal counts prove equivalence.
+description: Run official TypeSpec Azure lints from a merged or unmerged build against real Azure specs and compare their observed coverage with a Swagger validator. Support one-to-one, one-to-many, and separate many-to-one comparisons; defer general many-to-many analysis. Resolve fresh inputs, inject candidate packages, and investigate gaps without assuming equal counts prove equivalence.
 argument-hint: "[PR URL or native rule] [Swagger validator ID] [optional specs filter]"
 user-invocable: true
 ---
@@ -30,6 +30,45 @@ The current generator evaluates production ARM Swagger validation. Data-plane,
 RPaaS, staging-only, and SDK-name policies need separately established comparison
 profiles; do not present an ARM run as proof for those audiences.
 
+## Mapping scope
+
+Use **one Swagger validator rule per analyzer invocation**, with an explicit
+list of official TypeSpec rule IDs. Record the validator ID, native IDs,
+semantic checks supplied by each native rule, audience, rule options, alignment
+profile, and supporting violating/compliant tests in the migration evidence.
+This is a reviewable mapping record, not a new CLI manifest format.
+
+| Mapping                                    | Procedure                                                                                                                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One Swagger rule to one TypeSpec rule      | Pass one `--validator-rule` and one `--tsp-rule`.                                                                                                                         |
+| One Swagger rule to several TypeSpec rules | Repeat `--tsp-rule` for the rules that collectively implement the validator's checks. Preserve each rule's diagnostic identity and investigate its contribution.          |
+| Several Swagger rules to one TypeSpec rule | Run a separate comparison for each Swagger rule, using the same native rule and frozen compatible inputs. Give each validator its own report and conclusion.              |
+| General many-to-many                       | Defer group-level analysis and equivalence. Record the mapping and limitation; do not infer a cross-product of rule pairs or collapse the group into one coverage result. |
+
+Do not repeat `--validator-rule`; the CLI rejects duplicate values. Do not
+invent a multi-validator flag, mapping-file option, or group runner. Independent
+one-to-one or one-to-many comparisons within a broader mapping can supply
+scoped evidence, but do not establish equivalence for the whole group.
+
+For many-to-one comparisons, a shared native rule can report checks unrelated
+to the selected Swagger rule. Matching project sets can therefore hide a missing
+check. Verify each validator's material checks with discriminating violating and
+compliant fixtures, inspect the relevant native findings, and explain broader
+native behavior. Do not attribute findings by message text or property names.
+When reliable attribution is unavailable, report observed aggregate project
+overlap and unresolved attribution rather than claiming equivalence.
+
+Related comparisons may use different options or alignment profiles only when
+those differences are explicit. Do not compare their totals as if they shared
+the same execution policy. In particular, `boolean-http` supports only the
+single Azure Core `no-boolean` rule, not a list of native rules.
+
+Keep each validator's population, failures, one-sided project sets, raw counts,
+and conclusion separate. Do not sum native findings across reports: a shared
+native diagnostic may appear in several comparisons. Different rule IDs at the
+same source location remain distinct findings; location coincidence does not
+establish semantic identity.
+
 ## Fresh selection, immutable run
 
 1. Record the caller's current branch before any checkout. Do not change its
@@ -54,6 +93,17 @@ The tool snapshots the supplied clean checkouts, not remote branch names. The
 skill owns freshness selection. Preserve build logs proving that artifacts were
 built from the selected candidate; artifact hashes alone do not prove that
 source-to-build relationship.
+
+For related mapping comparisons, resolve the candidate and specs references
+once, then replay those exact commits and artifacts for each invocation instead
+of fetching a new latest snapshot between comparisons. Use a distinct empty
+output directory for every invocation and record all policy differences.
+Run them serially when they share a writable specs checkout.
+
+The current analyzer regenerates Swagger and validator results on every
+invocation. It has no cached-dataset or native-receipt input. Retain the packages
+and evidence, but do not claim that selecting the same commits skips execution.
+Automatic baseline/native-result reuse is deferred tooling work.
 
 ## Prepare candidate artifacts
 
@@ -195,6 +245,10 @@ to equalize counts.
 Return the report path, candidate/specs identities, actual loaded packages,
 selected/assessable/failed population, raw and aligned results, scope limitations,
 gap explanations, and a justified equivalence conclusion or explicit uncertainty.
+Include the mapping record and per-validator conclusions for related
+comparisons. State any unattributed shared-rule findings and deferred
+many-to-many scope explicitly; never replace them with a combined coverage
+percentage.
 For publication, put concise, reproducible pilot evidence in authored tooling
 documentation; keep generated corpora and machine-specific payloads out of Git.
 
