@@ -1425,83 +1425,83 @@ Verifies that an API-version override on a child client replaces the default ser
 The client call takes no API-version argument and must send the overridden query parameter
 `api-version=2022-10-01` instead of the service version `2025-01-01`.
 
-### Azure_Core_Authentication_Audience_apiKey
+### Azure_Core_Authentication_Audience_Closed_defaultAudience
 
-- Endpoint: `get /azure/core/authentication/audience/key`
+- Endpoint: `get /azure/core/authentication/audience/closed/default`
 
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-python/blob/1f24b9905f9ed7c96b5bdd18c95e031309e5aec4/sdk/search/azure-search-documents/azure/search/documents/_configuration.py#L42-L81) accepts an API key as an alternative to a token credential and sends it in the api-key header. Use API-key authentication with key valid-key, without selecting an audience. Expect header api-key: valid-key and response 204.
+Do not select an audience. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.com/.default and response 204.
 
-### Azure_Core_Authentication_Audience_customAudience
+### Azure_Core_Authentication_Audience_Closed_knownAudience
 
-- Endpoint: `get /azure/core/authentication/audience/custom`
+- Endpoint: `get /azure/core/authentication/audience/closed/known`
 
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-python/blob/1f24b9905f9ed7c96b5bdd18c95e031309e5aec4/sdk/search/azure-search-documents/azure/search/documents/_patch.py#L72-L78) accepts a resource string through its audience option. The custom example.com resource is synthetic; this is not a claim that Search accepts that token. Select custom resource https://custom.example.com with a recording credential that echoes requested scopes as its access token. Expect scope https://custom.example.com/.default and response 204.
+Select the Government enum member. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.us/.default and response 204. The audience API represents only the declared enum values.
 
-### Azure_Core_Authentication_Audience_defaultAudience
+### Azure_Core_Authentication_Audience_Environments_defaultEnvironment
 
-- Endpoint: `get /azure/core/authentication/audience/default`
+- Endpoint: `get /azure/core/authentication/audience/environments/default`
 
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-python/blob/1f24b9905f9ed7c96b5bdd18c95e031309e5aec4/sdk/search/azure-search-documents/azure/search/documents/_configuration.py#L42-L81) defaults token authentication to the public-cloud scope. Use token authentication without selecting an audience. The named Public default is not the first union member. A recording credential must return the requested scopes joined by a space as its access token. Expect scope https://search.azure.com/.default, the matching Bearer authorization header, and response 204.
+Supply no environment or endpoint override. The Public default selects http://localhost:3000/public and resource https://service.azure.com. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.com/.default, request path /public/azure/core/authentication/audience/environments/default, and response 204.
 
-### Azure_Core_Authentication_Audience_knownAudience
+### Azure_Core_Authentication_Audience_Environments_endpointOverride
 
-- Endpoint: `get /azure/core/authentication/audience/known`
+- Endpoint: `get /azure/core/authentication/audience/environments/endpoint-override`
 
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-js/blob/f79733570c12f9d6be391d1df4e3497bc963e30b/sdk/search/search-documents/src/searchAudience.ts#L7-L20) exposes known public, Government, and China cloud audience values independently of the service endpoint. Select the Government audience with a recording credential that echoes requested scopes as its access token. Expect scope https://search.azure.us/.default and response 204. The service endpoint remains the mock server, not the resource URI.
+Select Government and explicitly override the endpoint with http://localhost:3000/custom. Retain the Government resource. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.us/.default, request path /custom/azure/core/authentication/audience/environments/endpoint-override, and response 204.
+
+### Azure_Core_Authentication_Audience_Environments_governmentEnvironment
+
+- Endpoint: `get /azure/core/authentication/audience/environments/government`
+
+Select the Government environment without an endpoint override. Its pair selects http://localhost:3000/government and resource https://service.azure.us. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.us/.default, request path /government/azure/core/authentication/audience/environments/government, and response 204.
+
+### Azure_Core_Authentication_Audience_Open_apiKey
+
+- Endpoint: `get /azure/core/authentication/audience/open/key`
+
+Use API-key authentication with key valid-key, without selecting an audience. Expect header api-key: valid-key and response 204.
+
+### Azure_Core_Authentication_Audience_Open_customAudience
+
+- Endpoint: `get /azure/core/authentication/audience/open/custom`
+
+Select custom resource https://custom.example.com with a recording credential that echoes requested scopes as its access token. Expect scope https://custom.example.com/.default and response 204.
+
+### Azure_Core_Authentication_Audience_Open_defaultAudience
+
+- Endpoint: `get /azure/core/authentication/audience/open/default`
+
+Use token authentication without selecting an audience. The named Public default is not the first union member. A recording credential must return the requested scopes joined by a space as its access token. Expect scope https://search.azure.com/.default, the matching Bearer authorization header, and response 204.
+
+### Azure_Core_Authentication_Audience_Open_knownAudience
+
+- Endpoint: `get /azure/core/authentication/audience/open/known`
+
+Select the Government audience with a recording credential that echoes requested scopes as its access token. Expect scope https://search.azure.us/.default and response 204. The service endpoint remains the mock server, not the resource URI.
 
 ### Azure_Core_Authentication_Challenge_resourceChallenge
 
 - Endpoint: `get /azure/core/authentication/challenge/resource`
 
-Service analogue: [Azure Key Vault Secrets](https://github.com/Azure/azure-sdk-for-python/blob/1f24b9905f9ed7c96b5bdd18c95e031309e5aec4/sdk/keyvault/azure-keyvault-secrets/azure/keyvault/secrets/_shared/client_base.py#L103-L111) installs a challenge authentication policy instead of an ordinary bearer policy. This fixture covers the initial resource challenge, not the runtime's complete validation, caching, or claims behavior. Use a recording credential that echoes requested scopes as its access token. Permit the fixed mock challenge resource for this local-server test only. An initial unauthenticated request returns 401 with WWW-Authenticate: Bearer authorization="https://login.microsoftonline.com/common", resource="https://vault.azure.net". The named challenge runtime must request https://vault.azure.net/.default and retry with the matching Bearer authorization header. Expect the final response 204.
-
-### Azure_Core_Authentication_ClosedAudience_defaultAudience
-
-- Endpoint: `get /azure/core/authentication/closed-audience/default`
-
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-js/blob/f79733570c12f9d6be391d1df4e3497bc963e30b/sdk/search/search-documents/src/searchAudience.ts#L7-L20) supplies named cloud audience values. Closing that family to an enum is synthetic authoring coverage here, not a claim that Search rejects custom audiences. Do not select an audience. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.com/.default and response 204.
-
-### Azure_Core_Authentication_ClosedAudience_knownAudience
-
-- Endpoint: `get /azure/core/authentication/closed-audience/known`
-
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-js/blob/f79733570c12f9d6be391d1df4e3497bc963e30b/sdk/search/search-documents/src/searchAudience.ts#L7-L20) supplies a named Government audience. This fixture deliberately uses a closed enum and synthetic service.azure.us resource rather than reproducing Search's extensible audience API. Select the Government enum member. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.us/.default and response 204. The audience API represents only the declared enum values.
-
-### Azure_Core_Authentication_Environments_defaultEnvironment
-
-- Endpoint: `get /public/azure/core/authentication/environments/default`
-
-Service analogue: [Azure Monitor Logs](https://github.com/Azure/azure-sdk-for-go/blob/6aee0433368c2c3901003b9689b9ce9899e66854/sdk/monitor/query/azlogs/custom_client.go#L27-L45) defaults to AzurePublic and obtains its endpoint and audience from a cloud service configuration. This fixture substitutes local endpoint paths and synthetic resource values. Supply no environment or endpoint override. The Public default selects http://localhost:3000/public and resource https://service.azure.com. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.com/.default, request path /public/azure/core/authentication/environments/default, and response 204.
-
-### Azure_Core_Authentication_Environments_endpointOverride
-
-- Endpoint: `get /public/azure/core/authentication/environments/endpoint-override`
-
-Service analogue: [Azure Monitor Logs](https://github.com/Azure/azure-sdk-for-go/blob/6aee0433368c2c3901003b9689b9ce9899e66854/sdk/monitor/query/azlogs/custom_client.go#L35-L45) reads endpoint and audience independently from its cloud service configuration. This fixture models overriding only the endpoint while retaining the selected audience; it does not imply that the Go SDK exposes a separate endpoint option. Select Government and explicitly override the endpoint with http://localhost:3000/custom. Retain the Government resource. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.us/.default, request path /custom/azure/core/authentication/environments/endpoint-override, and response 204.
-
-### Azure_Core_Authentication_Environments_governmentEnvironment
-
-- Endpoint: `get /public/azure/core/authentication/environments/government`
-
-Service analogue: [Azure Monitor Logs](https://github.com/Azure/azure-sdk-for-go/blob/6aee0433368c2c3901003b9689b9ce9899e66854/sdk/monitor/query/azlogs/cloud_config.go#L11-L23) defines a Government endpoint/audience pair. This fixture uses distinct local URL paths instead of real cloud endpoints. Select the Government environment without an endpoint override. Its pair selects http://localhost:3000/government and resource https://service.azure.us. Use a recording credential that echoes requested scopes as its access token. Expect scope https://service.azure.us/.default, request path /government/azure/core/authentication/environments/government, and response 204.
+This fixture covers the initial resource challenge, not the runtime's complete validation, caching, or claims behavior. Use a recording credential that echoes requested scopes as its access token. Permit the fixed mock challenge resource for this local-server test only. An initial unauthenticated request returns 401 with WWW-Authenticate: Bearer authorization="https://login.microsoftonline.com/common", resource="https://vault.azure.net". The named challenge runtime must request https://vault.azure.net/.default and retry with the matching Bearer authorization header. Expect the final response 204.
 
 ### Azure_Core_Authentication_Requirements_anonymous
 
 - Endpoint: `get /azure/core/authentication/requirements/anonymous`
 
-Service analogue: [Azure Blob Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure#about-anonymous-read-access) permits reads without an Authorization header when anonymous access is explicitly enabled. Only the NoAuth branch is analogous; the combined token/key alternative in this fixture is not Blob Storage's authentication protocol. Select the NoAuth alternative. Supply no credentials and send neither api-key nor Authorization headers. Expect response 204. The Azure profile on the authenticated alternative must not introduce token requests for anonymous access.
+Select the NoAuth alternative. Supply no credentials and send neither api-key nor Authorization headers. Expect response 204. The Azure profile on the authenticated alternative must not introduce token requests for anonymous access.
 
 ### Azure_Core_Authentication_Requirements_combinedCredentials
 
 - Endpoint: `get /azure/core/authentication/requirements/combined`
 
-Service analogue: an Azure API Management gateway API can combine [Entra token validation](https://learn.microsoft.com/en-us/azure/api-management/api-management-howto-protect-backend-with-aad) with a required [subscription key](https://learn.microsoft.com/en-us/azure/api-management/api-management-subscriptions#use-a-subscription-key). This fixture's api-key header and resource are synthetic; the analogue is the AND requirement, not an APIM management SDK contract. Select the authenticated alternative and supply both key valid-key and a recording token credential that echoes requested scopes as its access token. Expect both api-key: valid-key and Authorization: Bearer https://service.azure.com/.default. Neither credential alone satisfies this alternative. Expect response 204.
+Select the authenticated alternative and supply both key valid-key and a recording token credential that echoes requested scopes as its access token. Expect both api-key: valid-key and Authorization: Bearer https://service.azure.com/.default. Neither credential alone satisfies this alternative. Expect response 204.
 
 ### Azure_Core_Authentication_Scopes_explicitScopes
 
 - Endpoint: `get /azure/core/authentication/scopes/explicit`
 
-Service analogue: [Azure AI Search](https://github.com/Azure/azure-sdk-for-python/blob/1f24b9905f9ed7c96b5bdd18c95e031309e5aec4/sdk/search/azure-search-documents/azure/search/documents/_configuration.py#L42-L81) accepts an explicit credential_scopes array for bearer authentication. The two example.com scopes are synthetic array-preservation coverage, not scopes required by Search. Use a recording credential that echoes requested scopes joined by a space as its access token. Expect exactly [https://service.example.com/read, https://service.example.com/write], in that order, with no /.default completion. Expect the matching Bearer authorization header and response 204.
+Use a recording credential that echoes requested scopes joined by a space as its access token. Expect exactly [https://service.example.com/read, https://service.example.com/write], in that order, with no /.default completion. Expect the matching Bearer authorization header and response 204.
 
 ### Azure_Core_Basic_createOrReplace
 

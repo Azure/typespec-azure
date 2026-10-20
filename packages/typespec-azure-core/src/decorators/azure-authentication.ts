@@ -17,7 +17,7 @@ import type {
 import { getUnionAsEnum } from "../helpers/union-enums.js";
 import { AzureCoreStateKeys, reportDiagnostic } from "../lib.js";
 
-/** Entra resources, not HTTP endpoints or literal JWT audiences. */
+/** An open or closed family of Entra resources, independent of HTTP endpoints. */
 export interface AzureAuthenticationAudience {
   type: Enum | Union;
   defaultAudienceName: string;
@@ -38,7 +38,7 @@ export type AzureTokenAuthentication =
       challengeContract: string;
     };
 
-/** Deployment data; authority and tenant remain credential-owned. */
+/** Optional endpoint defaults for an audience family; authority and tenant remain credential-owned. */
 export interface AzureServiceEnvironment {
   name: string;
   audienceName: string;
@@ -123,7 +123,7 @@ export function getAzureTokenAuthentication(
   return declaration.metadata;
 }
 
-/** Gets the nearest environment declaration for the specified authentication model. */
+/** Gets the nearest optional endpoint bindings for the specified audience profile. */
 export function getAzureServiceEnvironments(
   program: Program,
   target: Namespace | Interface,

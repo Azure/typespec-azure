@@ -623,7 +623,7 @@ export interface SdkCredentialType extends SdkTypeBase {
   azureAuthentication?: SdkAzureAuthentication;
 }
 
-/** An Entra resource family projected with ordinary SDK enum naming and usage. */
+/** An open or closed Entra resource family, independent of endpoint defaults. */
 export interface SdkAzureAuthenticationAudience extends Omit<AzureAuthenticationAudience, "type"> {
   type: SdkEnumType;
 }
@@ -639,6 +639,7 @@ export type SdkAzureTokenAuthenticationProfile =
 /** Token-request semantics and client-local deployment data, not runtime algorithms. */
 export interface SdkAzureAuthentication {
   profile: SdkAzureTokenAuthenticationProfile;
+  /** Optional endpoint bindings for this client's audience profile; never inferred from resources. */
   environments: AzureServiceEnvironment[];
   defaultEnvironment?: string;
 }

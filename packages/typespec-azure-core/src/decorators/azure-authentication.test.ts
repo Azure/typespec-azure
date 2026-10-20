@@ -216,6 +216,51 @@ describe("Azure token authentication", () => {
 });
 
 describe("Azure service environments", () => {
+  it.each(["open", "closed"])(
+    "adds optional endpoint defaults to the same %s audience profile",
+    async (family) => {
+      const { program, Auth, Service } = await Tester.compile(t.code`
+        ${family === "open" ? "union" : "enum"} Audience {
+          Government: "https://search.azure.us",
+          Public: "https://search.azure.com",
+          ${family === "open" ? "string," : ""}
+        }
+        @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, Audience)
+        model ${t.model("Auth")} is AadOauth2Auth<["https://search.azure.com/.default"]>;
+        @azureServiceEnvironments(Auth, #{
+          Public: #{audience: "Public"},
+          Government: #{audience: "Government", defaultEndpoint: "https://instance.search.azure.us"}
+        }, "Public")
+        namespace ${t.namespace("Service")} {}
+      `);
+      expect(getAzureTokenAuthentication(program, Auth)).toMatchObject({
+        kind: "entraDefaultScope",
+        audience: {
+          defaultAudienceName: "Public",
+          defaultAudience: "https://search.azure.com",
+          allowCustomAudience: family === "open",
+        },
+        defaultScopes: ["https://search.azure.com/.default"],
+      });
+      expect(getAzureServiceEnvironments(program, Service, Auth)).toEqual({
+        environments: [
+          {
+            name: "Public",
+            audienceName: "Public",
+            audience: "https://search.azure.com",
+          },
+          {
+            name: "Government",
+            audienceName: "Government",
+            audience: "https://search.azure.us",
+            defaultEndpoint: "https://instance.search.azure.us",
+          },
+        ],
+        defaultEnvironment: "Public",
+      });
+    },
+  );
+
   it("inherits deployment data and allows a more specific declaration", async () => {
     const { program, Auth, Service, Operations } = await Tester.compile(t.code`
       ${audience}

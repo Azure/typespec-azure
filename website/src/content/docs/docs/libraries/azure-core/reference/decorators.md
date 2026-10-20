@@ -10,10 +10,13 @@ llmstxt: true
 
 ### `@azureServiceEnvironments` {#@Azure.Core.azureServiceEnvironments}
 
-Associates named deployment data with an Entra authentication model.
-Environments reference audience member names, not duplicate resource values.
-The optional default environment must use the default audience.
-Authority and tenant configuration remain the credential's responsibility.
+Adds optional endpoint defaults to the same Entra audience-selection profile.
+
+Environments reference audience member names, not duplicate resource values, and work with either open or closed audience families.
+
+An explicit client endpoint overrides an environment endpoint without changing its audience. When no endpoint default is declared, ordinary service endpoint configuration applies; an audience resource does not identify a service instance.
+
+The optional default environment must use the default audience. Authority and tenant configuration remain the credential's responsibility.
 
 ```typespec
 @Azure.Core.azureServiceEnvironments(authentication: Model, environments: valueof Record<Azure.Core.AzureServiceEnvironment>, defaultEnvironment?: valueof string)
@@ -34,10 +37,12 @@ The namespace or interface using the authentication model.
 
 ### `@azureTokenAuthentication` {#@Azure.Core.azureTokenAuthentication}
 
-Adds audience or named challenge semantics to an existing OAuth authentication model.
-An Entra audience is a string enum or union of resource values, with an optional open
-`string` branch for custom resources. Every OAuth flow must already use the scope
-derived from the named default member. Resource values are preserved exactly.
+Adds audience selection or named challenge semantics to an existing OAuth authentication model.
+
+An Entra audience is a string enum or union of resource values; a union's `string` branch permits custom resources. Open and closed families use the same resource-to-scope binding and may have optional endpoint defaults through `@azureServiceEnvironments`.
+
+Every OAuth flow must already use the scope derived from the named default member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
+
 Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
 
 ```typespec

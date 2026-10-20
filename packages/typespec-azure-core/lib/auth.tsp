@@ -32,12 +32,12 @@ union AzureTokenAuthenticationOptions {
   },
 }
 
-/** A service deployment's audience and optional default HTTP endpoint. */
+/** An optional endpoint default bound to a member of the same audience family. */
 model AzureServiceEnvironment {
   /** A member name from the authentication model's audience enum or union. */
   audience: string;
 
-  /** An absolute HTTP or HTTPS endpoint, independent of the audience resource. */
+  /** An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. */
   defaultEndpoint?: string;
 }
 

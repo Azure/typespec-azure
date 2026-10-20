@@ -88,7 +88,7 @@ model Azure.Core.AzureApiKeyAuthentication
 
 ### `AzureServiceEnvironment` {#Azure.Core.AzureServiceEnvironment}
 
-A service deployment's audience and optional default HTTP endpoint.
+An optional endpoint default bound to a member of the same audience family.
 
 ```typespec
 model Azure.Core.AzureServiceEnvironment
@@ -96,10 +96,10 @@ model Azure.Core.AzureServiceEnvironment
 
 #### Properties
 
-| Name             | Type     | Description                                                               |
-| ---------------- | -------- | ------------------------------------------------------------------------- |
-| audience         | `string` | A member name from the authentication model's audience enum or union.     |
-| defaultEndpoint? | `string` | An absolute HTTP or HTTPS endpoint, independent of the audience resource. |
+| Name             | Type     | Description                                                                               |
+| ---------------- | -------- | ----------------------------------------------------------------------------------------- |
+| audience         | `string` | A member name from the authentication model's audience enum or union.                     |
+| defaultEndpoint? | `string` | An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. |
 
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 

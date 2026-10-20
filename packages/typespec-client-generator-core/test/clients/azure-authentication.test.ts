@@ -20,6 +20,74 @@ function getCredential(client: SdkClientType) {
   return credential;
 }
 
+it.each([
+  { family: "open", endpointDefaults: false },
+  { family: "open", endpointDefaults: true },
+  { family: "closed", endpointDefaults: false },
+  { family: "closed", endpointDefaults: true },
+])(
+  "keeps $family audiences independent of endpoint configuration with defaults: $endpointDefaults",
+  async ({ family, endpointDefaults }) => {
+    const { program } = await AzureCoreTester.compile(`
+      ${family === "open" ? "union" : "enum"} ResourceAudience {
+        Government: "https://search.azure.us",
+        Public: "https://search.azure.com",
+        ${family === "open" ? "string," : ""}
+      }
+      @azureTokenAuthentication(#{kind: "entraDefaultScope", defaultAudience: "Public"}, ResourceAudience)
+      model ResourceAuth is AadOauth2Auth<["https://search.azure.com/.default"]>;
+      ${
+        endpointDefaults
+          ? `@azureServiceEnvironments(ResourceAuth, #{
+              Public: #{audience: "Public", defaultEndpoint: "https://instance.search.windows.net"},
+              Government: #{audience: "Government", defaultEndpoint: "https://instance.search.azure.us"}
+            }, "Public")`
+          : ""
+      }
+      @server("{endpoint}", "Service instance endpoint", {endpoint: url})
+      @useAuth(ResourceAuth)
+      @service namespace Service { @get op read(): void; }
+    `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
+    const client = context.sdkPackage.clients[0];
+    const credential = getCredential(client);
+    if (credential.type.kind !== "credential") throw new Error("Missing credential type");
+    const metadata = credential.type.azureAuthentication;
+    if (metadata?.profile.kind !== "entraDefaultScope") throw new Error("Missing Entra profile");
+    expect(metadata.profile.audience.allowCustomAudience).toBe(family === "open");
+    expect(metadata.profile.audience.type.isFixed).toBe(family === "closed");
+    expect(metadata.profile.defaultScopes).toEqual(["https://search.azure.com/.default"]);
+    expect(metadata.environments).toEqual(
+      endpointDefaults
+        ? [
+            {
+              name: "Public",
+              audienceName: "Public",
+              audience: "https://search.azure.com",
+              defaultEndpoint: "https://instance.search.windows.net",
+            },
+            {
+              name: "Government",
+              audienceName: "Government",
+              audience: "https://search.azure.us",
+              defaultEndpoint: "https://instance.search.azure.us",
+            },
+          ]
+        : [],
+    );
+    expect(metadata.defaultEnvironment).toBe(endpointDefaults ? "Public" : undefined);
+    const endpoint = client.clientInitialization.parameters.find(
+      (parameter) => parameter.kind === "endpoint",
+    );
+    if (endpoint?.type.kind !== "endpoint") throw new Error("Missing service instance endpoint");
+    expect(endpoint.type.serverUrl).toBe("{endpoint}");
+    expect(endpoint.type.templateArguments).toMatchObject([
+      { name: "endpoint", optional: false, clientDefaultValue: undefined },
+    ]);
+  },
+);
+
 it.each(["python", "csharp", "java", "go", "ts"])(
   "projects typed audiences onto the exact OAuth alternative for %s",
   async (language) => {
