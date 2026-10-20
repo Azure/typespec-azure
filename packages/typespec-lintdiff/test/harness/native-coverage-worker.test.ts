@@ -10,6 +10,7 @@ const rule = "@azure-tools/typespec-azure-core/no-boolean";
 const prelude = `
   import "@typespec/http";
   import "@typespec/versioning";
+  import "@azure-tools/typespec-autorest";
   import "@azure-tools/typespec-azure-core";
   using TypeSpec.Http;
   using TypeSpec.Versioning;
@@ -194,5 +195,106 @@ linter:
         expect(result.diagnostics).toHaveLength(2);
       },
     );
+
+    it("includes emitted derived models reachable only through their base model", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @discriminator("kind")
+        model Pet { kind: string; }
+        model Cat extends Pet { kind: "cat"; enabled: boolean; }
+        @get @route("/pets") op read(): Pet;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
+    it("excludes externally referenced derived graphs while retaining raw findings", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+
+        @discriminator("kind")
+        model ChildReferenceBase { kind: string; }
+        @Autorest.useRef("./common.json#/definitions/ChildReference")
+        model ChildReference extends ChildReferenceBase {
+          kind: "child";
+          enabled: boolean;
+        }
+        @get @route("/child-reference") op readChildReference(): ChildReferenceBase;
+
+        @Autorest.useRef("./common.json#/definitions/BaseReference")
+        @discriminator("kind")
+        model BaseReference { kind: string; }
+        model BaseReferenceChild extends BaseReference {
+          kind: "child";
+          enabled: boolean;
+        }
+        @get @route("/base-reference") op readBaseReference(): BaseReference;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(2);
+      expect(result.diagnostics).toEqual([]);
+    });
+
+    it("retains reachable union-variant diagnostic targets", () => {
+      const offsetRule = "@azure-tools/typespec-azure-core/no-offsetdatetime";
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        union Timestamp { utc: utcDateTime, offset: offsetDateTime }
+        @get @route("/timestamp") op read(): Timestamp;
+      `,
+        { tspRules: [offsetRule], scope: "http-reachable" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
+    it("retains reachable enum-member diagnostic targets", () => {
+      const docsRule = "@azure-tools/typespec-azure-core/documentation-required";
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @doc("Available modes.")
+        enum Mode {
+          @doc("The ready mode.")
+          ready,
+          missing,
+        }
+        @doc("Read the current mode.")
+        @get @route("/mode") op read(): Mode;
+      `,
+        { tspRules: [docsRule], scope: "http-reachable" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
+    it("retains the selected service namespace diagnostic target", () => {
+      const authRule = "@azure-tools/typespec-azure-core/auth-required";
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @get @route("/widgets") op read(): string;
+      `,
+        { tspRules: [authRule], scope: "http-reachable" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
   },
 );

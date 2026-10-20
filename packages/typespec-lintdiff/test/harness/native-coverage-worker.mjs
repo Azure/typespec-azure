@@ -60,7 +60,15 @@ async function load(name, baseFile) {
 
 async function run() {
   compiler = await load("@typespec/compiler");
-  const { NodeHost, compile, resolveCompilerOptions, getSourceLocation, listServices } = compiler;
+  const {
+    NodeHost,
+    compile,
+    getService,
+    resolveCompilerOptions,
+    getSourceLocation,
+    isTemplateDeclaration,
+    listServices,
+  } = compiler;
   for (const rule of tspRules) {
     const separator = rule.lastIndexOf("/");
     const library = await load(rule.slice(0, separator));
@@ -78,7 +86,8 @@ async function run() {
       throw new Error(`The injected ${rule} resolves a different compiler instance.`);
     }
   }
-  await identify("@azure-tools/typespec-autorest");
+  const autorest = await load("@azure-tools/typespec-autorest");
+  const arm = await load("@azure-tools/typespec-azure-resource-manager");
   await identify("autorest");
   const validatorEntrypoint = await identify("@microsoft.azure/openapi-validator");
   await identify("@microsoft.azure/openapi-validator-core", validatorEntrypoint);
@@ -242,35 +251,61 @@ async function run() {
     type?.kind === "ModelProperty"
       ? tk.scalar.isBoolean(type.type)
       : type && tk.scalar.isBoolean(type);
-  const visit = (type, visited) => {
+  const isExternalReference = (type, service) =>
+    autorest.getRef(program, type) !== undefined ||
+    arm.getExternalTypeRef(program, type) !== undefined ||
+    (arm.isArmCommonType(type) &&
+      ["Model", "ModelProperty", "Enum", "Union"].includes(type.kind) &&
+      arm.getArmCommonTypeOpenAPIRef(program, type, {
+        version: project.apiVersion,
+        service,
+      }) !== undefined);
+  const includeDerivedModel = (model, service) =>
+    !isExternalReference(model, service) &&
+    !isTemplateDeclaration(model) &&
+    (model.templateMapper?.args === undefined ||
+      model.templateMapper.args.length === 0 ||
+      model.derivedModels.length > 0);
+  const visit = (type, visited, service) => {
     if (!type || visited.has(type)) return;
     visited.add(type);
     if (scope === "http-reachable" || (type.kind === "ModelProperty" && boolean(type))) add(type);
     switch (type.kind) {
       case "ModelProperty":
-        visit(type.type, visited);
+        visit(type.type, visited, service);
         break;
       case "Model":
-        for (const property of type.properties.values()) visit(property, visited);
-        visit(type.baseModel, visited);
-        visit(type.indexer?.value, visited);
+        for (const property of type.properties.values()) visit(property, visited, service);
+        if (!isExternalReference(type, service)) {
+          for (const derived of type.derivedModels) {
+            if (includeDerivedModel(derived, service)) visit(derived, visited, service);
+          }
+        }
+        visit(type.baseModel, visited, service);
+        visit(type.indexer?.value, visited, service);
         break;
       case "Union":
-        for (const variant of type.variants.values()) visit(variant.type, visited);
+        for (const variant of type.variants.values()) visit(variant, visited, service);
+        break;
+      case "UnionVariant":
+        visit(type.type, visited, service);
+        break;
+      case "Enum":
+        for (const member of type.members.values()) visit(member, visited, service);
         break;
       case "Tuple":
-        for (const value of type.values) visit(value, visited);
+        for (const value of type.values) visit(value, visited, service);
         break;
     }
   };
-  const visitBody = (body, operation, visited) => {
+  const visitBody = (body, operation, visited, service) => {
     if (!body) return;
     if ("type" in body) {
       if (scope === "boolean-http" && boolean(body.type)) add(body.property ?? operation);
-      visit(body.type, visited);
+      visit(body.type, visited, service);
     }
     if ("parts" in body) {
-      for (const part of body.parts) visitBody(part.body, operation, visited);
+      for (const part of body.parts) visitBody(part.body, operation, visited, service);
     }
   };
   let serviceCount = 0;
@@ -294,6 +329,7 @@ async function run() {
         namespace,
       ).type;
     }
+    const selectedService = getService(program, namespace) ?? { type: namespace };
     const [serviceGraph, httpDiagnostics] = http.getHttpService(program, namespace);
     for (const diagnostic of httpDiagnostics) {
       ambientDiagnostics.push({
@@ -309,17 +345,19 @@ async function run() {
       );
     }
     serviceCount++;
+    if (scope === "http-reachable") add(namespace);
     for (const operation of serviceGraph.operations) {
       const visited = new Set();
       if (scope === "http-reachable" || boolean(operation.operation.returnType))
         add(operation.operation);
-      visit(operation.operation.parameters, visited);
-      visit(operation.operation.returnType, visited);
-      for (const parameter of operation.parameters.parameters) visit(parameter.param, visited);
-      visitBody(operation.parameters.body, operation.operation, visited);
+      visit(operation.operation.parameters, visited, selectedService);
+      visit(operation.operation.returnType, visited, selectedService);
+      for (const parameter of operation.parameters.parameters)
+        visit(parameter.param, visited, selectedService);
+      visitBody(operation.parameters.body, operation.operation, visited, selectedService);
       for (const response of operation.responses) {
         for (const content of response.responses) {
-          visitBody(content.body, operation.operation, visited);
+          visitBody(content.body, operation.operation, visited, selectedService);
         }
       }
     }
