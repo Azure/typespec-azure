@@ -5,13 +5,11 @@ import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acron
 import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
-import { useCreateForPutRule } from "./rules/use-create-for-put.js";
-import { useDeleteForDeleteRule } from "./rules/use-delete-for-delete.js";
+import { useCorrectVerbRule } from "./rules/use-correct-verb.js";
 import { useUnionHierarchyRule } from "./rules/use-union-hierarchy.js";
 
 const rules = [
-  useCreateForPutRule,
-  useDeleteForDeleteRule,
+  useCorrectVerbRule,
   requireClientSuffixRule,
   propertyNameConflictRule,
   csharpNoUrlSuffixRule,

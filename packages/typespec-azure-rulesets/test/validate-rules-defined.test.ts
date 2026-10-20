@@ -61,7 +61,7 @@ describe("expect all rules to be defined", () => {
       false,
     );
     strictEqual(
-      ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-delete-for-delete"],
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-correct-verb"],
       false,
     );
     ok(
@@ -69,11 +69,24 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("keeps PUT SDK naming guidance opt-in", () => {
-    const ruleName = "@azure-tools/typespec-client-generator-core/use-create-for-put";
-    ok($linter.ruleSets?.["client-sdk"].disable?.[ruleName]);
-    for (const rulesetName of ["data-plane", "resource-manager", "client-sdk"]) {
-      ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
+  it("keeps combined SDK naming guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[rulesetName].disable?.[ruleName], undefined);
+    }
+    for (const oldName of ["use-create-for-put", "use-update-for-patch", "use-delete-for-delete"]) {
+      for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+        strictEqual(
+          ruleset.enable?.[`@azure-tools/typespec-client-generator-core/${oldName}`],
+          undefined,
+        );
+        strictEqual(
+          ruleset.disable?.[`@azure-tools/typespec-client-generator-core/${oldName}`],
+          undefined,
+        );
+      }
     }
   });
 

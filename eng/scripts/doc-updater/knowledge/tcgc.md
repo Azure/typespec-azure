@@ -204,7 +204,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## SDK Method Naming Rules
 
 - `get-operation-name` checks the common TCGC SDK name of concrete GET operations and requires a `get` or `list` prefix. It honors unscoped `@clientName`, ignores emitter-scoped overrides and OpenAPI operation IDs, and skips template declarations/artifacts and non-GET operations.
-- `use-create-for-put` checks concrete PUT endpoints and requires the common TCGC SDK name to start with `create`, case-insensitively. It uses the same common-name resolution, applies without requiring ARM provider metadata, and is disabled by default in the `client-sdk` ruleset.
+- `use-correct-verb` checks concrete PUT, PATCH, and DELETE endpoints and requires the common TCGC SDK name to start with `create`, `update`, and `delete`, respectively, case-insensitively. It replaces `use-create-for-put`, uses the same common-name resolution, applies without requiring ARM provider metadata, and is disabled by default in the `client-sdk` ruleset.
 - Linter-only naming rules do not alter the generated client graph or wire behavior, so their unit tests and generated rule reference pages are the appropriate coverage; do not add Spector carrier scenarios for them.
 
 ## isExactName Property (May 2026)

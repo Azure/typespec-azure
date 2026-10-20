@@ -8,11 +8,9 @@ export default {
     "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
     "@azure-tools/typespec-client-generator-core/use-union-hierarchy": true,
     "@azure-tools/typespec-client-generator-core/get-operation-name": false,
-    "@azure-tools/typespec-client-generator-core/use-delete-for-delete": false,
+    "@azure-tools/typespec-client-generator-core/use-correct-verb": false,
   },
   disable: {
-    "@azure-tools/typespec-client-generator-core/use-create-for-put":
-      "Opt-in ARM naming guidance; data-plane PUT methods may use other verbs.",
     "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms":
       "Disabled until the C# emitter handles standard acronym casing.",
   },
