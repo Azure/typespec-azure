@@ -438,12 +438,6 @@ describe("namespace selection logic", () => {
     const depths = testCases.map((tc) => ({ name: tc.name, depth: tc.name.split(".").length }));
     expect(depths[1].depth).toBeGreaterThan(depths[0].depth);
   });
-
-  it("should document management plane detection", () => {
-    // Azure.ResourceManager namespace indicates management plane
-    expect("management").toBe("management");
-    expect("data").toBe("data");
-  });
 });
 
 describe("inferLanguageFromEmitterName", () => {
