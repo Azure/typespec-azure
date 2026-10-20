@@ -568,17 +568,19 @@ describe("native coverage accounting", () => {
       const test = fixture();
       const metaFile = path.join(test.dataset, "_meta.json");
       const meta = JSON.parse(fs.readFileSync(metaFile, "utf8"));
-      meta.projects[0].sourcePath = "another-project";
+      meta.projects[0].apiVersion = "2027-01-01";
       write(metaFile, meta);
       const evidence = { ...test.evidence, files: inventoryDataset(test.dataset) };
       write(path.join(test.run, "baseline.json"), evidence);
       write(path.join(test.run, "manifest.json"), {
         schemaVersion: 2,
         status: "complete",
-        finishedAt: "today",
+        finishedAt: new Date().toISOString(),
         baselineIdentity: identity(evidence),
       });
-      expect(() => reuseBaseline(test.run, test.destination, test.context)).toThrow();
+      expect(() => reuseBaseline(test.run, test.destination, test.context)).toThrow(
+        /project population/i,
+      );
     });
 
     it.each(["schema", "incomplete", "failed", "empty", "escape"])(

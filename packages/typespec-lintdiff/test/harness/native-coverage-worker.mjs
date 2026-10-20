@@ -63,7 +63,9 @@ async function run() {
   const {
     NodeHost,
     compile,
+    getLifecycleVisibilityEnum,
     getService,
+    getVisibilityForClass,
     resolveCompilerOptions,
     getSourceLocation,
     isTemplateDeclaration,
@@ -110,7 +112,7 @@ async function run() {
   const [options, configDiagnostics] = await resolveCompilerOptions(NodeHost, {
     cwd: projectDir,
     entrypoint: mainPath,
-    overrides: { emit: [], options: {} },
+    overrides: { emit: [] },
   });
   const defaultProgram = await compile(NodeHost, mainPath, {
     ...options,
@@ -238,6 +240,24 @@ async function run() {
     pathToFileURL(requireFromSpecs.resolve("@typespec/compiler/typekit")).href
   );
   const tk = typekit.$(program);
+  const autorestOptions = autorest.resolveAutorestOptions(
+    program,
+    projectDir,
+    options.options?.["@azure-tools/typespec-autorest"] ?? {},
+  );
+  const metadataInfo = http.createMetadataInfo(program, {
+    canonicalVisibility: http.Visibility.Read,
+    canShareProperty(property) {
+      const sharedVisibilities = ["Read", "Create", "Update"];
+      const lifecycle = getLifecycleVisibilityEnum(program);
+      const visibilities = getVisibilityForClass(program, property, lifecycle);
+      return (
+        visibilities.size !== 0 &&
+        (visibilities.size === lifecycle.members.size ||
+          [...visibilities].every((visibility) => sharedVisibilities.includes(visibility.name)))
+      );
+    },
+  });
   const allowed = new Set();
   const key = (value) =>
     value.sourceFile === undefined
@@ -266,46 +286,58 @@ async function run() {
     (model.templateMapper?.args === undefined ||
       model.templateMapper.args.length === 0 ||
       model.derivedModels.length > 0);
-  const visit = (type, visited, service) => {
-    if (!type || visited.has(type)) return;
-    visited.add(type);
+  const referenceOnly = (type, service, visibility) =>
+    isExternalReference(type, service) &&
+    (autorestOptions.emitCommonTypesSchema === "never" ||
+      !metadataInfo.isTransformed(type, visibility));
+  const visit = (type, visited, service, visibility) => {
+    if (!type) return;
+    let seen = visited.get(visibility);
+    if (!seen) {
+      seen = new Set();
+      visited.set(visibility, seen);
+    }
+    if (seen.has(type)) return;
+    seen.add(type);
+    if (type.kind === "Model" && referenceOnly(type, service, visibility)) return;
     if (scope === "http-reachable" || (type.kind === "ModelProperty" && boolean(type))) add(type);
     switch (type.kind) {
       case "ModelProperty":
-        visit(type.type, visited, service);
+        visit(type.type, visited, service, visibility);
         break;
       case "Model":
-        for (const property of type.properties.values()) visit(property, visited, service);
+        for (const property of type.properties.values())
+          visit(property, visited, service, visibility);
         if (!isExternalReference(type, service)) {
           for (const derived of type.derivedModels) {
-            if (includeDerivedModel(derived, service)) visit(derived, visited, service);
+            if (includeDerivedModel(derived, service)) visit(derived, visited, service, visibility);
           }
         }
-        visit(type.baseModel, visited, service);
-        visit(type.indexer?.value, visited, service);
+        visit(type.baseModel, visited, service, visibility);
+        visit(type.indexer?.value, visited, service, visibility);
         break;
       case "Union":
-        for (const variant of type.variants.values()) visit(variant, visited, service);
+        for (const variant of type.variants.values()) visit(variant, visited, service, visibility);
         break;
       case "UnionVariant":
-        visit(type.type, visited, service);
+        visit(type.type, visited, service, visibility);
         break;
       case "Enum":
-        for (const member of type.members.values()) visit(member, visited, service);
+        for (const member of type.members.values()) visit(member, visited, service, visibility);
         break;
       case "Tuple":
-        for (const value of type.values) visit(value, visited, service);
+        for (const value of type.values) visit(value, visited, service, visibility);
         break;
     }
   };
-  const visitBody = (body, operation, visited, service) => {
+  const visitBody = (body, operation, visited, service, visibility) => {
     if (!body) return;
     if ("type" in body) {
       if (scope === "boolean-http" && boolean(body.type)) add(body.property ?? operation);
-      visit(body.type, visited, service);
+      visit(body.type, visited, service, visibility);
     }
     if ("parts" in body) {
-      for (const part of body.parts) visitBody(part.body, operation, visited, service);
+      for (const part of body.parts) visitBody(part.body, operation, visited, service, visibility);
     }
   };
   let serviceCount = 0;
@@ -347,17 +379,36 @@ async function run() {
     serviceCount++;
     if (scope === "http-reachable") add(namespace);
     for (const operation of serviceGraph.operations) {
-      const visited = new Set();
+      const visited = new Map();
+      const requestVisibility = http.resolveRequestVisibility(
+        program,
+        operation.operation,
+        operation.verb,
+      );
       if (scope === "http-reachable" || boolean(operation.operation.returnType))
         add(operation.operation);
-      visit(operation.operation.parameters, visited, selectedService);
-      visit(operation.operation.returnType, visited, selectedService);
+      if (scope === "http-reachable" && operation.container.kind === "Interface")
+        add(operation.container);
+      visit(operation.operation.parameters, visited, selectedService, requestVisibility);
+      visit(operation.operation.returnType, visited, selectedService, http.Visibility.Read);
       for (const parameter of operation.parameters.parameters)
-        visit(parameter.param, visited, selectedService);
-      visitBody(operation.parameters.body, operation.operation, visited, selectedService);
+        visit(parameter.param, visited, selectedService, requestVisibility);
+      visitBody(
+        operation.parameters.body,
+        operation.operation,
+        visited,
+        selectedService,
+        requestVisibility,
+      );
       for (const response of operation.responses) {
         for (const content of response.responses) {
-          visitBody(content.body, operation.operation, visited, selectedService);
+          visitBody(
+            content.body,
+            operation.operation,
+            visited,
+            selectedService,
+            http.Visibility.Read,
+          );
         }
       }
     }

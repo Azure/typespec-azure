@@ -244,6 +244,41 @@ linter:
       expect(result.diagnostics).toEqual([]);
     });
 
+    it("excludes direct reference-only model contents", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @Autorest.useRef("./common.json#/definitions/ExternalWidget")
+        model ExternalWidget { enabled: boolean; }
+        @get @route("/widget") op read(): ExternalWidget;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toEqual([]);
+    });
+
+    it("retains locally emitted visibility transformations of referenced models", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @Autorest.useRef("./common.json#/definitions/ExternalWidget")
+        model ExternalWidget {
+          enabled: boolean;
+          @visibility(Lifecycle.Read, Lifecycle.Delete) readAndDeleteOnly: string;
+        }
+        @patch @route("/widget") op update(@body body: ExternalWidget): void;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
     it("retains reachable union-variant diagnostic targets", () => {
       const offsetRule = "@azure-tools/typespec-azure-core/no-offsetdatetime";
       const result = evaluate(
@@ -253,6 +288,23 @@ linter:
         @get @route("/timestamp") op read(): Timestamp;
       `,
         { tspRules: [offsetRule], scope: "http-reachable" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
+    it("retains a reachable operation's owning interface target", () => {
+      const casingRule = "@azure-tools/typespec-azure-core/casing-style";
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        interface storeFront {
+          @get @route("/widgets") read(): string;
+        }
+      `,
+        { tspRules: [casingRule], scope: "http-reachable" },
       );
       expect(result.error).toBeUndefined();
       expect(result.status).toBe("success");

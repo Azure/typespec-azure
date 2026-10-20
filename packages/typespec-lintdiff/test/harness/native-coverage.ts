@@ -1098,9 +1098,9 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       ) {
         throw new Error(`Candidate artifact changed during the comparison: ${artifact.file}`);
       }
-      if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
-        throw new Error("Dataset changed during the comparison.");
-      }
+    }
+    if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
+      throw new Error("Dataset changed during the comparison.");
     }
     manifest.status = report.unassessedProjects.length > 0 ? "incomplete" : "complete";
     writeJson(path.join(output, "manifest.json"), {
