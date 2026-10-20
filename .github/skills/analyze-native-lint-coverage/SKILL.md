@@ -1,7 +1,7 @@
 ---
 name: analyze-native-lint-coverage
-description: Run official TypeSpec Azure lints from a merged or unmerged build against real Azure specs and compare their observed coverage with a Swagger validator. Support one-to-one, one-to-many, and separate many-to-one comparisons; defer general many-to-many analysis. Resolve fresh inputs, inject candidate packages, and investigate gaps without assuming equal counts prove equivalence.
-argument-hint: "[PR URL or native rule] [Swagger validator ID] [optional specs filter]"
+description: Run merged or unmerged official TypeSpec Azure lints against real specs. Compare one-to-one, one-to-many or explicit many-to-one mappings using fresh or verified reusable Swagger baselines. Preserve member evidence and diagnostic counts without assuming equal totals prove equivalence; defer general many-to-many.
+argument-hint: "[PR URL or native rule] [Swagger validator IDs] [optional baseline run or specs filter]"
 user-invocable: true
 ---
 
@@ -16,7 +16,7 @@ queue.
 ## Inputs and contract
 
 Resolve the candidate PR or branch, canonical repository, official native rule
-IDs, original validator ID, and intended audience. Inspect the actual source,
+IDs, original validator ID(s), and intended audience. Inspect the actual source,
 tests, registration, and authored rule documentation. PR descriptions can retain
 old rule names; verify the final `createRule({ name })` and linter registration.
 
@@ -32,42 +32,46 @@ profiles; do not present an ARM run as proof for those audiences.
 
 ## Mapping scope
 
-Use **one Swagger validator rule per analyzer invocation**, with an explicit
-list of official TypeSpec rule IDs. Record the validator ID, native IDs,
+Use an explicit mapping per analyzer invocation. Record validator IDs, native IDs,
 semantic checks supplied by each native rule, audience, rule options, alignment
 profile, and supporting violating/compliant tests in the migration evidence.
-This is a reviewable mapping record, not a new CLI manifest format.
+This is a reviewable mapping record, not a new CLI manifest format. Groups need
+the queue's [per-member intake and admission](../do-linter-development-task-one-by-one/native-first.md#input-and-group-admission)
+even when this skill runs independently.
 
 | Mapping                                    | Procedure                                                                                                                                                                 |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | One Swagger rule to one TypeSpec rule      | Pass one `--validator-rule` and one `--tsp-rule`.                                                                                                                         |
 | One Swagger rule to several TypeSpec rules | Repeat `--tsp-rule` for the rules that collectively implement the validator's checks. Preserve each rule's diagnostic identity and investigate its contribution.          |
-| Several Swagger rules to one TypeSpec rule | Run a separate comparison for each Swagger rule, using the same native rule and frozen compatible inputs. Give each validator its own report and conclusion.              |
+| Several Swagger rules to one TypeSpec rule | Repeat `--validator-rule` and pass exactly one `--tsp-rule`. Run native once and retain each Swagger member's observations, semantic tests and conclusion.                |
 | General many-to-many                       | Defer group-level analysis and equivalence. Record the mapping and limitation; do not infer a cross-product of rule pairs or collapse the group into one coverage result. |
 
-Do not repeat `--validator-rule`; the CLI rejects duplicate values. Do not
-invent a multi-validator flag, mapping-file option, or group runner. Independent
-one-to-one or one-to-many comparisons within a broader mapping can supply
-scoped evidence, but do not establish equivalence for the whole group.
+Repeated distinct `--validator-rule` values are supported; duplicate IDs and
+multiple validators combined with multiple native rules are rejected. Do not
+invent a mapping-file CLI option. Separate historical member comparisons remain
+scoped evidence; do not add their shared native counts together.
 
 For many-to-one comparisons, a shared native rule can report checks unrelated
 to the selected Swagger rule. Matching project sets can therefore hide a missing
 check. Verify each validator's material checks with discriminating violating and
 compliant fixtures, inspect the relevant native findings, and explain broader
 native behavior. Do not attribute findings by message text or property names.
-When reliable attribution is unavailable, report observed aggregate project
-overlap and unresolved attribution rather than claiming equivalence.
+When reliable attribution is unavailable, report group counts, observed project
+sets and independent member conclusions. Per-member native counts remain
+unassessed, not zero. Attribution limits alone are not missing production checks;
+unanswered required semantics or unexplained count gaps still block a conclusion.
 
 Related comparisons may use different options or alignment profiles only when
 those differences are explicit. Do not compare their totals as if they shared
 the same execution policy. In particular, `boolean-http` supports only the
 single Azure Core `no-boolean` rule, not a list of native rules.
 
-Keep each validator's population, failures, one-sided project sets, raw counts,
-and conclusion separate. Do not sum native findings across reports: a shared
-native diagnostic may appear in several comparisons. Different rule IDs at the
-same source location remain distinct findings; location coincidence does not
-establish semantic identity.
+Keep each validator's population, failures, raw counts and conclusion separate.
+Do not call a shared native rule's full project set that member's coverage
+without attribution. Different validator IDs at the same JSON path remain
+distinct observations; location coincidence does not establish semantic overlap.
+The tool sums raw member occurrences and counts native diagnostics once. It does
+not automatically normalize cross-validator overlap or actionable units.
 
 ## Fresh selection, immutable run
 
@@ -76,18 +80,19 @@ establish semantic identity.
 2. Discover or prepare dedicated candidate and specs checkouts. Never reset,
    clean, or appropriate another task's checkout. Keep auxiliary checkouts under
    the caller's worktrees boundary, default `C:\dev\worktrees`.
-3. Fetch the candidate's current head and the current
+3. For a new baseline, fetch the candidate's current head and the current
    `Azure/azure-rest-api-specs:typespec-next` branch. Select them once for this
    run. For a merged pilot, use current canonical `main` containing the merge,
-   not a historical merge SHA as the permanent default.
+   not a historical merge SHA as the permanent default. For explicit reuse,
+   read the baseline's specs/closure instead of resolving latest again.
 4. Resolve a compatible compiler/library closure from the candidate checkout,
    including its actual `core` gitlink. Do not independently install arbitrary
    `latest` compiler and Azure packages. If newer specs require newer APIs,
    report the mismatch; do not silently downgrade specs or drop failed projects.
 5. Record the resolved SHAs, package/tool versions, selection policies and
-   build/pack commands. Freeze them through the run. A new independent run
-   resolves fresh references; a replay checks out the recorded SHAs and uses
-   the retained artifacts. Never refresh a moving ref halfway through a run.
+   build/pack commands. Freeze them through the run. A baseline refresh resolves
+   fresh references; second/third candidate runs can select the same completed
+   baseline. Never refresh a moving ref halfway through a comparison.
 
 The tool snapshots the supplied clean checkouts, not remote branch names. The
 skill owns freshness selection. Preserve build logs proving that artifacts were
@@ -100,10 +105,46 @@ of fetching a new latest snapshot between comparisons. Use a distinct empty
 output directory for every invocation and record all policy differences.
 Run them serially when they share a writable specs checkout.
 
-The current analyzer regenerates Swagger and validator results on every
-invocation. It has no cached-dataset or native-receipt input. Retain the packages
-and evidence, but do not claim that selecting the same commits skips execution.
-Automatic baseline/native-result reuse is deferred tooling work.
+### Baseline lifecycle
+
+Without `--baseline-run`, the analyzer generates a fresh dataset and writes
+schema-2 `manifest.json` plus schema-1 `baseline.json`. To reuse that completed
+run, pass `--baseline-run <absolute-completed-run-directory>` with the usual
+candidate/specs/tarball options and a **new empty output directory**. This skips
+both Swagger generation and validator execution. It still patches/installs the
+candidate and reruns native workers; it does not reuse stale native findings.
+The old schema-1 pilot manifests are evidence, not reusable schema-2 baselines.
+
+Reuse verifies completion, source/runtime/generator/settings compatibility,
+project success/inventory, dataset schema/index/shards and every retained file's
+SHA-256 before and after copying. Corrupt, partial, failed, escaping or symlinked
+inputs fail explicitly; no silent refresh or compliant fallback occurs.
+Retain all dataset files needed by the baseline inventory.
+
+Identical candidate artifacts need no compatibility receipt. Changed lint
+artifacts require `--baseline-compatibility-receipt <absolute-json-path>`.
+The tool verifies unchanged packed compiler/emission/library/metadata closure
+outside the documented lint-file allowlist and requires content-bound reviewed
+assertions. See the exact receipt schema and compatibility boundary in
+[native-coverage.md](../../../packages/typespec-lintdiff/docs/native-coverage.md).
+This is not a signed attestation or automatic semantic proof. Review changed
+lint code, installation manifests/locks and emission effects; uncertainty,
+changed dependencies/metadata/emitter or an unsupported closure requires a new
+baseline, not an unsupported `--force` flag.
+
+A receipt-required attempt preserves both identities in its manifest/error.
+Review that evidence, then use a new output directory for the approved run;
+do not overwrite failed evidence. Receipt identities use the documented compact
+Node JSON representation, not an arbitrary JSON serializer or whitespace hash.
+
+Specs SHA alone never establishes cache compatibility. Store immutable baselines,
+compact results and member `migration.md` in the verified personal-fork evidence
+worktree, with durable checksummed large assets under the
+[evidence contract](../do-linter-development-task-one-by-one/evidence.md).
+The runtime consumes a local completed-run directory: publishing/downloading
+fork evidence and verifying portable replay are orchestration steps, not
+automatic CLI features. Refresh creates a new baseline; it never replaces the
+selected immutable one.
 
 ## Prepare candidate artifacts
 
@@ -181,6 +222,9 @@ variable is absent; skipped controls are not passing runtime evidence.
 
 Repeat `--tsp-rule` for an explicit one-to-many mapping. Do not credit unrelated
 diagnostics from an existing rule without investigating their attribution.
+For an admitted many-to-one group, repeat `--validator-rule` instead and retain
+exactly one native ID. For a second candidate run add `--baseline-run` and, when
+required, a reviewed compatibility receipt; all other required options remain.
 Production ruleset enablement is not changed: the worker explicitly enables the
 mapped rules only for the comparison, removes conflicting configuration-level
 disable entries, preserves directly configured and inherited rule options, and
@@ -206,17 +250,23 @@ rule-specific profile before claiming equivalence.
 
 The output contains:
 
-- `manifest.json`: run status, selected source identities, artifact SHA-256
-  hashes, scope, filtering and suppression policies, and command context.
-- `dataset`: freshly generated Swagger, validator shards, raw output, selected
-  API versions, and project failure metadata. No stale checked-in dataset is
-  reused.
+- `manifest.json` (schema 2): run status, source/runtime/artifact identities,
+  scope/policies, baseline context/identity and reuse/receipt provenance.
+- `baseline.json` (schema 1): frozen context, exact dataset inventory/hashes
+  and selected projects.
+- `dataset`: freshly generated or integrity-verified copied Swagger, validator
+  shards, raw output, API versions and failure metadata. No unchecked stale
+  dataset is reused.
 - `native-*.json`: raw and aligned target diagnostics, ambient diagnostics,
   default-activation findings, runtime package versions/entrypoint paths and
   entrypoint hashes, and projection receipts.
-- `coverage.json` and `coverage.md`: aligned assessable project sets, both
+- `coverage.json` (schema 2) and `coverage.md`: aligned assessable project sets, both
   one-sided sets, unassessed projects, raw counts, conservative identity counts,
   and both directions of count differences.
+- Group fields: explicit member observations, raw per-project difference and
+  both directional excess sums, unavailable member attribution and undetermined
+  completeness. Legacy location-count fields are conservative summaries, not
+  normalized actionable-check counts.
 - Per-stage and per-worker logs. Command failure is explicit and preserved.
 
 A nonzero exit with an incomplete report means some projects remain unassessed;
@@ -234,6 +284,16 @@ directions. Distinguish rule defects, source-to-emission multiplicity, selected
 versions, references, suppression, and infrastructure failures. JSON paths and
 source locations are different identities; do not use fuzzy or property-name
 matching to declare exact correspondence.
+
+For groups apply the
+[diagnostic-count policy](../do-linter-development-task-one-by-one/native-first.md#counts-completeness-and-correspondence).
+Raw counts are the starting observation; primary comparable counts need an
+explicit justified unit. Preserve signed/absolute/relative per-project gaps and
+both excess directions; equal corpus totals cannot cancel opposing gaps.
+Count proven overlapping actionable defects once only with separate tested
+normalization evidence. The CLI does not compute that normalization, relative
+threshold acceptance or semantic correspondence automatically. "Close" counts
+prioritize investigation, never waive an unexplained gap or omitted member.
 
 The report intentionally returns `equivalence: not-determined`, even with
 100% observed project coverage. State a separate evidence-backed semantic

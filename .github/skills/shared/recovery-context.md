@@ -31,6 +31,30 @@ current identities and content instead. Changed scope, an unexplained head, or
 missing evidence is still a blocker. Permission to edit these skills is not
 permission to restart a blocked rule task.
 
+### Native-first task scope
+
+Persist `flowVersion`, task ID, frozen validator membership/revision, native
+target, upstream/native profiles, baseline ID, candidate snapshot/artifacts,
+native/evidence owners and A/B review receipts in the same durable context.
+An old legacy context remains legacy; no resumption selector changes its PR
+bases, owners or repair history.
+
+Native-first maps the existing development/promotion preparation budgets to
+development/release-readiness. All eligibility and finite limits below still
+apply: task-wide orchestration/semantic-repair/reserve/timeout/comparison/hook
+allowances are shared by the whole group, never multiplied per member.
+Checkpoint B production-semantic defects return to A then B under the existing
+three-repair-cycle cap; documentation-only corrections reuse A only when its
+applicable content/inputs are unchanged. Keep all earlier failures and counters.
+Do not use semantic repair to retry operational errors.
+
+The one native PR is the active source PR for lifecycle purposes. Existing
+post-merge opt-in and exact legacy-fork permissions do not authorize an
+unrelated replacement PR. Evidence-fork publication is a separate recorded
+role under the native evidence contract, not `legacy_fork_update` and not a
+fork fallback for native or skill code. Preserve publication uncertainty,
+same-owner continuation and quiescence gates.
+
 ### Existing fork updates
 
 An explicit `legacy_fork_update` permits `update-existing` for that exact PR

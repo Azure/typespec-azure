@@ -13,6 +13,16 @@ This skill is the orchestrator. It should not blindly create new native lints. I
 
 Use the [classification guide](./classification-guide.md) when deciding how to frame the result.
 
+For [native-first grouped tasks](../do-linter-development-task-one-by-one/native-first.md),
+classify every member before deciding the group outcome. A coherent many-to-one
+extension is allowed; similar implementation structure alone is not enough.
+Retain per-member test/conclusion evidence, compatible public controls, and
+existing released native IDs. Use combined comparable diagnostic counts as the
+main numerical signal, with member completeness and project guardrails; equal
+counts or a dominant member cannot hide an omitted check. The queue owns the
+single native PR, separate evidence publication and both review checkpoints.
+Do not route that task through temporary development or promotion.
+
 ## Process
 
 1. If the user did not name a rule, shortlist candidates that look safe to migrate now:

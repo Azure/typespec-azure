@@ -91,11 +91,10 @@ async function run() {
     ...validator.nativeRulesets.azCommon.rules,
     ...validator.nativeRulesets.azArm.rules,
   };
-  if (
-    !Object.hasOwn(spectralRules, input.validatorRule) &&
-    !Object.hasOwn(nativeRules, input.validatorRule)
-  ) {
-    throw new Error(`Unknown production ARM validator rule: ${input.validatorRule}`);
+  for (const rule of input.validatorRules ?? [input.validatorRule]) {
+    if (!Object.hasOwn(spectralRules, rule) && !Object.hasOwn(nativeRules, rule)) {
+      throw new Error(`Unknown production ARM validator rule: ${rule}`);
+    }
   }
   const projectDir = path.resolve(specsRepo, project.sourcePath);
   const mainPath = path.join(projectDir, "main.tsp");

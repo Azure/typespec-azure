@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
+import { gunzipSync } from "node:zlib";
 
 export interface NativeDiagnostic {
   rule: string;
@@ -39,6 +40,7 @@ interface DatasetProject {
 }
 
 interface ValidatorDiagnostic {
+  rule?: string;
   project: string;
   swaggerFile: string;
   path: Array<string | number>;
@@ -55,24 +57,29 @@ interface ProjectCounts {
   nativeSourceCount: number;
   nativeLocationlessCount: number;
   difference: number;
+  rawDifference: number;
 }
 
-interface Config {
+export interface Config {
   candidateRepo: string;
   specsRepo: string;
   tgzDir: string;
   output: string;
   validatorRule: string;
+  validatorRules: string[];
   tspRules: string[];
   scope: "source" | "http-reachable" | "boolean-http";
   concurrency: number;
   filter?: string;
   limit?: number;
+  baselineRun?: string;
+  baselineCompatibilityReceipt?: string;
 }
 
 export function parseNativeCoverageArgs(args: string[]): Config {
   const values = new Map<string, string>();
   const tspRules: string[] = [];
+  const validatorRules: string[] = [];
   const names = new Set([
     "--candidate-repo",
     "--specs-repo",
@@ -84,6 +91,8 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     "--concurrency",
     "--filter",
     "--limit",
+    "--baseline-run",
+    "--baseline-compatibility-receipt",
   ]);
   for (let index = 0; index < args.length; index += 2) {
     const name = args[index];
@@ -91,7 +100,12 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     if (!names.has(name) || !value || value.startsWith("--")) {
       throw new Error(`Unknown argument or missing value: ${name}`);
     }
-    if (name === "--tsp-rule") {
+    if (name === "--validator-rule") {
+      if (!/^[A-Za-z][A-Za-z0-9._-]*$/.test(value) || validatorRules.includes(value)) {
+        throw new Error(`Invalid or duplicate validator rule: ${value}`);
+      }
+      validatorRules.push(value);
+    } else if (name === "--tsp-rule") {
       if (!/^@azure-tools\/[^/]+\/[^/]+$/.test(value) || tspRules.includes(value)) {
         throw new Error(`Invalid or duplicate official rule: ${value}`);
       }
@@ -119,6 +133,13 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     throw new Error(`Unsupported comparison scope: ${scope}`);
   }
   if (tspRules.length === 0) throw new Error("At least one --tsp-rule is required.");
+  if (validatorRules.length === 0) throw new Error("At least one --validator-rule is required.");
+  if (validatorRules.length > 1 && tspRules.length > 1) {
+    throw new Error("General many-to-many mappings are not supported.");
+  }
+  if (values.has("--baseline-compatibility-receipt") && !values.has("--baseline-run")) {
+    throw new Error("--baseline-compatibility-receipt requires --baseline-run.");
+  }
   if (
     scope === "boolean-http" &&
     (tspRules.length !== 1 || tspRules[0] !== "@azure-tools/typespec-azure-core/no-boolean")
@@ -130,12 +151,15 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     specsRepo: required("--specs-repo"),
     tgzDir: required("--tgz-dir"),
     output: required("--output"),
-    validatorRule: required("--validator-rule"),
+    validatorRule: validatorRules[0],
+    validatorRules,
     tspRules,
     scope,
     concurrency: positiveInteger("--concurrency", 2)!,
     filter: values.get("--filter"),
     limit: positiveInteger("--limit"),
+    baselineRun: values.get("--baseline-run"),
+    baselineCompatibilityReceipt: values.get("--baseline-compatibility-receipt"),
   };
 }
 
@@ -151,6 +175,7 @@ export function buildNativeCoverageReport(
   projects: DatasetProject[],
   validator: ValidatorDiagnostic[],
   native: NativeProjectResult[],
+  validatorRules = [...new Set(validator.map((item) => item.rule ?? "unspecified"))],
 ) {
   const selected = new Set<string>();
   for (const project of projects) {
@@ -188,8 +213,9 @@ export function buildNativeCoverageReport(
       unassessedValidatorRawCount += swagger.length;
       continue;
     }
-    const validatorFileIndependentCount = new Set(swagger.map((item) => JSON.stringify(item.path)))
-      .size;
+    const validatorFileIndependentCount = new Set(
+      swagger.map((item) => JSON.stringify([item.rule, item.path])),
+    ).size;
     const nativeSourceCount = new Set(receipt.diagnostics.map(sourceIdentity)).size;
     rows.push({
       project: project.sourcePath,
@@ -205,6 +231,7 @@ export function buildNativeCoverageReport(
           item.sourceFile === undefined || item.line === undefined || item.column === undefined,
       ).length,
       difference: validatorFileIndependentCount - nativeSourceCount,
+      rawDifference: swagger.length - receipt.diagnostics.length,
     });
   }
   const validatorProjects = rows
@@ -217,6 +244,7 @@ export function buildNativeCoverageReport(
     .sort();
   const validatorSet = new Set(validatorProjects);
   const nativeSet = new Set(nativeProjects);
+  const assessable = new Set(rows.map((row) => row.project));
   const overlapProjects = validatorProjects.filter((project) => nativeSet.has(project));
   const sum = (
     field:
@@ -229,12 +257,33 @@ export function buildNativeCoverageReport(
       | "nativeLocationlessCount",
   ) => rows.reduce((total, row) => total + row[field], 0);
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     equivalence: "not-determined" as const,
+    countingUnit:
+      "sum of raw member validator occurrences versus aligned native diagnostics, counted once",
+    crossValidatorOverlap: "not-normalized; shared paths do not establish semantic identity",
+    memberNativeAttribution: "unavailable; member-specific semantic tests are required",
+    members: validatorRules.map((rule) => {
+      const observations = validator.filter((item) => (item.rule ?? "unspecified") === rule);
+      return {
+        rule,
+        rawCount: observations.length,
+        assessableRawCount: observations.filter((item) => assessable.has(item.project)).length,
+        unassessedRawCount: observations.filter((item) => !assessable.has(item.project)).length,
+        observations,
+        projects: [...new Set(observations.map((item) => item.project))].sort(),
+        nativeAttribution: "unavailable",
+        semanticCompleteness: "not-determined",
+      };
+    }),
     selectedProjectCount: projects.length,
+    selectedValidatorRawCount: validator.length,
     assessableProjectCount: rows.length,
     unassessedProjects,
     unassessedValidatorRawCount,
+    unassessedNativeRawCount: native
+      .filter((item) => !assessable.has(item.project))
+      .reduce((total, item) => total + item.rawDiagnostics.length, 0),
     validatorProjects,
     nativeProjects,
     overlapProjects,
@@ -251,11 +300,15 @@ export function buildNativeCoverageReport(
     nativeAlignedCount: sum("nativeAlignedCount"),
     nativeSourceCount: sum("nativeSourceCount"),
     nativeLocationlessCount: sum("nativeLocationlessCount"),
+    rawValidatorExcess: rows.reduce((total, row) => total + Math.max(0, row.rawDifference), 0),
+    rawNativeExcess: rows.reduce((total, row) => total + Math.max(0, -row.rawDifference), 0),
+    projectsWithEqualRawCounts: rows.filter((row) => row.rawDifference === 0).length,
     projectsWithEqualCounts: rows.filter((row) => row.difference === 0).length,
     validatorExcess: rows.reduce((total, row) => total + Math.max(0, row.difference), 0),
     nativeExcess: rows.reduce((total, row) => total + Math.max(0, -row.difference), 0),
     projects: rows.sort(
       (left, right) =>
+        Math.abs(right.rawDifference) - Math.abs(left.rawDifference) ||
         Math.abs(right.difference) - Math.abs(left.difference) ||
         left.project.localeCompare(right.project),
     ),
@@ -282,6 +335,435 @@ function writeJson(file: string, value: unknown): void {
   fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function hash(value: string | Buffer): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function contentIdentity(value: unknown): string {
+  return hash(JSON.stringify(value));
+}
+
+function containedFile(root: string, relative: string): string {
+  const target = path.resolve(root, relative);
+  const local = path.relative(root, target);
+  if (!local || local.startsWith("..") || path.isAbsolute(local)) {
+    throw new Error(`Evidence path escapes its directory: ${relative}`);
+  }
+  let current = root;
+  for (const part of local.split(path.sep)) {
+    current = path.join(current, part);
+    if (fs.lstatSync(current).isSymbolicLink()) {
+      throw new Error(`Evidence must not contain symbolic links: ${relative}`);
+    }
+  }
+  return target;
+}
+
+export function inventoryDataset(root: string): Array<{ file: string; sha256: string }> {
+  const files: Array<{ file: string; sha256: string }> = [];
+  function visit(directory: string) {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const absolute = path.join(directory, entry.name);
+      if (entry.isSymbolicLink()) throw new Error("Dataset contains a symbolic link.");
+      if (entry.isDirectory()) visit(absolute);
+      else if (entry.isFile()) {
+        files.push({
+          file: path.relative(root, absolute),
+          sha256: hash(fs.readFileSync(absolute)),
+        });
+      } else throw new Error("Unsupported dataset file type.");
+    }
+  }
+  visit(root);
+  return files.sort((left, right) => left.file.localeCompare(right.file));
+}
+
+export interface BaselineContext {
+  specsCommit: string;
+  specsRepository: string;
+  coreCommit: string;
+  nodeVersion: string;
+  specsPackageManager: string;
+  scope: Config["scope"];
+  filter?: string;
+  limit?: number;
+  generatorFiles: Array<{ file: string; sha256: string }>;
+  toolingDependencies: Array<{ file: string; sha256: string }>;
+  runtimeInstallation: Array<{ file: string; sha256: string }>;
+  candidateCommit: string;
+  artifacts: Array<{ file: string; sha256: string }>;
+  lintArtifactContents: Array<{ artifact: string; files: Array<{ file: string; sha256: string }> }>;
+}
+
+export function packedFileInventory(archive: Buffer): Array<{ file: string; sha256: string }> {
+  const data = gunzipSync(archive);
+  const files = new Map<string, string>();
+  let extendedPath: string | undefined;
+  for (let offset = 0; offset + 512 <= data.length;) {
+    const header = data.subarray(offset, offset + 512);
+    if (header.every((byte) => byte === 0)) break;
+    const text = (start: number, end: number) =>
+      header.subarray(start, end).toString("utf8").replace(/\0.*$/s, "");
+    const sizeText = text(124, 136).trim();
+    if (!/^[0-7]+$/.test(sizeText)) throw new Error("Unsupported tar entry size.");
+    const size = Number.parseInt(sizeText, 8);
+    const start = offset + 512;
+    if (!Number.isSafeInteger(size) || start + size > data.length) {
+      throw new Error("Truncated packed artifact.");
+    }
+    const content = data.subarray(start, start + size);
+    const type = text(156, 157);
+    const prefix = text(345, 500);
+    const file = extendedPath ?? (prefix ? `${prefix}/${text(0, 100)}` : text(0, 100));
+    if (type === "x") {
+      let position = 0;
+      while (position < content.length) {
+        const separator = content.indexOf(32, position);
+        const length = Number(content.subarray(position, separator).toString("utf8"));
+        if (
+          separator < position ||
+          !Number.isSafeInteger(length) ||
+          length <= 0 ||
+          position + length > content.length
+        )
+          throw new Error("Invalid tar extended header.");
+        const record = content.subarray(separator + 1, position + length - 1).toString("utf8");
+        if (record.startsWith("path=")) extendedPath = record.slice(5);
+        else if (!/^(mtime|atime|ctime)=/.test(record)) {
+          throw new Error("Unsupported tar extended metadata.");
+        }
+        position += length;
+      }
+    } else {
+      extendedPath = undefined;
+      if (!file.startsWith("package/") || file.split("/").includes("..")) {
+        throw new Error("Packed artifact path escapes its package.");
+      }
+      if (type === "0" || type === "") {
+        if (files.has(file)) throw new Error("Duplicate packed artifact file.");
+        files.set(file, hash(content));
+      } else if (type !== "5") throw new Error("Unsupported packed artifact entry type.");
+    }
+    offset = start + Math.ceil(size / 512) * 512;
+  }
+  if (files.size === 0 || extendedPath !== undefined)
+    throw new Error("Empty or invalid packed artifact.");
+  return [...files]
+    .map(([file, sha256]) => ({ file, sha256 }))
+    .sort((left, right) => left.file.localeCompare(right.file));
+}
+
+function isLintArtifact(file: string): boolean {
+  return /^azure-tools-typespec-(azure-core|azure-resource-manager|client-generator-core)-/.test(
+    file,
+  );
+}
+
+export interface BaselineEvidence {
+  schemaVersion: 1;
+  context: BaselineContext;
+  files: Array<{ file: string; sha256: string }>;
+  projects: DatasetProject[];
+}
+
+interface CoverageDataset {
+  schemaVersion: number;
+  complete: boolean;
+  specsCommit: string;
+  specsRepository: string;
+  resultFiles: string[];
+  commonTypesFiles: string[];
+  filters: { serviceType: string; path?: string; limit?: number };
+  projects: DatasetProject[];
+}
+
+export function readCoverageDataset(
+  datasetDir: string,
+  context: BaselineContext,
+  requireSuccessful = false,
+) {
+  const dataset: CoverageDataset = JSON.parse(
+    fs.readFileSync(containedFile(datasetDir, "_meta.json"), "utf8"),
+  );
+  if (
+    dataset.schemaVersion !== 4 ||
+    dataset.complete !== true ||
+    !context.specsCommit ||
+    dataset.specsCommit !== context.specsCommit ||
+    dataset.specsRepository !== context.specsRepository ||
+    !Array.isArray(dataset.projects) ||
+    dataset.projects.length === 0 ||
+    dataset.filters?.serviceType !== "resource-manager" ||
+    dataset.filters.path !== context.filter?.replace(/\\/g, "/") ||
+    dataset.filters.limit !== context.limit
+  ) {
+    throw new Error(
+      "Dataset schema, completion, snapshot or population selection is incompatible.",
+    );
+  }
+  const selected = new Set<string>();
+  for (const project of dataset.projects) {
+    if (
+      typeof project.sourcePath !== "string" ||
+      !project.sourcePath ||
+      path.isAbsolute(project.sourcePath) ||
+      project.sourcePath.split(/[\\/]/).includes("..") ||
+      selected.has(project.sourcePath) ||
+      !["success", "failed"].includes(project.compileStatus) ||
+      !["success", "failed", "no-swagger"].includes(project.validationStatus) ||
+      (requireSuccessful &&
+        (project.compileStatus !== "success" || project.validationStatus !== "success"))
+    ) {
+      throw new Error("Baseline population contains duplicate, invalid or failed projects.");
+    }
+    selected.add(project.sourcePath);
+  }
+  const references = [
+    dataset.resultFiles,
+    dataset.commonTypesFiles,
+    ...dataset.projects.flatMap((project) => {
+      const record = project as DatasetProject & {
+        swaggerFiles: string[];
+        swaggerAssets: string[];
+        rawFiles: string[];
+        typespecFiles: string[];
+      };
+      return [record.swaggerFiles, record.swaggerAssets, record.rawFiles, record.typespecFiles];
+    }),
+  ];
+  for (const files of references) {
+    if (!Array.isArray(files)) throw new Error("Missing dataset file inventory.");
+    for (const file of files) {
+      if (typeof file !== "string" || !fs.statSync(containedFile(datasetDir, file)).isFile()) {
+        throw new Error("Missing referenced dataset file.");
+      }
+    }
+  }
+  const index: {
+    schemaVersion: number;
+    specsCommit: string;
+    totalViolations: number;
+    rules: Record<string, { count: number; resultsFile: string }>;
+  } = JSON.parse(fs.readFileSync(containedFile(datasetDir, "validator-results.json"), "utf8"));
+  if (index.schemaVersion !== 4 || index.specsCommit !== context.specsCommit || !index.rules) {
+    throw new Error("Invalid validator dataset index.");
+  }
+  const members = new Map<string, ValidatorDiagnostic[]>();
+  for (const [rule, entry] of Object.entries(index.rules)) {
+    if (!rule || !Number.isSafeInteger(entry.count) || entry.count < 0) {
+      throw new Error(`Invalid validator index entry: ${rule}`);
+    }
+    const shard = JSON.parse(fs.readFileSync(containedFile(datasetDir, entry.resultsFile), "utf8"));
+    if (
+      shard.schemaVersion !== 4 ||
+      shard.rule !== rule ||
+      shard.specsCommit !== context.specsCommit ||
+      !Array.isArray(shard.results) ||
+      shard.results.length !== entry.count ||
+      shard.results.some(
+        (item: ValidatorDiagnostic) =>
+          item.rule !== rule ||
+          !selected.has(item.project) ||
+          typeof item.swaggerFile !== "string" ||
+          !Array.isArray(item.path) ||
+          item.path.some((part) => typeof part !== "string" && typeof part !== "number"),
+      )
+    ) {
+      throw new Error(`Invalid validator shard: ${rule}`);
+    }
+    members.set(rule, shard.results);
+  }
+  if (
+    contentIdentity([...dataset.resultFiles].sort()) !==
+    contentIdentity(
+      Object.values(index.rules)
+        .map((entry) => entry.resultsFile)
+        .sort(),
+    )
+  ) {
+    throw new Error("Dataset and validator shard inventories differ.");
+  }
+  if (
+    [...members.values()].reduce((total, items) => total + items.length, 0) !==
+    index.totalViolations
+  ) {
+    throw new Error("Validator index totals do not match its shards.");
+  }
+  return { dataset, members };
+}
+
+export function validateBaselineCompatibility(
+  evidence: BaselineEvidence,
+  context: BaselineContext,
+  receipt?: unknown,
+): void {
+  const {
+    candidateCommit: beforeCommit,
+    artifacts: beforeArtifacts,
+    runtimeInstallation: beforeRuntime,
+    lintArtifactContents: beforeContents,
+    ...before
+  } = evidence.context;
+  const {
+    candidateCommit: afterCommit,
+    artifacts: afterArtifacts,
+    runtimeInstallation: afterRuntime,
+    lintArtifactContents: afterContents,
+    ...after
+  } = context;
+  if (contentIdentity(before) !== contentIdentity(after)) {
+    throw new Error(
+      "Baseline compiler, generator, settings, runtime or specs context is incompatible.",
+    );
+  }
+  if (
+    beforeCommit === afterCommit &&
+    contentIdentity(beforeArtifacts) === contentIdentity(afterArtifacts) &&
+    beforeRuntime.some((item) => /lock/.test(item.file)) &&
+    contentIdentity(beforeRuntime) === contentIdentity(afterRuntime)
+  ) {
+    return;
+  }
+  const old = new Map(beforeArtifacts.map((item) => [item.file, item.sha256]));
+  const changed = afterArtifacts.filter((item) => old.get(item.file) !== item.sha256);
+  if (
+    beforeArtifacts.length !== afterArtifacts.length ||
+    beforeArtifacts.some((item) => !afterArtifacts.some((other) => other.file === item.file)) ||
+    changed.some((item) => !isLintArtifact(item.file))
+  ) {
+    throw new Error(
+      "Changed compiler, emitter, dependency artifacts or artifact population invalidate baseline reuse.",
+    );
+  }
+  const emissionClosure = (files: Array<{ file: string; sha256: string }>) =>
+    files.filter(
+      (item) =>
+        !/^package\/dist\/src\/(?:rules\/.+|linter)\.(?:js|d\.ts)(?:\.map)?$/.test(item.file),
+    );
+  for (const artifact of changed) {
+    const previous = beforeContents.find((item) => item.artifact === artifact.file);
+    const current = afterContents.find((item) => item.artifact === artifact.file);
+    if (
+      !previous ||
+      !current ||
+      previous.files.length === 0 ||
+      current.files.length === 0 ||
+      !previous.files.some((item) => item.file === "package/package.json") ||
+      !current.files.some((item) => item.file === "package/package.json") ||
+      contentIdentity(emissionClosure(previous.files)) !==
+        contentIdentity(emissionClosure(current.files))
+    ) {
+      throw new Error(
+        "Packed emission/library/metadata/dependency closure changed or is unverifiable.",
+      );
+    }
+  }
+  const reviewed = receipt as
+    | {
+        schemaVersion?: number;
+        baselineIdentity?: string;
+        candidateContextIdentity?: string;
+        reviewedBy?: string;
+        rationale?: string;
+        assertions?: Record<string, boolean>;
+      }
+    | undefined;
+  if (
+    reviewed?.schemaVersion !== 1 ||
+    reviewed.baselineIdentity !== contentIdentity(evidence) ||
+    reviewed.candidateContextIdentity !== contentIdentity(context) ||
+    typeof reviewed.reviewedBy !== "string" ||
+    !reviewed.reviewedBy.trim() ||
+    typeof reviewed.rationale !== "string" ||
+    !reviewed.rationale.trim() ||
+    [
+      "lintOnly",
+      "unchangedCompiler",
+      "unchangedLibraries",
+      "unchangedEmission",
+      "unchangedMetadata",
+      "unchangedDependencies",
+      "noUnknownChanges",
+    ].some((assertion) => reviewed.assertions?.[assertion] !== true)
+  ) {
+    throw new Error(
+      `A reviewed lint-only compatibility receipt is required. baselineIdentity=${contentIdentity(evidence)} candidateContextIdentity=${contentIdentity(context)}`,
+    );
+  }
+}
+
+export function reuseBaseline(
+  run: string,
+  destination: string,
+  context: BaselineContext,
+  receipt?: unknown,
+) {
+  const manifestFile = containedFile(run, "manifest.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
+  const baselineFile = containedFile(run, "baseline.json");
+  const evidence: BaselineEvidence = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
+  if (
+    manifest.schemaVersion !== 2 ||
+    manifest.status !== "complete" ||
+    typeof manifest.finishedAt !== "string" ||
+    !Number.isFinite(Date.parse(manifest.finishedAt)) ||
+    evidence.schemaVersion !== 1 ||
+    !Array.isArray(evidence.files) ||
+    manifest.baselineIdentity !== contentIdentity(evidence)
+  ) {
+    throw new Error("Only a completed, sealed schema-2 baseline run can be reused.");
+  }
+  validateBaselineCompatibility(evidence, context, receipt);
+  const datasetDir = containedFile(run, "dataset");
+  if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
+    throw new Error("Baseline dataset inventory or file hashes are corrupt.");
+  }
+  const result = readCoverageDataset(datasetDir, context, true);
+  if (contentIdentity(result.dataset.projects) !== contentIdentity(evidence.projects)) {
+    throw new Error("Baseline project population changed.");
+  }
+  if (fs.existsSync(destination)) throw new Error("Baseline copy destination already exists.");
+  fs.cpSync(datasetDir, destination, { recursive: true, errorOnExist: true, force: false });
+  if (contentIdentity(inventoryDataset(destination)) !== contentIdentity(evidence.files)) {
+    throw new Error("Copied baseline dataset failed integrity verification.");
+  }
+  return {
+    evidence,
+    provenance: {
+      run: path.resolve(run),
+      manifestSha256: hash(fs.readFileSync(manifestFile)),
+      baselineIdentity: contentIdentity(evidence),
+      compatibilityReceipt: receipt ?? null,
+      compatibilityReceiptIdentity: receipt === undefined ? null : contentIdentity(receipt),
+    },
+  };
+}
+
+export async function prepareCoverageBaseline(
+  config: Pick<Config, "baselineRun" | "baselineCompatibilityReceipt">,
+  datasetDir: string,
+  context: BaselineContext,
+  generateSwaggerAndValidate: () => Promise<void>,
+) {
+  if (config.baselineRun) {
+    const receipt = config.baselineCompatibilityReceipt
+      ? JSON.parse(fs.readFileSync(config.baselineCompatibilityReceipt, "utf8"))
+      : undefined;
+    return reuseBaseline(path.resolve(config.baselineRun), datasetDir, context, receipt);
+  }
+  await generateSwaggerAndValidate();
+  const generated = readCoverageDataset(datasetDir, context);
+  return {
+    evidence: {
+      schemaVersion: 1 as const,
+      context,
+      files: inventoryDataset(datasetDir),
+      projects: generated.dataset.projects,
+    },
+    provenance: undefined,
+  };
+}
+
 async function command(cwd: string, args: string[], log: string): Promise<void> {
   console.log(`Running ${path.basename(log)}; raw output: ${log}`);
   const fd = fs.openSync(log, "w");
@@ -306,11 +788,14 @@ function markdown(report: ReturnType<typeof buildNativeCoverageReport>, config: 
   const lines = [
     "# Native TypeSpec coverage analysis",
     "",
-    `Validator: \`${config.validatorRule}\``,
+    `Validators: ${config.validatorRules.map((rule) => `\`${rule}\``).join(", ")}`,
     `Native rules: ${config.tspRules.map((rule) => `\`${rule}\``).join(", ")}`,
     `Scope: \`${config.scope}\`; partial: ${config.filter !== undefined || config.limit !== undefined}.`,
     "",
     "**This is observed coverage, not an automatic equivalence decision.**",
+    `Primary counting unit: ${report.countingUnit}.`,
+    "Member-native attribution is unavailable. Test every member's semantics, including members with no observations.",
+    "Cross-validator overlap is not normalized. Equal source locations do not establish one actionable grouped violation.",
     "JSON paths and source locations are different identity domains. One-sided projects and outliers require investigation.",
     config.scope === "source"
       ? "Source diagnostics include all declared versions; Swagger uses the latest emitted API version."
@@ -326,6 +811,14 @@ function markdown(report: ReturnType<typeof buildNativeCoverageReport>, config: 
     `| Native raw / aligned / source targets | ${report.nativeRawCount} / ${report.nativeAlignedCount} / ${report.nativeSourceCount} |`,
     `| Native findings under project defaults | ${report.nativeDefaultCount} |`,
     `| Validator excess / native excess | ${report.validatorExcess} / ${report.nativeExcess} |`,
+    `| Raw validator excess / raw native excess (primary) | ${report.rawValidatorExcess} / ${report.rawNativeExcess} |`,
+    "",
+    "## Member observations (not member-native coverage)",
+    "",
+    ...report.members.map(
+      (member) =>
+        `- ${member.rule}: ${member.rawCount} raw observations; completeness not determined.`,
+    ),
     "",
     "## One-sided projects",
     "",
@@ -340,13 +833,13 @@ function markdown(report: ReturnType<typeof buildNativeCoverageReport>, config: 
     "",
     "## Diagnostic outliers",
     "",
-    "| Project | Validator paths | Native targets | Difference |",
-    "| --- | ---: | ---: | ---: |",
+    "| Project | Validator raw | Native aligned | Raw difference | Validator paths | Native targets | Location difference |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ...report.projects
-      .filter((row) => row.difference !== 0)
+      .filter((row) => row.difference !== 0 || row.rawDifference !== 0)
       .map(
         (row) =>
-          `| ${row.project} | ${row.validatorFileIndependentCount} | ${row.nativeSourceCount} | ${row.difference} |`,
+          `| ${row.project} | ${row.validatorRawCount} | ${row.nativeAlignedCount} | ${row.rawDifference} | ${row.validatorFileIndependentCount} | ${row.nativeSourceCount} | ${row.difference} |`,
       ),
     "",
   ];
@@ -362,10 +855,14 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       "Output must be a new or empty run directory; previous evidence is never overwritten.",
     );
   }
-  for (const root of [candidateRepo, specsRepo]) {
+  for (const root of [
+    candidateRepo,
+    specsRepo,
+    ...(config.baselineRun ? [path.resolve(config.baselineRun)] : []),
+  ]) {
     const relative = path.relative(root, output);
     if (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative)) {
-      throw new Error("Output must be outside the candidate and specs checkouts.");
+      throw new Error("Output must be outside input checkouts and retained baseline runs.");
     }
   }
   const candidate = snapshot(candidateRepo);
@@ -394,7 +891,7 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     throw new Error(`Missing @typespec/integration-tester CLI: ${integration}`);
   fs.mkdirSync(output, { recursive: true });
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     startedAt: new Date().toISOString(),
     status: "running",
     config: { ...config, candidateRepo, specsRepo, output, tgzDir },
@@ -406,14 +903,15 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       "rev-parse",
       "HEAD",
     ]),
-    generatorFiles: ["native-coverage.ts", "native-coverage-worker.mjs", "spec-dataset.ts"].map(
-      (file) => ({
+    generatorFiles: [
+      ...["native-coverage.ts", "native-coverage-worker.mjs", "spec-dataset.ts"].map((file) => ({
         file,
         sha256: createHash("sha256")
           .update(fs.readFileSync(path.join(import.meta.dirname, file)))
           .digest("hex"),
-      }),
-    ),
+      })),
+      { file: "candidate:tsp-integration", sha256: hash(fs.readFileSync(integration)) },
+    ],
     nodeVersion: process.version,
     specsPackageManager: JSON.parse(fs.readFileSync(path.join(specsRepo, "package.json"), "utf8"))
       .packageManager,
@@ -423,6 +921,9 @@ export async function runNativeCoverage(config: Config): Promise<void> {
         "existing project configuration plus explicit mapped-rule enablement; source suppressions retained",
       equivalence: "manual decision required; no fuzzy matching or name-only normalization",
     },
+    baselineIdentity: undefined as string | undefined,
+    baselineReuse: undefined as ReturnType<typeof reuseBaseline>["provenance"] | undefined,
+    baselineContext: undefined as BaselineContext | undefined,
   };
   writeJson(path.join(output, "manifest.json"), manifest);
   try {
@@ -443,39 +944,92 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       path.join(output, "integration.log"),
     );
     const datasetDir = path.join(output, "dataset");
-    const generatorArgs = [
-      "--import",
-      import.meta.resolve("tsx/esm"),
-      path.join(import.meta.dirname, "spec-dataset.ts"),
-      "--specs-repo",
-      specsRepo,
-      "--commit",
-      specs.commit,
-      "--output",
-      datasetDir,
-      "--concurrency",
-      String(config.concurrency),
-    ];
-    if (config.filter !== undefined) generatorArgs.push("--filter", config.filter);
-    if (config.limit !== undefined) generatorArgs.push("--limit", String(config.limit));
-    await command(
-      path.resolve(import.meta.dirname, "..", ".."),
-      generatorArgs,
-      path.join(output, "swagger.log"),
-    );
-    const dataset: { specsCommit: string; projects: DatasetProject[] } = JSON.parse(
-      fs.readFileSync(path.join(datasetDir, "_meta.json"), "utf8"),
-    );
-    if (dataset.specsCommit !== specs.commit || dataset.projects.length === 0) {
-      throw new Error("Generated dataset has the wrong snapshot or an empty population.");
+    const runtimeFiles = [
+      path.join(specsRepo, "package.json"),
+      path.join(specsRepo, "pnpm-lock.yaml"),
+      path.join(specsRepo, "package-lock.json"),
+      path.join(specsRepo, "node_modules", ".pnpm", "lock.yaml"),
+      path.join(specsRepo, "node_modules", ".package-lock.json"),
+    ]
+      .filter((file) => fs.existsSync(file))
+      .map((file, index) => ({
+        file: `${index}-${path.basename(file)}`,
+        content: fs.readFileSync(file),
+      }));
+    for (const item of runtimeFiles) {
+      const destination = path.join(output, "runtime-installation", item.file);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.writeFileSync(destination, item.content);
     }
-    const index: { rules: Record<string, { resultsFile: string }> } = JSON.parse(
-      fs.readFileSync(path.join(datasetDir, "validator-results.json"), "utf8"),
-    );
-    const shard = index.rules[config.validatorRule];
-    const validator: ValidatorDiagnostic[] = shard
-      ? JSON.parse(fs.readFileSync(path.join(datasetDir, shard.resultsFile), "utf8")).results
-      : [];
+    const context: BaselineContext = {
+      specsCommit: specs.commit,
+      specsRepository: specs.repository,
+      coreCommit: manifest.coreCommit,
+      nodeVersion: process.version,
+      specsPackageManager: manifest.specsPackageManager,
+      scope: config.scope,
+      filter: config.filter,
+      limit: config.limit,
+      generatorFiles: manifest.generatorFiles,
+      toolingDependencies: [
+        path.join(candidateRepo, "pnpm-lock.yaml"),
+        path.resolve(import.meta.dirname, "..", "..", "package.json"),
+        path.resolve(import.meta.dirname, "..", "..", "..", "..", "pnpm-lock.yaml"),
+      ]
+        .filter((file) => fs.existsSync(file))
+        .map((file, index) => ({
+          file: `${index}:${path.basename(file)}`,
+          sha256: hash(fs.readFileSync(file)),
+        })),
+      runtimeInstallation: runtimeFiles.map((item) => ({
+        file: item.file,
+        sha256: hash(item.content),
+      })),
+      candidateCommit: candidate.commit,
+      artifacts: artifacts.map((item) => ({ ...item, file: path.basename(item.file) })),
+      lintArtifactContents: artifacts
+        .filter((item) => isLintArtifact(path.basename(item.file)))
+        .map((item) => ({
+          artifact: path.basename(item.file),
+          files: packedFileInventory(fs.readFileSync(item.file)),
+        })),
+    };
+    manifest.baselineContext = context;
+    writeJson(path.join(output, "manifest.json"), manifest);
+    const prepared = await prepareCoverageBaseline(config, datasetDir, context, async () => {
+      const generatorArgs = [
+        "--import",
+        import.meta.resolve("tsx/esm"),
+        path.join(import.meta.dirname, "spec-dataset.ts"),
+        "--specs-repo",
+        specsRepo,
+        "--commit",
+        specs.commit,
+        "--output",
+        datasetDir,
+        "--concurrency",
+        String(config.concurrency),
+      ];
+      if (config.filter !== undefined) generatorArgs.push("--filter", config.filter);
+      if (config.limit !== undefined) generatorArgs.push("--limit", String(config.limit));
+      await command(
+        path.resolve(import.meta.dirname, "..", ".."),
+        generatorArgs,
+        path.join(output, "swagger.log"),
+      );
+      for (const item of runtimeFiles) {
+        const destination = path.join(datasetDir, "_baseline-runtime", item.file);
+        fs.mkdirSync(path.dirname(destination), { recursive: true });
+        fs.writeFileSync(destination, item.content);
+      }
+    });
+    const evidence = prepared.evidence;
+    manifest.baselineReuse = prepared.provenance;
+    writeJson(path.join(output, "baseline.json"), evidence);
+    manifest.baselineIdentity = contentIdentity(evidence);
+    writeJson(path.join(output, "manifest.json"), manifest);
+    const { dataset, members } = readCoverageDataset(datasetDir, context);
+    const validator = config.validatorRules.flatMap((rule) => members.get(rule) ?? []);
     const native: NativeProjectResult[] = [];
     let next = 0;
     await Promise.all(
@@ -489,6 +1043,7 @@ export async function runNativeCoverage(config: Config): Promise<void> {
             specsRepo,
             project,
             validatorRule: config.validatorRule,
+            validatorRules: config.validatorRules,
             tspRules: config.tspRules,
             scope: config.scope,
           });
@@ -522,7 +1077,12 @@ export async function runNativeCoverage(config: Config): Promise<void> {
         }
       }),
     );
-    const report = buildNativeCoverageReport(dataset.projects, validator, native);
+    const report = buildNativeCoverageReport(
+      dataset.projects,
+      validator,
+      native,
+      config.validatorRules,
+    );
     writeJson(path.join(output, "coverage.json"), report);
     fs.writeFileSync(path.join(output, "coverage.md"), markdown(report, config));
     if (
@@ -537,6 +1097,9 @@ export async function runNativeCoverage(config: Config): Promise<void> {
         artifact.sha256
       ) {
         throw new Error(`Candidate artifact changed during the comparison: ${artifact.file}`);
+      }
+      if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
+        throw new Error("Dataset changed during the comparison.");
       }
     }
     manifest.status = report.unassessedProjects.length > 0 ? "incomplete" : "complete";

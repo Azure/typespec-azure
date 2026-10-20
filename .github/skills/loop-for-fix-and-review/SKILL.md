@@ -48,6 +48,9 @@ If neither is available, ask the user for the pull request URL or number.
 
 Classify the target before creating subagents:
 
+- **native migration PR mode** applies to a verified
+  [native-first queue context](#native-migration-context), with one official
+  implementation and no temporary-rule promotion source.
 - **standard PR mode** applies to ordinary pull requests, including lintdiff
   rule-development or repair pull requests.
 - **promotion PR mode** applies when the semantic PR diff promotes a rule from
@@ -72,13 +75,47 @@ against that contract; changes beyond its limited authorization retain the
 source-semantic stop policy. Do not rewrite the source or claim that its corpus
 counts validate the adapted SDK-name behavior.
 
+### Native migration context
+
+Require the queue marker, persisted `flowVersion: native-first`, exact task ID/
+membership revision, native target, native/evidence publication bindings,
+baseline/candidate identities, validation plan, and `checkpoint` equal to
+`development-review` or `release-readiness-review`. Verify the actual canonical
+main-based PR, diff and pushed head against that context. A legacy promotion
+cannot escape its immutable-source policy by changing a label or sending this
+marker. Missing/unverifiable required context blocks initialization.
+
+Both checkpoints use this skill unchanged for persistent-agent setup, configured
+models, Balanced review requests, review-specific collection, unresolved backlog,
+independent five-round budget, parent publication approval and clean termination.
+Each invocation creates a fresh collector/fixer pair. Pass the native context,
+task-wide recovery counters and no-skill-edit ownership constraint to both.
+An outer-owned review leaves the native worker idle and returns to that same
+owner; do not dispatch a separate promotion owner.
+
+At development review, valid production findings can be fixed in place, subject
+to the [native validation route](#linter-source-changes). At release-readiness
+review, a confirmed production-semantic defect returns `source-repair-required`
+to the queue with native SHA/locations, member(s), expected/actual behavior,
+reproducer, affected A evidence, acceptance criteria and exact unfinished state.
+Stop both agents first; do not repair only at B or declare the thread resolved.
+The queue owns the bounded A-then-B repair cycle. Documentation/packaging-only
+fixes can remain in B with affected checks/local review and unchanged applicable
+A content. Uncertain findings/operational failures do not authorize repair.
+
+Before returning, verify actual head, baseline/evidence refs, checkpoint result,
+reviewed content and quiescence. A clean review is not a full queue result; the
+queue independently verifies both checkpoints and published evidence.
+
 ### Queue-controlled source-repair handoff
 
 When the caller is `/do-linter-development-task-one-by-one` and provides the
 `lintdiff-development-queue` marker with its
 [cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
 pass that context and the queue's process-review ownership constraint to both
-nested agents. Standalone review behavior is unchanged.
+nested agents. The remainder of this subsection is the legacy promotion handoff;
+native-first uses [native migration context](#native-migration-context) instead.
+Standalone review behavior is unchanged.
 
 The outer queue may invoke this skill directly after a worker returns
 `review-handoff` because nested persistent-agent controls are unavailable.
@@ -734,6 +771,20 @@ has no automatic setup-hook allowance. This does not make hook failures
 eligible for the per-test reduced-concurrency diagnostic above.
 
 ### Linter source changes
+
+In native migration PR mode, follow the
+[official migration contract](../shared/native-migration-contract.md) and the
+task's predeclared required scope. Do not invoke temporary-rule development,
+its fixture harness/corpus, or `/lintdiff-rule-promote`. A production-rule/helper
+edit reruns affected member tests, native package/ruleset checks and real-spec
+official-package coverage; reuse only a verified compatible Swagger baseline.
+Unproved member isolation requires all member checks. Tests/docs-only changes
+rerun affected checks, including compiled final examples when changed.
+Update external migration evidence, candidate identity and count explanations;
+never manufacture per-member native attribution or waive an unexplained gap.
+Apply the existing bounded correction/recovery/publication gates and return a
+release-readiness semantic defect through the handoff above rather than fixing
+it solely in B.
 
 In standard PR mode, run the corpus procedure only when a valid fix changes
 production linter-rule code. Changes limited to tests, fixtures, snapshots,

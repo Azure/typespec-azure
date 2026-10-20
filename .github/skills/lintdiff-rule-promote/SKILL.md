@@ -10,6 +10,14 @@ user-invocable: true
 Use this skill when a migrated rule in `packages/typespec-lintdiff` is ready to be
 promoted into an official TypeSpec Azure library.
 
+This remains available for standalone and legacy queue promotion. A
+[native-first task](../do-linter-development-task-one-by-one/native-first.md)
+already develops in the official package and must not invoke this workflow or
+create a second rule PR. Its release-readiness checkpoint retains this skill's
+applicable native packaging, test, documentation, ruleset and example requirements
+through the [official migration contract](../shared/native-migration-contract.md),
+without inventing an immutable temporary source commit.
+
 Promotion is a handoff workflow, not a rule-design workflow. The rule's source
 PR in `packages/typespec-lintdiff` remains the source of truth while the
 official-library PR is prepared in a clean worktree.

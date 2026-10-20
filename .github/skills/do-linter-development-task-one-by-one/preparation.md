@@ -1,5 +1,48 @@
 # Workspace preparation contract
 
+## Native-first preparation
+
+Dispatch by the task's persisted `flowVersion`, not its current branch name.
+For `native-first`, use [the native task contract](native-first.md) instead of
+the legacy three-resource procedure below. Keep the shared coordinator/folder
+resolution, physical containment, ownership, dependency-layer fingerprints,
+readiness persistence and invalidation requirements in this file.
+
+Prepare one canonical-main-based native publisher, the selected immutable specs
+runtime, and the separately verified fork evidence checkout/publisher. Record
+versioned tooling outside the native PR when canonical `main` lacks the coverage
+harness. All execution checkouts, including auxiliary snapshots, remain inside
+`worktrees_folder`. Read-only instruction/artifact sources are not execution
+checkouts. Existing shared resources require explicit serial ownership.
+
+Resolve latest inputs for a new baseline; a reuse request reads the completed
+baseline's exact specs/closure, not checked-in `_meta.json` or a moving tip.
+Verify candidate core gitlink and compatible package closure. Do not repeatedly
+install passing prerequisites; repair only invalidated layers or proven missing
+tools. Native-first dependency recipes come from the official destination and
+the coverage skill: build/pack the candidate's compatible closure and use the
+specs checkout's declared manager for injection. Do not run the legacy lintdiff
+installation/link profile or assume specs uses `npm ci`. Reuse common readiness
+checks without inheriting temporary-library dependencies.
+
+No source edits begin until publication/review capabilities, valid member
+intake/group admission, required population/profile and evidence replay/storage
+capabilities are established. A missing automatic cache proof needs the
+documented conservative verification, not a silent cache hit.
+
+Persist readiness with native/evidence owners, base/head/refspecs, specs/tooling/
+snapshot paths and identities, baseline choice, membership revision, instruction
+hashes, dependency fingerprints and recovery counters. No promotion owner or
+promotion source SHA is needed. Both A/B checkpoints run through the same native
+publication owner with separate review invocations. Existing legacy manifests
+are never adopted/retargeted as native-first.
+
+## Legacy preparation
+
+The three-resource preparation and two native-code publication owners below
+apply to legacy queues and existing standalone development/promotion callers.
+They do not add a second native PR to native-first tasks.
+
 The queue owns preparation before dispatching development. Prepare development,
 specs and promotion as one bundle for the current rule, not as side effects of
 delegated development or promotion. Prepare rules serially in input order; do

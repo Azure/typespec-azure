@@ -1,5 +1,35 @@
 # Publication execution backends
 
+## Native-first publication
+
+For recorded `flowVersion: native-first`, one native implementation publisher
+owns both development and release-readiness checkpoints on one canonical head,
+with base `Azure/typespec-azure:main`. Apply publication preflight, lifecycle,
+operation-specific backend controls, exact head verification, bounded recovery,
+completion delivery and quiescence below. Do not run this file's legacy
+development-to-distinct-promotion-owner dispatch or legacy phase prompts.
+
+In an explicit-target backend, use one fresh top-level general-purpose worker
+per task/semantic-repair cycle with the
+[native-first procedure](native-first.md), not the legacy worker command.
+In a session-bound backend, retain the one verified native owner across both
+checkpoints/cycles and create new phase dispatch IDs. A directory change does not
+create a publisher. A/B each get a new persistent collector/fixer pair and their
+independent local review. Outer-owned review keeps the phase owner idle and
+resumes that same native owner, never a promotion owner. Apply the existing
+capability preflight before work; no concurrent writers or replacement owners.
+
+Bind evidence to the signed-in user's verified personal fork and dedicated
+branch using [the evidence contract](evidence.md). This is a separate role and
+narrow fork exception, not permission to publish native/skill PR heads there.
+Do not route fork evidence through a session-bound native PR creation tool.
+If the required backend cannot address both roles safely, stop before setup.
+
+Native-first does not change existing legacy PR bases/heads, app comparison
+bindings or post-merge authorizations. Record `flowVersion` in every dispatch,
+result and recovery context. A task created under the legacy flow keeps its
+separate owners, strict worker command and source provenance.
+
 Use this shared contract for development preparation and standalone workers,
 standalone and queued promotion, authorized follow-up repair, publication-only
 recovery, and post-run skill PRs. It changes execution and publication ownership,
@@ -53,8 +83,8 @@ may retain its head only with the exact
 [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
 Otherwise stop for explicit migration authorization; do not silently
 move, replace, or close it. New PRs and skill-only PRs retain the canonical-head
-policy. Promotion targets canonical `main`; migration and skill PRs
-target the explicitly selected migration branch. Examples using `origin` mean
+policy. Promotion and native-first rule PRs target canonical `main`; legacy
+migration and skill PRs target the explicitly selected branch. Examples using `origin` mean
 the verified canonical fetch remote; substitute its actual name when different.
 
 Git upstream controls tracking, push settings control push routing, and

@@ -10,6 +10,15 @@ user-invocable: true
 Use this skill to implement or correct migrated Swagger validator rules in
 `packages/typespec-lintdiff`.
 
+This remains the legacy temporary-library workflow. For direct official-package
+development use
+[/do-linter-development-task-one-by-one --flow native-first](../do-linter-development-task-one-by-one/native-first.md).
+Do not rewrite prepared worker commands, retarget an existing development PR,
+or invoke this worker from a native-first task. The native boundary/completeness
+sections below remain reusable requirements through the
+[official migration contract](../shared/native-migration-contract.md), not a
+requirement to create a temporary implementation first.
+
 For dispatcher and standalone/queued worker invocations, perform the read-only
 ARM eligibility gate before creating anything, then apply the shared
 [publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
