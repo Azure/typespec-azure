@@ -168,6 +168,11 @@ export interface NextOperationLink extends LogicalOperationStep {
   responseModel: Model;
   /** information on how to get the uri to the status monitor */
   target: OperationLink;
+  /**
+   * The explicitly linked polling operation, when the link was declared with
+   * `@pollingOperation`. Absent for an inferred or standalone polling location.
+   */
+  operation?: Operation;
 }
 
 /**
@@ -354,15 +359,14 @@ export function getLroProtocolMetadata(
   if (context === undefined) return undefined;
   processFinalReference(program, operation, context);
   processFinalLink(program, operation, context);
-  const nextReference:
-    NextOperationReference | (NextOperationLink & { operation: Operation }) | undefined =
-    processStatusMonitorReference(program, operation, context);
+  const nextReference = processStatusMonitorReference(program, operation, context);
   if (nextReference !== undefined && nextReference.responseModel.kind === "Model") {
     context.statusMonitorStep = nextReference;
     const linkedOperation =
       nextReference.kind === "nextOperationLink"
         ? nextReference.operation
         : nextReference.target.operation;
+    if (!linkedOperation) return undefined;
     processFinalReference(program, linkedOperation, context);
     processFinalLink(program, linkedOperation, context);
     context.pollingStep = getPollingStep(program, nextReference.responseModel, context);
@@ -489,6 +493,22 @@ function createLroProtocolMetadata(
     }
   }
 
+  const pollingLink = context.pollingOperationLink?.link;
+  const statusMonitorStep =
+    context.statusMonitorStep?.kind === "nextOperationReference" && pollingLink
+      ? {
+          ...context.statusMonitorStep,
+          target: {
+            ...context.statusMonitorStep.target,
+            link: {
+              kind: "link" as const,
+              location: pollingLink.location,
+              property: pollingLink.property,
+            },
+          },
+        }
+      : context.statusMonitorStep;
+
   return {
     operation,
     initial: {
@@ -497,7 +517,7 @@ function createLroProtocolMetadata(
       isAction,
     },
     polling: {
-      statusMonitorStep: context.statusMonitorStep,
+      statusMonitorStep,
       pollingInfo: context.pollingStep,
       statusMonitorResult: context.statusMonitorResult,
     },
@@ -1223,7 +1243,7 @@ function processStatusMonitorReference(
   program: Program,
   referencedOperation: Operation,
   context: LroContext,
-): NextOperationReference | (NextOperationLink & { operation: Operation }) | undefined {
+): NextOperationReference | NextOperationLink | undefined {
   const references: Map<string, OperationLinkMetadata> | undefined = getOperationLinks(
     program,
     referencedOperation,

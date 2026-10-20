@@ -27,6 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getAuthentication,
   getHttpOperation,
@@ -49,6 +50,7 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  LroOperationIdDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -88,6 +90,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -103,6 +106,47 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+interface ScopedLroDecorator {
+  scope?: string;
+  target: DiagnosticTarget;
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+const [getLroOperationIdEntries, setLroOperationIdEntries, getLroOperationIdMap] = useStateMap<
+  ModelProperty,
+  ScopedLroDecorator[]
+>(lroOperationIdKey);
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries = getLroOperationIdEntries(context.program, target) ?? [];
+  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
+  setLroOperationIdEntries(context.program, target, entries);
+};
+
+export function validateLroDecoratorTargets(program: Program): void {
+  for (const [target, entries] of getLroOperationIdMap(program)) {
+    if (!isPathParam(program, target)) {
+      reportDiagnostic(program, {
+        code: "lro-operation-id-not-path",
+        target: entries[0].target,
+      });
+    }
+  }
+}
+
+export function getLroOperationIdDecorators(
+  context: TCGCContext,
+  target: ModelProperty,
+): ScopedLroDecorator[] {
+  return (getLroOperationIdEntries(context.program, target) ?? []).filter(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
 
 /**
  * The set of emitters a scope string effectively selects.

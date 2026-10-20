@@ -21,6 +21,7 @@ import {
   $disablePageable,
   $flattenProperty,
   $legacyHierarchyBuilding,
+  $lroOperationId,
   $markAsLro,
   $markAsPageable,
   $nextLinkVerb,
@@ -71,6 +72,7 @@ export const $decorators = {
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
     clientOption: $clientOption,
+    lroOperationId: $lroOperationId,
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {

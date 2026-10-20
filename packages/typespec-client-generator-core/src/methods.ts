@@ -52,6 +52,7 @@ import {
   type SdkOperationLink,
   type SdkOperationReference,
   type SdkPagingServiceMethod,
+  type SdkPathParameter,
   type SdkPollingOperationStep,
   type SdkPropertyMap,
   type SdkServiceMethod,
@@ -78,6 +79,8 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
+import { getStatusMonitorLink, resolveLroOperationId } from "./lro-operation-id.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -402,12 +405,28 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
 ): [SdkLroServiceMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // TCGC selects the client result; Core remains responsible for protocol steps.
+  const nativeMetadata = getRawLroMetadata(context.program, operation);
   const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return diagnostics.wrap(undefined);
   }
 
   const finalResponse = getFinalResponse();
+  const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
+  const operationIdSource = getStatusMonitorLink(statusMonitorStep);
+  const operationIdProperty = diagnostics.pipe(resolveLroOperationId(context, nativeMetadata));
+  const operationIdPathParameter = operationIdProperty
+    ? getStatusMonitorOperation(statusMonitorStep)?.parameters.find(
+        (parameter): parameter is SdkPathParameter =>
+          parameter.kind === "path" && parameter.__raw === operationIdProperty,
+      )
+    : undefined;
+  const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
+  const pollingResponseBody = rawMetadata.pollingInfo.responseModel
+    ? (diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
+      ) as SdkModelType)
+    : undefined;
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -415,24 +434,34 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     finalResponse,
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
-      responseBody: rawMetadata.pollingInfo.responseModel
-        ? (diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
-          ) as SdkModelType)
-        : undefined,
+      responseBody: pollingResponseBody,
     },
     operation: diagnostics.pipe(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
     logicalResult: diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
-    statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
-    pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
+    statusMonitorStep,
+    pollingInfo,
     envelopeResult: diagnostics.pipe(
       getSdkModelWithDiagnostics(context, rawMetadata.envelopeResult),
     ),
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
+    ...(operationIdPathParameter && operationIdSource
+      ? {
+          operationId: {
+            source: operationIdSource,
+            pathParameter: operationIdPathParameter,
+          } as const,
+        }
+      : {}),
   });
+
+  function getStatusMonitorOperation(
+    step: SdkNextOperationLink | SdkNextOperationReference | undefined,
+  ): SdkServiceOperation | undefined {
+    return step?.kind === "nextOperationReference" ? step.target.operation : step?.operation;
+  }
 
   function getSdkLroServiceFinalStep(
     context: TCGCContext,
@@ -488,6 +517,13 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
           getSdkModelWithDiagnostics(context, statusMonitorStep.responseModel),
         ),
         target: getSdkOperationLink(context, statusMonitorStep.target),
+        ...(statusMonitorStep.operation
+          ? {
+              operation: ignoreDiagnostics(
+                getSdkBasicServiceMethod(context, statusMonitorStep.operation, client),
+              ).operation,
+            }
+          : {}),
       };
     }
     return {
