@@ -329,7 +329,7 @@ export function getUniqueVarName(
   }
   const lastCandidate = candidates[candidates.length - 1];
   for (let suffix = 0; suffix < 100; ++suffix) {
-    const candidate = `${lastCandidate}_${suffix}`;
+    const candidate = `${lastCandidate}${suffix}`;
     if (!names.has(candidate)) {
       return candidate;
     }

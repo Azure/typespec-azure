@@ -9,20 +9,20 @@ describe("getUniqueVarName", () => {
 
   it("suffixes the last candidate when all candidates collide", () => {
     expect(getUniqueVarName([{ name: "resp" }, { name: "response" }], ["resp", "response"])).toBe(
-      "response_0",
+      "response0",
     );
   });
 
   it("skips occupied suffixes", () => {
     expect(
       getUniqueVarName(
-        [{ name: "resp" }, { name: "response" }, { name: "response_0" }, { name: "response_1" }],
+        [{ name: "resp" }, { name: "response" }, { name: "response0" }, { name: "response1" }],
         ["resp", "response"],
       ),
-    ).toBe("response_2");
+    ).toBe("response2");
   });
 
   it("supports a single candidate", () => {
-    expect(getUniqueVarName([{ name: "resp" }], ["resp"])).toBe("resp_0");
+    expect(getUniqueVarName([{ name: "resp" }], ["resp"])).toBe("resp0");
   });
 });
