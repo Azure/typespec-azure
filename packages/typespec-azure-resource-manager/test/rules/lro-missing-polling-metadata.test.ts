@@ -3,9 +3,11 @@ import { getSourceLocation } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   expectDiagnostics,
+  t,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { getHttpOperation } from "@typespec/http";
+import { beforeEach, describe, expect, it } from "vitest";
 import { lroMissingPollingMetadataRule } from "../../src/rules/lro-missing-polling-metadata.js";
 
 const header = `
@@ -101,8 +103,36 @@ it("reports an async provider POST with plain Location headers", async () => {
   );
 });
 
-it("accepts standard async resource PATCH polling metadata", async () => {
-  await expectCompliant("update is ArmResourcePatchAsync<Widget, WidgetProperties>;", "Widgets");
+it("accepts standard async resource operations with qualifying polling responses", async () => {
+  await tester
+    .expect(
+      t.code`${header}
+      @armResourceOperations
+      interface Widgets {
+        ${t.op("createOrUpdate")} is ArmResourceCreateOrReplaceAsync<Widget>;
+        ${t.op("update")} is ArmResourcePatchAsync<Widget, WidgetProperties>;
+        ${t.op("remove")} is ArmResourceDeleteWithoutOkAsync<Widget>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(({ program, createOrUpdate, update, remove }) => {
+      for (const operation of [createOrUpdate, update, remove]) {
+        const [httpOperation] = getHttpOperation(program, operation);
+        expect(
+          httpOperation.responses.some(
+            (response) =>
+              typeof response.statusCodes === "number" &&
+              [200, 201, 202, 204].includes(response.statusCodes) &&
+              response.responses.some((content) =>
+                Object.keys(content.headers ?? {}).some((name) =>
+                  ["location", "azure-asyncoperation"].includes(name.toLowerCase()),
+                ),
+              ),
+          ),
+        ).toBe(true);
+      }
+      return [];
+    });
 });
 
 it("accepts default async custom PATCH polling metadata", async () => {
@@ -217,19 +247,19 @@ it("checks PATCH without provider metadata when the ARM rule is selected", async
     }));
 });
 
-it("leaves registered resource-instance POST response-code ownership to the existing rule", async () => {
-  await expectCompliant(
+it("reports polling headers on registered resource-instance POST operations", async () => {
+  await expectViolation(
     "startWidget is ArmResourceActionSync<Widget, Request = void, Response = ArmAcceptedResponse<ExtraHeaders = PlainLocationHeaders>>;",
     "Widgets",
   );
 });
 
-it("ignores GET PUT and DELETE accepted responses", async () => {
+it("ignores GET PUT and DELETE accepted responses without polling headers", async () => {
   await tester
     .expect(
       `
       @service namespace SelectedArmProgram;
-      model Accepted { @statusCode statusCode: 202; @header("Location") location?: string; }
+      model Accepted { @statusCode statusCode: 202; }
       @get @route("/get") op read(): Accepted;
       @put @route("/put") op create(): Accepted;
       @delete @route("/delete") op remove(): Accepted;
@@ -238,16 +268,184 @@ it("ignores GET PUT and DELETE accepted responses", async () => {
     .toBeValid();
 });
 
-it("ignores unmarked POST accepted responses", async () => {
+it("ignores unmarked POST accepted responses without polling headers", async () => {
   await tester
     .expect(
       `
       @service namespace SelectedArmProgram;
-      model Accepted { @statusCode statusCode: 202; @header("Location") location?: string; }
+      model Accepted { @statusCode statusCode: 202; }
       @post @route("/action") op act(): Accepted;
     `,
     )
     .toBeValid();
+});
+
+it("reports PATCH 202 even without a polling header", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      @patch op /*target*/update(): { @statusCode statusCode: 202; };
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
+});
+
+it("reports a marked provider POST 202 even without a polling header", async () => {
+  await tester
+    .expect(
+      `${header}
+      model Accepted { @statusCode statusCode: 202; }
+      @armResourceOperations
+      interface ProviderOperations {
+        /*target*/start is ArmProviderActionSync<Request = void, Response = Accepted>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
+});
+
+it.each([
+  ["put", 201, "Azure-AsyncOperation"],
+  ["patch", 200, "lOcAtIoN"],
+  ["post", 202, "Location"],
+  ["delete", 204, "azure-asyncoperation"],
+])("reports %s %s with %s on the operation", async (verb, status, name) => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      model Response {
+        @statusCode statusCode: ${status};
+        @header("${name}") pollingUrl?: string;
+      }
+      @${verb} op /*target*/test(): Response;
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
+});
+
+it.each([
+  ["get", 202, "Location"],
+  ["head", 200, "Azure-AsyncOperation"],
+  ["post", 203, "Location"],
+  ["post", 400, "Azure-AsyncOperation"],
+  ["post", 200, "Operation-Location"],
+  ["post", 200, "Retry-After"],
+])("ignores %s %s with %s", async (verb, status, name) => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      @${verb} op test(): {
+        @statusCode statusCode: ${status};
+        @header("${name}") pollingUrl?: string;
+      };
+    `,
+    )
+    .toBeValid();
+});
+
+it("reports a qualifying header after an unrelated header", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      @post op /*target*/test(): {
+        @statusCode statusCode: 200;
+        @header("Retry-After") retryAfter?: int32;
+        @header("Location") pollingUrl?: string;
+      };
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
+});
+
+it("does not accept an output-only LRO extension as polling metadata", async () => {
+  const runner = await Tester.import("@typespec/openapi").createInstance();
+  const extensionTester = createLinterRuleTester(
+    runner,
+    lroMissingPollingMetadataRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+  await extensionTester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      @OpenAPI.extension("x-ms-long-running-operation", true)
+      @post op /*target*/test(): {
+        @statusCode statusCode: 200;
+        @header("Location") pollingUrl?: string;
+      };
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
+});
+
+it("reports once when several responses and headers require polling metadata", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      model Created {
+        @statusCode statusCode: 201;
+        @header("Azure-AsyncOperation") pollingUrl?: string;
+      }
+      model Accepted {
+        @statusCode statusCode: 202;
+        @header("Location") location?: string;
+        @header("Azure-AsyncOperation") pollingUrl?: string;
+      }
+      @patch op /*target*/update(): Created | Accepted;
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(target).pos,
+      end: getSourceLocation(target).end,
+    }));
+});
+
+it("reports each header-triggered operation when response properties are shared", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      model Response {
+        @statusCode statusCode: 201;
+        @header("Location") pollingUrl?: string;
+      }
+      @put @route("/one") op /*first*/first(): Response;
+      @put @route("/two") op /*second*/second(): Response;
+    `,
+    )
+    .toEmitDiagnostics(({ first, second }) =>
+      [first, second].map((operation) => ({
+        ...diagnostic,
+        pos: getSourceLocation(operation).pos,
+        end: getSourceLocation(operation).end,
+      })),
+    );
 });
 
 describe("registered resolver side effects", () => {

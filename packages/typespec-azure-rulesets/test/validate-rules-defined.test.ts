@@ -79,4 +79,15 @@ describe("expect all rules to be defined", () => {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }
   });
+
+  it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
+    const name = "lro-missing-polling-metadata";
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(
+      $linter.ruleSets?.["resource-manager"].enable?.[
+        `@azure-tools/typespec-azure-resource-manager/${name}`
+      ],
+      false,
+    );
+  });
 });
