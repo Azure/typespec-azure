@@ -8,36 +8,8 @@ operation, including inherited endpoints, and skips uninstantiated templates.
 It checks the supplied program, not a selected API-version projection.
 
 This is **not a general ARM path restriction**. Specific-parent extension paths
-are supported ordinary ARM endpoints. Disable this rule unless the
-authored contract is intended for RPaaS extension routing.
-
-## Enable or disable
-
-The rule is enabled by the ARM library's compiler-provided `all` ruleset. This is
-an opt-out adaptation of the legacy RPaaS-only policy, not deployment detection.
-The general Azure resource-manager ruleset still leaves it disabled. Enable it
-individually for the appropriate contract in `tspconfig.yaml`:
-
-```yaml
-linter:
-  enable:
-    "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": true
-```
-
-The project must choose the appropriate enablement for its routing contract.
-The rule does not detect deployment configuration or require provider-namespace
-metadata.
-
-When extending ARM `all`, services that do not use RPaaS extension routing can
-disable the rule project-wide:
-
-```yaml
-linter:
-  extends:
-    - "@azure-tools/typespec-azure-resource-manager/all"
-  disable:
-    "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": "This service does not use RPaaS extension routing."
-```
+are supported ordinary ARM endpoints. This guidance applies to contracts intended
+for RPaaS extension routing; it does not identify a service's deployment audience.
 
 ## Impact
 
@@ -112,10 +84,10 @@ interface Bindings {
 
 ## Suppression
 
-For ordinary ARM contracts, disable the rule in `tspconfig.yaml` rather than suppressing
-supported endpoints individually. For an intentional RPaaS routing exception
-approved by the service's routing reviewers, suppress the fully qualified rule
-on the offending operation with a reason documenting that approval.
+Prefer an arbitrary-scope extension template for RPaaS routing. For an intentional
+RPaaS routing exception approved by the service's routing reviewers, suppress the
+fully qualified rule on the offending operation with a reason documenting that
+approval. Supported ordinary ARM endpoints are not RPaaS routing exceptions.
 
 ## LintDiff Equivalent
 

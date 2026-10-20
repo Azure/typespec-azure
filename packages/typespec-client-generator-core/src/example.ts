@@ -1,7 +1,9 @@
+import { deriveOperationKey, materializeLegacyExample } from "@azure-tools/typespec-azure-examples";
 import {
   type CompilerHost,
   type Diagnostic,
   type DiagnosticCollector,
+  type Namespace,
   NoTarget,
   type Program,
   createDiagnosticCollector,
@@ -11,6 +13,11 @@ import {
   normalizePath,
   resolvePath,
 } from "@typespec/compiler";
+import {
+  type UnifiedExample,
+  type UnifiedExamples,
+  loadUnifiedExamples,
+} from "./examples-unified.js";
 import {
   type SdkArrayExampleValue,
   type SdkArrayType,
@@ -35,6 +42,7 @@ import {
   isSdkFloatKind,
   isSdkIntKind,
 } from "./interfaces.js";
+import { findServiceForOperation } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { resolveOperationId } from "./public-utils.js";
 
@@ -60,12 +68,16 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
  */
 async function loadExamples(
   context: TCGCContext,
+  unifiedServices: ReadonlyMap<Namespace, UnifiedExamples>,
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
   const apiVersions = context.getPackageVersions();
   const exampleDirs: string[][] = [];
   if (apiVersions.size <= 1) {
+    if (unifiedServices.size > 0) {
+      return diagnostics.wrap(new Map());
+    }
     // single service case
     const apiVersion =
       apiVersions.size === 1 ? apiVersions.values().next().value?.at(-1) : undefined;
@@ -93,6 +105,9 @@ async function loadExamples(
   } else {
     // multiple services case, we need to load examples from sub service folders
     for (const [service, versions] of apiVersions) {
+      if (unifiedServices.has(service)) {
+        continue;
+      }
       const apiVersion = versions.length > 0 ? versions[versions.length - 1] : undefined;
       const examplesBaseDir = resolvePath(
         context.program.projectRoot,
@@ -199,11 +214,24 @@ async function searchExampleJsonFiles(program: Program, exampleDir: string): Pro
 
 export async function handleClientExamples(
   context: TCGCContext,
-  client: SdkClientType<SdkServiceOperation>,
+  clients: SdkClientType<SdkServiceOperation>[],
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
+  if (clients.length === 0) {
+    return diagnostics.wrap(undefined);
+  }
 
-  const examples = diagnostics.pipe(await loadExamples(context));
+  const unifiedServices = new Map<Namespace, UnifiedExamples>();
+  // An explicit examples-dir preserves the existing JSON-only loading contract.
+  if (context.examplesDir === undefined) {
+    for (const service of context.getPackageVersions().keys()) {
+      const unified = diagnostics.pipe(await loadUnifiedExamples(context, service));
+      if (unified) {
+        unifiedServices.set(service, unified);
+      }
+    }
+  }
+  const examples = diagnostics.pipe(await loadExamples(context, unifiedServices));
   // Example files are sourced from the swagger/autorest output, where each operation has a
   // single canonical `operationId`. Per-language `@clientLocation`/`@clientName` overrides
   // (e.g. `@@clientLocation(op, "Foo", "javascript")`) would otherwise produce a different
@@ -212,26 +240,44 @@ export async function handleClientExamples(
   // example operation ids under the `autorest` scope so the same matching is used regardless
   // of which language emitter is consuming TCGC.
   const exampleMatchingContext: TCGCContext = { ...context, emitterName: "autorest" };
-  const clientQueue = [client];
+  const clientQueue = [...clients];
   while (clientQueue.length > 0) {
     const client = clientQueue.pop()!;
     if (client.children) {
       clientQueue.push(...client.children);
     }
     for (const method of client.methods) {
+      const service = method.__raw
+        ? findServiceForOperation(client.__raw.services, method.__raw)
+        : undefined;
+      const unified = service ? unifiedServices.get(service) : undefined;
       // since operation could have customization in client.tsp, we need to handle all the original operation
       let operation = method.__raw;
       while (operation) {
-        // try operation id with renaming
-        let operationId = resolveOperationId(exampleMatchingContext, operation, true).toLowerCase();
-        if (examples.has(operationId)) {
-          diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
-          break;
+        let loaded: Record<string, LoadedExample> | undefined;
+        for (const honorRenaming of [true, false]) {
+          const operationId = resolveOperationId(exampleMatchingContext, operation, honorRenaming);
+          if (unified) {
+            const entries = unified.byOperation.get(deriveOperationKey(operationId));
+            if (entries && method.operation.kind === "http") {
+              loaded = diagnostics.pipe(
+                materializeUnifiedExamples(
+                  method.operation,
+                  operationId,
+                  unified.apiVersion,
+                  entries,
+                ),
+              );
+            }
+          } else {
+            loaded = examples.get(operationId.toLowerCase());
+          }
+          if (loaded) {
+            break;
+          }
         }
-        // try operation id without renaming
-        operationId = resolveOperationId(exampleMatchingContext, operation, false).toLowerCase();
-        if (examples.has(operationId)) {
-          diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
+        if (loaded) {
+          diagnostics.pipe(handleMethodExamples(context, method, loaded));
           break;
         }
         operation = operation.sourceOperation;
@@ -239,6 +285,47 @@ export async function handleClientExamples(
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+function materializeUnifiedExamples(
+  operation: SdkHttpOperation,
+  operationId: string,
+  apiVersion: string,
+  entries: readonly UnifiedExample[],
+): [Record<string, LoadedExample>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const normalized = new Map<string, LoadedExample>();
+  const usedTitles = new Set<string>();
+  const apiVersionParameter = operation.parameters.find((parameter) => parameter.isApiVersionParam);
+  for (const { example, relativePath } of entries) {
+    const data = materializeLegacyExample(example, {
+      operationId,
+      apiVersion,
+      bodyParameterName: operation.bodyParam?.serializedName,
+    });
+    // The legacy bridge assumes the standard wire name. Use the SDK's
+    // API-version metadata instead, including custom wire names.
+    if (apiVersionParameter?.serializedName !== "api-version" || !apiVersion) {
+      delete data.parameters["api-version"];
+    }
+    if (apiVersionParameter && apiVersion) {
+      data.parameters[apiVersionParameter.serializedName] ??= apiVersion;
+    }
+    const title = uniqueExampleTitle(data.title, usedTitles);
+    normalized.set(title, { relativePath, data });
+  }
+  return diagnostics.wrap(Object.fromEntries(normalized));
+}
+
+// Match AutoRest's unified-example behavior so title collisions preserve every lineage.
+function uniqueExampleTitle(title: string, used: Set<string>): string {
+  let name = title;
+  let index = 2;
+  while (used.has(name)) {
+    name = `${title}_${index++}`;
+  }
+  used.add(name);
+  return name;
 }
 
 function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
@@ -290,7 +377,9 @@ function handleHttpOperationExamples(
   }
 
   // sort examples by file path
-  operation.examples.sort((a, b) => (a.filePath > b.filePath ? 1 : -1));
+  operation.examples.sort((a, b) =>
+    a.filePath === b.filePath ? a.name.localeCompare(b.name) : a.filePath > b.filePath ? 1 : -1,
+  );
 
   return diagnostics.wrap(undefined);
 }
