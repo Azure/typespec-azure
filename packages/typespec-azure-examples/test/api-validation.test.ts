@@ -142,16 +142,19 @@ Widgets.create:
     );
   });
 
-  it("reports an unknown operation rather than silently ignoring it", async () => {
-    const diagnostics = await validate(`
-Widgets.missing:
+  it.each(["Widgets.missing", "widgets.create"])(
+    "reports an unknown canonical operation key (%s)",
+    async (operation) => {
+      const diagnostics = await validate(`
+${operation}:
   - request: {}
     responses: { 200: {} }
 `);
-    expect(diagnostics).toMatchObject([
-      { code: "unknown-example-operation", operation: "Widgets.missing", severity: "error" },
-    ]);
-  });
+      expect(diagnostics).toMatchObject([
+        { code: "unknown-example-operation", operation, severity: "error" },
+      ]);
+    },
+  );
 
   it("reports unresolved contract references as errors, not successful validation", async () => {
     const operation = contract.paths["/widgets/{id}"].put;

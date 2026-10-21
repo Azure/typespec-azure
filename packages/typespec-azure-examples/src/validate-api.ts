@@ -62,7 +62,7 @@ export async function validateApiExamples(
       for (const method of HTTP_METHODS) {
         const operation = item[method];
         if (isObject(operation) && typeof operation.operationId === "string") {
-          operations.set(deriveOperationKey(operation.operationId).toLowerCase(), {
+          operations.set(deriveOperationKey(operation.operationId), {
             operation,
             path: resolve(path),
             pathItem: item,
@@ -109,7 +109,7 @@ export async function validateApiExamples(
             message: `${example.operation} (${version}) ${path.join(".")}: ${message}`,
           });
         };
-        const meta = operations.get(example.operation.toLowerCase());
+        const meta = operations.get(example.operation);
         if (!meta) {
           report([], "Operation does not exist in this API version.", "unknown-example-operation");
           continue;
