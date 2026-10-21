@@ -37,26 +37,10 @@ status-specific model.
 
 ## ❌ Incorrect
 
+Assume `Widget` is already defined. Replacing the standard error response with
+`NotFoundResponse` adds a disallowed `404` response.
+
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model WidgetProperties {
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @armResourceOperations
 interface Widgets {
   read is ArmResourceRead<Widget, Error = NotFoundResponse>;
@@ -66,25 +50,6 @@ interface Widgets {
 ## ✅ Correct
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model WidgetProperties {
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @armResourceOperations
 interface Widgets {
   read is ArmResourceRead<Widget>;
