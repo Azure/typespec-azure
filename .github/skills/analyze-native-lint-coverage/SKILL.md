@@ -217,8 +217,18 @@ mise exec -- pnpm --dir packages\typespec-lintdiff exec vitest run `
 
 This control suite checks official-package loading, explicit activation despite
 configuration disablement, compliance, authored suppression, missing-rule
-failures, and version-dependent boolean alignment. It skips when that environment
-variable is absent; skipped controls are not passing runtime evidence.
+failures, version-dependent boolean alignment, nonpayload visibility,
+reference-only parameters, response headers, and shared schemas. It skips when
+that environment variable is absent; skipped controls are not passing runtime
+evidence.
+
+Derive semantic controls from the complete validator selector, not only the
+native rule's existing tests. For the boolean pilot, also compare boolean
+literals, nullable booleans, derived scalars, array items, and dictionary values
+through the actual emitter and production validator. An exact standard-scalar
+predicate need not recognize these emitted boolean schemas. Preserve and
+document such native-rule gaps; do not manufacture native findings or change
+production semantics as part of this analysis.
 
 Repeat `--tsp-rule` for an explicit one-to-many mapping. Do not credit unrelated
 diagnostics from an existing rule without investigating their attribution.
@@ -240,7 +250,10 @@ retains authored source suppressions.
 - `boolean-http`: only for Azure Core `no-boolean`. Retain source findings
   represented by boolean properties or direct bodies in the selected-version
   HTTP graph. It uses structured compiler/HTTP/versioning metadata, not generated
-  names or emitted-property-name matching.
+  names or emitted-property-name matching. Payload traversal respects visibility,
+  body-ignore and explicit-body metadata policies, including canonical shared
+  read schemas. HTTP parameters and response headers are traversed separately;
+  reference-only parameters do not contribute local schema findings.
 
 Keep raw findings even when alignment removes them. If a rule's predicate must
 be reevaluated after projection, report that limitation and establish a supported

@@ -279,6 +279,79 @@ linter:
       expect(result.diagnostics).toHaveLength(1);
     });
 
+    it.each(["boolean-http", "http-reachable"])(
+      "excludes nonpayload properties from %s while retaining raw findings",
+      (scope) => {
+        const result = evaluate(
+          `
+          @service namespace Contoso;
+          model Widget {
+            @visibility(Lifecycle.Delete) deleteOnly: boolean;
+            @bodyIgnore ignored: boolean;
+            value: string;
+          }
+          @get @route("/widget") op read(): Widget;
+        `,
+          { scope },
+        );
+        expect(result.error).toBeUndefined();
+        expect(result.status).toBe("success");
+        expect(result.rawDiagnostics).toHaveLength(2);
+        expect(result.diagnostics).toEqual([]);
+      },
+    );
+
+    it("excludes externally referenced spread query parameters", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        model Query {
+          @Autorest.useRef("./common.json#/parameters/Flag")
+          @query flag: boolean;
+        }
+        @get @route("/widget") op read(...Query): string;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics.length).toBeGreaterThan(0);
+      expect(result.diagnostics).toEqual([]);
+    });
+
+    it("retains ordinary parameters, response headers and shared read schemas", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        model Widget {
+          @header flag: boolean;
+          @visibility(Lifecycle.Create) createOnly: boolean;
+        }
+        @get @route("/widget") op read(@query enabled: boolean): Widget;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(3);
+      expect(result.diagnostics).toHaveLength(3);
+    });
+
+    it("retains metadata-annotated properties inside an explicit inline body", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @post @route("/widget")
+        op write(@body body: { @header flag: boolean }): void;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe("success");
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
     it("retains reachable union-variant diagnostic targets", () => {
       const offsetRule = "@azure-tools/typespec-azure-core/no-offsetdatetime";
       const result = evaluate(

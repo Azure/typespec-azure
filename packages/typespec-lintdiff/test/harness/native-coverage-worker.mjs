@@ -290,12 +290,16 @@ async function run() {
     isExternalReference(type, service) &&
     (autorestOptions.emitCommonTypesSchema === "never" ||
       !metadataInfo.isTransformed(type, visibility));
-  const visit = (type, visited, service, visibility) => {
+  const visit = (type, visited, service, visibility, ignoreMetadataAnnotations = false) => {
     if (!type) return;
-    let seen = visited.get(visibility);
+    if (type.kind === "Model" && !metadataInfo.isTransformed(type, visibility)) {
+      visibility = http.Visibility.Read;
+    }
+    const context = `${visibility}:${ignoreMetadataAnnotations}`;
+    let seen = visited.get(context);
     if (!seen) {
       seen = new Set();
-      visited.set(visibility, seen);
+      visited.set(context, seen);
     }
     if (seen.has(type)) return;
     seen.add(type);
@@ -303,30 +307,38 @@ async function run() {
     if (scope === "http-reachable" || (type.kind === "ModelProperty" && boolean(type))) add(type);
     switch (type.kind) {
       case "ModelProperty":
-        visit(type.type, visited, service, visibility);
+        visit(type.type, visited, service, visibility, ignoreMetadataAnnotations);
         break;
       case "Model":
-        for (const property of type.properties.values())
-          visit(property, visited, service, visibility);
-        if (!isExternalReference(type, service)) {
-          for (const derived of type.derivedModels) {
-            if (includeDerivedModel(derived, service)) visit(derived, visited, service, visibility);
+        for (const property of type.properties.values()) {
+          if (metadataInfo.isPayloadProperty(property, visibility, ignoreMetadataAnnotations)) {
+            visit(property, visited, service, visibility, ignoreMetadataAnnotations);
           }
         }
-        visit(type.baseModel, visited, service, visibility);
-        visit(type.indexer?.value, visited, service, visibility);
+        if (!isExternalReference(type, service)) {
+          for (const derived of type.derivedModels) {
+            if (includeDerivedModel(derived, service)) {
+              visit(derived, visited, service, visibility, ignoreMetadataAnnotations);
+            }
+          }
+        }
+        visit(type.baseModel, visited, service, visibility, ignoreMetadataAnnotations);
+        visit(type.indexer?.value, visited, service, visibility, ignoreMetadataAnnotations);
         break;
       case "Union":
-        for (const variant of type.variants.values()) visit(variant, visited, service, visibility);
+        for (const variant of type.variants.values())
+          visit(variant, visited, service, visibility, ignoreMetadataAnnotations);
         break;
       case "UnionVariant":
-        visit(type.type, visited, service, visibility);
+        visit(type.type, visited, service, visibility, ignoreMetadataAnnotations);
         break;
       case "Enum":
-        for (const member of type.members.values()) visit(member, visited, service, visibility);
+        for (const member of type.members.values())
+          visit(member, visited, service, visibility, ignoreMetadataAnnotations);
         break;
       case "Tuple":
-        for (const value of type.values) visit(value, visited, service, visibility);
+        for (const value of type.values)
+          visit(value, visited, service, visibility, ignoreMetadataAnnotations);
         break;
     }
   };
@@ -334,7 +346,13 @@ async function run() {
     if (!body) return;
     if ("type" in body) {
       if (scope === "boolean-http" && boolean(body.type)) add(body.property ?? operation);
-      visit(body.type, visited, service, visibility);
+      visit(
+        body.type,
+        visited,
+        service,
+        visibility,
+        body.isExplicit && body.containsMetadataAnnotations,
+      );
     }
     if ("parts" in body) {
       for (const part of body.parts) visitBody(part.body, operation, visited, service, visibility);
@@ -391,8 +409,13 @@ async function run() {
         add(operation.container);
       visit(operation.operation.parameters, visited, selectedService, requestVisibility);
       visit(operation.operation.returnType, visited, selectedService, http.Visibility.Read);
-      for (const parameter of operation.parameters.parameters)
-        visit(parameter.param, visited, selectedService, requestVisibility);
+      for (const parameter of operation.parameters.parameters) {
+        let source = parameter.param;
+        while (source.sourceProperty) source = source.sourceProperty;
+        if (!isExternalReference(source, selectedService)) {
+          visit(parameter.param, visited, selectedService, requestVisibility);
+        }
+      }
       visitBody(
         operation.parameters.body,
         operation.operation,
@@ -402,6 +425,9 @@ async function run() {
       );
       for (const response of operation.responses) {
         for (const content of response.responses) {
+          for (const header of Object.values(content.headers ?? {})) {
+            visit(header, visited, selectedService, http.Visibility.Read);
+          }
           visitBody(
             content.body,
             operation.operation,

@@ -24,6 +24,12 @@ compiler, HTTP/versioning libraries, and lint package from the specs checkout.
 This prevents the tooling checkout's compiler from silently evaluating a
 candidate built for a different TypeSpec version.
 
+HTTP alignment filters payload properties using HTTP metadata and the emitter's
+canonical shared-schema visibility. It retains explicit-body annotation
+handling, separately visits actual parameters and response headers, and excludes
+reference-only parameters, including their spread-source references. Filtering
+never removes findings from the raw native receipt.
+
 Explicit rule activation is local to the comparison. Existing source suppressions
 and directly configured/inherited rule options remain effective. Raw diagnostics
 are retained before optional selected-version
