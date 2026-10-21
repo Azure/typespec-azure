@@ -11,7 +11,7 @@ services). See the RFC: _Unified Examples Format_.
 ## Format
 
 ```yaml
-$schema: https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/schemas/examples.schema.yaml
+# yaml-language-server: $schema=https://unpkg.com/@azure-tools/typespec-azure-examples@0.2.1/dist/schema/dist/ExamplesYaml.json
 $namespace: Microsoft.EventGrid
 
 CaCertificates.get:
@@ -47,6 +47,104 @@ CaCertificates.get:
   `{api-version}` placeholder where a version must be embedded in a value.
 - Optional `id` is the filename stem: `id: GetWidget` generates `GetWidget.json`.
   Existing `legacyFilename: GetWidget.json` remains supported. Lineages still use titles.
+
+## Authoring workflow
+
+In `azure-rest-api-specs`, run `pnpm install` from the repository root. The root install
+exposes `pnpm tsp-examples`; other repositories can install
+`@azure-tools/typespec-azure-examples` as a development dependency.
+
+Check `pnpm tsp-examples --help` before using a command from this document. Published
+version 0.2.1 includes `validate`, but not `add`. The separate migration and expansion
+binaries are available as `pnpm tsp-examples-migrate` and
+`pnpm tsp-examples-legacy-expand`.
+
+### Adding or editing an example
+
+1. Author `examples.yaml` beside `main.tsp` and `service.yaml`, or keep related operations
+   together in `examples/<Interface>.yaml`. An operation and all its version variants must
+   stay in one file. Existing specs-repository checks require an `examples/` directory,
+   so the per-interface layout avoids adding directory placeholders.
+2. Use the canonical operation key, not a language SDK method name:
+   `CaCertificates_Get` in Swagger maps to `CaCertificates.get`; a standalone ID such as
+   `GetSchemaById` keeps its spelling. `$namespace` is the TypeSpec service namespace.
+3. Put values in their HTTP locations: `request.path`, `query`, `headers`, or `body`.
+   The body is its wire payload, without the legacy Swagger body-parameter wrapper.
+   Responses use numeric status keys, with optional `headers` and `body`.
+4. Use `id` without `.json` when the generated filename needs to be preserved. `title`
+   is optional display text, but it also groups version variants into lineages: keep
+   it unchanged within a lineage. Different examples on one operation need distinct titles.
+5. Omit the request `api-version`. Use `{api-version}` only where a value should contain
+   the selected version; keep an intentionally different historical version literal.
+
+From the repository root, validate and regenerate:
+
+```bash
+pnpm tsp-examples validate path/to/project --warn-as-error
+pnpm exec tsp compile path/to/project
+```
+
+Edit YAML, not the emitted `stable/<version>/examples/*.json` or
+`preview/<version>/examples/*.json`. Commit the regenerated artifacts with the YAML.
+Preserve existing sample values and titles when changing only the authoring format.
+
+### Adding an API version
+
+First add the version to the TypeSpec definition and compile it so the versioned Swagger
+and adjacent `service.yaml` are current. An unchanged example needs no new entry: its base
+or latest applicable `since` variant carries forward.
+
+For changed example data, append a **complete** request/response variant with the same
+title and a quoted `since` from `service.yaml`. This is a replacement value for that
+version onward, not a partial patch. Do not modify an older variant if its historical
+output must stay unchanged. A newly introduced example also needs `since` when it must
+not appear in earlier versions.
+
+When the installed CLI lists `add`, the command below can prepare new/changed entries;
+review its cloned values and fill in generated skeletons before committing:
+
+```bash
+pnpm tsp-examples add path/to/project --api-version 2025-01-01 --dry-run
+pnpm tsp-examples add path/to/project --api-version 2025-01-01
+```
+
+If `add` is unavailable, author those variants manually. Version selection follows
+`service.yaml` order, including version strings that are not full dates. Do not use
+this workflow to remove an example in a later version; see the removal limitation below.
+
+### Migrating an existing service
+
+Keep the original JSON examples until migration and compilation have been compared:
+
+```bash
+pnpm tsp-examples-migrate path/to/swagger-root --out path/to/project --service path/to/project/service.yaml --split-by-interface --dry-run --warn-as-error
+```
+
+`swagger-root` must contain the `stable/` and `preview/` trees; it can differ from the
+TypeSpec project directory. Review the preview, then run without `--dry-run`.
+Compile the project and compare every migrated version's example filenames, titles,
+parameter values, response values, and Swagger references. Only then remove the authored
+JSON under the project's old `examples/<version>/` directories. Retain generated JSON
+referenced by Swagger and leave historical Swagger-only versions outside the migration unchanged.
+
+### Editor support and validation guarantees
+
+The JSON Schema is already published inside the package. The version-pinned URL used in
+the modeline above provides completion and structural checks in YAML language-server
+editors for either file layout. The same URL can be associated with `**/examples.yaml`
+and `**/examples/*.yaml` in editor settings. Pin a schema version supported by the installed
+tooling; no repository-specific schema server is required.
+
+Editor schema checks do not establish that an operation exists or that example values
+match the API. In published examples 0.2.1, `validate` also checks only the document's
+format and version/placement rules. Continue to run TypeSpec compilation and normal
+API/SDK CI checks.
+
+If `pnpm tsp-examples validate --help` lists `--schema-only`, that release supports
+API-aware validation: the normal command compiles `main.tsp` in memory using the project's
+installed compiler/AutoRest emitter and checks values against the current API contract.
+`--schema-only` explicitly selects the format-only check. Do not assume those capabilities
+from an updated README alone; check the installed command's help.
 
 ## `tsp-examples validate`
 
