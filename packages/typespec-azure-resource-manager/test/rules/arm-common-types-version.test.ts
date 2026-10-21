@@ -1,5 +1,9 @@
 import { Tester } from "#test/tester.js";
-import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import {
+  type DiagnosticMatch,
+  type LinterRuleTester,
+  createLinterRuleTester,
+} from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
 import { armCommonTypesVersionRule } from "../../src/rules/arm-common-types-version.js";
@@ -10,9 +14,9 @@ const ruleCode = "@azure-tools/typespec-azure-resource-manager/arm-common-types-
 const latestVersion = "v6";
 const missingVersionMessage =
   "Specify the ARM common-types version using the @armCommonTypesVersion decorator on the service namespace or on each version of the service version enum.";
-const outdatedVersionDiagnostic = (target: string, currentVersion = "v3") => ({
+const outdatedVersionDiagnostic = (pos: number, currentVersion = "v3"): DiagnosticMatch => ({
   code: ruleCode,
-  target,
+  pos,
   message: `Use the latest ARM common-types version '${latestVersion}' instead of '${currentVersion}'.`,
 });
 
@@ -29,7 +33,7 @@ it("emits diagnostic when a version in the enum is missing a common type version
   await tester
     .expect(
       `
-        @service(#{ title: "Test" })
+        /*target*/@service(#{ title: "Test" })
         @versioned(Service.Versions)
         @armProviderNamespace("Contoso.Service")
         namespace Service;
@@ -42,27 +46,27 @@ it("emits diagnostic when a version in the enum is missing a common type version
         }
       `,
     )
-    .toEmitDiagnostics({
+    .toEmitDiagnostics((x) => ({
       code: ruleCode,
-      target: "Service",
+      pos: x.pos.target.pos,
       message: missingVersionMessage,
-    });
+    }));
 });
 
 it("emits diagnostic when unversioned service namespace is missing a common type version", async () => {
   await tester
     .expect(
       `
-        @service(#{ title: "Test" })
+        /*target*/@service(#{ title: "Test" })
         @armProviderNamespace("Contoso.Service")
         namespace Service;
       `,
     )
-    .toEmitDiagnostics({
+    .toEmitDiagnostics((x) => ({
       code: ruleCode,
-      target: "Service",
+      pos: x.pos.target.pos,
       message: missingVersionMessage,
-    });
+    }));
 });
 
 it("does not emit when the service namespace has a common type version without version on enum values", async () => {
@@ -123,12 +127,12 @@ it.each(["v3", "v4", "v5"])(
     await tester
       .expect(
         `
-        @armProviderNamespace
+        /*target*/@armProviderNamespace
         @armCommonTypesVersion(CommonTypes.Versions.${version})
         namespace Service;
       `,
       )
-      .toEmitDiagnostics(outdatedVersionDiagnostic("Service", version));
+      .toEmitDiagnostics((x) => outdatedVersionDiagnostic(x.pos.target.pos, version));
   },
 );
 
@@ -142,12 +146,15 @@ it("reports an older namespace selection for each API version", async () => {
       namespace Service;
 
       enum Versions {
-        v1,
-        v2,
+        /*v1*/v1,
+        /*v2*/v2,
       }
     `,
     )
-    .toEmitDiagnostics([outdatedVersionDiagnostic("v1"), outdatedVersionDiagnostic("v2")]);
+    .toEmitDiagnostics((x) => [
+      outdatedVersionDiagnostic(x.pos.v1.pos),
+      outdatedVersionDiagnostic(x.pos.v2.pos),
+    ]);
 });
 
 it("reports an older enum-member override of a latest namespace selection", async () => {
@@ -160,13 +167,13 @@ it("reports an older enum-member override of a latest namespace selection", asyn
       namespace Service;
 
       enum Versions {
-        @armCommonTypesVersion(CommonTypes.Versions.v3)
+        /*target*/@armCommonTypesVersion(CommonTypes.Versions.v3)
         v1,
         v2,
       }
     `,
     )
-    .toEmitDiagnostics(outdatedVersionDiagnostic("v1"));
+    .toEmitDiagnostics((x) => outdatedVersionDiagnostic(x.pos.target.pos));
 });
 
 it("accepts a latest enum-member override of an older namespace selection", async () => {
@@ -196,33 +203,33 @@ it("checks explicit per-version selections without a namespace selection", async
       namespace Service;
 
       enum Versions {
-        @armCommonTypesVersion(CommonTypes.Versions.v3)
+        /*target*/@armCommonTypesVersion(CommonTypes.Versions.v3)
         v1,
         @armCommonTypesVersion(CommonTypes.Versions.v6)
         v2,
       }
     `,
     )
-    .toEmitDiagnostics(outdatedVersionDiagnostic("v1"));
+    .toEmitDiagnostics((x) => outdatedVersionDiagnostic(x.pos.target.pos));
 });
 
 it("supports string version selections", async () => {
   await tester
     .expect(
       `
-      @armProviderNamespace
+      /*target*/@armProviderNamespace
       @armCommonTypesVersion("v3")
       namespace Service;
     `,
     )
-    .toEmitDiagnostics(outdatedVersionDiagnostic("Service"));
+    .toEmitDiagnostics((x) => outdatedVersionDiagnostic(x.pos.target.pos));
 });
 
 it("checks each ARM service independently", async () => {
   await tester
     .expect(
       `
-      @armProviderNamespace
+      /*target*/@armProviderNamespace
       @armCommonTypesVersion(CommonTypes.Versions.v3)
       namespace Older {}
 
@@ -231,7 +238,7 @@ it("checks each ARM service independently", async () => {
       namespace Current {}
     `,
     )
-    .toEmitDiagnostics(outdatedVersionDiagnostic("Older"));
+    .toEmitDiagnostics((x) => outdatedVersionDiagnostic(x.pos.target.pos));
 });
 
 it("does not check non-ARM services or Azure library namespaces", async () => {
