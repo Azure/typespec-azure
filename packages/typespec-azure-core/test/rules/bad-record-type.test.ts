@@ -95,4 +95,59 @@ describe("models properties of type Record<T>", () => {
         message: `Foo.props should not use ': Record<unknown>'. Use ': Record<string>' instead.`,
       });
   });
+
+  it.each(["is", "extends"])(
+    "reports only the named record definition using %s",
+    async (keyword) => {
+      await tester
+        .expect(
+          `
+        model Foo ${keyword} Record<unknown> {}
+        model Bar {
+          foo: Foo;
+          anotherFoo: Foo;
+        }
+      `,
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-core/bad-record-type",
+          message: `Foo should not use '${keyword} Record<unknown>'. Use '${keyword} Record<string>' instead.`,
+        });
+    },
+  );
+
+  it("does not repeat a suppressed warning at references to a named record", async () => {
+    await Tester.compile(
+      `
+        #suppress "@azure-tools/typespec-azure-core/bad-record-type" "Open-ended dictionary is required."
+        model Foo is Record<unknown>;
+        model Bar {
+          foo: Foo;
+        }
+      `,
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: { "@azure-tools/typespec-azure-core/bad-record-type": true },
+          },
+        },
+      },
+    );
+  });
+
+  it("reports record aliases at the property", async () => {
+    await tester
+      .expect(
+        `
+        alias UnknownRecord = Record<unknown>;
+        model Foo {
+          props: UnknownRecord;
+        }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-core/bad-record-type",
+        message: `Foo.props should not use ': Record<unknown>'. Use ': Record<string>' instead.`,
+      });
+  });
 });
