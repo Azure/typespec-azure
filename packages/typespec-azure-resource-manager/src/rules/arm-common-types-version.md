@@ -33,45 +33,12 @@ namespace Microsoft.Contoso;
 
 ## ✅ Correct
 
-Select the latest version on the namespace and use standard ARM resource
-operation templates:
+Select the latest version on the service namespace:
 
 ```tsp
-import "@azure-tools/typespec-azure-resource-manager";
-import "@typespec/http";
-import "@typespec/rest";
-import "@typespec/versioning";
-
-using Azure.ResourceManager;
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
-
 @armProviderNamespace
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
-@versioned(Versions)
 namespace Microsoft.Contoso;
-
-enum Versions {
-  v2026_08_01: "2026-08-01",
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetProperties {
-  /** The resource provisioning state. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-interface Operations extends Azure.ResourceManager.Operations {}
-
-@armResourceOperations
-interface Widgets {
-  get is ArmResourceRead<Widget>;
-}
 ```
 
 Alternatively, apply `@armCommonTypesVersion` to every API version enum member
