@@ -24,28 +24,8 @@ This routing impact applies to RPaaS contracts, not ordinary ARM endpoints.
 ## ❌ Incorrect
 
 The extension read operation embeds a specific virtual machine's parent URI.
-The examples use the standard ARM imports and `using` declarations.
 
 ```tsp
-@armProviderNamespace
-@service
-@versioned(Versions)
-@armCommonTypesVersion(CommonTypes.Versions.v6)
-namespace Microsoft.Test;
-
-enum Versions {
-  @useDependency(Azure.ResourceManager.CommonTypes.Versions.v6)
-  v2024: "2024-01-01",
-}
-
-model Binding is ExtensionResource<BindingProperties> {
-  ...ResourceNameParameter<Binding>;
-}
-
-model BindingProperties {
-  label?: string;
-}
-
 alias VirtualMachine = Extension.ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
 
 @armResourceOperations
@@ -59,25 +39,6 @@ interface Bindings {
 Accept an arbitrary scope with the same resource and read operation.
 
 ```tsp
-@armProviderNamespace
-@service
-@versioned(Versions)
-@armCommonTypesVersion(CommonTypes.Versions.v6)
-namespace Microsoft.Test;
-
-enum Versions {
-  @useDependency(Azure.ResourceManager.CommonTypes.Versions.v6)
-  v2024: "2024-01-01",
-}
-
-model Binding is ExtensionResource<BindingProperties> {
-  ...ResourceNameParameter<Binding>;
-}
-
-model BindingProperties {
-  label?: string;
-}
-
 @armResourceOperations
 interface Bindings {
   read is Extension.Read<Extension.ScopeParameter, Binding>;
