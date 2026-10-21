@@ -12,18 +12,51 @@ import type {
   Type,
 } from "@typespec/compiler";
 
+/**
+ * Interface-level operation options
+ */
 export interface ResourceOperationOptions {
+  /**
+   * The resource type for the operations in the interface
+   */
   readonly resourceType?: Record<string, unknown>;
+  /**
+   * If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing.
+   */
   readonly allowStaticRoutes?: boolean;
+  /**
+   * If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged
+   */
   readonly omitTags?: boolean;
 }
 
+/**
+ * Options for defining a feature file and its associated output
+ */
 export interface ArmFeatureFileOptions {
+  /**
+   * The feature name
+   */
   readonly featureName: string;
+  /**
+   * The associated file name for the features
+   */
   readonly fileName: string;
+  /**
+   * The feature description in Swagger
+   */
   readonly description: string;
+  /**
+   * The feature title in Swagger
+   */
   readonly title?: string;
+  /**
+   * The feature terms of service in Swagger
+   */
   readonly termsOfService?: string;
+  /**
+   * The API version to use for clients generated from this feature file
+   */
   readonly version?: string;
 }
 

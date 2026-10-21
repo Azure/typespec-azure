@@ -1,4 +1,4 @@
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -1907,7 +1907,7 @@ export const $markAsLro: MarkAsLroDecorator = (
     });
     return;
   }
-  if (getLroMetadata(context.program, target)) {
+  if (getLroProtocolMetadata(context.program, target)) {
     reportDiagnostic(context.program, {
       code: "mark-as-lro-ineffective",
       format: {
