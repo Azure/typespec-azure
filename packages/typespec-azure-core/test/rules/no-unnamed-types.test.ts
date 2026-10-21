@@ -144,6 +144,40 @@ describe("response bodies", () => {
     await tester.expect(code).toBeValid();
   });
 
+  it("reports an anonymous response inherited from a concrete interface template", async () => {
+    await tester
+      .expect(
+        `
+        interface Templates<T> {
+          @get @route("/widgets") read(): /*target*/{ value: T };
+        }
+        interface Widgets extends Templates<string> {}
+        `,
+      )
+      .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+  });
+
+  it("accepts a named response inherited from a concrete interface template", async () => {
+    await tester
+      .expect(
+        `
+        model Result<T> { value: T; }
+        interface Templates<T> {
+          @get @route("/widgets") read(): Result<T>;
+        }
+        interface Widgets extends Templates<string> {}
+        `,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    '@get @route("/widgets") op read<T>(): { value: T };',
+    'interface Templates<T> { @get @route("/widgets") read(): { value: T }; }',
+  ])("does not check uninstantiated response templates: %s", async (code) => {
+    await tester.expect(code).toBeValid();
+  });
+
   it.each(["body", "bodyRoot"])("reports an explicit @%s body once", async (decorator) => {
     await tester
       .expect(`@get op read(): { @${decorator} body: /*target*/{ value: string } };`)

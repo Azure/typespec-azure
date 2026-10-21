@@ -6,7 +6,6 @@ import {
   ignoreDiagnostics,
   isNullType,
   isTemplateDeclaration,
-  isTemplateInstance,
   type Model,
   type ModelProperty,
   paramMessage,
@@ -25,7 +24,6 @@ import {
   isMultipartBodyProperty,
   isStatusCode,
 } from "@typespec/http";
-import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
@@ -100,9 +98,8 @@ export const noUnnamedTypesRule = createRule({
         }
 
         if (
-          isTemplateInstance(operation) ||
           isTemplateDeclaration(operation) ||
-          isTemplatedInterfaceOperation(operation) ||
+          (operation.interface !== undefined && isTemplateDeclaration(operation.interface)) ||
           getLocationContext(program, operation).type !== "project"
         ) {
           return;

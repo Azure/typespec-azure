@@ -120,7 +120,8 @@ spread, or in both places. Adding payload properties outside the named model
 creates a new anonymous response shape and is reported. Empty, metadata-only,
 scalar, array and dictionary responses are not reported by the implicit-response check.
 Library operations and generic operation/interface templates are excluded from
-that check.
+that check. Concrete operations inherited from instantiated interface templates
+are checked like directly declared operations.
 
 Explicit `@body` and `@bodyRoot` properties continue to use the existing
 property-type checks and template-argument exceptions.
