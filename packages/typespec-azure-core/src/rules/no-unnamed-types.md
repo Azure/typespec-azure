@@ -129,27 +129,10 @@ property-type checks and template-argument exceptions.
 
 For an ARM resource read, use `ArmResourceRead` and customize its `Response` only
 when needed. Adding a payload property outside a named model creates an anonymous
-response shape:
+response shape. These excerpts assume an ARM provider context with `Widget` already
+declared and the HTTP and ARM namespaces in scope:
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace("Microsoft.Contoso")
-namespace Microsoft.Contoso;
-
-model WidgetProperties {
-  value: string;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<
@@ -168,24 +151,6 @@ interface Widgets {
 Define the complete payload as a named model and spread it into the customized response:
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace("Microsoft.Contoso")
-namespace Microsoft.Contoso;
-
-model WidgetProperties {
-  value: string;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
 model WidgetResponse extends Widget {
   etag: string;
 }
