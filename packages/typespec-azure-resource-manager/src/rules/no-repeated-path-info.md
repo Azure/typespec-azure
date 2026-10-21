@@ -38,12 +38,11 @@ and ambiguity when the request URI and payload disagree.
 ## ❌ Incorrect
 
 The standard ARM create-or-replace operation carries `widgetName` in the URI.
-Repeating it in `WidgetProperties` triggers this rule.
+With `ArmResourceCreateOrReplaceSync<Widget>`, repeating that key name in
+`WidgetProperties` triggers this rule. These excerpts omit unchanged provider
+and operation declarations.
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
 model Widget is TrackedResource<WidgetProperties> {
   @key("widgetName")
   @segment("widgets")
@@ -55,36 +54,16 @@ model WidgetProperties {
   widgetName?: string;
   description?: string;
 }
-
-@armResourceOperations
-interface Widgets {
-  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-}
 ```
 
 ## ✅ Correct
 
-Keep the same operation template and remove only the redundant properties-bag
-member.
+Keep the resource key and operation template unchanged; remove only the redundant
+properties-bag member.
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-}
-
 model WidgetProperties {
   description?: string;
-}
-
-@armResourceOperations
-interface Widgets {
-  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
 }
 ```
 
