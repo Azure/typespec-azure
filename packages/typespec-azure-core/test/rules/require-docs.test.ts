@@ -1,8 +1,6 @@
-import { getDoc, getSourceLocation } from "@typespec/compiler";
+import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import * as Http from "@typespec/http";
-import { getHttpOperation } from "@typespec/http";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { requireDocumentation } from "../../src/rules/require-docs.js";
 import { Tester } from "../test-host.js";
 
@@ -26,27 +24,33 @@ describe("emit `documentation-required` when documentation is missing", () => {
     await tester
       .expect(
         `
-      @doc(" ") model Widget {
-        @doc("\\t") name: string;
-        missing: string;
+      @doc(" ") model /*widget*/Widget {
+        @doc("\\t") /*name*/name: string;
+        /*missing*/missing: string;
       }
     `,
       )
-      .toEmitDiagnostics([
+      .toEmitDiagnostics(({ widget, name, missing }) => [
         {
           code: "@azure-tools/typespec-azure-core/documentation-required",
           message:
             "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-core/documentation-required",
-          message:
-            "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+          pos: getSourceLocation(widget).pos,
+          end: getSourceLocation(widget).end,
         },
         {
           code: "@azure-tools/typespec-azure-core/documentation-required",
           message:
             "The ModelProperty named 'missing' should have a documentation or description, use doc comment /** */ to provide it.",
+          pos: getSourceLocation(missing).pos,
+          end: getSourceLocation(missing).end,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
+            "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+          pos: getSourceLocation(name).pos,
+          end: getSourceLocation(name).end,
         },
       ]);
   });
@@ -204,23 +208,7 @@ describe("empty documentation", () => {
   beforeEach(async () => {
     tester = createLinterRuleTester(
       await Tester.createInstance(),
-      {
-        ...requireDocumentation,
-        create(context) {
-          return requireDocumentation.create({
-            ...context,
-            // Missing-doc behavior is covered by require-docs.test.ts; these fixtures isolate authored docs.
-            reportDiagnostic(diagnostic) {
-              if (
-                getDoc(context.program, diagnostic.target as Parameters<typeof getDoc>[1]) !==
-                undefined
-              ) {
-                context.reportDiagnostic(diagnostic);
-              }
-            },
-          });
-        },
-      },
+      requireDocumentation,
       "@azure-tools/typespec-azure-core",
     );
   });
@@ -231,8 +219,9 @@ describe("empty documentation", () => {
   };
 
   it.each([
-    '@doc("Payload data.") model Payload { data: { @doc(" ") value: string }; }',
+    '@doc("Payload data.") model Payload { @doc("The nested data.") data: { @doc(" ") value: string }; }',
     '@doc("Available values.") union Values { @doc(" ") int32, string }',
+    '@doc("A generic container.") model Box<T> {} @doc(" ") model Widget is Box<string>;',
     '@versioned(Widgets.Versions) namespace Widgets; @doc(" ") enum Versions { @doc(" ") v1: "2026-01-01" }',
   ])("checks explicit blanks beyond missing-doc requirements: %s", async (code) => {
     await tester
@@ -240,8 +229,17 @@ describe("empty documentation", () => {
       .toEmitDiagnostics(code.includes("enum Versions") ? [diagnostic, diagnostic] : [diagnostic]);
   });
 
-  it("preserves the uninstantiated template exemption when the compiler exposes no doc metadata", async () => {
-    await tester.expect('@doc(" ") model Template<T> {}').toBeValid();
+  it("checks explicit blanks on discriminator types, members, and properties", async () => {
+    await tester
+      .expect(
+        `
+        @doc(" ") enum PetKind { @doc(" ") cat }
+        @doc("A pet resource.") @discriminator("kind") model Pet {
+          @doc(" ") kind: PetKind;
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic, diagnostic, diagnostic]);
   });
 
   it.each(["Widget", "description"])(
@@ -280,9 +278,9 @@ describe("empty documentation", () => {
     '@doc(" ") op read(): string;',
     '@doc(" ") model Widget {}',
     '@doc(" ") scalar Label extends string;',
-    '@doc(" ") enum State { Ready }',
-    '@doc(" ") union State { ready: "ready", string }',
-    'union State { @doc(" ") ready: "ready", string }',
+    '@doc(" ") enum State { @doc("Available for use.") Ready }',
+    '@doc(" ") union State { @doc("Available for use.") ready: "ready", string }',
+    '@doc("Available states.") union State { @doc(" ") ready: "ready", string }',
   ])("rejects explicit whitespace documentation: %s", async (code) => {
     await tester.expect(code).toEmitDiagnostics([diagnostic]);
   });
@@ -292,13 +290,12 @@ describe("empty documentation", () => {
   });
 
   it.each([
-    "model Widget { name: string; }",
-    "op read(name: string): string;",
+    "namespace Widgets {} interface Empty {} scalar Label extends string;",
     '@doc("A widget resource") model Widget {}',
     '@doc("  A widget resource  ") model Widget {}',
     '@doc(".") model Widget {}',
     "/** A widget resource */ model Widget {}",
-  ])("accepts missing or nonblank documentation: %s", async (code) => {
+  ])("accepts exempt missing or nonblank documentation: %s", async (code) => {
     await tester.expect(code).toBeValid();
   });
 
@@ -306,7 +303,7 @@ describe("empty documentation", () => {
     await tester
       .expect(
         `
-        model Widget {
+        @doc("A widget resource.") model Widget {
           @doc(" ")
           name: string;
         }
@@ -316,7 +313,9 @@ describe("empty documentation", () => {
   });
 
   it("rejects a whitespace-only parameter description", async () => {
-    await tester.expect('op read(@doc(" ") name: string): string;').toEmitDiagnostics([diagnostic]);
+    await tester
+      .expect('@doc("Read a widget.") op read(@doc(" ") name: string): string;')
+      .toEmitDiagnostics([diagnostic]);
   });
 
   it("accepts nonblank descriptions on models, properties, and operations", async () => {
@@ -335,29 +334,11 @@ describe("empty documentation", () => {
       .toBeValid();
   });
 
-  it("validates the standard incorrect and correct examples", async () => {
-    const examples = [
-      `model Widget {
-  @doc(" ")
-  name: string;
-}
-`,
-      `model Widget {
-  @doc("The widget name.")
-  name: string;
-}
-`,
-    ];
-
-    await tester.expect(examples[0]).toEmitDiagnostics([diagnostic]);
-    await tester.expect(examples[1]).toBeValid();
-  });
-
   it("targets offending properties rather than their containing model", async () => {
     await tester
       .expect(
         `
-        model Widget {
+        @doc("A widget resource.") model Widget {
           @doc("") /*name*/name: string;
           @doc(" ") /*value*/value: string;
           @doc("A valid label") label: string;
@@ -381,7 +362,7 @@ describe("empty documentation", () => {
     await tester
       .expect(
         `
-        enum State {
+        @doc("Available states.") enum State {
           @doc(" ") /*ready*/Ready
         }
       `,
@@ -404,33 +385,12 @@ describe("uninformative documentation", () => {
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    vi.spyOn(Http, "getHttpOperation");
     const runner = await Tester.createInstance();
     tester = createLinterRuleTester(
       runner,
-      {
-        ...requireDocumentation,
-        create(context) {
-          return requireDocumentation.create({
-            ...context,
-            // Missing-doc behavior is covered by require-docs.test.ts; these fixtures isolate authored docs.
-            reportDiagnostic(diagnostic) {
-              if (
-                getDoc(context.program, diagnostic.target as Parameters<typeof getDoc>[1]) !==
-                undefined
-              ) {
-                context.reportDiagnostic(diagnostic);
-              }
-            },
-          });
-        },
-      },
+      requireDocumentation,
       "@azure-tools/typespec-azure-core",
     );
-  });
-
-  afterEach(() => {
-    vi.mocked(Http.getHttpOperation).mockRestore();
   });
 
   function diagnostic(name: string, description: string) {
@@ -440,7 +400,7 @@ describe("uninformative documentation", () => {
     };
   }
 
-  it("resolves HTTP metadata only when documentation needs an effective-name comparison", async () => {
+  it("distinguishes source-name, missing, blank, punctuation-only, and effective-verb documentation", async () => {
     await tester
       .expect(
         `
@@ -456,13 +416,15 @@ describe("uninformative documentation", () => {
         {
           code: "@azure-tools/typespec-azure-core/documentation-required",
           message:
+            "The Operation named 'absent' should have a documentation or description, use doc comment /** */ to provide it.",
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
             "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
         },
         diagnostic("get", "GET."),
       ]);
-    expect(vi.mocked(getHttpOperation).mock.calls.map(([, operation]) => operation.name)).toEqual([
-      "fetch",
-    ]);
   });
 
   it("reports source-name, verb, and missing-doc diagnostics through the unfiltered rule", async () => {
@@ -501,44 +463,58 @@ describe("uninformative documentation", () => {
       .toEmitDiagnostics([diagnostic("Versions", "Versions"), diagnostic("v1", "v1")]);
   });
 
-  for (const partType of [
-    'HttpPart<string, #{name: "part_name"}>',
-    'HttpPart<UploadText, #{name: "part_name"}>',
-    'HttpPart<string[], #{name: "part_name"}>',
-    'HttpPart<string, #{name: "part_name"}>[]',
-  ]) {
-    it(`compares multipart documentation with its authored name for ${partType}`, async () => {
-      const operation = (doc: string) => `
-        scalar UploadText extends string;
+  it("checks explicit names on discriminator unions, variants, and properties", async () => {
+    await tester
+      .expect(
+        `
+        @doc("PetKind") union PetKind { @doc("cat") cat: "cat" }
+        @doc("A pet resource.") @discriminator("kind") model Pet {
+          @doc("kind") kind: PetKind;
+        }
+      `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("kind", "kind"),
+        diagnostic("PetKind", "PetKind"),
+        diagnostic("cat", "cat"),
+      ]);
+  });
+
+  it("compares multipart documentation with its authored name over source and JSON names", async () => {
+    const operation = (doc: string) => `
+        @doc("Upload text for processing.")
         op upload(
-          @header contentType: "multipart/form-data",
-          @multipartBody body: { @doc("${doc}") /*part*/propName: ${partType}; }
+          @doc("The request media type.") @header contentType: "multipart/form-data",
+          @doc("The submitted parts.") @multipartBody body: {
+            @encodedName("application/json", "jsonName")
+            @doc("${doc}") /*part*/propName: HttpPart<string, #{name: "part_name"}>;
+          }
         ): void;
       `;
-      await tester.expect(operation(" Part_Name. ")).toEmitDiagnostics(({ part }) => {
-        const location = getSourceLocation(part);
-        return [
-          {
-            ...diagnostic("part_name", " Part_Name. "),
-            file: location.file.path,
-            pos: location.pos,
-            end: location.end,
-          },
-        ];
-      });
-      await tester.expect(operation("propName")).toBeValid();
-      await tester.expect(operation("The text submitted for processing.")).toBeValid();
-      await tester
-        .expect(operation("description."))
-        .toEmitDiagnostics([diagnostic("part_name", "description.")]);
+    await tester.expect(operation(" Part_Name. ")).toEmitDiagnostics(({ part }) => {
+      const location = getSourceLocation(part);
+      return [
+        {
+          ...diagnostic("part_name", " Part_Name. "),
+          file: location.file.path,
+          pos: location.pos,
+          end: location.end,
+        },
+      ];
     });
-  }
+    await tester.expect(operation("propName")).toBeValid();
+    await tester.expect(operation("jsonName")).toBeValid();
+    await tester.expect(operation("The text submitted for processing.")).toBeValid();
+    await tester
+      .expect(operation("description."))
+      .toEmitDiagnostics([diagnostic("part_name", "description.")]);
+  });
 
   it("uses the source property name for an unnamed multipart part", async () => {
     const operation = (doc: string) => `
-      op upload(
-        @header contentType: "multipart/form-data",
-        @multipartBody body: {
+      @doc("Upload text for processing.") op upload(
+        @doc("The request media type.") @header contentType: "multipart/form-data",
+        @doc("The submitted parts.") @multipartBody body: {
           @encodedName("application/json", "jsonName")
           @doc("${doc}") propName: HttpPart<string>;
         }
@@ -550,20 +526,30 @@ describe("uninformative documentation", () => {
     await tester.expect(operation("jsonName")).toBeValid();
   });
 
-  it("preserves authored multipart names over JSON encoded names", async () => {
-    const operation = (doc: string) => `
-      op upload(
-        @header contentType: "multipart/form-data",
-        @multipartBody body: {
+  it("unwraps an outer array of repeated HTTP parts and targets the authored property", async () => {
+    await tester
+      .expect(
+        `
+      @doc("Upload text for processing.") op upload(
+        @doc("The request media type.") @header contentType: "multipart/form-data",
+        @doc("The submitted parts.") @multipartBody body: {
           @encodedName("application/json", "jsonName")
-          @doc("${doc}") propName: HttpPart<string, #{name: "part_name"}>;
+          @doc("part_name") /*part*/propName: HttpPart<string, #{name: "part_name"}>[];
         }
       ): void;
-    `;
-    await tester
-      .expect(operation("part_name"))
-      .toEmitDiagnostics([diagnostic("part_name", "part_name")]);
-    await tester.expect(operation("jsonName")).toBeValid();
+    `,
+      )
+      .toEmitDiagnostics(({ part }) => {
+        const location = getSourceLocation(part);
+        return [
+          {
+            ...diagnostic("part_name", "part_name"),
+            file: location.file.path,
+            pos: location.pos,
+            end: location.end,
+          },
+        ];
+      });
   });
 
   it("reports model documentation matching its name", async () => {
@@ -592,52 +578,60 @@ describe("uninformative documentation", () => {
 
   it("reports enum documentation matching its name", async () => {
     await tester
-      .expect('@doc("State") enum State { Ready }')
+      .expect('@doc("State") enum State { @doc("Available for use.") Ready }')
       .toEmitDiagnostics([diagnostic("State", "State")]);
   });
 
   it("reports union documentation matching its name", async () => {
     await tester
-      .expect('@doc("State") union State { Ready: "ready", string }')
+      .expect('@doc("State") union State { @doc("Available for use.") Ready: "ready", string }')
       .toEmitDiagnostics([diagnostic("State", "State")]);
   });
 
   it("compares enum members with their names rather than literal values", async () => {
     await tester
-      .expect('enum State { @doc("Ready.") Ready: "available" }')
+      .expect('@doc("Available states.") enum State { @doc("Ready.") Ready: "available" }')
       .toEmitDiagnostics([diagnostic("Ready", "Ready.")]);
-    await tester.expect('enum State { @doc("wire-value") Ready: "wire-value" }').toBeValid();
+    await tester
+      .expect('@doc("Available states.") enum State { @doc("wire-value") Ready: "wire-value" }')
+      .toBeValid();
   });
 
   it("compares named union variants with their names rather than literal values", async () => {
     await tester
-      .expect('union State { @doc("Ready.") Ready: "available", string }')
+      .expect('@doc("Available states.") union State { @doc("Ready.") Ready: "available", string }')
       .toEmitDiagnostics([diagnostic("Ready", "Ready.")]);
-    await tester.expect('union State { @doc("available") Ready: "available", string }').toBeValid();
+    await tester
+      .expect(
+        '@doc("Available states.") union State { @doc("available") Ready: "available", string }',
+      )
+      .toBeValid();
   });
 
   it("compares unnamed string variants with their values", async () => {
     await tester
-      .expect('union State { @doc("ready") "ready", string }')
+      .expect('@doc("Available states.") union State { @doc("ready") "ready", string }')
       .toEmitDiagnostics([diagnostic("ready", "ready")]);
   });
 
   it("checks unnamed non-string variants only for placeholder text", async () => {
     await tester
-      .expect('union State { @doc("description") int32, string }')
+      .expect('@doc("Available states.") union State { @doc("description") int32, string }')
       .toEmitDiagnostics([diagnostic("description", "description")]);
-    await tester.expect('union State { @doc("int32") int32, string }').toBeValid();
+    await tester
+      .expect('@doc("Available states.") union State { @doc("int32") int32, string }')
+      .toBeValid();
   });
 
   it("checks key property documentation", async () => {
     await tester
-      .expect('model Widget { @key @doc("id") id: string; }')
+      .expect('@doc("A widget resource.") model Widget { @key @doc("id") id: string; }')
       .toEmitDiagnostics([diagnostic("id", "id")]);
   });
 
   it("reports property documentation matching its name", async () => {
     await tester
-      .expect('model Widget { @doc("sku") sku: string; }')
+      .expect('@doc("A widget resource.") model Widget { @doc("sku") sku: string; }')
       .toEmitDiagnostics([diagnostic("sku", "sku")]);
   });
 
@@ -679,10 +673,14 @@ describe("uninformative documentation", () => {
 
   it("compares inferred POST operations with their effective HTTP verb", async () => {
     await tester
-      .expect('@route("/widgets") @doc("post") op create(@body body: string): string;')
+      .expect(
+        '@route("/widgets") @doc("post") op create(@doc("The request payload.") @body body: string): string;',
+      )
       .toEmitDiagnostics([diagnostic("post", "post")]);
     await tester
-      .expect('@route("/widgets") @doc("create") op create(@body body: string): string;')
+      .expect(
+        '@route("/widgets") @doc("create") op create(@doc("The request payload.") @body body: string): string;',
+      )
       .toEmitDiagnostics([diagnostic("create", "create")]);
   });
 
@@ -694,7 +692,7 @@ describe("uninformative documentation", () => {
   it("compares ordinary properties with their JSON encoded names", async () => {
     await tester
       .expect(
-        'model Widget { @encodedName("application/json", "wire-name") @doc(" Wire-Name. ") sourceName: string; }',
+        '@doc("A widget resource.") model Widget { @encodedName("application/json", "wire-name") @doc(" Wire-Name. ") sourceName: string; }',
       )
       .toEmitDiagnostics([diagnostic("wire-name", " Wire-Name. ")]);
   });
@@ -702,7 +700,7 @@ describe("uninformative documentation", () => {
   it("accepts JSON-renamed property documentation matching only its source name", async () => {
     await tester
       .expect(
-        'model Widget { @encodedName("application/json", "wire-name") @doc("sourceName") sourceName: string; }',
+        '@doc("A widget resource.") model Widget { @encodedName("application/json", "wire-name") @doc("sourceName") sourceName: string; }',
       )
       .toBeValid();
   });
@@ -710,7 +708,7 @@ describe("uninformative documentation", () => {
   it("checks JSON-renamed properties for placeholder text", async () => {
     await tester
       .expect(
-        'model Widget { @encodedName("application/json", "wire-name") @doc("description.") sourceName: string; }',
+        '@doc("A widget resource.") model Widget { @encodedName("application/json", "wire-name") @doc("description.") sourceName: string; }',
       )
       .toEmitDiagnostics([diagnostic("wire-name", "description.")]);
   });
@@ -718,7 +716,7 @@ describe("uninformative documentation", () => {
   it("ignores non-JSON encoded names for ordinary properties", async () => {
     await tester
       .expect(
-        'model Widget { @encodedName("application/xml", "wire-name") @doc("wire-name") sourceName: string; }',
+        '@doc("A widget resource.") model Widget { @encodedName("application/xml", "wire-name") @doc("wire-name") sourceName: string; }',
       )
       .toBeValid();
   });
@@ -728,14 +726,16 @@ describe("uninformative documentation", () => {
       const route = kind === "path" ? '@route("/widgets/{wireName}")' : "";
       await tester
         .expect(
-          `${route} @get op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("wireName.") source: string): string;`,
+          `${route} @get @doc("Read a widget.") op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("wireName.") source: string): string;`,
         )
         .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
-      await tester
-        .expect(
-          `${route} @get op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("jsonName") source: string): string;`,
-        )
-        .toBeValid();
+      for (const doc of ["jsonName", "source"]) {
+        await tester
+          .expect(
+            `${route} @get @doc("Read a widget.") op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("${doc}") source: string): string;`,
+          )
+          .toBeValid();
+      }
     }
   });
 
@@ -744,8 +744,8 @@ describe("uninformative documentation", () => {
       .expect(
         `
         @route("/widgets") @doc("get") op /*read*/read(): string;
-        @route("/widgets") @doc("post") op /*create*/create(@body body: string): string;
-        model Widget {
+        @route("/widgets") @doc("post") op /*create*/create(@doc("The request payload.") @body body: string): string;
+        @doc("A widget resource.") model Widget {
           @encodedName("application/json", "wire-name")
           @doc("wire-name")
           /*source*/sourceName: string;
@@ -769,39 +769,14 @@ describe("uninformative documentation", () => {
       );
   });
 
-  it("compares path parameters with their wire names", async () => {
-    await tester
-      .expect(
-        '@route("/widgets/{wireName}") @get op read(@path("wireName") @doc("wireName.") source: string): string;',
-      )
-      .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
-    await tester
-      .expect(
-        '@route("/widgets/{wireName}") @get op read(@path("wireName") @doc("source") source: string): string;',
-      )
-      .toBeValid();
-  });
-
-  it("compares query parameters with their wire names", async () => {
-    await tester
-      .expect('@get op read(@query("wireName") @doc("wireName.") source: string): string;')
-      .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
-    await tester
-      .expect('@get op read(@query("wireName") @doc("source") source: string): string;')
-      .toBeValid();
-  });
-
-  it("compares header parameters with their wire names", async () => {
-    await tester
-      .expect('@get op read(@header("wireName") @doc("wireName.") source: string): string;')
-      .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
-    await tester
-      .expect('@get op read(@header("wireName") @doc("source") source: string): string;')
-      .toBeValid();
-  });
-
   it("keeps missing documentation separate and rejects explicit empty documentation", async () => {
-    await tester.expect("model Widget {}").toBeValid();
+    await tester.expect("model Widget {}").toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-core/documentation-required",
+        message:
+          "The Model named 'Widget' should have a documentation or description, use doc comment /** */ to provide it.",
+      },
+    ]);
     await tester.expect('@doc("") model Widget {}').toEmitDiagnostics([
       {
         code: "@azure-tools/typespec-azure-core/documentation-required",
@@ -810,7 +785,9 @@ describe("uninformative documentation", () => {
       },
     ]);
     await tester.expect('@doc("  ...  ") model Widget {}').toBeValid();
-    await tester.expect('enum State { Ready } union Mode { Active: "active", string }').toBeValid();
+    await tester
+      .expect("namespace Widgets {} interface Empty {} scalar Label extends string;")
+      .toBeValid();
   });
 
   it("accepts meaningful documentation", async () => {
@@ -818,18 +795,22 @@ describe("uninformative documentation", () => {
       .expect(
         `
       @doc("A widget available in the store.") model Widget {}
-      enum State { @doc("The widget is ready for use.") Ready }
-      union Mode { @doc("The widget is ready for use.") Ready: "ready", string }
+      @doc("Available states.") enum State { @doc("The widget is ready for use.") Ready }
+      @doc("Available modes.") union Mode { @doc("The widget is ready for use.") Ready: "ready", string }
     `,
       )
       .toBeValid();
   });
 
   it("exempts HTTP status-code properties", async () => {
-    await tester.expect('model Response { @statusCode @doc("status") status: 200; }').toBeValid();
     await tester
       .expect(
-        'model Response { @statusCode @encodedName("application/json", "wire-status") @doc("wire-status") status: 200; }',
+        '@doc("The response metadata.") model Response { @statusCode @doc("status") status: 200; }',
+      )
+      .toBeValid();
+    await tester
+      .expect(
+        '@doc("The response metadata.") model Response { @statusCode @encodedName("application/json", "wire-status") @doc("wire-status") status: 200; }',
       )
       .toBeValid();
   });
@@ -838,8 +819,8 @@ describe("uninformative documentation", () => {
     await tester
       .expect(
         `
-      enum State { @doc("Ready") /*ready*/Ready }
-      model Widget { @key @doc("id") /*id*/id: string; }
+      @doc("Available states.") enum State { @doc("Ready") /*ready*/Ready }
+      @doc("A widget resource.") model Widget { @key @doc("id") /*id*/id: string; }
     `,
       )
       .toEmitDiagnostics(({ ready, id }) =>

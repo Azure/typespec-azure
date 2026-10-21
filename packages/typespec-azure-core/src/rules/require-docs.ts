@@ -1,4 +1,4 @@
-import { createDocumentationNameValidator } from "./documentation-names.js";
+import { getDocumentationName, normalizeDocumentation } from "./documentation-names.js";
 
 import {
   createRule,
@@ -15,13 +15,9 @@ import {
   type Union,
   type UnionVariant,
 } from "@typespec/compiler";
+import { isStatusCode } from "@typespec/http";
 import { getVersionsForEnum } from "@typespec/versioning";
-import {
-  documentationMessages,
-  hasMeaningfulDocumentation,
-  withExplicitDocumentation,
-  type DocumentationTarget,
-} from "./documentation.js";
+import { documentationMessages, type DocumentationTarget } from "./documentation.js";
 import {
   isExcludedCoreType,
   isInlineModel,
@@ -29,8 +25,6 @@ import {
   isTemplatedInterfaceOperation,
   isTemplatedOperationSignature,
 } from "./utils.js";
-
-import { createEmptyDocumentationValidator } from "./documentation-empty.js";
 
 /** Versioning enums are self-documenting and don't need separate documentation. */
 function isExcludedVersionEnum(program: Program, enumObj: Enum): boolean {
@@ -99,129 +93,160 @@ export const requireDocumentation = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required",
   messages: documentationMessages,
   create(context) {
-    const validateName = createDocumentationNameValidator(context);
-    const validateEmpty = createEmptyDocumentationValidator(context);
     const discTypes = getDiscriminatedTypes(context.program);
-    const requiredTargets = new Set<DocumentationTarget>();
     const needsDocumentation = (target: DocumentationTarget) => {
-      requiredTargets.add(target);
-      if (getDoc(context.program, target) === undefined) return true;
-      if (!hasMeaningfulDocumentation(context.program, target)) {
-        context.reportDiagnostic({ target, messageId: "empty" });
-      }
-      return false;
+      return getDoc(context.program, target) === undefined;
     };
-    return withExplicitDocumentation(
-      context.program,
-      {
-        enum: (enumObj: Enum) => {
-          // version enums and enum members are considered intrinsically self-documenting
-          if (isExcludedVersionEnum(context.program, enumObj)) {
-            return;
-          }
-          if (isExcludedDiscriminator(context.program, enumObj, discTypes)) {
-            return;
-          }
-          if (!isExcludedCoreType(context.program, enumObj) && needsDocumentation(enumObj)) {
+    const checkDocumentation = (target: DocumentationTarget) => {
+      const doc = getDoc(context.program, target);
+      if (doc === undefined) return;
+      if (doc.trim().length === 0) {
+        context.reportDiagnostic({ target, messageId: "empty" });
+        return;
+      }
+      if (
+        target.kind === "Namespace" ||
+        target.kind === "Interface" ||
+        (target.kind === "ModelProperty" && isStatusCode(context.program, target))
+      )
+        return;
+      if (
+        (target.kind === "Model" ||
+          target.kind === "Scalar" ||
+          target.kind === "Enum" ||
+          target.kind === "EnumMember" ||
+          target.kind === "Union") &&
+        !target.name
+      )
+        return;
+      const normalizedDoc = normalizeDocumentation(doc);
+      if (normalizedDoc.length === 0) return;
+      const name = getDocumentationName(context.program, target, doc);
+      if (
+        normalizedDoc === "description" ||
+        (name !== undefined && normalizedDoc === normalizeDocumentation(name))
+      ) {
+        context.reportDiagnostic({
+          target,
+          messageId: "uninformative",
+          format: { name: name ?? "description", description: doc },
+        });
+      }
+    };
+    return {
+      namespace: checkDocumentation,
+      interface: checkDocumentation,
+      scalar: checkDocumentation,
+      modelProperty: checkDocumentation,
+      unionVariant: checkDocumentation,
+      enum: (enumObj: Enum) => {
+        checkDocumentation(enumObj);
+        // The compiler does not emit enumMember events.
+        for (const member of enumObj.members.values()) checkDocumentation(member);
+        // version enums and enum members are considered intrinsically self-documenting
+        if (isExcludedVersionEnum(context.program, enumObj)) {
+          return;
+        }
+        if (isExcludedDiscriminator(context.program, enumObj, discTypes)) {
+          return;
+        }
+        if (!isExcludedCoreType(context.program, enumObj) && needsDocumentation(enumObj)) {
+          context.reportDiagnostic({
+            target: enumObj,
+            format: { kind: enumObj.kind, name: enumObj.name },
+          });
+        }
+        for (const member of enumObj.members.values()) {
+          if (needsDocumentation(member)) {
             context.reportDiagnostic({
-              target: enumObj,
-              format: { kind: enumObj.kind, name: enumObj.name },
+              target: member,
+              format: { kind: member.kind, name: member.name },
             });
           }
-          for (const member of enumObj.members.values()) {
-            if (needsDocumentation(member)) {
-              context.reportDiagnostic({
-                target: member,
-                format: { kind: member.kind, name: member.name },
-              });
-            }
+        }
+      },
+      operation: (operation: Operation) => {
+        checkDocumentation(operation);
+        // Don't pay attention to operations on templated interfaces that
+        // haven't been filled in with parameters yet
+        if (
+          !isTemplatedInterfaceOperation(operation) &&
+          !isTemplatedOperationSignature(operation) &&
+          !isExcludedCoreType(context.program, operation)
+        ) {
+          if (needsDocumentation(operation)) {
+            context.reportDiagnostic({
+              target: operation,
+              format: { kind: operation.kind, name: operation.name },
+            });
           }
-        },
-        operation: (operation: Operation) => {
-          // Don't pay attention to operations on templated interfaces that
-          // haven't been filled in with parameters yet
-          if (
-            !isTemplatedInterfaceOperation(operation) &&
-            !isTemplatedOperationSignature(operation) &&
-            !isExcludedCoreType(context.program, operation)
-          ) {
-            if (needsDocumentation(operation)) {
-              context.reportDiagnostic({
-                target: operation,
-                format: { kind: operation.kind, name: operation.name },
-              });
-            }
 
-            for (const param of operation.parameters.properties.values()) {
-              if (needsDocumentation(param)) {
-                context.reportDiagnostic({
-                  target: param,
-                  format: { kind: param.kind, name: param.name },
-                });
-              }
-            }
-          }
-        },
-        model: (model: Model) => {
-          // it's by design that the `getDoc` function can't get the `doc` for template declaration type.
-          if (
-            !isTemplateDeclarationType(model) &&
-            !isInlineModel(model) &&
-            !isExcludedCoreType(context.program, model) &&
-            model.name !== "object"
-          ) {
-            if (needsDocumentation(model)) {
+          for (const param of operation.parameters.properties.values()) {
+            if (needsDocumentation(param)) {
               context.reportDiagnostic({
-                target: model,
-                format: { kind: model.kind, name: model.name },
-              });
-            }
-            for (const prop of model.properties.values()) {
-              // Properties that are discriminators are considered self-documenting
-              if (isExcludedDiscriminator(context.program, prop, discTypes)) {
-                return;
-              }
-              if (needsDocumentation(prop)) {
-                context.reportDiagnostic({
-                  target: prop,
-                  format: { kind: prop.kind, name: prop.name },
-                });
-              }
-            }
-          }
-        },
-        union: (union: Union) => {
-          if (isExcludedDiscriminator(context.program, union, discTypes)) {
-            return;
-          }
-          if (!isExcludedCoreType(context.program, union) && needsDocumentation(union)) {
-            const name = getUnionName(union);
-            if (name !== undefined) {
-              context.reportDiagnostic({
-                target: union,
-                format: { kind: union.kind, name: name },
+                target: param,
+                format: { kind: param.kind, name: param.name },
               });
             }
           }
-          for (const variant of union.variants.values()) {
-            if (needsDocumentation(variant)) {
-              // symbols don't need documentation
-              const variantName = getVariantName(variant);
-              if (variantName !== undefined) {
-                context.reportDiagnostic({
-                  target: variant,
-                  format: { kind: variant.kind, name: variantName },
-                });
-              }
+        }
+      },
+      model: (model: Model) => {
+        checkDocumentation(model);
+        // it's by design that the `getDoc` function can't get the `doc` for template declaration type.
+        if (
+          !isTemplateDeclarationType(model) &&
+          !isInlineModel(model) &&
+          !isExcludedCoreType(context.program, model) &&
+          model.name !== "object"
+        ) {
+          if (needsDocumentation(model)) {
+            context.reportDiagnostic({
+              target: model,
+              format: { kind: model.kind, name: model.name },
+            });
+          }
+          for (const prop of model.properties.values()) {
+            // Properties that are discriminators are considered self-documenting
+            if (isExcludedDiscriminator(context.program, prop, discTypes)) {
+              return;
+            }
+            if (needsDocumentation(prop)) {
+              context.reportDiagnostic({
+                target: prop,
+                format: { kind: prop.kind, name: prop.name },
+              });
             }
           }
-        },
+        }
       },
-      requiredTargets,
-      (target) => {
-        validateName(target);
-        validateEmpty(target);
+      union: (union: Union) => {
+        checkDocumentation(union);
+        if (isExcludedDiscriminator(context.program, union, discTypes)) {
+          return;
+        }
+        if (!isExcludedCoreType(context.program, union) && needsDocumentation(union)) {
+          const name = getUnionName(union);
+          if (name !== undefined) {
+            context.reportDiagnostic({
+              target: union,
+              format: { kind: union.kind, name: name },
+            });
+          }
+        }
+        for (const variant of union.variants.values()) {
+          if (needsDocumentation(variant)) {
+            // symbols don't need documentation
+            const variantName = getVariantName(variant);
+            if (variantName !== undefined) {
+              context.reportDiagnostic({
+                target: variant,
+                format: { kind: variant.kind, name: variantName },
+              });
+            }
+          }
+        }
       },
-    );
+    };
   },
 });
