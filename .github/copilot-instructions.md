@@ -43,6 +43,12 @@ for package selection, scaffolding, and registration.
 ### Implementation and scope
 
 - Prefer existing rules, supported APIs, and native linter callbacks over custom infrastructure.
+- Evaluate simplification and consolidation against the native guideline and released
+  compatibility, not merely the proposed design or its tests. Justify custom resolvers and
+  special cases with supported inputs that need them.
+- Use the narrowest semantic APIs needed. Prefer native types and structured metadata over
+  generated-output heuristics; handle returned resolution diagnostics explicitly rather than
+  treating failed resolution as compliance.
 - Keep applicability, exceptions, targets, and enablement consistent across code, registration,
   rulesets, tests, docs, and changelogs. Distinguish registration from ruleset activation.
 - Keep PRs focused. Separate behavior-preserving cleanup from intentional policy changes.
@@ -52,11 +58,17 @@ for package selection, scaffolding, and registration.
 - Test the shipped rule in its owning package's `test/rules/` suite using public APIs and
   package-local testers. Assert accepted/rejected inputs, diagnostic messages/counts, and
   authored targets; use built-in source markers instead of calculated offsets.
+- Extend the existing canonical behavior suite for each rule, including when its filename
+  differs from the public rule name. Avoid duplicate suites and per-rule tests that inspect
+  implementation source to enforce architecture.
 - Cover distinct boundaries with representative cases, not exhaustive cross-products.
   Preserve regressions that fail when the protected behavior is removed.
 - Avoid duplicating compiler behavior or another rule's independent assertions. Keep integration
   tests for concrete interactions and registration/default checks in public-entry/ruleset suites.
   Prefer behavioral assertions; do not hide unexpected diagnostics with filtering.
+- Reconcile final PR acceptance claims with evidence at the appropriate test layer. Preserve
+  distinct rule-owned coverage during cleanup; remove framework-only cases and stale claims
+  rather than relocating redundant tests.
 - Run existing checks and distinguish local results from pending or failed CI.
   Measure representative timing and memory for substantial traversal/resolution changes.
 
@@ -73,8 +85,10 @@ for package selection, scaffolding, and registration.
   each excerpt need not be standalone.
 - Prefer audience-appropriate standard templates and supported customization arguments.
   Both examples must reach the intended check; fix the violation rather than bypassing it.
-- Validate the published excerpts with the rule and explicit public setup, not just similar
-  larger fixtures. Do not add bespoke Markdown parsers or fence-count tests.
+- Validate the actual published excerpts with the target rule explicitly enabled and
+  reproducible public setup. Both must compile without unrelated errors; assert the intended
+  diagnostics for the incorrect example and none from that rule for the correction.
+  Do not add bespoke Markdown parsers or fence-count tests.
 
 ### Changelog entries
 
