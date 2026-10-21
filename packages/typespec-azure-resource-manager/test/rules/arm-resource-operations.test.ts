@@ -1,8 +1,10 @@
 import { Tester } from "#test/tester.js";
+import { getSourceLocation } from "@typespec/compiler";
 import {
   type LinterRuleTester,
   type TesterInstance,
   createLinterRuleTester,
+  t,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
@@ -157,15 +159,15 @@ describe("PUT request and response bodies", () => {
     const response = status === 200 ? "Ok" : "Created";
     await tester
       .expect(
-        `${models}
-    /*start*/@put op put(@body body: Other): /*end*/${response}<Widget>;
+        t.code`${models}
+    @put op ${t.op("put")}(@body body: Other): ${response}<Widget>;
   `,
       )
-      .toEmitDiagnostics((x) => [
+      .toEmitDiagnostics(({ put }) => [
         {
           ...diagnostic(`request: Other; ${status} response: Widget`),
-          pos: x.pos.start.pos,
-          end: x.pos.end.pos + `${response}<Widget>;`.length,
+          pos: getSourceLocation(put).pos,
+          end: getSourceLocation(put).end,
         },
       ]);
   });
@@ -230,12 +232,12 @@ describe("PUT request and response bodies", () => {
 
   it("prioritizes the missing request over response mismatches", async () => {
     await tester
-      .expect(`${models} /*start*/@put op put(): Ok<Widget> | /*end*/Created<Other>;`)
-      .toEmitDiagnostics((x) => [
+      .expect(t.code`${models} @put op ${t.op("put")}(): Ok<Widget> | Created<Other>;`)
+      .toEmitDiagnostics(({ put }) => [
         {
           ...missingRequest,
-          pos: x.pos.start.pos,
-          end: x.pos.end.pos + "Created<Other>;".length,
+          pos: getSourceLocation(put).pos,
+          end: getSourceLocation(put).end,
         },
       ]);
   });
@@ -266,16 +268,16 @@ describe("PUT request and response bodies", () => {
   it("does not require name/type property heuristics to reject an unregistered model", async () => {
     await tester
       .expect(
-        `${models}
+        t.code`${models}
     model Plain { value: string; }
-    /*start*/@put op put(@body body: Plain): Ok<Plain> | /*end*/Created<Plain>;
+    @put op ${t.op("put")}(@body body: Plain): Ok<Plain> | Created<Plain>;
   `,
       )
-      .toEmitDiagnostics((x) => [
+      .toEmitDiagnostics(({ put }) => [
         {
           ...unregistered("request: Plain; 200 response: Plain; 201 response: Plain"),
-          pos: x.pos.start.pos,
-          end: x.pos.end.pos + "Created<Plain>;".length,
+          pos: getSourceLocation(put).pos,
+          end: getSourceLocation(put).end,
         },
       ]);
   });
@@ -642,21 +644,21 @@ describe("PUT request and response bodies", () => {
   ] as const)(
     "covers %s through the consolidated lifecycle rule",
     async (_, request, response, expected) => {
-      const source = `${models}
+      const source = t.code`${models}
     @armProviderNamespace namespace Operations {
       model Plain { value: string; }
       @armResourceOperations interface Widgets {
-        /*start*/@put @armResourceCreateOrUpdate(Resources.Widget)
-        put(...ResourceInstanceParameters<Resources.Widget>${request}):
-          ArmResponse<${response}> | /*end*/ErrorResponse;
+        @put @armResourceCreateOrUpdate(Resources.Widget)
+        ${t.op("put")}(...ResourceInstanceParameters<Resources.Widget>${request}):
+          ArmResponse<${response}> | ErrorResponse;
       }
     }
   `;
-      await tester.expect(source).toEmitDiagnostics((x) => [
+      await tester.expect(source).toEmitDiagnostics(({ put }) => [
         {
           ...expected,
-          pos: x.pos.start.pos,
-          end: x.pos.end.pos + "ErrorResponse".length,
+          pos: getSourceLocation(put).pos,
+          end: getSourceLocation(put).end,
         },
       ]);
     },
@@ -688,24 +690,24 @@ describe("PUT request and response bodies", () => {
   it("skips unused templates and checks each concrete operation alias", async () => {
     await tester
       .expect(
-        `${models}
+        t.code`${models}
     @put op Template<T>(@body body: Widget): Ok<T>;
     interface Unused<T> { @put put(@body body: Widget): Ok<Other>; }
-    /*first*/@route("/first") op first is /*firstEnd*/Template<Other>;
-    /*second*/@route("/second") op second is /*secondEnd*/Template<Other>;
+    @route("/first") op ${t.op("first")} is Template<Other>;
+    @route("/second") op ${t.op("second")} is Template<Other>;
     @route("/valid") op valid is Template<Widget>;
   `,
       )
-      .toEmitDiagnostics((x) => [
+      .toEmitDiagnostics(({ first, second }) => [
         {
           ...diagnostic("request: Widget; 200 response: Other"),
-          pos: x.pos.first.pos,
-          end: x.pos.firstEnd.pos + "Template<Other>;".length,
+          pos: getSourceLocation(first).pos,
+          end: getSourceLocation(first).end,
         },
         {
           ...diagnostic("request: Widget; 200 response: Other"),
-          pos: x.pos.second.pos,
-          end: x.pos.secondEnd.pos + "Template<Other>;".length,
+          pos: getSourceLocation(second).pos,
+          end: getSourceLocation(second).end,
         },
       ]);
   });
