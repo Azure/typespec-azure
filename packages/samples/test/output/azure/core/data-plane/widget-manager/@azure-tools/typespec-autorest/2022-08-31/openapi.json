@@ -689,7 +689,7 @@
             "description": "The resource instance.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetCreateOrUpdate"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
@@ -1151,7 +1151,7 @@
             "description": "The resource instance.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetAnalyticsCreateOrUpdate"
+              "$ref": "#/definitions/WidgetAnalytics"
             }
           }
         ],
@@ -2216,22 +2216,6 @@
         "repairCount"
       ]
     },
-    "WidgetAnalyticsCreateOrUpdate": {
-      "type": "object",
-      "description": "Provides analytics about the use and maintenance of a Widget.",
-      "properties": {
-        "useCount": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The number of uses of the widget."
-        },
-        "repairCount": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The number of times the widget was repaired."
-        }
-      }
-    },
     "WidgetColor": {
       "type": "string",
       "description": "The color of a widget.",
@@ -2272,20 +2256,6 @@
             "description": "Blue"
           }
         ]
-      }
-    },
-    "WidgetCreateOrUpdate": {
-      "type": "object",
-      "description": "A widget.",
-      "properties": {
-        "color": {
-          "$ref": "#/definitions/WidgetColor",
-          "description": "The widget color."
-        },
-        "manufacturerId": {
-          "type": "string",
-          "description": "The ID of the widget's manufacturer."
-        }
       }
     },
     "WidgetPart": {

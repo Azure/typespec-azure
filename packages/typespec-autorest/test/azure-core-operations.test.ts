@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { compileOpenAPI } from "./test-host.js";
 
@@ -56,13 +56,21 @@ it("ensure properties with 'create' visibility are included in the ResourceCreat
       
       
       @test
-      #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
       op createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
     `,
     { preset: "azure" },
   );
-  const propKeys = Object.keys(result.definitions?.["WidgetCreateOrUpdate"].properties!);
-  deepStrictEqual(propKeys, ["modality", "color"]);
+  const body = result.paths["/widgets/{widgetName}"].patch!.parameters.find(
+    (param) => "in" in param && param.in === "body",
+  );
+  ok(body);
+  deepStrictEqual(body.schema, { $ref: "#/definitions/Widget" });
+  const widget = result.definitions?.["Widget"];
+  ok(widget);
+  deepStrictEqual(Object.keys(widget.properties!), ["name", "modality", "color"]);
+  deepStrictEqual(widget.required, ["name", "modality", "color"]);
+  strictEqual(widget.properties!.name.readOnly, true);
+  deepStrictEqual(widget.properties!.modality["x-ms-mutability"], ["read", "create"]);
 });
 
 it("ensure properties with 'create' visibility are included in the LongRunningResourceCreateOrUpdate body", async () => {
@@ -88,14 +96,22 @@ it("ensure properties with 'create' visibility are included in the LongRunningRe
     
     
     @test
-    #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
     op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
   `,
     { preset: "azure" },
   );
 
-  const propKeys = Object.keys(result.definitions!["WidgetCreateOrUpdate"].properties!);
-  deepStrictEqual(propKeys, ["modality", "color"]);
+  const body = result.paths["/widgets/{widgetName}"].patch!.parameters.find(
+    (param) => "in" in param && param.in === "body",
+  );
+  ok(body);
+  deepStrictEqual(body.schema, { $ref: "#/definitions/Widget" });
+  const widget = result.definitions?.["Widget"];
+  ok(widget);
+  deepStrictEqual(Object.keys(widget.properties!), ["name", "modality", "color"]);
+  deepStrictEqual(widget.required, ["name", "modality", "color"]);
+  strictEqual(widget.properties!.name.readOnly, true);
+  deepStrictEqual(widget.properties!.modality["x-ms-mutability"], ["read", "create"]);
 });
 
 it("ensure ConditionalRequestHeaders does not appear on Action or List operations", async () => {

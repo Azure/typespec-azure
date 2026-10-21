@@ -414,6 +414,7 @@ describe("'emit-lro-options' option", () => {
 describe("'emit-common-types-schema' option", () => {
   const commonTypesFolder = resolveVirtualPath("common-types/resource-management");
   const commonTypesPath = "../common-types/resource-management/v3/types.json";
+  // Opt into legacy optionality to exercise transformed common-type schemas.
   const commonCode = `
     @armProviderNamespace
             namespace Microsoft.Test;
@@ -450,6 +451,7 @@ describe("'emit-common-types-schema' option", () => {
       @Azure.Core.useFinalStateVia("azure-async-operation")
       createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
       #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
+      @patch(#{ implicitOptionality: true })
       update is ArmResourcePatchSync<Widget, WidgetProperties>;
       delete is ArmResourceDeleteSync<Widget>;
       listByResourceGroup is ArmResourceListByParent<Widget>;
