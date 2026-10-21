@@ -1,13 +1,11 @@
 import { Tester } from "#test/tester.js";
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { getSourceLocation, type Entity } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, expect, it } from "vitest";
-import { getArmResources } from "../../src/resource.js";
+import { beforeEach, it } from "vitest";
 import { noEmptyPostResponseRule } from "../../src/rules/no-empty-post-response.js";
 
 const header = `
@@ -111,7 +109,20 @@ it("accepts the documented 204 response customization", async () => {
     .toBeValid();
 });
 
-it("excludes a long-running POST with an otherwise offending bodyless 200 response", async () => {
+it("rejects the bodyless 200 response customization on a synchronous POST", async () => {
+  await tester
+    .expect(
+      `${header}
+        @armResourceOperations
+        interface Employees {
+          /*hire*/hire is ArmResourceActionSync<Employee, void, Response = OkResponse>;
+        }
+      `,
+    )
+    .toEmitDiagnostics(({ hire }) => expected(hire));
+});
+
+it("excludes the same bodyless 200 response customization on a long-running POST", async () => {
   await tester
     .expect(
       `${header}
@@ -121,18 +132,7 @@ it("excludes a long-running POST with an otherwise offending bodyless 200 respon
         }
       `,
     )
-    .toEmitDiagnostics(({ program }) => {
-      const operation = getArmResources(program)[0].operations.actions.hire;
-      expect(getLroMetadata(program, operation.operation)).toBeDefined();
-      expect(
-        operation.httpOperation.responses.some(
-          (response) =>
-            response.statusCodes === 200 &&
-            response.responses.some((variant) => variant.body === undefined),
-        ),
-      ).toBe(true);
-      return [];
-    });
+    .toBeValid();
 });
 
 it("rejects an explicit void body in the synchronous ARM action response", async () => {
