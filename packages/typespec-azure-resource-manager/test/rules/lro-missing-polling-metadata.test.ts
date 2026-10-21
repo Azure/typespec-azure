@@ -3,11 +3,9 @@ import { getSourceLocation } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   expectDiagnostics,
-  t,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
-import { getHttpOperation } from "@typespec/http";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { lroMissingPollingMetadataRule } from "../../src/rules/lro-missing-polling-metadata.js";
 
 const header = `
@@ -106,33 +104,29 @@ it("reports an async provider POST with plain Location headers", async () => {
 it("accepts standard async resource operations with qualifying polling responses", async () => {
   await tester
     .expect(
-      t.code`${header}
+      `${header}
       @armResourceOperations
       interface Widgets {
-        ${t.op("createOrUpdate")} is ArmResourceCreateOrReplaceAsync<Widget>;
-        ${t.op("update")} is ArmResourcePatchAsync<Widget, WidgetProperties>;
-        ${t.op("remove")} is ArmResourceDeleteWithoutOkAsync<Widget>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        update is ArmResourcePatchAsync<Widget, WidgetProperties>;
+        remove is ArmResourceDeleteWithoutOkAsync<Widget>;
       }
     `,
     )
-    .toEmitDiagnostics(({ program, createOrUpdate, update, remove }) => {
-      for (const operation of [createOrUpdate, update, remove]) {
-        const [httpOperation] = getHttpOperation(program, operation);
-        expect(
-          httpOperation.responses.some(
-            (response) =>
-              typeof response.statusCodes === "number" &&
-              [200, 201, 202, 204].includes(response.statusCodes) &&
-              response.responses.some((content) =>
-                Object.keys(content.headers ?? {}).some((name) =>
-                  ["location", "azure-asyncoperation"].includes(name.toLowerCase()),
-                ),
-              ),
-          ),
-        ).toBe(true);
-      }
-      return [];
-    });
+    .toBeValid();
+});
+
+it.each([
+  [
+    "PATCH",
+    "update is ArmResourcePatchAsync<Widget, WidgetProperties, LroHeaders = PlainLocationHeaders>;",
+  ],
+  [
+    "DELETE",
+    "remove is ArmResourceDeleteWithoutOkAsync<Widget, LroHeaders = PlainLocationHeaders>;",
+  ],
+])("reports the same async resource %s with plain polling headers", async (_verb, operation) => {
+  await expectViolation(operation, "Widgets");
 });
 
 it("accepts default async custom PATCH polling metadata", async () => {
