@@ -5,3 +5,5 @@ packages:
 ---
 
 Classify services using ARM provider metadata instead of ARM library imports so data-plane services that use ARM common types remain data-plane.
+
+Derive Python package names from the public namespace prefix, excluding underscore-prefixed private segments and their descendants.

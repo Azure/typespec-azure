@@ -120,7 +120,9 @@ function parsePython(
   if (packageName && !namespace) {
     namespace = String(packageName).replace(/-/g, ".");
   } else if (namespace && !packageName) {
-    packageName = String(namespace).replace(/\./g, "-");
+    packageName = String(namespace)
+      .replace(/(?:^|\.)_.*$/, "")
+      .replace(/\./g, "-");
   }
 
   return {

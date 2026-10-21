@@ -125,6 +125,43 @@ describe("variable substitution", () => {
 });
 
 describe("language-specific parsers", () => {
+  it.each([
+    ["azure.ai.ml._restclient.dataset_dataplane", "azure-ai-ml"],
+    ["azure.ai.ml._generated.models", "azure-ai-ml"],
+    ["azure.ai.ml._internal", "azure-ai-ml"],
+    ["azure.ai.ml", "azure-ai-ml"],
+    ["azure.ai.ml.dataset_dataplane", "azure-ai-ml-dataset_dataplane"],
+    ["azure.ai.ml._generated", "azure-ai-ml"],
+  ])("should derive Python package %s as %s", (namespace, packageName) => {
+    const result = buildLanguageMetadata(
+      { "@azure-tools/typespec-python": { namespace } },
+      {},
+      "/repos/tsp-output",
+    );
+
+    expect(result.python[0].packageName).toBe(packageName);
+    expect(result.python[0].namespace).toBe(namespace.replace(/\._generated$/, ""));
+  });
+
+  it.each(["package-name", "package_name"])(
+    "should preserve an explicit Python %s with a private namespace",
+    (key) => {
+      const result = buildLanguageMetadata(
+        {
+          "@azure-tools/typespec-python": {
+            [key]: "azure-custom-package",
+            namespace: "azure.ai.ml._restclient.dataset_dataplane",
+          },
+        },
+        {},
+        "/repos/tsp-output",
+      );
+
+      expect(result.python[0].packageName).toBe("azure-custom-package");
+      expect(result.python[0].namespace).toBe("azure.ai.ml._restclient.dataset_dataplane");
+    },
+  );
+
   it("should parse Python package metadata correctly", () => {
     const options = {
       "package-name": "azure-keyvault-secrets",
