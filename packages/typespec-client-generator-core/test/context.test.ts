@@ -1,6 +1,6 @@
 import { resolveArmResources } from "@azure-tools/typespec-azure-resource-manager";
 import { resolveVirtualPath } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { parse } from "yaml";
 import { createSdkContext } from "../src/context.js";
@@ -77,6 +77,41 @@ it("export HTTP authentication metadata from emitter", async () => {
   strictEqual(authentication.options[0].schemes[0].type, "noAuth");
   strictEqual(authentication.options[1].schemes[0].type, "apiKey");
   strictEqual(authentication.options[1].schemes[0].model, undefined);
+});
+
+it("export union variants without losing symbol-keyed alternatives", async () => {
+  const { outputs } = await SimpleTester.emit(SdkTestLibrary.name).compile(`
+    @service
+    namespace TestService;
+
+    @usage(Usage.input)
+    model Test {
+      value: Choice;
+    }
+
+    union Choice {
+      first: string,
+      string,
+      second: string,
+      string,
+    }
+  `);
+  const output = outputs["tcgc-output.yaml"];
+  ok(output);
+  const codeModel = parse(output);
+  const union = codeModel.unions[0];
+  deepStrictEqual(
+    union.variants.map((variant: { name?: string; type: { kind: string } }) => [
+      variant.name,
+      variant.type.kind,
+    ]),
+    [
+      ["first", "string"],
+      [undefined, "string"],
+      ["second", "string"],
+      [undefined, "string"],
+    ],
+  );
 });
 
 it("export complex TCGC output from emitter", async () => {
