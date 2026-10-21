@@ -1,765 +1,266 @@
 import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
-import {
-  type LinterRuleTester,
-  type TesterInstance,
-  createLinterRuleTester,
-  t,
-} from "@typespec/compiler/testing";
+import { createLinterRuleTester, t, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
-
-let runner: TesterInstance;
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
-    runner,
+    await Tester.createInstance(),
     armResourceOperationsRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
-it("emits diagnostics if response type is different from resource type.", async () => {
-  await tester
-    .expect(
-      `
-              @armProviderNamespace
-        namespace Microsoft.Foo;
-
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
-        }
-
-        model BarResource is TrackedResource<{}> {
-          ...ResourceNameParameter<BarResource>;
-        }
-
-        @armResourceOperations
-        interface FooResources {
-          @get @armResourceRead(FooResource) get(@key("foo") name: string): ArmResponse<BarResource> | ErrorResponse;
-          @put @armResourceCreateOrUpdate(FooResource) create(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<FooResource> | ErrorResponse;
-          @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<FooResource>> | ErrorResponse;
-        }
-      `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-    });
-});
-
-it("emits diagnostics if response type of create operation is different from resource type.", async () => {
-  await tester
-    .expect(
-      `
-              @armProviderNamespace
-        namespace Microsoft.Foo;
-
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
-        }
-
-        model BarResource is TrackedResource<{}> {
-          ...ResourceNameParameter<BarResource>;
-        }
-
-        @armResourceOperations
-        interface FooResources {
-          @put @armResourceCreateOrUpdate(FooResource) create(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<BarResource> | ErrorResponse;
-        }
-      `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-    });
-});
-
-it("emits diagnostics if response type of list operation is different from resource type.", async () => {
-  await tester
-    .expect(
-      `
-              @armProviderNamespace
-        namespace Microsoft.Foo;
-        
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
-        }
-
-        model BarResource is TrackedResource<{}> {
-          ...ResourceNameParameter<BarResource>;
-        }
-
-        @armResourceOperations
-        interface FooResources {
-          @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
-        }
-      `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-    });
-});
-
-describe("PUT request and response bodies", () => {
-  let tester: LinterRuleTester;
-
-  beforeEach(async () => {
-    tester = createLinterRuleTester(
-      await Tester.createInstance(),
-      armResourceOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
-
-  const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
-
-  const models = `
-  @armProviderNamespace namespace Resources {
-    model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
-    model Other is ProxyResource<{}> { ...ResourceNameParameter<Other>; }
-  }
-  using Resources;
-  model Ok<T> { @statusCode statusCode: 200; @body body: T; }
-  model Created<T> { @statusCode statusCode: 201; @body body: T; }
+const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
+const models = `
+  @armProviderNamespace namespace Microsoft.Test;
+  model Widget is TrackedResource<{
+    common?: string;
+    @visibility(Lifecycle.Update) updateOnly?: string;
+  }> { ...ResourceNameParameter<Widget>; }
+  model Other is ProxyResource<{}> { ...ResourceNameParameter<Other>; }
 `;
+const responseDiagnostic = {
+  code,
+  severity: "warning" as const,
+  message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+};
+const requestDiagnostic = (request: string) => ({
+  code,
+  severity: "warning" as const,
+  message: `PUT request body must use resource model Microsoft.Test.Widget. Found ${request}.`,
+});
 
-  const diagnostic = (bodies: string) => ({
-    code,
-    severity: "warning" as const,
-    message: `PUT bodies must reuse the same resource model. Found ${bodies.replaceAll("Widget", "Resources.Widget").replaceAll("Other", "Resources.Other")}.`,
-  });
+it.each([
+  "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Other> | ErrorResponse;",
+  "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Widget> | ArmCreatedResponse<Other> | ErrorResponse;",
+  "@get @armResourceList(Widget) list(...Foundations.SubscriptionScope<Widget>): ArmResponse<ResourceListResult<Other>> | ErrorResponse;",
+  "@patch @armResourceUpdate(Widget) update(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Other> | ErrorResponse;",
+])("preserves canonical lifecycle and list response validation: %s", async (operation) => {
+  await tester
+    .expect(`${models} @armResourceOperations interface Widgets { ${operation} }`)
+    .toEmitDiagnostics([responseDiagnostic]);
+});
 
-  it("accepts the same model across the request and both responses", async () => {
-    await tester
-      .expect(
-        `${models}
-    @put op put(@body body: Widget): Ok<Widget> | Created<Widget>;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it("does not assume a REST resource decorator enables ARM lifecycle response validation", async () => {
-    await tester
-      .expect(
-        `${models}
-    @put @createsOrReplacesResource(Widget)
-    op put(@body body: Widget): Ok<Other>;
-  `,
-      )
-      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
-  });
-
-  it.each([200, 201])("compares the request with a lone %s response", async (status) => {
-    const response = status === 200 ? "Ok" : "Created";
-    await tester
-      .expect(
-        t.code`${models}
-    @put op ${t.op("put")}(@body body: Other): ${response}<Widget>;
-  `,
-      )
-      .toEmitDiagnostics(({ put }) => [
-        {
-          ...diagnostic(`request: Other; ${status} response: Widget`),
-          pos: getSourceLocation(put).pos,
-          end: getSourceLocation(put).end,
-        },
-      ]);
-  });
-
-  it.each([200, 201])("compares a singleton %s response range", async (status) => {
-    await tester
-      .expect(
-        `
-      ${models}
-      model Result {
-        @statusCode @minValue(${status}) @maxValue(${status}) code: int32;
-        @body body: Widget;
-      }
-      @put op put(@body body: Other): Result;
-    `,
-      )
-      .toEmitDiagnostics([diagnostic(`request: Other; ${status} response: Widget`)]);
-  });
-
-  it("does not select a non-singleton range as an exact response", async () => {
-    await tester
-      .expect(
-        `
-      ${models}
-      model Result {
-        @statusCode @minValue(200) @maxValue(202) code: int32;
-        @body body: Other;
-      }
-      @put op put(@body body: Widget): Result;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it.each([
-    ["Other", "Widget", "Widget"],
-    ["Widget", "Other", "Widget"],
-    ["Widget", "Widget", "Other"],
-  ])("reports one diagnostic for request %s, 200 %s and 201 %s", async (request, ok, created) => {
-    await tester
-      .expect(
-        `${models}
-    @put op put(@body body: ${request}): Ok<${ok}> | Created<${created}>;
-  `,
-      )
-      .toEmitDiagnostics([
-        diagnostic(`request: ${request}; 200 response: ${ok}; 201 response: ${created}`),
-      ]);
-  });
-
-  const missingRequest = {
-    code,
-    severity: "warning" as const,
-    message: "ARM PUT operations must have a request body.",
-  };
-
-  const unregistered = (bodies: string) => ({
-    code,
-    severity: "warning" as const,
-    message: `PUT bodies must use registered ARM resource models. Found ${bodies}.`,
-  });
-
-  it("prioritizes the missing request over response mismatches", async () => {
-    await tester
-      .expect(t.code`${models} @put op ${t.op("put")}(): Ok<Widget> | Created<Other>;`)
-      .toEmitDiagnostics(({ put }) => [
-        {
-          ...missingRequest,
-          pos: getSourceLocation(put).pos,
-          end: getSourceLocation(put).end,
-        },
-      ]);
-  });
-
-  it.each([
-    "@put op put(): Ok<Widget>;",
-    "@put op put(): void;",
-    "@put op put(@body body: void): Ok<Widget>;",
-    "@put op put(@header token: string, @query filter?: string): Created<Widget>;",
-  ])("reports an absent request body: %s", async (operation) => {
-    await tester.expect(`${models} ${operation}`).toEmitDiagnostics([missingRequest]);
-  });
-
-  it.each([200, 201])(
-    "requires registration for a shared plain model at status %s",
-    async (status) => {
-      await tester
-        .expect(
-          `${models}
-    model Plain { name: string; type: string; }
-    @put op put(@body body: Plain): ${status === 200 ? "Ok" : "Created"}<Plain>;
-  `,
-        )
-        .toEmitDiagnostics([unregistered(`request: Plain; ${status} response: Plain`)]);
-    },
-  );
-
-  it("does not require name/type property heuristics to reject an unregistered model", async () => {
-    await tester
-      .expect(
-        t.code`${models}
-    model Plain { value: string; }
-    @put op ${t.op("put")}(@body body: Plain): Ok<Plain> | Created<Plain>;
-  `,
-      )
-      .toEmitDiagnostics(({ put }) => [
-        {
-          ...unregistered("request: Plain; 200 response: Plain; 201 response: Plain"),
-          pos: getSourceLocation(put).pos,
-          end: getSourceLocation(put).end,
-        },
-      ]);
-  });
-
-  it("checks an identifiable unregistered response even with an unsupported request", async () => {
-    await tester
-      .expect(
-        `${models}
-    model Plain { value: string; }
-    @put op put(@body body: string): Created<Plain>;
-  `,
-      )
-      .toEmitDiagnostics([unregistered("201 response: Plain")]);
-  });
-
-  it("compares request and 201 even when 200 is bodyless", async () => {
-    await tester
-      .expect(
-        `${models}
-    @put op put(@body body: Other): { @statusCode status: 200; } | Created<Widget>;
-  `,
-      )
-      .toEmitDiagnostics([diagnostic("request: Other; 201 response: Widget")]);
-  });
-
-  it.each([
-    "@put op put(@body body: Widget): void;",
-    "@put op put(@body body: Widget): { @statusCode status: 204; };",
-    "@post op put(@body body: Other): Ok<Widget> | Created<Other>;",
-    "@patch op put(@body body: Other): Ok<Widget> | Created<Other>;",
-  ])("does not require missing participants or check other verbs: %s", async (operation) => {
-    await tester.expect(`${models} ${operation}`).toBeValid();
-  });
-
-  it("ignores 202 and error bodies", async () => {
-    await tester
-      .expect(
-        `${models}
-    @error model Failure { @statusCode status: 400; @body body: Other; }
-    @put op put(@body body: Widget): Ok<Widget> | Created<Widget> |
-      { @statusCode status: 202; @body body: Other; } | Failure;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it("accepts shared models with lifecycle visibility, defaults and constraints", async () => {
-    await tester
-      .expect(
-        `
-    ${models}
-    @armProviderNamespace namespace Custom {
-      model ResourceModel is ProxyResource<{
-        @visibility(Lifecycle.Create, Lifecycle.Update) secret?: string;
-        @minLength(1) value: string = "same";
-      }> { ...ResourceNameParameter<ResourceModel>; }
-    }
-    @put op put(@bodyRoot body: Custom.ResourceModel):
-      Ok<Custom.ResourceModel> | Created<Custom.ResourceModel>;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it.each(["alias Copy = Widget;", ""])(
-    "accepts aliases and implicit bodies using original properties: %s",
-    async (alias) => {
-      await tester
-        .expect(
-          `${models}
-    ${alias}
-    @put op put(...Widget): {
-      @statusCode status: 200;
-      @header etag: string;
-      ...Widget;
-    } | Created<${alias ? "Copy" : "Widget"}>;
-  `,
-        )
-        .toBeValid();
-    },
-  );
-
-  it.each(["model Copy is Widget;", "model Copy extends Widget {}", "model Copy { ...Widget; }"])(
-    "does not equate separately declared resource models: %s",
-    async (copy) => {
-      await tester
-        .expect(
-          `${models}
-      @armProviderNamespace namespace Copies { ${copy} }
-      @put op put(@body body: Widget): Ok<Copies.Copy>;
-    `,
-        )
-        .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Copies.Copy")]);
-    },
-  );
-
-  it("does not equate same-named models in different namespaces", async () => {
-    await tester
-      .expect(
-        `${models}
-    namespace One { model Resource { value: string; } }
-    namespace Two { model Resource { value: string; } }
-    @put op put(@body body: One.Resource): Ok<Two.Resource>;
-  `,
-      )
-      .toEmitDiagnostics([diagnostic("request: One.Resource; 200 response: Two.Resource")]);
-  });
-
-  it.each([
-    "{ value: string; }",
-    "string",
-    "bytes",
-    "[string]",
-    "Widget[]",
-    "Record<Widget>",
-    "Widget | Other",
-  ])("skips unsupported or unidentified resource bodies: %s", async (body) => {
-    await tester
-      .expect(
-        `${models}
-      @put op put(@body body: ${body}): Ok<Other>;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it("skips ambiguous 200 body types in either order", async () => {
-    for (const variants of ["First | Second", "Second | First"]) {
-      await tester
-        .expect(
-          `${models}
-      model First { @statusCode status: 200; @body body: Widget; }
-      model Second { @statusCode status: 200; @body body: Other; }
-      @put op put(@body body: Widget): ${variants};
-    `,
-        )
-        .toBeValid();
-    }
-  });
-
-  it("skips ambiguous 201 body kinds", async () => {
-    await tester
-      .expect(
-        `${models}
-      model Parts { value: HttpPart<string>; }
-      model Json { @statusCode status: 201; @body body: Parts; }
-      model Multi {
-        @statusCode status: 201;
-        @header contentType: "multipart/form-data";
-        @multipartBody body: Parts;
-      }
-      @put op put(@body body: Widget): Json | Multi;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it("still compares known participants when another status is ambiguous", async () => {
-    await tester
-      .expect(
-        `${models}
-    model Alternative { @statusCode status: 200; @body body: Other; }
-    @put op put(@body body: Widget): Ok<Widget> | Alternative | Created<Other>;
-  `,
-      )
-      .toEmitDiagnostics([diagnostic("request: Widget; 201 response: Other")]);
-  });
-
-  it("accepts shared content variants and ignores a bodyless variant", async () => {
-    await tester
-      .expect(
-        `${models}
-      model Json { @statusCode status: 200; @header contentType: "application/json"; @body body: Widget; }
-      model Xml { @statusCode status: 200; @header contentType: "application/xml"; @body body: Widget; }
-      model Empty { @statusCode status: 200; }
-      @put op put(@body body: Widget): Empty | Xml | Json | Created<Widget>;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it("ignores a void 200 variant without hiding a resource mismatch", async () => {
-    await tester
-      .expect(
-        `${models}
-      model Empty { @statusCode status: 200; @bodyRoot body: void; }
-      model ResourceResponse { @statusCode status: 200; @bodyRoot body: Other; }
-      @put op put(@bodyRoot body: Widget): Empty | ResourceResponse;
-    `,
-      )
-      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
-  });
-
-  it("ignores a void 201 variant without hiding an unregistered response", async () => {
-    await tester
-      .expect(
-        `
-      model Plain { value: string; }
-      model Empty { @statusCode status: 201; @body body: void; }
-      model ResourceResponse { @statusCode status: 201; @body body: Plain; }
-      @put op put(@body body: string): ResourceResponse | Empty;
-    `,
-      )
-      .toEmitDiagnostics([unregistered("201 response: Plain")]);
-  });
-
-  it("accepts a void variant alongside the same resource", async () => {
-    await tester
-      .expect(
-        `${models}
-      model Empty { @statusCode status: 200; @bodyRoot body: void; }
-      @put op put(@bodyRoot body: Widget): Empty | Ok<Widget>;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it("accepts an explicitly void success body without a resource response", async () => {
-    await tester
-      .expect(
-        `${models}
-      model Empty { @statusCode status: 201; @bodyRoot body: void; }
-      @put op put(@bodyRoot body: Widget): Empty;
-    `,
-      )
-      .toBeValid();
-  });
-
-  it.each(["Record<string>", "Array<string>"])("skips inherited indexers from %s", async (base) => {
-    await tester
-      .expect(
-        `${models}
-    model Indexed extends ${base} {}
-    model Derived extends Indexed {}
-    @put op put(@body body: Derived): Ok<Widget>;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it("compares identifiable responses when the request is an inherited dictionary", async () => {
-    await tester
-      .expect(
-        `${models}
-    model Dictionary extends Record<string> {}
-    @put op put(@body body: Dictionary): Ok<Widget> | Created<Other>;
-  `,
-      )
-      .toEmitDiagnostics([diagnostic("200 response: Widget; 201 response: Other")]);
-  });
-
-  it("skips file bodies", async () => {
-    await tester
-      .expect(
-        `${models}
-    @put op put(@body body: Http.File): Ok<Widget>;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it("skips multipart resource comparison", async () => {
-    await tester
-      .expect(
-        `${models}
-    model Parts { value: HttpPart<string>; }
-    @put op put(@header contentType: "multipart/form-data", @multipartBody body: Parts): Ok<Widget>;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it("keeps resource identity when PUT uses Create visibility and PATCH exposes Update input", async () => {
-    await tester
-      .expect(
-        `
-    @service @armProviderNamespace namespace Microsoft.TestService;
-    model Widget is TrackedResource<{
-      common?: string;
-      @visibility(Lifecycle.Update) updateOnly?: string;
-    }> { ...ResourceNameParameter<Widget>; }
-    model WidgetPatch {
-      tags?: Record<string>;
-      properties?: { updateOnly?: string; };
-    }
-    @armResourceOperations interface Widgets {
-      @parameterVisibility(Lifecycle.Create)
-      create is ArmResourceCreateOrReplaceSync<Widget>;
-      update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-    }
-  `,
-      )
-      .toBeValid();
-  });
-
+describe("registered resource PUT requests", () => {
   it.each(["TrackedResource", "ProxyResource"])(
-    "accepts %s with both success statuses",
+    "accepts standard %s PUT templates",
     async (base) => {
       await tester
         .expect(
           `
-    @armProviderNamespace @service namespace Microsoft.Test;
-    model Widget is ${base}<{}> { ...ResourceNameParameter<Widget>; }
-    @armResourceOperations interface Widgets {
-      createOrReplace is ArmResourceCreateOrReplaceSync<Widget>;
-    }
-  `,
+        @armProviderNamespace namespace Microsoft.Test;
+        model Widget is ${base}<{}> { ...ResourceNameParameter<Widget>; }
+        @armResourceOperations interface Widgets {
+          create is ArmResourceCreateOrReplaceSync<Widget>;
+        }
+      `,
         )
         .toBeValid();
     },
   );
 
-  it("keeps canonical-resource validation without duplicate lifecycle diagnostics", async () => {
-    const source = `${models}
-    @armProviderNamespace namespace Operations {
-      @armResourceOperations interface Widgets {
-        @put @armResourceCreateOrUpdate(Resources.Widget)
-        put(...ResourceInstanceParameters<Resources.Widget>, @bodyRoot body: Other):
-          ArmResponse<Other> | ErrorResponse;
-      }
-    }
-  `;
-    await createLinterRuleTester(
-      await Tester.createInstance(),
-      armResourceOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    )
-      .expect(source)
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-        message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-      });
-  });
-
-  it("checks the canonical PUT resource when no success body can establish its identity", async () => {
-    await tester
-      .expect(
-        `${models}
-    @armProviderNamespace namespace Operations {
-      @armResourceOperations interface Widgets {
-        @put @armResourceCreateOrUpdate(Resources.Widget)
-        put(...ResourceInstanceParameters<Resources.Widget>, @bodyRoot body: Other): void;
-      }
-    }
-  `,
-      )
-      .toEmitDiagnostics([diagnostic("request: Other; resource: Widget")]);
-  });
-
-  it.each([
-    ["missing request", "", "Resources.Widget", missingRequest],
-    [
-      "request mismatch",
-      ", @bodyRoot body: Resources.Other",
-      "Resources.Widget",
-      diagnostic("request: Other; 200 response: Widget"),
-    ],
-    [
-      "unregistered bodies",
-      ", @bodyRoot body: Plain",
-      "Plain",
-      unregistered("request: Operations.Plain; 200 response: Operations.Plain"),
-    ],
-  ] as const)(
-    "covers %s through the consolidated lifecycle rule",
-    async (_, request, response, expected) => {
-      const source = t.code`${models}
-    @armProviderNamespace namespace Operations {
-      model Plain { value: string; }
-      @armResourceOperations interface Widgets {
-        @put @armResourceCreateOrUpdate(Resources.Widget)
-        ${t.op("put")}(...ResourceInstanceParameters<Resources.Widget>${request}):
-          ArmResponse<${response}> | ErrorResponse;
-      }
-    }
-  `;
-      await tester.expect(source).toEmitDiagnostics(({ put }) => [
-        {
-          ...expected,
-          pos: getSourceLocation(put).pos,
-          end: getSourceLocation(put).end,
-        },
-      ]);
+  it.each(["@body", "@bodyRoot"])(
+    "compares a %s request with the canonical resource",
+    async (body) => {
+      await tester
+        .expect(
+          t.code`${models}
+        model Input { value?: string; }
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          ${t.op("create")}(...ResourceInstanceParameters<Widget>, ${body} body: Input):
+            ArmResponse<Widget> | ArmCreatedResponse<Widget> | ErrorResponse;
+        }
+      `,
+        )
+        .toEmitDiagnostics(({ create }) => [
+          {
+            ...requestDiagnostic("Microsoft.Test.Input"),
+            pos: getSourceLocation(create).pos,
+            end: getSourceLocation(create).end,
+          },
+        ]);
     },
   );
 
-  it("checks user namespaces without provider metadata", async () => {
+  it.each(["", ", @body body: void", ", @header token: string, @query filter?: string"])(
+    "requires a PUT request independently of response bodies: %s",
+    async (parameters) => {
+      await tester
+        .expect(
+          `${models}
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>${parameters}): void;
+        }
+      `,
+        )
+        .toEmitDiagnostics([
+          {
+            code,
+            severity: "warning",
+            message: "ARM PUT operations must have a request body.",
+          },
+        ]);
+    },
+  );
+
+  it.each([
+    "model Input { common?: string; }",
+    "model Input is Widget;",
+    "model Input extends Widget {}",
+    "model Input { ...Widget; }",
+  ])("rejects a distinct request declaration: %s", async (declaration) => {
     await tester
       .expect(
         `${models}
-    namespace Custom {
-      @put op put(@bodyRoot body: Widget): Ok<Other>;
-    }
-  `,
+        ${declaration}
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Input): ArmResponse<Widget>;
+        }
+      `,
       )
-      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
+      .toEmitDiagnostics([requestDiagnostic("Microsoft.Test.Input")]);
   });
 
-  it("ignores Azure library declarations", async () => {
+  it("recovers the resource from an implicit request body", async () => {
     await tester
       .expect(
         `${models}
-    namespace Azure.Core { @put op core(@body body: Widget): Ok<Other>; }
-    namespace Azure.ResourceManager { @put op arm(@body body: Widget): Ok<Other>; }
-  `,
+        alias Input = Widget;
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, ...Input): ArmResponse<Widget>;
+        }
+      `,
       )
       .toBeValid();
   });
 
-  it("skips unused templates and checks each concrete operation alias", async () => {
-    await tester
-      .expect(
-        t.code`${models}
-    @put op Template<T>(@body body: Widget): Ok<T>;
-    interface Unused<T> { @put put(@body body: Widget): Ok<Other>; }
-    @route("/first") op ${t.op("first")} is Template<Other>;
-    @route("/second") op ${t.op("second")} is Template<Other>;
-    @route("/valid") op valid is Template<Widget>;
-  `,
-      )
-      .toEmitDiagnostics(({ first, second }) => [
-        {
-          ...diagnostic("request: Widget; 200 response: Other"),
-          pos: getSourceLocation(first).pos,
-          end: getSourceLocation(first).end,
-        },
-        {
-          ...diagnostic("request: Widget; 200 response: Other"),
-          pos: getSourceLocation(second).pos,
-          end: getSourceLocation(second).end,
-        },
-      ]);
-  });
-
-  it("checks inherited concrete interface operations", async () => {
+  it("accepts an explicit alias of the registered resource", async () => {
     await tester
       .expect(
         `${models}
-    interface Template<T> { @put put(@body body: Widget): Ok<T>; }
-    @route("/same") interface Same extends Template<Widget> {}
-    @route("/different") interface Different extends Template<Other> {}
-  `,
+        alias Input = Widget;
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Input): ArmResponse<Widget>;
+        }
+      `,
       )
-      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
+      .toBeValid();
   });
 
-  it("diagnoses the standard request override", async () => {
+  it("accepts the asynchronous standard template", async () => {
     await tester
       .expect(
-        `@armProviderNamespace
-namespace Microsoft.Example;
-
-model Widget
-  is TrackedResource<{
-    value?: string;
-  }> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetInput {
-  value?: string;
-}
-
-@armResourceOperations
-interface Widgets {
-  @put
-  @armResourceCreateOrUpdate(Widget)
-  createOrReplace is Azure.ResourceManager.Foundations.ArmCreateOperation<
-    ResourceInstanceParameters<Widget>,
-    WidgetInput,
-    ArmResponse<Widget> | ArmCreatedResponse<Widget>,
-    ErrorResponse
-  >;
-}
-`,
+        `${models}
+        @armResourceOperations interface Widgets {
+          create is ArmResourceCreateOrReplaceAsync<Widget>;
+        }
+      `,
       )
-      .toEmitDiagnostics([
-        {
-          code,
-          message:
-            "PUT bodies must reuse the same resource model. Found request: Microsoft.Example.WidgetInput; 200 response: Microsoft.Example.Widget; 201 response: Microsoft.Example.Widget.",
-        },
-      ]);
+      .toBeValid();
   });
+
+  it("rejects a scalar request instead of mistaking it for an absent body", async () => {
+    await tester
+      .expect(
+        `${models}
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, @body body: string): ArmResponse<Widget>;
+        }
+      `,
+      )
+      .toEmitDiagnostics([requestDiagnostic("string")]);
+  });
+
+  it("honors Create visibility without confusing PATCH input with the resource", async () => {
+    await tester
+      .expect(
+        `${models}
+        model WidgetPatch { tags?: Record<string>; properties?: { updateOnly?: string; }; }
+        @armResourceOperations interface Widgets {
+          @parameterVisibility(Lifecycle.Create)
+          create is ArmResourceCreateOrReplaceSync<Widget>;
+          update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it.each(["void", "{ @statusCode status: 204; }"])(
+    "compares the request even without a resource response: %s",
+    async (response) => {
+      await tester
+        .expect(
+          `${models}
+          @armResourceOperations interface Widgets {
+            @put @armResourceCreateOrUpdate(Widget)
+            create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Other): ${response};
+          }
+        `,
+        )
+        .toEmitDiagnostics([requestDiagnostic("Microsoft.Test.Other")]);
+    },
+  );
+
+  it("reports independent request and response violations against the same resource", async () => {
+    await tester
+      .expect(
+        `${models}
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Other):
+            ArmResponse<Other> | ErrorResponse;
+        }
+      `,
+      )
+      .toEmitDiagnostics([requestDiagnostic("Microsoft.Test.Other"), responseDiagnostic]);
+  });
+
+  it("checks a concrete alias of a registered template", async () => {
+    await tester
+      .expect(
+        `${models}
+        @put @armResourceCreateOrUpdate(Widget)
+        op Template<T>(...ResourceInstanceParameters<Widget>, @bodyRoot body: T): ArmResponse<Widget>;
+        @armResourceOperations interface Widgets { create is Template<Other>; }
+      `,
+      )
+      .toEmitDiagnostics([requestDiagnostic("Microsoft.Test.Other")]);
+  });
+
+  it("preserves operation-level suppression for a legacy request model", async () => {
+    await Tester.compile(
+      `${models}
+        model Input { value?: string; }
+        @armResourceOperations interface Widgets {
+          #suppress "${code}" "Existing API uses a separate request model."
+          @put @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Input): ArmResponse<Widget>;
+        }
+      `,
+      { compilerOptions: { linterRuleSet: { enable: { [code]: true } } } },
+    );
+  });
+
+  it.each([
+    "@put op custom(@bodyRoot body: Other): Widget;",
+    "@put @createsOrReplacesResource(Widget) op custom(@bodyRoot body: Other): Widget;",
+    "@armResourceOperations interface Custom { @put custom(@bodyRoot body: Other): Widget; }",
+    "@put op custom(): Widget;",
+  ])(
+    "leaves unregistered custom operations to operation-registration rules: %s",
+    async (operation) => {
+      await tester.expect(`${models} ${operation}`).toBeValid();
+    },
+  );
 });
