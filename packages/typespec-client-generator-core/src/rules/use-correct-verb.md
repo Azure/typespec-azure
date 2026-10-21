@@ -1,4 +1,4 @@
-Use common SDK method names beginning with `create` for PUT, `update` for PATCH,
+Use common SDK method names for resource lifecycle operations. Operation names should  begin with `create` for PUT, `update` for PATCH,
 and `delete` for DELETE. Prefix matching is case-insensitive. GET, POST, HEAD,
 and other HTTP verbs are outside this rule.
 
