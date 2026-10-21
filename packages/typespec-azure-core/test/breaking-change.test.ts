@@ -15,24 +15,79 @@ import {
   findUnversionedSuppressions,
   getSuppressions,
   getUnversionedSuppressions,
-} from "../src/suppression/decorators.js";
-import { Tester, TesterWithSuppressions } from "./test-host.js";
+  scanAllUnversionedSuppressions,
+} from "../src/index.js";
+import { Tester } from "./test-host.js";
 
 describe("suppression decorators", () => {
-  it("compiles approval decorators with only the Azure.Core library imported", async () => {
-    const { program } = await TesterWithSuppressions.compile(`
+  it(
+    "compiles approval decorators with only the Azure.Core library imported",
+    { timeout: 30_000 },
+    async () => {
+      const { program } = await Tester.compile(`
       namespace Test;
-      @approvedBreakingChange("Reviewed.", #{ kind: "OperationRemoved", since: "2025-01-01" })
-      @approvedUnversionedChange("Migration.", #{ kind: "OperationRemoved" })
+      @approvedBreakingChange("Reviewed.", #{ kind: "OperationRemoved", since: "2025-01-01", path: "operations.read" })
+      @approvedUnversionedChange("Migration.", #{ kind: "OperationRemoved", path: "operations.read" })
       model Widget {}
     `);
+      const widget = getModel(program, "Widget");
+      expect(getSuppressions(program, widget)).toEqual([
+        {
+          kind: "OperationRemoved",
+          reason: "Reviewed.",
+          version: "2025-01-01",
+          path: "operations.read",
+        },
+      ]);
+      expect(getUnversionedSuppressions(program, widget)).toEqual([
+        { kind: "OperationRemoved", reason: "Migration.", path: "operations.read" },
+      ]);
+    },
+  );
+
+  it.each(["approvedBreakingChange", "approvedUnversionedChange"])(
+    "diagnoses invalid kinds passed through @%s without storing approval metadata",
+    async (decorator) => {
+      const [{ program }, diagnostics] = await Tester.compileAndDiagnose(`
+        namespace Test;
+        @${decorator}("Reviewed.", #{ kind: "NotAKind" })
+        model Widget {}
+      `);
+      const widget = getModel(program, "Widget");
+      expect(diagnostics).toHaveLength(1);
+      expect(diagnostics[0]).toMatchObject({
+        code: "@azure-tools/typespec-azure-core/invalid-suppression-kind",
+        severity: "warning",
+        message: "Invalid DiffKind 'NotAKind' specified in suppression decorator.",
+      });
+      expect(diagnostics[0].target).toBe(widget);
+      expect(getSuppressions(program, widget)).toEqual([]);
+      expect(getUnversionedSuppressions(program, widget)).toEqual([]);
+    },
+  );
+
+  it("enumerates unversioned approvals without including cross-version approvals", async () => {
+    const { program } = await Tester.compile(`
+      namespace Test;
+      @approvedBreakingChange("Versioned.")
+      @approvedUnversionedChange("Model migration.")
+      model Widget {
+        @approvedUnversionedChange("Property migration.", #{ kind: "ResponsePropertyRemoved" })
+        legacy: string;
+      }
+    `);
     const widget = getModel(program, "Widget");
-    expect(getSuppressions(program, widget)).toEqual([
-      { kind: "OperationRemoved", reason: "Reviewed.", version: "2025-01-01" },
-    ]);
-    expect(getUnversionedSuppressions(program, widget)).toEqual([
-      { kind: "OperationRemoved", reason: "Migration." },
-    ]);
+    const approvals = scanAllUnversionedSuppressions(program);
+    expect(approvals).toHaveLength(2);
+    expect(approvals.find((approval) => approval.target === widget)?.suppression).toEqual({
+      kind: undefined,
+      reason: "Model migration.",
+    });
+    const legacy = getProperty(widget, "legacy");
+    expect(approvals.find((approval) => approval.target === legacy)?.suppression).toEqual({
+      kind: "ResponsePropertyRemoved",
+      reason: "Property migration.",
+    });
   });
   it("stores approved breaking change suppressions", async () => {
     const { program } = await Tester.compile(`
