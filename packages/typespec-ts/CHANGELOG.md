@@ -1,5 +1,21 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.58.0
+
+### Features
+
+- [#5196](https://github.com/Azure/typespec-azure/pull/5196) Generate JSONL and SSE operations returning `Promise<AsyncIterable<T>>` of deserialized items or events instead of raw byte streams, with eager HTTP validation and terminal-event handling.
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#5599](https://github.com/Azure/typespec-azure/pull/5599) Handle optional response bodies when generating storage-compatible return types
+- [#5580](https://github.com/Azure/typespec-azure/pull/5580) Export nested API subpaths for multi-service packages, including separate clients and services merged into one client, in package exports and build configuration.
+- [#5536](https://github.com/Azure/typespec-azure/pull/5536) Preserve caller-provided logging options when applying the default package logger.
+
+
 ## 0.57.0
 
 ### Features

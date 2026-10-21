@@ -1,4 +1,4 @@
-import { type UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { type UnionEnum, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   type BooleanLiteral,
   type Diagnostic,
@@ -30,6 +30,7 @@ import {
   isArrayModelType,
   isErrorModel,
   isNeverType,
+  isNullType,
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -116,6 +117,7 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -633,6 +635,7 @@ export function getSdkUnionWithDiagnostics(
           isExactName: false,
           namespace,
           variantTypes: [],
+          variants: new Map(),
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           access: "public",
           usage: UsageFlags.None,
@@ -663,15 +666,36 @@ export function getSdkUnionWithDiagnostics(
           };
         }
         updateReferencedTypeMap(context, type, retval);
-        const variantTypes = nonNullOptions.map((x) =>
-          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
+        const variants = new Map(
+          [...type.variants.values()]
+            .filter((variant) => !isNullType(variant.type))
+            .map((variant) => [
+              variant.name,
+              diagnostics.pipe(getClientTypeWithDiagnostics(context, variant.type, operation)),
+            ]),
         );
+        const variantTypes = [...variants.values()];
         if (retval.kind === "nullable" && retval.type.kind === "union") {
+          retval.type.variants = variants;
           retval.type.variantTypes = variantTypes;
         } else if (retval.kind === "union") {
+          retval.variants = variants;
           retval.variantTypes = variantTypes;
         }
       }
+    }
+
+    const sdkUnionType =
+      retval?.kind === "union"
+        ? retval
+        : retval?.kind === "nullable" && retval.type.kind === "union"
+          ? retval.type
+          : undefined;
+    const baseType = type.baseType;
+    if (sdkUnionType && baseType) {
+      sdkUnionType.baseType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, baseType, operation),
+      );
     }
   }
 
@@ -694,6 +718,7 @@ function getEmptyUnionType(
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
+    variants: new Map(),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     access: "public",
     usage: UsageFlags.None,
@@ -995,7 +1020,8 @@ function getUnionAsEnumValueType(
   union: Union,
 ): [SdkBuiltInType | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const nonNullOptions = getNonNullOptions(union);
+  const nonNullOptions =
+    union.baseType?.kind === "Scalar" ? [union.baseType] : getNonNullOptions(union);
   for (const option of nonNullOptions) {
     if (option.kind === "Union") {
       const ret = diagnostics.pipe(getUnionAsEnumValueType(context, option));
@@ -1288,6 +1314,7 @@ function getSdkCredentialType(
       __raw: service,
       kind: "union",
       variantTypes: credentialTypes,
+      variants: new Map(credentialTypes.map((type) => [Symbol("variant"), type])),
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
       isExactName: false,
@@ -1690,6 +1717,12 @@ export function updateUsageOrAccess(
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
     }
+    if (type.baseType) {
+      // A constraint must not pull in unrelated discriminated subtypes.
+      options.ignoreSubTypeStack.push(true);
+      diagnostics.pipe(updateUsageOrAccess(context, value, type.baseType, options));
+      options.ignoreSubTypeStack.pop();
+    }
     return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
@@ -1933,7 +1966,7 @@ function updateTypesFromOperation(
     }
     popNamingContext(context);
 
-    const lroMetaData = getLroMetadata(program, operation);
+    const lroMetaData = getRawLroMetadata(program, operation);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2608,6 +2641,11 @@ function updateSerializationOptions(
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       updateSerializationOptions(context, unionType, contentTypes, options);
+    }
+    if (type.baseType) {
+      options.ignoreSubTypeStack.push(true);
+      diagnostics.pipe(updateSerializationOptions(context, type.baseType, contentTypes, options));
+      options.ignoreSubTypeStack.pop();
     }
     return diagnostics.wrap(undefined);
   }

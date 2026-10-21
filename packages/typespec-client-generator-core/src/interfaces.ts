@@ -542,7 +542,22 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   /** Full qualified namespace. */
   namespace: string;
   kind: "union";
+  /** SDK types of the alternatives, in the same order as `variants.values()`. */
   variantTypes: TValueType[];
+  /**
+   * Maps variant keys to SDK types, in the same iteration order as `variantTypes`.
+   * Declared alternatives retain TypeSpec source order and their original string or symbol keys.
+   * String keys are declared names without casing transformations; symbols identify unnamed/default variants.
+   * Synthesized alternatives use new, unique symbol keys.
+   * Explicit null alternatives are excluded and represented by an `SdkNullableType` wrapper.
+   * Distinct keys may reference the same SDK type.
+   */
+  variants: Map<string | symbol, TValueType>;
+  /**
+   * Type declared by the union's `extends` clause. This constrains the variants but does not imply inheritance.
+   * Usage, access, and serialization information propagate to this referenced type.
+   */
+  baseType?: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** Whether the type has public or private accessibility. */
@@ -1176,7 +1191,7 @@ interface SdkLroServiceMethodOptions {
  * Long running operation metadata.
  */
 export interface SdkLroServiceMetadata {
-  /** LRO metadata from TypeSpec core library */
+  /** Core-compatible raw metadata with TCGC-selected client result fields. */
   __raw: LroMetadata;
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
@@ -1440,8 +1455,10 @@ export interface DecoratorOptions {
 
 interface SdkExampleBase {
   kind: string;
+  /** Unique example name within the operation. */
   name: string;
   doc: string;
+  /** Path to the source JSON or YAML file containing the example. */
   filePath: string;
   rawExample: any;
 }
