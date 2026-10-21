@@ -216,6 +216,45 @@ Widgets.create:
     ).toEqual([]);
   });
 
+  it("accepts future values of open enums without weakening closed enums", async () => {
+    const document = {
+      ...contract,
+      definitions: {
+        Widget: {
+          type: "object",
+          properties: {
+            open: {
+              type: "string",
+              enum: ["Known"],
+              "x-ms-enum": { modelAsString: true },
+            },
+            closed: {
+              type: "string",
+              enum: ["Known"],
+              "x-ms-enum": { modelAsString: false },
+            },
+          },
+        },
+      },
+    };
+    const diagnostics = await validateApiExamples(
+      [
+        loadExampleFile(
+          "examples.yaml",
+          `
+Widgets.create:
+  - request: { path: { id: "1" }, body: { open: Future, closed: Known } }
+    responses: { 200: { body: { open: Future, closed: Invalid } } }
+`,
+        ),
+      ],
+      new Map([["/spec/openapi.json", document]]),
+      ["2024-01-01"],
+    );
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].message).toContain("responses.200.body.closed");
+  });
+
   it("resolves external body parameters and schemas relative to the parameter document", async () => {
     const operation = contract.paths["/widgets/{id}"].put;
     const document = {

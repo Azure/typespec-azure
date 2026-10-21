@@ -399,6 +399,9 @@ function normalizeSchema(
     });
   }
   if (normalized.type === "file") normalized.type = "string";
+  if (isObject(value["x-ms-enum"]) && value["x-ms-enum"].modelAsString === true) {
+    delete normalized.enum;
+  }
   if (
     scope === "value" &&
     normalized.additionalProperties === undefined &&
