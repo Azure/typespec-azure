@@ -216,7 +216,7 @@ model Widget is TrackedResource<WidgetProperties> {
 }
 
 model WidgetPatchProperties {
-  label?: string;
+  /*target*/label?: string;
 }
 
 model WidgetPatch {
@@ -278,9 +278,11 @@ interface Widgets {
     });
 
     it("diagnoses the incorrect ARM template fixture", async () => {
-      await fixtureTester
-        .expect(examples[0])
-        .toEmitDiagnostics([{ ...missingProperty("label"), target: "label" }]);
+      await fixtureTester.expect(examples[0]).toEmitDiagnostics(({ pos }) => ({
+        ...missingProperty("label"),
+        pos: pos.target.pos,
+        end: pos.target.pos + "label?: string".length,
+      }));
     });
 
     it("accepts the correct ARM template fixture", async () => {
@@ -342,10 +344,14 @@ interface Widgets {
       .expect(
         bodyPair(`
         model PutBody { @encodedName("application/json", "putName") name?: string; }
-        model PatchBody { @encodedName("application/json", "patchName") name?: string; }
+        model PatchBody { /*target*/@encodedName("application/json", "patchName") name?: string; }
       `),
       )
-      .toEmitDiagnostics({ ...missingProperty("patchName"), target: "name" });
+      .toEmitDiagnostics(({ pos }) => ({
+        ...missingProperty("patchName"),
+        pos: pos.target.pos,
+        end: pos.target.pos + '@encodedName("application/json", "patchName") name?: string'.length,
+      }));
   });
 
   it("retains inherited-only nested wrappers as leaves", async () => {
@@ -456,7 +462,7 @@ interface Widgets {
           }
           model WidgetPatch {
             tags?: Record<string>;
-            properties?: { updateOnly?: string; };
+            properties?: { /*target*/updateOnly?: string; };
           }
           @armResourceOperations interface Widgets {
             @parameterVisibility(Lifecycle.Create)
@@ -465,7 +471,11 @@ interface Widgets {
           }
           `,
         )
-        .toEmitDiagnostics({ ...missingProperty("updateOnly"), target: "updateOnly" });
+        .toEmitDiagnostics(({ pos }) => ({
+          ...missingProperty("updateOnly"),
+          pos: pos.target.pos,
+          end: pos.target.pos + "updateOnly?: string".length,
+        }));
     },
   );
 
