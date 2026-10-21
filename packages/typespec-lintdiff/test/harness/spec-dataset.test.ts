@@ -9,6 +9,7 @@ import {
   getValidatorExtensionReference,
   keepOutputFileInsideEmitterDirectory,
   parseViolations,
+  retainLatestSwagger,
   selectLatestApiVersion,
   updateAutorestOption,
 } from "./spec-dataset.js";
@@ -21,6 +22,47 @@ const project = {
 };
 
 describe("spec dataset results", () => {
+  it("retains relocated reference closures outside a project output but inside the dataset", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "lintdiff-reference-test-"));
+    try {
+      const source = path.join(directory, "source", "project");
+      const dataset = path.join(directory, "dataset");
+      const output = path.join(dataset, "projects", "demo", "swagger");
+      const relative = path.join("stable", "2026-01-01");
+      fs.mkdirSync(path.join(source, relative), { recursive: true });
+      fs.mkdirSync(path.join(directory, "source", "common"), { recursive: true });
+      fs.mkdirSync(path.join(output, relative), { recursive: true });
+      const common = '{"definitions":{"Flag":{"type":"boolean"}}}';
+      fs.writeFileSync(path.join(directory, "source", "common", "types.json"), common);
+      fs.writeFileSync(path.join(directory, "secret.json"), '{"private":true}');
+      fs.writeFileSync(
+        path.join(source, relative, "shared.json"),
+        '{"definitions":{"Flag":{"$ref":"../../../common/types.json#/definitions/Flag"},"Outside":{"$ref":"../../../../secret.json"}}}',
+      );
+      const main = path.join(output, relative, "main.json");
+      fs.writeFileSync(
+        main,
+        '{"swagger":"2.0","info":{"version":"2026-01-01"},"definitions":{"Flag":{"$ref":"./shared.json#/definitions/Flag"}}}',
+      );
+      retainLatestSwagger(
+        output,
+        [{ absolutePath: main, apiVersion: "2026-01-01" }],
+        source,
+        dataset,
+        path.join(directory, "source"),
+      );
+      expect(
+        fs.readFileSync(path.join(dataset, "projects", "demo", "common", "types.json"), "utf8"),
+      ).toBe(common);
+      expect(fs.readFileSync(path.join(output, relative, "shared.json"), "utf8")).toContain(
+        "../../../common/types.json#/definitions/Flag",
+      );
+      expect(fs.existsSync(path.join(dataset, "projects", "secret.json"))).toBe(false);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("disables source service metadata writes in the temporary emitter configuration", () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "lintdiff-config-test-"));
     try {

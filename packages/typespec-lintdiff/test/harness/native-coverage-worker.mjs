@@ -259,6 +259,11 @@ async function run() {
     },
   });
   const allowed = new Set();
+  const emittedTypes = new Set();
+  const indirectlyProcessed = new Set();
+  const inlineModel = (model) =>
+    !compiler.getFriendlyName(program, model) &&
+    (!model.name || compiler.isTemplateInstance(model));
   const key = (value) =>
     value.sourceFile === undefined
       ? undefined
@@ -303,7 +308,8 @@ async function run() {
     }
     if (seen.has(type)) return;
     seen.add(type);
-    if (type.kind === "Model" && referenceOnly(type, service, visibility)) return;
+    if (["Model", "Union"].includes(type.kind) && referenceOnly(type, service, visibility)) return;
+    if (["Model", "Union"].includes(type.kind)) emittedTypes.add(type);
     if (scope === "http-reachable" || (type.kind === "ModelProperty" && boolean(type))) add(type);
     switch (type.kind) {
       case "ModelProperty":
@@ -355,11 +361,14 @@ async function run() {
       );
     }
     if ("parts" in body) {
+      indirectlyProcessed.add(body.type);
       for (const part of body.parts) visitBody(part.body, operation, visited, service, visibility);
     }
   };
   let serviceCount = 0;
   for (const service of listServices(program)) {
+    emittedTypes.clear();
+    indirectlyProcessed.clear();
     const mutators = versioning.getVersioningMutators(program, service.type);
     let namespace = service.type;
     if (mutators?.kind === "versioned") {
@@ -413,6 +422,9 @@ async function run() {
         let source = parameter.param;
         while (source.sourceProperty) source = source.sourceProperty;
         if (!isExternalReference(source, selectedService)) {
+          if (source !== parameter.param && source.model && !inlineModel(source.model)) {
+            indirectlyProcessed.add(source.model);
+          }
           visit(parameter.param, visited, selectedService, requestVisibility);
         }
       }
@@ -437,6 +449,26 @@ async function run() {
           );
         }
       }
+    }
+    if (scope === "boolean-http" && !autorestOptions.omitUnreachableTypes) {
+      const authentication = http.resolveAuthentication(serviceGraph);
+      const authModels = new Set(authentication?.schemes.map((scheme) => scheme.model) ?? []);
+      const addSchema = (type) => {
+        if (
+          !emittedTypes.has(type) &&
+          !indirectlyProcessed.has(type) &&
+          !authModels.has(type) &&
+          !inlineModel(type) &&
+          !isTemplateDeclaration(type)
+        ) {
+          visit(type, new Map(), selectedService, http.Visibility.Read);
+        }
+      };
+      compiler.navigateTypesInNamespace(
+        namespace,
+        { model: addSchema, union: addSchema },
+        { skipSubNamespaces: compiler.isGlobalNamespace(program, namespace) },
+      );
     }
   }
   if (serviceCount === 0)

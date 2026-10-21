@@ -222,6 +222,12 @@ reference-only parameters, response headers, and shared schemas. It skips when
 that environment variable is absent; skipped controls are not passing runtime
 evidence.
 
+Also verify default-emitted unreachable service schemas, explicit
+`omit-unreachable-types` behavior, local children of externally referenced bases,
+and named unions. Retain the complete relative-reference closure when moving
+external Swagger files into the dataset; copied files can reference dependencies
+outside a project output directory but must remain within the dataset boundary.
+
 Derive semantic controls from the complete validator selector, not only the
 native rule's existing tests. For the boolean pilot, also compare boolean
 literals, nullable booleans, derived scalars, array items, and dictionary values
@@ -254,6 +260,11 @@ retains authored source suppressions.
   body-ignore and explicit-body metadata policies, including canonical shared
   read schemas. HTTP parameters and response headers are traversed separately;
   reference-only parameters do not contribute local schema findings.
+  When `omit-unreachable-types` is false, the boolean profile also includes
+  named schemas emitted from the selected service namespace. An unused named
+  query model can therefore contribute a local Boolean schema even when the
+  operation's parameter is reference-only. Distinguish these emitted schemas
+  from the parameter reference instead of dropping their shared source location.
 
 Keep raw findings even when alignment removes them. If a rule's predicate must
 be reevaluated after projection, report that limitation and establish a supported

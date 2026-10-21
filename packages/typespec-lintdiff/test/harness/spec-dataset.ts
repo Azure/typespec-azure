@@ -551,6 +551,8 @@ function copyReferencedFileClosure(
   stagingDir: string,
   fallbackRoots: string[],
   seen: Set<string>,
+  datasetDir: string,
+  specsRepo: string,
 ): void {
   const seenKey = `${path.resolve(sourceFile)}|${destinationRelativePath}`;
   if (seen.has(seenKey) || !fs.existsSync(sourceFile)) {
@@ -571,24 +573,44 @@ function copyReferencedFileClosure(
     const relativePath = path.normalize(
       path.join(path.dirname(destinationRelativePath), reference),
     );
-    if (relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    const emittedFile = path.resolve(outputDir, relativePath);
+    const datasetRelative = path.relative(datasetDir, emittedFile);
+    if (
+      datasetRelative === ".." ||
+      datasetRelative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(datasetRelative)
+    ) {
       continue;
     }
 
-    const emittedFile = path.join(outputDir, relativePath);
-    const referencedFile = fs.existsSync(emittedFile)
-      ? emittedFile
-      : fallbackRoots
-          .map((root) => path.join(root, relativePath))
-          .find((candidate) => fs.existsSync(candidate));
+    const referencedFile = [
+      path.resolve(path.dirname(sourceFile), reference),
+      emittedFile,
+      ...fallbackRoots.map((root) => path.resolve(root, relativePath)),
+    ].find((candidate) => {
+      if (!fs.existsSync(candidate)) return false;
+      const real = fs.realpathSync(candidate);
+      return [datasetDir, specsRepo].some((root) => {
+        const relative = path.relative(root, real);
+        return (
+          relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative)
+        );
+      });
+    });
     if (!referencedFile) {
       continue;
     }
 
-    const destination = path.join(stagingDir, relativePath);
+    const outsideOutput = relativePath === ".." || relativePath.startsWith(`..${path.sep}`);
+    const destination = outsideOutput ? emittedFile : path.join(stagingDir, relativePath);
     if (!fs.existsSync(destination)) {
       fs.mkdirSync(path.dirname(destination), { recursive: true });
       fs.copyFileSync(referencedFile, destination);
+    } else if (
+      outsideOutput &&
+      !fs.readFileSync(destination).equals(fs.readFileSync(referencedFile))
+    ) {
+      throw new Error(`Conflicting referenced file inside dataset: ${destination}`);
     }
     copyReferencedFileClosure(
       referencedFile,
@@ -597,14 +619,18 @@ function copyReferencedFileClosure(
       stagingDir,
       fallbackRoots,
       seen,
+      datasetDir,
+      specsRepo,
     );
   }
 }
 
-function retainLatestSwagger(
+export function retainLatestSwagger(
   outputDir: string,
   swaggerFiles: EmittedSwagger[],
   projectDir: string,
+  datasetDir: string,
+  specsRepo: string,
 ): { apiVersion?: string; swaggerFiles: EmittedSwagger[] } {
   const apiVersion = selectLatestApiVersion(swaggerFiles.map((file) => file.apiVersion));
   if (!apiVersion) {
@@ -663,6 +689,8 @@ function retainLatestSwagger(
             stagingDir,
             fallbackRoots,
             seenReferences,
+            datasetDir,
+            specsRepo,
           );
         }
       }
@@ -730,7 +758,13 @@ async function compileProject(
         shell: process.platform === "win32",
       },
     );
-    const latest = retainLatestSwagger(outputDir, findSwaggerFiles(outputDir), project.projectDir);
+    const latest = retainLatestSwagger(
+      outputDir,
+      findSwaggerFiles(outputDir),
+      project.projectDir,
+      config.datasetDir,
+      config.specsRepo,
+    );
     return {
       status: "success",
       durationMs: Date.now() - started,

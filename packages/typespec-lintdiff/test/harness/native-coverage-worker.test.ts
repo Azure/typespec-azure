@@ -196,6 +196,28 @@ linter:
       },
     );
 
+    it.each([false, true])(
+      "respects omit-unreachable-types=%s for service namespace schemas",
+      (omit) => {
+        const result = evaluate(
+          `
+        @service namespace Contoso {
+          model Unused { enabled: boolean; }
+          @get @route("/status") op read(): string;
+        }
+        namespace Outside { model Unused { other: boolean; } }
+      `,
+          { scope: "boolean-http" },
+          {
+            config: `options:\n  "@azure-tools/typespec-autorest":\n    omit-unreachable-types: ${omit}\nlinter:\n  disable:\n    "${rule}": "Control: explicit opt-in."\n`,
+          },
+        );
+        expect(result.error).toBeUndefined();
+        expect(result.rawDiagnostics).toHaveLength(2);
+        expect(result.diagnostics).toHaveLength(omit ? 0 : 1);
+      },
+    );
+
     it("includes emitted derived models reachable only through their base model", () => {
       const result = evaluate(
         `
@@ -213,7 +235,37 @@ linter:
       expect(result.diagnostics).toHaveLength(1);
     });
 
-    it("excludes externally referenced derived graphs while retaining raw findings", () => {
+    it("retains default-emitted local children of reference-only bases", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        @Autorest.useRef("./common.json#/definitions/Base")
+        model Base { name: string; }
+        model Child extends Base { enabled: boolean; }
+        @get @route("/base") op read(): Base;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
+    it("retains default-emitted named unions with inline boolean properties", () => {
+      const result = evaluate(
+        `
+        @service namespace Contoso;
+        union Choice { value: { enabled: boolean; }, absent: null }
+        @get @route("/status") op read(): string;
+      `,
+        { scope: "boolean-http" },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.diagnostics).toHaveLength(1);
+    });
+
+    it("excludes reference-only derived graphs when unreachable schemas are omitted", () => {
       const result = evaluate(
         `
         @service namespace Contoso;
@@ -237,6 +289,10 @@ linter:
         @get @route("/base-reference") op readBaseReference(): BaseReference;
       `,
         { scope: "boolean-http" },
+        {
+          config:
+            'options:\n  "@azure-tools/typespec-autorest":\n    omit-unreachable-types: true\n',
+        },
       );
       expect(result.error).toBeUndefined();
       expect(result.status).toBe("success");
@@ -301,9 +357,11 @@ linter:
       },
     );
 
-    it("excludes externally referenced spread query parameters", () => {
-      const result = evaluate(
-        `
+    it.each([false, true])(
+      "aligns referenced query parameters with omit-unreachable-types=%s",
+      (omit) => {
+        const result = evaluate(
+          `
         @service namespace Contoso;
         model Query {
           @Autorest.useRef("./common.json#/parameters/Flag")
@@ -311,13 +369,17 @@ linter:
         }
         @get @route("/widget") op read(...Query): string;
       `,
-        { scope: "boolean-http" },
-      );
-      expect(result.error).toBeUndefined();
-      expect(result.status).toBe("success");
-      expect(result.rawDiagnostics.length).toBeGreaterThan(0);
-      expect(result.diagnostics).toEqual([]);
-    });
+          { scope: "boolean-http" },
+          {
+            config: `options:\n  "@azure-tools/typespec-autorest":\n    omit-unreachable-types: ${omit}\n`,
+          },
+        );
+        expect(result.error).toBeUndefined();
+        expect(result.status).toBe("success");
+        expect(result.rawDiagnostics).toHaveLength(2);
+        expect(result.diagnostics).toHaveLength(omit ? 0 : 2);
+      },
+    );
 
     it("retains ordinary parameters, response headers and shared read schemas", () => {
       const result = evaluate(

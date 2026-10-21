@@ -30,6 +30,17 @@ handling, separately visits actual parameters and response headers, and excludes
 reference-only parameters, including their spread-source references. Filtering
 never removes findings from the raw native receipt.
 
+The boolean profile also follows `omit-unreachable-types`: when disabled, it
+retains named schemas emitted from the selected service namespace even if no
+operation reaches them. This includes local derived types and named unions.
+Reference-only parameters remain distinct from default-emitted named parameter
+models. The general `http-reachable` profile remains HTTP-only.
+
+Swagger reference retention preserves relative references from copied external
+files, including dependencies outside a project's output but inside the
+dataset. Source reads stay inside the selected specs checkout or dataset.
+Dependencies with conflicting destination content fail explicitly.
+
 Explicit rule activation is local to the comparison. Existing source suppressions
 and directly configured/inherited rule options remain effective. Raw diagnostics
 are retained before optional selected-version
