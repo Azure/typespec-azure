@@ -104,7 +104,22 @@ describe("migrate (end-to-end)", () => {
       },
     };
     await writeFile(join(root, "stable", "2023-01-01", "service.json"), JSON.stringify(doc));
-    await writeFile(join(root, "service.yaml"), 'versions:\n  - version: "2023-01-01"\n');
+    await writeVersion(root, "2024-06-01", "premium");
+    const later = swagger("2024-06-01");
+    Object.values(later.paths)[0].put.parameters[1].name = "payload";
+    await writeFile(join(root, "stable", "2024-06-01", "service.json"), JSON.stringify(later));
+    await writeFile(
+      join(root, "stable", "2024-06-01", "examples", "Create.json"),
+      JSON.stringify({
+        operationId: "Things_Create",
+        parameters: { subscriptionId: "sub", id: "1", payload: { sku: "premium" } },
+        responses: { "200": { body: { sku: "premium" } } },
+      }),
+    );
+    await writeFile(
+      join(root, "service.yaml"),
+      'versions:\n  - version: "2023-01-01"\n  - version: "2024-06-01"\n',
+    );
 
     const result = await migrate(root);
     const migrated = parse(result.files[0].content);
@@ -118,6 +133,10 @@ describe("migrate (end-to-end)", () => {
     expect(expanded.files.find((file) => file.fileName === "Create.json")?.document).toMatchObject({
       parameters: { subscriptionId: "sub", id: "1", resource: { sku: "basic" } },
     });
+    const laterExpanded = await resolveLegacyExamples(root, "2024-06-01");
+    expect(
+      laterExpanded.files.find((file) => file.fileName === "Create.json")?.document,
+    ).toMatchObject({ parameters: { payload: { sku: "premium" } } });
   });
 
   it("fails explicitly for an unresolved external parameter rather than guessing query", async () => {
