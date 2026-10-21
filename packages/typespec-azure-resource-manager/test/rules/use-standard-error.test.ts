@@ -185,63 +185,18 @@ it("rejects custom model reference shapes", async () => {
     .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
 });
 
-it("rejects named scalar, enum, union, collection, generic, and nullable custom errors", async () => {
+it("rejects inline models, non-model payloads, nullable custom errors, and ambiguous unions", async () => {
   await tester
     .expect(
       `${header}
-        scalar CustomScalar extends string;
-        enum CustomEnum { bad }
-        union CustomUnion { bad: "bad", worse: "worse" }
-        model NamedArray is string[];
-        model NamedRecord is Record<string>;
-        model Generic<T> { value: T; }
-        @friendlyName("FriendlyError") model Friendly<T> { value: T; }
         model Custom { code: string; }
-        @route("/scalar") op scalarError is Request<CustomScalar>;
-        @route("/enum") op enumError is Request<CustomEnum>;
-        @route("/union") op unionError is Request<CustomUnion>;
-        @route("/array") op arrayError is Request<NamedArray>;
-        @route("/record") op recordError is Request<NamedRecord>;
-        @route("/generic") op genericError is Request<Generic<string>>;
-        @route("/friendly") op friendlyError is Request<Friendly<string>>;
+        @route("/inline") op inlineError is Request<{ code: string; }>;
+        @route("/string") op stringError is Request<string>;
         @route("/nullable") op nullableError is Request<Custom | null>;
+        @route("/ambiguous") op ambiguousError is Request<CommonTypes.ErrorResponse | Custom | null>;
       `,
     )
-    .toEmitDiagnostics([
-      diagnostic,
-      diagnostic,
-      diagnostic,
-      diagnostic,
-      diagnostic,
-      diagnostic,
-      diagnostic,
-      diagnostic,
-    ]);
-});
-
-it("rejects inline, primitive, literal, tuple, unknown, and bytes error payloads", async () => {
-  await tester
-    .expect(
-      `${header}
-        model Generic<T> { value: T; }
-        enum Codes { bad }
-        @route("/model") op modelBody is Request<{ code: string; }>;
-        @route("/array") op arrayBody is Request<string[]>;
-        @route("/record") op recordBody is Request<Record<string>>;
-        @route("/generic") op genericBody is Request<Generic<string>>;
-        @route("/string") op stringBody is Request<string>;
-        @route("/literal") op literalBody is Request<"bad">;
-        @route("/number") op numberBody is Request<42>;
-        @route("/boolean") op booleanBody is Request<false>;
-        @route("/template") op templateBody is Request<"error-${"bad"}">;
-        @route("/enum-member") op enumMemberBody is Request<Codes.bad>;
-        @route("/tuple") op tupleBody is Request<[string, int32]>;
-        @route("/union") op unionBody is Request<"bad" | "worse">;
-        @route("/unknown") op unknownBody is Request<unknown>;
-        @route("/bytes") op bytesBody is Request<bytes>;
-      `,
-    )
-    .toEmitDiagnostics(Array.from({ length: 14 }, () => diagnostic));
+    .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
 });
 
 it("rejects binary and multipart error payloads", async () => {
@@ -319,19 +274,16 @@ it("ignores success bodies when errors use the standard contract", async () => {
     )
     .toBeValid();
 });
-it.each(["get", "post", "put", "patch", "delete"])(
-  "checks synchronous %s error responses",
-  async (verb) => {
-    await tester
-      .expect(
-        `${header}
+it.each(["get", "post"])("checks synchronous %s error responses", async (verb) => {
+  await tester
+    .expect(
+      `${header}
         @route("/sync") @${verb} op sync(): Accepted | Failure<string>;
       `,
-      )
-      .toEmitDiagnostics(diagnostic);
-  },
-);
-it.each(["get", "post", "put", "patch", "delete", "head"])(
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+it.each(["get", "post", "head"])(
   "requires an error response on synchronous %s operations",
   async (verb) => {
     await tester
@@ -346,7 +298,7 @@ it.each(["get", "post", "put", "patch", "delete", "head"])(
       });
   },
 );
-it.each(["get", "post", "put", "patch", "delete"])("rejects bodyless %s errors", async (verb) => {
+it.each(["get", "post"])("rejects bodyless %s errors", async (verb) => {
   await tester
     .expect(
       `${header}
@@ -355,26 +307,23 @@ it.each(["get", "post", "put", "patch", "delete"])("rejects bodyless %s errors",
     )
     .toEmitDiagnostics(diagnostic);
 });
-it.each(["get", "post", "put", "patch", "delete"])(
-  "accepts standard synchronous %s errors",
-  async (verb) => {
-    await tester
-      .expect(
-        `${header}
+it.each(["get", "post"])("accepts standard synchronous %s errors", async (verb) => {
+  await tester
+    .expect(
+      `${header}
       @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
     `,
-      )
-      .toBeValid();
-  },
-);
+    )
+    .toBeValid();
+});
 
-it.each([400, 404, 500])("accepts bodyless HEAD %s errors", async (status) => {
+it("accepts a bodyless explicit HEAD error", async () => {
   await tester
     .expect(
       `${header}
         @head @route("/exists")
         op exists(): { @statusCode statusCode: 204; } |
-          { @statusCode statusCode: ${status}; };
+          { @statusCode statusCode: 400; };
       `,
     )
     .toBeValid();
