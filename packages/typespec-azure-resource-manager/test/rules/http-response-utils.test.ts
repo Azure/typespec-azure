@@ -1,13 +1,13 @@
+import { CompilerTester } from "#test/tester.js";
 import { t } from "@typespec/compiler/testing";
 import type { HttpOperationBody, HttpPayloadBody } from "@typespec/http";
-import { assert, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   containsStatusCode,
   isStatusCodeAllowed,
   matchesStatusCode,
   selectResponseBody,
 } from "../../src/rules/http-response-utils.js";
-import { CompilerTester } from "../tester.js";
 
 describe("HTTP response status primitives", () => {
   it("matches literals and singleton ranges exactly", () => {
@@ -23,18 +23,23 @@ describe("HTTP response status primitives", () => {
       const {
         First: first,
         Second: second,
-        ContentType,
-        Filename,
-        Contents,
-      } = await CompilerTester.compile(t.code`
+        ContentType: contentType,
+        Filename: filename,
+        Contents: contents,
+      } = await CompilerTester.compile(
+        t.code`
           model ${t.model("First")} {
+            value: string;
             ${t.modelProperty("ContentType")}: string;
             ${t.modelProperty("Filename")}: string;
             ${t.modelProperty("Contents")}: string;
           }
           model ${t.model("Second")} { other: string; }
-        `);
-      assert(Contents.type.kind === "Scalar");
+        `,
+      );
+      if (contents.type.kind !== "Scalar") {
+        throw new Error("Expected scalar file contents in the compiler-only fixture.");
+      }
       const json: HttpOperationBody = {
         bodyKind: "single",
         type: first,
@@ -53,9 +58,9 @@ describe("HTTP response status primitives", () => {
           type: first,
           isText: true,
           contentTypes: ["text/plain"],
-          contentTypeProperty: ContentType,
-          filename: Filename,
-          contents: { ...Contents, type: Contents.type },
+          contentTypeProperty: contentType,
+          filename,
+          contents: { ...contents, type: contents.type },
         },
       ];
       for (const alternative of alternatives) {
