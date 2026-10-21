@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Add the `no-tags-on-proxy-resource` lint rule for detecting unsupported envelope tags on non-tracked ARM resources, with a removal code fix for directly declared envelope tags. Resource-specific properties bags are not checked.
+Add the `no-tags-on-proxy-resource` lint rule for detecting unsupported envelope tags on non-tracked ARM resources, with a removal code fix for directly declared envelope tags. Resource-specific properties bags are not checked. Document how to remove unsupported tags or use the `TrackedResource` template when ARM tags are required.

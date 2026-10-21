@@ -1,9 +1,11 @@
-Only tracked resources support ARM tags. This rule checks the resource envelope of registered
-non-tracked ARM resources, including proxy and extension resources. It does not check the
-resource-specific `properties` bag: a field named `properties.tags` does not represent ARM tags.
-Use a tracked resource when ARM tags are required.
+Only tracked resources support ARM tags. Resources should not have a `tags` property in the
+resource envelope unless they use the `Azure.ResourceManager.TrackedResource` model template
+in their definition. If this is intended to be a tracked resource, use the `TrackedResource`
+template. If it is not a tracked resource, remove the property.
 
-The rule checks JSON property names, including names assigned with `@encodedName`.
+This rule applies to non-tracked resource envelopes, including proxy and extension resources,
+and checks JSON property names, including names assigned with `@encodedName`. It does not check
+the resource-specific `properties` bag: a field named `properties.tags` does not represent ARM tags.
 
 ## Impact
 
@@ -36,11 +38,29 @@ model WidgetProperties {
 
 ## ✅ Correct
 
+If the resource is not a tracked resource, remove the envelope `tags` property:
+
 ```tsp
 @armProviderNamespace
 namespace MyService;
 
 model Widget is ProxyResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {
+  description?: string;
+}
+```
+
+If the resource requires ARM tags, use `TrackedResource`. The template provides the `tags`
+property; do not redeclare it:
+
+```tsp
+@armProviderNamespace
+namespace MyService;
+
+model Widget is TrackedResource<WidgetProperties> {
   ...ResourceNameParameter<Widget>;
 }
 
