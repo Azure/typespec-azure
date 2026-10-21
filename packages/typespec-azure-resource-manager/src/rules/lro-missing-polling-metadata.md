@@ -28,9 +28,10 @@ Registered resource-instance POST, PUT, and DELETE operations remain subject to
 the polling-header check. Existing ARM response-code and Location-header rules
 retain ownership of their separate status-code and header-presence requirements.
 
-Operations reached through overlapping service declarations are checked once,
-including compliant operations. This avoids repeating diagnostics from native
-polling-metadata resolution.
+Each concrete operation within an explicitly declared service is checked once,
+including operations in nested namespaces and overlapping services. Operations
+outside explicit services are not checked. This avoids repeating diagnostics
+from native polling-metadata resolution.
 
 The combined rule retains one disabled (`false`) entry in the central Azure
 resource-manager ruleset. The ARM library's compiler-generated `all` ruleset
@@ -49,25 +50,16 @@ completion.
 ## ❌ Incorrect
 
 Replacing the standard headers with a string-valued `Location` header preserves
-the accepted response but removes its polling semantics:
+the accepted response but removes its polling semantics. These excerpts assume
+the `Widget` resource model is already defined:
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 model PlainLocationHeaders {
   ...Azure.Core.Foundations.RetryAfterHeader;
   @header("Location") location?: string;
 }
 
-@armResourceOperations
-interface Widgets {
-  update is ArmCustomPatchAsync<Widget, Widget, LroHeaders = PlainLocationHeaders>;
-}
+op update is ArmCustomPatchAsync<Widget, Widget, LroHeaders = PlainLocationHeaders>;
 ```
 
 ## ✅ Correct
@@ -76,22 +68,11 @@ Keep the same asynchronous operation and accepted response, but restore the
 supported polling and final-result metadata:
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  update is ArmCustomPatchAsync<
-    Widget,
-    Widget,
-    LroHeaders = ArmLroLocationHeader<FinalResult = Widget> &
-      Azure.Core.Foundations.RetryAfterHeader
-  >;
-}
+op update is ArmCustomPatchAsync<
+  Widget,
+  Widget,
+  LroHeaders = ArmLroLocationHeader<FinalResult = Widget> & Azure.Core.Foundations.RetryAfterHeader
+>;
 ```
 
 Custom `ArmProviderActionAsync` headers have the same requirement. The default

@@ -1,6 +1,12 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { createRule, fileRef, listServices, type Operation } from "@typespec/compiler";
-import { getHttpService, type HttpOperationResponse } from "@typespec/http";
+import {
+  createRule,
+  fileRef,
+  isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
+  listServices,
+} from "@typespec/compiler";
+import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
 import { isArmCollectionAction } from "../operations.js";
 
 const pollingStatusCodes = new Set([200, 201, 202, 204]);
@@ -19,31 +25,43 @@ export const lroMissingPollingMetadataRule = createRule({
       "ARM operations indicating asynchronous processing must have native polling metadata. Use an asynchronous ARM template or preserve supported semantic LRO headers.",
   },
   create(context) {
+    const serviceNamespaces = new Set(listServices(context.program).map((service) => service.type));
     return {
-      root() {
-        const visitedOperations = new Set<Operation>();
-        for (const service of listServices(context.program)) {
-          const [httpService] = getHttpService(context.program, service.type);
-          for (const httpOperation of httpService.operations) {
-            const operation = httpOperation.operation;
-            if (visitedOperations.has(operation)) {
-              continue;
-            }
-            const requiresAcceptedMetadata =
-              httpOperation.verb === "patch" ||
-              (httpOperation.verb === "post" && isArmCollectionAction(context.program, operation));
-            const hasAcceptedResponse =
-              requiresAcceptedMetadata &&
-              httpOperation.responses.some((response) => response.statusCodes === 202);
-            const hasPollingResponse =
-              pollingVerbs.has(httpOperation.verb) && hasPollingHeader(httpOperation.responses);
-            if (hasAcceptedResponse || hasPollingResponse) {
-              // Metadata resolution can report Core diagnostics even for compliant operations.
-              visitedOperations.add(operation);
-              if (getLroMetadata(context.program, operation) === undefined) {
-                context.reportDiagnostic({ target: operation });
-              }
-            }
+      operation(operation) {
+        const container = operation.interface ?? operation.namespace;
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          !container ||
+          container.operations.get(operation.name) !== operation ||
+          (operation.interface &&
+            (isTemplateDeclaration(operation.interface) ||
+              operation.interface.namespace?.interfaces.get(operation.interface.name) !==
+                operation.interface))
+        ) {
+          return;
+        }
+
+        let namespace = operation.namespace;
+        while (namespace && !serviceNamespaces.has(namespace)) {
+          namespace = namespace.namespace;
+        }
+        if (!namespace) {
+          return;
+        }
+
+        const [httpOperation] = getHttpOperation(context.program, operation);
+        const requiresAcceptedMetadata =
+          httpOperation.verb === "patch" ||
+          (httpOperation.verb === "post" && isArmCollectionAction(context.program, operation));
+        const hasAcceptedResponse =
+          requiresAcceptedMetadata &&
+          httpOperation.responses.some((response) => response.statusCodes === 202);
+        const hasPollingResponse =
+          pollingVerbs.has(httpOperation.verb) && hasPollingHeader(httpOperation.responses);
+        if (hasAcceptedResponse || hasPollingResponse) {
+          // Metadata resolution can report Core diagnostics even for compliant operations.
+          if (getLroMetadata(context.program, operation) === undefined) {
+            context.reportDiagnostic({ target: operation });
           }
         }
       },

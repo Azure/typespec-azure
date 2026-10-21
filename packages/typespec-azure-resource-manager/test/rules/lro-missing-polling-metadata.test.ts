@@ -207,23 +207,50 @@ it("reports a nested service operation once across overlapping HTTP service trav
     }));
 });
 
-it("reports each distinct provider operation once when response headers are shared", async () => {
+it.each(["", "namespace Unscoped;"])(
+  "does not fall back to operations without an explicit service (%s)",
+  async (namespace) => {
+    await tester
+      .expect(
+        `
+        ${namespace}
+        @patch op update(): { @statusCode statusCode: 202; @header("Location") location?: string; };
+      `,
+      )
+      .toBeValid();
+  },
+);
+
+it("ignores operations outside the explicit service", async () => {
   await tester
     .expect(
-      `${header}
-      @armResourceOperations
-      interface ProviderOperations {
-        /*start*/startProvider is ArmProviderActionAsync<
-          Request = void, Response = void, LroHeaders = PlainLocationHeaders
-        >;
-        /*stop*/stopProvider is ArmProviderActionAsync<
-          Request = void, Response = void, LroHeaders = PlainLocationHeaders
-        >;
+      `
+      @service namespace SelectedArmProgram {}
+      namespace Outside {
+        @patch op update(): { @statusCode statusCode: 202; @header("Location") location?: string; };
       }
     `,
     )
-    .toEmitDiagnostics(({ start, stop }) =>
-      [start, stop].map((operation) => ({
+    .toBeValid();
+});
+
+it("checks concrete endpoints in nested namespaces but not templates or their instances", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace SelectedArmProgram;
+      model Accepted { @statusCode statusCode: 202; }
+      @patch op update<T>(): Accepted;
+      interface Template<T> { @patch update(): Accepted; }
+      alias Instance = Template<string>;
+      namespace Nested {
+        @route("/one") op /*first*/first is update<string>;
+        @route("/two") op /*second*/second is Instance.update;
+      }
+    `,
+    )
+    .toEmitDiagnostics(({ first, second }) =>
+      [first, second].map((operation) => ({
         ...diagnostic,
         pos: getSourceLocation(operation).pos,
         end: getSourceLocation(operation).end,
