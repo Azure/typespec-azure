@@ -30,7 +30,7 @@ const header = `
     @header("Operation-Location") operationLocation: string;
   }
 
-  model Failure<T> {
+  @error model Failure<T> {
     @statusCode statusCode: 400;
     @body body: T;
   }
@@ -78,15 +78,13 @@ it("accepts the standard error from ARM templates", async () => {
     .toBeValid();
 });
 
-it.each([
-  "{ ...CommonTypes.ErrorResponse; @statusCode status: 400; @header requestId: string; }",
-  "SpreadError",
-  "CopiedError",
-])("rejects implicit standard error wrappers with HTTP metadata: %s", async (response) => {
-  await tester
-    .expect(
-      `${header}
-        model SpreadError {
+it.each(["SpreadError", "CopiedError"])(
+  "rejects marked implicit standard error wrappers with HTTP metadata: %s",
+  async (response) => {
+    await tester
+      .expect(
+        `${header}
+        @error model SpreadError {
           ...CommonTypes.ErrorResponse;
           @statusCode status: 400;
           @header requestId: string;
@@ -98,15 +96,16 @@ it.each([
         @route("/wrapped") @post
         op wrapped(): Accepted | ${response};
       `,
-    )
-    .toEmitDiagnostics([diagnostic]);
-});
+      )
+      .toEmitDiagnostics([diagnostic]);
+  },
+);
 
 it("accepts direct and explicit standard error bodies with HTTP metadata", async () => {
   await tester
     .expect(
       `${header}
-        model ExplicitError {
+        @error model ExplicitError {
           @statusCode status: 400;
           @header requestId: string;
           @body body: CommonTypes.ErrorResponse;
@@ -203,29 +202,40 @@ it("rejects binary and multipart error payloads", async () => {
   await tester
     .expect(
       `${header}
+        @error model BinaryError {
+          @statusCode statusCode: 500;
+          @header contentType: "application/octet-stream";
+          @body body: bytes;
+        }
+        @error model MultipartError {
+          @statusCode statusCode: 500;
+          @multipartBody body: { part: HttpPart<string>; };
+        }
         @route("/binary") @post
-        op binary(): Accepted |
-          { @statusCode statusCode: 500; @header contentType: "application/octet-stream"; @body body: bytes; };
+        op binary(): Accepted | BinaryError;
         @route("/multipart") @post
-        op multipart(): Accepted |
-          { @statusCode statusCode: 500; @multipartBody body: { part: HttpPart<string>; }; };
+        op multipart(): Accepted | MultipartError;
       `,
     )
     .toEmitDiagnostics([diagnostic, diagnostic]);
 });
 
-it("checks default, explicit, and ranged error status codes", async () => {
+it("checks marked errors with default, explicit, and ranged status codes", async () => {
   await tester
     .expect(
       `${header}
         @error model DefaultError { code: string; }
+        @error model ExplicitError { @statusCode statusCode: 503; @body body: string; }
+        @error model RangedError {
+          @statusCode @minValue(400) @maxValue(499) statusCode: int32;
+          @body body: string;
+        }
         @route("/default") @post
         op defaultError(): Accepted | DefaultError;
         @route("/explicit") @post
-        op explicitError(): Accepted | { @statusCode statusCode: 503; @body body: string; };
+        op explicitError(): Accepted | ExplicitError;
         @route("/range") @post
-        op rangedError(): Accepted |
-          { @statusCode @minValue(400) @maxValue(499) statusCode: int32; @body body: string; };
+        op rangedError(): Accepted | RangedError;
       `,
     )
     .toEmitDiagnostics([diagnostic, diagnostic, diagnostic]);
@@ -236,10 +246,9 @@ it("reports once across multiple error responses", async () => {
     .expect(
       `${header}
         @error model Custom { code: string; }
+        @error model ServerError { @statusCode statusCode: 500; @body body: string; }
         @route("/run") @post
-        op run(): Accepted | Custom |
-          { @statusCode statusCode: 400; @body body: string; } |
-          { @statusCode statusCode: 500; @body body: string; };
+        op run(): Accepted | Custom | Failure<string> | ServerError;
       `,
     )
     .toEmitDiagnostics([diagnostic]);
@@ -302,7 +311,8 @@ it.each(["get", "post"])("rejects bodyless %s errors", async (verb) => {
   await tester
     .expect(
       `${header}
-      @route("/sync") @${verb} op sync(): Accepted | { @statusCode statusCode: 400; };
+      @error model BodylessError { @statusCode statusCode: 400; }
+      @route("/sync") @${verb} op sync(): Accepted | BodylessError;
     `,
     )
     .toEmitDiagnostics(diagnostic);
@@ -321,9 +331,9 @@ it("accepts a bodyless explicit HEAD error", async () => {
   await tester
     .expect(
       `${header}
+        @error model HeadError { @statusCode statusCode: 400; }
         @head @route("/exists")
-        op exists(): { @statusCode statusCode: 204; } |
-          { @statusCode statusCode: 400; };
+        op exists(): { @statusCode statusCode: 204; } | HeadError;
       `,
     )
     .toBeValid();
@@ -361,4 +371,169 @@ it("reports a shared operation declaration once across template instantiations",
       `,
     )
     .toEmitDiagnostics([diagnostic]);
+});
+
+it.each([
+  "model Unmarked { @statusCode statusCode: 400; @body body: string; }",
+  "model Unmarked { @statusCode statusCode: 500; @body body: CommonTypes.ErrorResponse; }",
+  "model Unmarked { @statusCode @minValue(400) @maxValue(499) statusCode: int32; @body body: string; }",
+])("requires a marked error rather than an HTTP error status: %s", async (declaration) => {
+  await tester
+    .expect(
+      `${header}
+      ${declaration}
+      @route("/unmarked") @get op unmarked(): Accepted | Unmarked;
+    `,
+    )
+    .toEmitDiagnostics({
+      ...diagnostic,
+      message: useStandardErrorRule.messages.missingErrorResponse,
+    });
+});
+
+it("requires a marked error even on HEAD", async () => {
+  await tester
+    .expect(
+      `${header}
+      @head @route("/unmarked")
+      op unmarked(): { @statusCode statusCode: 204; } | { @statusCode statusCode: 400; };
+    `,
+    )
+    .toEmitDiagnostics({
+      ...diagnostic,
+      message: useStandardErrorRule.messages.missingErrorResponse,
+    });
+});
+
+it.each(["string", "CommonTypes.ErrorResponse"])(
+  "checks marked errors with a non-error HTTP status: %s",
+  async (payload) => {
+    const expectation = tester.expect(
+      `${header}
+      @error model Marked {
+        @statusCode statusCode: 200;
+        @body body: ${payload};
+      }
+      @route("/marked") @get op marked(): Marked;
+    `,
+    );
+    if (payload === "string") {
+      await expectation.toEmitDiagnostics(diagnostic);
+    } else {
+      await expectation.toBeValid();
+    }
+  },
+);
+
+it.each(["string", "CommonTypes.ErrorResponse"])(
+  "recognizes inherited error markers: %s",
+  async (payload) => {
+    const expectation = tester.expect(
+      `${header}
+      @error model Marked {}
+      model Inherited extends Marked {
+        @statusCode statusCode: 200;
+        @body body: ${payload};
+      }
+      @route("/inherited") @get op inherited(): Inherited;
+    `,
+    );
+    if (payload === "string") {
+      await expectation.toEmitDiagnostics(diagnostic);
+    } else {
+      await expectation.toBeValid();
+    }
+  },
+);
+
+it.each(["Unmarked | Marked", "Marked | Unmarked"])(
+  "ignores unmarked payloads sharing a status with a marked standard error: %s",
+  async (responses) => {
+    await tester
+      .expect(
+        `${header}
+        model Unmarked { @statusCode statusCode: 400; @body body: string; }
+        @error model Marked {
+          @statusCode statusCode: 400;
+          @body body: CommonTypes.ErrorResponse;
+        }
+        @route("/shared") @get op shared(): ${responses};
+      `,
+      )
+      .toBeValid();
+  },
+);
+
+it.each(["Unmarked | Marked", "Marked | Unmarked"])(
+  "checks every marked variant sharing a non-error status: %s",
+  async (responses) => {
+    await tester
+      .expect(
+        `${header}
+        model Unmarked { @statusCode statusCode: 200; @body body: CommonTypes.ErrorResponse; }
+        @error model Marked { @statusCode statusCode: 200; @body body: string; }
+        @route("/shared") @get op shared(): ${responses};
+      `,
+      )
+      .toEmitDiagnostics(diagnostic);
+  },
+);
+
+it.each(["Standard | Custom", "Custom | Standard"])(
+  "rejects a custom marked variant sharing a status with a standard error: %s",
+  async (responses) => {
+    await tester
+      .expect(
+        `${header}
+        @error model Standard {
+          @statusCode statusCode: 200;
+          @body body: CommonTypes.ErrorResponse;
+        }
+        @error model Custom { @statusCode statusCode: 200; @body body: string; }
+        @route("/shared") @get op shared(): ${responses};
+      `,
+      )
+      .toEmitDiagnostics(diagnostic);
+  },
+);
+
+it("checks marked errors inside nested return unions", async () => {
+  await tester
+    .expect(
+      `${header}
+      @error model Custom { @statusCode statusCode: 200; @body body: string; }
+      alias Errors = Custom | CommonTypes.ErrorResponse;
+      @route("/nested") @get op nested(): Accepted | Errors;
+    `,
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+
+it("accepts bodyless marked HEAD errors with Content-Type metadata", async () => {
+  await tester
+    .expect(
+      `${header}
+      @error model HeadError {
+        @statusCode statusCode: 400;
+        @header contentType: "application/json";
+      }
+      @head @route("/exists") op exists(): HeadError;
+    `,
+    )
+    .toBeValid();
+});
+
+it("does not treat error models nested inside a discriminated payload as error responses", async () => {
+  await tester
+    .expect(
+      `${header}
+      @error model Custom { message: string; }
+      @discriminated union Payload { failure: Custom, success: string }
+      @route("/payload") @get op payload(): Payload;
+    `,
+    )
+    .toEmitDiagnostics({
+      ...diagnostic,
+      message: useStandardErrorRule.messages.missingErrorResponse,
+    });
 });
