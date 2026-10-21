@@ -12,32 +12,7 @@ the common name. Diagnostics target the original operation.
 The rule is disabled by default in the `client-sdk` ruleset. It does not select
 an emitter or API-version projection, or reconstruct historical renamed names.
 
-Use this shared setup before each ARM example:
-
-```typespec
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-import "@azure-tools/typespec-client-generator-core";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.ResourceManager;
-using Azure.ClientGenerator.Core;
-
-@armProviderNamespace
-@service
-@armCommonTypesVersion(CommonTypes.Versions.v5)
-namespace Example;
-
-model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName") @segment("widgets") name: string;
-}
-
-model WidgetProperties {
-  provisioningState?: ResourceProvisioningState;
-}
-```
+These examples assume `Widget` and `WidgetProperties` are defined ARM resource types.
 
 #### ❌ Incorrect
 
@@ -72,10 +47,6 @@ the common SDK name without renaming the TypeSpec operation:
 ```typespec
 @armResourceOperations
 interface Widgets {
-  @clientName("createOrUpdate")
-  replace is ArmResourceCreateOrReplaceAsync<Widget>;
-  @clientName("updateWidget")
-  modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
   @clientName("deleteWidget")
   remove is ArmResourceDeleteSync<Widget>;
 }

@@ -1,5 +1,13 @@
-import { createRule, fileRef, paramMessage } from "@typespec/compiler";
-import { getAllHttpServices } from "@typespec/http";
+import {
+  createRule,
+  fileRef,
+  isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
+  listServices,
+  paramMessage,
+  type Namespace,
+} from "@typespec/compiler";
+import { getHttpOperation } from "@typespec/http";
 import { createTCGCContext } from "../context.js";
 import { AllScopes } from "../internal-utils.js";
 import { getLibraryName } from "../public-utils.js";
@@ -22,22 +30,50 @@ export const useCorrectVerbRule = createRule({
       "@azure-tools/typespec-client-generator-core",
       { mutateNamespace: false },
     );
+    const serviceNamespaces = new Set(listServices(context.program).map((service) => service.type));
+    const globalNamespace = context.program.getGlobalNamespaceType();
 
     return {
-      root: () => {
-        const [services] = getAllHttpServices(context.program);
-        for (const service of services) {
-          for (const { operation, verb } of service.operations) {
-            if (verb !== "put" && verb !== "patch" && verb !== "delete") continue;
-            const prefix = verbPrefixes[verb];
-            const operationName = getLibraryName(tcgcContext, operation, AllScopes);
-            if (!operationName.toLowerCase().startsWith(prefix)) {
-              context.reportDiagnostic({
-                target: operation,
-                format: { verb: verb.toUpperCase(), operationName, prefix },
-              });
-            }
+      operation: (operation) => {
+        if (isTemplateDeclarationOrInstance(operation)) return;
+        const container = operation.interface ?? operation.namespace;
+        const namespace = operation.interface?.namespace ?? operation.namespace;
+        if (!container || !namespace || container.operations.get(operation.name) !== operation) {
+          return;
+        }
+        if (
+          operation.interface &&
+          (isTemplateDeclaration(operation.interface) ||
+            namespace.interfaces.get(operation.interface.name) !== operation.interface)
+        ) {
+          return;
+        }
+
+        // HTTP's implicit global service is nonrecursive, including only direct interfaces.
+        let eligible =
+          namespace === globalNamespace &&
+          (serviceNamespaces.size === 0 || serviceNamespaces.has(globalNamespace));
+        for (
+          let ancestor: Namespace | undefined = namespace;
+          ancestor && ancestor !== globalNamespace;
+          ancestor = ancestor.namespace
+        ) {
+          if (serviceNamespaces.has(ancestor)) {
+            eligible = true;
+            break;
           }
+        }
+        if (!eligible) return;
+
+        const [{ verb }] = getHttpOperation(context.program, operation);
+        if (verb !== "put" && verb !== "patch" && verb !== "delete") return;
+        const prefix = verbPrefixes[verb];
+        const operationName = getLibraryName(tcgcContext, operation, AllScopes);
+        if (!operationName.toLowerCase().startsWith(prefix)) {
+          context.reportDiagnostic({
+            target: operation,
+            format: { verb: verb.toUpperCase(), operationName, prefix },
+          });
         }
       },
     };

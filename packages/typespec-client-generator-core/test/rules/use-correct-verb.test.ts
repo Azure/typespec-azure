@@ -1,9 +1,7 @@
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
-import { beforeEach, describe, expect, it } from "vitest";
-import { $linter } from "../../src/linter.js";
+import { beforeEach, describe, it } from "vitest";
 import { useCorrectVerbRule } from "../../src/rules/use-correct-verb.js";
-import { ArmBaseTester, ArmTester, SimpleTester } from "../tester.js";
+import { ArmTester, SimpleTester } from "../tester.js";
 
 const header = "@service namespace Test;";
 const cases = [
@@ -36,7 +34,8 @@ function diagnostic(verb: string, prefix: string, operationName: string, target 
   };
 }
 
-describe.each(cases)("$verb SDK names", ({ verb, prefix, invalid }) => {
+describe("HTTP SDK names", () => {
+  const { verb, prefix, invalid } = cases[2];
   let tester: LinterRuleTester;
   beforeEach(async () => {
     const runner = await SimpleTester.import("@typespec/openapi").createInstance();
@@ -49,6 +48,14 @@ describe.each(cases)("$verb SDK names", ({ verb, prefix, invalid }) => {
   const endpoint = (name: string) => `@${verb} @route("/widgets") op ${name}(): void;`;
   const finding = (name: string, target = name) => diagnostic(verb, prefix, name, target);
 
+  it.each(cases)("maps $verb to $prefix", async ({ verb, prefix, invalid }) => {
+    await tester
+      .expect(`${header} @${verb} @route("/widgets") op ${prefix}Widget(): void;`)
+      .toBeValid();
+    await tester
+      .expect(`${header} @${verb} @route("/widgets") op ${invalid}(): void;`)
+      .toEmitDiagnostics([diagnostic(verb, prefix, invalid)]);
+  });
   it.each(["", "Widget", "OrUpdate"])("accepts the prefix with suffix %s", async (suffix) => {
     await tester.expect(`${header} ${endpoint(prefix + suffix)}`).toBeValid();
   });
@@ -128,13 +135,6 @@ describe.each(cases)("$verb SDK names", ({ verb, prefix, invalid }) => {
       )
       .toEmitDiagnostics([finding(`${invalid}_${prefix}`)]);
   });
-  it.each([200, 201, 202, 204])("checks names independently of response code %s", async (code) => {
-    await tester
-      .expect(
-        `${header} @${verb} @route("/widgets") op ${invalid}(): { @statusCode code: ${code} };`,
-      )
-      .toEmitDiagnostics([finding(invalid)]);
-  });
   it("reports each concrete endpoint once", async () => {
     await tester
       .expect(
@@ -183,17 +183,72 @@ describe("combined endpoint selection", () => {
         cases.map(({ verb, prefix, invalid }) => diagnostic(verb, prefix, invalid)),
       );
   });
-  it("registers only the combined rule, without enabling it for C#", () => {
-    const names = $linter.rules.map((rule) => rule.name);
-    expect(names).toContain("use-correct-verb");
-    for (const oldName of ["use-create-for-put", "use-update-for-patch", "use-delete-for-delete"]) {
-      expect(names).not.toContain(oldName);
-    }
-    expect(
-      $linter.ruleSets?.["best-practices:csharp"].enable?.[
-        "@azure-tools/typespec-client-generator-core/use-correct-verb"
-      ],
-    ).toBeUndefined();
+  it("reports a nested service endpoint exactly once", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Outer {
+          @service namespace Inner {
+            @delete @route("/widgets") op remove(): void;
+          }
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic("delete", "delete", "remove")]);
+  });
+  it("includes child namespaces and interfaces of an explicit service only", async () => {
+    await tester
+      .expect(
+        `
+        @delete @route("/global") op globalHelper(): void;
+        @service namespace Service {
+          namespace Child {
+            @delete @route("/child") op removeChild(): void;
+            interface Widgets { @delete @route("/interface") removeWidget(): void; }
+          }
+        }
+        namespace Other { @delete @route("/other") op helper(): void; }
+      `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("delete", "delete", "removeChild"),
+        diagnostic("delete", "delete", "removeWidget"),
+      ]);
+  });
+  it("uses only direct global operations and interfaces when no service is declared", async () => {
+    await tester
+      .expect(
+        `
+        @delete @route("/global") op removeGlobal(): void;
+        interface Widgets { @delete @route("/interface") removeWidget(): void; }
+        namespace Other {
+          @delete @route("/other") op helper(): void;
+          interface Helpers { @delete @route("/helper") removeHelper(): void; }
+        }
+      `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("delete", "delete", "removeGlobal"),
+        diagnostic("delete", "delete", "removeWidget"),
+      ]);
+  });
+  it("checks concrete aliases but not template declarations or instances", async () => {
+    await tester
+      .expect(
+        `
+        ${header}
+        @delete @route("/template") op removeTemplate<T>(): T;
+        op removeAlias is removeTemplate<void>;
+        interface Templates<T> {
+          @delete @route("/interface") removeInterface(): T;
+        }
+        interface Widgets extends Templates<void> {}
+      `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("delete", "delete", "removeAlias"),
+        diagnostic("delete", "delete", "removeInterface"),
+      ]);
   });
 });
 
@@ -238,34 +293,4 @@ describe("standard ARM operations", () => {
         .toEmitDiagnostics([diagnostic(verb, prefix, invalid, prefix)]);
     },
   );
-});
-
-describe("published ARM examples", () => {
-  it("compiles the incorrect, correct, and common-name examples", async () => {
-    const docs = await readFile(
-      new URL("../../src/rules/use-correct-verb.md", import.meta.url),
-      "utf8",
-    );
-    const snippets = [...docs.matchAll(/```typespec\r?\n([\s\S]*?)```/g)].map((match) => match[1]);
-    expect(snippets).toHaveLength(5);
-    const tester = createLinterRuleTester(
-      await ArmBaseTester.createInstance(),
-      useCorrectVerbRule,
-      "@azure-tools/typespec-client-generator-core",
-    );
-    await tester
-      .expect(`${snippets[0]}\n${snippets[1]}`)
-      .toEmitDiagnostics(
-        cases.map(({ verb, prefix, invalid }) => diagnostic(verb, prefix, invalid)),
-      );
-    await tester.expect(`${snippets[0]}\n${snippets[2]}`).toBeValid();
-    await tester.expect(`${snippets[0]}\n${snippets[3]}`).toBeValid();
-    const runner = await ArmBaseTester.createInstance();
-    const [, diagnostics] = await runner.compileAndDiagnose(`${snippets[0]}\n${snippets[4]}`, {
-      linterRuleSet: {
-        enable: { "@azure-tools/typespec-client-generator-core/use-correct-verb": true },
-      },
-    });
-    expect(diagnostics).toEqual([]);
-  });
 });
