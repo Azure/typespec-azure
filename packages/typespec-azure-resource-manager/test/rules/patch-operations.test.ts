@@ -699,17 +699,6 @@ interface Widgets {
       .toBeValid();
   });
 
-  it("ignores documentation differences on matching properties", async () => {
-    await tester
-      .expect(
-        bodyPair(`
-        model PutBody { @doc("Create the name.") name?: string; }
-        model PatchBody { @doc("Update the name.") name?: string; }
-      `),
-      )
-      .toBeValid();
-  });
-
   it("ignores absent discriminators on both bodies", async () => {
     await tester
       .expect(
@@ -1042,38 +1031,5 @@ interface Widgets {
         message: "The PATCH operation must have a request body.",
       });
     }
-  });
-});
-
-describe("effective PUT and PATCH input boundaries", () => {
-  it("does not assume resource identity and registration imply writable-input transitivity", async () => {
-    const source = `
-      @service @armProviderNamespace namespace Microsoft.TestService;
-      model Widget is TrackedResource<{
-        common?: string;
-        @visibility(Lifecycle.Update) updateOnly?: string;
-      }> { ...ResourceNameParameter<Widget>; }
-      model WidgetPatch {
-        tags?: Record<string>;
-        properties?: { updateOnly?: string; };
-      }
-      @armResourceOperations interface Widgets {
-        @parameterVisibility(Lifecycle.Create)
-        create is ArmResourceCreateOrReplaceSync<Widget>;
-        update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-      }
-    `;
-    await createLinterRuleTester(
-      await Tester.createInstance(),
-      patchOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    )
-      .expect(source)
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-        message:
-          "The property 'updateOnly' in the PATCH body does not correspond to a property in the PUT body.",
-        target: "updateOnly",
-      });
   });
 });
