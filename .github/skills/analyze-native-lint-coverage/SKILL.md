@@ -146,6 +146,14 @@ fork evidence and verifying portable replay are orchestration steps, not
 automatic CLI features. Refresh creates a new baseline; it never replaces the
 selected immutable one.
 
+Follow [specs source retention](../do-linter-development-task-one-by-one/evidence.md#specs-source-retention)
+as well as result storage. Prefer preserving the frozen source on a run-specific
+branch in the verified existing personal specs fork. Record and verify its
+repository/ref/SHA; keep authored source changes separate from runtime injection
+and generated data. Unchanged, independently fetchable canonical source can be
+recorded as a fallback. A source branch does not replace the baseline/assets or
+prove portable CLI reuse.
+
 ## Prepare candidate artifacts
 
 Read that checkout's toolchain and package-manager configuration. Check mise
@@ -340,6 +348,13 @@ many-to-many scope explicitly; never replace them with a combined coverage
 percentage.
 For publication, put concise, reproducible pilot evidence in authored tooling
 documentation; keep generated corpora and machine-specific payloads out of Git.
+The skill's orchestration must push the dedicated personal-fork evidence branch,
+verify its actual remote head and return immutable note/receipt links. Include
+the specs retention method and the instructions needed to recover inputs and
+regenerate data and `migration.md`. Distinguish reading saved evidence,
+reanalyzing downloaded observations and fully rerunning the frozen comparison;
+report which paths were actually verified. Do not call a local worktree alone
+durable publication or a count-audit replay full regeneration.
 
 This skill does not replace native rule tests, default-activation integration
 tests, normal external-integration checks, documentation validation, independent

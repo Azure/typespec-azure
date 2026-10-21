@@ -80,6 +80,9 @@ whole input and both publication roles before costly setup. Resources are:
 - Isolated writable specs runtime at the selected baseline's specs commit.
 - Evidence worktree/branch in the verified signed-in user's personal fork.
   The evidence role is not permission for a fork native/skill PR.
+- Specs source retention under the [evidence contract](evidence.md#specs-source-retention):
+  prefer a verified personal specs preservation branch at the frozen source SHA,
+  with source recovery and publication capability recorded separately.
 - A versioned tooling checkout and immutable validation snapshot only when
   needed. Canonical `main` need not contain the comparison package or skills.
 
@@ -209,7 +212,8 @@ explicit prerequisite blocker, not permission to weaken a gate.
 ## Ledger, recovery and finish criteria
 
 Keep task ID, `flowVersion`, membership revision, per-member outcome, contract,
-native/evidence publication bindings, exact runtime/tooling paths and hashes,
+native/evidence publication bindings, specs retention repository/ref/SHA or
+documented fallback, exact runtime/tooling paths and hashes,
 baseline ID, candidate snapshot/source/artifacts, fixture/claim map, validation
 plan/results, A/B local and GitHub receipts, PR tuple, evidence commit/assets,
 original deadlines/dispatch IDs, recovery decisions and append-only history.

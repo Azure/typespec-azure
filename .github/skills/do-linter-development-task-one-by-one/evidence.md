@@ -61,6 +61,46 @@ block publication rather than authorizing a force-push. Writable specs execution
 also needs exclusive ownership or a separate runtime. Preserve staging and
 failure receipts; publish a complete manifest only after integrity verification.
 
+## Specs source retention
+
+Generated coverage data does not replace the TypeSpec source needed to regenerate
+it. Preserve the selected specs commit, including its examples, external Swagger,
+common types, configuration and dependency manifests/locks. Keep those source
+inputs separate from generated reports and candidate package assets.
+
+For durable regeneration, prefer a run-specific preservation branch in the
+signed-in user's existing personal fork of `Azure/azure-rest-api-specs`.
+Discover the actual fork and verify its canonical parent, write permission,
+publication owner and exact destination ref independently of the TypeSpec Azure
+evidence fork. Never guess the owner from a remote name, reuse an unrelated
+branch, create a fork automatically or publish a specs PR for this purpose.
+The evidence publisher may manage this auxiliary ref only when its backend can
+explicitly address that repository.
+
+For unchanged source, create the preservation branch at the **exact frozen
+specs commit**, not today's upstream tip. No extra commit or source copy is
+needed. For reuse, verify the recorded branch still points to that SHA; do not
+move it. A new source snapshot needs a new preservation ref. Verify remote
+readback/fetch and record the canonical repository/selected SHA plus personal
+repository/ref/SHA in the publication receipt and `migration.md`.
+
+If authored specs changes are required, commit only the reviewed source changes
+on a dedicated personal specs branch **before** selecting the clean validation
+snapshot. Record both the upstream base and tested commit. That changed commit
+requires a new baseline; never append changes to a branch backing sealed
+evidence. Keep runtime injection overlays, temporary configs, `node_modules`,
+caches and generated corpora out of the source branch. Retain their necessary
+commands, inputs and package hashes in the evidence instead.
+
+A personal specs branch is not technically necessary when the unchanged
+canonical commit can be fetched independently. If no suitable existing fork or
+publication capability is available, record that verified canonical source or
+a checksummed source bundle as the retention method and state its limits.
+If required source cannot be recovered, ask for the missing fork/access or an
+approved archival destination; do not claim reproducible regeneration.
+Preserving a source ref alone does not establish baseline compatibility, lock
+all runtime dependencies or prove a full rerun.
+
 ## Provenance without circular commits
 
 Validate immutable candidate snapshot `S` and packages `P`. After required
@@ -96,6 +136,27 @@ assets, verify hashes and compatibility, and reconstruct inputs without the
 original development worktree or Copilot session directory. A replay must use
 the recorded specs commit and closure, not resolve latest again. Test this
 round trip before claiming portable reuse.
+
+Push the evidence branch and return its repository/ref, actual pushed commit,
+immutable `migration.md` link, specs retention tuple and asset/verification
+receipts. Local commits or ignored output alone do not satisfy publication.
+Preserve the following distinct recovery paths:
+
+- **Read saved evidence:** retrieve the committed note, manifests and linked
+  assets without rerunning either linter.
+- **Reanalyze saved observations:** retain a dependency-free helper or exact
+  commands to regenerate numerical reports from downloaded observations. Verify
+  the claimed outputs independently; this does not rerun native diagnostics or
+  restore a sealed CLI baseline.
+- **Regenerate coverage and the migration note:** retain the exact tooling,
+  candidate/core and specs source identities; artifacts, dependency/runtime
+  identities and available locks; mapping/options and population policies; and
+  build, injection, validation and analysis commands. Recover source from the
+  preserved specs ref and verify its SHA before execution. Rerun required
+  semantic controls and gap investigations before writing a new `migration.md`;
+  counts alone cannot regenerate its equivalence conclusion. Record unavailable
+  runtime locks and untested reruns explicitly. Do not promise identical counts
+  or prose without evidence.
 
 Required failures/unfinished investigations remain visible and block their
 corresponding success claim. Final success requires the verified native head,

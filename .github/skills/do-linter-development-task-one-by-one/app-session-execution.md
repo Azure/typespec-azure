@@ -24,6 +24,10 @@ branch using [the evidence contract](evidence.md). This is a separate role and
 narrow fork exception, not permission to publish native/skill PR heads there.
 Do not route fork evidence through a session-bound native PR creation tool.
 If the required backend cannot address both roles safely, stop before setup.
+Specs preservation refs are auxiliary evidence writes to a separately verified
+personal specs fork, not native/skill PR heads. Verify explicit repository/ref
+capability under [source retention](evidence.md#specs-source-retention); a session
+binding to TypeSpec Azure does not authorize writing to the specs repository.
 
 Native-first does not change existing legacy PR bases/heads, app comparison
 bindings or post-merge authorizations. Record `flowVersion` in every dispatch,
