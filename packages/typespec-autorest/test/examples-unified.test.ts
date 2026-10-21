@@ -97,6 +97,40 @@ async function compileVersioned(
 }
 
 describe("unified examples format", () => {
+  it("reports a misspelled operation for each applicable API version", async () => {
+    tester.fs.add(
+      resolveVirtualPath("./examples.yaml"),
+      versionedExamplesYaml.replace("Widgets.get:", "Widgets.geet:"),
+    );
+    const [, diagnostics] = await tester.compileAndDiagnose(versionedSpec);
+    const errors = diagnostics.filter(
+      (diagnostic) =>
+        diagnostic.code === "@azure-tools/typespec-autorest/unknown-example-operation",
+    );
+    expect(errors).toHaveLength(2);
+    expect(errors.every((diagnostic) => diagnostic.severity === "error")).toBe(true);
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("Widgets.geet");
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("2023-01-01");
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("2023-06-01");
+  });
+
+  it("does not report a later operation before its example becomes applicable", async () => {
+    tester.fs.add(
+      resolveVirtualPath("./examples.yaml"),
+      versionedExamplesYaml.replace(
+        "Widgets.create:\n  - request:",
+        'Widgets.create:\n  - since: "2023-06-01"\n    request:',
+      ),
+    );
+    const [, diagnostics] = await tester.compileAndDiagnose(
+      versionedSpec.replace(
+        '@operationId("Widgets_Create")',
+        '@added(Versions.v2)\n  @operationId("Widgets_Create")',
+      ),
+    );
+    expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+  });
+
   it("materializes legacy x-ms-examples from examples.yaml (auto-detected)", async () => {
     const { v1 } = await compileVersioned(versionedExamplesYaml);
 

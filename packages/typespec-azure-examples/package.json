@@ -62,9 +62,18 @@
   ],
   "dependencies": {
     "ajv": "catalog:",
+    "ajv-formats": "catalog:",
     "picocolors": "catalog:",
     "yaml": "catalog:",
     "yargs": "catalog:"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@typespec/compiler": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "catalog:",

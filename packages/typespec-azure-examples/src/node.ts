@@ -6,3 +6,4 @@ export * from "./index.js";
 export * from "./migrate/index.js";
 export { formatDiagnostics, formatSummary } from "./reporter.js";
 export * from "./resolve/index.js";
+export { validateProjectExamples } from "./validate-project.js";

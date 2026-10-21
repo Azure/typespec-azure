@@ -1,5 +1,6 @@
 import { readdir, readFile } from "fs/promises";
 import { basename, dirname, isAbsolute, join, resolve, sep } from "path";
+import { resolveJsonReference } from "../resolve-ref.js";
 import type {
   ParameterLocation,
   SwaggerDocument,
@@ -75,31 +76,21 @@ export async function resolveParameterReferences(
   doc: SwaggerDocument,
   file: string,
 ): Promise<SwaggerDocument> {
-  const documents = new Map<string, SwaggerDocument>([[resolve(file), doc]]);
+  const documents = new Map<string, unknown>([[resolve(file), doc]]);
   async function resolveParameter(
     parameter: SwaggerParameter,
     fromFile: string,
     seen: ReadonlySet<string> = new Set(),
   ): Promise<SwaggerParameter> {
     if (parameter.$ref === undefined) return parameter;
-    const [filePart, fragment = ""] = parameter.$ref.split("#");
-    const targetFile = filePart ? resolve(dirname(fromFile), filePart) : resolve(fromFile);
-    const key = `${targetFile}#${fragment}`;
+    const key = `${fromFile}:${parameter.$ref}`;
     if (seen.has(key))
       throw new Error(`Circular parameter reference '${parameter.$ref}' in ${fromFile}.`);
-    let targetDoc = documents.get(targetFile);
-    if (targetDoc === undefined) {
-      targetDoc = JSON.parse(await readFile(targetFile, "utf-8")) as SwaggerDocument;
-      documents.set(targetFile, targetDoc);
-    }
-    let target: unknown = targetDoc;
-    for (const part of fragment.replace(/^\//, "").split("/").filter(Boolean)) {
-      const name = decodeURIComponent(part).replace(/~1/g, "/").replace(/~0/g, "~");
-      target =
-        target !== null && typeof target === "object"
-          ? (target as Record<string, unknown>)[name]
-          : undefined;
-    }
+    const { file: targetFile, value: target } = await resolveJsonReference(
+      parameter.$ref,
+      fromFile,
+      documents,
+    );
     if (target === null || typeof target !== "object" || Array.isArray(target)) {
       throw new Error(`Cannot resolve parameter reference '${parameter.$ref}' in ${fromFile}.`);
     }
