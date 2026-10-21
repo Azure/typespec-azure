@@ -10,6 +10,7 @@ export default {
     "@azure-tools/typespec-azure-core/casing-style": true,
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
     "@azure-tools/typespec-azure-core/no-boolean": false,
+    "@azure-tools/typespec-azure-core/no-redundant-summary": false,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
     "@azure-tools/typespec-azure-core/no-case-mismatch": true,
@@ -58,6 +59,7 @@ export default {
     // Azure resource manager
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
     "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": true,
+    "@azure-tools/typespec-azure-resource-manager/scope-path-segment-casing": false,
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
@@ -90,6 +92,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/resource-missing-read": false,
     "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
@@ -109,6 +112,9 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
     "@azure-tools/typespec-azure-resource-manager/use-model-request-body": false,
+    "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": false,
+    "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes": false,
+    "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
