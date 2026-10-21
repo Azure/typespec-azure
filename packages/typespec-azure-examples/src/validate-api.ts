@@ -36,6 +36,8 @@ export async function validateApiExamples(
         const path = fileURLToPath(uri);
         const document = documents.get(path) ?? JSON.parse(await readFile(path, "utf-8"));
         documents.set(path, document);
+        if (typeof document === "boolean") return { allOf: [document] };
+        if (!isObject(document)) throw new Error(`Invalid API schema document '${uri}'.`);
         return normalizeSchema(document, direction);
       },
     });
