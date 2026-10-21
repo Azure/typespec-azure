@@ -3,7 +3,7 @@ import {
   createRule,
   fileRef,
   getProperty,
-  isTemplateInstance,
+  isTemplateDeclarationOrInstance,
   paramMessage,
   walkPropertiesInherited,
 } from "@typespec/compiler";
@@ -23,7 +23,10 @@ export const noRepeatedPathInfoRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
-        if (isTemplateInstance(operation) || isTemplatedInterfaceOperation(operation)) {
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          isTemplatedInterfaceOperation(operation)
+        ) {
           return;
         }
 

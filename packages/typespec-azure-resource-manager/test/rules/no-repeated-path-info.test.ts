@@ -217,6 +217,29 @@ it("checks ordinary project namespaces without provider metadata", async () => {
     .toEmitDiagnostics([diagnostic()]);
 });
 
+it.each([true, false])(
+  "checks concrete inherited PUT operations with repeated properties: %s",
+  async (repeats) => {
+    const expectation = tester.expect(`
+      model Properties { /*repeated*/${repeats ? "widgetName" : "description"}?: string; }
+      interface Templates<T> {
+        @put @route("/widgets/{widgetName}")
+        op create(@path widgetName: string, @body body: T): void;
+      }
+      interface Widgets extends Templates<{ properties: Properties }> {}
+    `);
+    if (repeats) {
+      await expectation.toEmitDiagnostics(({ repeated }) => ({
+        ...diagnostic(),
+        pos: getSourceLocation(repeated).pos,
+        end: getSourceLocation(repeated).end,
+      }));
+    } else {
+      await expectation.toBeValid();
+    }
+  },
+);
+
 describe("URI and envelope name boundaries", () => {
   it.each(["widgetName", "identity"])(
     "selects the URI name independently of envelope names with @key(%s)",
