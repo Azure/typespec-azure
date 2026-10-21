@@ -57,6 +57,13 @@ file-independent JSON paths, raw native diagnostics, and distinct native source
 targets remain separate measures. The tool reports positive and negative count
 differences separately and does not decide semantic equivalence.
 
+Validator findings distinguish the invoked input file (`validatorInputFile`)
+from the document named by the validator (`swaggerFile` when attribution is
+`reported`). AutoRest can validate referenced documents during one invocation,
+so the two files need not match. Raw findings remain unchanged in number.
+`sourceDocuments` and `sourceAttribution` preserve ambiguous or missing source
+information; those cases are not exact file-level identities.
+
 ## Supported CLI
 
 From `packages\typespec-lintdiff`, with the **specs-declared package manager**

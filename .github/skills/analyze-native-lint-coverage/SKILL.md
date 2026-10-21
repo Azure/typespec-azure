@@ -309,6 +309,11 @@ versions, references, suppression, and infrastructure failures. JSON paths and
 source locations are different identities; do not use fuzzy or property-name
 matching to declare exact correspondence.
 
+Inspect validator-reported source documents, not just CLI input filenames.
+AutoRest can diagnose a referenced document while validating another input.
+Retain `validatorInputFile`, `sourceDocuments` and source attribution; ambiguous
+or missing attribution must not become a claimed exact file-level identity.
+
 For groups apply the
 [diagnostic-count policy](../do-linter-development-task-one-by-one/native-first.md#counts-completeness-and-correspondence).
 Raw counts are the starting observation; primary comparable counts need an

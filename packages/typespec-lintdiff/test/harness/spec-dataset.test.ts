@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   aggregateResults,
@@ -140,6 +140,68 @@ describe("spec dataset results", () => {
         path: [],
       },
     ]);
+  });
+
+  it("distinguishes the reported document from the validator invocation input", () => {
+    const dataset = path.resolve("dataset with spaces");
+    const document = path.join(dataset, "swagger", "common.json");
+    const stdout = JSON.stringify({
+      level: "warning",
+      code: "ExampleRule",
+      source: [{ document: pathToFileURL(document).href }],
+      details: { jsonpath: ["definitions", "Flag"] },
+    });
+    const findings = ["swagger/one.json", "swagger/two.json"].flatMap((input) =>
+      parseViolations(stdout, project, input, dataset),
+    );
+    expect(findings).toHaveLength(2);
+    expect(findings.map((item) => item.swaggerFile)).toEqual([
+      "swagger/common.json",
+      "swagger/common.json",
+    ]);
+    expect(findings.map((item) => item.validatorInputFile)).toEqual([
+      "swagger/one.json",
+      "swagger/two.json",
+    ]);
+    expect(findings[0].sourceAttribution).toBe("reported");
+  });
+
+  it("retains ambiguous source attribution without dropping the finding", () => {
+    const dataset = path.resolve("dataset");
+    const stdout = JSON.stringify({
+      level: "warning",
+      code: "ExampleRule",
+      source: ["one.json", "two.json"].map((name) => ({
+        document: pathToFileURL(path.join(dataset, name)).href,
+      })),
+    });
+    const findings = parseViolations(stdout, project, "input.json", dataset);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({
+      swaggerFile: "input.json",
+      validatorInputFile: "input.json",
+      sourceDocuments: ["one.json", "two.json"],
+      sourceAttribution: "ambiguous",
+    });
+  });
+
+  it.each([
+    undefined,
+    [{ document: "not-a-file-url" }],
+    [{ document: "https://example.test/spec" }],
+  ])("retains findings without an attributable local source: %j", (source) => {
+    const findings = parseViolations(
+      JSON.stringify({ level: "warning", code: "ExampleRule", source }),
+      project,
+      "input.json",
+      path.resolve("dataset"),
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({
+      swaggerFile: "input.json",
+      validatorInputFile: "input.json",
+      sourceAttribution: "input-fallback",
+    });
   });
 
   it("groups normalized results by validator rule and level", () => {

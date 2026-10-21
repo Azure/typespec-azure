@@ -14,7 +14,7 @@ import { execFile, execFileSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { pathToFileURL } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import { promisify } from "util";
 
 const execFileAsync = promisify(execFile);
@@ -63,6 +63,10 @@ interface ValidatorViolation {
   level: "warning" | "error" | "fatal";
   project: string;
   swaggerFile: string;
+  validatorInputFile?: string;
+  sourceDocuments?: string[];
+  sourceAttribution?: "reported" | "ambiguous" | "input-fallback";
+  sourceResolutionErrors?: string[];
   message: string;
   path: Array<string | number>;
   details?: unknown;
@@ -793,6 +797,7 @@ export function parseViolations(
   stdout: string,
   project: ArmProject,
   swaggerFile: string,
+  datasetDir?: string,
 ): ValidatorViolation[] {
   const violations: ValidatorViolation[] = [];
   for (const line of stdout.split(/\r?\n/)) {
@@ -804,11 +809,58 @@ export function parseViolations(
       if (!["warning", "error", "fatal"].includes(value.level) || !value.code) {
         continue;
       }
+      let reportedFile: string | undefined;
+      const provenance: Pick<
+        ValidatorViolation,
+        "validatorInputFile" | "sourceDocuments" | "sourceAttribution" | "sourceResolutionErrors"
+      > = {};
+      if (datasetDir) {
+        const errors: string[] = [];
+        const documents: string[] = Array.isArray(value.source)
+          ? value.source.flatMap((source: unknown) =>
+              source &&
+              typeof source === "object" &&
+              "document" in source &&
+              typeof source.document === "string"
+                ? [source.document]
+                : [],
+            )
+          : [];
+        const resolved = documents.map((document: string) => {
+          try {
+            const relative = path.relative(datasetDir, fileURLToPath(document));
+            if (
+              relative &&
+              relative !== ".." &&
+              !relative.startsWith(`..${path.sep}`) &&
+              !path.isAbsolute(relative)
+            ) {
+              return { document, file: normalizeRelative(relative) };
+            }
+          } catch (error) {
+            errors.push(error instanceof Error ? error.message : String(error));
+          }
+          return { document, file: undefined };
+        });
+        const unique = [
+          ...new Map(resolved.map((source) => [source.file ?? source.document, source])).values(),
+        ];
+        reportedFile = unique.length === 1 ? unique[0].file : undefined;
+        provenance.validatorInputFile = swaggerFile;
+        provenance.sourceDocuments = unique.map((source) => source.file ?? source.document);
+        provenance.sourceAttribution = reportedFile
+          ? "reported"
+          : unique.length > 1
+            ? "ambiguous"
+            : "input-fallback";
+        if (errors.length > 0) provenance.sourceResolutionErrors = errors;
+      }
       violations.push({
         rule: String(value.code),
         level: value.level,
         project: project.sourcePath,
-        swaggerFile,
+        swaggerFile: reportedFile ?? swaggerFile,
+        ...provenance,
         message: String(value.message ?? ""),
         path: Array.isArray(value.details?.jsonpath) ? value.details.jsonpath : [],
         details: value.details,
@@ -909,7 +961,7 @@ async function validateProject(
       normalizeRelative(path.relative(config.datasetDir, stdoutPath)),
       normalizeRelative(path.relative(config.datasetDir, stderrPath)),
     );
-    violations.push(...parseViolations(stdout, project, relativeSwagger));
+    violations.push(...parseViolations(stdout, project, relativeSwagger, config.datasetDir));
   }
 
   return {
