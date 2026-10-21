@@ -139,12 +139,9 @@
           }
         }
       },
-      "patch": {
-        "operationId": "Widgets_CreateOrUpdateWidget",
-        "description": "Creates or updates a Widget asynchronously",
-        "consumes": [
-          "application/merge-patch+json"
-        ],
+      "put": {
+        "operationId": "Widgets_CreateOrReplaceWidget",
+        "description": "Creates or replaces a Widget asynchronously",
         "parameters": [
           {
             "$ref": "#/parameters/Azure.Core.Foundations.ApiVersionParameter"
@@ -183,7 +180,7 @@
             "description": "The resource instance.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetCreateOrUpdate"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
@@ -288,7 +285,7 @@
           }
         },
         "x-ms-long-running-operation-options": {
-          "final-state-via": "operation-location"
+          "final-state-via": "original-uri"
         },
         "x-ms-long-running-operation": true
       },
@@ -665,16 +662,6 @@
         "manufacturerId",
         "etag"
       ]
-    },
-    "WidgetCreateOrUpdate": {
-      "type": "object",
-      "description": "A widget.",
-      "properties": {
-        "manufacturerId": {
-          "type": "string",
-          "description": "The ID of the widget's manufacturer."
-        }
-      }
     },
     "WidgetServiceErrorResponse": {
       "type": "object",

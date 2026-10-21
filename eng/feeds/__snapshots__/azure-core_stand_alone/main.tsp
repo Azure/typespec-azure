@@ -7,6 +7,7 @@ using Http;
 using Rest;
 using Versioning;
 using Azure.Core;
+using Azure.Core.Traits;
 
 @useAuth(
   ApiKeyAuth<ApiKeyLocation.header, "api-key"> | OAuth2Auth<[
@@ -53,26 +54,28 @@ model FakedSharedModel {
   createdDate: utcDateTime;
 }
 
+alias Operations = Azure.Core.ResourceOperations<NoConditionalRequests &
+  NoRepeatableRequests &
+  NoClientRequestId>;
+
 interface Widgets {
   @doc("Fetch a Widget by name.")
-  getWidget is ResourceRead<Widget>;
+  getWidget is Operations.ResourceRead<Widget>;
 
   @doc("Gets status of a Widget operation.")
-  getWidgetOperationStatus is GetResourceOperationStatus<Widget>;
+  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
 
-  @doc("Creates or updates a Widget asynchronously.")
+  @doc("Creates or replaces a Widget asynchronously.")
   @pollingOperation(Widgets.getWidgetOperationStatus)
-  createOrUpdateWidget is LongRunningResourceCreateOrUpdate<Widget>;
+  createOrReplaceWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 
   @doc("Delete a Widget asynchronously.")
   @pollingOperation(Widgets.getWidgetOperationStatus)
-  deleteWidget is LongRunningResourceDelete<Widget>;
+  deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
   @doc("List Widget resources")
-  listWidgets is ResourceList<
+  listWidgets is Operations.ResourceList<
     Widget,
-    {
-      parameters: StandardListQueryParameters;
-    }
+    ListQueryParametersTrait<StandardListQueryParameters>
   >;
 }

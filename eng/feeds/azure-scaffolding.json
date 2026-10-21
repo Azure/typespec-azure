@@ -25,8 +25,8 @@
         "destination": "tspconfig.yaml"
       },
       {
-        "path": "./data-plane/examples/2022-11-01-preview/Widgets_CreateOrUpdateWidgetSample.json",
-        "destination": "examples/2022-11-01-preview/Widgets_CreateOrUpdateWidgetSample.json"
+        "path": "./data-plane/examples/2022-11-01-preview/Widgets_CreateOrReplaceWidgetSample.json",
+        "destination": "examples/2022-11-01-preview/Widgets_CreateOrReplaceWidgetSample.json"
       },
       {
         "path": "./data-plane/examples/2022-11-01-preview/Widgets_DeleteWidgetSample.json",
@@ -147,8 +147,8 @@
         "destination": "tspconfig.yaml"
       },
       {
-        "path": "./data-plane/examples/2022-11-01-preview/Widgets_CreateOrUpdateWidgetSample.json",
-        "destination": "examples/2022-11-01-preview/Widgets_CreateOrUpdateWidgetSample.json"
+        "path": "./data-plane/examples/2022-11-01-preview/Widgets_CreateOrReplaceWidgetSample.json",
+        "destination": "examples/2022-11-01-preview/Widgets_CreateOrReplaceWidgetSample.json"
       },
       {
         "path": "./data-plane/examples/2022-11-01-preview/Widgets_DeleteWidgetSample.json",

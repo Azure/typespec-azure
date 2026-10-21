@@ -12,7 +12,7 @@ llmstxt: true
 | --------------------- | ----------- | -------- | -------------------------------------------------------------- |
 | GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                            |
 | CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;` |
-| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmTagsPatchSync<Resource>;`                        |
+| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmCustomPatchSync<Resource, TagsPatchRequest>;`    |
 | Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`        |
 | Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                   |
 | List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`    |
@@ -20,6 +20,9 @@ llmstxt: true
 
 \* Arm requires that, at minimum, a TrackedResource can update Tags. A Full PATCH of all updateable
 resource properties is preferred.
+
+`TagsPatchRequest` and `PatchRequest` are explicit request models; see
+[Resource Update Operations (PATCH)](#resource-update-operations-patch) for examples.
 
 ### Proxy Resource
 
@@ -47,7 +50,8 @@ CreateOrUpdate (PUT), Update (Patch), Delete, and Action (POST) operations over 
 ### Determining Which Resource Properties Appear in Lifecycle Operations
 
 By default, any property that occurs in your resource model will also appear in the response to GET,
-PUT, PATCH, and LIST operations, and in the request for PUT and PATCH operations. This does not work
+PUT, PATCH, and LIST operations, and in the request for PUT operations. For PATCH, define a separate
+request model containing the properties that clients can update. This does not work
 for all properties. Some properties are calculated by the service and cannot be directly set by PUT
 or PATCH (provisioningState, modification date, etc.). Some properties can only be set when creating
 a resource, but always appear in responses (e.g. 'location'). Some properties can only be set when
@@ -125,41 +129,68 @@ to clients, and `ResourceType` is the type of the resource being created (or upd
 
 ARM Requires that all `Tracked` resources implement PATCH for ARM tags, which are contained in the
 envelope of every `TrackedResource`. ARM recommends that you also allow PATCH of other envelope
-properties and resource-specific properties. Unless marked with a specific visibility, any property
-in your rp-specific properties will be automatically included in the PATCH schema.
+properties and resource-specific properties. Define an explicit PATCH request model containing the
+updateable properties and mark properties as optional when clients can omit them.
 
 TypeSpec Provides both Synchronous and Asynchronous PATCH Operations, and allows you to specify a
 PATCH for Resource tags only, a PATCH for all updateable properties, or a custom patch. Generally,
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description                       | TypeSpec                                                                |
-| ------------------------------------------- | ----------------------------------------------------------------------- |
-| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                              |
-| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                             |
-| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`         |
-| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>`        |
-| Sync Lifecycle PATCH                        | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`  |
-| Async Lifecycle PATCH                       | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>` |
+| Operation Description                       | TypeSpec                                                         |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| Sync TagsOnly PATCH                         | `update is ArmCustomPatchSync<ResourceType, TagsPatchRequest>`   |
+| Async TagsOnly PATCH                        | `update is ArmCustomPatchAsync<ResourceType, TagsPatchRequest>`  |
+| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`  |
+| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>` |
 
 The `ArmCustomPatch*` templates are the recommended choice for PATCH operations. They take the
 resource type and your custom PATCH request type as parameters, giving you full control over the
-PATCH schema. The `ArmTagsPatch*` templates take the resource type as a parameter and only allow
-updating ARM tags.
+PATCH schema. For example, a tags-only PATCH request can be declared as:
 
-> **Note:** The `ArmTagsPatch*` and `ArmResourcePatch*` templates use implicit optionality, which
-> requires a suppression at the usage site:
+```typespec
+/** The tags to update. */
+model TagsPatchRequest {
+  ...Azure.ResourceManager.Foundations.TagsUpdateModel<ResourceType>;
+}
+
+op update is ArmCustomPatchSync<ResourceType, TagsPatchRequest>;
+```
+
+Use a tags-only request only when the resource has no other envelope properties that ARM
+requires to be updateable through PATCH. Resources exposing properties such as `identity`,
+`managedBy`, `plan`, or `sku` must include those properties in their PATCH request model too.
+
+For updates to envelope and resource-specific properties, define a dedicated model matching the
+API's PATCH contract. To derive a request model from the updateable resource properties, use
+`Azure.ResourceManager.Foundations.ResourceUpdateModel`:
+
+```typespec
+/** The properties to update. */
+model PatchRequestModel is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+  ResourceType,
+  ResourcePropertiesType
+>;
+
+op update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>;
+```
+
+This helper makes the updateable envelope and top-level resource-specific properties optional.
+Check nested models against your API's PATCH semantics; it does not recursively make all nested
+properties optional.
+
+> **Note:** `ArmTagsPatch*`, `ArmResourcePatch*`, and the `ResourceUpdateSync` interface
+> (also exposed through the `ResourceUpdate` alias and composite interfaces) use deprecated
+> implicit optionality and are not recommended for new specifications. Use `ArmCustomPatch*`
+> with an explicit request model instead of suppressing the warning.
 >
-> ```tsp
-> #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
-> update is ArmTagsPatchSync<ResourceType>;
-> ```
-
-> **Note:** The `ArmResourcePatch*` templates are **not recommended**. They rely on Lifecycle.Update
+> The `ArmResourcePatch*` templates also rely on Lifecycle.Update
 > visibility analysis to automatically determine which properties are included in the PATCH schema,
 > but this analysis is only performed by the typespec-autorest emitter and will not be replicated in
-> SDKs generated for the PATCH operation. Instead, spec authors should define a specific PATCH model
-> and use the `ArmCustomPatch*` templates.
+> SDKs generated for the PATCH operation.
+>
+> When migrating an existing API, preserve its request schema and SDK contract, including
+> property optionality, nested models, and request body parameter names.
 
 ### Resource Delete Operations (DELETE)
 

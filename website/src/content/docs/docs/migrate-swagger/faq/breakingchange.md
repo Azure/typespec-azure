@@ -66,17 +66,21 @@ Given a PATCH operation, for example:
 
 ```tsp
 interface Widgets {
-  update is ArmResourcePatchAsync<Widget, WidgetProperties>;
+  update is ArmCustomPatchAsync<Widget, WidgetPatch>;
 }
 ```
 
-TypeSpec uses `properties` as the standardized request body parameter name. If your existing Swagger used a different name, use `@@clientName` to preserve the original Swagger named body parameter and avoid a breaking change in SDK method signatures:
+`WidgetPatch` is an explicit request model matching the existing API's PATCH schema, including
+property optionality and nested models. See [Resource Update Operations (PATCH)](../../howtos/ARM/resource-operations.md#resource-update-operations-patch).
+
+TypeSpec uses `properties` as the standardized request body parameter name for `ArmCustomPatchAsync`. If your existing Swagger used a different name, use `@@clientName` to preserve the original Swagger named body parameter and avoid a breaking change in SDK method signatures:
 
 ```tsp
 @@clientName(Widgets.update::parameters.properties, "<original-swagger-body-parameter-name>");
 ```
 
-This works for any PATCH operation template.
+When changing PATCH templates, check the actual request body parameter name before applying
+`@@clientName`; do not assume it is the same for every template.
 
 #### Action (POST) APIs
 
@@ -150,23 +154,30 @@ You can generally choose an asynchronous operation template that matches your op
 
 #### Templates for Async PATCH Operations
 
-- `ArmTagsPatchAsync` is a PATCH operation that only allows changing the resource tags (the minimum for Azure Resource Manager).
-
-  ```tsp
-  op update is ArmTagsPatchAsync<Resource>;
-  ```
-
-- `ArmResourcePatchAsync` is a PATCH operation that uses the visibility settings to select properties for the PATCH request body (any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
-
-  ```tsp
-  op update is ArmResourcePatchAsync<Resource, ResourceProperties>;
-  ```
-
-- `ArmCustomPatchAsync` is a PATCH operation that allows you to customize the PATCH request body.
+- `ArmCustomPatchAsync` is the recommended asynchronous PATCH template. Pass an explicit
+  request model matching the existing API's updateable properties and their optionality.
 
   ```tsp
   op update is ArmCustomPatchAsync<Resource, PatchRequestBody>;
   ```
+
+- For an API that only updates tags, use the same template with an explicit tags request model:
+
+  ```tsp
+  /** The tags to update. */
+  model TagsPatchRequest {
+    ...Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>;
+  }
+
+  op update is ArmCustomPatchAsync<Resource, TagsPatchRequest>;
+  ```
+
+These operations follow the required 202 pattern to resolve the LRO via Location. Customize
+the polling headers with the `LroHeaders` parameter when needed.
+
+Do not use `ArmTagsPatchAsync` or `ArmResourcePatchAsync` for new specifications; these
+templates rely on deprecated implicit optionality. Migrating existing uses requires preserving
+the PATCH request schema and SDK contract, not just replacing the template name.
 
 #### Templates for Async POST (Action) Operations
 

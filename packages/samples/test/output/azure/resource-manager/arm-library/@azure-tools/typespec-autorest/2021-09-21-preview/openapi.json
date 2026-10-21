@@ -227,7 +227,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TestExtensionResourceUpdate"
+              "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionPatch"
             }
           }
         ],
@@ -487,7 +487,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TestTenantResourceUpdate"
+              "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantPatch"
             }
           }
         ],
@@ -1315,7 +1315,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TestTrackedResourceUpdate"
+              "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedPatch"
             }
           }
         ],
@@ -1360,9 +1360,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Resource deleted successfully."
-          },
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
@@ -1790,6 +1787,16 @@
       },
       "readOnly": true
     },
+    "Microsoft.InterfacesTest.TestExtensionPatch": {
+      "type": "object",
+      "description": "The extension resource properties to update.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestExtensionResourceUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
     "Microsoft.InterfacesTest.TestExtensionProperties": {
       "type": "object",
       "description": "rp-specific properties for the resource",
@@ -1820,6 +1827,16 @@
           "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
         }
       ]
+    },
+    "Microsoft.InterfacesTest.TestTenantPatch": {
+      "type": "object",
+      "description": "The tenant resource properties to update.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TestTenantResourceUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
     },
     "Microsoft.InterfacesTest.TestTenantProperties": {
       "type": "object",
@@ -1866,6 +1883,19 @@
           "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
         }
       ]
+    },
+    "Microsoft.InterfacesTest.TestTrackedPatch": {
+      "type": "object",
+      "description": "The tracked resource properties to update.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
     },
     "Microsoft.InterfacesTest.TestTrackedProperties": {
       "type": "object",
@@ -2009,16 +2039,6 @@
         "value"
       ]
     },
-    "TestExtensionResourceUpdate": {
-      "type": "object",
-      "description": "The type used for update operations of the TestExtensionResource.",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/TestExtensionResourceUpdateProperties",
-          "description": "The resource-specific properties for this resource."
-        }
-      }
-    },
     "TestExtensionResourceUpdateProperties": {
       "type": "object",
       "description": "The updatable properties of the TestExtensionResource.",
@@ -2050,16 +2070,6 @@
       "required": [
         "value"
       ]
-    },
-    "TestTenantResourceUpdate": {
-      "type": "object",
-      "description": "The type used for update operations of the TestTenantResource.",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/TestTenantResourceUpdateProperties",
-          "description": "The resource-specific properties for this resource."
-        }
-      }
     },
     "TestTenantResourceUpdateProperties": {
       "type": "object",
@@ -2162,19 +2172,6 @@
       "required": [
         "value"
       ]
-    },
-    "TestTrackedResourceUpdate": {
-      "type": "object",
-      "description": "The type used for update operations of the TestTrackedResource.",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "parameters": {

@@ -35,9 +35,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/WidgetServiceErrorResponse'
   /widgets/{widgetName}:
-    patch:
-      operationId: Widgets_createOrUpdateWidget
-      description: Creates or updates a Widget asynchronously
+    put:
+      operationId: Widgets_createOrReplaceWidget
+      description: Creates or replaces a Widget asynchronously
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: widgetName
@@ -119,9 +119,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/merge-patch+json:
+          application/json:
             schema:
-              $ref: '#/components/schemas/WidgetCreateOrUpdate'
+              $ref: '#/components/schemas/Widget'
         description: The resource instance.
     get:
       operationId: Widgets_getWidget
@@ -503,13 +503,6 @@ components:
             - $ref: '#/components/schemas/Azure.Core.eTag'
           description: The entity tag for this resource.
           readOnly: true
-      description: A widget.
-    WidgetCreateOrUpdate:
-      type: object
-      properties:
-        manufacturerId:
-          type: string
-          description: The ID of the widget's manufacturer.
       description: A widget.
     WidgetServiceErrorResponse:
       type: object

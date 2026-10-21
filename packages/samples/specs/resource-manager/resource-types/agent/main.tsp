@@ -141,22 +141,32 @@ interface Operations extends Azure.ResourceManager.Operations {}
 // See: https://azure.github.io/typespec-azure/docs/howtos/arm/resource-operations/
 
 // Appliance agent operations
+/** The appliance agent tags to update. */
+model ApplianceAgentTagsPatch {
+  ...Azure.ResourceManager.Foundations.TagsUpdateModel<ContosoApplianceAgent>;
+}
+
 @armResourceOperations
 interface ApplianceAgents {
   get is ArmResourceRead<ContosoApplianceAgent>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<ContosoApplianceAgent>;
-  update is ArmTagsPatchSync<ContosoApplianceAgent>;
+  update is ArmCustomPatchSync<ContosoApplianceAgent, ApplianceAgentTagsPatch>;
   delete is ArmResourceDeleteWithoutOkAsync<ContosoApplianceAgent>;
   listBySubscription is ArmListBySubscription<ContosoApplianceAgent>;
   listByResourceGroup is ArmResourceListByParent<ContosoApplianceAgent>;
 }
 
 // Platform agent operations
+/** The platform agent tags to update. */
+model PlatformAgentTagsPatch {
+  ...Azure.ResourceManager.Foundations.TagsUpdateModel<ContosoPlatformAgent>;
+}
+
 @armResourceOperations
 interface PlatformAgents {
   get is ArmResourceRead<ContosoPlatformAgent>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<ContosoPlatformAgent>;
-  update is ArmTagsPatchSync<ContosoPlatformAgent>;
+  update is ArmCustomPatchSync<ContosoPlatformAgent, PlatformAgentTagsPatch>;
   delete is ArmResourceDeleteWithoutOkAsync<ContosoPlatformAgent>;
   listBySubscription is ArmListBySubscription<ContosoPlatformAgent>;
   listByResourceGroup is ArmResourceListByParent<ContosoPlatformAgent>;

@@ -4,7 +4,7 @@ import type {
   Operation,
   Program,
 } from "@typespec/compiler";
-import { createRule, isTemplateInstance, paramMessage } from "@typespec/compiler";
+import { createRule, fileRef, isTemplateInstance, paramMessage } from "@typespec/compiler";
 import type { HttpVerb } from "@typespec/http";
 import { getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
@@ -15,6 +15,7 @@ import {
 
 export const useOperationDecoratorRule = createRule({
   name: "use-operation-decorator",
+  docs: fileRef.fromPackageRoot("src/rules/use-operation-decorator.md"),
   severity: "warning",
   description: "Validate ARM Resource operations use the correct decorator for the HTTP verb.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-operation-decorator",

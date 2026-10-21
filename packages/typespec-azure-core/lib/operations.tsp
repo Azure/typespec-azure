@@ -152,6 +152,9 @@ interface ResourceOperations<
 
   /**
    * Create or update operation template.
+   * Uses deprecated implicit optionality and is not recommended for new APIs.
+   * Use `ResourceCreateOrReplace` for PUT, or `Foundations.ResourceOperation` with
+   * `@patch` and an explicit request model for partial updates.
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */
@@ -189,6 +192,9 @@ interface ResourceOperations<
 
   /**
    * Long-running resource create or update operation template.
+   * Uses deprecated implicit optionality and is not recommended for new APIs.
+   * Use `LongRunningResourceCreateOrReplace` for PUT, or a custom long-running
+   * PATCH operation with an explicit request model for partial updates.
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */
@@ -227,6 +233,9 @@ interface ResourceOperations<
 
   /**
    * Resource update operation template.
+   * Uses deprecated implicit optionality and is not recommended for new APIs.
+   * For partial updates, use `Foundations.ResourceOperation` with `@patch` and
+   * an explicit request model instead.
    * @template Resource Resource type.
    * @template Traits Object describing the traits of the operation.
    */

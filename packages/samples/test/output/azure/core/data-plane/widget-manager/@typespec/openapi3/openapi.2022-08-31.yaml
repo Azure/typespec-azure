@@ -414,9 +414,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
   /widgets/{widgetName}:
-    patch:
-      operationId: Widgets_createOrUpdateWidget
-      description: Creates or updates a Widget asynchronously
+    put:
+      operationId: Widgets_createOrReplaceWidget
+      description: Creates or replaces a Widget asynchronously
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: widgetName
@@ -504,9 +504,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/merge-patch+json:
+          application/json:
             schema:
-              $ref: '#/components/schemas/WidgetCreateOrUpdate'
+              $ref: '#/components/schemas/Widget'
         description: The resource instance.
     get:
       operationId: Widgets_getWidget
@@ -671,9 +671,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
-    patch:
-      operationId: Widgets_updateAnalytics
-      description: Creates or updates a WidgetAnalytics
+    put:
+      operationId: Widgets_createOrReplaceAnalytics
+      description: Creates or replaces a WidgetAnalytics
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: widgetName
@@ -749,9 +749,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/merge-patch+json:
+          application/json:
             schema:
-              $ref: '#/components/schemas/WidgetAnalyticsCreateOrUpdate'
+              $ref: '#/components/schemas/WidgetAnalytics'
         description: The resource instance.
   /widgets/{widgetName}/operations/{operationId}:
     get:
@@ -1579,18 +1579,6 @@ components:
           format: int64
           description: The number of times the widget was repaired.
       description: Provides analytics about the use and maintenance of a Widget.
-    WidgetAnalyticsCreateOrUpdate:
-      type: object
-      properties:
-        useCount:
-          type: integer
-          format: int64
-          description: The number of uses of the widget.
-        repairCount:
-          type: integer
-          format: int64
-          description: The number of times the widget was repaired.
-      description: Provides analytics about the use and maintenance of a Widget.
     WidgetColor:
       anyOf:
         - type: string
@@ -1602,17 +1590,6 @@ components:
             - Green
             - Blue
       description: The color of a widget.
-    WidgetCreateOrUpdate:
-      type: object
-      properties:
-        color:
-          allOf:
-            - $ref: '#/components/schemas/WidgetColor'
-          description: The widget color.
-        manufacturerId:
-          type: string
-          description: The ID of the widget's manufacturer.
-      description: A widget.
     WidgetPart:
       type: object
       required:
