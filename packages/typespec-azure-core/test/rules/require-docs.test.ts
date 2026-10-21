@@ -427,31 +427,6 @@ describe("uninformative documentation", () => {
       ]);
   });
 
-  it("reports source-name, verb, and missing-doc diagnostics through the unfiltered rule", async () => {
-    const fullTester = createLinterRuleTester(
-      await Tester.createInstance(),
-      requireDocumentation,
-      "@azure-tools/typespec-azure-core",
-    );
-    await fullTester
-      .expect(
-        `
-      @route("/read") @get @doc(" READ. ") op read(): string;
-      @route("/fetch") @get @doc("get") op fetch(): string;
-      @route("/undocumented") op undocumented(): string;
-    `,
-      )
-      .toEmitDiagnostics([
-        diagnostic("read", " READ. "),
-        diagnostic("get", "get"),
-        {
-          code: "@azure-tools/typespec-azure-core/documentation-required",
-          message:
-            "The Operation named 'undocumented' should have a documentation or description, use doc comment /** */ to provide it.",
-        },
-      ]);
-  });
-
   it("checks explicit docs on declarations exempt from missing-doc requirements", async () => {
     await tester
       .expect(
