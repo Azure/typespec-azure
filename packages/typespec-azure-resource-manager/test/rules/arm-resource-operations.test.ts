@@ -126,11 +126,10 @@ describe("PUT request and response bodies", () => {
   model Created<T> { @statusCode statusCode: 201; @body body: T; }
 `;
 
-  const diagnostic = (bodies: string, target = "put") => ({
+  const diagnostic = (bodies: string) => ({
     code,
     severity: "warning" as const,
     message: `PUT bodies must reuse the same resource model. Found ${bodies.replaceAll("Widget", "Resources.Widget").replaceAll("Other", "Resources.Other")}.`,
-    target,
   });
 
   it("accepts the same model across the request and both responses", async () => {
@@ -159,10 +158,16 @@ describe("PUT request and response bodies", () => {
     await tester
       .expect(
         `${models}
-    @put op put(@body body: Other): ${response}<Widget>;
+    /*start*/@put op put(@body body: Other): /*end*/${response}<Widget>;
   `,
       )
-      .toEmitDiagnostics([diagnostic(`request: Other; ${status} response: Widget`)]);
+      .toEmitDiagnostics((x) => [
+        {
+          ...diagnostic(`request: Other; ${status} response: Widget`),
+          pos: x.pos.start.pos,
+          end: x.pos.end.pos + `${response}<Widget>;`.length,
+        },
+      ]);
   });
 
   it.each([200, 201])("compares a singleton %s response range", async (status) => {
@@ -215,20 +220,24 @@ describe("PUT request and response bodies", () => {
     code,
     severity: "warning" as const,
     message: "ARM PUT operations must have a request body.",
-    target: "put",
   };
 
   const unregistered = (bodies: string) => ({
     code,
     severity: "warning" as const,
     message: `PUT bodies must use registered ARM resource models. Found ${bodies}.`,
-    target: "put",
   });
 
   it("prioritizes the missing request over response mismatches", async () => {
     await tester
-      .expect(`${models} @put op put(): Ok<Widget> | Created<Other>;`)
-      .toEmitDiagnostics([missingRequest]);
+      .expect(`${models} /*start*/@put op put(): Ok<Widget> | /*end*/Created<Other>;`)
+      .toEmitDiagnostics((x) => [
+        {
+          ...missingRequest,
+          pos: x.pos.start.pos,
+          end: x.pos.end.pos + "Created<Other>;".length,
+        },
+      ]);
   });
 
   it.each([
@@ -259,11 +268,15 @@ describe("PUT request and response bodies", () => {
       .expect(
         `${models}
     model Plain { value: string; }
-    @put op put(@body body: Plain): Ok<Plain> | Created<Plain>;
+    /*start*/@put op put(@body body: Plain): Ok<Plain> | /*end*/Created<Plain>;
   `,
       )
-      .toEmitDiagnostics([
-        unregistered("request: Plain; 200 response: Plain; 201 response: Plain"),
+      .toEmitDiagnostics((x) => [
+        {
+          ...unregistered("request: Plain; 200 response: Plain; 201 response: Plain"),
+          pos: x.pos.start.pos,
+          end: x.pos.end.pos + "Created<Plain>;".length,
+        },
       ]);
   });
 
@@ -633,13 +646,19 @@ describe("PUT request and response bodies", () => {
     @armProviderNamespace namespace Operations {
       model Plain { value: string; }
       @armResourceOperations interface Widgets {
-        @put @armResourceCreateOrUpdate(Resources.Widget)
+        /*start*/@put @armResourceCreateOrUpdate(Resources.Widget)
         put(...ResourceInstanceParameters<Resources.Widget>${request}):
-          ArmResponse<${response}> | ErrorResponse;
+          ArmResponse<${response}> | /*end*/ErrorResponse;
       }
     }
   `;
-      await tester.expect(source).toEmitDiagnostics([expected]);
+      await tester.expect(source).toEmitDiagnostics((x) => [
+        {
+          ...expected,
+          pos: x.pos.start.pos,
+          end: x.pos.end.pos + "ErrorResponse".length,
+        },
+      ]);
     },
   );
 
@@ -672,14 +691,22 @@ describe("PUT request and response bodies", () => {
         `${models}
     @put op Template<T>(@body body: Widget): Ok<T>;
     interface Unused<T> { @put put(@body body: Widget): Ok<Other>; }
-    @route("/first") op first is Template<Other>;
-    @route("/second") op second is Template<Other>;
+    /*first*/@route("/first") op first is /*firstEnd*/Template<Other>;
+    /*second*/@route("/second") op second is /*secondEnd*/Template<Other>;
     @route("/valid") op valid is Template<Widget>;
   `,
       )
-      .toEmitDiagnostics([
-        diagnostic("request: Widget; 200 response: Other", "first"),
-        diagnostic("request: Widget; 200 response: Other", "second"),
+      .toEmitDiagnostics((x) => [
+        {
+          ...diagnostic("request: Widget; 200 response: Other"),
+          pos: x.pos.first.pos,
+          end: x.pos.firstEnd.pos + "Template<Other>;".length,
+        },
+        {
+          ...diagnostic("request: Widget; 200 response: Other"),
+          pos: x.pos.second.pos,
+          end: x.pos.secondEnd.pos + "Template<Other>;".length,
+        },
       ]);
   });
 
