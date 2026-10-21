@@ -27,7 +27,8 @@ concurrency:
 # 1. Add a `test:<lang>:e2e` script to your emitter's package.json
 # 2. Add an entry to the matrix below with:
 #    - name, lang, package-filter, working-directory
-#    - mise-install-args: tools to install via mise (e.g., "java maven")
+#    - mise-install-args: tools to install via mise (e.g., "python uv")
+#      Java uses the shared setup-java action for runtime setup and Maven caching.
 #    - run-prepare / run-regenerate: set to true if the package has those scripts
 # ============================================================================
 
@@ -59,7 +60,6 @@ jobs:
             lang: java
             package-filter: "@azure-tools/typespec-java"
             working-directory: packages/typespec-java
-            mise-install-args: "java maven"
             run-prepare: false
             run-regenerate: true
 
@@ -95,6 +95,9 @@ jobs:
         uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           install_args: ${{ matrix.mise-install-args }}
+
+      - uses: ./.github/actions/setup-java
+        if: matrix.lang == 'java'
 
       # --- Build excluded core packages from source ---
       # Some language client packages (http-client-python, http-client-java, etc.)
