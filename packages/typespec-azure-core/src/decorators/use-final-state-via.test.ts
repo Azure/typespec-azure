@@ -49,25 +49,37 @@ it("emits diagnostic for invalid PUT override", async () => {
   `);
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-azure-core/invalid-final-state",
+    severity: "warning",
     message:
-      "There was no header corresponding to the desired final-state-via value 'operation-location'.",
+      "The response is missing the 'Operation-Location' header required by final-state-via 'operation-location'. For example, spread 'Azure.Core.Foundations.LongRunningStatusLocation' into the response model.",
   });
 });
 
-it("emits error for missing header", async () => {
-  const diagnostics = await Tester.diagnose(`
+it.each([
+  ["location", "Location", "TypeSpec.Http.LocationHeader"],
+  [
+    "azure-async-operation",
+    "Azure-AsyncOperation",
+    "Azure.ResourceManager.ArmAsyncOperationHeader",
+  ],
+])(
+  "identifies the missing header and a response model for %s",
+  async (finalState, header, model) => {
+    const diagnostics = await Tester.diagnose(`
     @pollingOperation(bar)
-    @useFinalStateVia("location")
+    @useFinalStateVia("${finalState}")
     @post op foo(): {};
 
     @route("/polling")
     @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
   `);
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-azure-core/invalid-final-state",
-    message: `There was no header corresponding to the desired final-state-via value 'location'.`,
-  });
-});
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-azure-core/invalid-final-state",
+      severity: "warning",
+      message: `The response is missing the '${header}' header required by final-state-via '${finalState}'. For example, spread '${model}' into the response model.`,
+    });
+  },
+);
 it("emits error for original-uri on non-PUT/PATCH/POST request", async () => {
   const diagnostics = await Tester.diagnose(`
     @pollingOperation(bar)
