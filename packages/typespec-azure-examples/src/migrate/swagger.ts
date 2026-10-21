@@ -5,6 +5,7 @@ import type {
   SwaggerDocument,
   SwaggerOperation,
   SwaggerParameter,
+  SwaggerPathItem,
   XmsExampleDoc,
 } from "./swagger-types.js";
 import { HTTP_METHODS } from "./swagger-types.js";
@@ -67,6 +68,72 @@ export function collectParamLocations(
     }
   }
   return map;
+}
+
+/** Resolve parameter references relative to their declaring document before collecting locations. */
+export async function resolveParameterReferences(
+  doc: SwaggerDocument,
+  file: string,
+): Promise<SwaggerDocument> {
+  const documents = new Map<string, SwaggerDocument>([[resolve(file), doc]]);
+  async function resolveParameter(
+    parameter: SwaggerParameter,
+    fromFile: string,
+    seen: ReadonlySet<string> = new Set(),
+  ): Promise<SwaggerParameter> {
+    if (parameter.$ref === undefined) return parameter;
+    const [filePart, fragment = ""] = parameter.$ref.split("#");
+    const targetFile = filePart ? resolve(dirname(fromFile), filePart) : resolve(fromFile);
+    const key = `${targetFile}#${fragment}`;
+    if (seen.has(key))
+      throw new Error(`Circular parameter reference '${parameter.$ref}' in ${fromFile}.`);
+    let targetDoc = documents.get(targetFile);
+    if (targetDoc === undefined) {
+      targetDoc = JSON.parse(await readFile(targetFile, "utf-8")) as SwaggerDocument;
+      documents.set(targetFile, targetDoc);
+    }
+    let target: unknown = targetDoc;
+    for (const part of fragment.replace(/^\//, "").split("/").filter(Boolean)) {
+      const name = decodeURIComponent(part).replace(/~1/g, "/").replace(/~0/g, "~");
+      target =
+        target !== null && typeof target === "object"
+          ? (target as Record<string, unknown>)[name]
+          : undefined;
+    }
+    if (target === null || typeof target !== "object" || Array.isArray(target)) {
+      throw new Error(`Cannot resolve parameter reference '${parameter.$ref}' in ${fromFile}.`);
+    }
+    const resolved = await resolveParameter(
+      target as SwaggerParameter,
+      targetFile,
+      new Set([...seen, key]),
+    );
+    if (typeof resolved.name !== "string" || resolved.in === undefined) {
+      throw new Error(`Reference '${parameter.$ref}' in ${fromFile} is not a parameter.`);
+    }
+    return resolved;
+  }
+  const resolveParameters = (parameters: readonly SwaggerParameter[] | undefined) =>
+    parameters && Promise.all(parameters.map((parameter) => resolveParameter(parameter, file)));
+
+  const paths: Record<string, SwaggerPathItem> = {};
+  for (const [path, item] of Object.entries(doc.paths ?? {})) {
+    const updated: Record<string, unknown> = {
+      ...item,
+      parameters: await resolveParameters(item.parameters),
+    };
+    for (const method of HTTP_METHODS) {
+      const operation = item[method] as SwaggerOperation | undefined;
+      if (operation && typeof operation === "object") {
+        updated[method] = {
+          ...operation,
+          parameters: await resolveParameters(operation.parameters),
+        };
+      }
+    }
+    paths[path] = updated;
+  }
+  return { ...doc, paths };
 }
 
 /** Extract every operation that carries `x-ms-examples` from a parsed Swagger document. */
@@ -154,7 +221,7 @@ export async function crawlExamples(root: string): Promise<CrawlResult> {
     versions.add(version);
     namespace ??= namespaceFromPaths(Object.keys(doc.paths));
 
-    for (const operation of extractOperations(doc)) {
+    for (const operation of extractOperations(await resolveParameterReferences(doc, file))) {
       for (const [exampleName, entry] of Object.entries(operation.examples)) {
         if (entry?.$ref === undefined) continue;
         const examplePath = resolveRefPath(file, entry.$ref);

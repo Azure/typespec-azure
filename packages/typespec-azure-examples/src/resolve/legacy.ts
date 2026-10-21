@@ -10,7 +10,11 @@ import { readFile } from "fs/promises";
 import { materializeLegacyExample } from "../legacy.js";
 import { deriveOperationKey } from "../migrate/operation-key.js";
 import { HTTP_METHODS, type ParameterLocation } from "../migrate/swagger-types.js";
-import { collectParamLocations, discoverSwaggerFiles } from "../migrate/swagger.js";
+import {
+  collectParamLocations,
+  discoverSwaggerFiles,
+  resolveParameterReferences,
+} from "../migrate/swagger.js";
 import { defaultLegacyExampleFilename, stripJsonExtension } from "../naming.js";
 import type { ExampleDiagnostic } from "../types.js";
 import { resolveExamplesDir } from "./resolve-dir.js";
@@ -82,7 +86,8 @@ async function crawlOperationMetadata(dir: string): Promise<Map<string, Operatio
     } catch {
       continue;
     }
-    for (const pathItem of Object.values(doc.paths ?? {}) as any[]) {
+    const resolved = await resolveParameterReferences(doc, file);
+    for (const pathItem of Object.values(resolved.paths ?? {}) as any[]) {
       if (pathItem === null || typeof pathItem !== "object") continue;
       for (const method of HTTP_METHODS) {
         const operation = pathItem[method];
