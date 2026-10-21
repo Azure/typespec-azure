@@ -78,13 +78,8 @@ for package selection, scaffolding, and registration.
 
 ### Changelog entries
 
-- Run `pnpm change add` from the repository root. Put Azure entries in root **`.chronus/changes/`**,
-  not `core/.chronus/changes/`, package folders, or generated `CHANGELOG.md` files.
-- Use affected npm package names and a `changeKind` from `.chronus/config.yaml`. Describe the
-  final user-visible behavior, rule enablement, and compatibility impact.
-- Update existing entries for the same unreleased change instead of adding redundant `internal`
-  entries for review cleanup. Preserve unrelated entries and distinct package coverage.
-  Check coverage with `pnpm chronus status`.
+- For changes made in response to review comments, update the existing changelog entry
+  rather than adding a redundant one.
 
 ## Branch and PR Workflow
 
