@@ -92,6 +92,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/resource-missing-read": false,
     "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
@@ -110,8 +111,12 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
     "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
+    "@azure-tools/typespec-azure-resource-manager/no-tags-on-proxy-resource": false,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
     "@azure-tools/typespec-azure-resource-manager/use-model-request-body": false,
+    "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": false,
+    "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes": false,
+    "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
