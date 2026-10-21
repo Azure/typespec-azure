@@ -171,6 +171,13 @@ function doc(code: string) {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "union-model-discriminator-conflict": {
+      ...doc("union-model-discriminator-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' cannot be converted to a polymorphic SDK model because model '${"modelName"}' in its hierarchy uses @discriminator. Use @discriminated on the union without @discriminator on its model hierarchy, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
     "union-model-conversion-conflict": {
       ...doc("union-model-conversion-conflict"),
       severity: "error",

@@ -41,6 +41,7 @@ describe("inline discriminated union conversion", () => {
       strictEqual(method.operation.bodyParam?.type, base);
       strictEqual(method.operation.responses[0].type, base);
       strictEqual(base.discriminatorProperty?.name, "kind");
+      strictEqual(base.discriminatorProperty?.isExactName, false);
       strictEqual(base.discriminatorProperty?.serializationOptions.json?.name, "kind");
       deepStrictEqual(Object.keys(base.discriminatedSubtypes ?? {}), ["cat", "dog"]);
       const mammal = context.sdkPackage.models.find((model) => model.name === "Mammal");
@@ -66,6 +67,7 @@ describe("inline discriminated union conversion", () => {
         ok(property);
         strictEqual(property.type.kind, "constant");
         strictEqual(property.type.value, tag);
+        strictEqual(property.isExactName, false);
         strictEqual(property.serializationOptions.json?.name, "kind");
         strictEqual(variant.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
       }
@@ -306,6 +308,93 @@ describe("inline discriminated union conversion", () => {
     strictEqual(property.name, "clientKind");
     strictEqual(property.serializationOptions.json?.name, "kind");
   });
+
+  it.each([false, true])(
+    "preserves exact discriminator names with inherited property=%s",
+    async (inherited) => {
+      const { program } = await SimpleTesterWithService.compile(`
+        model Entity { ${inherited ? '@clientName(exact("Pet_KIND")) kind: string;' : ""} }
+        model PetBase extends Entity {
+          ${inherited ? "" : '@clientName(exact("Pet_KIND")) kind: string;'}
+        }
+        model Cat extends PetBase { meows: boolean; }
+        @discriminated(#{ envelope: "none" })
+        union Pet extends PetBase { cat: Cat }
+        op get(): Pet;
+      `);
+      const context = await createSdkContextForTester(program);
+      expectDiagnostics(context.diagnostics, []);
+      const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+      ok(base);
+      const cat = base.discriminatedSubtypes?.cat;
+      ok(cat);
+      for (const property of [
+        base.discriminatorProperty,
+        cat.properties.find((p) => p.discriminator),
+      ]) {
+        ok(property);
+        strictEqual(property.name, "Pet_KIND");
+        strictEqual(property.isExactName, true);
+        strictEqual(property.serializationOptions.json?.name, "kind");
+      }
+    },
+  );
+
+  it.each([
+    { location: "base", propertyName: "type" },
+    { location: "ancestor", propertyName: "type" },
+    { location: "variant", propertyName: "type" },
+    { location: "base", propertyName: "kind" },
+  ])(
+    "rejects a model discriminator on the $location using $propertyName before recursive conversion",
+    async ({ location, propertyName }) => {
+      const { program } = await SimpleTesterWithService.compile(`
+        ${location === "ancestor" ? `@discriminator("${propertyName}")` : ""}
+        model Entity { ${propertyName}: string; }
+        ${location === "base" ? `@discriminator("${propertyName}")` : ""}
+        model PetBase extends Entity { next?: Pet; }
+        ${location === "variant" ? `@discriminator("${propertyName}")` : ""}
+        model Cat extends PetBase { ${propertyName}: "cat"; }
+        @discriminated(#{ envelope: "none" })
+        union Pet extends PetBase { cat: Cat }
+        op get(): PetBase;
+      `);
+      const context = await createSdkContextForTester(program);
+      expectDiagnostics(context.diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/union-model-discriminator-conflict",
+          severity: "error",
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+          severity: "warning",
+        },
+      ]);
+      const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+      ok(base);
+      const next = base.properties.find((property) => property.name === "next");
+      ok(next);
+      strictEqual(next.type.kind, "union");
+      if (propertyName !== "kind") {
+        strictEqual(
+          base.properties.some((property) => property.serializationOptions.json?.name === "kind"),
+          false,
+        );
+      }
+      if (location === "base") strictEqual(base.discriminatorProperty?.name, propertyName);
+      if (location === "ancestor")
+        strictEqual(base.baseModel?.discriminatorProperty?.name, propertyName);
+      const native = await createSdkContextForTester(
+        program,
+        {},
+        { convertDiscriminatedUnionsToModels: false },
+      );
+      expectDiagnostics(native.diagnostics, {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        severity: "warning",
+      });
+    },
+  );
 
   it.each(["public", "internal"] as const)(
     "preserves union usage and %s access overrides on the projected base",

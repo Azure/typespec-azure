@@ -273,6 +273,8 @@ Ordinary unions, object-envelope unions, structural-only variants, unions withou
 
 Compatible unions sharing the same base share its SDK model and combined subtype map; the polymorphic representation does not enforce each union's subset separately. Synthesized inline discriminator properties also appear on directly used SDK variants. Disable conversion when an emitter needs union-specific serialization or exact alternative-set information.
 
+Do not combine `@discriminated` unions with `@discriminator` on their variant models or ancestors. Conversion reports `union-model-discriminator-conflict` for such hierarchies, including when both decorators use the same property name. Use one discriminator mechanism, or disable union conversion.
+
 **Model Types:**
 
 - [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.

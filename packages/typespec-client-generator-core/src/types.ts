@@ -730,6 +730,23 @@ function getSdkDiscriminatedUnionModel(
     return diagnostics.wrap(undefined);
   }
 
+  const discriminatedModel = [...discriminated.variants.values()]
+    .flatMap((variant) => (variant.kind === "Model" ? walkBaseChain(variant) : []))
+    .find((model) => getDiscriminator(context.program, model));
+  if (discriminatedModel) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "union-model-discriminator-conflict",
+        target: union,
+        format: {
+          unionName: union.name ?? "(anonymous)",
+          modelName: discriminatedModel.name,
+        },
+      }),
+    );
+    return diagnostics.wrap(undefined);
+  }
+
   (context.__discriminatedUnionModels ??= new Map()).set(union, base);
   const model = diagnostics.pipe(getSdkModelWithDiagnostics(context, base, operation));
   updateReferencedTypeMap(context, union, model);
@@ -742,31 +759,33 @@ function getSdkDiscriminatedUnionModel(
     };
   });
   const propertyName = discriminated.options.discriminatorPropertyName;
-  // A payload model can have only one tag. Existing hierarchies must also agree on
-  // the discriminator's wire name and on tags introduced by other unions.
+  const hasDuplicatePayload =
+    new Set(variants.map((variant) => variant.raw)).size !== variants.length;
+  const hasConflictingProperty =
+    model.discriminatorProperty !== undefined &&
+    model.discriminatorProperty.serializationOptions.json?.name !== propertyName;
+  const hasEncodedDiscriminator = [base, ...variants.map((variant) => variant.raw)].some((raw) => {
+    const property = walkBaseChain(raw)
+      .map((ancestor) => ancestor.properties.get(propertyName))
+      .find((property) => property !== undefined);
+    return (
+      property && resolveEncodedName(context.program, property, "application/json") !== propertyName
+    );
+  });
+  // Multiple unions sharing SDK models must agree on each payload's tag and each tag's payload.
+  const hasConflictingTag = variants.some(({ tag, model: subtype }) => {
+    if (subtype.discriminatorValue !== undefined && subtype.discriminatorValue !== tag) return true;
+    return (
+      model.discriminatedSubtypes !== undefined &&
+      Object.hasOwn(model.discriminatedSubtypes, tag) &&
+      model.discriminatedSubtypes[tag] !== subtype
+    );
+  });
   if (
-    new Set(variants.map((variant) => variant.raw)).size !== variants.length ||
-    (model.discriminatorProperty &&
-      (model.discriminatorProperty.serializationOptions.json?.name ??
-        model.discriminatorProperty.__raw?.name ??
-        model.discriminatorProperty.name) !== propertyName) ||
-    [base, ...variants.map((variant) => variant.raw)].some((raw) => {
-      const property = walkBaseChain(raw)
-        .map((ancestor) => ancestor.properties.get(propertyName))
-        .find((property) => property !== undefined);
-      return (
-        property &&
-        resolveEncodedName(context.program, property, "application/json") !== propertyName
-      );
-    }) ||
-    variants.some(
-      (variant) =>
-        (variant.model.discriminatorValue !== undefined &&
-          variant.model.discriminatorValue !== variant.tag) ||
-        (model.discriminatedSubtypes &&
-          Object.hasOwn(model.discriminatedSubtypes, variant.tag) &&
-          model.discriminatedSubtypes[variant.tag] !== variant.model),
-    )
+    hasDuplicatePayload ||
+    hasConflictingProperty ||
+    hasEncodedDiscriminator ||
+    hasConflictingTag
   ) {
     diagnostics.add(
       createDiagnostic({
@@ -840,7 +859,12 @@ function getUnionDiscriminatorProperty(
             isExactName: false,
             decorators: [],
           };
-    property = createDiscriminatorProperty(model, source?.name ?? name, type, name);
+    property = createDiscriminatorProperty(
+      model,
+      source ?? { name, isExactName: false },
+      type,
+      name,
+    );
     property.__raw = rawProperty;
     model.properties.unshift(property);
   }
@@ -860,7 +884,7 @@ function getUnionDiscriminatorProperty(
 
 function createDiscriminatorProperty(
   model: SdkModelType,
-  name: string,
+  { name, isExactName }: Pick<SdkModelPropertyType, "name" | "isExactName">,
   type: SdkType,
   serializedName: string,
 ): SdkModelPropertyType {
@@ -875,7 +899,7 @@ function createDiscriminatorProperty(
     type,
     name,
     isGeneratedName: false,
-    isExactName: false,
+    isExactName,
     onClient: false,
     apiVersions: model.apiVersions,
     isApiVersionParam: false,
@@ -1030,10 +1054,9 @@ function addDiscriminatorToModelType(
     } else {
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
-    const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     const discriminatorPropertyType = createDiscriminatorProperty(
       model,
-      name,
+      discriminatorProperty ?? { name: discriminator.propertyName, isExactName: false },
       discriminatorType!,
       discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated

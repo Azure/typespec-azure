@@ -1,4 +1,4 @@
-This diagnostic is issued when an inline-discriminated union's discriminator property or tag mappings conflict with another union or an existing model discriminator in the same hierarchy.
+This diagnostic is issued when an inline-discriminated union's discriminator property or tag mappings cannot be represented consistently by its SDK model hierarchy, including conflicts with another converted union.
 
 ## Impact
 
