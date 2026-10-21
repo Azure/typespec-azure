@@ -112,6 +112,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
     "@azure-tools/typespec-azure-resource-manager/use-model-request-body": false,
+    "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": false,
     "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes": false,
     "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put": false,
 
