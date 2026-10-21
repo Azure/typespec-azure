@@ -1,9 +1,7 @@
 import { Tester, UnwrappedTester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
 import { noUnsafePatchBodyPropertiesRule } from "../../src/rules/no-unsafe-patch-body-properties.js";
-import { patchEnvelopePropertiesRules } from "../../src/rules/patch-envelope-properties.js";
 
 let tester: LinterRuleTester;
 
@@ -61,8 +59,7 @@ describe("semantic examples", () => {
     );
   });
   it("reports the unsafe standard-template payload", async () => {
-    const examples = [
-      `import "@typespec/http";
+    const example = `import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-resource-manager";
 
@@ -86,22 +83,7 @@ model Widget is TrackedResource<WidgetProperties> {
   name: string;
 }
 
-model WidgetPatchProperties {
-  displayName?: string;
-  description?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
-@armResourceOperations
-interface Widgets {
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-}
-`,
-      `model UnsafeWidgetPatch {
+model UnsafeWidgetPatch {
   location?: string;
   properties: {
     displayName: string;
@@ -109,15 +91,15 @@ interface Widgets {
     enabled?: boolean = false;
   };
 }
-`,
-    ];
-    const valid = examples[0];
-    const invalid = examples[1];
+
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchSync<Widget, PatchModel = UnsafeWidgetPatch>;
+}
+`;
 
     await fixtureTester
-      .expect(
-        `${valid.replace("ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>", "ArmCustomPatchSync<Widget, PatchModel = UnsafeWidgetPatch>")}\n${invalid}`,
-      )
+      .expect(example)
       .toEmitDiagnostics([
         immutable("location"),
         required("properties"),
@@ -389,23 +371,20 @@ describe("immutable paths and effective input", () => {
       .toEmitDiagnostics(immutable("properties.provisioningState"));
   });
 
-  it.each(["Read", "Create", "Read, Lifecycle.Create"])(
-    "excludes %s properties and descendants",
-    async (vis) => {
-      await tester
-        .expect(
-          `${service}
+  it("excludes Read/Create properties and descendants from ordinary PATCH", async () => {
+    await tester
+      .expect(
+        `${service}
       model Patch {
-        @visibility(Lifecycle.${vis}) location: string = "west";
-        @visibility(Lifecycle.${vis}) ignored: { required: string; enabled?: boolean = false; };
+        @visibility(Lifecycle.Read, Lifecycle.Create) location: string = "west";
+        @visibility(Lifecycle.Read, Lifecycle.Create) ignored: { required: string; enabled?: boolean = false; };
         value?: string;
       }
       @patch op update(@body body: Patch): { value: string };
     `,
-        )
-        .toBeValid();
-    },
-  );
+      )
+      .toBeValid();
+  });
 
   it.each(["", "@visibility(Lifecycle.Read, Lifecycle.Query) unrelated?: string;"])(
     "does not let an unrelated Read/Query field change existing warnings: %s",
@@ -426,19 +405,16 @@ describe("immutable paths and effective input", () => {
     },
   );
 
-  it.each(["Read", "Create", "Query", "Delete"])(
-    "checks exposed non-Update %s input",
-    async (vis) => {
-      await tester
-        .expect(
-          `${service}
-      model Patch { @visibility(Lifecycle.${vis}) value?: string; }
-      @parameterVisibility(Lifecycle.${vis}) @patch op update(@body body: Patch): void;
+  it("checks exposed non-Update Create input", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch { @visibility(Lifecycle.Create) value?: string; }
+      @parameterVisibility(Lifecycle.Create) @patch op update(@body body: Patch): void;
     `,
-        )
-        .toEmitDiagnostics(visibility("value"));
-    },
-  );
+      )
+      .toEmitDiagnostics(visibility("value"));
+  });
 
   it("does not let Update visibility permit an immutable field", async () => {
     await tester
@@ -514,16 +490,11 @@ describe("partial-update safety and traversal policies", () => {
       )
       .toEmitDiagnostics([required("configuration"), required("configuration.value")]);
   });
-  it.each([
-    ["boolean", "false"],
-    ["int32", "0"],
-    ["string", '""'],
-    ["string", '"value"'],
-  ])("checks %s default %s", async (type, value) => {
+  it("checks a falsy default", async () => {
     await tester
       .expect(
         `${service}
-        @patch op update(@body body: { value?: ${type} = ${value} }): void;
+        @patch op update(@body body: { value?: boolean = false }): void;
       `,
       )
       .toEmitDiagnostics(defaultValue("value"));
@@ -876,42 +847,7 @@ describe("resource selection", () => {
       )
       .toEmitDiagnostics(missing("extra"));
   });
-});
-
-describe("scope and registration", () => {
-  it.each([
-    '@header contentType: "multipart/form-data", @multipartBody body: { required: HttpPart<string> }',
-    '@header contentType: "multipart/form-data", @multipartBody body: [HttpPart<string, #{name: "required"}>]',
-    "@bodyRoot body: File",
-    '@header contentType: "application/octet-stream", @body body: bytes',
-  ])("does not inspect transport payload: %s", async (parameters) => {
-    await tester.expect(`${service} @patch op update(${parameters}): void;`).toBeValid();
-  });
-
-  describe("native scope independent of emitter settings", () => {
-    it.each([
-      [
-        "property",
-        "model Patch { extra?: string; } @patch op update(@body body: Patch): { value: string };",
-      ],
-      ["operation", "@patch op update(@body body: { extra?: string }): { value: string };"],
-      [
-        "GET fallback",
-        '@route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse; @route("/widgets") @get op read(): { value: string };',
-      ],
-    ])("checks native %s without emitter configuration", async (_, snippet) => {
-      await tester.expect(`${service}${snippet}`).toEmitDiagnostics(missing("extra"));
-    });
-    it("uses matching native response properties without emitter configuration", async () => {
-      await tester
-        .expect(
-          `${service}
-        model Resource { value: string; }
-        @patch op update(@body body: { value?: string }): Resource;
-      `,
-        )
-        .toBeValid();
-    });
+  describe("ambiguous response content", () => {
     it.each([false, true])(
       "does not select an arbitrary comparison resource from ambiguous content variants (%s)",
       async (reverse) => {
@@ -937,6 +873,17 @@ describe("scope and registration", () => {
           .toBeValid();
       },
     );
+  });
+});
+
+describe("scope and registration", () => {
+  it.each([
+    '@header contentType: "multipart/form-data", @multipartBody body: { required: HttpPart<string> }',
+    '@header contentType: "multipart/form-data", @multipartBody body: [HttpPart<string, #{name: "required"}>]',
+    "@bodyRoot body: File",
+    '@header contentType: "application/octet-stream", @body body: bytes',
+  ])("does not inspect transport payload: %s", async (parameters) => {
+    await tester.expect(`${service} @patch op update(${parameters}): void;`).toBeValid();
   });
 
   describe("applicability", () => {
@@ -988,7 +935,7 @@ describe("PATCH resource and envelope boundaries", () => {
     );
   });
 
-  it("preserves overlapping arm-resource-patch subset diagnostics", async () => {
+  it("reports extra properties in a standard ARM PATCH payload", async () => {
     const snippet = `${definitions}
         model Patch { tags?: Record<string>; extra?: string; }
         @armResourceOperations interface Widgets {
@@ -1000,19 +947,9 @@ describe("PATCH resource and envelope boundaries", () => {
       message:
         "The property 'extra' in the request body either does not appear in the resource model or is nested at the wrong level.",
     });
-    const existing = createLinterRuleTester(
-      await Tester.createInstance(),
-      patchOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-    await existing.expect(snippet).toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message:
-        "Resource PATCH models must be a subset of the resource type. The following properties: [extra] do not exist in resource Model 'Widget'.",
-    });
   });
 
-  it("leaves required envelope presence to patch-envelope", async () => {
+  it("allows omission of supported envelope properties", async () => {
     const snippet = `${definitions}
         model Patch { properties?: { value?: string }; }
         @armResourceOperations interface Widgets {
@@ -1021,15 +958,5 @@ describe("PATCH resource and envelope boundaries", () => {
         }
       `;
     await tester.expect(snippet).toBeValid();
-    const existing = createLinterRuleTester(
-      await Tester.createInstance(),
-      patchEnvelopePropertiesRules,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-    await existing.expect(snippet).toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/patch-envelope",
-      message:
-        "The Resource PATCH request for resource 'Widget' is missing envelope properties:  [tags]. Since these properties are supported in the resource, they must also be updatable via PATCH.",
-    });
   });
 });

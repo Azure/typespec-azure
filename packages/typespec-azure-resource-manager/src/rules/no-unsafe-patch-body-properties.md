@@ -69,63 +69,14 @@ uses of a shared model or different resource counterparts. Diagnostics contain
 JSON paths and target authored project properties; imported declarations are
 reported at the nearest local use or the operation.
 
-## Correct example
-
-Prefer standard ARM update templates such as `ArmCustomPatchSync` when defining
-resource operations. A partial custom payload can omit resource properties:
-
-```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName: string;
-  description?: string;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-}
-
-model WidgetPatchProperties {
-  displayName?: string;
-  description?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
-@armResourceOperations
-interface Widgets {
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-}
-```
-
-In contrast, a custom payload with `displayName: string`, a default-valued
-`description`, a writable envelope `location`, or an extra property absent from
-the resource produces the corresponding diagnostic. Move incorrectly nested
-properties to their resource JSON location rather than changing only their
-authored TypeSpec name.
-
 ## Incorrect example
 
-Using this payload instead of `WidgetPatch` in the `ArmCustomPatchSync` operation
-above exposes an immutable field, requires partial-update input, introduces
-properties absent from the resource, and supplies a default:
+Assume a tracked `Widget` resource whose `properties` contains `displayName` and
+`description`, but not `extra` or `enabled`. These excerpts show only the custom
+PATCH payload; imports, resource declarations, and operations are omitted.
+
+This payload exposes immutable `location`, requires `properties` and
+`displayName`, introduces absent fields, and supplies a default:
 
 ```tsp
 model UnsafeWidgetPatch {
@@ -137,6 +88,25 @@ model UnsafeWidgetPatch {
   };
 }
 ```
+
+## Correct example
+
+Remove immutable and extra fields, make input optional, and omit defaults:
+
+```tsp
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: {
+    displayName?: string;
+    description?: string;
+  };
+}
+```
+
+Use the fixed payload with a standard ARM update template such as
+`ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>`. Resource properties may
+be omitted. Move incorrectly nested properties to their resource JSON location
+rather than changing only their authored TypeSpec name.
 
 ## Applicability and related rules
 
