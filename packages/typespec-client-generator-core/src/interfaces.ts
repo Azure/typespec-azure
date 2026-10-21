@@ -1212,6 +1212,19 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * Server-issued SDK long-running operation identifier selected from the linked status-monitor
+   * operation, when requested with `@lroOperationId`. This does not drive polling and is distinct
+   * from a caller-supplied `Operation-Id` API parameter.
+   */
+  operationId?: SdkLroOperationIdMetadata;
+}
+
+export interface SdkLroOperationIdMetadata {
+  /** Exact URI link from the status-monitor step. */
+  source: SdkOperationLink;
+  /** Exact path parameter selected from the linked status-monitor operation. */
+  pathParameter: SdkPathParameter;
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
@@ -1246,6 +1259,8 @@ export interface SdkNextOperationLink extends SdkLogicalOperationStep {
   kind: "nextOperationLink";
   responseModel: SdkModelType;
   target: SdkOperationLink;
+  /** Explicitly linked polling operation, when one was declared. */
+  operation?: SdkServiceOperation;
 }
 
 /**
