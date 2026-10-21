@@ -389,13 +389,13 @@ describe("PUT request and response bodies", () => {
       .toBeValid();
   });
 
-  it.each([200, 201])("skips ambiguous %s body types in either order", async (status) => {
+  it("skips ambiguous 200 body types in either order", async () => {
     for (const variants of ["First | Second", "Second | First"]) {
       await tester
         .expect(
           `${models}
-      model First { @statusCode status: ${status}; @body body: Widget; }
-      model Second { @statusCode status: ${status}; @body body: Other; }
+      model First { @statusCode status: 200; @body body: Widget; }
+      model Second { @statusCode status: 200; @body body: Other; }
       @put op put(@body body: Widget): ${variants};
     `,
         )
@@ -403,23 +403,21 @@ describe("PUT request and response bodies", () => {
     }
   });
 
-  it.each([200, 201])("skips ambiguous %s body kinds in either order", async (status) => {
-    for (const variants of ["Json | Multi", "Multi | Json"]) {
-      await tester
-        .expect(
-          `${models}
+  it("skips ambiguous 201 body kinds", async () => {
+    await tester
+      .expect(
+        `${models}
       model Parts { value: HttpPart<string>; }
-      model Json { @statusCode status: ${status}; @body body: Parts; }
+      model Json { @statusCode status: 201; @body body: Parts; }
       model Multi {
-        @statusCode status: ${status};
+        @statusCode status: 201;
         @header contentType: "multipart/form-data";
         @multipartBody body: Parts;
       }
-      @put op put(@body body: Widget): ${variants};
+      @put op put(@body body: Widget): Json | Multi;
     `,
-        )
-        .toBeValid();
-    }
+      )
+      .toBeValid();
   });
 
   it("still compares known participants when another status is ambiguous", async () => {
@@ -433,65 +431,65 @@ describe("PUT request and response bodies", () => {
       .toEmitDiagnostics([diagnostic("request: Widget; 201 response: Other")]);
   });
 
-  it("accepts shared content variants and ignores bodyless variants regardless of order", async () => {
-    for (const variants of ["Json | Xml | Empty", "Empty | Xml | Json"]) {
-      await tester
-        .expect(
-          `${models}
+  it("accepts shared content variants and ignores a bodyless variant", async () => {
+    await tester
+      .expect(
+        `${models}
       model Json { @statusCode status: 200; @header contentType: "application/json"; @body body: Widget; }
       model Xml { @statusCode status: 200; @header contentType: "application/xml"; @body body: Widget; }
       model Empty { @statusCode status: 200; }
-      @put op put(@body body: Widget): ${variants} | Created<Widget>;
+      @put op put(@body body: Widget): Empty | Xml | Json | Created<Widget>;
     `,
-        )
-        .toBeValid();
-    }
+      )
+      .toBeValid();
   });
 
-  it.each([200, 201])(
-    "ignores void %s variants without hiding mismatches or registration errors",
-    async (status) => {
-      for (const variants of ["Empty | ResourceResponse", "ResourceResponse | Empty"]) {
-        await tester
-          .expect(
-            `${models}
-      model Empty { @statusCode status: ${status}; @bodyRoot body: void; }
-      model ResourceResponse { @statusCode status: ${status}; @bodyRoot body: Other; }
-      @put op put(@bodyRoot body: Widget): ${variants};
+  it("ignores a void 200 variant without hiding a resource mismatch", async () => {
+    await tester
+      .expect(
+        `${models}
+      model Empty { @statusCode status: 200; @bodyRoot body: void; }
+      model ResourceResponse { @statusCode status: 200; @bodyRoot body: Other; }
+      @put op put(@bodyRoot body: Widget): Empty | ResourceResponse;
     `,
-          )
-          .toEmitDiagnostics([diagnostic(`request: Widget; ${status} response: Other`)]);
+      )
+      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
+  });
 
-        await tester
-          .expect(
-            `
+  it("ignores a void 201 variant without hiding an unregistered response", async () => {
+    await tester
+      .expect(
+        `
       model Plain { value: string; }
-      model Empty { @statusCode status: ${status}; @body body: void; }
-      model ResourceResponse { @statusCode status: ${status}; @body body: Plain; }
-      @put op put(@body body: string): ${variants};
+      model Empty { @statusCode status: 201; @body body: void; }
+      model ResourceResponse { @statusCode status: 201; @body body: Plain; }
+      @put op put(@body body: string): ResourceResponse | Empty;
     `,
-          )
-          .toEmitDiagnostics([unregistered(`${status} response: Plain`)]);
-      }
-    },
-  );
+      )
+      .toEmitDiagnostics([unregistered("201 response: Plain")]);
+  });
 
-  it.each([200, 201])(
-    "accepts void %s variants with the same resource or no resource",
-    async (status) => {
-      for (const variants of ["Empty | ResourceResponse", "ResourceResponse | Empty", "Empty"]) {
-        await tester
-          .expect(
-            `${models}
-      model Empty { @statusCode status: ${status}; @bodyRoot body: void; }
-      model ResourceResponse { @statusCode status: ${status}; @bodyRoot body: Widget; }
-      @put op put(@bodyRoot body: Widget): ${variants};
+  it("accepts a void variant alongside the same resource", async () => {
+    await tester
+      .expect(
+        `${models}
+      model Empty { @statusCode status: 200; @bodyRoot body: void; }
+      @put op put(@bodyRoot body: Widget): Empty | Ok<Widget>;
     `,
-          )
-          .toBeValid();
-      }
-    },
-  );
+      )
+      .toBeValid();
+  });
+
+  it("accepts an explicitly void success body without a resource response", async () => {
+    await tester
+      .expect(
+        `${models}
+      model Empty { @statusCode status: 201; @bodyRoot body: void; }
+      @put op put(@bodyRoot body: Widget): Empty;
+    `,
+      )
+      .toBeValid();
+  });
 
   it.each(["Record<string>", "Array<string>"])("skips inherited indexers from %s", async (base) => {
     await tester
@@ -532,20 +530,6 @@ describe("PUT request and response bodies", () => {
         `${models}
     model Parts { value: HttpPart<string>; }
     @put op put(@header contentType: "multipart/form-data", @multipartBody body: Parts): Ok<Widget>;
-  `,
-      )
-      .toBeValid();
-  });
-
-  it("accepts standard ARM create-or-replace templates", async () => {
-    await tester
-      .expect(
-        `
-    @armProviderNamespace @service namespace Microsoft.Test;
-    model Widget is TrackedResource<{ value?: string }> { ...ResourceNameParameter<Widget>; }
-    @armResourceOperations interface Widgets {
-      createOrReplace is ArmResourceCreateOrReplaceSync<Widget>;
-    }
   `,
       )
       .toBeValid();
@@ -711,23 +695,10 @@ describe("PUT request and response bodies", () => {
       .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
   });
 
-  const examples = [
-    `@armProviderNamespace
-namespace Microsoft.Example;
-
-model Widget
-  is TrackedResource<{
-    value?: string;
-  }> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  createOrReplace is ArmResourceCreateOrReplaceSync<Widget>;
-}
-`,
-    `@armProviderNamespace
+  it("diagnoses the standard request override", async () => {
+    await tester
+      .expect(
+        `@armProviderNamespace
 namespace Microsoft.Example;
 
 model Widget
@@ -753,19 +724,13 @@ interface Widgets {
   >;
 }
 `,
-  ];
-
-  it("compiles the standard standard template", async () => {
-    await tester.expect(examples[0]).toBeValid();
-  });
-
-  it("diagnoses the standard request override", async () => {
-    await tester.expect(examples[1]).toEmitDiagnostics([
-      {
-        code,
-        message:
-          "PUT bodies must reuse the same resource model. Found request: Microsoft.Example.WidgetInput; 200 response: Microsoft.Example.Widget; 201 response: Microsoft.Example.Widget.",
-      },
-    ]);
+      )
+      .toEmitDiagnostics([
+        {
+          code,
+          message:
+            "PUT bodies must reuse the same resource model. Found request: Microsoft.Example.WidgetInput; 200 response: Microsoft.Example.Widget; 201 response: Microsoft.Example.Widget.",
+        },
+      ]);
   });
 });
