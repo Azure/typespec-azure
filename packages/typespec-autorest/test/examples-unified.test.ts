@@ -97,10 +97,10 @@ async function compileVersioned(
 }
 
 describe("unified examples format", () => {
-  it("reports a misspelled operation for each applicable API version", async () => {
+  it("reports an unknown operation for each applicable API version", async () => {
     tester.fs.add(
       resolveVirtualPath("./examples.yaml"),
-      versionedExamplesYaml.replace("Widgets.get:", "Widgets.geet:"),
+      versionedExamplesYaml.replace("Widgets.get:", "Widgets.missing:"),
     );
     const [, diagnostics] = await tester.compileAndDiagnose(versionedSpec);
     const errors = diagnostics.filter(
@@ -109,7 +109,7 @@ describe("unified examples format", () => {
     );
     expect(errors).toHaveLength(2);
     expect(errors.every((diagnostic) => diagnostic.severity === "error")).toBe(true);
-    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("Widgets.geet");
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("Widgets.missing");
     expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("2023-01-01");
     expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("2023-06-01");
   });

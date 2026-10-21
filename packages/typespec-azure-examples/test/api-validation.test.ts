@@ -144,12 +144,12 @@ Widgets.create:
 
   it("reports an unknown operation rather than silently ignoring it", async () => {
     const diagnostics = await validate(`
-Widgets.creatte:
+Widgets.missing:
   - request: {}
     responses: { 200: {} }
 `);
     expect(diagnostics).toMatchObject([
-      { code: "unknown-example-operation", operation: "Widgets.creatte", severity: "error" },
+      { code: "unknown-example-operation", operation: "Widgets.missing", severity: "error" },
     ]);
   });
 
