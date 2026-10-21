@@ -63,7 +63,8 @@ duplicate top-level resource envelope properties.
 
 ## Migrated TypeSpec behavior
 
-The native rule visits operations, skips template declarations/instances,
+The native rule visits operations, skips generic operation declarations/instances
+and operations on generic interface declarations,
 requires the HTTP verb to be `put`, gathers HTTP path and query parameter names,
 and inspects a single model request body. It looks for a model-valued
 `properties` member and walks inherited properties inside that bag. A diagnostic
@@ -77,7 +78,20 @@ properties declaration produce two diagnostics at the same declaration. Inherite
 members are included, but nested model-valued members are not traversed recursively;
 cycles and shared siblings therefore do not create extra payload-path diagnostics.
 Project-imported members retain their source target. Template sources are skipped
-while concrete aliases are checked.
+while concrete aliases and operations inherited into concrete interfaces are checked.
+
+### Concrete inherited operation repair
+
+The template guard uses the compiler's declaration-aware predicate rather than
+rejecting every operation carrying template-instance metadata. A concrete
+interface inheriting a PUT from a generic interface is an actionable HTTP endpoint,
+not an uninstantiated template. The canonical native suite covers both repeating
+and nonrepeating inherited bodies, including the repeated property's exact source
+span. The violating regression produced zero warnings before this repair.
+
+This bounded repair does not refresh the historical corpus totals below or
+establish universal Swagger parity. Existing authored-name, template-source,
+per-operation multiplicity, and emitter-isolation boundaries are retained.
 
 ## Native semantic matrix
 

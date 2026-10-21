@@ -197,4 +197,28 @@ describe("repeated-path-info native contract", () => {
       )
       .toEmitDiagnostics([diagnostic()]);
   });
+
+  it.each([true, false])(
+    "checks concrete inherited PUT operations with repeated properties: %s",
+    async (repeats) => {
+      const expectation = (await tester()).expect(`
+        using TypeSpec.Http;
+        model Properties { /*repeated*/${repeats ? "widgetName" : "description"}?: string; }
+        interface Templates<T> {
+          @put @route("/widgets/{widgetName}")
+          op create(@path widgetName: string, @body body: T): void;
+        }
+        interface Widgets extends Templates<{ properties: Properties }> {}
+      `);
+      if (repeats) {
+        await expectation.toEmitDiagnostics(({ repeated }) => ({
+          ...diagnostic(),
+          pos: getSourceLocation(repeated).pos,
+          end: getSourceLocation(repeated).end,
+        }));
+      } else {
+        await expectation.toBeValid();
+      }
+    },
+  );
 });
