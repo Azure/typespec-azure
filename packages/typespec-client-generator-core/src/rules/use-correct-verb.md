@@ -1,16 +1,13 @@
-Use common SDK method names for resource lifecycle operations. Operation names should  begin with `create` for PUT, `update` for PATCH,
+Use common SDK method names for resource lifecycle operations. Operation names should begin with `create` for PUT, `update` for PATCH,
 and `delete` for DELETE. Prefix matching is case-insensitive. GET, POST, HEAD,
 and other HTTP verbs are outside this rule.
 
-The rule checks concrete HTTP service endpoints in ARM and data-plane services.
-It does not require ARM provider metadata or check client-only declarations
-outside services. It resolves common names through TCGC, honoring unscoped
-`@clientName`, exact names, and the supported `@friendlyName` fallback.
-Language-specific overrides and explicit OpenAPI operation IDs do not change
-the common name. Diagnostics target the original operation.
+This guidance applies to both ARM and data-plane services. To fix a warning,
+rename the operation or use `@clientName` without a language scope, as shown below.
+Changing only a language-specific name or an OpenAPI operation ID does not fix
+the common SDK name.
 
-The rule is disabled by default in the `client-sdk` ruleset. It does not select
-an emitter or API-version projection, or reconstruct historical renamed names.
+The rule is disabled by default in the `client-sdk` ruleset.
 
 These examples assume `Widget` and `WidgetProperties` are defined ARM resource types.
 
@@ -68,10 +65,9 @@ interface Widgets {
 
 ## Migration
 
-This rule replaces `use-create-for-put` and consolidates the proposed
-`use-update-for-patch` and `use-delete-for-delete` rules. Replace the old name
-in linter configuration and suppressions with `use-correct-verb`.
-Enabling the replacement checks all three verbs, not just PUT.
+If you use `use-create-for-put`, replace it with `use-correct-verb` in linter
+configuration and suppressions. Enabling the replacement checks PATCH and DELETE
+names as well as PUT names.
 
 ## LintDiff Equivalent
 
@@ -80,7 +76,3 @@ Enabling the replacement checks all three verbs, not just PUT.
 | [PutInOperationName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-in-operation-name.md)       | PUT names start with `create`.    |
 | [PatchInOperationName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-in-operation-name.md)   | PATCH names start with `update`.  |
 | [DeleteInOperationName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/delete-in-operation-name.md) | DELETE names start with `delete`. |
-
-The native rule checks common SDK names rather than serialized `operationId`
-or lintdiff authored names. It intentionally does not reproduce underscore,
-group-prefix, or missing-ID exemptions. No emitted Swagger parity is claimed.
