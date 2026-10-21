@@ -111,6 +111,21 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `serializationOptions` on SdkModelType properties was already documented. Now also documented on `SdkBodyParameter` and `SdkHttpResponseBase` in the HTTP Operation Parameters and Response sections.
 - `baseModel` property on SdkModelType is not documented in guideline.md but exists in interfaces.ts.
 
+## Union Constraints
+
+- `SdkUnionType.baseType` preserves only an explicit TypeSpec union `extends` constraint; TCGC does not infer it from a common model ancestor.
+- Usage, access, and serialization information propagate through an explicit union base, including nullable and union constraint chains. Propagation intentionally excludes unrelated discriminated subtypes.
+- A union's model constraint does not create inheritance. Each model variant must explicitly inherit from the constrained model.
+- For unions converted to enums, an explicit scalar constraint determines `SdkEnumType.valueType` and the known values' types. It takes precedence over literal inference and narrower scalar variants.
+- Fixed versus extensible remains variant-driven: a scalar constraint alone stays fixed; including an open scalar variant makes the enum extensible.
+
+## LRO Protocol and Client Results
+
+- Azure.Core `getLroProtocolMetadata` owns protocol discovery: initial response facts, polling links and bindings, terminal states, final-state-via, and required final requests.
+- TCGC selects the native LRO client result, envelope, and extraction path from those protocol facts. `lroMetadata.finalResponse.resultSegments` is independent of paging result segments for combined LRO+paging methods.
+- `lroMetadata.__raw`, `__raw_lro_metadata`, and Core's combined `getLroMetadata` remain compatibility projections; emitter code should consume the SDK metadata.
+- Legacy `@markAsLro` is a TCGC-only synthetic fallback. It does not create native Core protocol metadata or native LRO usage flags, and applying it to an already-native LRO reports `mark-as-lro-ineffective`.
+
 ## Diagnostics
 
 - `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
