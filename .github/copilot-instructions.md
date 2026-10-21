@@ -78,8 +78,8 @@ for package selection, scaffolding, and registration.
 
 ### Changelog entries
 
-- For changes made in response to review comments, update the existing changelog entry
-  rather than adding a redundant one.
+- When reviewing a PR, check for redundant changelog entries. Ensure entries describe the
+  final changes, not the PR's revision history or intermediate review-driven cleanup.
 
 ## Branch and PR Workflow
 
