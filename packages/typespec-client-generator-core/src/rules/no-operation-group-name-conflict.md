@@ -28,15 +28,6 @@ additional checks.
 ### Incorrect
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-client-generator-core";
-
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core;
-
-@service
-namespace Example;
-
 model Widget {
   id: string;
 }
@@ -49,15 +40,6 @@ interface WidgetOperations {
 ### Correct
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-client-generator-core";
-
-using TypeSpec.Http;
-using Azure.ClientGenerator.Core;
-
-@service
-namespace Example;
-
 model Widget {
   id: string;
 }

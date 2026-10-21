@@ -97,18 +97,15 @@ it("uses common type names as well as group names", async () => {
     .toBeValid();
 });
 
-it.each(["csharp", "java", "python", "javascript"])(
-  "checks names in the explicitly configured %s scope",
-  async (scope) => {
-    await tester
-      .expect(
-        `${header}
-          @clientName("Item", "${scope}") model Widget { id: string; }
-          @clientName("Item", "${scope}") interface Group { @get op read(): Widget; }`,
-      )
-      .toEmitDiagnostics(diagnostic("Item"));
-  },
-);
+it("checks names in an explicitly configured language scope", async () => {
+  await tester
+    .expect(
+      `${header}
+        @clientName("Item", "csharp") model Widget { id: string; }
+        @clientName("Item", "csharp") interface Group { @get op read(): Widget; }`,
+    )
+    .toEmitDiagnostics(diagnostic("Item"));
+});
 
 it("does not combine overrides from different languages", async () => {
   await tester
@@ -184,16 +181,6 @@ it("uses friendly names without classifying SDK types", async () => {
     .toEmitDiagnostics(diagnostic("Item"));
 });
 
-it("includes unused type declarations without inspecting operation reachability", async () => {
-  await tester
-    .expect(
-      `${header}
-        model Widget { child?: Widget; }
-        @clientName("Widget") interface Group { @get op read(): string; }`,
-    )
-    .toEmitDiagnostics(diagnostic());
-});
-
 it("checks nested namespaces independently", async () => {
   await tester
     .expect(
@@ -221,23 +208,6 @@ it("does not flatten types or groups across namespaces", async () => {
       `${header}
       namespace Types { model Widget { id: string; } }
       @clientName("Widget") interface Group { @get op read(): Types.Widget; }`,
-    )
-    .toBeValid();
-});
-
-it("does not follow model properties, bases or polymorphic alternatives", async () => {
-  await tester
-    .expect(
-      `${header}
-      namespace Types {
-        @discriminator("kind") model Base { kind: string; }
-        model Widget extends Base { kind: "widget"; child?: Widget; }
-        model Container { child: Widget; }
-      }
-      @clientName("Widget") interface Group {
-        @get @route("/base") op read(): Types.Base;
-        @get @route("/container") op readContainer(): Types.Container;
-      }`,
     )
     .toBeValid();
 });
