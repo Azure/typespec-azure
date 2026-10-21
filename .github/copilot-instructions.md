@@ -34,6 +34,117 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 - Use `pnpm change add` to add a change description for the touched packages
 - Types of changes are described in `.chronus/config.yaml`
 
+## Linter PR Review Guidelines
+
+Use these guidelines when implementing or reviewing native TypeSpec linter rules,
+including Swagger/LintDiff migrations. See the
+[rule authoring guide](../website/src/content/docs/docs/howtos/contributing/creating-linter-rules.md)
+for package selection, scaffolding, and registration.
+
+### Implementation and scope
+
+- Prefer existing rules, supported compiler/library APIs, and native linter callbacks over
+  custom walkers, adapter factories, or mutable dispatch registries. Keep helpers and
+  deduplication only where they serve a concrete requirement.
+- State the native rule's applicability, exclusions, diagnostic targets, and enablement.
+  Availability in a package is not activation in a ruleset. Keep implementation, registration,
+  rulesets, tests, documentation, and change descriptions consistent.
+- Evaluate simplifications against required behavior, not just the current implementation
+  or tests. Separate genuine policy decisions from behavior-preserving cleanup; do not
+  silently change scope, exceptions, or released suppression behavior.
+- Keep unrelated sample upgrades and fixture synchronization in separate PRs when possible.
+  Explain dependencies, fixture provenance, and how copied baselines stay synchronized.
+
+### Tests
+
+- Keep the rule's canonical behavior suite in its owning package's `test/rules/` directory.
+  Test the shipped rule directly with package-local testers and supported public fixture APIs.
+  Do not recreate the implementation, filter away unexpected diagnostics, or use private
+  decorator/state APIs merely to construct a hypothetical case.
+- Assert observable behavior: accepted and rejected inputs, diagnostic messages/counts, and
+  exact authored targets. Prefer built-in source markers to calculated string offsets.
+  For imported-file targets, submit the marked file through the tester's multi-file input.
+- Cover distinct semantic boundaries rather than every Cartesian product. Use representative
+  verbs, statuses, visibility values, metadata placements, and declaration kinds when they
+  take the same branch. Remove cosmetic duplicates and repeated full ARM template positives.
+- Preserve discriminating regressions: ambiguity and order independence, state isolation,
+  recursive boundaries, authored/inherited targets, and duplicate-report prevention where
+  the rule owns those behaviors. A test must fail if the behavior it claims to protect is
+  removed; an exempt fixture that passes for another reason does not prove an exemption.
+- Respect responsibility boundaries. Do not repeat generic compiler behavior, suppression
+  machinery, or another rule's independent assertions in this suite. Retain integration
+  coverage for a concrete interaction or regression. Helper tests do not replace coverage
+  of rule-specific filtering or selection performed by the caller.
+- Put package registration, legacy-name absence, and ruleset-default assertions in the
+  appropriate public-entry/ruleset suite rather than repeating them per semantic case.
+  Prefer behavioral assertions to spies on resolver calls; retain internal-path assertions
+  only when needed to prove a specific side-effect or performance regression.
+- Use existing test/build/lint commands. Report focused tests, broader checks, external
+  integration results, and pending CI separately; do not turn a timeout or known failure
+  into a success claim. For substantial traversal/resolution changes, measure representative
+  base/head timing and memory rather than treating diagnostic counts as performance evidence.
+
+### Rule documentation
+
+- Write for TypeSpec specification authors: explain what is required, where it applies,
+  why it matters, and how to correct a violation. Use native TypeSpec concepts and concise,
+  actionable language rather than implementation terminology.
+- Do not fill the public rule page with visitor mechanics, test strategy, internal helper
+  details, or instructions for AI implementers. Keep implementation notes in contributor
+  material or PR evidence, not the author-facing explanation.
+- Keep legacy validator mappings and parity limitations in a dedicated migration/provenance
+  section, such as `LintDiff Equivalent`, rather than interleaving them with native guidance.
+  Discuss emitted OpenAPI only when it explains a real user-facing requirement or consequence.
+- Edit the authored `packages/<pkg>/src/rules/<rule-name>.md` and regenerate public reference
+  documentation with the owning package's existing command; do not patch generated pages alone.
+
+### Documentation examples
+
+- Show the smallest incorrect/correct pair that exposes the rule-owned difference. Omit
+  repeated imports, service/provider setup, resource scaffolding, and unchanged defaults;
+  state assumed context when necessary. Examples need not each be standalone specifications.
+- Choose the intended audience explicitly. For ARM resource scenarios, prefer standard ARM
+  templates and supported named customization arguments over handwritten routes/operations.
+  Use the appropriate standard templates for other audiences when available. If no supported
+  template can demonstrate the violation, explain that limitation in PR evidence.
+- Ensure both sides reach the intended check: the correction must fix the violation rather
+  than escape through an unrelated exemption. Preserve relevant key/wire names, payload fields,
+  response shapes, or decorator placement while removing irrelevant boilerplate.
+- Validate the actual published excerpts with the owning rule and minimal explicit public
+  setup, checking the intended diagnostic contrast. A larger test inspired by an example
+  does not validate the example's current text. Distinguish excerpt validation from standalone
+  compilation and continuous coverage; do not add bespoke Markdown parsers or fence-count tests.
+
+### Changelog entries
+
+- Run `pnpm change add` from the Azure repository root. Commit unreleased Azure package entries
+  under **`.chronus/changes/` at the repository root**, not `core/.chronus/changes/`, a package-local
+  folder, or a generated `CHANGELOG.md`. `core/` is the separate TypeSpec compiler submodule.
+- Use the actual npm package names in `packages` and a `changeKind` from `.chronus/config.yaml`.
+  Describe the user-visible result: name the rule, the violation/fix, and any default ruleset
+  enablement or compatibility impact. Distinguish introducing a rule from registering it disabled.
+  For example:
+
+  ```markdown
+  ---
+  changeKind: feature
+  packages:
+    - "@azure-tools/typespec-azure-resource-manager"
+  ---
+
+  Add the `resource-missing-read` lint rule requiring a read operation for ARM resources with create or update operations.
+  ```
+
+- Inspect existing task-owned unreleased entries first. Update the existing feature/fix entry
+  to describe the final shipped behavior instead of adding a new entry for each review round.
+  Do not add a redundant `internal` entry for test pruning, helper reuse, formatting, or
+  syncing with the base branch when the same package/change already has user-facing coverage.
+- Preserve unrelated entries and distinct package coverage, including a rulesets package when
+  its registration/enablement changes. Choose `feature`, `fix`, `breaking`, or another configured
+  kind according to the actual effect, not merely the fact that the PR is a migration.
+- Run `pnpm chronus status` to check coverage. Do not add meaningless entries just to satisfy
+  package detection; Markdown and test-only changes are excluded by `.chronus/config.yaml`.
+
 ## Branch and PR Workflow
 
 - When creating worktrees or branches for new work, base them off the main Azure fork's `main` branch (Azure/typespec-azure). Depending on the user's local git remote setup, this may be called `upstream` or `origin`.
