@@ -1,5 +1,5 @@
 import type { Namespace, Program, SourceLocation, Type, Value } from "@typespec/compiler";
-import type { DiffKind } from "./diff-kind.js";
+import type { DiffKind } from "@azure-tools/typespec-azure-core";
 
 /**
  * The direction component of a diff — request or response.

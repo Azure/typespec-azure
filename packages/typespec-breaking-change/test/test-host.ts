@@ -26,7 +26,6 @@ export const TesterWithArm = createTester(resolvePath(import.meta.dirname, "..")
     "@typespec/versioning",
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-azure-resource-manager",
-    "@azure-tools/typespec-breaking-change",
   ],
 })
   .importLibraries()

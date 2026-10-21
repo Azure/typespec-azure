@@ -1,12 +1,12 @@
-import type { Program, Type } from "@typespec/compiler";
 import {
   findSuppressions,
   findUnversionedSuppressions,
   scanAllUnversionedSuppressions,
   type ResolvedSuppression,
-} from "./decorators.js";
-import { isOperationIdentity } from "../types.js";
+} from "@azure-tools/typespec-azure-core";
+import type { Program, Type } from "@typespec/compiler";
 import type { Finding, OperationDiffIdentity } from "../types.js";
+import { isOperationIdentity } from "../types.js";
 
 /**
  * Scan the head program's unversioned suppression state map for Phase A
@@ -79,8 +79,7 @@ function collectSuppressions(
   program: Program,
   targetType: Type,
 ): ResolvedSuppression[] {
-  const finder =
-    finding.phase === "same-version" ? findUnversionedSuppressions : findSuppressions;
+  const finder = finding.phase === "same-version" ? findUnversionedSuppressions : findSuppressions;
 
   const suppressions = [...finder(program, targetType)];
 

@@ -1,5 +1,5 @@
+import type { DiffKind } from "@azure-tools/typespec-azure-core";
 import type { ModelProperty } from "@typespec/compiler";
-import type { DiffKind } from "../diff-kind.js";
 import type { ApiDiff, ComparisonPhase, Finding, VersionPair } from "../types.js";
 
 type Classification = Readonly<{

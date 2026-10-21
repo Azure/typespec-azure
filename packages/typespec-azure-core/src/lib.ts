@@ -3,6 +3,12 @@ import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
   diagnostics: {
+    "breaking-change": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Breaking change detected: ${"message"}`,
+      },
+    },
     "invalid-suppression-kind": {
       severity: "warning",
       messages: {

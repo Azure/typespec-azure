@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-breaking-change"
 ---
 
-Consume approval decorators and kind validation from Azure.Core instead of defining a separate TypeSpec namespace.
+Consume approval decorators, kind validation, and breaking-change diagnostics from Azure.Core. Remove the obsolete TypeSpec library entrypoint and forwarding modules while retaining the JavaScript analyzer and CLI.

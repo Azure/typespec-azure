@@ -1,7 +1,9 @@
+import {
+  BreakingChangeStateKeys,
+  type DiffKind,
+  type SuppressionMetadata,
+} from "@azure-tools/typespec-azure-core";
 import type { Program, Type } from "@typespec/compiler";
-import type { DiffKind } from "../diff-kind.js";
-import { BreakingChangeStateKeys } from "../lib.js";
-import type { SuppressionMetadata } from "./decorators.js";
 
 /**
  * A normalized suppression record that can be compared across compilations

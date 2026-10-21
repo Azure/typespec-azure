@@ -11,6 +11,7 @@ import { describe, expect, it } from "vitest";
 import {
   $approvedBreakingChange,
   $approvedUnversionedChange,
+  $lib,
   findSuppressions,
   findUnversionedSuppressions,
   getSuppressions,
@@ -44,6 +45,25 @@ describe("suppression decorators", () => {
       ]);
     },
   );
+
+  it("creates breaking-change diagnostics without the prototype library", async () => {
+    const { program } = await Tester.compile(`
+      namespace Test;
+      model Widget {}
+    `);
+    const widget = getModel(program, "Widget");
+    const diagnostic = $lib.createDiagnostic({
+      code: "breaking-change",
+      target: widget,
+      format: { message: "Property 'legacy' was removed." },
+    });
+    expect(diagnostic).toMatchObject({
+      code: "@azure-tools/typespec-azure-core/breaking-change",
+      severity: "error",
+      message: "Breaking change detected: Property 'legacy' was removed.",
+    });
+    expect(diagnostic.target).toBe(widget);
+  });
 
   it.each(["approvedBreakingChange", "approvedUnversionedChange"])(
     "diagnoses invalid kinds passed through @%s without storing approval metadata",
