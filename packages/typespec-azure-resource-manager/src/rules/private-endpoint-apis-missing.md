@@ -26,19 +26,11 @@ or consistently listing and managing private endpoint connections.
 
 ## Incorrect
 
-This resource exposes connection operations without private link discovery.
+Assume `Widget`, `PrivateEndpointConnection`, and `PrivateLinkResource` are already
+declared resource models. This resource exposes connection operations without
+private link discovery.
 
 ```typespec
-@armProviderNamespace
-@service
-namespace Microsoft.TestService;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Resource = Widget, KeyName = "widgetName", SegmentName = "widgets">;
-}
-
-model PrivateEndpointConnection is PrivateEndpointConnectionResource;
-model PrivateLinkResource is PrivateLink;
 alias Connections = PrivateEndpoints<PrivateEndpointConnection>;
 alias Links = PrivateLinks<PrivateLinkResource>;
 
@@ -54,16 +46,6 @@ interface Widgets {
 Add the matching private link collection for the same parent resource.
 
 ```typespec
-@armProviderNamespace
-@service
-namespace Microsoft.TestService;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Resource = Widget, KeyName = "widgetName", SegmentName = "widgets">;
-}
-
-model PrivateEndpointConnection is PrivateEndpointConnectionResource;
-model PrivateLinkResource is PrivateLink;
 alias Connections = PrivateEndpoints<PrivateEndpointConnection>;
 alias Links = PrivateLinks<PrivateLinkResource>;
 

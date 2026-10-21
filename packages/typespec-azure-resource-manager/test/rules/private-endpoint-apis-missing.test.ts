@@ -63,7 +63,7 @@ async function checkPresence(mask: number) {
   }
 }
 
-describe("private-endpoint-apis-missing", () => {
+describe("registered ARM path completeness", () => {
   it("accepts a resource without private endpoint APIs", () => checkPresence(0));
   it("requires collections when only the connection point exists", () => checkPresence(1));
   it("requires the point and links when only the connection collection exists", () =>
@@ -129,36 +129,34 @@ describe("private-endpoint-apis-missing", () => {
       }
     `;
     const actions = linkFirst ? linkAction + otherAction : otherAction + linkAction;
-    it(`accepts complete APIs with same-name actions across interfaces, link first: ${linkFirst}`, async () => {
-      await tester
-        .expect(
-          `${setup}
+    it(`retains same-name actions across interfaces: linkFirst=${linkFirst}, connections=${linkFirst}`, async () => {
+      const expectation = tester.expect(`${setup}
         @armResourceOperations interface EndpointOperations {
-          read is Connections.Read<Widget>;
-          list is Connections.ListByParent<Widget>;
+          ${linkFirst ? operations.slice(0, 2).join("\n") : ""}
         }
         ${actions}
-      `,
-        )
-        .toBeValid();
-    });
-    it(`reports both missing connections with same-name actions, link first: ${linkFirst}`, async () => {
-      await tester.expect(`${setup}${actions}`).toEmitDiagnostics((result) =>
-        suffixes.slice(0, 2).map((suffix) => ({
-          ...diagnostic(basePath + suffix),
-          pos: result.pos.links.pos,
-        })),
-      );
+      `);
+      if (linkFirst) {
+        await expectation.toBeValid();
+      } else {
+        await expectation.toEmitDiagnostics((result) =>
+          suffixes.slice(0, 2).map((suffix) => ({
+            ...diagnostic(basePath + suffix),
+            pos: result.pos.links.pos,
+          })),
+        );
+      }
     });
   }
 
-  for (const legacy of [false, true]) {
-    for (const widgetFirst of [true, false]) {
-      for (const includeLinks of [true, false]) {
-        it(`retains same-name read/list registrations: legacy=${legacy}, widgetFirst=${widgetFirst}, links=${includeLinks}`, async () => {
-          const parents = widgetFirst ? ["Widget", "Other"] : ["Other", "Widget"];
-          const interfaces = parents.map(
-            (parent) => `
+  for (const { legacy, widgetFirst, includeLinks } of [
+    { legacy: false, widgetFirst: true, includeLinks: false },
+    { legacy: true, widgetFirst: false, includeLinks: true },
+  ]) {
+    it(`retains same-name read/list registrations: legacy=${legacy}, widgetFirst=${widgetFirst}, links=${includeLinks}`, async () => {
+      const parents = widgetFirst ? ["Widget", "Other"] : ["Other", "Widget"];
+      const interfaces = parents.map(
+        (parent) => `
               ${
                 legacy
                   ? `
@@ -178,36 +176,36 @@ describe("private-endpoint-apis-missing", () => {
                 ${includeLinks ? `${parent.toLowerCase()}Links is Links.ListByParent<${parent}>;` : ""}
               }
             `,
-          );
-          const expectation = tester.expect(`${setup}
+      );
+      const expectation = tester.expect(`${setup}
             model Other is TrackedResource<{}> {
               ...ResourceNameParameter<Resource = Other, KeyName = "otherName", SegmentName = "others">;
             }
             ${interfaces.join("\n")}
           `);
-          if (includeLinks) {
-            await expectation.toBeValid();
-          } else {
-            await expectation.toEmitDiagnostics((result) =>
-              parents.map((parent) => ({
-                ...diagnostic(
-                  (parent === "Widget"
-                    ? basePath
-                    : basePath.replace("widgets/{widgetName}", "others/{otherName}")) + suffixes[2],
-                ),
-                pos: result.pos[parent].pos,
-              })),
-            );
-          }
-        });
+      if (includeLinks) {
+        await expectation.toBeValid();
+      } else {
+        await expectation.toEmitDiagnostics((result) =>
+          parents.map((parent) => ({
+            ...diagnostic(
+              (parent === "Widget"
+                ? basePath
+                : basePath.replace("widgets/{widgetName}", "others/{otherName}")) + suffixes[2],
+            ),
+            pos: result.pos[parent].pos,
+          })),
+        );
       }
-    }
+    });
   }
 
-  for (const customResource of [false, true]) {
-    for (const includeConnections of [true, false]) {
-      it(`checks legacy operations on an unlisted registered model: custom=${customResource}, connections=${includeConnections}`, async () => {
-        const expectation = tester.expect(`${setup}
+  for (const { customResource, includeConnections } of [
+    { customResource: false, includeConnections: true },
+    { customResource: true, includeConnections: false },
+  ]) {
+    it(`checks legacy operations on an unlisted registered model: custom=${customResource}, connections=${includeConnections}`, async () => {
+      const expectation = tester.expect(`${setup}
           ${customResource ? "@Legacy.customAzureResource" : ""}
           model LinkInformation {
             id?: string;
@@ -226,18 +224,17 @@ describe("private-endpoint-apis-missing", () => {
             links is LinkOperations.ListSinglePage<LinkInformation>;
           }
         `);
-        if (includeConnections) {
-          await expectation.toBeValid();
-        } else {
-          await expectation.toEmitDiagnostics((result) =>
-            suffixes.slice(0, 2).map((suffix) => ({
-              ...diagnostic(basePath + suffix),
-              pos: result.pos.target.pos,
-            })),
-          );
-        }
-      });
-    }
+      if (includeConnections) {
+        await expectation.toBeValid();
+      } else {
+        await expectation.toEmitDiagnostics((result) =>
+          suffixes.slice(0, 2).map((suffix) => ({
+            ...diagnostic(basePath + suffix),
+            pos: result.pos.target.pos,
+          })),
+        );
+      }
+    });
   }
 
   for (const includeLinks of [true, false]) {

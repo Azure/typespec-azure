@@ -1,7 +1,6 @@
 import {
   createRule,
   fileRef,
-  navigateProgram,
   paramMessage,
   type Interface,
   type Operation,
@@ -24,23 +23,20 @@ export const privateEndpointApisMissingRule = createRule({
     default: paramMessage`The private endpoint API: ${"apiPath"} is missing.`,
   },
   create(context) {
+    const supportedResources = new Map<string, PrivateEndpointApiSet>();
+
     return {
-      root: (program) => {
-        const supportedResources = new Map<string, PrivateEndpointApiSet>();
+      operation(operation) {
+        if (getArmResourceOperationData(context.program, operation) === undefined) {
+          return;
+        }
 
-        navigateProgram(program, {
-          operation(operation) {
-            if (getArmResourceOperationData(program, operation) === undefined) {
-              return;
-            }
-
-            const resourceOperation = getResourceOperation(program, operation);
-            if (resourceOperation !== undefined) {
-              collectPath(supportedResources, resourceOperation);
-            }
-          },
-        });
-
+        const resourceOperation = getResourceOperation(context.program, operation);
+        if (resourceOperation !== undefined) {
+          collectPath(supportedResources, resourceOperation);
+        }
+      },
+      exit() {
         for (const [basePath, apiSet] of supportedResources.entries()) {
           const target = getDiagnosticTarget(apiSet);
           if (!apiSet.privateEndpointConnectionPath) {
