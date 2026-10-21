@@ -14,7 +14,25 @@ import type {
   Union,
 } from "@typespec/compiler";
 
+/**
+ * Common typed options bag for the `scope` argument accepted by scoped TCGC decorators.
+ *
+ * Every scoped decorator's own options model can extend this base so new, decorator-specific
+ * settings can be added over time without breaking the legacy plain-string scope argument.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language
+ * emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns for `scope`:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ */
 export interface DecoratorOptions {
+  /**
+   * Specifies the target language emitters that a decorator should apply to. If not set, the
+   * decorator applies to all language emitters by default.
+   */
   readonly scope?: string;
 }
 
