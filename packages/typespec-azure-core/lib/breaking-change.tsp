@@ -22,7 +22,7 @@ model ApprovedBreakingChangeOptions {
 }
 
 /**
- * Marks a breaking change as intentionally approved for cross-version (Phase B) comparison.
+ * Marks a breaking change as intentionally approved for cross-version comparison.
  *
  * When placed on a type, property, operation, or namespace, it suppresses
  * the matching breaking-change finding in the tool output.
@@ -63,10 +63,10 @@ model ApprovedUnversionedChangeOptions {
 }
 
 /**
- * Marks a same-version (Phase A) structural difference as intentionally approved.
+ * Marks a same-version structural difference as intentionally approved.
  *
- * Phase A compares two compilations of the same version. Any diff indicates a
- * version projection inconsistency. Use this decorator only when the inconsistency
+ * A same-version comparison uses two compilations of the same API version. Any difference
+ * indicates a version projection inconsistency. Use this decorator only when the inconsistency
  * is known and accepted (e.g., during a refactoring migration).
  *
  * @param reason A required explanation of why the unversioned change is approved.
