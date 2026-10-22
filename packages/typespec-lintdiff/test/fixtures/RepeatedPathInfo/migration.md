@@ -12,14 +12,15 @@ version/population mismatch, not a missed check. The fixture now applies
 unreachable declaration. A focused rerun of the Confidential Ledger project
 reports one diagnostic from each engine after projection.
 
-The native contract compares authored properties-bag member names with supported
-HTTP path/query names, not JSON-encoded keys. Valid `@encodedName` cases
-intentionally differ in both directions: an alias can introduce or remove a
-JSON duplicate without changing the native result. **Swagger parity is partial**;
-corpus overlap does not establish universal equivalence. No production update
-is needed for the authoring-name contract. Emitter-free tests cover that contract,
-and separate comparison fixtures prove the encoding gap. Six compile failures
-remain unassessed; corpus pinning and detailed evidence follow.
+The native contract now compares JSON-encoded properties-bag member names with
+supported HTTP path/query names, while targeting the authored declaration.
+This repairs both previously intentional `@encodedName` differences: a JSON
+alias can introduce or remove a duplicate, just as in the Swagger validator.
+Emitter-free native tests and independent emission/validator tests cover both
+directions. **Swagger parity remains partial**: native operation populations,
+properties-bag selection and diagnostic units are not universally equivalent
+to emitted schemas. Historical corpus totals have not been rerun for this repair;
+the six historical compile failures remain unassessed.
 
 ## Rule identity
 
@@ -68,9 +69,10 @@ and operations on generic interface declarations,
 requires the HTTP verb to be `put`, gathers HTTP path and query parameter names,
 and inspects a single model request body. It looks for a model-valued
 `properties` member and walks inherited properties inside that bag. A diagnostic
-is reported on each source property whose authored `ModelProperty.name` matches
-a supported HTTP PUT path or query parameter name. JSON `@encodedName` overrides
-do not change this authoring-name check.
+is reported on each source property whose JSON name from `resolveEncodedName`
+matches a supported HTTP PUT path or query parameter name. The JSON name is
+used for matching, deduplication and the message; the source property remains
+the diagnostic target. Overrides for other media types do not affect the check.
 
 The diagnostic unit is one matching name per concrete PUT operation. The
 deduplication set is local to that operation: two PUT operations sharing one
@@ -90,8 +92,9 @@ and nonrepeating inherited bodies, including the repeated property's exact sourc
 span. The violating regression produced zero warnings before this repair.
 
 This bounded repair does not refresh the historical corpus totals below or
-establish universal Swagger parity. Existing authored-name, template-source,
-per-operation multiplicity, and emitter-isolation boundaries are retained.
+establish universal Swagger parity. Template-source, per-operation multiplicity,
+and emitter-isolation boundaries are retained. The later JSON-name repair changes
+only name resolution, not the concrete inherited-operation guard.
 
 ## Native semantic matrix
 
@@ -106,12 +109,12 @@ per-operation multiplicity, and emitter-isolation boundaries are retained.
 | Duplicate exists only as a top-level body/envelope property               | Already covered by another ARM lint, outside this validator's nested-bag target | ignored by this rule                                                                               | No violation   | No mapped diagnostic     | `top-level-body-property-only` |
 | PATCH body repeats a path parameter                                       | Outside validator scope                                                         | non-PUT skipped                                                                                    | No violation   | No mapped diagnostic     | `patch-body-repeats-path`      |
 
-### Emitted-field evidence and intentional encoding boundary
+### Emitted-field evidence and repaired JSON-name boundary
 
 The validator selects keys of the resolved request schema's nested `properties`
 bag, not TypeSpec source identifiers. The following research matrix distinguishes
-field presence from the authored surface; it does not prescribe emitter logic
-for the native rule.
+field presence from the authored surface. The native rule obtains JSON names
+directly from compiler metadata without emitter dependencies.
 
 | Authored shape                                                      | Validity/support                                            | Selected OpenAPI field present/value                                     | Native check and emission behavior                                                                                                | Swagger / native result | Evidence                                                           |
 | ------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------ |
@@ -122,8 +125,8 @@ for the native rule.
 | Distinct bag members                                                | Supported                                                   | Bag exists; no matching key                                              | No authored-name or JSON-key match                                                                                                | 0 / 0                   | `body-no-repeats`                                                  |
 | Duplicate only on envelope                                          | Rejected by `arm-resource-invalid-envelope-property`        | No matching nested bag key; duplicate is outside selected bag            | Neither check selects the envelope duplicate                                                                                      | 0 / 0                   | `top-level-body-property-only`                                     |
 | Duplicate only on PATCH                                             | Supported operation, outside rule scope                     | No selected PUT duplicate; PATCH key is not selected                     | Both checks restrict operation verb to PUT                                                                                        | 0 / 0                   | `patch-body-repeats-path`                                          |
-| `@encodedName("application/json", "widgetName") otherName?: string` | Supported, compiles and emits without diagnostics           | Yes: key `widgetName`; `otherName` absent                                | Authored `otherName` does not match; AutoRest applies JSON name override                                                          | 1 / 0, intentional      | `encoded-names/json-name-only.tsp`, native and emission suites     |
-| `@encodedName("application/json", "otherName") widgetName?: string` | Supported, compiles and emits without diagnostics           | Yes: key `otherName`; `widgetName` absent                                | Authored `widgetName` matches; AutoRest applies JSON name override                                                                | 0 / 1, intentional      | `encoded-names/authored-name-only.tsp`, native and emission suites |
+| `@encodedName("application/json", "widgetName") otherName?: string` | Supported, compiles and emits without diagnostics           | Yes: key `widgetName`; `otherName` absent                                | JSON `widgetName` matches; the diagnostic still targets authored `otherName`                                                      | 1 / 1                   | `encoded-names/json-name-only.tsp`, native and emission suites     |
+| `@encodedName("application/json", "otherName") widgetName?: string` | Supported, compiles and emits without diagnostics           | Yes: key `otherName`; `widgetName` absent                                | JSON `otherName` does not match; authored `widgetName` alone no longer causes a diagnostic                                        | 0 / 0                   | `encoded-names/authored-name-only.tsp`, native and emission suites |
 | Path and query sharing the same HTTP name                           | Already rejected by `@typespec/http/incompatible-uri-param` | Not assessed: invalid source is not an emission-completeness requirement | Native compiler rejects before the lint test                                                                                      | Not applicable          | Native rejection regression                                        |
 
 The alias fixtures are standalone `.tsp` inputs, not parity-harness `main.tsp`
@@ -273,7 +276,7 @@ object.
 **Disposition:** No rule change. This is a version/population mismatch, not an
 extra check on a supported selected-version shape.
 
-## Focused fixture evidence
+## Historical focused fixture evidence before JSON-name repair
 
 `pnpm --dir packages/typespec-lintdiff validate --rule RepeatedPathInfo` passes
 after refreshing stale snapshots and ambient compliance expectations. It found
@@ -308,20 +311,34 @@ those diagnostic observations. They do invalidate the former universal-equivalen
 interpretation. The `coverageKind` is now `partial` to represent intentional
 Swagger encoding differences.
 
-## Required TypeSpec changes
+## JSON-name repair and acceptance
 
-No production rule update is required for the authored-name native contract.
-This PR refreshes stale focused snapshots and ambient compliance expectations,
-records partial Swagger parity in rule metadata, adds emitter-free native and
-separate encoding comparison regressions, and corrects this migration evidence.
+The later production repair replaces authored-name matching with compiler JSON
+name resolution. It reverses only the two alias expectations above and adds
+inherited alias/override, query wire-name, other-media-type and shared-declaration
+regressions. Existing template guards, PUT-only scope, bag-only nonrecursive
+traversal, exact source targets and emitter/TCGC isolation remain covered.
+The two independent emission comparisons and all eight existing parity fixtures
+remain acceptance requirements. The historical full corpus and its aggregate
+counts are not revalidated by these focused checks.
+
+Fresh focused validation at compiler `a6137cac43a727ce0c2656364fd72d50c272ee4a`
+passes all 17 native tests and both independent emission/validator comparisons.
+The eight existing parity fixtures pass without snapshot changes: five covered
+partial-classification violations, three reviewed-ambient compliance controls,
+and zero unresolved gaps. The fixture worker also confirms mapped native counts
+`1/0` for the two alias inputs against the repaired production build.
+Production build, strict changed-test types, scoped normal/type-aware lint,
+intended-file formatting and diff hygiene pass. The fixture harness uses the
+clean shared validator checkout at `6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`;
+this is not a refresh of the historical source/corpus tuple above.
 
 ## Final conclusion
 
 `tsp-lintdiff-local-linter/repeated-path-info` enforces the native authoring
-contract: PUT request-body `properties` members must not repeat supported HTTP
-PUT path or query parameter names. JSON-encoded property-name overrides remain
-outside that check, so Swagger parity is **partial** in both alias directions.
-The latest full corpus has complete observed project overlap and no one-sided
-projects, not universal supported-shape equivalence. Its raw-count difference
-is explained by a removed older-version declaration. Neither that population
-difference nor the intentional JSON-name gap requires production encoding logic.
+contract: JSON keys of PUT request-body `properties` members must not repeat
+supported HTTP PUT path or query parameter names. Both supported alias directions
+now agree with the Swagger validator without requiring an emitter at runtime.
+Swagger parity remains **partial** rather than universal: historical project
+overlap and the explained selected-version count difference do not establish
+equivalence for every supported shape or refresh the full-corpus results.

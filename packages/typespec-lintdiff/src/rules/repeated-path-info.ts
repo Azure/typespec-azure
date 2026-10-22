@@ -4,6 +4,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   paramMessage,
+  resolveEncodedName,
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
@@ -53,18 +54,19 @@ export const repeatedPathInfoRule = createRule({
 
         const reportedNames = new Set<string>();
         for (const property of walkPropertiesInherited(propertiesModel)) {
-          if (!repeatedNames.has(property.name)) {
+          const name = resolveEncodedName(context.program, property, "application/json");
+          if (!repeatedNames.has(name)) {
             continue;
           }
-          if (reportedNames.has(property.name)) {
+          if (reportedNames.has(name)) {
             continue;
           }
-          reportedNames.add(property.name);
+          reportedNames.add(name);
 
           context.reportDiagnostic({
             target: property,
             format: {
-              name: property.name,
+              name,
             },
           });
         }

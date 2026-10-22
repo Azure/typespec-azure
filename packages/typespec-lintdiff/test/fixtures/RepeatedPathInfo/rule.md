@@ -42,34 +42,34 @@ The TypeSpec rule visits non-template PUT operations, reads their HTTP operation
 metadata, gathers path and query parameter names, and checks the single model
 request body. It reports each repeated property name found in the resource
 `properties` model, including inherited properties, and deduplicates repeated
-names within each operation. The comparison uses the **authored property name**
-(`ModelProperty.name`) and the supported HTTP path/query parameter name.
+names within each operation. The comparison uses the **JSON property name**
+(`resolveEncodedName(program, property, "application/json")`) and the supported
+HTTP path/query parameter name. Diagnostics still target the authored property.
 The diagnostic unit is one matching name per concrete PUT operation: two PUT
 operations sharing a properties declaration report twice at that declaration.
 The rule does not recursively descend into nested members of the properties bag.
 Concrete interfaces inheriting PUT operations from generic interfaces are checked;
 generic operation sources and generic interface declarations are skipped.
 
-This intentionally follows TypeSpec authoring semantics rather than reconstructing
-JSON encoding, Swagger parameter-array locations, or emitted duplicate occurrences.
-In particular, `@encodedName("application/json", ...)` does not change the authored
-property name. **Swagger parity is partial**, even for valid TypeSpec: an alias
-can introduce or remove a duplicate JSON key without changing the native result.
+JSON name overrides can introduce or remove a duplicate payload key. The native
+rule uses compiler metadata without loading an emitter, and agrees with the
+Swagger validator on both supported alias directions.
 For a `{widgetName}` path:
 
 | Properties member                                                   | Native diagnostics | Swagger diagnostics |
 | ------------------------------------------------------------------- | -----------------: | ------------------: |
-| `@encodedName("application/json", "widgetName") otherName?: string` |                  0 |                   1 |
-| `@encodedName("application/json", "otherName") widgetName?: string` |                  1 |                   0 |
+| `@encodedName("application/json", "widgetName") otherName?: string` |                  1 |                   1 |
+| `@encodedName("application/json", "otherName") widgetName?: string` |                  0 |                   0 |
 
 The two source fixtures in `encoded-names/` are compiled by
 `test/rules/repeated-path-info.test.ts` without an emitter and independently by
 `test/rules/repeated-path-info-emission.test.ts` with AutoRest and the installed
-Swagger validator function. They intentionally are not parity-harness `main.tsp`
-cases: that harness expects mapped native diagnostics for Swagger violations.
-The comparison suite instead asserts both emitted JSON keys and validator counts.
-This explicit native contract does not require adding JSON-name handling to
-production to obtain Swagger parity.
+Swagger validator function. The comparison suite asserts both emitted JSON keys
+and validator counts, separately from the emitter-free native assertions.
+The fixtures remain standalone `.tsp` inputs rather than duplicated harness cases.
+`coverageKind: partial` remains conservative: the native operation graph,
+properties-bag selection, diagnostic locations and counts are not a proof of
+universal emitted-schema or selected-version equivalence.
 
 ## Semantic coverage notes
 
@@ -82,8 +82,10 @@ The authorable semantic matrix covered locally is:
 - tenant-scoped PUT resource repeats its path parameter inside `properties` => invalid
 - compliant PUT body with distinct `properties` members => valid
 - repeated property only in PATCH/update payload => valid for this rule
-- JSON alias alone repeats a path name => native compliant, Swagger violation
-- authored name repeats a path name but JSON alias does not => native violation, Swagger compliant
+- JSON alias alone repeats a path name => native and Swagger violation
+- authored name repeats a path name but JSON alias does not => native and Swagger compliant
+- inherited JSON aliases and authored overrides => preserve the effective member and exact diagnostic target
+- JSON aliases match query wire names; aliases for other media types do not change JSON matching
 - cycles and shared sibling models inside the bag => not recursively traversed
 - a shared properties model used by two PUT operations => two diagnostics at the same source property
 - a project-imported properties declaration => diagnostic targets that declaration

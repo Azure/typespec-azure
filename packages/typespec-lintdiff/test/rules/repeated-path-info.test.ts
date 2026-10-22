@@ -45,25 +45,22 @@ const operation = `
 
 describe("repeated-path-info native contract", () => {
   it.each([
-    ["json-name-only", false],
-    ["authored-name-only", true],
-  ] as const)(
-    "checks authored names in the supported ARM fixture %s",
-    async (fixture, violates) => {
-      const code = (
-        await readFile(
-          new URL(`../fixtures/RepeatedPathInfo/encoded-names/${fixture}.tsp`, import.meta.url),
-          "utf8",
-        )
-      ).replace('import "../../lib/imports.tsp";', "");
-      const expectation = (await tester()).expect(code);
-      if (violates) {
-        await expectation.toEmitDiagnostics([diagnostic()]);
-      } else {
-        await expectation.toBeValid();
-      }
-    },
-  );
+    ["json-name-only", true],
+    ["authored-name-only", false],
+  ] as const)("checks JSON names in the supported ARM fixture %s", async (fixture, violates) => {
+    const code = (
+      await readFile(
+        new URL(`../fixtures/RepeatedPathInfo/encoded-names/${fixture}.tsp`, import.meta.url),
+        "utf8",
+      )
+    ).replace('import "../../lib/imports.tsp";', "");
+    const expectation = (await tester()).expect(code);
+    if (violates) {
+      await expectation.toEmitDiagnostics([diagnostic()]);
+    } else {
+      await expectation.toBeValid();
+    }
+  });
 
   it("targets the repeated authored property, including inherited properties", async () => {
     await (
@@ -98,6 +95,76 @@ describe("repeated-path-info native contract", () => {
       .toEmitDiagnostics([diagnostic("wirePath"), diagnostic("wireQuery")]);
   });
 
+  it.each([false, true])(
+    "targets inherited JSON names while respecting an authored override: %s",
+    async (overrides) => {
+      const expectation = (await tester()).expect(`
+        ${operation}
+        model Base {
+          @encodedName("application/json", "widgetName") /*repeated*/otherName?: string;
+        }
+        model Properties extends Base {
+          ${overrides ? '@encodedName("application/json", "description") otherName?: string;' : ""}
+        }
+      `);
+      if (overrides) {
+        await expectation.toBeValid();
+      } else {
+        await expectation.toEmitDiagnostics(({ repeated }) => ({
+          ...diagnostic(),
+          pos: getSourceLocation(repeated).pos,
+          end: getSourceLocation(repeated).end,
+        }));
+      }
+    },
+  );
+
+  it("compares JSON names with query wire names, not authored identifiers", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `
+        using TypeSpec.Http;
+        model Properties {
+          @encodedName("application/json", "wireQuery") otherName?: string;
+          @encodedName("application/json", "description") querySource?: string;
+        }
+        @put @route("/widgets")
+        op create(@query("wireQuery") querySource?: string,
+          @body body: { properties: Properties }): void;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic("wireQuery")]);
+  });
+
+  it("ignores encoded names for other media types", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `
+        ${operation}
+        model Properties {
+          @encodedName("application/xml", "widgetName") otherName?: string;
+        }
+      `,
+      )
+      .toBeValid();
+    await (
+      await tester()
+    )
+      .expect(
+        `
+        ${operation}
+        model Properties {
+          @encodedName("application/xml", "description") widgetName?: string;
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic()]);
+  });
+
   it("classifies a path/query wire-name collision as already rejected by HTTP", async () => {
     const [, diagnostics] = await Tester.compileAndDiagnose(`
       ${operation.replace("@body body:", '@query("widgetName") queryName: string, @body body:')}
@@ -124,26 +191,32 @@ describe("repeated-path-info native contract", () => {
       .toBeValid();
   });
 
-  it("reports a shared declaration once per PUT operation at the same source target", async () => {
-    await (
-      await tester()
-    )
-      .expect(
-        `
+  it.each([false, true])(
+    "reports a shared declaration once per PUT operation with a JSON alias: %s",
+    async (encoded) => {
+      await (
+        await tester()
+      )
+        .expect(
+          `
         ${operation}
-        model Properties { /*repeated*/widgetName?: string; }
+        model Properties {
+          ${encoded ? '@encodedName("application/json", "widgetName")' : ""}
+          /*repeated*/${encoded ? "otherName" : "widgetName"}?: string;
+        }
         @put @route("/other/{widgetName}")
         op other(@path widgetName: string, @body body: { properties: Properties }): void;
       `,
-      )
-      .toEmitDiagnostics(({ repeated }) =>
-        [1, 2].map(() => ({
-          ...diagnostic(),
-          pos: getSourceLocation(repeated).pos,
-          end: getSourceLocation(repeated).end,
-        })),
-      );
-  });
+        )
+        .toEmitDiagnostics(({ repeated }) =>
+          [1, 2].map(() => ({
+            ...diagnostic(),
+            pos: getSourceLocation(repeated).pos,
+            end: getSourceLocation(repeated).end,
+          })),
+        );
+    },
+  );
 
   it("reports project-imported properties at their imported declaration", async () => {
     await (
