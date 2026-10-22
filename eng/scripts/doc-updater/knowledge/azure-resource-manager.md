@@ -170,11 +170,21 @@ Identity paths are matched case-insensitively for literal segments and by positi
 - `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
 - `lro-response-mismatch` validates that PUT and PATCH final results match the resource type, DELETE final results are `void`, and POST final results match successful response bodies.
 
+Do not recommend `ArmTopParameter`, `ArmSkipParameter`, `order-by`, continuation tokens, or other custom query parameters for collection GET examples. Standard ARM list templates supply the required paging metadata; custom list operations need `@list`, `@pageItems`, `@nextLink`, and an envelope containing only `value` and `nextLink`.
+
+Primitive, union, array, and record request bodies are rejected; bodyless and multipart operations are allowed. `ArmResponse<string>` resolves to a non-JSON scalar response; wrap scalar values in a response model.
+
 When these rules are added or promoted, update both the generated linter reference and the manually maintained rule evaluation and RPC coverage guides.
 
 The `lro-response-mismatch` implementation has a detailed adjacent Markdown file but no `docs` association in its TypeScript rule definition. Consequently, `pnpm regen-docs` generates only its short description. Fixing the association requires an edit under `packages/typespec-azure-resource-manager/src/rules/`.
 
+## Long-Running Operation Results
+
+LRO final-result metadata must match operation semantics: PUT and PATCH return the resource, DELETE returns `void`, and POST actions use their response type (or `void` for no-content actions). Standard async templates configure these defaults. When overriding `LroHeaders`, preserve the matching `FinalResult`.
+
 ## Feature Files
+
+`ArmFeatureFileOptions.version` optionally selects the API version used for clients generated from that feature file. Empty or whitespace-only values are invalid. This property exists only on the current `Azure.ResourceManager.featureFileOptions`; do not document it on deprecated `Legacy.featureOptions`. Feature files remain restricted to approved brownfield migrations.
 
 The internal `getFeatureFileSet` accessor returns the enum configured by `@featureFiles`, or `undefined` when the decorator is absent. The `arm-feature-file-usage-discourage` rule tests for `undefined`; an empty or otherwise falsey-looking enum state still represents configured feature files.
 
