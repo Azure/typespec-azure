@@ -12,9 +12,10 @@ allowed-tools: shell
 Use this skill for changes to `resolveArmResources`, `ResolvedResource`, `Provider`, ARM resource
 operation resolution, selected-version ARM metadata, or integrations that consume this metadata.
 
-Read
-`packages/typespec-azure-resource-manager/rfcs/resolve-arm-resources-versioned-view.md`
-before changing the API or its state and cache behavior.
+Read `packages/typespec-azure-resource-manager/proposal/resolve-arm-resources.md` for the base
+resource graph contract and
+`website/src/content/docs/docs/howtos/ARM/getting-resource-information.md` for the supported
+consumer workflow before changing the API or its state and cache behavior.
 
 ## Purpose of the API
 
