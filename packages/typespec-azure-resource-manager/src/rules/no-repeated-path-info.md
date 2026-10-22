@@ -68,8 +68,7 @@ model WidgetProperties {
 
 This rule corresponds to
 [RepeatedPathInfo](https://github.com/Azure/azure-openapi-validator/blob/main/docs/repeated-path-info.md)
-and ARM guideline `RPC-Put-V1-05`. Unlike the Swagger validator, which compares
-serialized JSON keys, this rule deliberately compares authored TypeSpec member
-names. JSON name overrides therefore have only partial Swagger parity.
-The rule checks the compiler's native operation graph, not an emitted
-single-version schema.
+and ARM guideline `RPC-Put-V1-05`. Like the Swagger validator, it compares JSON
+property names, including JSON name overrides, with path and query parameter
+names. It checks native TypeSpec operations rather than an emitted single-version
+schema.

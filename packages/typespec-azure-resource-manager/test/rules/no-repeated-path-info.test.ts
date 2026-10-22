@@ -138,15 +138,78 @@ it("ignores repeated properties in PATCH bodies", async () => {
     .toBeValid();
 });
 
-it("allows a JSON alias that alone repeats a path name", async () => {
+it("reports a JSON alias that alone repeats a path name", async () => {
   await tester
     .expect(armResource('@encodedName("application/json", "widgetName") otherName?: string;'))
+    .toEmitDiagnostics([diagnostic()]);
+});
+
+it("allows an authored name when its JSON alias does not repeat a path name", async () => {
+  await tester
+    .expect(armResource('@encodedName("application/json", "otherName") widgetName?: string;'))
     .toBeValid();
 });
 
-it("reports an authored name even when its JSON alias differs", async () => {
+it.each([false, true])(
+  "targets inherited JSON names while respecting an authored override: %s",
+  async (overrides) => {
+    const expectation = tester.expect(`
+      ${operation}
+      model Base {
+        @encodedName("application/json", "widgetName") /*repeated*/otherName?: string;
+      }
+      model Properties extends Base {
+        ${overrides ? '@encodedName("application/json", "description") otherName?: string;' : ""}
+      }
+    `);
+    if (overrides) {
+      await expectation.toBeValid();
+    } else {
+      await expectation.toEmitDiagnostics(({ repeated }) => ({
+        ...diagnostic(),
+        pos: getSourceLocation(repeated).pos,
+        end: getSourceLocation(repeated).end,
+      }));
+    }
+  },
+);
+
+it("compares JSON names with query wire names, not authored identifiers", async () => {
   await tester
-    .expect(armResource('@encodedName("application/json", "otherName") widgetName?: string;'))
+    .expect(
+      `
+      model Properties {
+        @encodedName("application/json", "wireQuery") otherName?: string;
+        @encodedName("application/json", "description") querySource?: string;
+      }
+      @put @route("/widgets")
+      op create(@query("wireQuery") querySource?: string,
+        @body body: { properties: Properties }): void;
+    `,
+    )
+    .toEmitDiagnostics([diagnostic("wireQuery")]);
+});
+
+it("ignores encoded names for other media types", async () => {
+  await tester
+    .expect(
+      `
+      ${operation}
+      model Properties {
+        @encodedName("application/xml", "widgetName") otherName?: string;
+      }
+    `,
+    )
+    .toBeValid();
+  await tester
+    .expect(
+      `
+      ${operation}
+      model Properties {
+        @encodedName("application/xml", "description") widgetName?: string;
+      }
+    `,
+    )
     .toEmitDiagnostics([diagnostic()]);
 });
 
@@ -175,24 +238,30 @@ it("does not recurse into cycles or shared sibling models", async () => {
     .toBeValid();
 });
 
-it("reports a shared declaration once per PUT operation at the same source target", async () => {
-  await tester
-    .expect(
-      `
+it.each([false, true])(
+  "reports a shared declaration once per PUT operation with a JSON alias: %s",
+  async (encoded) => {
+    await tester
+      .expect(
+        `
       ${operation}
-      model Properties { /*repeated*/widgetName?: string; }
+      model Properties {
+        ${encoded ? '@encodedName("application/json", "widgetName")' : ""}
+        /*repeated*/${encoded ? "otherName" : "widgetName"}?: string;
+      }
       @put @route("/other/{widgetName}")
       op other(@path widgetName: string, @body body: { properties: Properties }): void;
     `,
-    )
-    .toEmitDiagnostics(({ repeated }) =>
-      [1, 2].map(() => ({
-        ...diagnostic(),
-        pos: getSourceLocation(repeated).pos,
-        end: getSourceLocation(repeated).end,
-      })),
-    );
-});
+      )
+      .toEmitDiagnostics(({ repeated }) =>
+        [1, 2].map(() => ({
+          ...diagnostic(),
+          pos: getSourceLocation(repeated).pos,
+          end: getSourceLocation(repeated).end,
+        })),
+      );
+  },
+);
 
 it("ignores missing bodies, non-model bodies, and missing or non-model properties bags", async () => {
   await tester
