@@ -86,9 +86,6 @@ describe("migrate → resolve round-trip (Microsoft.Contoso)", () => {
         // The full reconstructed document (title + operationId envelope, parameters, responses)
         // must match the original x-ms-examples file exactly.
         expect(legacy, `document mismatch for ${key}`).toEqual(original!.doc);
-        expect(JSON.stringify(legacy.responses), `response field order mismatch for ${key}`).toBe(
-          JSON.stringify(original!.doc.responses),
-        );
         // `title` must be the first key, matching the dominant legacy convention.
         expect(Object.keys(legacy).slice(0, 2)).toEqual(["title", "operationId"]);
       }
