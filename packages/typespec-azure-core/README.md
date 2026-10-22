@@ -365,6 +365,14 @@ None
 
 Overrides the final state value for an operation
 
+Header-based values require the corresponding header in an operation response:
+
+| Value                   | Response header        | Example model to spread into the response                                                    |
+| ----------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
+| `operation-location`    | `Operation-Location`   | `Azure.Core.Foundations.LongRunningStatusLocation`                                           |
+| `location`              | `Location`             | `TypeSpec.Http.LocationHeader`                                                               |
+| `azure-async-operation` | `Azure-AsyncOperation` | `Azure.ResourceManager.ArmAsyncOperationHeader` (requires the Azure.ResourceManager library) |
+
 ```typespec
 @Azure.Core.useFinalStateVia(finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation")
 ```
