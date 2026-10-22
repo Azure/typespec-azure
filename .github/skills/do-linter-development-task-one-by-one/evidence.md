@@ -24,6 +24,7 @@ migration-evidence\
   tasks\<task-id>\
     task.json
     migration.md
+    evidence-details.md
     members\<validator-id>\
       migration.md
     runs\<run-id>\
@@ -123,8 +124,18 @@ evaluation; current-time reassessment needs a fresh validator run.
 
 ## Migration note and replay
 
-The group `migration.md` leads with the native conclusion, member status matrix,
-combined raw/comparable counts, directional gaps and explanations. Link every
+Write singleton, group and member `migration.md` using the shared
+[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Lead with evidenced standard-case successes alongside remaining limits. Make
+actual counts easy to find, distinguish targeted representation corner cases
+from production coverage, and show a working example plus representative gaps.
+Link each additional material case directly to a short source/schema example.
+Preserve long investigations and replay instructions in `evidence-details.md`
+or an existing linked appendix; it is part of the published evidence, not omitted
+validation.
+
+The group note retains the member status matrix, combined raw/comparable counts,
+directional gaps and explanations in the corresponding sections. Link every
 member to its own semantic/fixture evidence and original validator source.
 Describe intentional native differences separately from functional equivalence.
 Do not invent per-member native coverage when attribution is unavailable.

@@ -230,8 +230,12 @@ needs special investigation:
    files that can be read with `git show <ref>:<path>`.
 3. Complete the prepared-environment gate in process step 3 below.
 4. Do not run the lintdiff harness during promotion. The source rule's
-   `migration.md` is the source of migration evidence; use source package build
-   plus native target tests for promotion validation.
+   `migration.md` and its linked appendix are the source of migration evidence;
+   read both rather than treating a concise note as missing investigation.
+   The [shared report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note)
+   governs new or refreshed notes, not permission to rewrite immutable source
+   evidence during promotion. Use source package build plus native target tests
+   for promotion validation.
 5. Convert fixture coverage with the standard mapping in step 5 instead of
    copying snapshots or recreating the full harness layout.
 6. In a fresh worktree, build the target package dependency closure once before

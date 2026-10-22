@@ -324,7 +324,78 @@ Do not claim equivalence when one-sided projects or outliers remain unexplained.
 
 For legacy work create `migration.md` beside the rule fixtures. Native-first
 work uses the verified fork [evidence layout](../do-linter-development-task-one-by-one/evidence.md),
-with a group note and per-member notes linked from the native PR. Include:
+with a group note and per-member notes linked from the native PR.
+
+This is the shared report contract for migration development, native coverage
+analysis and gap investigation. It changes presentation, not the investigation,
+validation, review or acceptance requirements.
+
+### Reader-facing report
+
+Keep `migration.md` concise, normally about one or two pages (roughly 600-900
+words). This is a readability target, not permission to omit required findings.
+Put long investigations, provenance, repair history, complete inventories and
+reproduction commands in a linked `evidence-details.md` or existing appendix.
+Use these five sections in order:
+
+1. **Conclusion and scope.** Lead with the supported behavior and practical
+   migration value when evidence establishes them. State remaining gaps, the
+   rule-change decision and material uncertainty alongside those positives.
+   Distinguish standard-case agreement from full functional parity; do not
+   declare the whole migration unsuccessful merely because representation
+   corner cases remain. Do not invent success, soften a required-check failure,
+   or claim equivalence despite a demonstrated semantic gap. Name the compared
+   audience, API-version policy and analysis/default activation distinction;
+   link the frozen inputs rather than opening with hashes or commands.
+2. **Actual coverage.** Put the key numbers in a compact scorecard: selected,
+   assessed and failed/unassessed projects; raw Swagger and raw/aligned native
+   findings; affected-project overlap; and one-sided projects. Identify the
+   counting units and comparison scope. Project overlap and ratios between
+   different diagnostic identities are not functional coverage. Mark exact
+   diagnostic correspondence unassessed when it is not established. Link the
+   full report and per-project audit.
+3. **Function-level coverage.** Show supported core behavior and compliant
+   controls before the targeted gap inventory. Define the audited behaviors,
+   denominator, observed counts and status for each row: covered, missing,
+   compiler-prevented, approved retirement or unassessed. Distinguish ordinary
+   authoring surfaces from representation corner cases when justified; never
+   label a missing core function a corner case to minimize it. A deliberately
+   edge-heavy fixture suite is a stress test, not an estimate of production
+   coverage. Explain that equally weighted case percentages do not measure
+   real-spec prevalence or exhaustive rule-wide coverage. "Corner case" describes
+   the shape, not proven rarity; state frequency limits and real-spec witnesses.
+   Label test-case counts separately from behavior coverage.
+4. **Why diagnostic counts differ.** Use a small cause/observation/disposition
+   table with links to exact examples. Preserve both directional excesses and
+   unexplained residuals; do not let opposite project gaps cancel. Separate
+   multiplicity, reference boundaries, version/population alignment and true
+   semantic misses. Call findings obsolete only with target-specific
+   version/removal evidence. Label deliberate policy retirements separately
+   and record their explicit approval.
+   A native non-finding alone is not evidence that a legacy check is outdated.
+5. **Examples and required action.** Show a small working core example when
+   supported, plus representative material gaps, preferably from real services.
+   Include minimal TypeSpec, emitted schema or validator behavior, and each
+   engine's observed result so the difference is immediately clear. Keep only
+   a few examples inline; link every other material cause or audited corner
+   case directly to a short, named source/schema example, not just the appendix
+   title or a large JSON dump. Keep production rule/test actions separate from
+   comparison-tool fixes. State the production changes needed for full parity,
+   or why none are required. An approved narrower policy supports a scoped
+   outcome, not full parity. Link reproduction/source-retention receipts and
+   distinguish verified replay from untested regeneration.
+
+For many-to-one tasks, retain the member status matrix in the conclusion,
+combined raw/comparable counts in the scorecard, and per-member semantic
+evidence in the function table or directly linked member notes. Do not invent
+per-member native counts when attribution is unavailable. Use the same outline
+for member notes without duplicating shared baseline data.
+
+### Supporting evidence and completeness
+
+Keep all of the following in the concise report or its directly linked supporting
+evidence. Moving details must not discard evidence, weaken a gate or turn an
+unresolved investigation into an accepted difference:
 
 1. Final migration conclusion.
 2. A direct answer to whether the migrated TypeSpec rule must change.

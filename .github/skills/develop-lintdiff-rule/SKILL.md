@@ -731,42 +731,25 @@ the newly generated results. This step is required for every rule that proceeds
 through the Development workflow, including runs that started with an empty
 diff or required no production rule change.
 
-#### Lead with the result and gap explanation
+#### Use the shared five-section report
 
-Immediately after the document title, start with `## Result and gap summary`.
-This is the migration note's primary reader-facing information, not an audit-log
-introduction. In roughly 150 words or fewer, answer:
+Follow the [migration report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note):
+conclusion and scope; actual coverage; function-level coverage; count differences;
+examples and required action. Lead with evidenced standard-case successes as
+well as remaining limits. Separate representation corner cases from missing
+core behavior; a targeted stress-test percentage is not production coverage.
+Include a working example when supported and link each remaining material case
+directly to its small source/schema explanation.
 
-- **Results:** What are the latest validator versus migrated TypeSpec diagnostic
-  counts and affected-project counts? Name the compared scope, including staging
-  versus production or selected API version when material. Label partial or
-  non-comparable results explicitly.
-- **Why they differ:** Explain the concrete cause of each material discrepancy
-  in plain language and quantify its contribution when established. Distinguish
-  a real missed check from validator false positives, emitted duplicates,
-  version/population differences, or exclusions. Say what each engine checks
-  differently; labels such as "different methodologies" are not an explanation.
-- **Decision:** State whether a TypeSpec rule update is required, was completed,
-  or is unnecessary for the explained gap, and why. State the functional
-  equivalence conclusion separately from raw-count equality.
-- **Uncertainty:** Surface any unexplained remainder or material evidence
-  limitation here, not only deep in the document. Do not present an unresolved
-  gap as intentional or call findings false positives without supporting evidence.
+If comparison is blocked, state the blocker instead of implying parity. If
+counts match, do not treat equality as proof of equivalence. Do not lead with
+hashes, commands, reconciliation history or repair chronology.
 
-Use a short paragraph or compact bullets; when several causes contribute, a
-small cause/count/disposition table can follow. Link to the detailed evidence
-sections below rather than repeating their full tables. If counts match, say
-there is no observed count gap without treating equality as proof of equivalence.
-If comparison is blocked, lead with that blocker instead of implying parity.
+#### Preserve supporting evidence in a linked appendix
 
-A reader should understand the mismatch and its migration impact from this
-opening alone. Do not lead with commit hashes, tool versions, commands, report
-reconciliation history, or repair chronology.
-
-#### Keep the supporting evidence below the summary
-
-Retain the complete evidence required by `/analyze-swagger-typespec-lint-gap`;
-the concise opening supplements it, not replaces it. Record:
+Retain the complete evidence required by `/analyze-swagger-typespec-lint-gap`.
+Keep `migration.md` concise and put long details in a linked `evidence-details.md`
+or existing appendix, without removing any required investigation. Record:
 
 - the specs commit and whether the run was full or partial
 - latest validator and TypeSpec project and diagnostic counts
@@ -818,8 +801,9 @@ After restoring generated corpus data and removing temporary fixture links:
 
 1. Build a flat list of manually maintained files changed by the rule:
    production `.ts` files, fixture `main.tsp` and `expect.json` files,
-   `rule.md`, `migration.md`, and any directly changed tests. On PowerShell,
-   append each command result to the same array; do not create a nested array
+   `rule.md`, `migration.md`, its authored evidence appendix, and any directly
+   changed tests. On PowerShell, append each command result to the same array;
+   do not create a nested array
    whose entries become space-joined formatter arguments.
    Derive this list from the actual reviewed diff, deduplicate it and verify
    membership, existence and supported extensions. Record the count for evidence,
@@ -894,11 +878,12 @@ The reviewer must:
 
 - compare the rule branch against the freshly fetched
   `refs/remotes/origin/<target-branch>`, not a same-named local branch
-- inspect the production rule, fixtures, snapshots, `rule.md`, and
-  `migration.md`
-- verify that `migration.md` opens with an accurate result and gap summary:
-  counts, concrete causes, rule-change decision, and material uncertainty must
-  agree with the detailed evidence without requiring readers to reconstruct them
+- inspect the production rule, fixtures, snapshots, `rule.md`, `migration.md`
+  and its linked supporting evidence
+- verify the shared five-section migration report: evidenced positives,
+  actual counts, core/corner-case context, concrete causes, rule-change decision
+  and material uncertainty must agree with the linked evidence; examples must
+  be easy to reach, and stress-test percentages must not imply production coverage
 - check for semantic misses, false positives, incorrect TypeSpec compiler API
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics

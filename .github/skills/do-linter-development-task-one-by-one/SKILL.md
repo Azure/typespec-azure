@@ -51,6 +51,12 @@ and **must not fall through to the legacy phases below**. Keep one active task
 at a time. Both flows preserve required validation, independent local review,
 bounded GitHub review/fix, publication approval, and quiescence.
 
+Both flows must create or refresh `migration.md` under the shared
+[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Review the concise report and its linked evidence together: preserve evidenced
+positives, actual counts, core/corner-case context and quickly accessible examples
+without weakening any required investigation or acceptance gate.
+
 ## Legacy contract
 
 Everything below this heading describes `flowVersion: legacy`. Its references to

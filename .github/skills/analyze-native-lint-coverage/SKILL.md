@@ -339,6 +339,13 @@ to equalize counts.
 
 ## Deliverable
 
+Write `migration.md` using the shared
+[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Highlight evidenced core behavior alongside remaining gaps, distinguish targeted
+corner-case tests from production prevalence, and provide quick inline examples
+with direct links to the others. Keep full evidence and reproduction details in
+a linked appendix; brevity does not waive any required control or investigation.
+
 Return the report path, candidate/specs identities, actual loaded packages,
 selected/assessable/failed population, raw and aligned results, scope limitations,
 gap explanations, and a justified equivalence conclusion or explicit uncertainty.
