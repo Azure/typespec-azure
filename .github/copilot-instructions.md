@@ -42,7 +42,8 @@ for package selection, scaffolding, and registration.
 
 ### Implementation and scope
 
-- Prefer existing rules, supported APIs, and native linter callbacks over custom infrastructure.
+- Reuse existing rules, supported APIs and native callbacks; avoid custom dispatchers or redundant
+  program walks. Collect cross-node state in callbacks and report in `exit` when needed.
 - Evaluate simplification and consolidation against the native guideline and released
   compatibility, not merely the proposed design or its tests. Justify custom resolvers and
   special cases with supported inputs that need them.
