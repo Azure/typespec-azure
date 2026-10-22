@@ -47,6 +47,8 @@ names within each operation. The comparison uses the **authored property name**
 The diagnostic unit is one matching name per concrete PUT operation: two PUT
 operations sharing a properties declaration report twice at that declaration.
 The rule does not recursively descend into nested members of the properties bag.
+Concrete interfaces inheriting PUT operations from generic interfaces are checked;
+generic operation sources and generic interface declarations are skipped.
 
 This intentionally follows TypeSpec authoring semantics rather than reconstructing
 JSON encoding, Swagger parameter-array locations, or emitted duplicate occurrences.
