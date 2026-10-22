@@ -89,6 +89,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isSameServiceConfigurations,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -312,7 +313,9 @@ export const $client: ClientDecorator = (
       if (auth === undefined) {
         auth = { authentication: currentAuth, service: svc };
       } else {
-        isSame = isSameAuth(context.program, auth.authentication, currentAuth, auth.service, svc);
+        isSame =
+          isSameAuth(context.program, auth.authentication, currentAuth) &&
+          isSameServiceConfigurations(context.program, auth.service, svc);
         if (!isSame) {
           break;
         }

@@ -4,7 +4,6 @@ import type {
   Enum,
   EnumMember,
   EnumValue,
-  Interface,
   Model,
   ModelProperty,
   Namespace,
@@ -14,9 +13,9 @@ import type {
   UnionVariant,
 } from "@typespec/compiler";
 
-export interface AzureServiceEnvironment {
-  readonly audience: EnumValue;
-  readonly defaultEndpoint?: string;
+export interface AzureTokenAuthenticationOptions {
+  readonly kind: unknown;
+  readonly defaultAudience: EnumValue;
 }
 
 /**
@@ -55,53 +54,73 @@ export type PollingLocationDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * Adds audience selection or named challenge semantics to an existing OAuth authentication model.
+ * Adds Entra audience-selection semantics to an existing OAuth authentication model.
  *
  * An Entra audience enum lists known resource values. Use the same enum for every language; it does not restrict custom audience input or prescribe a native SDK enum.
  *
- * Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Optional endpoint defaults use `@azureServiceEnvironments` with the same resource-to-scope binding.
+ * Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Pair endpoints with OAuth settings using `@azureServiceConfigurations`.
  *
  * The default audience references an enum member and identifies the known-resource catalog. Every OAuth flow must already use the scope derived from that member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
  *
  * Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
  *
  * @param target The OAuth authentication model.
- * @param profile The Entra default-scope or named challenge profile.
+ * @param profile The Entra default-scope profile.
  */
 export type AzureTokenAuthenticationDecorator = (
   context: DecoratorContext,
   target: Model,
-  profile:
-    | {
-        readonly kind: unknown;
-        readonly defaultAudience: EnumValue;
-      }
-    | {
-        readonly kind: unknown;
-        readonly challengeContract: string;
-      },
+  profile: AzureTokenAuthenticationOptions,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * Adds optional endpoint defaults to the same Entra audience-selection profile.
+ * Pairs named HTTP server endpoints with OAuth authentication configurations.
  *
- * Environments reference members of the authentication model's audience enum, not duplicate resource values. They declare shared cloud data, not a required native SDK cloud or options API.
+ * Calls `@server` for each configuration, with the default first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
  *
- * An explicit client endpoint overrides an environment endpoint without changing its audience. When no endpoint default is declared, ordinary service endpoint configuration applies; an audience resource does not identify a service instance.
+ * The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
  *
- * The optional default environment must use the default audience. Authority and tenant configuration remain the credential's responsibility.
+ * Configurations vary OAuth URLs and scopes, not authentication mechanisms. Ordinary OAuth authentication needs no Entra audience annotation. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
  *
- * @param target The namespace or interface using the authentication model.
- * @param authentication The annotated Entra authentication model.
- * @param environments The named audience and optional endpoint records.
- * @param defaultEnvironment The name of the default environment, if any.
+ * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+ *
+ * @param target The namespace using these configurations.
+ * @param configurations The named endpoint and authentication records.
+ * @param defaultConfiguration The name of the default configuration.
+ * @example
+ * ```typespec
+ * model PublicAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.io/.default"],
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+ * >;
+ * model GovernmentAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.us/.default"],
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+ * >;
+ *
+ * model Configurations {
+ *   Public: {
+ *     endpoint: "https://api.loganalytics.io";
+ *     authentication: PublicAuth;
+ *   };
+ *   Government: {
+ *     endpoint: "https://api.loganalytics.us";
+ *     authentication: GovernmentAuth;
+ *   };
+ * }
+ *
+ * @service
+ * @azureServiceConfigurations(Configurations, "Public")
+ * namespace Logs;
+ * ```
  */
-export type AzureServiceEnvironmentsDecorator = (
+export type AzureServiceConfigurationsDecorator = (
   context: DecoratorContext,
-  target: Namespace | Interface,
-  authentication: Model,
-  environments: Record<string, AzureServiceEnvironment>,
-  defaultEnvironment?: string,
+  target: Namespace,
+  configurations: Model,
+  defaultConfiguration: string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -256,7 +275,7 @@ export type AzureCoreDecorators = {
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   azureTokenAuthentication: AzureTokenAuthenticationDecorator;
-  azureServiceEnvironments: AzureServiceEnvironmentsDecorator;
+  azureServiceConfigurations: AzureServiceConfigurationsDecorator;
   previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;

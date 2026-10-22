@@ -86,20 +86,37 @@ model Azure.Core.AzureApiKeyAuthentication
 | in   | `TypeSpec.Http.ApiKeyLocation.header` | location of the API key |
 | name | `"Ocp-Apim-Subscription-Key"`         | name of the API key     |
 
-### `AzureServiceEnvironment` {#Azure.Core.AzureServiceEnvironment}
+### `AzureServiceConfiguration` {#Azure.Core.AzureServiceConfiguration}
 
-Shared cloud data binding an optional endpoint default to a declared audience resource.
+A deployment's HTTP endpoint and OAuth authentication requirements.
 
 ```typespec
-model Azure.Core.AzureServiceEnvironment
+model Azure.Core.AzureServiceConfiguration
 ```
 
 #### Properties
 
-| Name             | Type         | Description                                                                               |
-| ---------------- | ------------ | ----------------------------------------------------------------------------------------- |
-| audience         | `EnumMember` | A member of the authentication model's known-audience enum.                               |
-| defaultEndpoint? | `string`     | An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. |
+| Name           | Type              | Description                                                                     |
+| -------------- | ----------------- | ------------------------------------------------------------------------------- |
+| endpoint       | `string`          | The server URL or URL template, as accepted by `@server`.                       |
+| authentication | `unknown`         | Authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. |
+| parameters?    | `Record<unknown>` | Parameters used in the endpoint URL template.                                   |
+| description?   | `string`          | Description of the server.                                                      |
+
+### `AzureTokenAuthenticationOptions` {#Azure.Core.AzureTokenAuthenticationOptions}
+
+Shared service token-request semantics, independent of native SDK API shape.
+
+```typespec
+model Azure.Core.AzureTokenAuthenticationOptions
+```
+
+#### Properties
+
+| Name            | Type                                                        | Description                                                                       |
+| --------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| kind            | `Azure.Core.AzureTokenAuthenticationKind.entraDefaultScope` | The token-request profile.                                                        |
+| defaultAudience | `EnumMember`                                                | The default member of the known-audience enum, which also identifies the catalog. |
 
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
@@ -490,16 +507,15 @@ model Azure.Core.TopQueryParameter
 
 ### `AzureTokenAuthenticationKind` {#Azure.Core.AzureTokenAuthenticationKind}
 
-Shared service token-request profiles, independent of native SDK API shape.
+Shared service token-request semantics, independent of native SDK API shape.
 
 ```typespec
 enum Azure.Core.AzureTokenAuthenticationKind
 ```
 
-| Name              | Value | Description                                                    |
-| ----------------- | ----- | -------------------------------------------------------------- |
-| entraDefaultScope |       | Derive an Entra scope from the selected resource.              |
-| challengeBased    |       | Delegate challenge processing to a named SDK runtime contract. |
+| Name              | Value | Description                                       |
+| ----------------- | ----- | ------------------------------------------------- |
+| entraDefaultScope |       | Derive an Entra scope from the selected resource. |
 
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 
@@ -508,21 +524,6 @@ The deployment scopes in which an Azure Resource Manager resource identifier may
 ```typespec
 union Azure.Core.ArmResourceDeploymentScope
 ```
-
-### `AzureTokenAuthenticationOptions` {#Azure.Core.AzureTokenAuthenticationOptions}
-
-Shared service token-request semantics, independent of native SDK API shape.
-
-```typespec
-union Azure.Core.AzureTokenAuthenticationOptions
-```
-
-#### Variants
-
-| Name              | Type    | Description                                                              |
-| ----------------- | ------- | ------------------------------------------------------------------------ |
-| entraDefaultScope | `{...}` | Derive an Entra scope by appending `/.default` to the selected resource. |
-| challengeBased    | `{...}` | Delegate challenge processing to a named SDK runtime contract.           |
 
 ### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
 

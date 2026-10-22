@@ -288,7 +288,9 @@ export const $lib = createTypeSpecLibrary({
 
   state: {
     azureTokenAuthentication: { description: "Azure token-request profiles" },
-    azureServiceEnvironments: { description: "Client-local Azure service environments" },
+    azureServiceConfigurations: {
+      description: "Paired Azure service endpoints and OAuth settings",
+    },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },

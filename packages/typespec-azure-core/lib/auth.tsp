@@ -11,43 +11,34 @@ using Azure.Core.Traits.Private;
 
 namespace Azure.Core;
 
-/** Shared service token-request profiles, independent of native SDK API shape. */
+/** Shared service token-request semantics, independent of native SDK API shape. */
 enum AzureTokenAuthenticationKind {
   /** Derive an Entra scope from the selected resource. */
   entraDefaultScope,
-
-  /** Delegate challenge processing to a named SDK runtime contract. */
-  challengeBased,
 }
 
 /** Shared service token-request semantics, independent of native SDK API shape. */
-union AzureTokenAuthenticationOptions {
-  /** Derive an Entra scope by appending `/.default` to the selected resource. */
-  entraDefaultScope: {
-    /** The token-request profile. */
-    kind: AzureTokenAuthenticationKind.entraDefaultScope,
+model AzureTokenAuthenticationOptions {
+  /** The token-request profile. */
+  kind: AzureTokenAuthenticationKind.entraDefaultScope;
 
-    /** The default member of the known-audience enum, which also identifies the catalog. */
-    defaultAudience: TypeSpec.Reflection.EnumMember,
-  },
-
-  /** Delegate challenge processing to a named SDK runtime contract. */
-  challengeBased: {
-    /** The token-request profile. */
-    kind: AzureTokenAuthenticationKind.challengeBased,
-
-    /** The versioned runtime contract, for example `azure.keyVaultChallenge/v1`. */
-    challengeContract: string,
-  },
+  /** The default member of the known-audience enum, which also identifies the catalog. */
+  defaultAudience: TypeSpec.Reflection.EnumMember;
 }
 
-/** Shared cloud data binding an optional endpoint default to a declared audience resource. */
-model AzureServiceEnvironment {
-  /** A member of the authentication model's known-audience enum. */
-  audience: TypeSpec.Reflection.EnumMember;
+/** A deployment's HTTP endpoint and OAuth authentication requirements. */
+model AzureServiceConfiguration {
+  /** The server URL or URL template, as accepted by `@server`. */
+  endpoint: string;
 
-  /** An absolute HTTP or HTTPS endpoint default; an explicit client endpoint takes precedence. */
-  defaultEndpoint?: string;
+  /** Authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. */
+  authentication: unknown;
+
+  /** Parameters used in the endpoint URL template. */
+  parameters?: Record<unknown>;
+
+  /** Description of the server. */
+  description?: string;
 }
 
 /**

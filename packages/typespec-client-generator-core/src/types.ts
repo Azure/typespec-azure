@@ -1,7 +1,5 @@
 import {
   type UnionEnum,
-  getAzureServiceEnvironmentAuthenticationModels,
-  getAzureServiceEnvironments,
   getAzureTokenAuthentication,
   getUnionAsEnum,
 } from "@azure-tools/typespec-azure-core";
@@ -80,7 +78,6 @@ import {
   type SdkAzureAuthentication,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
-  type SdkClient,
   type SdkClientType,
   type SdkConstantType,
   type SdkCredentialParameter,
@@ -108,7 +105,9 @@ import {
   createGeneratedName,
   filterPreviewVersion,
   getAvailableApiVersions,
+  getClientDefaultServiceConfiguration,
   getClientDoc,
+  getClientServiceConfigurations,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
@@ -1296,9 +1295,7 @@ function getSdkCredentialType(
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
       // Projection diagnostics and audience usage are collected by handleAllTypes.
-      const azureAuthentication = ignoreDiagnostics(
-        getSdkAzureAuthentication(context, client.__raw, scheme),
-      );
+      const azureAuthentication = ignoreDiagnostics(getSdkAzureAuthentication(context, scheme));
       credentialTypes.push({
         // Multiple services only deal with the first server config
         __raw: client.__raw.services[0],
@@ -1333,10 +1330,14 @@ function getSdkCredentialType(
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClientType<SdkHttpOperation>,
+  authentication?: Authentication,
 ): SdkCredentialParameter | undefined {
   // Multiple services only deal with the first server config
   const service = client.__raw.services[0];
-  const auth = getAuthentication(context.program, service);
+  const auth =
+    authentication ??
+    getClientDefaultServiceConfiguration(context, client.__raw)?.authentication ??
+    getAuthentication(context.program, service);
   if (!auth) return undefined;
   return {
     type: getSdkCredentialType(context, client, auth),
@@ -1358,34 +1359,12 @@ export function getSdkCredentialParameter(
 
 function getSdkAzureAuthentication(
   context: TCGCContext,
-  client: SdkClient,
   scheme: HttpAuth,
 ): [SdkAzureAuthentication | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (scheme.type !== "oauth2") return diagnostics.wrap(undefined);
   const profile = getAzureTokenAuthentication(context.program, scheme.model);
   if (!profile) return diagnostics.wrap(undefined);
-  const service = client.services[0];
-  const serviceEnvironments = getAzureServiceEnvironments(context.program, service, scheme.model);
-  let environments = serviceEnvironments;
-  for (let current: SdkClient | undefined = client; current; current = current.parent) {
-    if (!current.type) continue;
-    const candidate = getAzureServiceEnvironments(context.program, current.type, scheme.model);
-    // The getter caches declarations; inherited service defaults must wait for SDK parents.
-    if (candidate && candidate !== serviceEnvironments) {
-      environments = candidate;
-      break;
-    }
-  }
-  const deployment = {
-    environments: environments?.environments.map((environment) => ({ ...environment })) ?? [],
-    ...(environments?.defaultEnvironment === undefined
-      ? {}
-      : { defaultEnvironment: environments.defaultEnvironment }),
-  };
-  if (profile.kind === "challengeBased") {
-    return diagnostics.wrap({ profile: { ...profile }, ...deployment });
-  }
   const type = diagnostics.pipe(getClientTypeWithDiagnostics(context, profile.audience.type));
   if (type.kind !== "enum") {
     diagnostics.add(
@@ -1409,7 +1388,6 @@ function getSdkAzureAuthentication(
       },
       defaultScopes: [...profile.defaultScopes],
     },
-    ...deployment,
   });
 }
 
@@ -2598,28 +2576,18 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   const services = new Set<Namespace>();
   for (const client of context.getClients()) {
     const service = client.services[0];
-    const target = client.type ?? service;
     const authentication = getAuthentication(context.program, service);
-    const schemes = authentication?.options.flatMap((option) => option.schemes) ?? [];
-    const environmentModels = new Set([
-      ...getAzureServiceEnvironmentAuthenticationModels(context.program, target),
-      ...getAzureServiceEnvironmentAuthenticationModels(context.program, service),
-    ]);
-    for (const model of environmentModels) {
-      if (!schemes.some((scheme) => scheme.model === model)) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "azure-authentication-invalid",
-            target,
-            format: {
-              reason: `Service environments reference '${model.name}', which is not an authentication alternative of this client.`,
-            },
-          }),
-        );
-      }
-    }
-    for (const scheme of schemes) {
-      const metadata = diagnostics.pipe(getSdkAzureAuthentication(context, client, scheme));
+    const catalog = getClientServiceConfigurations(context, client);
+    const schemes = new Map(
+      [
+        ...(authentication?.options ?? []),
+        ...(catalog?.configurations.flatMap(
+          (configuration) => configuration.authentication.options,
+        ) ?? []),
+      ].flatMap((option) => option.schemes.map((scheme) => [scheme.model, scheme] as const)),
+    );
+    for (const scheme of schemes.values()) {
+      const metadata = diagnostics.pipe(getSdkAzureAuthentication(context, scheme));
       if (metadata?.profile.kind === "entraDefaultScope") {
         diagnostics.pipe(
           updateUsageOrAccess(context, UsageFlags.Input, metadata.profile.audience.type),
@@ -2641,9 +2609,12 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
     // server parameters
     // Multiple services only deal with the first server config
-    const servers = getServers(context.program, client.services[0]);
-    if (servers !== undefined && servers[0].parameters !== undefined) {
-      for (const param of servers[0].parameters.values()) {
+    const catalog = getClientServiceConfigurations(context, client);
+    const servers = catalog
+      ? catalog.configurations.map((configuration) => configuration.server)
+      : getServers(context.program, client.services[0])?.slice(0, 1);
+    for (const server of servers ?? []) {
+      for (const param of server.parameters.values()) {
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }

@@ -1,6 +1,8 @@
 import {
+  type AzureServiceConfiguration,
+  type AzureServiceConfigurations,
   FinalStateValue,
-  getAzureServiceEnvironments,
+  getAzureServiceConfigurations,
   getAzureTokenAuthentication,
   getEffectiveApiVersionOverride,
   isPreviewVersion,
@@ -17,6 +19,7 @@ import {
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getSummary,
+  getTypeName,
   getVisibilityForClass,
   ignoreDiagnostics,
   type Interface,
@@ -1381,6 +1384,31 @@ export function getActualClientType(client: SdkClient): Namespace | Interface {
   return client.services[0];
 }
 
+export function getClientServiceConfigurations(
+  context: TCGCContext,
+  client: SdkClient,
+): AzureServiceConfigurations | undefined {
+  const service = client.services[0];
+  const defaults = service ? getAzureServiceConfigurations(context.program, service) : undefined;
+  for (let current: SdkClient | undefined = client; current; current = current.parent) {
+    if (!current.type) continue;
+    const candidate = getAzureServiceConfigurations(context.program, current.type);
+    // Inherited service defaults must not hide a customized SDK parent's catalog.
+    if (candidate && candidate !== defaults) return candidate;
+  }
+  return defaults;
+}
+
+export function getClientDefaultServiceConfiguration(
+  context: TCGCContext,
+  client: SdkClient,
+): AzureServiceConfiguration | undefined {
+  const catalog = getClientServiceConfigurations(context, client);
+  return catalog?.configurations.find(
+    (configuration) => configuration.name === catalog.defaultConfiguration,
+  );
+}
+
 export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
   if (left.length !== right.length) {
     return false;
@@ -1393,13 +1421,7 @@ export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean 
   return true;
 }
 
-export function isSameAuth(
-  program: Program,
-  left: Authentication,
-  right: Authentication,
-  leftService: Namespace,
-  rightService: Namespace,
-): boolean {
+export function isSameAuth(program: Program, left: Authentication, right: Authentication): boolean {
   if (left.options.length !== right.options.length) {
     return false;
   }
@@ -1428,13 +1450,7 @@ export function isSameAuth(
           break;
         case "oauth2":
           compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
-          if (
-            !isSameAzureTokenAuthentication(program, leftScheme.model, rightScheme.model) ||
-            !isDeepStrictEqual(
-              getAzureServiceEnvironments(program, leftService, leftScheme.model),
-              getAzureServiceEnvironments(program, rightService, rightScheme.model),
-            )
-          ) {
+          if (!isSameAzureTokenAuthentication(program, leftScheme.model, rightScheme.model)) {
             return false;
           }
           if (leftScheme.flows.length !== rightScheme.flows.length) {
@@ -1498,7 +1514,8 @@ export function isSameAuth(
                   "Unexpected auth scheme type mismatch",
                 );
                 if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  ("tokenUrl" in leftFlow ? leftFlow.tokenUrl : undefined) !==
+                    ("tokenUrl" in rightFlow ? rightFlow.tokenUrl : undefined) ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
                 ) {
                   return false;
@@ -1536,10 +1553,46 @@ function isSameAzureTokenAuthentication(
       isDeepStrictEqual(left.audience.knownAudiences, right.audience.knownAudiences)
     );
   }
-  if (left?.kind === "challengeBased") {
-    return right?.kind === "challengeBased" && left.challengeContract === right.challengeContract;
-  }
   return right === undefined;
+}
+
+export function isSameServiceConfigurations(
+  program: Program,
+  leftService: Namespace,
+  rightService: Namespace,
+): boolean {
+  const left = getAzureServiceConfigurations(program, leftService);
+  const right = getAzureServiceConfigurations(program, rightService);
+  if (!left || !right) return left === right;
+  if (
+    left.defaultConfiguration !== right.defaultConfiguration ||
+    left.configurations.length !== right.configurations.length
+  )
+    return false;
+  return left.configurations.every((configuration, index) => {
+    const other = right.configurations[index];
+    if (
+      configuration.name !== other.name ||
+      configuration.server.url !== other.server.url ||
+      configuration.server.parameters.size !== other.server.parameters.size ||
+      !isSameAuth(program, configuration.authentication, other.authentication)
+    )
+      return false;
+    for (const [name, parameter] of configuration.server.parameters) {
+      const otherParameter = other.server.parameters.get(name);
+      if (
+        !otherParameter ||
+        getTypeName(parameter.type) !== getTypeName(otherParameter.type) ||
+        parameter.optional !== otherParameter.optional ||
+        !isDeepStrictEqual(
+          parameter.defaultValue ? getValueTypeValue(parameter.defaultValue) : undefined,
+          otherParameter.defaultValue ? getValueTypeValue(otherParameter.defaultValue) : undefined,
+        )
+      )
+        return false;
+    }
+    return true;
+  });
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {

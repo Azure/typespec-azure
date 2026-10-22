@@ -77,7 +77,7 @@ Available ruleSets:
 
 ### Azure.Core
 
-- [`@azureServiceEnvironments`](#@azureserviceenvironments)
+- [`@azureServiceConfigurations`](#@azureserviceconfigurations)
 - [`@azureTokenAuthentication`](#@azuretokenauthentication)
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
@@ -95,40 +95,71 @@ Available ruleSets:
 - [`@uniqueItems`](#@uniqueitems)
 - [`@useFinalStateVia`](#@usefinalstatevia)
 
-#### `@azureServiceEnvironments`
+#### `@azureServiceConfigurations`
 
-Adds optional endpoint defaults to the same Entra audience-selection profile.
+Pairs named HTTP server endpoints with OAuth authentication configurations.
 
-Environments reference members of the authentication model's audience enum, not duplicate resource values. They declare shared cloud data, not a required native SDK cloud or options API.
+Calls `@server` for each configuration, with the default first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
 
-An explicit client endpoint overrides an environment endpoint without changing its audience. When no endpoint default is declared, ordinary service endpoint configuration applies; an audience resource does not identify a service instance.
+The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
 
-The optional default environment must use the default audience. Authority and tenant configuration remain the credential's responsibility.
+Configurations vary OAuth URLs and scopes, not authentication mechanisms. Ordinary OAuth authentication needs no Entra audience annotation. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+
+OAuth URL metadata does not change a caller-owned credential's authority or tenant.
 
 ```typespec
-@Azure.Core.azureServiceEnvironments(authentication: Model, environments: valueof Record<Azure.Core.AzureServiceEnvironment>, defaultEnvironment?: valueof string)
+@Azure.Core.azureServiceConfigurations(configurations: Model, defaultConfiguration: valueof string)
 ```
 
 ##### Target
 
-The namespace or interface using the authentication model.
-`Namespace | Interface`
+The namespace using these configurations.
+`Namespace`
 
 ##### Parameters
 
-| Name               | Type                                                 | Description                                       |
-| ------------------ | ---------------------------------------------------- | ------------------------------------------------- |
-| authentication     | `Model`                                              | The annotated Entra authentication model.         |
-| environments       | `valueof Record<Azure.Core.AzureServiceEnvironment>` | The named audience and optional endpoint records. |
-| defaultEnvironment | `valueof string`                                     | The name of the default environment, if any.      |
+| Name                 | Type             | Description                                    |
+| -------------------- | ---------------- | ---------------------------------------------- |
+| configurations       | `Model`          | The named endpoint and authentication records. |
+| defaultConfiguration | `valueof string` | The name of the default configuration.         |
+
+##### Examples
+
+```typespec
+model PublicAuth is AadOauth2Auth<
+  ["https://api.loganalytics.io/.default"],
+  "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+>;
+model GovernmentAuth is AadOauth2Auth<
+  ["https://api.loganalytics.us/.default"],
+  "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+>;
+
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: PublicAuth;
+  };
+  Government: {
+    endpoint: "https://api.loganalytics.us";
+    authentication: GovernmentAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs;
+```
 
 #### `@azureTokenAuthentication`
 
-Adds audience selection or named challenge semantics to an existing OAuth authentication model.
+Adds Entra audience-selection semantics to an existing OAuth authentication model.
 
 An Entra audience enum lists known resource values. Use the same enum for every language; it does not restrict custom audience input or prescribe a native SDK enum.
 
-Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Optional endpoint defaults use `@azureServiceEnvironments` with the same resource-to-scope binding.
+Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Pair endpoints with OAuth settings using `@azureServiceConfigurations`.
 
 The default audience references an enum member and identifies the known-resource catalog. Every OAuth flow must already use the scope derived from that member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
 
@@ -145,9 +176,9 @@ The OAuth authentication model.
 
 ##### Parameters
 
-| Name    | Type                                                                          | Description                                         |
-| ------- | ----------------------------------------------------------------------------- | --------------------------------------------------- |
-| profile | [valueof `AzureTokenAuthenticationOptions`](#azuretokenauthenticationoptions) | The Entra default-scope or named challenge profile. |
+| Name    | Type                                                                          | Description                      |
+| ------- | ----------------------------------------------------------------------------- | -------------------------------- |
+| profile | [valueof `AzureTokenAuthenticationOptions`](#azuretokenauthenticationoptions) | The Entra default-scope profile. |
 
 #### `@finalLocation`
 

@@ -1449,29 +1449,23 @@ Use token authentication without selecting an audience. The named Public default
 
 Select the Government audience with a recording credential that echoes requested scopes as its access token. Expect scope https://search.azure.us/.default and response 204. The service endpoint remains the mock server, not the resource URI.
 
-### Azure_Core_Authentication_Challenge_resourceChallenge
+### Azure_Core_Authentication_Configurations_defaultConfiguration
 
-- Endpoint: `get /azure/core/authentication/challenge/resource`
+- Endpoint: `get /azure/core/authentication/configurations/default`
 
-This fixture covers the initial resource challenge, not the runtime's complete validation, caching, or claims behavior. Use a recording credential that echoes requested scopes as its access token. Permit the fixed mock challenge resource for this local-server test only. An initial unauthenticated request returns 401 with WWW-Authenticate: Bearer authorization="https://login.microsoftonline.com/common", resource="https://vault.azure.net". The named challenge runtime must request https://vault.azure.net/.default and retry with the matching Bearer authorization header. Expect the final response 204.
+Supply no configuration or endpoint override. The explicit Public default is not the first declared configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.io/.default, request path /public/azure/core/authentication/configurations/default, and response 204.
 
-### Azure_Core_Authentication_Environments_defaultEnvironment
+### Azure_Core_Authentication_Configurations_endpointOverride
 
-- Endpoint: `get /public/azure/core/authentication/environments/default`
+- Endpoint: `get /azure/core/authentication/configurations/endpoint-override`
 
-Supply no environment or endpoint override. The Public default selects http://localhost:3000/public and resource https://api.loganalytics.io. Use a recording credential that echoes requested scopes as its access token. Expect scope https://api.loganalytics.io/.default, request path /public/azure/core/authentication/environments/default, and response 204.
+Select Government and override only its endpoint with http://localhost:3000/custom. Retain the selected OAuth configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.us/.default, request path /custom/azure/core/authentication/configurations/endpoint-override, and response 204.
 
-### Azure_Core_Authentication_Environments_endpointOverride
+### Azure_Core_Authentication_Configurations_governmentConfiguration
 
-- Endpoint: `get /public/azure/core/authentication/environments/endpoint-override`
+- Endpoint: `get /azure/core/authentication/configurations/government`
 
-Select Government and explicitly override the endpoint with http://localhost:3000/custom. Retain the Government resource. Use a recording credential that echoes requested scopes as its access token. Expect scope https://api.loganalytics.us/.default, request path /custom/azure/core/authentication/environments/endpoint-override, and response 204.
-
-### Azure_Core_Authentication_Environments_governmentEnvironment
-
-- Endpoint: `get /public/azure/core/authentication/environments/government`
-
-Select the Government environment without an endpoint override. Its pair selects http://localhost:3000/government and resource https://api.loganalytics.us. Use a recording credential that echoes requested scopes as its access token. Expect scope https://api.loganalytics.us/.default, request path /government/azure/core/authentication/environments/government, and response 204.
+Select Government without overriding the endpoint. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.us/.default, request path /government/azure/core/authentication/configurations/government, and response 204.
 
 ### Azure_Core_Basic_createOrReplace
 

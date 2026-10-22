@@ -1,8 +1,8 @@
-This diagnostic is issued when `@azureTokenAuthentication` or `@azureServiceEnvironments` declares invalid Azure authentication settings.
+This diagnostic is issued when `@azureTokenAuthentication` or `@azureServiceConfigurations` declares invalid Azure authentication settings.
 
 ## Impact
 
-- **Area:** Azure authentication declarations. Blocks invalid token profiles or environment bindings from being used to generate authentication metadata.
+- **Area:** Azure authentication declarations. Blocks invalid token profiles or endpoint/OAuth configuration catalogs.
 - **Not affected:** Ordinary HTTP authentication without these decorators, including explicit OAuth scope arrays and API-key alternatives.
 
 ## Incorrect Usage
@@ -49,9 +49,9 @@ For other reported reasons, apply the corresponding constraint:
 
 - Target an OAuth authentication model with at least one flow. Ordinary explicit scopes need no Azure token profile.
 - Use enum-member references for the profile kind and default audience. The default member identifies the known-resource catalog; all resource values must be nonempty strings without surrounding whitespace. Resource values, including trailing slashes, are preserved exactly when appending `/.default`.
-- Give a challenge profile a nonempty runtime contract, rather than an audience or invented fixed scopes.
-- Reference members of the authentication model's audience enum in environment bindings. A member of a different enum is not interchangeable even if its name or resource value matches.
-- Use absolute HTTP(S) environment endpoints without credentials or fragments. A default environment must exist and select the authentication model's default audience.
-- Declare environments only once per target and authentication model. Explicit client endpoints override environment defaults; selecting an audience alone never derives or rewrites an endpoint.
+- Declare a nonempty model of named configuration records and select an existing default by name.
+- Each configuration needs a nonempty endpoint string literal and ordinary HTTP authentication requirements. Endpoint template parameters use a model, as in `@server`; `description`, when provided, is a string literal.
+- Every configuration must include OAuth2 and preserve the same authentication mechanisms and requirement groups. Only OAuth URLs and scopes vary; existing key alternatives and AND groups remain intact.
+- Do not combine `@azureServiceConfigurations` with direct `@server` or `@useAuth` declarations on the same namespace. The pairing decorator calls those HTTP APIs itself, exposing all servers and one OR of authentication requirements.
 
-The known-resource enum does not restrict native audience input. All language emitters consume the same declaration and choose their native audience APIs and compatibility behavior.
+Ordinary OAuth configurations do not require an Entra audience annotation. The known-resource enum does not restrict native audience input. All language emitters consume the same declaration and choose their native audience APIs and compatibility behavior. Challenge processing and endpoint-derived audience resolution are outside this feature.

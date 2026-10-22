@@ -1,7 +1,6 @@
 import {
   FinalStateValue,
   type AzureAuthenticationAudience,
-  type AzureServiceEnvironment,
   type AzureTokenAuthentication,
   type LroMetadata,
   type ParameterSource,
@@ -608,8 +607,21 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+  /** Paired deployment defaults; existing initialization fields describe the named default. */
+  serviceConfigurations?: {
+    defaultConfiguration: string;
+    configurations: SdkServiceConfiguration[];
+  };
   /** How to initialize a client. */
   initializedBy: InitializedByFlags;
+}
+
+/** A deployment's endpoint and authentication, independent of native constructor shape. */
+export interface SdkServiceConfiguration {
+  name: string;
+  endpoint: SdkEndpointType;
+  authentication: Authentication;
+  credential?: SdkCredentialParameter;
 }
 
 /**
@@ -629,20 +641,16 @@ export interface SdkAzureAuthenticationAudience extends Omit<AzureAuthentication
   type: SdkEnumType;
 }
 
-export type SdkAzureTokenAuthenticationProfile =
-  | {
-      kind: "entraDefaultScope";
-      audience: SdkAzureAuthenticationAudience;
-      defaultScopes: string[];
-    }
-  | Exclude<AzureTokenAuthentication, { kind: "entraDefaultScope" }>;
+export interface SdkAzureTokenAuthenticationProfile extends Omit<
+  AzureTokenAuthentication,
+  "audience"
+> {
+  audience: SdkAzureAuthenticationAudience;
+}
 
-/** Token-request semantics and client-local deployment data, not runtime algorithms. */
+/** Explicit Entra token-request semantics, not endpoint inference or runtime algorithms. */
 export interface SdkAzureAuthentication {
   profile: SdkAzureTokenAuthenticationProfile;
-  /** Optional endpoint bindings for this client's audience profile; never inferred from resources. */
-  environments: AzureServiceEnvironment[];
-  defaultEnvironment?: string;
 }
 
 /**

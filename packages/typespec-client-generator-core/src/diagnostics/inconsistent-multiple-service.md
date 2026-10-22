@@ -42,7 +42,7 @@ All services must have the same server and auth definitions.
 
 Make the merged services use matching server and auth definitions, or generate them as separate clients.
 
-For Azure authentication, matching default OAuth scopes is not sufficient: merged services must also agree on profile presence and kind, the default audience member, all known audience resources, challenge contracts, and environment bindings. Separate auth models or enums may be used when their settings are equivalent.
+For Azure authentication, matching default OAuth scopes is not sufficient: merged services must also agree on Entra profile presence, the default audience member, all known audience resources, and any endpoint/OAuth catalog. Catalogs must have matching names, defaults, endpoint templates/parameter defaults, and per-configuration authentication. Identical flat HTTP servers and auth alternatives do not establish identical pairings. Separate auth models or enums may be used when their settings are equivalent.
 
 ```typespec
 @service

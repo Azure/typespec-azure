@@ -1,19 +1,14 @@
 import {
   type Enum,
   type EnumMember,
-  type Interface,
   type Model,
-  type Namespace,
   type Program,
   isTemplateDeclaration,
   typespecTypeToJson,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
-import type {
-  AzureServiceEnvironmentsDecorator,
-  AzureTokenAuthenticationDecorator,
-} from "../../generated-defs/Azure.Core.js";
+import type { AzureTokenAuthenticationDecorator } from "../../generated-defs/Azure.Core.js";
 import { AzureCoreStateKeys, reportDiagnostic } from "../lib.js";
 
 /** Known Entra resources, independent of native audience API shape, custom input, or endpoints. */
@@ -25,28 +20,10 @@ export interface AzureAuthenticationAudience {
 }
 
 /** Additional semantics for an existing OAuth authentication model. */
-export type AzureTokenAuthentication =
-  | {
-      kind: "entraDefaultScope";
-      audience: AzureAuthenticationAudience;
-      defaultScopes: string[];
-    }
-  | {
-      kind: "challengeBased";
-      challengeContract: string;
-    };
-
-/** Optional endpoint defaults for an audience family; authority and tenant remain credential-owned. */
-export interface AzureServiceEnvironment {
-  name: string;
-  audienceName: string;
-  audience: string;
-  defaultEndpoint?: string;
-}
-
-export interface AzureServiceEnvironments {
-  environments: AzureServiceEnvironment[];
-  defaultEnvironment?: string;
+export interface AzureTokenAuthentication {
+  kind: "entraDefaultScope";
+  audience: AzureAuthenticationAudience;
+  defaultScopes: string[];
 }
 
 interface TokenDeclaration {
@@ -55,22 +32,10 @@ interface TokenDeclaration {
   metadata?: AzureTokenAuthentication;
 }
 
-interface EnvironmentDeclaration {
-  environments: Parameters<AzureServiceEnvironmentsDecorator>[3];
-  defaultEnvironment?: string;
-  validated?: boolean;
-  metadata?: AzureServiceEnvironments;
-}
-
 const [getTokenDeclaration, setTokenDeclaration, getTokenDeclarations] = useStateMap<
   Model,
   TokenDeclaration
 >(AzureCoreStateKeys.azureTokenAuthentication);
-
-const [getEnvironmentDeclarations, setEnvironmentDeclarations, getAllEnvironmentDeclarations] =
-  useStateMap<Namespace | Interface, Map<Model, EnvironmentDeclaration>>(
-    AzureCoreStateKeys.azureServiceEnvironments,
-  );
 
 export const $azureTokenAuthentication: AzureTokenAuthenticationDecorator = (
   context,
@@ -79,26 +44,6 @@ export const $azureTokenAuthentication: AzureTokenAuthenticationDecorator = (
 ) => {
   if (!validateDecoratorUniqueOnNode(context, target, $azureTokenAuthentication)) return;
   setTokenDeclaration(context.program, target, { profile });
-};
-
-export const $azureServiceEnvironments: AzureServiceEnvironmentsDecorator = (
-  context,
-  target,
-  authentication,
-  environments,
-  defaultEnvironment,
-) => {
-  const declarations = getEnvironmentDeclarations(context.program, target) ?? new Map();
-  if (declarations.has(authentication)) {
-    invalid(
-      context.program,
-      target,
-      "Environments for this authentication model are declared more than once.",
-    );
-    return;
-  }
-  declarations.set(authentication, { environments, defaultEnvironment });
-  setEnvironmentDeclarations(context.program, target, declarations);
 };
 
 /** Gets metadata for this exact authentication-model alternative. */
@@ -124,53 +69,13 @@ export function isAzureAuthenticationAudience(program: Program, type: Enum): boo
   );
 }
 
-/** Gets the nearest optional endpoint bindings for the specified audience profile. */
-export function getAzureServiceEnvironments(
-  program: Program,
-  target: Namespace | Interface,
-  authentication: Model,
-): AzureServiceEnvironments | undefined {
-  let current: Namespace | Interface | undefined = target;
-  while (current) {
-    const declaration = getEnvironmentDeclarations(program, current)?.get(authentication);
-    if (declaration) return validateEnvironments(program, current, authentication, declaration);
-    current = current.namespace;
-  }
-  return undefined;
-}
-
-/** Lists authentication models referenced by applicable environment declarations. */
-export function getAzureServiceEnvironmentAuthenticationModels(
-  program: Program,
-  target: Namespace | Interface,
-): Model[] {
-  const models = new Set<Model>();
-  let current: Namespace | Interface | undefined = target;
-  while (current) {
-    for (const model of getEnvironmentDeclarations(program, current)?.keys() ?? []) {
-      models.add(model);
-    }
-    current = current.namespace;
-  }
-  return [...models];
-}
-
 export function validateAzureAuthentication(program: Program): void {
   for (const authentication of getTokenDeclarations(program).keys()) {
     getAzureTokenAuthentication(program, authentication);
   }
-  for (const [target, declarations] of getAllEnvironmentDeclarations(program)) {
-    for (const [authentication, declaration] of declarations) {
-      validateEnvironments(program, target, authentication, declaration);
-    }
-  }
 }
 
-function invalid(
-  program: Program,
-  target: Model | Namespace | Interface | Enum,
-  reason: string,
-): undefined {
+function invalid(program: Program, target: Model | Enum, reason: string): undefined {
   reportDiagnostic(program, {
     code: "azure-authentication-invalid",
     target,
@@ -215,16 +120,6 @@ function validateTokenAuthentication(
   const flows = getOAuthScopes(program, authentication);
   if (!flows) return undefined;
   const { profile } = declaration;
-  if ("challengeContract" in profile) {
-    if (!profile.challengeContract.trim()) {
-      return invalid(
-        program,
-        authentication,
-        "A challenge profile requires a non-empty challenge contract.",
-      );
-    }
-    return { kind: "challengeBased", challengeContract: profile.challengeContract };
-  }
   const audience = getAudience(program, profile.defaultAudience.value);
   if (!audience) return undefined;
   const scope = `${audience.defaultAudience}/.default`;
@@ -273,84 +168,4 @@ function getAudience(
     defaultAudience: knownAudiences[defaultAudienceName],
     knownAudiences,
   };
-}
-
-function validateEnvironments(
-  program: Program,
-  target: Namespace | Interface,
-  authentication: Model,
-  declaration: EnvironmentDeclaration,
-): AzureServiceEnvironments | undefined {
-  if (declaration.validated) return declaration.metadata;
-  declaration.validated = true;
-  const profile = getAzureTokenAuthentication(program, authentication);
-  if (profile?.kind !== "entraDefaultScope") {
-    return invalid(
-      program,
-      target,
-      "Service environments require an Entra default-scope authentication model.",
-    );
-  }
-  const environments: AzureServiceEnvironment[] = [];
-  for (const [name, options] of Object.entries(declaration.environments)) {
-    const member = options.audience.value;
-    if (
-      !name.trim() ||
-      member.enum !== profile.audience.type ||
-      !Object.hasOwn(profile.audience.knownAudiences, member.name)
-    ) {
-      return invalid(
-        program,
-        target,
-        `Environment '${name}' must reference a member of the authentication audience enum.`,
-      );
-    }
-    if (options.defaultEndpoint !== undefined && !isServiceEndpoint(options.defaultEndpoint)) {
-      return invalid(
-        program,
-        target,
-        `Environment '${name}' must use an absolute HTTP or HTTPS defaultEndpoint.`,
-      );
-    }
-    environments.push({
-      name,
-      audienceName: member.name,
-      audience: profile.audience.knownAudiences[member.name],
-      ...(options.defaultEndpoint === undefined
-        ? {}
-        : { defaultEndpoint: options.defaultEndpoint }),
-    });
-  }
-  if (declaration.defaultEnvironment !== undefined) {
-    const selected = environments.find(
-      (environment) => environment.name === declaration.defaultEnvironment,
-    );
-    if (!selected) {
-      return invalid(
-        program,
-        target,
-        `The default environment '${declaration.defaultEnvironment}' is not declared.`,
-      );
-    }
-    if (selected.audienceName !== profile.audience.defaultAudienceName) {
-      return invalid(
-        program,
-        target,
-        "The default environment must use the default audience member.",
-      );
-    }
-  }
-  declaration.metadata = {
-    environments,
-    ...(declaration.defaultEnvironment === undefined
-      ? {}
-      : { defaultEnvironment: declaration.defaultEnvironment }),
-  };
-  return declaration.metadata;
-}
-
-function isServiceEndpoint(value: string): boolean {
-  if (!/^https?:\/\//i.test(value) || value.trim() !== value || !URL.canParse(value)) return false;
-  const url = new URL(value);
-  return !!url.hostname && !url.username && !url.password && !url.hash;
 }
