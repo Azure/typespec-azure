@@ -117,6 +117,23 @@ Do not implement a selected-version view by filtering only the final provider. P
 required for renames, type changes, optionality changes, removed members, and operation return
 types.
 
+For a multi-service program:
+
+1. Discover service namespaces with `listServices(program)`.
+2. Select exact shared `Version` metadata, normally from `getAllVersions(program, namespace)`.
+3. Validate that every selected namespace is an ARM provider namespace and every `Version` is the
+   registered object owned by that namespace.
+4. Project and resolve each service independently because services can have unrelated version
+   enums while sharing one ARM provider string.
+5. Filter realm registrations to types declared under the projected service namespace; mutating one
+   service can re-register sibling-service decorators in the same realm.
+6. Finalize each service with its own `Version.value`, then concatenate resources and provider
+   operations in selection order.
+7. Return no partial provider if any selection is invalid or cannot be projected.
+
+Use namespace and `Version` references for programmatic selection. Do not identify a service by its
+ARM provider string: Compute subservices all use `Microsoft.Compute`.
+
 ## State and cache classification
 
 Treat these as registration state:
@@ -244,6 +261,21 @@ Use at least three versions and cover:
 - parent and scope consistency.
 
 Assert returned declared types belong to the selected realm.
+
+### Multi-service selected versions
+
+Use one small reusable TypeSpec fixture rather than copying a production specification. Cover:
+
+- discovering ARM services and selecting the final declared version of each;
+- independently versioned services that share one ARM provider string;
+- one combined provider with resources and provider operations in selection order;
+- a mixed-version selection and a single-entry selection;
+- parent and resource-valued scope references into the returned combined graph;
+- each naming request receiving the selected service's version value; and
+- atomic diagnostics for empty, duplicate, non-ARM, and mismatched namespace/version selections.
+
+Rely on the existing compatibility and call-order suites instead of duplicating them for the
+multi-service entry point.
 
 ### Isolation
 

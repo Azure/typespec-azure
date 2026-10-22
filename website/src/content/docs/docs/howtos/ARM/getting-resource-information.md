@@ -105,6 +105,77 @@ const v2 = resolveArmResources(context.program, { version: "2025-01-01" });
 The resolver isolates and caches the projected structural graphs. Resolving one version does not
 change another version or the default declaration view.
 
+## Resolve the latest version of multiple services
+
+Some programs contain several ARM services that share one ARM provider string but declare separate
+version enums. For example, Compute, ComputeDisk, ComputeGallery, and ComputeSku all use
+`Microsoft.Compute`. Select these services by their TypeSpec namespace objects, not by the shared
+ARM provider string.
+
+Use the compiler and versioning APIs to discover each ARM service and its latest declared version:
+
+```ts
+import { getNamespaceFullName, listServices } from "@typespec/compiler";
+import { getAllVersions } from "@typespec/versioning";
+import {
+  getArmProviderNamespace,
+  resolveArmResources,
+  type ArmServiceVersionSelection,
+} from "@azure-tools/typespec-azure-resource-manager";
+
+const serviceVersions: ArmServiceVersionSelection[] = listServices(context.program)
+  .filter(
+    ({ type: namespace }) => getArmProviderNamespace(context.program, namespace) !== undefined,
+  )
+  .map(({ type: namespace }) => {
+    const version = getAllVersions(context.program, namespace)?.at(-1);
+    if (version === undefined) {
+      throw new Error(
+        `ARM service ${getNamespaceFullName(namespace)} does not declare service versions.`,
+      );
+    }
+    return { namespace, version };
+  });
+
+const provider = resolveArmResources(context.program, { serviceVersions });
+```
+
+`getAllVersions` returns versions in enum declaration order, so `.at(-1)` selects the latest
+declared version. If an emitter uses another policy, such as latest stable, apply that policy to the
+returned `Version[]` before creating the selection.
+
+The resolver projects every selected namespace at its own version and returns one combined
+`Provider`. A selection is atomic: if any namespace/version pair is invalid, the call reports a
+diagnostic and returns an empty provider result.
+
+If emitter configuration supplies strings, resolve them against the discovered objects before
+calling the resolver:
+
+```ts
+const namespace = listServices(context.program)
+  .map((service) => service.type)
+  .find((candidate) => getNamespaceFullName(candidate) === configuredNamespace);
+
+if (namespace === undefined) {
+  throw new Error(`Service namespace ${configuredNamespace} was not found.`);
+}
+
+const version = getAllVersions(context.program, namespace)?.find(
+  (candidate) => candidate.value === configuredVersion,
+);
+if (version === undefined) {
+  throw new Error(`Version ${configuredVersion} was not found for ${configuredNamespace}.`);
+}
+
+const provider = resolveArmResources(context.program, {
+  serviceVersions: [{ namespace, version }],
+});
+```
+
+The `version` and `serviceVersions` options are mutually exclusive in TypeScript. Use `version` for
+the existing single-service string-based call and `serviceVersions` for reference-based
+multi-service selection.
+
 ## Apply TCGC client names
 
 An SDK emitter can reuse its TCGC `SdkContext` so `@clientName` and language-scoped naming rules are

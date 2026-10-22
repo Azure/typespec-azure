@@ -1,7 +1,10 @@
+import { getNamespaceFullName, listServices } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { expectDiagnostics } from "@typespec/compiler/testing";
+import { getAllVersions, type Version } from "@typespec/versioning";
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
+import { getArmProviderNamespace } from "../src/namespace.js";
 import type { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
 import {
   isResourceOperationMatch,
@@ -38,6 +41,125 @@ interface ResolvedResourceCheck {
   resourceName?: string;
   operations: ResourceOperationsCheck;
 }
+
+const multiServiceVersionedSpec = `
+using Azure.Core;
+
+@service(#{ title: "Compute" })
+@armProviderNamespace("Microsoft.Compute")
+@versioned(Versions)
+namespace Compute {
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v1: "2024-11-01",
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2: "2025-04-01",
+  }
+
+  @renamedFrom(Versions.v2, "OldVirtualMachine")
+  model VirtualMachine is TrackedResource<{}> {
+    ...ResourceNameParameter<VirtualMachine>;
+  }
+
+  @parentResource(VirtualMachine)
+  model VirtualMachineExtension is ProxyResource<{}> {
+    ...ResourceNameParameter<VirtualMachineExtension>;
+  }
+
+  @added(Versions.v2)
+  model CapacityReservation is ProxyResource<{}> {
+    ...ResourceNameParameter<CapacityReservation>;
+  }
+
+  @armResourceOperations
+  interface VirtualMachines {
+    get is ArmResourceRead<VirtualMachine>;
+  }
+
+  @armResourceOperations
+  interface VirtualMachineExtensions {
+    get is ArmResourceRead<VirtualMachineExtension>;
+  }
+
+  @added(Versions.v2)
+  @armResourceOperations
+  interface CapacityReservations {
+    get is ArmResourceRead<CapacityReservation>;
+  }
+
+  @added(Versions.v2)
+  @route("/providers/Microsoft.Compute/computeStatus")
+  interface ComputeStatus {
+    @get status(): string;
+  }
+}
+
+@service(#{ title: "Compute Disk" })
+@armProviderNamespace("Microsoft.Compute")
+@versioned(Versions)
+namespace ComputeDisk {
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v1: "2024-03-02",
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2: "2025-01-02",
+  }
+
+  model Disk is TrackedResource<{}> {
+    ...ResourceNameParameter<Disk>;
+  }
+
+  @added(Versions.v2)
+  model Snapshot is ProxyResource<{}> {
+    ...ResourceNameParameter<Snapshot>;
+  }
+
+  @armResourceOperations
+  interface Disks {
+    get is ArmResourceRead<Disk>;
+  }
+
+  @added(Versions.v2)
+  @armResourceOperations
+  interface Snapshots {
+    get is ArmResourceRead<Snapshot>;
+  }
+}
+
+@service(#{ title: "Compute Gallery" })
+@armProviderNamespace("Microsoft.Compute")
+@versioned(Versions)
+namespace ComputeGallery {
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v1: "2024-03-03",
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2: "2025-03-03",
+  }
+
+  model GalleryProperties {
+    @typeChangedFrom(Versions.v2, string)
+    value: int32;
+  }
+
+  model Gallery is TrackedResource<GalleryProperties> {
+    ...ResourceNameParameter<Gallery>;
+  }
+
+  @armResourceOperations
+  interface Galleries {
+    get is ArmResourceRead<Gallery>;
+  }
+}
+
+@service(#{ title: "Utility" })
+@versioned(Versions)
+namespace Utility {
+  enum Versions {
+    v1: "2025-01-01",
+  }
+}
+`;
 
 function checkArmOperationsHas(
   operations: ArmResourceOperation[] | undefined,
@@ -901,6 +1023,219 @@ interface Temporaries {
       "Widget",
     ]);
     expect(legacy.resources?.some((x) => unsafe_Realm.realmForType.has(x.type))).toBe(false);
+  }, 30_000);
+
+  it("resolves selected versions from multiple ARM service namespaces", async () => {
+    const { program } = await Tester.compile(multiServiceVersionedSpec);
+    const armServices = listServices(program).filter(
+      ({ type }) => getArmProviderNamespace(program, type) !== undefined,
+    );
+    expect(armServices.map(({ type }) => getNamespaceFullName(type))).toEqual([
+      "Compute",
+      "ComputeDisk",
+      "ComputeGallery",
+    ]);
+
+    const latestSelections = armServices.map(({ type: namespace }) => {
+      const version = getAllVersions(program, namespace)?.at(-1);
+      ok(version);
+      return { namespace, version };
+    });
+    const latest = resolveArmResources(program, { serviceVersions: latestSelections });
+    expect(latest.resources?.map((resource) => resource.type.name).sort()).toEqual([
+      "CapacityReservation",
+      "Disk",
+      "Gallery",
+      "Snapshot",
+      "VirtualMachine",
+      "VirtualMachineExtension",
+    ]);
+    expect(latest.providerOperations?.map((operation) => operation.name)).toEqual(["status"]);
+
+    const [compute, computeDisk, computeGallery] = armServices.map(({ type }) => type);
+    const computeV1 = getAllVersions(program, compute)?.[0];
+    const diskV2 = getAllVersions(program, computeDisk)?.[1];
+    const galleryV1 = getAllVersions(program, computeGallery)?.[0];
+    ok(computeV1);
+    ok(diskV2);
+    ok(galleryV1);
+
+    const mixed = resolveArmResources(program, {
+      serviceVersions: [
+        { namespace: compute, version: computeV1 },
+        { namespace: computeDisk, version: diskV2 },
+        { namespace: computeGallery, version: galleryV1 },
+      ],
+    });
+    expect(
+      mixed.resources?.map((resource) => getNamespaceFullName(resource.type.namespace!)),
+    ).toEqual(["Compute", "Compute", "ComputeDisk", "ComputeDisk", "ComputeGallery"]);
+    expect(
+      mixed.resources
+        ?.filter((resource) => getNamespaceFullName(resource.type.namespace!) === "Compute")
+        .map((resource) => resource.type.name)
+        .sort(),
+    ).toEqual(["OldVirtualMachine", "VirtualMachineExtension"]);
+    expect(
+      mixed.resources
+        ?.filter((resource) => getNamespaceFullName(resource.type.namespace!) === "ComputeDisk")
+        .map((resource) => resource.type.name)
+        .sort(),
+    ).toEqual(["Disk", "Snapshot"]);
+    expect(mixed.providerOperations).toEqual([]);
+    expect(mixed.resources?.every((resource) => unsafe_Realm.realmForType.has(resource.type))).toBe(
+      true,
+    );
+
+    const extension = mixed.resources?.find(
+      (resource) => resource.type.name === "VirtualMachineExtension",
+    );
+    ok(extension?.parent);
+    expect(mixed.resources).toContain(extension.parent);
+    expect(extension.parent.type.name).toBe("OldVirtualMachine");
+
+    const gallery = mixed.resources?.find((resource) => resource.type.name === "Gallery");
+    const galleryProperties = gallery?.type.properties.get("properties")?.type;
+    ok(galleryProperties?.kind === "Model");
+    expect(galleryProperties.properties.get("value")?.type).toMatchObject({
+      kind: "Scalar",
+      name: "string",
+    });
+
+    const galleryOnly = resolveArmResources(program, {
+      serviceVersions: [{ namespace: computeGallery, version: galleryV1 }],
+    });
+    expect(galleryOnly.resources?.map((resource) => resource.type.name)).toEqual(["Gallery"]);
+    expect(galleryOnly.providerOperations).toEqual([]);
+  }, 30_000);
+
+  it("customizes names with each selected service version", async () => {
+    const { program } = await Tester.compile(multiServiceVersionedSpec);
+    const selections = listServices(program)
+      .filter(({ type }) => getArmProviderNamespace(program, type) !== undefined)
+      .map(({ type: namespace }) => {
+        const version = getAllVersions(program, namespace)?.at(-1);
+        ok(version);
+        return { namespace, version };
+      });
+    const baseline = resolveArmResources(program, { serviceVersions: selections });
+    const requests = new Set<string>();
+    const named = resolveArmResources(program, {
+      serviceVersions: selections,
+      nameResolver: ({ kind, type, version, defaultName }) => {
+        const namespace =
+          type?.namespace === undefined ? "synthetic" : getNamespaceFullName(type.namespace);
+        requests.add(`${namespace}:${version}:${kind}`);
+        switch (kind) {
+          case "resource-model":
+          case "operation-group":
+            return `Client${defaultName}`;
+          case "operation":
+            return `client${defaultName}`;
+          case "resource":
+            return undefined;
+        }
+      },
+    });
+
+    expect(
+      named.resources?.find((resource) => resource.type.name === "VirtualMachine"),
+    ).toMatchObject({
+      resourceName: "ClientVirtualMachine",
+    });
+    expect(named.resources?.find((resource) => resource.type.name === "Disk")).toMatchObject({
+      resourceName: "ClientDisk",
+    });
+    expect(named.resources?.find((resource) => resource.type.name === "Gallery")).toMatchObject({
+      resourceName: "ClientGallery",
+    });
+    expect(requests).toContain("Compute:2025-04-01:resource-model");
+    expect(requests).toContain("Compute:2025-04-01:operation");
+    expect(requests).toContain("Compute:2025-04-01:operation-group");
+    expect(requests).toContain("ComputeDisk:2025-01-02:resource-model");
+    expect(requests).toContain("ComputeGallery:2025-03-03:resource-model");
+    expect(
+      named.resources?.map((resource) => ({
+        path: resource.resourceInstancePath,
+        type: resource.resourceType,
+      })),
+    ).toEqual(
+      baseline.resources?.map((resource) => ({
+        path: resource.resourceInstancePath,
+        type: resource.resourceType,
+      })),
+    );
+  }, 30_000);
+
+  it("reports invalid multi-service selections atomically", async () => {
+    const { program } = await Tester.compile(multiServiceVersionedSpec);
+    const services = new Map(
+      listServices(program).map(({ type }) => [getNamespaceFullName(type), type]),
+    );
+    const compute = services.get("Compute");
+    const computeDisk = services.get("ComputeDisk");
+    const utility = services.get("Utility");
+    ok(compute);
+    ok(computeDisk);
+    ok(utility);
+    const computeV2 = getAllVersions(program, compute)?.[1];
+    const diskV2 = getAllVersions(program, computeDisk)?.[1];
+    const utilityV1 = getAllVersions(program, utility)?.[0];
+    ok(computeV2);
+    ok(diskV2);
+    ok(utilityV1);
+
+    expect(resolveArmResources(program, { serviceVersions: [] })).toEqual({});
+    expect(
+      resolveArmResources(program, {
+        serviceVersions: [
+          { namespace: compute, version: computeV2 },
+          { namespace: compute, version: computeV2 },
+        ],
+      }),
+    ).toEqual({});
+    expect(
+      resolveArmResources(program, {
+        serviceVersions: [
+          { namespace: compute, version: computeV2 },
+          { namespace: utility, version: utilityV1 },
+        ],
+      }),
+    ).toEqual({});
+    expect(
+      resolveArmResources(program, {
+        serviceVersions: [{ namespace: compute, version: diskV2 }],
+      }),
+    ).toEqual({});
+    expect(
+      resolveArmResources(program, {
+        serviceVersions: [{ namespace: compute, version: { ...computeV2 } as Version }],
+      }),
+    ).toEqual({});
+
+    expectDiagnostics(program.diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-service-versions-empty",
+        message: "At least one ARM service version must be selected.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-service-duplicate",
+        message: "ARM service namespace 'Compute' was selected more than once.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-service-not-arm",
+        message: "Namespace 'Utility' is not an ARM provider service.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-service-version-mismatch",
+        message:
+          "API version '2025-01-02' belongs to namespace 'ComputeDisk', not selected namespace 'Compute'.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-service-version-invalid",
+        message: "API version '2025-04-01' is not registered for ARM service namespace 'Compute'.",
+      },
+    ]);
   }, 30_000);
 
   it("reports invalid selected API versions", async () => {

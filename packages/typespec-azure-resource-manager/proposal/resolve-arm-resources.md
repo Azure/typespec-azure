@@ -4,7 +4,11 @@
 
 `resolveArmResources(program)` should produce a complete, deterministic description of the ARM provider shape represented by the TypeSpec program.
 
-The API should preserve the view represented by the `program` it receives. If the caller passes an unprojected versioned program, the result should represent the canonical provider view for that program. If the caller needs a per-version resource shape, it should pass a version-projected program, or use a helper that projects the program before calling `resolveArmResources`.
+The no-options API should preserve the declaration view represented by the `program` it receives.
+For an exact version of one service, callers can pass `version`. For a program containing several
+independently versioned ARM services, callers can pass `serviceVersions` with the `Namespace` and
+`Version` references selected for each service. The resolver projects each selected namespace
+before resolving its resources and combines the results into one provider view.
 
 Each provider result should contain:
 
@@ -25,7 +29,14 @@ Each resolved resource should include enough information for downstream emitters
 - parent and scope relationships
 - singleton metadata, when applicable
 
-The result should not hide versioning information that is present in the input program, but `resolveArmResources` should not require every caller to receive one result per declared service version. Version-specific analysis can be layered on top by running resource resolution against version-projected programs.
+The result should not hide versioning information that is present in the input program, but
+`resolveArmResources` should not require every caller to receive one result per declared service
+version. A selected-version call returns only the declarations available in the requested service
+versions and uses projected TypeSpec references throughout the returned graph.
+
+Service selections use TypeSpec `Namespace` and versioning `Version` references rather than ARM
+provider strings. Several independently versioned services can share one ARM provider string, as
+Compute subservices share `Microsoft.Compute`.
 
 The API should still avoid duplicate resources caused by versioning internals re-applying decorators on projected or realm-copied types.
 

@@ -28,7 +28,7 @@ import { unsafe_mutateSubgraphWithNamespace, unsafe_Realm } from "@typespec/comp
 import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
-import { getVersioningMutators } from "@typespec/versioning";
+import { getAllVersions, getVersioningMutators, type Version } from "@typespec/versioning";
 
 import { camelCase, pascalCase } from "change-case";
 import type {
@@ -62,6 +62,7 @@ import { reportDiagnostic } from "./lib.js";
 import {
   getArmProviderNamespace,
   isArmLibraryNamespace,
+  isArmProviderNamespace,
   resolveProviderNamespace,
 } from "./namespace.js";
 import {
@@ -159,6 +160,32 @@ export interface Provider {
   providerOperations?: ArmResourceOperation[];
 }
 
+/** One ARM service namespace and exact version to resolve. */
+export interface ArmServiceVersionSelection {
+  /** ARM service namespace to resolve. */
+  namespace: Namespace;
+  /** Exact version metadata registered for that namespace. */
+  version: Version;
+}
+
+export interface ResolveArmResourcesSingleServiceOptions {
+  /** Exact API version to project before resolving ARM metadata. */
+  version?: string;
+  /** Mutually exclusive with `version`. */
+  serviceVersions?: never;
+  /** Optional consumer-owned resolver for logical metadata names. */
+  nameResolver?: ArmMetadataNameResolver;
+}
+
+export interface ResolveArmResourcesMultiServiceOptions {
+  /** Mutually exclusive with `serviceVersions`. */
+  version?: never;
+  /** ARM service namespace/version selections to resolve into one provider result. */
+  serviceVersions: readonly ArmServiceVersionSelection[];
+  /** Optional consumer-owned resolver for logical metadata names. */
+  nameResolver?: ArmMetadataNameResolver;
+}
+
 /**
  * Options for resolving ARM resource metadata.
  *
@@ -171,13 +198,20 @@ export interface Provider {
  *     kind === "resource" || type === undefined ? undefined : getConsumerName(type),
  * });
  * ```
+ *
+ * @example Resolve independently versioned services into one provider
+ *
+ * ```ts
+ * const provider = resolveArmResources(program, {
+ *   serviceVersions: [
+ *     { namespace: computeNamespace, version: computeVersion },
+ *     { namespace: diskNamespace, version: diskVersion },
+ *   ],
+ * });
+ * ```
  */
-export interface ResolveArmResourcesOptions {
-  /** Exact API version to project before resolving ARM metadata. */
-  version?: string;
-  /** Optional consumer-owned resolver for logical metadata names. */
-  nameResolver?: ArmMetadataNameResolver;
-}
+export type ResolveArmResourcesOptions =
+  ResolveArmResourcesSingleServiceOptions | ResolveArmResourcesMultiServiceOptions;
 
 /**
  * Logical ARM metadata name that can be customized by a consumer.
@@ -635,6 +669,11 @@ interface StructuralProvider {
   providerOperations: ArmResourceOperation[];
 }
 
+interface FinalizedProvider extends Provider {
+  resources: ResolvedResource[];
+  providerOperations: ArmResourceOperation[];
+}
+
 const structuralProviders = new WeakMap<Program, Map<Namespace, StructuralProvider>>();
 const syntheticResources = new WeakSet<StructuralResolvedResource>();
 
@@ -642,14 +681,25 @@ const syntheticResources = new WeakSet<StructuralResolvedResource>();
  * Resolves ARM resources and operations.
  *
  * With no options, this returns the multi-version declaration view and preserves the original
- * resolver behavior. When an exact API version is selected, the returned TypeSpec references are
- * projected with `@typespec/versioning` to reflect availability, renames, and type changes in that
- * version.
+ * resolver behavior. A single exact API version or several service namespace/version selections
+ * project the returned TypeSpec references with `@typespec/versioning` to reflect availability,
+ * renames, and type changes.
  */
 export function resolveArmResources(
   program: Program,
   options: ResolveArmResourcesOptions = {},
 ): Provider {
+  if (options.serviceVersions !== undefined) {
+    if (options.version !== undefined) {
+      reportDiagnostic(program, {
+        code: "arm-resource-service-options-conflict",
+        target: NoTarget,
+      });
+      return {};
+    }
+    return resolveArmResourcesForServiceVersions(program, options);
+  }
+
   const providerNamespace = resolveProviderNamespace(program);
   if (providerNamespace === undefined) return {};
   const context =
@@ -657,10 +707,117 @@ export function resolveArmResources(
       ? { program, providerNamespace }
       : resolveArmResourceVersionContext(program, providerNamespace, options.version);
   if (context === undefined) return {};
+  return resolveArmResourcesForResolvedContext(context, options);
+}
+
+function resolveArmResourcesForServiceVersions(
+  program: Program,
+  options: ResolveArmResourcesMultiServiceOptions,
+): Provider {
+  const selections = validateArmServiceVersionSelections(program, options.serviceVersions);
+  if (selections === undefined) return {};
+
+  const contexts: { context: ArmResourceResolutionContext; version: Version }[] = [];
+  for (const selection of selections) {
+    const context = resolveArmResourceVersionContext(
+      program,
+      selection.namespace,
+      selection.version,
+    );
+    if (context === undefined) return {};
+    contexts.push({ context, version: selection.version });
+  }
+
+  const providers = contexts.map(({ context, version }) =>
+    resolveArmResourcesForResolvedContext(context, {
+      version: version.value,
+      nameResolver: options.nameResolver,
+    }),
+  );
+  return {
+    resources: providers.flatMap((provider) => provider.resources),
+    providerOperations: providers.flatMap((provider) => provider.providerOperations),
+  };
+}
+
+function validateArmServiceVersionSelections(
+  program: Program,
+  selections: readonly ArmServiceVersionSelection[],
+): readonly ArmServiceVersionSelection[] | undefined {
+  if (selections.length === 0) {
+    reportDiagnostic(program, {
+      code: "arm-resource-service-versions-empty",
+      target: NoTarget,
+    });
+    return undefined;
+  }
+
+  const namespaces = new Set<Namespace>();
+  for (const selection of selections) {
+    const namespaceName = getNamespaceFullName(selection.namespace);
+    if (namespaces.has(selection.namespace)) {
+      reportDiagnostic(program, {
+        code: "arm-resource-service-duplicate",
+        format: { namespace: namespaceName },
+        target: selection.namespace,
+      });
+      return undefined;
+    }
+    namespaces.add(selection.namespace);
+
+    if (!isArmProviderNamespace(program, selection.namespace)) {
+      reportDiagnostic(program, {
+        code: "arm-resource-service-not-arm",
+        format: { namespace: namespaceName },
+        target: selection.namespace,
+      });
+      return undefined;
+    }
+
+    if (selection.version.namespace !== selection.namespace) {
+      reportDiagnostic(program, {
+        code: "arm-resource-service-version-mismatch",
+        format: {
+          version: selection.version.value,
+          versionNamespace: getNamespaceFullName(selection.version.namespace),
+          selectedNamespace: namespaceName,
+        },
+        target: selection.version.enumMember,
+      });
+      return undefined;
+    }
+
+    const registeredVersions = getAllVersions(program, selection.namespace);
+    if (registeredVersions?.includes(selection.version) !== true) {
+      reportDiagnostic(program, {
+        code: "arm-resource-service-version-invalid",
+        format: {
+          version: selection.version.value,
+          namespace: namespaceName,
+        },
+        target: selection.namespace,
+      });
+      return undefined;
+    }
+  }
+
+  return selections;
+}
+
+interface ArmResourcePresentationOptions {
+  version?: string;
+  nameResolver?: ArmMetadataNameResolver;
+}
+
+function resolveArmResourcesForResolvedContext(
+  context: ArmResourceResolutionContext,
+  options: ArmResourcePresentationOptions,
+): FinalizedProvider {
+  const { program } = context;
   const source = resolveArmResourcesForContext(context);
   if (options.nameResolver === undefined) {
     const cached = getResolvedResources(program, context.providerNamespace);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) return cached as FinalizedProvider;
     const provider = finalizeArmProvider(program, source, options);
     setResolvedResources(program, context.providerNamespace, provider);
     return provider;
@@ -671,8 +828,9 @@ export function resolveArmResources(
 function resolveArmResourceVersionContext(
   program: Program,
   providerNamespace: Namespace,
-  version: string,
+  version: string | Version,
 ): ArmResourceResolutionContext | undefined {
+  const versionValue = typeof version === "string" ? version : version.value;
   let providerSnapshots = armResourceVersionSnapshots.get(program);
   if (providerSnapshots === undefined) {
     providerSnapshots = new Map();
@@ -683,7 +841,7 @@ function resolveArmResourceVersionContext(
     versionSnapshots = new Map();
     providerSnapshots.set(providerNamespace, versionSnapshots);
   }
-  const cached = versionSnapshots.get(version);
+  const cached = versionSnapshots.get(versionValue);
   if (cached !== undefined) {
     return { program, ...cached };
   }
@@ -692,7 +850,7 @@ function resolveArmResourceVersionContext(
   if (versioning === undefined) {
     reportDiagnostic(program, {
       code: "arm-resource-version-not-supported",
-      format: { version },
+      format: { version: versionValue },
       target: providerNamespace,
     });
     return undefined;
@@ -700,18 +858,20 @@ function resolveArmResourceVersionContext(
   if (versioning.kind === "transient") {
     reportDiagnostic(program, {
       code: "arm-resource-version-transient",
-      format: { version },
+      format: { version: versionValue },
       target: providerNamespace,
     });
     return undefined;
   }
 
-  const snapshot = versioning.snapshots.find((x) => x.version.value === version);
+  const snapshot = versioning.snapshots.find((x) =>
+    typeof version === "string" ? x.version.value === version : x.version === version,
+  );
   if (snapshot === undefined) {
     reportDiagnostic(program, {
       code: "arm-resource-version-not-found",
       format: {
-        version,
+        version: versionValue,
         availableVersions: versioning.snapshots.map((x) => x.version.value).join(", "),
       },
       target: providerNamespace,
@@ -727,7 +887,7 @@ function resolveArmResourceVersionContext(
   if (projection.realm === null || projection.type.kind !== "Namespace") {
     reportDiagnostic(program, {
       code: "arm-resource-version-projection-failed",
-      format: { version },
+      format: { version: versionValue },
       target: providerNamespace,
     });
     return undefined;
@@ -737,7 +897,7 @@ function resolveArmResourceVersionContext(
     providerNamespace: projection.type,
     realm: projection.realm,
   };
-  versionSnapshots.set(version, resolvedSnapshot);
+  versionSnapshots.set(versionValue, resolvedSnapshot);
   return { program, ...resolvedSnapshot };
 }
 
@@ -754,6 +914,12 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): S
   // We haven't generated the full resource details yet
   const resources: StructuralResolvedResource[] = [];
   for (const resource of listArmResources(program, realm)) {
+    if (
+      realm !== undefined &&
+      !isTypeDeclaredInNamespace(resource.typespecType, providerNamespace)
+    ) {
+      continue;
+    }
     const operations = resolveArmResourceOperations(program, resource.typespecType);
     const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
     for (const op of operations) {
@@ -792,11 +958,20 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): S
   return resolved;
 }
 
+function isTypeDeclaredInNamespace(type: Model, namespace: Namespace): boolean {
+  let current = type.namespace;
+  while (current !== undefined) {
+    if (current === namespace) return true;
+    current = current.namespace;
+  }
+  return false;
+}
+
 function finalizeArmProvider(
   program: Program,
   provider: StructuralProvider,
-  options: ResolveArmResourcesOptions,
-): Provider {
+  options: ArmResourcePresentationOptions,
+): FinalizedProvider {
   const nameResolver = options.nameResolver;
   const resourceCopies = new Map<StructuralResolvedResource, ResolvedResource>();
   const resources = provider.resources.map((resource) => {
@@ -870,7 +1045,7 @@ function finalizeArmProvider(
 
   return {
     resources,
-    providerOperations: provider.providerOperations?.map((operation) =>
+    providerOperations: provider.providerOperations.map((operation) =>
       copyArmResourceOperation(
         program,
         nameResolver,

@@ -92,6 +92,42 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`API version '${"version"}' could not be projected.`,
       },
     },
+    "arm-resource-service-versions-empty": {
+      severity: "error",
+      messages: {
+        default: "At least one ARM service version must be selected.",
+      },
+    },
+    "arm-resource-service-options-conflict": {
+      severity: "error",
+      messages: {
+        default: "The 'version' and 'serviceVersions' options cannot be used together.",
+      },
+    },
+    "arm-resource-service-duplicate": {
+      severity: "error",
+      messages: {
+        default: paramMessage`ARM service namespace '${"namespace"}' was selected more than once.`,
+      },
+    },
+    "arm-resource-service-not-arm": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Namespace '${"namespace"}' is not an ARM provider service.`,
+      },
+    },
+    "arm-resource-service-version-mismatch": {
+      severity: "error",
+      messages: {
+        default: paramMessage`API version '${"version"}' belongs to namespace '${"versionNamespace"}', not selected namespace '${"selectedNamespace"}'.`,
+      },
+    },
+    "arm-resource-service-version-invalid": {
+      severity: "error",
+      messages: {
+        default: paramMessage`API version '${"version"}' is not registered for ARM service namespace '${"namespace"}'.`,
+      },
+    },
     "arm-resource-invalid-metadata-name": {
       severity: "error",
       messages: {
