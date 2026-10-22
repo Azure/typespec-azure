@@ -1,54 +1,22 @@
-Enums, models, operations, and their members/properties should have meaningful, nonblank documentation. Use doc comments (`/** */`) to provide descriptions.
+Enums, models, operations, and their members/properties should have meaningful documentation. Use doc comments (`/** */`) or `@doc` to provide descriptions.
 
-This strengthens the existing `documentation-required` rule, already enabled in the data-plane and resource-manager rulesets; no separate opt-in rule is needed. Empty and whitespace-only strings do not satisfy existing documentation requirements. Missing-documentation scopes and exemptions are unchanged.
+Explicit descriptions must not be empty, whitespace-only, the placeholder `description`, or a repetition of the name they describe. Name comparisons ignore surrounding whitespace, periods, and case.
+
+- Ordinary properties use their authored names, regardless of serialization names.
+- Operations are compared with their authored names and effective HTTP verbs. HTTP parameters and multipart parts use their HTTP names, falling back to the property name for unnamed parts.
+- Enum members and named union variants use their names; unnamed string variants use their values. HTTP status-code properties are exempt from name comparisons.
+
+Namespaces, interfaces, and scalars do not require documentation, but explicitly supplied blank descriptions are checked. Explicit documentation on inline properties and declarations exempt from missing-documentation requirements is also checked. Uninstantiated template documentation unavailable from the compiler is not checked.
 
 ## Impact
 
 - **Area:** API, SDK
 
-Missing documentation produces poor SDK reference docs and API documentation.
-
-## Descriptive documentation
-
-Explicit descriptions on models, scalars, enums and members, unions and variants, operations, and properties must not repeat their effective name or the placeholder `description`. Comparisons trim whitespace, ignore periods, and ignore case.
-
-- Operations are compared with **both their source operation name and their effective HTTP verb**, whether explicit or inferred.
-- Ordinary properties use their JSON encoded name. Header, path, and query parameters use their HTTP name.
-- Multipart properties use the authored part name, falling back to the property name (including array parts).
-- Enum members use the member name, not its serialized value. Named union variants use their name; unnamed string variants use their literal value. Other unnamed variants are checked only for placeholder text.
-- HTTP status-code properties are exempt from name comparisons.
-
-These explicit-description checks also apply to scalars and inline properties, and to explicitly documented declarations otherwise exempt from missing-doc requirements. They do not require new documentation on those declarations. Existing rule users may now see quality warnings without changing their configuration.
-
-```tsp
-// Incorrect: repeating the source name is not a description, even with @get.
-@get @doc("read") op read(): string;
-```
-
-```tsp
-// Correct.
-@get @doc("Reads the current widget.") op read(): string;
-```
-
-## LintDiff Equivalent
-
-This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md).
-
-### Consolidated documentation coverage
-
-The checks formerly proposed as `no-uninformative-doc` and `no-empty-doc` are part of the existing `documentation-required` rule, not separate opt-in rules.
-
-| Migrated lintdiff rule                                                                                                                | Coverage in this existing TypeSpec rule                                                                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md)           | Existing documentation requirements for types, operations, and members, with the existing missing-documentation scopes and exemptions retained.                                                                                 |
-| [DescriptionMustNotBeNodeName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/description-must-not-be-node-name.md)  | Rejects explicit descriptions that repeat effective declaration/member names or placeholder text, using the JSON/HTTP/multipart/member naming rules above. Operations are checked against both their source name and HTTP verb. |
-| [DescriptiveDescriptionRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/descriptive-description-required.md) | Rejects empty or whitespace-only explicit documentation, including on declarations exempt from missing-doc requirements when the compiler exposes their documentation.                                                          |
-
-The operation-source-name comparison intentionally strengthens the migrated HTTP-verb comparison. Explicit-description checks do not newly require documentation on declarations otherwise exempt from missing-doc requirements. These mappings concern compiler-exposed documentation metadata, not acceptance of emitted Swagger summary/description fields.
+Missing or uninformative documentation produces poor SDK reference docs and API documentation.
 
 #### ❌ Incorrect
 
-Model without documentation:
+Missing documentation:
 
 ```tsp
 model Pet {
@@ -56,19 +24,21 @@ model Pet {
 }
 ```
 
-Operation without documentation:
+Descriptions that only repeat the authored names:
 
 ```tsp
-op read(): void;
+/** Widget */
+model Widget {
+  /** Name */
+  name: string;
+}
 ```
 
-Enum without documentation:
+An explicitly blank description:
 
 ```tsp
-enum PetKind {
-  Cat,
-  Dog,
-}
+@doc(" \t")
+scalar Label extends string;
 ```
 
 #### ✅ Correct
@@ -91,34 +61,15 @@ enum PetKind {
   /** A dog. */
   Dog,
 }
+
+/** A display label shown to users. */
+scalar Label extends string;
 ```
 
 :::note
 Version enums and discriminator enums/unions are exempt from missing-documentation requirements as they are considered self-documenting. Explicit descriptions on these declarations are still checked for blank or uninformative content.
 :::
 
-## Explicit documentation
-
-Every explicit `@doc` string must contain non-whitespace content. In addition to the existing required targets, this includes namespaces, interfaces, scalars, inline model properties, all union variants, and explicitly documented declarations exempt from missing-doc requirements. Enum members are checked individually.
-
-Checks use documentation metadata exposed by the compiler. Uninstantiated template declarations whose documentation is not exposed remain exempt.
-
-Documentation is not newly required on these additional targets: absent documentation remains allowed where it was previously allowed. However, an explicit blank description now warns for existing rule users without a configuration change. Whitespace-only strings previously passed the rule's truthiness check.
-
-```tsp
-// Incorrect.
-@doc(" \t")
-scalar Label extends string;
-```
-
-```tsp
-// Correct.
-@doc("A display label shown to users.")
-scalar Label extends string;
-```
-
-This intentionally strengthens the previous truthiness check, which accepted whitespace-only strings. It uses compiler-exposed documentation metadata rather than inspecting emitted Swagger fields; uninstantiated template documentation unavailable from the compiler remains outside its coverage.
-
 ## Suppression
 
-Do not suppress. Add a `/** */` doc comment or an `@doc` decorator.
+Do not suppress. Add a meaningful `/** */` doc comment or an `@doc` decorator.

@@ -1,11 +1,12 @@
-import { getDocumentationName, normalizeDocumentation } from "./documentation-names.js";
-
 import {
   createRule,
   fileRef,
   getDiscriminatedTypes,
   getDiscriminator,
   getDoc,
+  ignoreDiagnostics,
+  isArrayModelType,
+  paramMessage,
   type Discriminator,
   type Enum,
   type Model,
@@ -15,9 +16,15 @@ import {
   type Union,
   type UnionVariant,
 } from "@typespec/compiler";
-import { isStatusCode } from "@typespec/http";
+import {
+  getHeaderFieldName,
+  getHttpOperation,
+  getHttpPart,
+  getPathParamName,
+  getQueryParamName,
+  isStatusCode,
+} from "@typespec/http";
 import { getVersionsForEnum } from "@typespec/versioning";
-import { documentationMessages, type DocumentationTarget } from "./documentation.js";
 import {
   isExcludedCoreType,
   isInlineModel,
@@ -25,6 +32,53 @@ import {
   isTemplatedInterfaceOperation,
   isTemplatedOperationSignature,
 } from "./utils.js";
+
+type DocumentationTarget = Parameters<typeof getDoc>[1];
+
+const documentationMessages = {
+  default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
+  empty: "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+  uninformative: paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
+};
+
+function normalizeDocumentation(value: string): string {
+  return value.trim().replace(/\./g, "").toLowerCase();
+}
+
+function getDocumentationName(
+  program: Program,
+  target: DocumentationTarget,
+  doc: string,
+): string | undefined {
+  switch (target.kind) {
+    case "UnionVariant":
+      return typeof target.name === "string"
+        ? target.name
+        : target.type.kind === "String"
+          ? target.type.value
+          : undefined;
+    case "Operation":
+      if (normalizeDocumentation(doc) === normalizeDocumentation(target.name)) {
+        return target.name;
+      }
+      // HTTP validation owns resolution diagnostics; this rule only checks documentation.
+      return ignoreDiagnostics(getHttpOperation(program, target)).verb;
+    case "ModelProperty": {
+      const httpName =
+        getPathParamName(program, target) ??
+        getQueryParamName(program, target) ??
+        getHeaderFieldName(program, target);
+      if (httpName !== undefined) return httpName;
+      const partType =
+        target.type.kind === "Model" && isArrayModelType(target.type)
+          ? target.type.indexer.value
+          : target.type;
+      return getHttpPart(program, partType)?.options.name ?? target.name;
+    }
+    default:
+      return "name" in target && typeof target.name === "string" ? target.name : undefined;
+  }
+}
 
 /** Versioning enums are self-documenting and don't need separate documentation. */
 function isExcludedVersionEnum(program: Program, enumObj: Enum): boolean {
@@ -139,10 +193,9 @@ export const requireDocumentation = createRule({
       scalar: checkDocumentation,
       modelProperty: checkDocumentation,
       unionVariant: checkDocumentation,
+      enumMember: checkDocumentation,
       enum: (enumObj: Enum) => {
         checkDocumentation(enumObj);
-        // The compiler does not emit enumMember events.
-        for (const member of enumObj.members.values()) checkDocumentation(member);
         // version enums and enum members are considered intrinsically self-documenting
         if (isExcludedVersionEnum(context.program, enumObj)) {
           return;
