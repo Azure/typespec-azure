@@ -794,13 +794,26 @@ function generateOperation(
   // that case the response handler is invoked by the fetcher.
   if (needsResponseHandler(method) && !go.isLROMethod(method)) {
     // methods that return a modeled type, headers, or both call the method's response handler
-    text += `${indent.get()}return client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
+    const responseCall = `client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`;
+    if (options["inject-spans"]) {
+      const responseVar = helpers.getUniqueVarName(helpers.getMethodParameters(method), [
+        "resp",
+        "response",
+      ]);
+      text += `${indent.get()}${responseVar}, err := ${responseCall}\n`;
+      text += `${indent.get()}return ${responseVar}, err\n`;
+    } else {
+      text += `${indent.get()}return ${responseCall}\n`;
+    }
   } else {
     // no response handler so we emit the status code check here
     const zeroResp = getZeroReturnValue(method, false);
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: `!runtime.HasStatusCode(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`,
-      body: (indent) => `${indent.get()}return ${zeroResp}, runtime.NewResponseError(httpResp)\n`,
+      body: (indent) =>
+        options["inject-spans"]
+          ? `${indent.get()}err = runtime.NewResponseError(httpResp)\n${indent.get()}return ${zeroResp}, err\n`
+          : `${indent.get()}return ${zeroResp}, runtime.NewResponseError(httpResp)\n`,
     })}\n`;
 
     if (go.isLROMethod(method)) {

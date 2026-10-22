@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.58.0
+
+### Features
+
+- [#5196](https://github.com/Azure/typespec-azure/pull/5196) Generate JSONL and SSE operations returning `Promise<AsyncIterable<T>>` of deserialized items or events instead of raw byte streams, with eager HTTP validation and terminal-event handling.
+
+
 ## 0.57.1
 
 ### Bug Fixes
