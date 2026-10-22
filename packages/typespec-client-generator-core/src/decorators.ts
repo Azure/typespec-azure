@@ -1,4 +1,7 @@
-import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
+import {
+  getAzureServiceConfigurations,
+  getLroProtocolMetadata,
+} from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -291,33 +294,38 @@ export const $client: ClientDecorator = (
       return;
     }
     services = serviceConfig.values;
-    // validate all services has same server definition
-    let servers = undefined;
-    let auth: { authentication: Authentication; service: Namespace } | undefined;
-    let isSame = true;
-    for (const svc of services) {
-      const currentServers = getServers(context.program, svc);
-      if (currentServers === undefined) continue;
-      if (servers === undefined) {
-        servers = currentServers;
-      } else {
-        isSame = isSameServers(servers, currentServers);
-        if (!isSame) {
-          break;
+    const catalog = services[0]
+      ? getAzureServiceConfigurations(context.program, services[0])
+      : undefined;
+    let isSame = services.every((svc) =>
+      isSameServiceConfigurations(catalog, getAzureServiceConfigurations(context.program, svc)),
+    );
+    // Paired catalogs include servers and auth; flat HTTP declaration order is not significant.
+    if (isSame && !catalog) {
+      let servers = undefined;
+      let auth: Authentication | undefined;
+      for (const svc of services) {
+        const currentServers = getServers(context.program, svc);
+        if (currentServers === undefined) continue;
+        if (servers === undefined) {
+          servers = currentServers;
+        } else {
+          isSame = isSameServers(servers, currentServers);
+          if (!isSame) {
+            break;
+          }
         }
       }
-    }
-    for (const svc of services) {
-      const currentAuth = getAuthentication(context.program, svc);
-      if (currentAuth === undefined) continue;
-      if (auth === undefined) {
-        auth = { authentication: currentAuth, service: svc };
-      } else {
-        isSame =
-          isSameAuth(auth.authentication, currentAuth) &&
-          isSameServiceConfigurations(context.program, auth.service, svc);
-        if (!isSame) {
-          break;
+      for (const svc of services) {
+        const currentAuth = getAuthentication(context.program, svc);
+        if (currentAuth === undefined) continue;
+        if (auth === undefined) {
+          auth = currentAuth;
+        } else {
+          isSame = isSameAuth(auth, currentAuth);
+          if (!isSame) {
+            break;
+          }
         }
       }
     }

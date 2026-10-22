@@ -2531,30 +2531,28 @@ export function getAllReferencedTypes(
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
-  for (const client of listClients(context)) {
-    for (const operation of listOperationsInClient(context, client)) {
-      // operations on a client
-      diagnostics.pipe(updateTypesFromOperation(context, operation));
-    }
-    for (const sc of listSubClients(context, client, true)) {
-      for (const operation of listOperationsInClient(context, sc)) {
-        // operations on sub clients
+  for (const root of listClients(context)) {
+    const clients = [root, ...listSubClients(context, root, true)];
+    for (const client of clients) {
+      for (const operation of listOperationsInClient(context, client)) {
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
     }
-    // server parameters
-    // Multiple services only deal with the first server config
-    const catalog = getClientServiceConfigurations(context, client);
-    const servers = catalog
-      ? catalog.configurations.map((configuration) => configuration.server)
-      : getServers(context.program, client.services[0])?.slice(0, 1);
-    for (const server of servers ?? []) {
-      for (const param of server.parameters.values()) {
-        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+    for (const client of clients) {
+      const catalog = getClientServiceConfigurations(context, client);
+      const servers = catalog
+        ? catalog.configurations.map((configuration) => configuration.server)
+        : client === root
+          ? getServers(context.program, client.services[0])?.slice(0, 1)
+          : undefined;
+      for (const server of servers ?? []) {
+        for (const param of server.parameters.values()) {
+          const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+        }
       }
     }
-    client.services.map((s) => services.add(s));
+    root.services.map((s) => services.add(s));
   }
   for (const service of services) {
     // versioned enums

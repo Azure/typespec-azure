@@ -271,6 +271,103 @@ it("prefers a child namespace's catalog over a customized SDK parent", async () 
   });
 });
 
+it("preserves matching catalogs on merged children and grandchildren", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    ${definitions}
+    model LocalConfigurations {
+      Local: { endpoint: "https://local.example.com"; authentication: GovernmentAuth };
+    }
+    model NestedConfigurations {
+      Nested: { endpoint: "https://nested.example.com"; authentication: GovernmentAuth };
+    }
+    model PrivateConfigurations {
+      Private: { endpoint: "https://private.example.com"; authentication: PublicAuth };
+    }
+    @service @azureServiceConfigurations(Configurations, "Public")
+    namespace First {
+      @azureServiceConfigurations(LocalConfigurations, "Local")
+      namespace Operations {
+        @azureServiceConfigurations(NestedConfigurations, "Nested")
+        namespace Nested { @get @route("/first") op first(): void; }
+      }
+    }
+    @service @azureServiceConfigurations(Configurations, "Public")
+    namespace Second {
+      @azureServiceConfigurations(LocalConfigurations, "Local")
+      namespace Operations {
+        @azureServiceConfigurations(NestedConfigurations, "Nested")
+        namespace Nested { @get @route("/second") op second(): void; }
+      }
+    }
+    @azureServiceConfigurations(PrivateConfigurations, "Private")
+    @client({service: [First, Second], autoMergeService: true})
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const root = context.sdkPackage.clients[0];
+  const child = root.children?.[0];
+  const grandchild = child?.children?.[0];
+  expect(root.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("Private");
+  expect(child?.clientInitialization.serviceConfigurations).toMatchObject({
+    defaultConfiguration: "Local",
+    configurations: [{ endpoint: { serverUrl: "https://local.example.com" } }],
+  });
+  expect(grandchild?.clientInitialization.serviceConfigurations).toMatchObject({
+    defaultConfiguration: "Nested",
+    configurations: [{ endpoint: { serverUrl: "https://nested.example.com" } }],
+  });
+  if (!child || !grandchild) throw new Error("Missing merged client hierarchy");
+  for (const client of [child, grandchild]) {
+    expect(getCredential(client).type).toMatchObject({
+      kind: "credential",
+      scheme: { model: { name: "GovernmentAuth" } },
+    });
+  }
+  expect(grandchild.methods.map((method) => method.name)).toEqual(["first", "second"]);
+});
+
+it.each(["child", "grandchild"])(
+  "rejects conflicting catalogs on merged %s namespaces",
+  async (level) => {
+    const { program } = await AzureCoreTester.compile(`
+      ${definitions}
+      model FirstLocal {
+        Local: { endpoint: "https://first.example.com"; authentication: GovernmentAuth };
+      }
+      model SecondLocal {
+        Local: { endpoint: "https://second.example.com"; authentication: GovernmentAuth };
+      }
+      @service @azureServiceConfigurations(Configurations, "Public")
+      namespace First {
+        @azureServiceConfigurations(FirstLocal, "Local")
+        namespace Operations {
+          ${level === "grandchild" ? '@azureServiceConfigurations(FirstLocal, "Local")' : ""}
+          namespace Nested { @get @route("/first") op first(): void; }
+        }
+      }
+      @service @azureServiceConfigurations(Configurations, "Public")
+      namespace Second {
+        @azureServiceConfigurations(${level === "child" ? "SecondLocal" : "FirstLocal"}, "Local")
+        namespace Operations {
+          ${level === "grandchild" ? '@azureServiceConfigurations(SecondLocal, "Local")' : ""}
+          namespace Nested { @get @route("/second") op second(): void; }
+        }
+      }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    await createSdkContextForTester(program);
+    const conflictingClientCount = level === "child" ? 2 : 1;
+    expectDiagnostics(
+      program.diagnostics,
+      Array.from({ length: conflictingClientCount }, () => ({
+        code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      })),
+    );
+  },
+);
+
 it("does not overwrite explicit operation and interface authentication", async () => {
   const { program } = await AzureCoreTester.compile(`
         ${definitions}
@@ -318,6 +415,61 @@ it.each([false, true])(
     );
   },
 );
+
+it.each(["Unconfigured, Configured", "Configured, Unconfigured"])(
+  "rejects a missing merged catalog with services ordered %s",
+  async (services) => {
+    const diagnostics = await AzureCoreTester.diagnose(`
+      ${definitions}
+      model SingleConfiguration {
+        Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+      }
+      @service @server("https://api.loganalytics.io")
+      namespace Unconfigured { @get @route("/first") op first(): void; }
+      @service @azureServiceConfigurations(SingleConfiguration, "Public")
+      namespace Configured { @get @route("/second") op second(): void; }
+      @client({service: [${services}], autoMergeService: true})
+      namespace Combined {}
+    `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
+    ]);
+  },
+);
+
+it("merges equivalent catalogs independently of non-default declaration order", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    ${definitions}
+    model ChinaAuth is AadOauth2Auth<["china.read"]>;
+    model FirstConfigurations {
+      Government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
+      Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+      China: { endpoint: "https://china.example.com"; authentication: ChinaAuth };
+    }
+    model SecondConfigurations {
+      China: { endpoint: "https://china.example.com"; authentication: ChinaAuth };
+      Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+      Government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
+    }
+    @service @azureServiceConfigurations(FirstConfigurations, "Public")
+    namespace First { @get @route("/first") op first(): void; }
+    @service @azureServiceConfigurations(SecondConfigurations, "Public")
+    namespace Second { @get @route("/second") op second(): void; }
+    @client({service: [First, Second], autoMergeService: true})
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const client = context.sdkPackage.clients[0];
+  const catalog = client.clientInitialization.serviceConfigurations;
+  expect(catalog?.defaultConfiguration).toBe("Public");
+  expect(catalog?.configurations.map((configuration) => configuration.name)).toEqual([
+    "Public",
+    "Government",
+    "China",
+  ]);
+  expect(client.methods.map((method) => method.name)).toEqual(["first", "second"]);
+});
 
 it("rejects merged catalogs with different password-flow token URLs", async () => {
   const diagnostics = await AzureCoreTester.diagnose(`
@@ -376,14 +528,16 @@ it("rejects incompatible pairings even when flat HTTP servers and auth alternati
   ]);
 });
 
-it("rejects merged catalogs with different server parameter defaults", async () => {
-  const diagnostics = await AzureCoreTester.diagnose(`
+it.each([false, true])(
+  "compares merged server parameter defaults: conflict=%s",
+  async (conflict) => {
+    const diagnostics = await AzureCoreTester.diagnose(`
         ${definitions}
         model FirstConfigurations {
           Public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://first.example.com" }; authentication: PublicAuth };
         }
         model SecondConfigurations {
-          Public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://second.example.com" }; authentication: PublicAuth };
+          Public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://${conflict ? "second" : "first"}.example.com" }; authentication: PublicAuth };
         }
         @service @azureServiceConfigurations(FirstConfigurations, "Public")
         namespace First { @get @route("/first") op read(): void; }
@@ -392,10 +546,14 @@ it("rejects merged catalogs with different server parameter defaults", async () 
         @client({service: [First, Second], autoMergeService: true})
         namespace Combined {}
       `);
-  expectDiagnostics(diagnostics, [
-    { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
-  ]);
-});
+    expectDiagnostics(
+      diagnostics,
+      conflict
+        ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
+        : [],
+    );
+  },
+);
 
 it.each(["1", "2"])(
   "projects version-specific configuration entries for version %s",
@@ -524,3 +682,38 @@ it("includes endpoint parameter types reachable only from a non-default configur
   expect(region.usage & UsageFlags.Input).toBeTruthy();
   expect(context.sdkPackage.enums).toContain(region);
 });
+
+it.each(["child", "grandchild"])(
+  "includes endpoint enums referenced only by a %s catalog",
+  async (level) => {
+    const { program } = await AzureCoreTester.compile(`
+      ${definitions}
+      enum Region { East: "east", West: "west" }
+      model LocalConfigurations {
+        Public: { endpoint: "https://local.example.com"; authentication: PublicAuth };
+        Government: {
+          endpoint: "https://{region}.government.example.com";
+          parameters: { region: Region };
+          authentication: GovernmentAuth;
+        };
+      }
+      @service @azureServiceConfigurations(Configurations, "Public")
+      namespace Service {
+        ${level === "child" ? '@azureServiceConfigurations(LocalConfigurations, "Public")' : ""}
+        namespace Operations {
+          ${level === "grandchild" ? '@azureServiceConfigurations(LocalConfigurations, "Public")' : ""}
+          namespace Nested { @get op read(): void; }
+        }
+      }
+    `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
+    const child = context.sdkPackage.clients[0].children?.[0];
+    const client = level === "child" ? child : child?.children?.[0];
+    const configuration = client?.clientInitialization.serviceConfigurations?.configurations[1];
+    const region = configuration?.endpoint.templateArguments[0].type;
+    if (region?.kind !== "enum") throw new Error("Missing child endpoint enum");
+    expect(region.usage & UsageFlags.Input).toBeTruthy();
+    expect(context.sdkPackage.enums).toContain(region);
+  },
+);

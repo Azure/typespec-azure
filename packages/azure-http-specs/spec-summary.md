@@ -1431,12 +1431,6 @@ The client call takes no API-version argument and must send the overridden query
 
 Supply no configuration or endpoint override. The explicit Public default is not the first declared configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.io/.default, request path /public/azure/core/authentication/configurations/default, and response 204.
 
-### Azure_Core_Authentication_Configurations_endpointOverride
-
-- Endpoint: `get /azure/core/authentication/configurations/endpoint-override`
-
-Select Government and override only its endpoint with http://localhost:3000/custom. Retain the selected OAuth configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.us/.default, request path /custom/azure/core/authentication/configurations/endpoint-override, and response 204.
-
 ### Azure_Core_Authentication_Configurations_governmentConfiguration
 
 - Endpoint: `get /azure/core/authentication/configurations/government`

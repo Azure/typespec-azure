@@ -77,6 +77,7 @@ export interface TCGCContext {
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
+  __mergedSubClientTypes?: Map<SdkClient, (Namespace | Interface)[]>;
   __clientToOperationsCache?: Map<SdkClient, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient>;
   __clientParametersCache: Map<SdkClient, SdkMethodParameter[]>;

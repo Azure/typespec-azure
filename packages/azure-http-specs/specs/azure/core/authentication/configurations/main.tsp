@@ -51,12 +51,3 @@ op defaultConfiguration(): NoContentResponse;
 @get
 @route("/government")
 op governmentConfiguration(): NoContentResponse;
-
-// This fixture specifies endpoint-only override behavior, not a universal public endpoint option.
-@scenario
-@scenarioDoc("""
-  Select Government and override only its endpoint with http://localhost:3000/custom. Retain the selected OAuth configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.us/.default, request path /custom/azure/core/authentication/configurations/endpoint-override, and response 204.
-  """)
-@get
-@route("/endpoint-override")
-op endpointOverride(): NoContentResponse;

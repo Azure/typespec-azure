@@ -45,6 +45,7 @@ import {
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
+import { deepEquals } from "@typespec/compiler/utils";
 import {
   type Authentication,
   getHeaderFieldOptions,
@@ -64,7 +65,6 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { isDeepStrictEqual } from "node:util";
 import {
   getAlternateType,
   getClientDocExplicit,
@@ -1387,15 +1387,17 @@ export function getClientServiceConfigurations(
   context: TCGCContext,
   client: SdkClient,
 ): AzureServiceConfigurations | undefined {
-  const service = client.services[0];
-  const defaults = service ? getAzureServiceConfigurations(context.program, service) : undefined;
+  const defaults = client.services.map((service) =>
+    getAzureServiceConfigurations(context.program, service),
+  );
   for (let current: SdkClient | undefined = client; current; current = current.parent) {
-    if (!current.type) continue;
-    const candidate = getAzureServiceConfigurations(context.program, current.type);
+    const type = current.type ?? context.__mergedSubClientTypes?.get(current)?.[0];
+    if (!type) continue;
+    const candidate = getAzureServiceConfigurations(context.program, type);
     // Inherited service defaults must not hide a customized SDK parent's catalog.
-    if (candidate && candidate !== defaults) return candidate;
+    if (candidate && !defaults.includes(candidate)) return candidate;
   }
-  return defaults;
+  return defaults[0];
 }
 
 export function getClientDefaultServiceConfiguration(
@@ -1536,22 +1538,22 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
 }
 
 export function isSameServiceConfigurations(
-  program: Program,
-  leftService: Namespace,
-  rightService: Namespace,
+  left: AzureServiceConfigurations | undefined,
+  right: AzureServiceConfigurations | undefined,
 ): boolean {
-  const left = getAzureServiceConfigurations(program, leftService);
-  const right = getAzureServiceConfigurations(program, rightService);
   if (!left || !right) return left === right;
   if (
     left.defaultConfiguration !== right.defaultConfiguration ||
     left.configurations.length !== right.configurations.length
   )
     return false;
-  return left.configurations.every((configuration, index) => {
-    const other = right.configurations[index];
+  const rightConfigurations = new Map(
+    right.configurations.map((configuration) => [configuration.name, configuration]),
+  );
+  return left.configurations.every((configuration) => {
+    const other = rightConfigurations.get(configuration.name);
     if (
-      configuration.name !== other.name ||
+      !other ||
       configuration.server.url !== other.server.url ||
       configuration.server.parameters.size !== other.server.parameters.size ||
       !isSameAuth(configuration.authentication, other.authentication)
@@ -1563,7 +1565,7 @@ export function isSameServiceConfigurations(
         !otherParameter ||
         getTypeName(parameter.type) !== getTypeName(otherParameter.type) ||
         parameter.optional !== otherParameter.optional ||
-        !isDeepStrictEqual(
+        !deepEquals(
           parameter.defaultValue ? getValueTypeValue(parameter.defaultValue) : undefined,
           otherParameter.defaultValue ? getValueTypeValue(otherParameter.defaultValue) : undefined,
         )

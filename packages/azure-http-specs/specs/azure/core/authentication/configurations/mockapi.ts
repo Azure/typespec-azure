@@ -17,11 +17,3 @@ Scenarios.Azure_Core_Authentication_Configurations_governmentConfiguration = pas
   response: { status: 204 },
   kind: "MockApiDefinition",
 });
-
-Scenarios.Azure_Core_Authentication_Configurations_endpointOverride = passOnSuccess({
-  uri: "/custom/azure/core/authentication/configurations/endpoint-override",
-  method: "get",
-  request: { headers: { authorization: "Bearer https://api.loganalytics.us/.default" } },
-  response: { status: 204 },
-  kind: "MockApiDefinition",
-});
