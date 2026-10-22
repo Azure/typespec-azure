@@ -159,6 +159,53 @@ describe("migrate (end-to-end)", () => {
     await expect(migrate(root)).rejects.toThrow(/Circular parameter reference/);
   });
 
+  it("preserves payload field order through YAML and legacy expansion for each version", async () => {
+    const root = await buildFixture();
+    const versions = ["2023-01-01", "2024-06-01"];
+    const bodies = [
+      { zeta: "last", nested: { second: 2, first: 1 }, items: [{ value: 1, name: "item" }] },
+      { items: [{ name: "item", value: 1 }], nested: { first: 1, second: 2 }, zeta: "last" },
+    ];
+    const originals = versions.map((version, index) => ({
+      title: "Create",
+      operationId: "Things_Create",
+      parameters: {
+        "api-version": version,
+        subscriptionId: "sub",
+        id: "1",
+        resource: bodies[index],
+      },
+      responses: {
+        "200":
+          index === 0
+            ? { body: bodies[index], headers: { "x-second": "2", "x-first": "1" } }
+            : { headers: { "x-first": "1", "x-second": "2" }, body: bodies[index] },
+      },
+    }));
+    for (const [index, version] of versions.entries()) {
+      await writeFile(
+        join(root, "stable", version, "examples", "Create.json"),
+        JSON.stringify(originals[index]),
+      );
+    }
+    await writeFile(
+      join(root, "service.yaml"),
+      'versions:\n  - version: "2023-01-01"\n  - version: "2024-06-01"\n',
+    );
+
+    const result = await migrate(root);
+    expect(result.diagnostics).toEqual([]);
+    expect(parse(result.files[0].content)["Things.create"]).toHaveLength(2);
+    await writeFile(join(root, "examples.yaml"), result.files[0].content);
+
+    for (const [index, version] of versions.entries()) {
+      const expanded = await resolveLegacyExamples(root, version);
+      expect(expanded.diagnostics).toEqual([]);
+      const document = expanded.files.find((file) => file.fileName === "Create.json")?.document;
+      expect(JSON.stringify(document)).toBe(JSON.stringify(originals[index]));
+    }
+  });
+
   it("produces a valid, collapsed examples.yaml", async () => {
     const root = await buildFixture();
     const result = await migrate(root);
