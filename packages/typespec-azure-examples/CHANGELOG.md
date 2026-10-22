@@ -4,11 +4,7 @@
 
 ### Features
 
-- [#5799](https://github.com/Azure/typespec-azure/pull/5799) Validate example request and response values against the current TypeSpec API, including required and typed server parameters, with API-version and YAML-location diagnostics. Use `--schema-only` for format-only validation.
-  
-  ```sh
-  tsp-examples validate path/to/project
-  ```
+- [#5799](https://github.com/Azure/typespec-azure/pull/5799) Validate example request and response values against the current TypeSpec API with `tsp-examples validate path/to/project`, including required and typed server parameters and API-version/YAML-location diagnostics. Use `--schema-only` for format-only validation.
 
 ### Bug Fixes
 
