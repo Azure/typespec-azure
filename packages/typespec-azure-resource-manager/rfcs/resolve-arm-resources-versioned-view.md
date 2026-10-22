@@ -683,7 +683,9 @@ Implement a graph-preserving copy:
 2. Copy operation records that contain customizable fields.
 3. Reconnect `parent` and resource-valued `scope` through an old-to-new resource map.
 4. Preserve TypeSpec and immutable HTTP metadata references.
-5. Evaluate and apply names to the copied graph.
+5. Map the structural resource classification to the public presentation: `Tracked` remains
+   `Tracked`, and every other structural resource kind becomes `Proxy`.
+6. Evaluate and apply names to the copied graph.
 
 The no-resolver result is also produced by this finalizer and may be cached to preserve repeated
 call identity. Customized results are never cached.

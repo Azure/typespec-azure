@@ -295,12 +295,17 @@ interface ResolvedResourceOperations {
   /** The scope of this resource */
   scope?: ArmResourceScope;
 }
+
+type StructuralResourceKind = "Tracked" | "Proxy" | "Extension" | "Other";
+
+export type ResolvedResourceKind = "Tracked" | "Proxy";
+
 /** Resolved operations, including operations for non-arm resources */
 export interface ResolvedResource {
   /** The model type for the resource */
   type: Model;
-  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
-  kind: "Tracked" | "Proxy" | "Extension" | "Other";
+  /** The public kind of resource. Non-tracked resources are presented as proxy resources. */
+  kind: ResolvedResourceKind;
   /** The provider namespace */
   providerNamespace: string;
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
@@ -583,10 +588,7 @@ export function getPublicResourceKind(
   }
 }
 
-function mapResourceKind(
-  kind: ArmResourceKind,
-  hasOperations: boolean,
-): "Tracked" | "Proxy" | "Extension" | "Other" {
+function mapResourceKind(kind: ArmResourceKind, hasOperations: boolean): StructuralResourceKind {
   switch (kind) {
     case "Tracked":
       return "Tracked";
@@ -599,6 +601,10 @@ function mapResourceKind(
     default:
       return hasOperations ? "Tracked" : "Other";
   }
+}
+
+function getResolvedResourceKind(kind: StructuralResourceKind): ResolvedResourceKind {
+  return kind === "Tracked" ? "Tracked" : "Proxy";
 }
 
 interface ArmResourceResolutionContext {
@@ -616,7 +622,8 @@ const armResourceVersionSnapshots = new WeakMap<
   Program,
   Map<Namespace, Map<string, ArmResourceVersionSnapshot>>
 >();
-interface StructuralResolvedResource extends ResolvedResource {
+interface StructuralResolvedResource extends Omit<ResolvedResource, "kind" | "parent" | "scope"> {
+  kind: StructuralResourceKind;
   resourceNameExpression: ResourceNameExpression;
   resourceNameIsExplicit: boolean;
   parent?: StructuralResolvedResource;
@@ -791,11 +798,12 @@ function finalizeArmProvider(
   options: ResolveArmResourcesOptions,
 ): Provider {
   const nameResolver = options.nameResolver;
-  const resourceCopies = new Map<ResolvedResource, ResolvedResource>();
+  const resourceCopies = new Map<StructuralResolvedResource, ResolvedResource>();
   const resources = provider.resources.map((resource) => {
-    const { resourceNameExpression, resourceNameIsExplicit, ...resourceMetadata } = resource;
+    const { kind, resourceNameExpression, resourceNameIsExplicit, ...resourceMetadata } = resource;
     const copy: ResolvedResource = {
       ...resourceMetadata,
+      kind: getResolvedResourceKind(kind),
       operations: { lifecycle: {}, lists: [], actions: [] },
       associatedOperations: undefined,
       parent: undefined,
@@ -841,7 +849,7 @@ function finalizeArmProvider(
       program,
       nameResolver,
       source.operations,
-      source,
+      target,
       target.resourceName,
       options.version,
     );
@@ -850,7 +858,7 @@ function finalizeArmProvider(
         program,
         nameResolver,
         operation,
-        source,
+        target,
         target.resourceName,
         options.version,
       ),

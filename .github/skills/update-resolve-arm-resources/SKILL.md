@@ -50,6 +50,8 @@ Preserve all of these invariants:
     checked.
 11. Program-wide ARM registration state is never cleared to prepare one selected version.
 12. Repeated resolution of the same version reuses the same projected namespace and realm.
+13. `ResolvedResource.kind` returns only `Tracked` or `Proxy`. Keep broader resource categories in
+    structural state and map every non-tracked category to `Proxy` during finalization.
 
 ## Implementation map
 

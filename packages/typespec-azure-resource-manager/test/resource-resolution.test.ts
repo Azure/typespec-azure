@@ -535,6 +535,62 @@ describe("unit tests for resource manager helpers", () => {
   });
 });
 describe("end-to-end tests for resource manager helpers", () => {
+  it("presents every resolved resource as tracked or proxy", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Parent is TrackedResource<{}> {
+  ...ResourceNameParameter<Parent>;
+}
+
+@parentResource(Parent)
+model Child is ProxyResource<{}> {
+  ...ResourceNameParameter<Child>;
+}
+
+model ExtensionWidget is ExtensionResource<{}> {
+  ...ResourceNameParameter<ExtensionWidget>;
+}
+
+model PrivateLinkResource is PrivateLink;
+alias PrivateLinkOperations = PrivateLinks<PrivateLinkResource>;
+
+@armResourceOperations
+interface Parents {
+  get is ArmResourceRead<Parent>;
+  getPrivateLink is PrivateLinkOperations.Read<Parent>;
+}
+
+@armResourceOperations
+interface Children {
+  get is ArmResourceRead<Child>;
+}
+
+@armResourceOperations
+interface ExtensionWidgets {
+  get is Extension.Read<Extension.Subscription, ExtensionWidget>;
+}
+`);
+
+    for (const provider of [
+      resolveArmResources(program),
+      resolveArmResources(program, { nameResolver: () => undefined }),
+    ]) {
+      const resources = provider.resources;
+      ok(resources);
+      expect(resources.every((resource) => ["Tracked", "Proxy"].includes(resource.kind))).toBe(
+        true,
+      );
+      expect(resources.find((resource) => resource.type.name === "Parent")?.kind).toBe("Tracked");
+      for (const typeName of ["Child", "ExtensionWidget", "PrivateLinkResource"]) {
+        expect(resources.find((resource) => resource.type.name === typeName)?.kind).toBe("Proxy");
+      }
+    }
+  });
+
   it("preserves the complete legacy provider view when returning the cached result", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
@@ -2120,7 +2176,7 @@ interface GenericResources {
     const employeeAtLocation = provider.resources[0];
     ok(employeeAtLocation);
     expect(employeeAtLocation).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Tenant",
@@ -2148,7 +2204,7 @@ interface GenericResources {
     const scope = provider.resources[1];
     ok(scope);
     expect(scope).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Scope",
@@ -2176,7 +2232,7 @@ interface GenericResources {
     const subscription = provider.resources[2];
     ok(subscription);
     expect(subscription).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Subscription",
@@ -2206,7 +2262,7 @@ interface GenericResources {
     const managementGroups = provider.resources[3];
     ok(managementGroups);
     expect(managementGroups).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ManagementGroup",
@@ -2236,7 +2292,7 @@ interface GenericResources {
     const serviceGroups = provider.resources[4];
     ok(serviceGroups);
     expect(serviceGroups).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ServiceGroup",
@@ -2266,7 +2322,7 @@ interface GenericResources {
     const resourceGroup = provider.resources[5];
     ok(resourceGroup);
     expect(resourceGroup).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2295,7 +2351,7 @@ interface GenericResources {
     const vms = provider.resources[6];
     ok(vms);
     expect(vms).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: expect.objectContaining({
@@ -2333,7 +2389,7 @@ interface GenericResources {
     const scaleSetVms = provider.resources[7];
     ok(scaleSetVms);
     expect(scaleSetVms).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
     });
@@ -2370,7 +2426,7 @@ interface GenericResources {
     const generics = provider.resources[8];
     ok(generics);
     expect(generics).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ExternalResource",
@@ -2398,7 +2454,7 @@ interface GenericResources {
     const vmExternal = provider.resources[9];
     ok(vmExternal);
     expect(vmExternal).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.Compute",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2414,7 +2470,7 @@ interface GenericResources {
     const scaleSetVmExternal = provider.resources[10];
     ok(scaleSetVmExternal);
     expect(scaleSetVmExternal).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.Compute",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2430,7 +2486,7 @@ interface GenericResources {
     const scaleSetExternal = provider.resources[11];
     ok(scaleSetExternal);
     expect(scaleSetExternal).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.Compute",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -2611,7 +2667,7 @@ interface GenericResources {
     const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Tenant",
@@ -2639,7 +2695,7 @@ interface GenericResources {
     const scope = provider.resources[1];
     ok(scope);
     expect(scope).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Scope",
@@ -2667,7 +2723,7 @@ interface GenericResources {
     const subscription = provider.resources[2];
     ok(subscription);
     expect(subscription).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
 
@@ -2698,7 +2754,7 @@ interface GenericResources {
     const vms = provider.resources[3];
     ok(vms);
     expect(vms).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
 
@@ -2738,7 +2794,7 @@ interface GenericResources {
     const generics = provider.resources[4];
     ok(generics);
     expect(generics).toMatchObject({
-      kind: "Extension",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
 
@@ -2956,7 +3012,7 @@ model DependentProperties {
     const privateEndpointConnection = provider.resources[1];
     ok(privateEndpointConnection);
     expect(privateEndpointConnection).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -3014,7 +3070,7 @@ model DependentProperties {
     const privateForDepInstance = provider.resources[2];
     ok(privateForDepInstance);
     expect(privateForDepInstance).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -3193,7 +3249,7 @@ model MoveResponse {
     const privateEndpointConnection = provider.resources[1];
     ok(privateEndpointConnection);
     expect(privateEndpointConnection).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -3556,7 +3612,7 @@ model DependentProperties {
     );
     ok(privateLink);
     expect(privateLink).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -3591,7 +3647,7 @@ model DependentProperties {
     );
     ok(privateForDepInstance);
     expect(privateForDepInstance).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -3750,7 +3806,7 @@ model MoveResponse {
     const privateLink = provider.resources[1];
     ok(privateLink);
     expect(privateLink).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Subscription",
@@ -3784,7 +3840,7 @@ model MoveResponse {
     ok(location);
     expect(location).toMatchObject({
       type: expect.anything(),
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       scope: "Subscription",
       resourceName: "Location",
@@ -4022,7 +4078,7 @@ model MoveResponse {
     const building = provider.resources[2];
     ok(building);
     expect(building).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -4042,7 +4098,7 @@ model MoveResponse {
     const room = provider.resources[3];
     ok(room);
     expect(room).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -4202,7 +4258,7 @@ model MoveResponse {
     const building = provider.resources[1];
     ok(building);
     expect(building).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -4453,7 +4509,7 @@ model MoveResponse {
     const building = provider.resources[2];
     ok(building);
     expect(building).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -4473,7 +4529,7 @@ model MoveResponse {
     const room = provider.resources[3];
     ok(room);
     expect(room).toMatchObject({
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
@@ -4780,7 +4836,7 @@ model DependentProperties {
     ok(location);
     expect(location).toMatchObject({
       type: expect.anything(),
-      kind: "Other",
+      kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       scope: "ResourceGroup",
       resourceName: "Location",
@@ -5673,7 +5729,7 @@ namespace Microsoft.Resources {
       const resource = provider.resources[0];
       ok(resource);
       expect(resource).toMatchObject({
-        kind: "Other",
+        kind: "Proxy",
         providerNamespace: "Microsoft.Resources",
         type: expect.anything(),
       });
