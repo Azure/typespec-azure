@@ -3,12 +3,6 @@ query parameters. Keep resource identity in the request URI and resource-specifi
 data in the resource's `properties` bag, so callers do not have to supply
 potentially conflicting values twice.
 
-This rule compares authored member names in the model-valued `properties` bag
-with the PUT operation's HTTP path and query parameter names. It includes
-inherited members and reports on the repeated property declaration. Each matching
-name is reported once per concrete PUT operation; a declaration shared by two PUT
-operations can receive two diagnostics.
-
 This rule complements
 [`arm-resource-duplicate-property`](./arm-resource-duplicate-property.md), which
 compares properties-bag members with envelope property names on ARM resource
@@ -17,16 +11,6 @@ models, independently of operations. For example, an envelope `name` with
 Conversely, `properties.identity` duplicates an envelope `identity` only under
 the envelope rule when no URI parameter is named `identity`. Both rules can
 report a member when its name matches both an envelope property and a URI parameter.
-
-The check does not recurse into nested models, inspect top-level envelope
-duplicates, or check PATCH bodies. Template sources are skipped, but concrete
-operation aliases are checked. Provider namespace metadata is not required when
-this rule is selected. The rule is available but disabled by default in the
-Azure resource-manager ruleset.
-
-`@encodedName("application/json", ...)` does not change an authored property
-name for this check. A JSON alias alone cannot introduce or remove a diagnostic;
-HTTP `@path` and `@query` name overrides do determine the parameter names.
 
 ## Impact
 
