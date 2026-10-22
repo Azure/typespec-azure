@@ -13,6 +13,13 @@ The goal is not to code immediately. The goal is to gather the evidence needed t
 
 Use the [evidence checklist](./evidence-checklist.md) to make sure the intake is complete.
 
+For an explicit [native-first group](../do-linter-development-task-one-by-one/native-first.md#input-and-group-admission),
+perform this intake for **each member**, retaining its audience, material checks,
+options, exceptions and diagnostic unit. Shared discovery may be reused with
+exact source evidence, never by assuming similar names mean identical behavior.
+Then assess one coherent native responsibility and compatible controls. Keep
+independent member conclusions and do not auto-add related validators.
+
 ## Process
 
 1. Gather upstream or source-of-truth material for the named rule:

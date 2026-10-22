@@ -10,6 +10,24 @@ TypeSpec lint rule without assuming that raw diagnostic counts must be equal.
 Produce reproducible evidence, decide whether the migrated TypeSpec rule needs
 to change, and give a rule-focused implementation plan when it does.
 
+For official-package runs, prefer the immutable baseline and candidate receipts
+from [/analyze-native-lint-coverage](../analyze-native-lint-coverage/SKILL.md).
+For explicit many-to-one tasks, apply the
+[combined-count policy](../do-linter-development-task-one-by-one/native-first.md#counts-completeness-and-correspondence):
+comparable diagnostic counts per project are primary; project sets remain
+population/regression guards and per-member tests prove completeness. Preserve
+raw counts and justified normalization, directional excesses and absolute/relative
+differences. Equal corpus totals must not cancel opposite project gaps.
+Investigate every residual; "close" is not permission to ignore a missing member.
+Never deduplicate distinct violations merely because paths/locations match.
+
+Require deterministic attribution only for claims that use it, such as per-member
+native counts or exact correspondence. Without it, report group observations
+and independent member conclusions, marking member native counts unassessed.
+Do not add artificial Swagger identities to production messages. Missing
+attribution alone is a reporting limit; unresolved required semantic/count
+questions or execution failures still block the relevant conclusion.
+
 ## Inputs
 
 Collect or identify:
@@ -17,9 +35,12 @@ Collect or identify:
 - Swagger validator rule ID.
 - Mapped TypeSpec lint rule ID.
 - Spec repo or lint-diff worktree.
-- The local snapshot of the external migration coverage report:
+- For native runs: completed baseline identity, actual specs/closure, candidate
+  source/artifacts, comparison profile and successful/failed project inventory.
+- For groups: explicit frozen membership and per-member semantic controls.
+- When investigating historical report disagreement, the local snapshot:
   `packages/typespec-lintdiff/docs/coverage_old.md`.
-- The lint-diff observed coverage report:
+- The historical lint-diff observed coverage report, when relevant:
   `packages/typespec-lintdiff/specs/coverage-breakdown.md`.
 - Source revision, generation time, and generator revision for both reports.
 - Validator and TypeSpec per-project diagnostic files.
@@ -32,7 +53,9 @@ unmatched projects cannot be reconstructed from it.
 
 ### 1. Reconcile the two coverage reports
 
-Always examine both reports before investigating an individual rule. Do not
+When historical coverage reports underpin the disputed claim, examine both
+before investigating an individual rule. Native baseline comparisons do not
+require reproducing unrelated old reports; record them as not applicable. Do not
 compare their category totals or coverage percentages as if they used the same
 definition.
 
@@ -110,7 +133,7 @@ Do not attribute a difference to rule behavior until these dimensions are
 aligned. Exclude TypeSpec compile failures from both sides of a behavioral
 comparison, while retaining failure details in machine-readable metadata.
 
-### 3. Compare project sets first
+### 3. Establish project-set guardrails
 
 Build these sets over the aligned population:
 
@@ -148,8 +171,9 @@ List every authorable surface the Swagger rule can diagnose, such as:
 - Operations or schemas.
 
 Require violating fixtures for each applicable surface and at least one
-compliant control. Run the repository's validation command and use
-`audit:noise` to find incidental or unmapped fixture diagnostics.
+compliant control. Run the owning native package's tests and injected-package
+controls for official runs. For legacy fixture runs, use the repository's
+validation command and `audit:noise` to find incidental or unmapped diagnostics.
 
 `audit:noise` is supporting evidence only. It does not establish target
 identity, prove compliant behavior, or replace real-service analysis.
@@ -157,7 +181,9 @@ identity, prove compliant behavior, or replace real-service analysis.
 ### 5. Analyze raw diagnostic cardinality
 
 Record raw validator and TypeSpec diagnostic totals, but do not use their
-equality as the migration criterion.
+equality alone as the migration criterion. For groups, combined comparable
+counts per project are the primary numerical signal. Define and justify the
+comparison unit, then investigate directional and absolute/relative gaps.
 
 Swagger rules run over emitted OpenAPI occurrences. TypeSpec rules run over
 semantic source targets. One TypeSpec declaration may produce multiple Swagger
@@ -176,9 +202,16 @@ TypeSpec may also report multiple semantic targets that share an emitted name.
 
 Calculate at least these identities:
 
-- Validator raw identity: project + Swagger file + JSON path.
-- Validator file-independent identity: project + JSON path.
-- TypeSpec source identity: project + source file + line + column.
+- Validator occurrence key: validator ID + project + Swagger file + JSON path.
+- Validator file-independent key: validator ID + project + JSON path.
+- TypeSpec source key: native rule ID + project + source file + line + column.
+
+These are conservative location summaries, not proof of actionable identity.
+Retain raw occurrences, including multiple distinct checks at the same key.
+Cross-validator overlap requires explicit semantic evidence; do not drop a rule
+ID and deduplicate the group by JSON path. Likewise distinct native violations
+can share a source location. Only independently tested claim-specific
+normalization can establish comparable counts.
 
 Report:
 
@@ -289,7 +322,80 @@ Do not claim equivalence when one-sided projects or outliers remain unexplained.
 
 ## Migration Note
 
-Create `migration.md` beside the rule fixtures and include:
+For legacy work create `migration.md` beside the rule fixtures. Native-first
+work uses the verified fork [evidence layout](../do-linter-development-task-one-by-one/evidence.md),
+with a group note and per-member notes linked from the native PR.
+
+This is the shared report contract for migration development, native coverage
+analysis and gap investigation. It changes presentation, not the investigation,
+validation, review or acceptance requirements.
+
+### Reader-facing report
+
+Keep `migration.md` concise, normally about one or two pages (roughly 600-900
+words). This is a readability target, not permission to omit required findings.
+Put long investigations, provenance, repair history, complete inventories and
+reproduction commands in a linked `evidence-details.md` or existing appendix.
+Use these five sections in order:
+
+1. **Conclusion and scope.** Lead with the supported behavior and practical
+   migration value when evidence establishes them. State remaining gaps, the
+   rule-change decision and material uncertainty alongside those positives.
+   Distinguish standard-case agreement from full functional parity; do not
+   declare the whole migration unsuccessful merely because representation
+   corner cases remain. Do not invent success, soften a required-check failure,
+   or claim equivalence despite a demonstrated semantic gap. Name the compared
+   audience, API-version policy and analysis/default activation distinction;
+   link the frozen inputs rather than opening with hashes or commands.
+2. **Actual coverage.** Put the key numbers in a compact scorecard: selected,
+   assessed and failed/unassessed projects; raw Swagger and raw/aligned native
+   findings; affected-project overlap; and one-sided projects. Identify the
+   counting units and comparison scope. Project overlap and ratios between
+   different diagnostic identities are not functional coverage. Mark exact
+   diagnostic correspondence unassessed when it is not established. Link the
+   full report and per-project audit.
+3. **Function-level coverage.** Show supported core behavior and compliant
+   controls before the targeted gap inventory. Define the audited behaviors,
+   denominator, observed counts and status for each row: covered, missing,
+   compiler-prevented, approved retirement or unassessed. Distinguish ordinary
+   authoring surfaces from representation corner cases when justified; never
+   label a missing core function a corner case to minimize it. A deliberately
+   edge-heavy fixture suite is a stress test, not an estimate of production
+   coverage. Explain that equally weighted case percentages do not measure
+   real-spec prevalence or exhaustive rule-wide coverage. "Corner case" describes
+   the shape, not proven rarity; state frequency limits and real-spec witnesses.
+   Label test-case counts separately from behavior coverage.
+4. **Why diagnostic counts differ.** Use a small cause/observation/disposition
+   table with links to exact examples. Preserve both directional excesses and
+   unexplained residuals; do not let opposite project gaps cancel. Separate
+   multiplicity, reference boundaries, version/population alignment and true
+   semantic misses. Call findings obsolete only with target-specific
+   version/removal evidence. Label deliberate policy retirements separately
+   and record their explicit approval.
+   A native non-finding alone is not evidence that a legacy check is outdated.
+5. **Examples and required action.** Show a small working core example when
+   supported, plus representative material gaps, preferably from real services.
+   Include minimal TypeSpec, emitted schema or validator behavior, and each
+   engine's observed result so the difference is immediately clear. Keep only
+   a few examples inline; link every other material cause or audited corner
+   case directly to a short, named source/schema example, not just the appendix
+   title or a large JSON dump. Keep production rule/test actions separate from
+   comparison-tool fixes. State the production changes needed for full parity,
+   or why none are required. An approved narrower policy supports a scoped
+   outcome, not full parity. Link reproduction/source-retention receipts and
+   distinguish verified replay from untested regeneration.
+
+For many-to-one tasks, retain the member status matrix in the conclusion,
+combined raw/comparable counts in the scorecard, and per-member semantic
+evidence in the function table or directly linked member notes. Do not invent
+per-member native counts when attribution is unavailable. Use the same outline
+for member notes without duplicating shared baseline data.
+
+### Supporting evidence and completeness
+
+Keep all of the following in the concise report or its directly linked supporting
+evidence. Moving details must not discard evidence, weaken a gate or turn an
+unresolved investigation into an accepted difference:
 
 1. Final migration conclusion.
 2. A direct answer to whether the migrated TypeSpec rule must change.

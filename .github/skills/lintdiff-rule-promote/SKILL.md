@@ -10,6 +10,14 @@ user-invocable: true
 Use this skill when a migrated rule in `packages/typespec-lintdiff` is ready to be
 promoted into an official TypeSpec Azure library.
 
+This remains available for standalone and legacy queue promotion. A
+[native-first task](../do-linter-development-task-one-by-one/native-first.md)
+already develops in the official package and must not invoke this workflow or
+create a second rule PR. Its release-readiness checkpoint retains this skill's
+applicable native packaging, test, documentation, ruleset and example requirements
+through the [official migration contract](../shared/native-migration-contract.md),
+without inventing an immutable temporary source commit.
+
 Promotion is a handoff workflow, not a rule-design workflow. The rule's source
 PR in `packages/typespec-lintdiff` remains the source of truth while the
 official-library PR is prepared in a clean worktree.
@@ -222,8 +230,12 @@ needs special investigation:
    files that can be read with `git show <ref>:<path>`.
 3. Complete the prepared-environment gate in process step 3 below.
 4. Do not run the lintdiff harness during promotion. The source rule's
-   `migration.md` is the source of migration evidence; use source package build
-   plus native target tests for promotion validation.
+   `migration.md` and its linked appendix are the source of migration evidence;
+   read both rather than treating a concise note as missing investigation.
+   The [shared report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note)
+   governs new or refreshed notes, not permission to rewrite immutable source
+   evidence during promotion. Use source package build plus native target tests
+   for promotion validation.
 5. Convert fixture coverage with the standard mapping in step 5 instead of
    copying snapshots or recreating the full harness layout.
 6. In a fresh worktree, build the target package dependency closure once before

@@ -14,7 +14,7 @@ import { execFile, execFileSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { pathToFileURL } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import { promisify } from "util";
 
 const execFileAsync = promisify(execFile);
@@ -63,6 +63,10 @@ interface ValidatorViolation {
   level: "warning" | "error" | "fatal";
   project: string;
   swaggerFile: string;
+  validatorInputFile?: string;
+  sourceDocuments?: string[];
+  sourceAttribution?: "reported" | "ambiguous" | "input-fallback";
+  sourceResolutionErrors?: string[];
   message: string;
   path: Array<string | number>;
   details?: unknown;
@@ -413,11 +417,16 @@ export function keepOutputFileInsideEmitterDirectory(content: string): string {
   return content.replace(/(output-file:\s*["']?)(?:(?:\.\.\/)+|\{project-root\}\/)+(.*)/, "$1$2");
 }
 
-function buildTempConfig(project: ArmProject, outputDir: string, commonTypesDir: string): string {
+export function buildTempConfig(
+  project: ArmProject,
+  outputDir: string,
+  commonTypesDir: string,
+): string {
   let content = fs.readFileSync(project.tspConfigPath, "utf8");
   const yamlOutputDir = normalizeRelative(outputDir);
   content = updateAutorestOption(content, "emitter-output-dir", yamlOutputDir);
   content = updateAutorestOption(content, "arm-types-dir", normalizeRelative(commonTypesDir));
+  content = updateAutorestOption(content, "service-yaml", "never");
 
   // Keep every emitter output inside the dataset, even when a service normally
   // writes generated Swagger outside its TypeSpec project directory.
@@ -546,6 +555,8 @@ function copyReferencedFileClosure(
   stagingDir: string,
   fallbackRoots: string[],
   seen: Set<string>,
+  datasetDir: string,
+  specsRepo: string,
 ): void {
   const seenKey = `${path.resolve(sourceFile)}|${destinationRelativePath}`;
   if (seen.has(seenKey) || !fs.existsSync(sourceFile)) {
@@ -566,24 +577,44 @@ function copyReferencedFileClosure(
     const relativePath = path.normalize(
       path.join(path.dirname(destinationRelativePath), reference),
     );
-    if (relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    const emittedFile = path.resolve(outputDir, relativePath);
+    const datasetRelative = path.relative(datasetDir, emittedFile);
+    if (
+      datasetRelative === ".." ||
+      datasetRelative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(datasetRelative)
+    ) {
       continue;
     }
 
-    const emittedFile = path.join(outputDir, relativePath);
-    const referencedFile = fs.existsSync(emittedFile)
-      ? emittedFile
-      : fallbackRoots
-          .map((root) => path.join(root, relativePath))
-          .find((candidate) => fs.existsSync(candidate));
+    const referencedFile = [
+      path.resolve(path.dirname(sourceFile), reference),
+      emittedFile,
+      ...fallbackRoots.map((root) => path.resolve(root, relativePath)),
+    ].find((candidate) => {
+      if (!fs.existsSync(candidate)) return false;
+      const real = fs.realpathSync(candidate);
+      return [datasetDir, specsRepo].some((root) => {
+        const relative = path.relative(root, real);
+        return (
+          relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative)
+        );
+      });
+    });
     if (!referencedFile) {
       continue;
     }
 
-    const destination = path.join(stagingDir, relativePath);
+    const outsideOutput = relativePath === ".." || relativePath.startsWith(`..${path.sep}`);
+    const destination = outsideOutput ? emittedFile : path.join(stagingDir, relativePath);
     if (!fs.existsSync(destination)) {
       fs.mkdirSync(path.dirname(destination), { recursive: true });
       fs.copyFileSync(referencedFile, destination);
+    } else if (
+      outsideOutput &&
+      !fs.readFileSync(destination).equals(fs.readFileSync(referencedFile))
+    ) {
+      throw new Error(`Conflicting referenced file inside dataset: ${destination}`);
     }
     copyReferencedFileClosure(
       referencedFile,
@@ -592,14 +623,18 @@ function copyReferencedFileClosure(
       stagingDir,
       fallbackRoots,
       seen,
+      datasetDir,
+      specsRepo,
     );
   }
 }
 
-function retainLatestSwagger(
+export function retainLatestSwagger(
   outputDir: string,
   swaggerFiles: EmittedSwagger[],
   projectDir: string,
+  datasetDir: string,
+  specsRepo: string,
 ): { apiVersion?: string; swaggerFiles: EmittedSwagger[] } {
   const apiVersion = selectLatestApiVersion(swaggerFiles.map((file) => file.apiVersion));
   if (!apiVersion) {
@@ -658,6 +693,8 @@ function retainLatestSwagger(
             stagingDir,
             fallbackRoots,
             seenReferences,
+            datasetDir,
+            specsRepo,
           );
         }
       }
@@ -725,7 +762,13 @@ async function compileProject(
         shell: process.platform === "win32",
       },
     );
-    const latest = retainLatestSwagger(outputDir, findSwaggerFiles(outputDir), project.projectDir);
+    const latest = retainLatestSwagger(
+      outputDir,
+      findSwaggerFiles(outputDir),
+      project.projectDir,
+      config.datasetDir,
+      config.specsRepo,
+    );
     return {
       status: "success",
       durationMs: Date.now() - started,
@@ -754,6 +797,7 @@ export function parseViolations(
   stdout: string,
   project: ArmProject,
   swaggerFile: string,
+  datasetDir?: string,
 ): ValidatorViolation[] {
   const violations: ValidatorViolation[] = [];
   for (const line of stdout.split(/\r?\n/)) {
@@ -765,11 +809,58 @@ export function parseViolations(
       if (!["warning", "error", "fatal"].includes(value.level) || !value.code) {
         continue;
       }
+      let reportedFile: string | undefined;
+      const provenance: Pick<
+        ValidatorViolation,
+        "validatorInputFile" | "sourceDocuments" | "sourceAttribution" | "sourceResolutionErrors"
+      > = {};
+      if (datasetDir) {
+        const errors: string[] = [];
+        const documents: string[] = Array.isArray(value.source)
+          ? value.source.flatMap((source: unknown) =>
+              source &&
+              typeof source === "object" &&
+              "document" in source &&
+              typeof source.document === "string"
+                ? [source.document]
+                : [],
+            )
+          : [];
+        const resolved = documents.map((document: string) => {
+          try {
+            const relative = path.relative(datasetDir, fileURLToPath(document));
+            if (
+              relative &&
+              relative !== ".." &&
+              !relative.startsWith(`..${path.sep}`) &&
+              !path.isAbsolute(relative)
+            ) {
+              return { document, file: normalizeRelative(relative) };
+            }
+          } catch (error) {
+            errors.push(error instanceof Error ? error.message : String(error));
+          }
+          return { document, file: undefined };
+        });
+        const unique = [
+          ...new Map(resolved.map((source) => [source.file ?? source.document, source])).values(),
+        ];
+        reportedFile = unique.length === 1 ? unique[0].file : undefined;
+        provenance.validatorInputFile = swaggerFile;
+        provenance.sourceDocuments = unique.map((source) => source.file ?? source.document);
+        provenance.sourceAttribution = reportedFile
+          ? "reported"
+          : unique.length > 1
+            ? "ambiguous"
+            : "input-fallback";
+        if (errors.length > 0) provenance.sourceResolutionErrors = errors;
+      }
       violations.push({
         rule: String(value.code),
         level: value.level,
         project: project.sourcePath,
-        swaggerFile,
+        swaggerFile: reportedFile ?? swaggerFile,
+        ...provenance,
         message: String(value.message ?? ""),
         path: Array.isArray(value.details?.jsonpath) ? value.details.jsonpath : [],
         details: value.details,
@@ -779,6 +870,12 @@ export function parseViolations(
     }
   }
   return violations;
+}
+
+export function getValidatorExtensionReference(specsRepo: string): string {
+  return pathToFileURL(
+    path.join(specsRepo, "node_modules", "@microsoft.azure", "openapi-validator") + path.sep,
+  ).href;
 }
 
 async function validateProject(
@@ -801,12 +898,7 @@ async function validateProject(
     };
   }
 
-  const validatorDependency = path.join(
-    config.specsRepo,
-    "node_modules",
-    "@microsoft.azure",
-    "openapi-validator",
-  );
+  const validatorDependency = getValidatorExtensionReference(config.specsRepo);
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   const rawFiles: string[] = [];
   const violations: ValidatorViolation[] = [];
@@ -869,7 +961,7 @@ async function validateProject(
       normalizeRelative(path.relative(config.datasetDir, stdoutPath)),
       normalizeRelative(path.relative(config.datasetDir, stderrPath)),
     );
-    violations.push(...parseViolations(stdout, project, relativeSwagger));
+    violations.push(...parseViolations(stdout, project, relativeSwagger, config.datasetDir));
   }
 
   return {

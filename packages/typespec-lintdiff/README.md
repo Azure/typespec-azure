@@ -11,13 +11,13 @@ migration decisions auditable.
 
 ## What's here
 
-| Path | Contents |
-|------|----------|
-| `src/` | The linter: `index.ts`, `lib.ts`, `linter.ts`, and **67 rule files** under `src/rules/`. |
-| `test/fixtures/` | **212** rule test-case directories (`<RuleName>/rule.md` + per-case `main.tsp`, emitted `output.json`, `expect.json`, `tsp-diagnostics.json`, `validator-diagnostics.json`). |
-| `test/harness/` | The validation/comparison harness (`validate.ts`, `cross-repo-*.ts`, `audit-*.ts`, `catalog.ts`, `generate/sync-rule-metadata.ts`, `analyze-noise.ts`, `compile-worker.ts`, `lib/`) and Python coverage helpers. |
-| `catalog/` | Coverage catalog: `CATALOG.md`, `catalog.json` (209 validator rules), `validator-rule-metadata.json`, `rule-metadata-audit.json`. |
-| `docs/` | `DESIGN.md`, `ONBOARDING.md`, `SUMMARY.md`, `SKILLS.md` (migration skills map), `validate-report.md`. |
+| Path             | Contents                                                                                                                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`           | The linter: `index.ts`, `lib.ts`, `linter.ts`, and **67 rule files** under `src/rules/`.                                                                                                                         |
+| `test/fixtures/` | **212** rule test-case directories (`<RuleName>/rule.md` + per-case `main.tsp`, emitted `output.json`, `expect.json`, `tsp-diagnostics.json`, `validator-diagnostics.json`).                                     |
+| `test/harness/`  | The validation/comparison harness (`validate.ts`, `cross-repo-*.ts`, `audit-*.ts`, `catalog.ts`, `generate/sync-rule-metadata.ts`, `analyze-noise.ts`, `compile-worker.ts`, `lib/`) and Python coverage helpers. |
+| `catalog/`       | Coverage catalog: `CATALOG.md`, `catalog.json` (209 validator rules), `validator-rule-metadata.json`, `rule-metadata-audit.json`.                                                                                |
+| `docs/`          | `DESIGN.md`, `ONBOARDING.md`, `SUMMARY.md`, `SKILLS.md` (migration skills map), `validate-report.md`.                                                                                                            |
 
 > The deeper analysis notes (phase reports, equivalence analysis, non-migrated / non-template /
 > broader-coverage rationale, future work) live in the source repo
@@ -74,6 +74,15 @@ or point the harness at existing checkouts via environment variables:
 
 - `LINTDIFF_VALIDATOR_ROOT` → an `azure-openapi-validator` checkout (validator rule source/docs).
 - `LINTDIFF_COMMON_TYPES` → ARM `common-types` TypeSpec sources used when compiling fixtures.
+
+### Official-library coverage
+
+Use [`coverage:native`](./docs/native-coverage.md) and the
+[`analyze-native-lint-coverage`](../../.github/skills/analyze-native-lint-coverage/SKILL.md)
+skill to compare a built official-library rule against fresh real specs without
+copying it into the temporary linter. Inputs are resolved at run start and
+recorded for replay; observed diagnostic overlap is not an automatic equivalence
+decision.
 
 ## Open items for the next developer
 

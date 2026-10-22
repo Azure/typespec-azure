@@ -1,11 +1,69 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Develop lintdiff rules end-to-end from any coordinator session, creating or reusing worktrees only under --worktrees-folder (default C:\dev\worktrees), with worktree-bound publication owners and sequential development, review, promotion, and promotion review.
-argument-hint: "[--worktrees-folder <absolute-path>] <rule ID ...> or <prepared worker commands>"
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Support opt-in native-first development on canonical main, explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
+argument-hint: "[--flow legacy|native-first] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
 user-invocable: true
 ---
 
 # Develop lintdiff rules one by one
+
+## Select the flow before parsing or preparing tasks
+
+This skill has two versioned execution contracts:
+
+| Flow           | Implementation and publication                                                                                                                               | Procedure                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| `legacy`       | Temporary lintdiff implementation and development PR against `feature/lintdiff-migration-new`, then a separate official-library promotion PR against `main`  | The legacy contract below                |
+| `native-first` | One official-library implementation on a task branch based on canonical `main`, one native PR, and separate development/release-readiness reviews of that PR | [Native-first contract](native-first.md) |
+
+Accept exactly one optional queue-level `--flow legacy|native-first`. Parse and
+remove it before applying the selected input grammar; reject duplicate, unknown
+or missing values before setup. With no selector, preserve `legacy` until a
+separately reviewed default switch verifies the native-first acceptance gates.
+Never edit or push directly to `main`.
+
+Read the recorded `flowVersion` first on resumption. A selector cannot retarget
+an existing task, change its ownership, or reset its budgets. Put queue options
+on separate lines outside prepared worker commands; never extract `--flow` or
+`--worktrees-folder` from inside their strict command grammar. Old prepared
+`/develop-lintdiff-rule --worker` commands remain legacy; reject them with
+`--flow native-first`, rather than rewriting their branch or arguments.
+
+In native-first mode, rule-ID tokens create singleton tasks. Alternatively,
+accept exactly one `--task-file <absolute-json-path>` for an ordered list of
+explicit singleton/group tasks; do not mix it with bare IDs or prepared worker
+commands. Validate it with [native_tasks.py](native_tasks.py) and the canonical
+tooling catalog before setup. The helper performs read-only schema/catalog/
+collision validation, not semantic group admission or publication preflight.
+Queue options belong outside the JSON. In legacy mode reject `--task-file`;
+the legacy worker grammar is unchanged.
+
+```text
+/do-linter-development-task-one-by-one --flow native-first EnumInsteadOfBoolean
+/do-linter-development-task-one-by-one --flow native-first --task-file C:\dev\migration-tasks.json
+```
+
+These are alternative invocations, not instructions to remigrate the merged
+example. Native-first runs must read [native-first.md](native-first.md), the
+[native preparation override](preparation.md#native-first-preparation), and
+[native publication routing](app-session-execution.md#native-first-publication)
+and **must not fall through to the legacy phases below**. Keep one active task
+at a time. Both flows preserve required validation, independent local review,
+bounded GitHub review/fix, publication approval, and quiescence.
+
+Both flows must create or refresh `migration.md` under the shared
+[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Review the concise report and its linked evidence together: preserve evidenced
+positives, actual counts, core/corner-case context and quickly accessible examples
+without weakening any required investigation or acceptance gate.
+
+## Legacy contract
+
+Everything below this heading describes `flowVersion: legacy`. Its references to
+one rule per task, three worktrees, two PR owners, fixed migration-branch input,
+promotion source immutability and promotion-specific results are not native-first
+requirements. Common folder safety, explicit identity checks and recovery bounds
+remain applicable through the native-first contract.
 
 Run a queue of rule IDs or prepared lintdiff worker commands sequentially. Each
 rule is an independent task. The queue owns
