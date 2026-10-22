@@ -25,6 +25,8 @@ export interface NativePackage {
 export interface NativeProjectResult {
   project: string;
   status: "success" | "failed";
+  assessmentMode?: "package-evidence";
+  nativePackage?: string;
   error?: string;
   rawDiagnostics: NativeDiagnostic[];
   diagnostics: NativeDiagnostic[];
@@ -68,6 +70,7 @@ export interface Config {
   validatorRule: string;
   validatorRules: string[];
   tspRules: string[];
+  nativePackage?: string;
   scope: "source" | "http-reachable" | "boolean-http";
   concurrency: number;
   filter?: string;
@@ -87,6 +90,7 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     "--output",
     "--validator-rule",
     "--tsp-rule",
+    "--native-package",
     "--scope",
     "--concurrency",
     "--filter",
@@ -132,7 +136,21 @@ export function parseNativeCoverageArgs(args: string[]): Config {
   if (scope !== "source" && scope !== "http-reachable" && scope !== "boolean-http") {
     throw new Error(`Unsupported comparison scope: ${scope}`);
   }
-  if (tspRules.length === 0) throw new Error("At least one --tsp-rule is required.");
+  const nativePackage = values.get("--native-package");
+  if (nativePackage !== undefined) {
+    if (
+      !/^@azure-tools\/typespec-(azure-core|azure-resource-manager|client-generator-core)$/.test(
+        nativePackage,
+      )
+    ) {
+      throw new Error("--native-package must name an official native destination package.");
+    }
+    if (tspRules.length > 0 || scope !== "source") {
+      throw new Error("--native-package evidence requires source scope and no --tsp-rule.");
+    }
+  } else if (tspRules.length === 0) {
+    throw new Error("At least one --tsp-rule or an explicit --native-package is required.");
+  }
   if (validatorRules.length === 0) throw new Error("At least one --validator-rule is required.");
   if (validatorRules.length > 1 && tspRules.length > 1) {
     throw new Error("General many-to-many mappings are not supported.");
@@ -154,6 +172,7 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     validatorRule: validatorRules[0],
     validatorRules,
     tspRules,
+    nativePackage,
     scope,
     concurrency: positiveInteger("--concurrency", 2)!,
     filter: values.get("--filter"),
@@ -313,6 +332,102 @@ export function buildNativeCoverageReport(
         left.project.localeCompare(right.project),
     ),
   };
+}
+
+export function buildNativePackageEvidenceReport(
+  projects: DatasetProject[],
+  validator: ValidatorDiagnostic[],
+  native: NativeProjectResult[],
+  nativePackage: string,
+  validatorRules: string[],
+) {
+  for (const receipt of native) {
+    if (
+      receipt.status === "success" &&
+      (receipt.assessmentMode !== "package-evidence" ||
+        receipt.nativePackage !== nativePackage ||
+        receipt.rawDiagnostics.length > 0 ||
+        receipt.diagnostics.length > 0 ||
+        (receipt.defaultTargetDiagnostics?.length ?? 0) > 0 ||
+        !receipt.packages.some((item) => item.name === nativePackage))
+    ) {
+      throw new Error(`Invalid package-evidence receipt: ${receipt.project}`);
+    }
+  }
+  const observations = buildNativeCoverageReport(projects, validator, native, validatorRules);
+  return {
+    schemaVersion: 3,
+    assessmentMode: "package-evidence" as const,
+    nativePackage,
+    equivalence: "not-assessed" as const,
+    countingUnit: "Swagger member observations only; no selected native lint diagnostic unit",
+    nativeDiagnosticCounts: null,
+    diagnosticComparison: null,
+    observedProjectCoveragePercent: null,
+    selectedProjectCount: observations.selectedProjectCount,
+    selectedValidatorRawCount: observations.selectedValidatorRawCount,
+    assessableProjectCount: observations.assessableProjectCount,
+    validatorRawCount: observations.validatorRawCount,
+    validatorFileIndependentCount: observations.validatorFileIndependentCount,
+    validatorProjects: observations.validatorProjects,
+    unassessedProjects: observations.unassessedProjects,
+    unassessedValidatorRawCount: observations.unassessedValidatorRawCount,
+    members: observations.members.map((member) => ({
+      rule: member.rule,
+      rawCount: member.rawCount,
+      assessableRawCount: member.assessableRawCount,
+      unassessedRawCount: member.unassessedRawCount,
+      observations: member.observations,
+      projects: member.projects,
+      nativeAttribution: "not-applicable; no selected native lint",
+      semanticCompleteness: "not-determined; separate native controls required",
+    })),
+    projects: observations.projects.map((row) => ({
+      project: row.project,
+      apiVersion: row.apiVersion,
+      validatorRawCount: row.validatorRawCount,
+      validatorFileIndependentCount: row.validatorFileIndependentCount,
+      nativeCompilation: "success",
+      nativeDiagnosticCounts: null,
+      diagnosticComparison: null,
+    })),
+  };
+}
+
+function packageEvidenceMarkdown(report: ReturnType<typeof buildNativePackageEvidenceReport>) {
+  return [
+    "# Native package evidence (not a lint comparison)",
+    "",
+    `Package: \`${report.nativePackage}\``,
+    "",
+    "**No native lint is selected. Native finding counts, overlap, count equality and functional equivalence are not assessed.**",
+    "Successful compilation is not proof of template enforcement or equivalent native validation.",
+    "",
+    "| Measure | Observation |",
+    "| --- | ---: |",
+    `| Selected projects | ${report.selectedProjectCount} |`,
+    `| Successful source compilation and Swagger validation | ${report.assessableProjectCount} |`,
+    `| Unassessed projects | ${report.unassessedProjects.length} |`,
+    `| Swagger raw findings in assessed projects | ${report.validatorRawCount} |`,
+    `| Swagger findings in unassessed projects | ${report.unassessedValidatorRawCount} |`,
+    "| Native finding counts and comparison metrics | Not applicable |",
+    "",
+    "## Swagger observations by project",
+    "",
+    "| Project | Raw findings | File-independent member paths |",
+    "| --- | ---: | ---: |",
+    ...report.projects.map(
+      (row) =>
+        `| ${row.project} | ${row.validatorRawCount} | ${row.validatorFileIndependentCount} |`,
+    ),
+    "",
+    "## Unassessed projects",
+    "",
+    ...report.unassessedProjects.map(
+      (item) => `- \`${item.project}\`: ${item.reason.replace(/\r?\n/g, " ")}`,
+    ),
+    "",
+  ].join("\n");
 }
 
 function git(root: string, args: string[]): string {
@@ -917,8 +1032,9 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       .packageManager,
     policies: {
       swagger: "latest-emitted-api-version; production ARM validator; no readme suppressions",
-      native:
-        "existing project configuration plus explicit mapped-rule enablement; source suppressions retained",
+      native: config.nativePackage
+        ? "package evidence only; existing project configuration; no selected native lint or comparable finding counts"
+        : "existing project configuration plus explicit mapped-rule enablement; source suppressions retained",
       equivalence: "manual decision required; no fuzzy matching or name-only normalization",
     },
     baselineIdentity: undefined as string | undefined,
@@ -1045,6 +1161,7 @@ export async function runNativeCoverage(config: Config): Promise<void> {
             validatorRule: config.validatorRule,
             validatorRules: config.validatorRules,
             tspRules: config.tspRules,
+            nativePackage: config.nativePackage,
             scope: config.scope,
           });
           try {
@@ -1077,14 +1194,20 @@ export async function runNativeCoverage(config: Config): Promise<void> {
         }
       }),
     );
-    const report = buildNativeCoverageReport(
-      dataset.projects,
-      validator,
-      native,
-      config.validatorRules,
-    );
+    const report = config.nativePackage
+      ? buildNativePackageEvidenceReport(
+          dataset.projects,
+          validator,
+          native,
+          config.nativePackage,
+          config.validatorRules,
+        )
+      : buildNativeCoverageReport(dataset.projects, validator, native, config.validatorRules);
     writeJson(path.join(output, "coverage.json"), report);
-    fs.writeFileSync(path.join(output, "coverage.md"), markdown(report, config));
+    fs.writeFileSync(
+      path.join(output, "coverage.md"),
+      "assessmentMode" in report ? packageEvidenceMarkdown(report) : markdown(report, config),
+    );
     if (
       snapshot(candidateRepo).commit !== candidate.commit ||
       snapshot(specsRepo).commit !== specs.commit

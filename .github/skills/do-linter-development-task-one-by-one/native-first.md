@@ -135,6 +135,10 @@ install only missing/invalid dependencies or changed manifests.
    Keep compile/parse/worker/projection failures unassessed. Investigate every
    one-sided project and both directions of outliers. Do not change the rule
    simply to equalize counts. A reduced pilot is not a full-run pass.
+   For an evidenced template/library outcome without a registered native lint,
+   use the explicit [native-package evidence lane](../analyze-native-lint-coverage/package-evidence.md).
+   Preserve injection, controls, full population, investigation and both reviews;
+   native finding/comparison metrics are not applicable, not zero or equivalent.
 5. **Checkpoint A: development review.** After all required development checks
    and independent local review, publish/update the one native draft PR, with
    pushed evidence links. Run a separate

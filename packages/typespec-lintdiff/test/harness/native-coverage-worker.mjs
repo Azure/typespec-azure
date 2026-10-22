@@ -7,7 +7,8 @@ import { pathToFileURL } from "node:url";
 const [inputFile, outputFile] = process.argv.slice(2);
 if (!inputFile || !outputFile) throw new Error("Expected input and output receipt filenames.");
 const input = JSON.parse(fs.readFileSync(inputFile, "utf8"));
-const { specsRepo, project, tspRules, scope } = input;
+const { specsRepo, project, tspRules, scope, nativePackage } = input;
+const assessment = nativePackage ? { assessmentMode: "package-evidence", nativePackage } : {};
 const requireFromSpecs = createRequire(path.join(specsRepo, "package.json"));
 const packages = [];
 let rawDiagnostics = [];
@@ -59,6 +60,21 @@ async function load(name, baseFile) {
 }
 
 async function run() {
+  if (nativePackage !== undefined) {
+    if (
+      !/^@azure-tools\/typespec-(azure-core|azure-resource-manager|client-generator-core)$/.test(
+        nativePackage,
+      ) ||
+      tspRules.length > 0 ||
+      scope !== "source"
+    ) {
+      throw new Error(
+        "Package evidence requires an official native package, source scope and no lint.",
+      );
+    }
+  } else if (tspRules.length === 0) {
+    throw new Error("No native lint or package-evidence target was selected.");
+  }
   compiler = await load("@typespec/compiler");
   const {
     NodeHost,
@@ -71,6 +87,20 @@ async function run() {
     isTemplateDeclaration,
     listServices,
   } = compiler;
+  function verifyCompiler(name) {
+    const requireFromLibrary = createRequire(
+      packages.find((item) => item.name === name).entrypoint,
+    );
+    if (
+      fs.realpathSync(requireFromLibrary.resolve("@typespec/compiler")) !== packages[0].entrypoint
+    ) {
+      throw new Error(`The injected ${name} resolves a different compiler instance.`);
+    }
+  }
+  if (nativePackage) {
+    await load(nativePackage);
+    verifyCompiler(nativePackage);
+  }
   for (const rule of tspRules) {
     const separator = rule.lastIndexOf("/");
     const library = await load(rule.slice(0, separator));
@@ -79,14 +109,7 @@ async function run() {
     ) {
       throw new Error(`The injected library does not register ${rule}.`);
     }
-    const requireFromLibrary = createRequire(
-      packages.find((item) => item.name === rule.slice(0, separator)).entrypoint,
-    );
-    if (
-      fs.realpathSync(requireFromLibrary.resolve("@typespec/compiler")) !== packages[0].entrypoint
-    ) {
-      throw new Error(`The injected ${rule} resolves a different compiler instance.`);
-    }
+    verifyCompiler(rule.slice(0, separator));
   }
   const autorest = await load("@azure-tools/typespec-autorest");
   const arm = await load("@azure-tools/typespec-azure-resource-manager");
@@ -487,12 +510,13 @@ async function run() {
 }
 
 try {
-  fs.writeFileSync(outputFile, `${JSON.stringify(await run(), null, 2)}\n`);
+  fs.writeFileSync(outputFile, `${JSON.stringify({ ...assessment, ...(await run()) }, null, 2)}\n`);
 } catch (error) {
   fs.writeFileSync(
     outputFile,
     `${JSON.stringify(
       {
+        ...assessment,
         project: project.sourcePath,
         status: "failed",
         error: error instanceof Error ? error.stack : String(error),

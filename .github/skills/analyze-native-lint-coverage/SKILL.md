@@ -51,6 +51,13 @@ multiple validators combined with multiple native rules are rejected. Do not
 invent a mapping-file CLI option. Separate historical member comparisons remain
 scoped evidence; do not add their shared native counts together.
 
+For an evidenced template/library outcome without a registered native lint,
+use the [native-package evidence lane](package-evidence.md) instead of inventing
+a mapping. Its explicit `--native-package` selector retains artifact injection,
+full-population source/Swagger observations and the existing acceptance gates.
+Native finding counts and comparison metrics are not applicable, not zero or
+equivalent. Successful compilation alone does not prove native enforcement.
+
 For many-to-one comparisons, a shared native rule can report checks unrelated
 to the selected Swagger rule. Matching project sets can therefore hide a missing
 check. Verify each validator's material checks with discriminating violating and
