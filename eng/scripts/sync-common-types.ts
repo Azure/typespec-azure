@@ -8,10 +8,10 @@ const versions = ["v3", "v4", "v5", "v6"];
 for (const version of versions) {
   console.group("Syncing version:", pc.cyan(version));
   const githubApiUrl = `https://api.github.com/repos/Azure/azure-rest-api-specs/contents/specification/common-types/resource-management/${version}`;
-  const localDirs = [`packages/samples/common-types/existing/${version}`];
-  if (version === "v6") {
-    localDirs.push(`packages/samples/specs/resource-manager/common-types/${version}`);
-  }
+  const localDirs = [
+    `packages/samples/common-types/existing/${version}`,
+    `packages/samples/specs/resource-manager/common-types/${version}`,
+  ];
 
   console.log("Downloading common types:", {
     version,
