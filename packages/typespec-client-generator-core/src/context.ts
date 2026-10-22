@@ -381,6 +381,12 @@ async function exportTCGCOutput(context: SdkContext) {
           return undefined; // remove raw example
         }
         if (v instanceof Map) {
+          if (k === "variants") {
+            return [...v].map(([name, type]) => ({
+              name: typeof name === "string" ? name : undefined,
+              type,
+            }));
+          }
           return Object.fromEntries(v);
         }
         return v;

@@ -39,6 +39,7 @@ import { noQueryInPostRule } from "./rules/no-query-in-post.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
@@ -55,6 +56,8 @@ import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
+import { useScopeForExtensionRoutingRule } from "./rules/use-scope-for-extension-routing.js";
+import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -109,14 +112,27 @@ const rules = [
   retryAfterRule,
   unsupportedTypeRule,
   useModelRequestBodyRule,
+  useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
+  noTagsOnProxyResourceRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
   useResourcePathForPutRule,
+  useScopeForExtensionRoutingRule,
 ];
 
 export const $linter = defineLinter({
   rules,
+  ruleSets: {
+    all: {
+      enable: Object.fromEntries(
+        rules.map((rule) => [
+          `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+          rule !== useScopeForExtensionRoutingRule,
+        ]),
+      ),
+    },
+  },
 });
