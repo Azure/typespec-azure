@@ -1,10 +1,24 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.48.3
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `e4f588a5f` to fix discriminator handling for untagged intermediate models ([microsoft/typespec#12294](https://github.com/microsoft/typespec/pull/12294)), preserve continuation-token method parameters ([microsoft/typespec#12305](https://github.com/microsoft/typespec/pull/12305)), and add an option to include continuation-token parameters ([microsoft/typespec#12309](https://github.com/microsoft/typespec/pull/12309)).
+
+
+## 0.48.2
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `f098e0fdd`. Includes Azure V1 continuation-token paging ([microsoft/typespec#12196](https://github.com/microsoft/typespec/pull/12196)), escaped enum values in schema Javadoc ([microsoft/typespec#12177](https://github.com/microsoft/typespec/pull/12177)), and dependency updates with version synchronization ([microsoft/typespec#12286](https://github.com/microsoft/typespec/pull/12286)). Add a local script to align test dependencies and plugins with the pinned generator.
+
+
 ## 0.48.1
 
 ### Bug Fixes
 
-- [#5699](https://github.com/Azure/typespec-azure/pull/5699) Update the Java generator to the latest TypeSpec core.
+- Update the Java generator to the latest TypeSpec core.
 
 
 ## 0.48.0

@@ -26,8 +26,123 @@ it("primitive union", async function () {
   strictEqual(values.length, 2);
   strictEqual(values[0].kind, "string");
   strictEqual(values[1].kind, "int32");
+  ok(sdkType.variants instanceof Map);
+  deepStrictEqual([...sdkType.variants.values()], values);
+  strictEqual(sdkType.variants.size, 2);
+  for (const key of sdkType.variants.keys()) {
+    strictEqual(typeof key, "symbol");
+  }
+  const rawUnion = sdkType.__raw;
+  ok(rawUnion);
+  strictEqual(rawUnion.kind, "Union");
+  deepStrictEqual([...sdkType.variants.keys()], [...rawUnion.variants.keys()]);
 
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
+});
+
+it.each([false, true])("named union variants with nullable=%s", async (nullable) => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: Choice;
+    }
+
+    union Choice {
+      firstOption: Payload,
+      int32,
+      ${nullable ? "null," : ""}
+      second_option: Payload,
+      int32,
+    }
+
+    @clientName("RenamedPayload")
+    model Payload {
+      value: string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  if (nullable) {
+    strictEqual(sdkType.kind, "nullable");
+  }
+  const unionType = sdkType.kind === "nullable" ? sdkType.type : sdkType;
+  strictEqual(unionType.kind, "union");
+  const keys = [...unionType.variants.keys()];
+  strictEqual(keys[0], "firstOption");
+  strictEqual(typeof keys[1], "symbol");
+  strictEqual(keys[2], "second_option");
+  strictEqual(typeof keys[3], "symbol");
+  strictEqual(unionType.variants.size, 4);
+  [...unionType.variants.values()].forEach((type, index) => {
+    strictEqual(type, unionType.variantTypes[index]);
+  });
+  const payload = unionType.variants.get("firstOption");
+  ok(payload);
+  strictEqual(payload, unionType.variants.get("second_option"));
+  strictEqual(payload.kind, "model");
+  strictEqual(payload.name, "RenamedPayload");
+  strictEqual(unionType.variants.get(keys[1])?.kind, "int32");
+  strictEqual(unionType.variants.get(keys[3])?.kind, "int32");
+});
+
+it("discriminated union preserves distinct tags for the same payload type", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: Limit;
+    }
+
+    @discriminated(#{ discriminatorPropertyName: "tag", envelopePropertyName: "contents" })
+    union Limit {
+      daily: string,
+      weekly: string,
+      monthly: string,
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  deepStrictEqual([...sdkType.variants.keys()], ["daily", "weekly", "monthly"]);
+  strictEqual(sdkType.variantTypes.length, 3);
+  [...sdkType.variants.values()].forEach((type, index) => {
+    strictEqual(type.kind, "string");
+    strictEqual(type, sdkType.variantTypes[index]);
+  });
+});
+
+it("discriminated union exposes an unnamed default variant", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: Pet;
+    }
+
+    @discriminated(#{ envelope: "none" })
+    union Pet {
+      cat: Cat,
+      UnknownPet,
+    }
+
+    model Cat {
+      name: string;
+    }
+    model UnknownPet {
+      kind: string;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  const keys = [...sdkType.variants.keys()];
+  strictEqual(sdkType.variants.size, 2);
+  strictEqual(keys[0], "cat");
+  strictEqual(typeof keys[1], "symbol");
+  strictEqual(sdkType.variants.get("cat"), sdkType.variantTypes[0]);
+  const defaultType = sdkType.variants.get(keys[1]);
+  ok(defaultType);
+  strictEqual(defaultType, sdkType.variantTypes[1]);
+  strictEqual(defaultType.kind, "model");
+  strictEqual(defaultType.name, "UnknownPet");
 });
 
 it("nullable", async function () {

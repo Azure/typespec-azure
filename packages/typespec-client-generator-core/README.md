@@ -91,7 +91,7 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
+Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
 
 ### `namespace`
 
@@ -120,7 +120,7 @@ Available ruleSets:
 
 | Name                                                                                                                                                                                                  | Description                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-client-generator-core/use-create-for-put`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-create-for-put)                     | ARM PUT SDK method names should use 'create' as the verb prefix.                                                                                                    |
+| [`@azure-tools/typespec-client-generator-core/use-correct-verb`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-correct-verb)                         | PUT, PATCH, and DELETE SDK method names should start with 'create', 'update', and 'delete', respectively.                                                           |
 | [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)               | Client names should end with 'Client'.                                                                                                                              |
 | [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)             | Avoid naming conflicts between a property and a model of the same name.                                                                                             |
 | [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.                                                                     |
