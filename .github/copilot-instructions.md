@@ -56,9 +56,9 @@ for package selection, scaffolding, and registration.
 
 ### Tests
 
-- Test the shipped rule in its owning package's `test/rules/` suite using public APIs and
-  package-local testers. Assert accepted/rejected inputs, diagnostic messages/counts, and
-  authored targets; use built-in source markers instead of calculated offsets.
+- Use shared package testers and `createLinterRuleTester`; no file-local `createTester` definitions.
+  Assert shipped behavior through valid/invalid inputs and diagnostic messages/counts/targets.
+  Use built-in markers, not calculated offsets.
 - Extend the existing canonical behavior suite for each rule, including when its filename
   differs from the public rule name. Avoid duplicate suites and per-rule tests that inspect
   implementation source to enforce architecture.
