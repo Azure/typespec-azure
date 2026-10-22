@@ -16,7 +16,6 @@ import {
   type TypeSpecScriptNode,
 } from "@typespec/compiler/ast";
 import { getVersionsForEnum } from "@typespec/versioning";
-import { isAzureAuthenticationAudience } from "../decorators/azure-authentication.js";
 export const noEnumRule = createRule({
   name: "no-enum",
   docs: fileRef.fromPackageRoot("src/rules/no-enum.md"),
@@ -29,9 +28,6 @@ export const noEnumRule = createRule({
   create(context) {
     return {
       enum: (en: Enum) => {
-        if (isAzureAuthenticationAudience(context.program, en)) {
-          return;
-        }
         const [_, versions] = getVersionsForEnum(context.program, en);
         if (versions !== undefined && versions.getVersions()[0].enumMember.enum === en) {
           return;

@@ -287,7 +287,6 @@ export const $lib = createTypeSpecLibrary({
   },
 
   state: {
-    azureTokenAuthentication: { description: "Azure token-request profiles" },
     azureServiceConfigurations: {
       description: "Paired Azure service endpoints and OAuth settings",
     },

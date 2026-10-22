@@ -16,7 +16,7 @@ Calls `@server` for each configuration, with the default first, and calls `@useA
 
 The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
 
-Configurations vary OAuth URLs and scopes, not authentication mechanisms. Ordinary OAuth authentication needs no Entra audience annotation. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+Configurations vary OAuth URLs and scopes, not authentication mechanisms. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
 
 OAuth URL metadata does not change a caller-owned credential's authority or tenant.
 
@@ -63,35 +63,10 @@ model Configurations {
 
 @service
 @azureServiceConfigurations(Configurations, "Public")
-namespace Logs;
+namespace Logs {
+  @get op query(): string;
+}
 ```
-
-### `@azureTokenAuthentication` {#@Azure.Core.azureTokenAuthentication}
-
-Adds Entra audience-selection semantics to an existing OAuth authentication model.
-
-An Entra audience enum lists known resource values. Use the same enum for every language; it does not restrict custom audience input or prescribe a native SDK enum.
-
-Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Pair endpoints with OAuth settings using `@azureServiceConfigurations`.
-
-The default audience references an enum member and identifies the known-resource catalog. Every OAuth flow must already use the scope derived from that member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
-
-Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
-
-```typespec
-@Azure.Core.azureTokenAuthentication(profile: valueof Azure.Core.AzureTokenAuthenticationOptions)
-```
-
-#### Target
-
-The OAuth authentication model.
-`Model`
-
-#### Parameters
-
-| Name    | Type                                                                                                    | Description                      |
-| ------- | ------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| profile | [valueof `AzureTokenAuthenticationOptions`](./data-types.md#Azure.Core.AzureTokenAuthenticationOptions) | The Entra default-scope profile. |
 
 ### `@finalLocation` {#@Azure.Core.finalLocation}
 

@@ -92,7 +92,7 @@ describe("Azure service configurations", () => {
     });
   });
 
-  it("does not require Entra audience annotations for ordinary OAuth scopes", async () => {
+  it("preserves ordinary OAuth scopes", async () => {
     const { program, Service } = await Tester.compile(t.code`
       model Auth is AadOauth2Auth<["read", "write"]>;
       model Configurations {

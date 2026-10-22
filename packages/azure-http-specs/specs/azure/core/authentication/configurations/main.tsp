@@ -12,25 +12,12 @@ using global.Azure.Core;
 @azureServiceConfigurations(Configurations, "Public")
 namespace _Specs_.Azure.Core.Authentication.Configurations;
 
-enum ResourceAudience {
-  Government: "https://api.loganalytics.us",
-  Public: "https://api.loganalytics.io",
-}
-
-@azureTokenAuthentication(#{
-  kind: AzureTokenAuthenticationKind.entraDefaultScope,
-  defaultAudience: ResourceAudience.Public,
-})
 model PublicAuth is AadOauth2Auth<
   ["https://api.loganalytics.io/.default"],
   "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
   "https://login.microsoftonline.com/common/oauth2/v2.0/token"
 >;
 
-@azureTokenAuthentication(#{
-  kind: AzureTokenAuthenticationKind.entraDefaultScope,
-  defaultAudience: ResourceAudience.Government,
-})
 model GovernmentAuth is AadOauth2Auth<
   ["https://api.loganalytics.us/.default"],
   "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",

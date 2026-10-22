@@ -6,13 +6,7 @@ import { type SdkClientType, UsageFlags } from "../../src/interfaces.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const definitions = `
-  enum Audience {
-    Government: "https://api.loganalytics.us",
-    Public: "https://api.loganalytics.io",
-  }
-  @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: Audience.Public})
   model PublicAuth is AadOauth2Auth<["https://api.loganalytics.io/.default"]>;
-  @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: Audience.Government})
   model GovernmentAuth is AadOauth2Auth<
     ["https://api.loganalytics.us/.default"],
     "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
@@ -68,18 +62,17 @@ it.each(["python", "csharp", "java", "go", "ts"])(
     });
     if (government?.credential?.type.kind !== "credential")
       throw new Error("Missing Government credential");
-    const audience = government.credential.type.azureAuthentication?.profile.audience.type;
-    if (!audience) throw new Error("Missing audience enum");
-    expect(audience.usage & UsageFlags.Input).toBeTruthy();
-    expect(context.sdkPackage.enums).toContain(audience);
-    expect(government.credential.type.azureAuthentication?.profile.defaultScopes).toEqual([
-      "https://api.loganalytics.us/.default",
-    ]);
+    expect(government.credential.type.scheme).toMatchObject({
+      model: { name: "GovernmentAuth" },
+      flows: [{ scopes: [{ value: "https://api.loganalytics.us/.default" }] }],
+    });
     const credential = getCredential(client);
     expect(credential.type).toMatchObject({
       kind: "credential",
-      scheme: { model: { name: "PublicAuth" } },
-      azureAuthentication: { profile: { defaultScopes: ["https://api.loganalytics.io/.default"] } },
+      scheme: {
+        model: { name: "PublicAuth" },
+        flows: [{ scopes: [{ value: "https://api.loganalytics.io/.default" }] }],
+      },
     });
     const endpoint = client.clientInitialization.parameters.find(
       (parameter) => parameter.kind === "endpoint",
@@ -92,6 +85,64 @@ it.each(["python", "csharp", "java", "go", "ts"])(
     expect(getAuthentication(program, client.__raw.services[0])?.options).toHaveLength(2);
   },
 );
+
+it("keeps ordinary multi-flow OAuth scopes unchanged without a configuration catalog", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    model ExplicitAuth is OAuth2Auth<[
+      {
+        type: OAuth2FlowType.implicit;
+        authorizationUrl: "https://login.example.com/authorize";
+        scopes: ["read"];
+      },
+      {
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/token";
+        scopes: ["write", "read"];
+      }
+    ]>;
+    @service @useAuth(ExplicitAuth)
+    namespace Service { @get op read(): void; }
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const client = context.sdkPackage.clients[0];
+  expect(client.clientInitialization).not.toHaveProperty("serviceConfigurations");
+  const credential = getCredential(client);
+  if (credential.type.kind !== "credential" || credential.type.scheme.type !== "oauth2") {
+    throw new Error("Missing OAuth credential");
+  }
+  expect(
+    credential.type.scheme.flows.map((flow) => flow.scopes.map((scope) => scope.value)),
+  ).toEqual([["read"], ["write", "read"]]);
+});
+
+it("preserves ordinary OR-of-AND authentication and client initialization order", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    model Auth is AadOauth2Auth<["read"]>;
+    @server("{endpoint}", "Service endpoint", {endpoint: url})
+    @useAuth([Auth, ApiKeyAuth<ApiKeyLocation.header, "api-key">] | NoAuth)
+    @service namespace Service { @get op read(): void; }
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const client = context.sdkPackage.clients[0];
+  expect(client.clientInitialization).not.toHaveProperty("serviceConfigurations");
+  expect(client.clientInitialization.parameters.map((parameter) => parameter.kind)).toEqual([
+    "endpoint",
+    "credential",
+  ]);
+  expect(
+    client.authentication?.options.map((option) => option.schemes.map((scheme) => scheme.type)),
+  ).toEqual([["oauth2", "apiKey"], ["noAuth"]]);
+  const credential = getCredential(client);
+  expect(credential.optional).toBe(false);
+  if (credential.type.kind !== "union") throw new Error("Missing credential union");
+  expect(credential.type.variantTypes.map((type) => type.scheme.type)).toEqual([
+    "oauth2",
+    "apiKey",
+    "noAuth",
+  ]);
+});
 
 it("retains required instance endpoints and key/token alternatives in every configuration", async () => {
   const { program } = await AzureCoreTester.compile(`

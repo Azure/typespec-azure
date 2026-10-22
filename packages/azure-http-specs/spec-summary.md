@@ -1425,30 +1425,6 @@ Verifies that an API-version override on a child client replaces the default ser
 The client call takes no API-version argument and must send the overridden query parameter
 `api-version=2022-10-01` instead of the service version `2025-01-01`.
 
-### Azure_Core_Authentication_Audience_apiKey
-
-- Endpoint: `get /azure/core/authentication/audience/key`
-
-Use API-key authentication with key valid-key, without selecting an audience. Expect header api-key: valid-key and response 204.
-
-### Azure_Core_Authentication_Audience_customAudience
-
-- Endpoint: `get /azure/core/authentication/audience/custom`
-
-Select custom resource https://custom.example.com with a recording credential that echoes requested scopes as its access token. Expect scope https://custom.example.com/.default and response 204.
-
-### Azure_Core_Authentication_Audience_defaultAudience
-
-- Endpoint: `get /azure/core/authentication/audience/default`
-
-Use token authentication without selecting an audience. The named Public default is not the first enum member. A recording credential must return the requested scopes joined by a space as its access token. Expect scope https://search.azure.com/.default, the matching Authorization header, and response 204.
-
-### Azure_Core_Authentication_Audience_knownAudience
-
-- Endpoint: `get /azure/core/authentication/audience/known`
-
-Select the Government audience with a recording credential that echoes requested scopes as its access token. Expect scope https://search.azure.us/.default and response 204. The service endpoint remains the mock server, not the resource URI.
-
 ### Azure_Core_Authentication_Configurations_defaultConfiguration
 
 - Endpoint: `get /azure/core/authentication/configurations/default`

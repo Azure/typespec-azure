@@ -3,7 +3,6 @@ import {
   type AzureServiceConfigurations,
   FinalStateValue,
   getAzureServiceConfigurations,
-  getAzureTokenAuthentication,
   getEffectiveApiVersionOverride,
   isPreviewVersion,
   type LroMetadata,
@@ -1421,7 +1420,7 @@ export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean 
   return true;
 }
 
-export function isSameAuth(program: Program, left: Authentication, right: Authentication): boolean {
+export function isSameAuth(left: Authentication, right: Authentication): boolean {
   if (left.options.length !== right.options.length) {
     return false;
   }
@@ -1450,9 +1449,6 @@ export function isSameAuth(program: Program, left: Authentication, right: Authen
           break;
         case "oauth2":
           compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
-          if (!isSameAzureTokenAuthentication(program, leftScheme.model, rightScheme.model)) {
-            return false;
-          }
           if (leftScheme.flows.length !== rightScheme.flows.length) {
             return false;
           }
@@ -1539,23 +1535,6 @@ export function isSameAuth(program: Program, left: Authentication, right: Authen
   return true;
 }
 
-function isSameAzureTokenAuthentication(
-  program: Program,
-  leftModel: Model,
-  rightModel: Model,
-): boolean {
-  const left = getAzureTokenAuthentication(program, leftModel);
-  const right = getAzureTokenAuthentication(program, rightModel);
-  if (left?.kind === "entraDefaultScope") {
-    return (
-      right?.kind === "entraDefaultScope" &&
-      left.audience.defaultAudienceName === right.audience.defaultAudienceName &&
-      isDeepStrictEqual(left.audience.knownAudiences, right.audience.knownAudiences)
-    );
-  }
-  return right === undefined;
-}
-
 export function isSameServiceConfigurations(
   program: Program,
   leftService: Namespace,
@@ -1575,7 +1554,7 @@ export function isSameServiceConfigurations(
       configuration.name !== other.name ||
       configuration.server.url !== other.server.url ||
       configuration.server.parameters.size !== other.server.parameters.size ||
-      !isSameAuth(program, configuration.authentication, other.authentication)
+      !isSameAuth(configuration.authentication, other.authentication)
     )
       return false;
     for (const [name, parameter] of configuration.server.parameters) {

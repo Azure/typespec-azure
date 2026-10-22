@@ -1,7 +1,5 @@
 import {
   FinalStateValue,
-  type AzureAuthenticationAudience,
-  type AzureTokenAuthentication,
   type LroMetadata,
   type ParameterSource,
 } from "@azure-tools/typespec-azure-core";
@@ -631,26 +629,6 @@ export interface SdkCredentialType extends SdkTypeBase {
   kind: "credential";
   /** Auth scheme. Reuse TypeSpec Http types. */
   scheme: HttpAuth;
-  /** Additional Azure semantics for this exact authentication-model alternative. */
-  azureAuthentication?: SdkAzureAuthentication;
-}
-
-/** Known service resources, independent of native audience APIs, custom input, or endpoints. */
-export interface SdkAzureAuthenticationAudience extends Omit<AzureAuthenticationAudience, "type"> {
-  /** Known-value catalog; its fixed members do not constrain the native audience input type. */
-  type: SdkEnumType;
-}
-
-export interface SdkAzureTokenAuthenticationProfile extends Omit<
-  AzureTokenAuthentication,
-  "audience"
-> {
-  audience: SdkAzureAuthenticationAudience;
-}
-
-/** Explicit Entra token-request semantics, not endpoint inference or runtime algorithms. */
-export interface SdkAzureAuthentication {
-  profile: SdkAzureTokenAuthenticationProfile;
 }
 
 /**

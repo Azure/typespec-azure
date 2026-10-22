@@ -41,34 +41,6 @@ it("allows the version enum", async () => {
     .toBeValid();
 });
 
-it("allows known authentication resource catalogs", async () => {
-  await tester
-    .expect(
-      `
-      enum Audience {
-        Public: "https://search.azure.com",
-        Government: "https://search.azure.us",
-      }
-      @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: Audience.Public})
-      model Auth is AadOauth2Auth<["https://search.azure.com/.default"]>;
-    `,
-    )
-    .toBeValid();
-});
-
-it("still warns for ordinary enums alongside an authentication catalog", async () => {
-  await tester
-    .expect(
-      `
-      enum Audience { Public: "https://search.azure.com" }
-      @azureTokenAuthentication(#{kind: AzureTokenAuthenticationKind.entraDefaultScope, defaultAudience: Audience.Public})
-      model Auth is AadOauth2Auth<["https://search.azure.com/.default"]>;
-      enum PetKind { cat, dog }
-    `,
-    )
-    .toEmitDiagnostics([{ code: "@azure-tools/typespec-azure-core/no-enum" }]);
-});
-
 it("emit warning about other enums in versioned service", async () => {
   await tester
     .expect(

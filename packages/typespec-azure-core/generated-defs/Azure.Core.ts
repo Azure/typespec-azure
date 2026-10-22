@@ -3,7 +3,6 @@ import type {
   DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
-  EnumValue,
   Model,
   ModelProperty,
   Namespace,
@@ -12,11 +11,6 @@ import type {
   Union,
   UnionVariant,
 } from "@typespec/compiler";
-
-export interface AzureTokenAuthenticationOptions {
-  readonly kind: unknown;
-  readonly defaultAudience: EnumValue;
-}
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -54,33 +48,13 @@ export type PollingLocationDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * Adds Entra audience-selection semantics to an existing OAuth authentication model.
- *
- * An Entra audience enum lists known resource values. Use the same enum for every language; it does not restrict custom audience input or prescribe a native SDK enum.
- *
- * Language emitters choose native audience APIs and preserve their existing input normalization and override precedence. Pair endpoints with OAuth settings using `@azureServiceConfigurations`.
- *
- * The default audience references an enum member and identifies the known-resource catalog. Every OAuth flow must already use the scope derived from that member. Resource values are preserved exactly; selecting an audience alone never derives or rewrites the service endpoint.
- *
- * Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
- *
- * @param target The OAuth authentication model.
- * @param profile The Entra default-scope profile.
- */
-export type AzureTokenAuthenticationDecorator = (
-  context: DecoratorContext,
-  target: Model,
-  profile: AzureTokenAuthenticationOptions,
-) => DecoratorValidatorCallbacks | void;
-
-/**
  * Pairs named HTTP server endpoints with OAuth authentication configurations.
  *
  * Calls `@server` for each configuration, with the default first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
  *
  * The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
  *
- * Configurations vary OAuth URLs and scopes, not authentication mechanisms. Ordinary OAuth authentication needs no Entra audience annotation. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+ * Configurations vary OAuth URLs and scopes, not authentication mechanisms. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
  *
  * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
  *
@@ -113,7 +87,9 @@ export type AzureTokenAuthenticationDecorator = (
  *
  * @service
  * @azureServiceConfigurations(Configurations, "Public")
- * namespace Logs;
+ * namespace Logs {
+ *   @get op query(): string;
+ * }
  * ```
  */
 export type AzureServiceConfigurationsDecorator = (
@@ -274,7 +250,6 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
-  azureTokenAuthentication: AzureTokenAuthenticationDecorator;
   azureServiceConfigurations: AzureServiceConfigurationsDecorator;
   previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;

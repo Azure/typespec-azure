@@ -171,13 +171,6 @@ function doc(code: string) {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
-    "azure-authentication-invalid": {
-      ...doc("azure-authentication-invalid"),
-      severity: "error",
-      messages: {
-        default: paramMessage`Cannot project Azure authentication: ${"reason"}`,
-      },
-    },
     "union-null": {
       ...doc("union-null"),
       severity: "warning",

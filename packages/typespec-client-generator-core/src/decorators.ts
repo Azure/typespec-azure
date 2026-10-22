@@ -314,7 +314,7 @@ export const $client: ClientDecorator = (
         auth = { authentication: currentAuth, service: svc };
       } else {
         isSame =
-          isSameAuth(context.program, auth.authentication, currentAuth) &&
+          isSameAuth(auth.authentication, currentAuth) &&
           isSameServiceConfigurations(context.program, auth.service, svc);
         if (!isSame) {
           break;

@@ -5,11 +5,6 @@ export { $linter } from "./linter.js";
 
 export * from "./decorators.js";
 export {
-  getAzureTokenAuthentication,
-  type AzureAuthenticationAudience,
-  type AzureTokenAuthentication,
-} from "./decorators/azure-authentication.js";
-export {
   getAzureServiceConfigurations,
   type AzureServiceConfiguration,
   type AzureServiceConfigurations,

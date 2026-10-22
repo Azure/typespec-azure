@@ -103,21 +103,6 @@ model Azure.Core.AzureServiceConfiguration
 | parameters?    | `Record<unknown>` | Parameters used in the endpoint URL template.                                   |
 | description?   | `string`          | Description of the server.                                                      |
 
-### `AzureTokenAuthenticationOptions` {#Azure.Core.AzureTokenAuthenticationOptions}
-
-Shared service token-request semantics, independent of native SDK API shape.
-
-```typespec
-model Azure.Core.AzureTokenAuthenticationOptions
-```
-
-#### Properties
-
-| Name            | Type                                                        | Description                                                                       |
-| --------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| kind            | `Azure.Core.AzureTokenAuthenticationKind.entraDefaultScope` | The token-request profile.                                                        |
-| defaultAudience | `EnumMember`                                                | The default member of the known-audience enum, which also identifies the catalog. |
-
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
 Provides the 'x-ms-client-request-id' header to enable request correlation in requests and responses.
@@ -504,18 +489,6 @@ model Azure.Core.TopQueryParameter
 | Name | Type    | Description                           |
 | ---- | ------- | ------------------------------------- |
 | top? | `int32` | The number of result items to return. |
-
-### `AzureTokenAuthenticationKind` {#Azure.Core.AzureTokenAuthenticationKind}
-
-Shared service token-request semantics, independent of native SDK API shape.
-
-```typespec
-enum Azure.Core.AzureTokenAuthenticationKind
-```
-
-| Name              | Value | Description                                       |
-| ----------------- | ----- | ------------------------------------------------- |
-| entraDefaultScope |       | Derive an Entra scope from the selected resource. |
 
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 

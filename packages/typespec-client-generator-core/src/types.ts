@@ -1,8 +1,4 @@
-import {
-  type UnionEnum,
-  getAzureTokenAuthentication,
-  getUnionAsEnum,
-} from "@azure-tools/typespec-azure-core";
+import { type UnionEnum, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   type BooleanLiteral,
   type Diagnostic,
@@ -41,7 +37,6 @@ import { isEvents } from "@typespec/events";
 import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
   type Authentication,
-  type HttpAuth,
   type HttpOperationFileBody,
   type HttpOperationMultipartBody,
   type HttpPayloadBody,
@@ -75,7 +70,6 @@ import {
   type AccessFlags,
   type ArrayKnownEncoding,
   type SdkArrayType,
-  type SdkAzureAuthentication,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
   type SdkClientType,
@@ -1294,14 +1288,11 @@ function getSdkCredentialType(
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
-      // Projection diagnostics and audience usage are collected by handleAllTypes.
-      const azureAuthentication = ignoreDiagnostics(getSdkAzureAuthentication(context, scheme));
       credentialTypes.push({
         // Multiple services only deal with the first server config
         __raw: client.__raw.services[0],
         kind: "credential",
         scheme: scheme,
-        ...(azureAuthentication === undefined ? {} : { azureAuthentication }),
         decorators: [],
       });
     }
@@ -1355,40 +1346,6 @@ export function getSdkCredentialParameter(
     access: "public",
     flatten: false,
   };
-}
-
-function getSdkAzureAuthentication(
-  context: TCGCContext,
-  scheme: HttpAuth,
-): [SdkAzureAuthentication | undefined, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  if (scheme.type !== "oauth2") return diagnostics.wrap(undefined);
-  const profile = getAzureTokenAuthentication(context.program, scheme.model);
-  if (!profile) return diagnostics.wrap(undefined);
-  const type = diagnostics.pipe(getClientTypeWithDiagnostics(context, profile.audience.type));
-  if (type.kind !== "enum") {
-    diagnostics.add(
-      createDiagnostic({
-        code: "azure-authentication-invalid",
-        target: profile.audience.type,
-        format: {
-          reason: "The known-audience enum must project to an SDK enum.",
-        },
-      }),
-    );
-    return diagnostics.wrap(undefined);
-  }
-  return diagnostics.wrap({
-    profile: {
-      kind: "entraDefaultScope",
-      audience: {
-        ...profile.audience,
-        knownAudiences: { ...profile.audience.knownAudiences },
-        type,
-      },
-      defaultScopes: [...profile.defaultScopes],
-    },
-  });
 }
 
 export function getSdkModelPropertyTypeBase(
@@ -2574,28 +2531,6 @@ export function getAllReferencedTypes(
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
-  for (const client of context.getClients()) {
-    const service = client.services[0];
-    const authentication = getAuthentication(context.program, service);
-    const catalog = getClientServiceConfigurations(context, client);
-    const schemes = new Map(
-      [
-        ...(authentication?.options ?? []),
-        ...(catalog?.configurations.flatMap(
-          (configuration) => configuration.authentication.options,
-        ) ?? []),
-      ].flatMap((option) => option.schemes.map((scheme) => [scheme.model, scheme] as const)),
-    );
-    for (const scheme of schemes.values()) {
-      const metadata = diagnostics.pipe(getSdkAzureAuthentication(context, scheme));
-      if (metadata?.profile.kind === "entraDefaultScope") {
-        diagnostics.pipe(
-          updateUsageOrAccess(context, UsageFlags.Input, metadata.profile.audience.type),
-        );
-        diagnostics.pipe(updateUsageOrAccess(context, "public", metadata.profile.audience.type));
-      }
-    }
-  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInClient(context, client)) {
       // operations on a client

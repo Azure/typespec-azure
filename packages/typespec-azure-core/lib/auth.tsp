@@ -11,21 +11,6 @@ using Azure.Core.Traits.Private;
 
 namespace Azure.Core;
 
-/** Shared service token-request semantics, independent of native SDK API shape. */
-enum AzureTokenAuthenticationKind {
-  /** Derive an Entra scope from the selected resource. */
-  entraDefaultScope,
-}
-
-/** Shared service token-request semantics, independent of native SDK API shape. */
-model AzureTokenAuthenticationOptions {
-  /** The token-request profile. */
-  kind: AzureTokenAuthenticationKind.entraDefaultScope;
-
-  /** The default member of the known-audience enum, which also identifies the catalog. */
-  defaultAudience: TypeSpec.Reflection.EnumMember;
-}
-
 /** A deployment's HTTP endpoint and OAuth authentication requirements. */
 model AzureServiceConfiguration {
   /** The server URL or URL template, as accepted by `@server`. */
