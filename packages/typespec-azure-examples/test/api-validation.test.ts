@@ -48,6 +48,40 @@ async function validate(content: string) {
 }
 
 describe("API-aware example validation", () => {
+  it.each(["path", "query"])("validates server parameters in request.%s", async (bucket) => {
+    const document = {
+      ...contract,
+      parameters: {
+        Endpoint: { name: "endpoint", in: "path", required: true, type: "string" },
+      },
+      "x-ms-parameterized-host": {
+        hostTemplate: "{endpoint}",
+        parameters: [{ $ref: "#/parameters/Endpoint" }],
+      },
+    };
+    const content = `
+Widgets.create:
+  - request:
+      path: { id: "1"${bucket === "path" ? ", endpoint: service.example" : ""} }
+      ${bucket === "query" ? "query: { endpoint: service.example }" : ""}
+      body: { name: example }
+    responses: { 204: {} }
+`;
+    const check = (source: string) =>
+      validateApiExamples(
+        [loadExampleFile("examples.yaml", source)],
+        new Map([["/spec/openapi.json", document]]),
+        ["2024-01-01"],
+      );
+    expect(await check(content)).toEqual([]);
+    const invalid = await check(content.replace("endpoint: service.example", "endpoint: 123"));
+    expect(invalid).toHaveLength(1);
+    expect(invalid[0].message).toContain(`request.${bucket}.endpoint: must be string`);
+    const missing = await check(content.replace("endpoint: service.example", ""));
+    expect(missing).toHaveLength(1);
+    expect(missing[0].message).toContain("Required server parameter is missing.");
+  });
+
   it("accepts matching wire values, implicit api-version and case-insensitive HTTP headers", async () => {
     expect(
       await validate(`

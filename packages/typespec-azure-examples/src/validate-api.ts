@@ -191,11 +191,19 @@ export async function validateApiExamples(
           ...(Array.isArray(meta.operation.parameters) ? meta.operation.parameters : []),
         ];
         let parameters: { value: JsonObject; path: string }[];
+        let hostParameters: { value: JsonObject; path: string }[];
         try {
+          const document = documents.get(meta.path);
+          const host = isObject(document) ? document["x-ms-parameterized-host"] : undefined;
+          hostParameters = await Promise.all(
+            (isObject(host) && Array.isArray(host.parameters) ? host.parameters : []).map(
+              (parameter) => dereference(parameter, meta.path),
+            ),
+          );
           const resolved = await Promise.all(
             parameterRecords.map((param) => dereference(param, meta.path)),
           );
-          for (const { value: parameter } of resolved) {
+          for (const { value: parameter } of [...resolved, ...hostParameters]) {
             if (
               typeof parameter.name !== "string" ||
               !["path", "query", "header", "body", "formData"].includes(String(parameter.in))
@@ -228,14 +236,18 @@ export async function validateApiExamples(
           const location = bucket === "headers" ? "header" : bucket;
           const values = isObject(request[bucket]) ? request[bucket] : {};
           for (const [name, value] of Object.entries(values)) {
-            const match = parameters.find(
-              ({ value: param }) =>
-                param.in === location &&
-                typeof param.name === "string" &&
-                (bucket === "headers"
-                  ? param.name.toLowerCase() === name.toLowerCase()
-                  : param.name === name),
-            );
+            const match =
+              parameters.find(
+                ({ value: param }) =>
+                  param.in === location &&
+                  typeof param.name === "string" &&
+                  (bucket === "headers"
+                    ? param.name.toLowerCase() === name.toLowerCase()
+                    : param.name === name),
+              ) ??
+              (bucket !== "headers"
+                ? hostParameters.find(({ value: param }) => param.name === name)
+                : undefined);
             if (!match) {
               if (bucket === "headers" && /^(content-type|accept|authorization)$/i.test(name)) {
                 await check({ type: "string" }, value, ["request", bucket, name]);
@@ -254,6 +266,17 @@ export async function validateApiExamples(
               bucket === "headers" ? key.toLowerCase() === name.toLowerCase() : key === name,
             );
             if (!present) report(["request", bucket, name], "Required parameter is missing.");
+          }
+        }
+        for (const { value: param } of hostParameters) {
+          if (!param.required || param.name === "api-version") continue;
+          const name = String(param.name);
+          if (
+            !["path", "query"].some(
+              (bucket) => isObject(request[bucket]) && Object.hasOwn(request[bucket], name),
+            )
+          ) {
+            report(["request", name], "Required server parameter is missing.");
           }
         }
         const body = parameters.find(({ value: param }) => param.in === "body");
