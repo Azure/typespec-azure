@@ -24,7 +24,7 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName, type SdkName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   hasDualFormatSupport,
@@ -51,13 +51,12 @@ export function buildOperationFiles(
   const { subfolder, clientName } = getClientModuleInfo(clientMap);
   const clientType = "Client";
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
-  for (const [prefixKey, operations] of methodMap) {
-    const prefixes = prefixKey.split("/");
+  for (const [prefixes, operations] of methodMap) {
     const operationFileName =
-      prefixes.length > 0 && prefixKey !== ""
+      prefixes.length > 0
         ? `${prefixes
             .map((hierarchy) => {
-              return normalizeName(hierarchy, NameType.File);
+              return normalizeSdkName(hierarchy, NameType.File);
             })
             .join("/")}/operations`
         : // When the program has no operation groups defined all operations are put
@@ -102,7 +101,7 @@ export function buildOperationFiles(
       addDeclaration(operationGroupFile, operationDeclaration, refkey(op, "api"));
     });
 
-    const indexPathPrefix = "../".repeat(prefixKey === "" ? 0 : prefixes.length) || "./";
+    const indexPathPrefix = "../".repeat(prefixes.length) || "./";
     operationGroupFile.addImportDeclaration({
       namedImports: [`${clientName} as Client`],
       moduleSpecifier: `${indexPathPrefix}index.js`,
@@ -119,7 +118,7 @@ export function buildOperationFiles(
  */
 export function buildOperationOptions(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: [SdkName[], ServiceOperation],
   sourceFile: SourceFile,
 ) {
   const dependencies = useDependencies();
@@ -205,8 +204,7 @@ export function buildLroDeserDetailMap(
   const map = new Map<string, OperationPathAndDeserDetails[]>();
   const existingNames = new Set<string>();
   const methodMap = getMethodHierarchiesMap(context, client);
-  for (const [prefixKey, operations] of methodMap) {
-    const prefixes = prefixKey.split("/");
+  for (const [prefixes, operations] of methodMap) {
     const lroOperations = operations.filter((o) => isLroOnlyOperation(o));
     // skip this operation group if it has no LRO operations
     if (lroOperations.length === 0) {
@@ -214,10 +212,10 @@ export function buildLroDeserDetailMap(
     }
 
     const operationFileName =
-      prefixes.length > 0 && prefixKey !== ""
+      prefixes.length > 0
         ? `${prefixes
             .map((hierarchy) => {
-              return normalizeName(hierarchy, NameType.File);
+              return normalizeSdkName(hierarchy, NameType.File);
             })
             .join("/")}/operations`
         : // When the program has no operation groups defined all operations are put
