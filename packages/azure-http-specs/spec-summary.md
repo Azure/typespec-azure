@@ -1425,6 +1425,18 @@ Verifies that an API-version override on a child client replaces the default ser
 The client call takes no API-version argument and must send the overridden query parameter
 `api-version=2022-10-01` instead of the service version `2025-01-01`.
 
+### Azure_Core_Authentication_Configurations_defaultConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/default`
+
+Supply no configuration or endpoint override. The explicit Public default is not the first declared configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.io/.default, request path /public/azure/core/authentication/configurations/default, and response 204.
+
+### Azure_Core_Authentication_Configurations_governmentConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/government`
+
+Select Government without overriding the endpoint. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.us/.default, request path /government/azure/core/authentication/configurations/government, and response 204.
+
 ### Azure_Core_Basic_createOrReplace
 
 - Endpoint: `get /azure/core/basic`

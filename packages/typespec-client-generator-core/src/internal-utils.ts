@@ -1,5 +1,8 @@
 import {
+  type AzureServiceConfiguration,
+  type AzureServiceConfigurations,
   FinalStateValue,
+  getAzureServiceConfigurations,
   getEffectiveApiVersionOverride,
   isPreviewVersion,
   type LroMetadata,
@@ -15,6 +18,7 @@ import {
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getSummary,
+  getTypeName,
   getVisibilityForClass,
   ignoreDiagnostics,
   type Interface,
@@ -41,6 +45,7 @@ import {
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
+import { deepEquals } from "@typespec/compiler/utils";
 import {
   type Authentication,
   getHeaderFieldOptions,
@@ -1378,6 +1383,33 @@ export function getActualClientType(client: SdkClient): Namespace | Interface {
   return client.services[0];
 }
 
+export function getClientServiceConfigurations(
+  context: TCGCContext,
+  client: SdkClient,
+): AzureServiceConfigurations | undefined {
+  const defaults = client.services.map((service) =>
+    getAzureServiceConfigurations(context.program, service),
+  );
+  for (let current: SdkClient | undefined = client; current; current = current.parent) {
+    const type = current.type ?? context.__mergedSubClientTypes?.get(current)?.[0];
+    if (!type) continue;
+    const candidate = getAzureServiceConfigurations(context.program, type);
+    // Inherited service defaults must not hide a customized SDK parent's catalog.
+    if (candidate && !defaults.includes(candidate)) return candidate;
+  }
+  return defaults[0];
+}
+
+export function getClientDefaultServiceConfiguration(
+  context: TCGCContext,
+  client: SdkClient,
+): AzureServiceConfiguration | undefined {
+  const catalog = getClientServiceConfigurations(context, client);
+  return catalog?.configurations.find(
+    (configuration) => configuration.name === catalog.defaultConfiguration,
+  );
+}
+
 export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
   if (left.length !== right.length) {
     return false;
@@ -1480,7 +1512,8 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                   "Unexpected auth scheme type mismatch",
                 );
                 if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  ("tokenUrl" in leftFlow ? leftFlow.tokenUrl : undefined) !==
+                    ("tokenUrl" in rightFlow ? rightFlow.tokenUrl : undefined) ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
                 ) {
                   return false;
@@ -1502,6 +1535,45 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
     }
   }
   return true;
+}
+
+export function isSameServiceConfigurations(
+  left: AzureServiceConfigurations | undefined,
+  right: AzureServiceConfigurations | undefined,
+): boolean {
+  if (!left || !right) return left === right;
+  if (
+    left.defaultConfiguration !== right.defaultConfiguration ||
+    left.configurations.length !== right.configurations.length
+  )
+    return false;
+  const rightConfigurations = new Map(
+    right.configurations.map((configuration) => [configuration.name, configuration]),
+  );
+  return left.configurations.every((configuration) => {
+    const other = rightConfigurations.get(configuration.name);
+    if (
+      !other ||
+      configuration.server.url !== other.server.url ||
+      configuration.server.parameters.size !== other.server.parameters.size ||
+      !isSameAuth(configuration.authentication, other.authentication)
+    )
+      return false;
+    for (const [name, parameter] of configuration.server.parameters) {
+      const otherParameter = other.server.parameters.get(name);
+      if (
+        !otherParameter ||
+        getTypeName(parameter.type) !== getTypeName(otherParameter.type) ||
+        parameter.optional !== otherParameter.optional ||
+        !deepEquals(
+          parameter.defaultValue ? getValueTypeValue(parameter.defaultValue) : undefined,
+          otherParameter.defaultValue ? getValueTypeValue(otherParameter.defaultValue) : undefined,
+        )
+      )
+        return false;
+    }
+    return true;
+  });
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {

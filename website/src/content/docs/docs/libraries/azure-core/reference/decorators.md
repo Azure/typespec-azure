@@ -8,6 +8,66 @@ llmstxt: true
 
 ## Azure.Core
 
+### `@azureServiceConfigurations` {#@Azure.Core.azureServiceConfigurations}
+
+Pairs named HTTP server endpoints with OAuth authentication configurations.
+
+Calls `@server` for each configuration, with the default first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
+
+The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
+
+Configurations vary OAuth URLs and scopes, not authentication mechanisms. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+
+OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+
+```typespec
+@Azure.Core.azureServiceConfigurations(configurations: Model, defaultConfiguration: valueof string)
+```
+
+#### Target
+
+The namespace using these configurations.
+`Namespace`
+
+#### Parameters
+
+| Name                 | Type             | Description                                    |
+| -------------------- | ---------------- | ---------------------------------------------- |
+| configurations       | `Model`          | The named endpoint and authentication records. |
+| defaultConfiguration | `valueof string` | The name of the default configuration.         |
+
+#### Examples
+
+```typespec
+model PublicAuth is AadOauth2Auth<
+  ["https://api.loganalytics.io/.default"],
+  "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+>;
+model GovernmentAuth is AadOauth2Auth<
+  ["https://api.loganalytics.us/.default"],
+  "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+>;
+
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: PublicAuth;
+  };
+  Government: {
+    endpoint: "https://api.loganalytics.us";
+    authentication: GovernmentAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+  @get op query(): string;
+}
+```
+
 ### `@finalLocation` {#@Azure.Core.finalLocation}
 
 Identifies a ModelProperty as containing the final location for the operation result.

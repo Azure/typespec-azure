@@ -86,6 +86,23 @@ model Azure.Core.AzureApiKeyAuthentication
 | in   | `TypeSpec.Http.ApiKeyLocation.header` | location of the API key |
 | name | `"Ocp-Apim-Subscription-Key"`         | name of the API key     |
 
+### `AzureServiceConfiguration` {#Azure.Core.AzureServiceConfiguration}
+
+A deployment's HTTP endpoint and OAuth authentication requirements.
+
+```typespec
+model Azure.Core.AzureServiceConfiguration
+```
+
+#### Properties
+
+| Name           | Type              | Description                                                                     |
+| -------------- | ----------------- | ------------------------------------------------------------------------------- |
+| endpoint       | `string`          | The server URL or URL template, as accepted by `@server`.                       |
+| authentication | `unknown`         | Authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. |
+| parameters?    | `Record<unknown>` | Parameters used in the endpoint URL template.                                   |
+| description?   | `string`          | Description of the server.                                                      |
+
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
 Provides the 'x-ms-client-request-id' header to enable request correlation in requests and responses.
