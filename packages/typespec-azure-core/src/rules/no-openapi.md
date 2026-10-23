@@ -17,7 +17,7 @@ This rule does not flag the `@extension` decorator. Client-altering `x-ms-*` ext
 
 | OpenAPI Decorator | Alternative                                                                                                                                                     |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@example`        | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.mdx)                                                                                              |
+| `@example`        | [Author examples in YAML](../../../howtos/examples.md); check SDK support before migrating legacy JSON.                                                         |
 | `@operationId`    | Name your interface and operation accordingly                                                                                                                   |
 | `@useRef`         | This should not be used, define the types correctly in TypeSpec. For ARM common types read the [Arm docs](../../../getstarted/azure-resource-manager/step00.md) |
 | `@info`           | Use versioning library for `version` and `@service` for title                                                                                                   |
