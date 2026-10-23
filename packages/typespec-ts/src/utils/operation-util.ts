@@ -53,7 +53,13 @@ import {
 } from "./media-types.js";
 import { isByteOrByteUnion } from "./model-utils.js";
 import { getLroLogicalResponseName, getResponseTypeName } from "./name-constructors.js";
-import { NameType, normalizeName, normalizeSdkName, reportInvalidExactName } from "./name-utils.js";
+import {
+  NameType,
+  normalizeName,
+  normalizeSdkName,
+  reportInvalidExactName,
+  type SdkName,
+} from "./name-utils.js";
 import { getOperationNamespaceInterfaceName } from "./namespace-utils.js";
 
 // Sorts the responses by status code
@@ -602,6 +608,8 @@ export type ServiceOperation = SdkServiceMethod<SdkHttpOperation> & {
   oriName?: string;
 };
 
+export type OperationWithHierarchy = readonly [SdkName[], ServiceOperation];
+
 export type ServiceParameter = (SdkMethodParameter | SdkHttpParameter | SdkBodyParameter) & {
   oriName?: string;
 };
@@ -609,9 +617,9 @@ export type ServiceParameter = (SdkMethodParameter | SdkHttpParameter | SdkBodyP
 export function getMethodHierarchiesMap(
   context: SdkContext,
   client: SdkClientType<SdkServiceOperation>,
-): Map<string, ServiceOperation[]> {
+): Map<SdkName[], ServiceOperation[]> {
   const methodQueue: [
-    string[],
+    SdkName[],
     SdkMethod<SdkHttpOperation> | SdkClientType<SdkServiceOperation>,
   ][] =
     client.children
@@ -627,10 +635,11 @@ export function getMethodHierarchiesMap(
   client.methods.forEach((m) => {
     methodQueue.push([[], m]);
   });
-  const operationHierarchiesMap: Map<string, ServiceOperation[]> = new Map<
-    string,
+  const operationHierarchiesMap: Map<SdkName[], ServiceOperation[]> = new Map<
+    SdkName[],
     ServiceOperation[]
   >();
+  const hierarchyKeys = new Map<string, SdkName[]>();
   while (methodQueue.length > 0) {
     const method = methodQueue.pop();
     if (!method) {
@@ -640,14 +649,15 @@ export function getMethodHierarchiesMap(
       context.emitterOptions?.hierarchyClient === false &&
       context.emitterOptions?.enableOperationGroup &&
       method[0].length > 0
-        ? [method[0][method[0].length - 1] as string]
+        ? method[0].slice(-1)
         : method[0];
     const operationOrGroup = method[1];
 
     if (operationOrGroup.kind === "client") {
-      const hierarchyName = operationOrGroup.isExactName
-        ? `$DO_NOT_NORMALIZE$${operationOrGroup.name}`
-        : operationOrGroup.name;
+      const hierarchyName: SdkName = {
+        name: operationOrGroup.name,
+        isExactName: operationOrGroup.isExactName,
+      };
       operationOrGroup.methods.forEach((m) => methodQueue.push([[...prefixes, hierarchyName], m]));
       const nonIndependentChildren = operationOrGroup.children?.filter((child) => {
         return (
@@ -677,11 +687,14 @@ export function getMethodHierarchiesMap(
           parameter.__raw ?? NoTarget,
         );
       }
-      const prefixKey =
+      const hierarchy =
         context.emitterOptions?.hierarchyClient || context.emitterOptions?.enableOperationGroup
-          ? prefixes.join("/")
-          : "";
-      const groupName = prefixes.map((p) => normalizeName(p, NameType.OperationGroup)).join("");
+          ? prefixes
+          : [];
+      const hierarchyId = JSON.stringify(hierarchy);
+      const prefixKey = hierarchyKeys.get(hierarchyId) ?? hierarchy;
+      hierarchyKeys.set(hierarchyId, prefixKey);
+      const groupName = prefixes.map((p) => normalizeSdkName(p, NameType.OperationGroup)).join("");
       if (
         context.emitterOptions?.hierarchyClient === false &&
         context.emitterOptions?.enableOperationGroup &&
@@ -749,10 +762,7 @@ function resolveParameterNameConflict(
   operationOrGroup: SdkServiceMethod<SdkHttpOperation>,
   p: ServiceParameter,
 ): ServiceParameter {
-  // When the name starts with $DO_NOT_NORMALIZE$, record the original name so that
-  // subsequent calls (e.g. emitNonModelResponseTypes then buildApiOptions both call
-  // getMethodHierarchiesMap on the same TCGC object) always normalize from the
-  // original, not from the already-mutated value.
+  // Repeated visits must resolve conflicts from the original, not the mutated name.
   const paramName = normalizeSdkName(p, NameType.Parameter, {
     shouldGuard: true,
     nameOverride: p.oriName ?? p.name,
