@@ -166,6 +166,11 @@ prove portable CLI reuse.
 Read that checkout's toolchain and package-manager configuration. Check mise
 first and use `mise exec --` where available. Initialize `core` at its gitlink.
 Install only missing prerequisites or changed dependency manifests.
+Use the [native dependency profile](../do-linter-development-task-one-by-one/preparation.md#native-first-dependency-profile)
+for candidate setup: select the required official-package/tool closures, install
+with `--frozen-lockfile --ignore-scripts`, then run the required builds and smoke
+checks explicitly. Do not invoke unrelated emitter lifecycle setup as a proxy
+for candidate readiness.
 
 Use the existing external-integration architecture:
 
