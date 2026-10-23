@@ -39,6 +39,25 @@ are never adopted/retargeted as native-first.
 
 ### Native-first dependency profile
 
+Before installation, read each checkout's `packageManager` and verify the actual
+launcher with `--version` in that checkout. A working global launcher does not
+prove that mise, a shim or the child install selects the same version. Use the
+declared version through mise when available. If the launcher is broken and the
+checkout provides `npm run install-pnpm`, inspect that script before using its
+repository-supported bootstrap. Do not reinstall a working launcher or hard-code
+one checkout's version for the other checkouts.
+
+Query the selected manager's effective registry in the target checkout before
+downloads. Do not assume pnpm inherits npm's registry configuration. When the
+selected manager loses an existing approved registry, preserve that registry
+process-locally for the integration/analyzer process and verify the effective
+value again. pnpm 12 uses `PNPM_CONFIG_REGISTRY`; use the configuration mechanism
+supported by the selected version. Record the registry selection and launcher
+version without credentials. Do not force public npm or hard-code a
+machine-specific feed. Persistent user/global configuration changes require an
+explicit user choice; never disable certificate verification. Successful metadata
+access alone does not prove tarball integrity or candidate installation.
+
 Derive readiness probes and required build selectors from the destination and
 coverage plan before installation. Check repository/core tooling, the actual
 test runner and required workspace entrypoints. A missing workspace `dist` needs
