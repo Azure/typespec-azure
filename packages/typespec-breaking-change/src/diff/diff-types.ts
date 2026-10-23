@@ -1,3 +1,4 @@
+import type { DiffKind } from "@azure-tools/typespec-azure-core";
 import {
   getSourceLocation,
   isArrayModelType,
@@ -11,7 +12,6 @@ import {
   type UnionVariant,
 } from "@typespec/compiler";
 import type { HttpCanonicalization } from "@typespec/http-canonicalization";
-import type { DiffKind } from "../diff-kind.js";
 import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "../types.js";
 import { resolveOrigin } from "./origin.js";
 

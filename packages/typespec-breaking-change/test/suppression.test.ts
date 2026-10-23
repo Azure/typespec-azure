@@ -1,3 +1,4 @@
+import { BreakingChangeStateKeys } from "@azure-tools/typespec-azure-core";
 import { describe, expect, it } from "vitest";
 import {
   applySuppressions,
@@ -9,7 +10,6 @@ import {
   type VersionPair,
   type VersionedView,
 } from "../src/index.js";
-import { BreakingChangeStateKeys } from "../src/lib.js";
 import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 const sameVersionPair: VersionPair = {

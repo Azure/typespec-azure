@@ -15,13 +15,13 @@ export {
   getUnversionedSuppressions,
   type ResolvedSuppression,
   type SuppressionMetadata,
-} from "./suppression/decorators.js";
+} from "@azure-tools/typespec-azure-core";
 export { emitFindingDiagnostics } from "./suppression/diagnostics.js";
 export * from "./diff/diff-engine.js";
-export { diffKinds, isDiffKind, type DiffKind } from "./diff-kind.js";
+export { diffKinds, isDiffKind, type DiffKind } from "@azure-tools/typespec-azure-core";
 export * from "./diff/diff-operations.js";
 export * from "./diff/diff-types.js";
-export { $lib, BreakingChangeStateKeys } from "./lib.js";
+export { BreakingChangeStateKeys } from "@azure-tools/typespec-azure-core";
 export { matchOperations, type MatchedOperation, type OperationMatchResult } from "./suppression/match.js";
 export {
   getOperationIdentity,

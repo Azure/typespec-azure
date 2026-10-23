@@ -1,8 +1,8 @@
 /**
  * All diff kinds recognized by the tool.
  *
- * A kind being present here does not by itself mean that the comparison engine
- * can produce it. See `diffKindCatalog` for implementation status.
+ * A kind being present here does not by itself mean that an analysis tool
+ * can produce it.
  */
 export const diffKinds = [
   "ApiVersionRemoved",

@@ -1,12 +1,12 @@
-import type { Program, Type } from "@typespec/compiler";
-import type { Finding } from "../types.js";
-import { isOperationIdentity } from "../types.js";
 import {
   findSuppressions,
   findUnversionedSuppressions,
   scanAllUnversionedSuppressions,
   type ResolvedSuppression,
-} from "./decorators.js";
+} from "@azure-tools/typespec-azure-core";
+import type { Program, Type } from "@typespec/compiler";
+import type { Finding } from "../types.js";
+import { isOperationIdentity } from "../types.js";
 import { composeFullIdentityPath } from "./target.js";
 
 /**
