@@ -38,19 +38,19 @@ If your spec is in preview and has not ever had a stable api-version, then there
   }
   ```
 
-- If you **do not need** to retain the OpenAPI for older previews (see [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only) if you are not sure).
-  - Remove the associated OpenAPI file and examples
+- Keep the already-published OpenAPI and examples for the old preview by default. Removing the old preview from TypeSpec versioning does not automatically mean those generated artifacts need to be deleted. Keep them if they are still needed, or if you are not sure (see [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only)).
+- Only remove the associated OpenAPI file and examples if the team confirms the old preview is retired or the artifacts are no longer needed for ARM registration or RPaaS live validation. If removal is appropriate:
 
-    ```bash
-    > rm -r 2025-12-01-preview
-    ```
+  ```bash
+  > rm -r 2025-12-01-preview
+  ```
 
   - Remove any references to the old version from README.md
 
 - Update the README.md to include the new api-version
 
 :::tip
-If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
+If the team confirms that the old preview's OpenAPI files and examples are no longer needed, remove them in a **separate follow-up PR** after this PR merges. This is optional, not a required part of the version update. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
 :::
 
 ## The General Case: One or more Stable Versions Exist
@@ -233,10 +233,10 @@ This includes the following steps:
 - update README.md to include a new entry for the new preview version and make it the default tag.
 
 :::tip
-If you wish to remove the OpenAPI files for the old preview version, do so in a **separate follow-up PR** after this PR merges. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
+Keep the already-published OpenAPI files and examples for the old preview by default; removing it from TypeSpec versioning does not require deleting those artifacts. If the team confirms the old preview is retired or the artifacts are no longer needed for ARM registration or RPaaS live validation, remove them in a **separate follow-up PR** after this PR merges. See [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only).
 :::
 
-- If you _do not_ need the older preview version (see [Should I Retain the OpenAPI for an Old Preview API](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api-arm-only) if you are not sure), in a separate PR after this PR is merged, remove the OpenAPI directory for that version and update the `README.md` file to remove all references to the old preview version files.
+- Only after confirming that the older preview is retired or its OpenAPI is no longer needed for ARM registration or RPaaS live validation, remove its OpenAPI directory and references from `README.md` in a separate PR after this PR is merged. If unsure, keep the files.
 
   ```bash
   C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\  > rm -r 2025-12-01-preview
