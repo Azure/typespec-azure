@@ -100,6 +100,29 @@ linter:
       expect(result.rawDiagnostics).toEqual([]);
     });
 
+    it("loads an explicit native package without claiming lint findings", () => {
+      const result = evaluate("model Widget { enabled: boolean; }", {
+        tspRules: [],
+        nativePackage: "@azure-tools/typespec-azure-core",
+      });
+      expect(result.status).toBe("success");
+      expect(result.assessmentMode).toBe("package-evidence");
+      expect(result.nativePackage).toBe("@azure-tools/typespec-azure-core");
+      expect(result.rawDiagnostics).toEqual([]);
+      expect(result.packages).toContainEqual(
+        expect.objectContaining({
+          name: "@azure-tools/typespec-azure-core",
+          sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+        }),
+      );
+    });
+
+    it("rejects an implicit empty target rather than manufacturing native compliance", () => {
+      const result = evaluate("model Widget {}", { tspRules: [] });
+      expect(result.status).toBe("failed");
+      expect(result.error).toMatch(/No native lint/);
+    });
+
     it("resolves the import-only official Resource Manager rulesets package", () => {
       const result = evaluate(
         "model Widget { enabled: boolean; }",

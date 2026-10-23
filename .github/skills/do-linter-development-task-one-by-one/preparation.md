@@ -19,9 +19,9 @@ Resolve latest inputs for a new baseline; a reuse request reads the completed
 baseline's exact specs/closure, not checked-in `_meta.json` or a moving tip.
 Verify candidate core gitlink and compatible package closure. Do not repeatedly
 install passing prerequisites; repair only invalidated layers or proven missing
-tools. Native-first dependency recipes come from the official destination and
-the coverage skill: build/pack the candidate's compatible closure and use the
-specs checkout's declared manager for injection. Do not run the legacy lintdiff
+tools. Use the [native dependency profile](#native-first-dependency-profile)
+below, then build/pack the candidate's compatible closure and use the specs
+checkout's declared manager for injection. Do not run the legacy lintdiff
 installation/link profile or assume specs uses `npm ci`. Reuse common readiness
 checks without inheriting temporary-library dependencies.
 
@@ -36,6 +36,62 @@ hashes, dependency fingerprints and recovery counters. No promotion owner or
 promotion source SHA is needed. Both A/B checkpoints run through the same native
 publication owner with separate review invocations. Existing legacy manifests
 are never adopted/retargeted as native-first.
+
+### Native-first dependency profile
+
+Before installation, read each checkout's `packageManager` and verify the actual
+launcher with `--version` in that checkout. A working global launcher does not
+prove that mise, a shim or the child install selects the same version. Use the
+declared version through mise when available. If the launcher is broken and the
+checkout provides `npm run install-pnpm`, inspect that script before using its
+repository-supported bootstrap. Do not reinstall a working launcher or hard-code
+one checkout's version for the other checkouts.
+
+Query the selected manager's effective registry in the target checkout before
+downloads. Do not assume pnpm inherits npm's registry configuration. When the
+selected manager loses an existing approved registry, preserve that registry
+process-locally for the integration/analyzer process and verify the effective
+value again. pnpm 12 uses `PNPM_CONFIG_REGISTRY`; use the configuration mechanism
+supported by the selected version. Record the registry selection and launcher
+version without credentials. Do not force public npm or hard-code a
+machine-specific feed. Persistent user/global configuration changes require an
+explicit user choice; never disable certificate verification. Successful metadata
+access alone does not prove tarball integrity or candidate installation.
+
+Derive readiness probes and required build selectors from the destination and
+coverage plan before installation. Check repository/core tooling, the actual
+test runner and required workspace entrypoints. A missing workspace `dist` needs
+its dependency-closure build, not another install.
+
+When a required dependency is missing, use a frozen, filtered install with
+`--ignore-scripts`, as in the existing development and promotion setup profiles.
+For an implementation requiring real-spec coverage, substitute the actual owning
+package in this command; omit only selectors not needed by the declared plan:
+
+```powershell
+mise exec -- pnpm install --filter . --filter ./core `
+  --filter "<owning-package>..." `
+  --filter "@azure-tools/typespec-autorest..." `
+  --filter "@azure-tools/typespec-azure-rulesets..." `
+  --filter "@typespec/integration-tester..." `
+  --filter "@typespec/prettier-plugin-typespec..." `
+  --frozen-lockfile --ignore-scripts
+```
+
+The root/core selectors materialize build tools; the remaining selectors cover
+native validation, emission/injection and TypeSpec formatting without selecting
+the temporary linter. Keep the configured registry and lockfile unchanged.
+Do not escalate to a script-enabled full-workspace install merely because one
+link or build output is missing: unrelated emitter lifecycle hooks can provision
+Python environments and contact PyPI outside the native task's dependency plan.
+
+Ignoring install scripts is not a build/test pass. Run the declared dependency
+builds, import/bin smoke checks and required native validation afterward. If a
+required package needs a lifecycle output, inspect its exact script and apply
+the existing dependency/recovery policy at that scope. Never disable TLS checks
+or call unrelated lifecycle failures passing. Preserve an accidentally broader
+command's failed receipt and reconcile it under the existing bounded correction
+policy; this profile grants no new external-operation retry or gate waiver.
 
 ## Legacy preparation
 

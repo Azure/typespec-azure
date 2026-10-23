@@ -5,6 +5,7 @@ import { gzipSync } from "node:zlib";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildNativeCoverageReport,
+  buildNativePackageEvidenceReport,
   inventoryDataset,
   packedFileInventory,
   parseNativeCoverageArgs,
@@ -129,6 +130,103 @@ describe("native coverage arguments", () => {
         "boolean-http",
       ]),
     ).toThrow(/no-boolean/);
+  });
+
+  it("requires an explicit official package for non-lint evidence", () => {
+    expect(
+      parseNativeCoverageArgs(
+        args.slice(0, -2).concat(["--native-package", "@azure-tools/typespec-azure-core"]),
+      ),
+    ).toMatchObject({
+      tspRules: [],
+      nativePackage: "@azure-tools/typespec-azure-core",
+      scope: "source",
+    });
+    expect(() => parseNativeCoverageArgs(args.slice(0, -2))).toThrow(/--tsp-rule/);
+  });
+
+  it.each([
+    ["--native-package", "@azure-tools/typespec-azure-core"],
+    ["--native-package", "unrelated-package"],
+  ])("does not mix package evidence with lint mappings: %j", (...extra) => {
+    expect(() => parseNativeCoverageArgs([...args, ...extra])).toThrow();
+  });
+
+  it("rejects non-source package evidence and duplicate package targets", () => {
+    const evidence = [...args.slice(0, -2), "--native-package", "@azure-tools/typespec-azure-core"];
+    expect(() => parseNativeCoverageArgs([...evidence, "--scope", "http-reachable"])).toThrow();
+    expect(() =>
+      parseNativeCoverageArgs([
+        ...evidence,
+        "--native-package",
+        "@azure-tools/typespec-azure-core",
+      ]),
+    ).toThrow();
+    expect(() =>
+      parseNativeCoverageArgs([...args.slice(0, -2), "--native-package", "unrelated"]),
+    ).toThrow();
+  });
+});
+
+describe("native package evidence accounting", () => {
+  const nativePackage = "@azure-tools/typespec-azure-core";
+  function receipt(name = project): NativeProjectResult {
+    return {
+      project: name,
+      status: "success",
+      assessmentMode: "package-evidence",
+      nativePackage,
+      rawDiagnostics: [],
+      diagnostics: [],
+      packages: [{ name: nativePackage, version: "test", entrypoint: "test.js" }],
+    };
+  }
+  it("retains real Swagger counts without zero native counts or equality claims", () => {
+    const result = buildNativePackageEvidenceReport(
+      [datasetProject()],
+      [{ ...validatorResult(), rule: "LegacyRule" }],
+      [receipt()],
+      nativePackage,
+      ["LegacyRule"],
+    );
+    expect(result).toMatchObject({
+      assessmentMode: "package-evidence",
+      validatorRawCount: 1,
+      nativeDiagnosticCounts: null,
+      diagnosticComparison: null,
+      observedProjectCoveragePercent: null,
+      equivalence: "not-assessed",
+    });
+    expect(result).not.toHaveProperty("projectsWithEqualCounts");
+    expect(result).not.toHaveProperty("nativeRawCount");
+    expect(result.projects[0].nativeDiagnosticCounts).toBeNull();
+    expect(result.members[0]).toMatchObject({ rawCount: 1, assessableRawCount: 1 });
+  });
+  it("keeps compiler failures unassessed with their Swagger observations", () => {
+    const result = buildNativePackageEvidenceReport(
+      [datasetProject()],
+      [{ ...validatorResult(), rule: "LegacyRule" }],
+      [{ ...receipt(), status: "failed", error: "Compile failure" }],
+      nativePackage,
+      ["LegacyRule"],
+    );
+    expect(result.assessableProjectCount).toBe(0);
+    expect(result.unassessedValidatorRawCount).toBe(1);
+    expect(result.unassessedProjects).toEqual([{ project, reason: "Compile failure" }]);
+    expect(result.members[0]).toMatchObject({ rawCount: 1, unassessedRawCount: 1 });
+  });
+  it.each([
+    { ...receipt(), nativePackage: "@azure-tools/typespec-client-generator-core" },
+    { ...receipt(), assessmentMode: undefined },
+    { ...receipt(), diagnostics: [diagnostic] },
+    { ...receipt(), rawDiagnostics: [diagnostic] },
+    { ...receipt(), packages: [] },
+  ])("rejects unbound or lint-bearing receipts", (invalid) => {
+    expect(() =>
+      buildNativePackageEvidenceReport([datasetProject()], [], [invalid], nativePackage, [
+        "LegacyRule",
+      ]),
+    ).toThrow(/receipt/);
   });
 });
 
