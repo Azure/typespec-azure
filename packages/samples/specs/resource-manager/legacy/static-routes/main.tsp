@@ -20,6 +20,7 @@ namespace Microsoft.ContosoProviderHub;
 interface Operations extends Azure.ResourceManager.Operations {}
 
 enum Versions {
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "Preserve older common-types schemas for this grandfathered API sample."
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @previewVersion
   `2025-06-01-preview`,

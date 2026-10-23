@@ -90,6 +90,21 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("enables consolidated ARM common-types version guidance", () => {
+    const ruleset = $linter.ruleSets?.["resource-manager"];
+    ok(ruleset);
+    ok(ruleset.enable?.["@azure-tools/typespec-azure-resource-manager/arm-common-types-version"]);
+    const removedRule =
+      "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types";
+    strictEqual(ruleset.enable?.[removedRule], undefined);
+    strictEqual(ruleset.disable?.[removedRule], undefined);
+    ok(
+      !ResourceManagerLinter.rules.some(
+        (rule) => rule.name === "use-latest-version-of-common-types",
+      ),
+    );
+  });
+
   it("keeps RPaaS extension-routing guidance opt-in in the general Azure rulesets", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);

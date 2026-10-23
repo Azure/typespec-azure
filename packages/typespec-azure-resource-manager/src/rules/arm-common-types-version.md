@@ -1,10 +1,20 @@
-If the same common types version is used across all service versions, this decorator should be applied either on the service namespace or on each version enum member. If the common types version is updated in later versions, the decorator should appear on each version enum member.
+ARM services should explicitly select the latest version in
+`Azure.ResourceManager.CommonTypes.Versions` using `@armCommonTypesVersion`.
+Apply the decorator to the service namespace when all API versions use the same
+common-types version. A decorator on an API version enum member overrides the
+namespace selection for that API version.
+
+The rule warns when explicit version configuration is missing or when an
+effective selection is older than the latest available version. It checks
+version selections, not individual legacy type usages.
 
 ## Impact
 
 - **Area:** API, SDK
 
-Indicates common-types are not being used, which normally surfaces as other violations too.
+Missing or outdated common-types selections can leave an API and its generated
+SDKs using older shared schemas and parameters. Latest-version warnings are
+enabled wherever this rule is enabled, including the resource-manager ruleset.
 
 ## ❌ Incorrect
 
@@ -13,33 +23,47 @@ Indicates common-types are not being used, which normally surfaces as other viol
 namespace Microsoft.Contoso;
 ```
 
+An explicit older selection also produces a warning:
+
+```tsp
+@armProviderNamespace
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+namespace Microsoft.Contoso;
+```
+
 ## ✅ Correct
 
-Apply `@armCommonTypesVersion` on the namespace:
+Select the latest version on the service namespace:
 
 ```tsp
 @armProviderNamespace
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
 namespace Microsoft.Contoso;
 ```
 
-## ✅ Correct (per version)
+Alternatively, apply `@armCommonTypesVersion` to every API version enum member
+instead of the namespace. Every effective selection must use the latest version
+to satisfy this rule.
 
-Apply `@armCommonTypesVersion` on each version enum member:
+As of August 2026, `v6` was the latest ARM common-types version.
+Newer versions may exist; check `Azure.ResourceManager.CommonTypes.Versions`
+before updating a service.
 
-```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
+## LintDiff Equivalent
 
-enum Versions {
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-  v1,
-
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2,
-}
-```
+This rule covers the version-selection guidance of
+[`LatestVersionOfCommonTypesMustBeUsed`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/latest-version-of-common-types-must-be-used.md).
+Unlike the OpenAPI rule, it does not inspect emitted common-type references.
 
 ## Suppression
 
-Suppress only if no common-types are ever used and that is valid; otherwise associate a common-types version with each version in the Versions enum.
+Prefer updating `@armCommonTypesVersion` to the latest version. Suppress only
+when an older version is required for compatibility and the API and SDK impact
+has been accepted, or when no common-types are used and omitting the selection
+is intentional.
+
+Place `#suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "Compatibility justification"`
+above the service namespace for missing configuration or an unversioned
+selection, or above the affected API version enum member for a versioned
+selection. Suppressing the rule also suppresses its missing-configuration check
+within that scope.
