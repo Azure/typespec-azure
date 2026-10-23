@@ -18,7 +18,7 @@ namespace Microsoft.LibraryTest;
 /** ARM Library API versions */
 enum Versions {
   /** 2021-09-21-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   @Azure.Core.previewVersion
   `2021-09-21-preview`,
 }
