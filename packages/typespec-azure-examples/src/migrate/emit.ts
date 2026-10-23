@@ -30,7 +30,7 @@ export function buildExamplesObject(
   return object;
 }
 
-/** Serialize an examples object to YAML, force-quoting `since` values so they stay strings. */
+/** Serialize examples without automatic line wrapping, force-quoting `since` values. */
 export function serializeExamplesYaml(object: Record<string, unknown>): string {
   const doc = new Document(object);
   visit(doc, {
@@ -55,7 +55,7 @@ export function serializeExamplesYaml(object: Record<string, unknown>): string {
       }
     },
   });
-  return doc.toString();
+  return doc.toString({ lineWidth: 0 });
 }
 
 /** Whether the visited node sits inside a `responses` mapping. */
