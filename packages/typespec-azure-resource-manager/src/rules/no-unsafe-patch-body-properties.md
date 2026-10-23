@@ -60,8 +60,12 @@ partial-update safety checks still run.
 The rule traverses single HTTP document bodies, object properties, inherited
 properties, nullable single-model unions, and array elements. `never` is omitted.
 Records retain named-property checks, but record indexer values, tuples, and
-multi-model unions are not expanded. Multipart transport wrappers, native File
-models and primitive binary bodies are not PATCH document-property models.
+multi-model unions are not expanded. When a present resource counterpart is an
+unsupported union, only descendant layout comparison is skipped; required,
+default, visibility, and immutable checks still run. Genuinely absent properties
+and supported single-model or nullable counterparts retain layout comparison.
+Multipart transport wrappers, native File models and primitive binary bodies
+are not PATCH document-property models.
 An array-versus-scalar mismatch alone is not a type-equality diagnostic.
 
 Recursive active-context tracking terminates cycles without suppressing sibling

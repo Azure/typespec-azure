@@ -12,6 +12,8 @@ When enabled, the rule applies ARM PATCH guidance throughout the compilation, in
 
 Property checks apply to single HTTP bodies, excluding multipart wrappers and file payloads. Array replacement elements may contain required properties, but their defaults, visibility, and resource layout remain checked. Top-level encoded identity retains its safety exemption without bypassing resource-layout checks.
 
+Skip descendant layout comparison for present unsupported resource unions without expanding their alternatives. Retain required/default/visibility/immutable safety checks, genuinely missing-property diagnostics, and supported single-model or nullable layout comparisons.
+
 Request visibility governs both input membership and optionality. Excluded properties are not checked, and absent or optional discriminators are not made required by emitter behavior.
 
 Keep `arm-resource-patch`, `patch-envelope`, and PATCH-to-PUT correspondence separate. The shared resource-manager ruleset registration remains disabled.
