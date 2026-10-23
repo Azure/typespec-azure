@@ -14,6 +14,7 @@ import {
   $armResourceList,
   $armResourceRead,
   $armResourceUpdate,
+  $providerOperation,
   $renamePathParameter,
 } from "./operations.js";
 import {
@@ -43,6 +44,7 @@ export { $lib } from "./lib.js";
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager": {
+    providerOperation: $providerOperation,
     armResourceCollectionAction: $armResourceCollectionAction,
     armProviderNameValue: $armProviderNameValue,
     armProviderNamespace: $armProviderNamespace,
