@@ -119,6 +119,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getRawLroMetadata } from "./lro-metadata.js";
+import { resolveLroStatusMetadata } from "./lro-status-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -1661,6 +1662,55 @@ export function getSdkModelPropertyType(
   return diagnostics.wrap(property);
 }
 
+export function getEffectiveSdkModelProperty(
+  model: SdkModelType,
+  rawProperty: ModelProperty,
+): SdkModelPropertyType | undefined {
+  let current: SdkModelType | undefined = model;
+  while (current) {
+    const property = current.properties.find(
+      (candidate) => candidate.__raw === rawProperty || candidate.__raw?.name === rawProperty.name,
+    );
+    if (property) return property;
+    current = current.baseModel;
+  }
+  return undefined;
+}
+
+export interface EffectiveSdkModelPropertySelection {
+  rawProperty: ModelProperty;
+  sdkProperty: SdkModelPropertyType;
+}
+
+export interface EffectiveSdkModelPropertyConflict {
+  rawProperty: ModelProperty;
+  clientName: string;
+}
+
+export function resolveEffectiveSdkModelProperties(
+  model: SdkModelType,
+  rawProperties: ModelProperty[],
+  reservedNames: string[] = [],
+): {
+  selections: EffectiveSdkModelPropertySelection[];
+  conflicts: EffectiveSdkModelPropertyConflict[];
+} {
+  const selections: EffectiveSdkModelPropertySelection[] = [];
+  const conflicts: EffectiveSdkModelPropertyConflict[] = [];
+  const seenNames = new Set(reservedNames);
+  for (const rawProperty of rawProperties) {
+    const sdkProperty = getEffectiveSdkModelProperty(model, rawProperty);
+    if (!sdkProperty) continue;
+    if (seenNames.has(sdkProperty.name)) {
+      conflicts.push({ rawProperty, clientName: sdkProperty.name });
+      continue;
+    }
+    seenNames.add(sdkProperty.name);
+    selections.push({ rawProperty, sdkProperty });
+  }
+  return { selections, conflicts };
+}
+
 function addPropertiesToModelType(
   context: TCGCContext,
   type: Model,
@@ -2175,6 +2225,9 @@ function updateTypesFromOperation(
     popNamingContext(context);
 
     const lroMetaData = getRawLroMetadata(program, operation);
+    const lroStatusMetadata = diagnostics.pipe(
+      resolveLroStatusMetadata(context, operation, lroMetaData, isVisibleSdkProperty),
+    );
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2289,6 +2342,30 @@ function updateTypesFromOperation(
         UsageFlags.LroPolling,
         "PollingResponse",
       );
+    }
+
+    if (lroMetaData) {
+      const pollingModel = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, lroMetaData.pollingInfo.responseModel),
+      );
+      for (const rawProperty of lroStatusMetadata?.properties ?? []) {
+        const sdkProperty = getEffectiveSdkModelProperty(pollingModel, rawProperty);
+        if (!sdkProperty) continue;
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
+        const operationAccess = getAccessOverride(context, operation) ?? "public";
+        const propertyAccess = getAccessOverride(context, sdkProperty.__raw ?? rawProperty);
+        if (operationAccess === "public" && propertyAccess === "internal") {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-access-override",
+              target: sdkProperty.__raw ?? rawProperty,
+            }),
+          );
+        }
+        const access = propertyAccess ?? operationAccess;
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkProperty.type));
+        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
+      }
     }
   } finally {
     popNamingContext(context); // pop operation
@@ -2633,14 +2710,19 @@ function reconcilePropertiesAfterRebase(
  * Apply the same predicates as `addPropertiesToModelType` so our view of the
  * SDK-observable property set stays aligned with the actual SDK shape.
  */
-function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
+export type SdkPropertyVisibilityPredicate = (
+  context: TCGCContext,
+  property: ModelProperty,
+) => boolean;
+
+export const isVisibleSdkProperty: SdkPropertyVisibilityPredicate = (context, property) => {
   return (
     !isStatusCode(context.program, property) &&
     !isNeverOrVoidType(property.type) &&
     !hasNoneVisibility(context, property) &&
     isInScope(context, property)
   );
-}
+};
 
 /**
  * Check if two property types are incompatible during `@hierarchyBuilding`

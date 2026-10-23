@@ -37,6 +37,21 @@ export interface DecoratorOptions {
 }
 
 /**
+ * Exposes an auxiliary status-monitor model property as typed SDK operation metadata. The property
+ * does not affect polling, status evaluation, errors, or final-result extraction and may only be
+ * available from the terminal response. Emitters expose it through their idiomatic operation or
+ * poller state.
+ *
+ * @param target The status-monitor model property.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -1154,6 +1169,7 @@ export type ClientOptionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
+  lroStatusMetadata: LroStatusMetadataDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;
