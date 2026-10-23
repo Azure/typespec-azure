@@ -416,7 +416,7 @@ it.each([false, true])(
   },
 );
 
-it.each(["Unconfigured, Configured", "Configured, Unconfigured"])(
+it.each(["WithoutConfigurations, Configured", "Configured, WithoutConfigurations"])(
   "rejects a missing merged catalog with services ordered %s",
   async (services) => {
     const diagnostics = await AzureCoreTester.diagnose(`
@@ -425,7 +425,7 @@ it.each(["Unconfigured, Configured", "Configured, Unconfigured"])(
         Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
       }
       @service @server("https://api.loganalytics.io")
-      namespace Unconfigured { @get @route("/first") op first(): void; }
+      namespace WithoutConfigurations { @get @route("/first") op first(): void; }
       @service @azureServiceConfigurations(SingleConfiguration, "Public")
       namespace Configured { @get @route("/second") op second(): void; }
       @client({service: [${services}], autoMergeService: true})
