@@ -60,6 +60,10 @@ Records retain named-property checks, but record indexer values, tuples, and
 multi-model unions are not expanded. Multipart transport wrappers, native File
 models and primitive binary bodies are not PATCH document-property models.
 An array-versus-scalar mismatch alone is not a type-equality diagnostic.
+When a present resource counterpart is an unsupported union, only descendant
+layout comparison is skipped; required, default, visibility, and immutable
+checks still run. This does not exempt genuinely absent resource properties or
+disable comparison for supported single-model and nullable counterparts.
 
 Recursive active-context tracking terminates cycles without suppressing sibling
 uses of a shared model or different resource counterparts. Diagnostics contain

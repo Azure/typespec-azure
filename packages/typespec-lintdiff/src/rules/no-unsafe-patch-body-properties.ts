@@ -110,6 +110,10 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
           const model = objectModel(type);
           if (model === undefined || isHttpFile(program, model)) return false;
           const counterpart = objectModel(state.resource);
+          // An unsupported union is not an absent resource property.
+          if (state.resource?.kind === "Union" && counterpart === undefined) {
+            state = { ...state, shape: false };
+          }
           const role =
             state.path.length === 0
               ? "root"

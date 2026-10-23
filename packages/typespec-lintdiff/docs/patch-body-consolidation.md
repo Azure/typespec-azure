@@ -2,6 +2,68 @@
 
 ## Decision and provenance
 
+### Bounded resource-union repair (October 23, 2026)
+
+Finding **01** in [#5294](https://github.com/Azure/typespec-azure/pull/5294#discussion_r4347184563)
+identified a false missing-property warning below a present resource-side
+multi-model union. This revision starts from development commit
+`729b948037d6c2d71284c929ec2f2d96d2a7793f`; its original rule implementation is
+identical to the immutable source
+`0cc1c2d73f30d0d0e57d1b1a7dc64bb932040da3` from merged source repair #5540.
+Neither historical commit is rewritten, and this source revision does not
+authorize or perform a destination update.
+
+The native traversal now disables descendant layout comparison only when its
+present resource counterpart is an unsupported union. It does not expand union
+alternatives or equate an unsupported counterpart with an absent property.
+Required/default/visibility/immutable checks, recursion, genuinely missing
+properties, and single-model/nullable comparisons remain active. Scalar layout
+behavior and array handling are unchanged.
+
+Six added canonical cases use public authoring APIs: `ArmCustomPatchSync` and
+`ArmCustomPatchAsync` reproduce the shared `properties.config.timeout` false
+positive; single-model and nullable controls still report an authored extra
+property; a recursive unsupported-union case retains all four safety categories;
+and an absent sibling retains its exact missing-property target. Before the
+production change, the two ARM cases and recursive safety case failed with
+spurious missing diagnostics while the two single-model controls passed.
+After the change, all **106 canonical tests** pass, including the absent-property
+control and the existing scalar, recursive, and collection regressions.
+
+Validation and corpus figures below are historical evidence, not results for
+this revision. No new corpus, full-package suite, destination, or exact Swagger
+parity claim is made. The current Chronus CLI accepts a private-package fix
+entry; that entry describes this bounded repair and supersedes the historical
+`No package changed` limitation below.
+
+Current validation:
+
+- `mise exec -- pnpm --filter tsp-lintdiff-local-linter build` passes.
+- `mise exec -- pnpm --filter tsp-lintdiff-local-linter exec vitest run test\rules\no-unsafe-patch-body-properties.test.ts`
+  passes all 106 tests.
+- The existing `validate ConsistentPatchProperties --parallelism=1` runner passes
+  all 23 selected layout fixtures without snapshot updates or snapshot failures.
+  It uses read-only validator commit `6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`
+  and common types from specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`
+  through the documented `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
+  inputs. Existing partial classifications, mapped-diagnostic notices, and four
+  reviewed validator discrepancies remain; runner success is not exact parity.
+- Changed TypeScript files pass `oxlint --deny-warnings` and its type-aware mode.
+- Root `pnpm format` initially rewrote imported baseline artifacts and was
+  stopped. It then completed with a local-only ignore for the 76,313 imported
+  corpus files under `packages/typespec-lintdiff/specs`. All unrelated formatter
+  changes and the local ignore were removed. No fixture snapshots are updated.
+- Required root `pnpm lint` was executed but exits with 228 warnings in 11
+  source/harness files verified unchanged from the source base; it is not a
+  passing root-lint claim. A run before removing unrelated formatting effects
+  showed 226 warnings. The first lint stage prevents the root type-aware stage
+  from running; changed-file type-aware lint was run separately.
+- Frozen dependency restoration linked the native dependencies but exited on
+  the unrelated Python preparation hook's TLS download failure. The subsequent
+  native dependency-closure build passed all 22 tasks.
+
+### Original consolidation
+
 This source repair combines `PatchBodyParametersSchema`, `ConsistentPatchProperties`,
 and `UnSupportedPatchProperties` into `no-unsafe-patch-body-properties`. It is an
 intentional native semantic consolidation, **not exact Swagger equivalence**.
@@ -268,7 +330,8 @@ mise exec -- pnpm --filter tsp-lintdiff-local-linter exec vitest run test\rules\
 mise exec -- pnpm --filter tsp-lintdiff-local-linter specs:typespec --specs-repo <pinned-specs-checkout> --output <isolated-dataset> --concurrency 6
 ```
 
-The source package is private: `pnpm change add tsp-lintdiff-local-linter --kind fix`
-reports `No package changed`. This document is the source change description;
-official promotion updates its package Chronus entry and generated rule docs.
-No official default enablement changes are included in this source repair.
+Historically, the private source package's change command reported
+`No package changed`, so this document served as its source change description.
+The October 23 revision adds a fix entry with the current CLI. Official promotion
+updates its own package Chronus entry and generated rule docs. No official
+default enablement changes are included in this source repair.

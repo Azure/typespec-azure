@@ -63,6 +63,109 @@ const legacyPatch = `
 `;
 
 describe("partial resource layout", () => {
+  const resourceUnionModels = `
+    using TypeSpec.Rest;
+    using Azure.ResourceManager;
+    model LocalConfig { kind: "local"; timeout?: int32; path?: string; }
+    model RemoteConfig { kind: "remote"; timeout?: int32; endpoint?: string; }
+  `;
+
+  it.each(["ArmCustomPatchSync", "ArmCustomPatchAsync"])(
+    "skips unsupported resource union descendants in %s",
+    async (template) => {
+      await tester
+        .expect(
+          `${service}${resourceUnionModels}
+          model Widget is TrackedResource<{ config?: LocalConfig | RemoteConfig }> {
+            @key("widgetName") @segment("widgets") @path name: string;
+          }
+          model WidgetPatch {
+            tags?: Record<string>;
+            properties?: { config?: { timeout?: int32; }; };
+          }
+          @armResourceOperations interface Widgets {
+            update is ${template}<Widget, PatchModel = WidgetPatch>;
+          }
+        `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each(["LocalConfig", "LocalConfig | null"])(
+    "retains resource layout comparison for %s",
+    async (counterpart) => {
+      await tester
+        .expect(
+          `${service}${resourceUnionModels}
+          model Widget is TrackedResource<{ config?: ${counterpart} }> {
+            @key("widgetName") @segment("widgets") @path name: string;
+          }
+          model WidgetPatch {
+            tags?: Record<string>;
+            properties?: { config?: { timeout?: int32; /*extra*/extra?: string; }; };
+          }
+          @armResourceOperations interface Widgets {
+            update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+          }
+        `,
+        )
+        .toEmitDiagnostics((x) => ({
+          ...missing("properties.config.extra"),
+          pos: x.pos.extra.pos,
+        }));
+    },
+  );
+
+  it("retains safety checks and recursion under unsupported resource unions", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Left { timeout?: int32; }
+        model Right { timeout?: int32; other?: string; }
+        model Config {
+          /*timeout*/timeout: int32;
+          /*enabled*/enabled?: boolean = false;
+          /*created*/@visibility(Lifecycle.Create) created?: string;
+          next?: Config;
+        }
+        @parameterVisibility(Lifecycle.Create) @patch
+        op update(@body body: {
+          properties?: {
+            config?: Config;
+            /*provisioningState*/provisioningState?: string;
+          };
+        }): { properties: Left | Right };
+      `,
+      )
+      .toEmitDiagnostics((x) => [
+        { ...required("properties.config.timeout"), pos: x.pos.timeout.pos },
+        { ...defaultValue("properties.config.enabled"), pos: x.pos.enabled.pos },
+        { ...visibility("properties.config.created"), pos: x.pos.created.pos },
+        { ...immutable("properties.provisioningState"), pos: x.pos.provisioningState.pos },
+      ]);
+  });
+
+  it("keeps genuinely absent resource descendants beside an unsupported union", async () => {
+    await tester
+      .expect(
+        `${service}${resourceUnionModels}
+        model Patch {
+          properties?: {
+            config?: { timeout?: int32; };
+            absent?: { /*timeout*/timeout?: int32; };
+          };
+        }
+        @patch op update(@body body: Patch):
+          { properties: { config: LocalConfig | RemoteConfig } };
+      `,
+      )
+      .toEmitDiagnostics((x) => ({
+        ...missing("properties.absent.timeout"),
+        pos: x.pos.timeout.pos,
+      }));
+  });
+
   it.each([false, true])("compares nullable model layouts, extra: %s", async (extra) => {
     const expectation = tester.expect(`${service}
       @patch op update(@body body: { details?: { value?: string; ${extra ? "extra?: string;" : ""} } | null } | null):
