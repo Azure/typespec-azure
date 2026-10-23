@@ -3,6 +3,47 @@ import { createLinterRuleTester } from "@typespec/compiler/testing";
 import { it } from "vitest";
 import { Tester } from "../tester.js";
 
+it.each([false, true])("checks customized ARM read responses; named payload: %s", async (named) => {
+  const runner = await Tester.createInstance();
+  const tester = createLinterRuleTester(
+    runner,
+    $linter.rules!.find((rule) => rule.name === "no-unnamed-types")!,
+    "@azure-tools/typespec-azure-core",
+  );
+  const expectation = tester.expect(`
+    @service
+    @armProviderNamespace("Microsoft.Contoso")
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties { value: string; }
+    model Widget is TrackedResource<WidgetProperties> {
+      ...ResourceNameParameter<Widget>;
+    }
+    model WidgetResponse extends Widget { etag: string; }
+
+    @armResourceOperations
+    interface Widgets {
+      get is ArmResourceRead<
+        Widget,
+        Response = /*target*/{
+          @statusCode status: 200;
+          ...${named ? "WidgetResponse" : "Widget"};
+          ${named ? "" : "etag: string;"}
+        }
+      >;
+    }
+  `);
+  if (named) {
+    await expectation.toBeValid();
+  } else {
+    await expectation.toEmitDiagnostics((x) => ({
+      code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+      message: "Anonymous model should be defined as a named model declaration.",
+      pos: x.pos.target.pos,
+    }));
+  }
+});
+
 it.each(["ArmResourceActionSync", "ArmResourceActionAsync"])(
   "requires named request bodies in %s",
   async (action) => {
