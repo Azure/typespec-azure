@@ -136,6 +136,14 @@ model Employee {
 }
 ```
 
+:::note
+
+Do not use this property-replacement pattern solely to version a paging `nextLink`'s URI shape or read-only/visibility behavior. For ARM paging, first prefer standard ARM/Azure.Core list and page templates when they fit the contract. If a custom page model is unavoidable, keep exactly one `@nextLink` property in each page model; do not define two versioned `@nextLink` properties or drop paging semantics as a workaround.
+
+An OpenAPI change to a published API version is appropriate only when that version's contract is intended to change too. For a preview-only wire-contract difference, version the surrounding page model or operation return type only when the wire contract actually differs by API version.
+
+:::
+
 ### Adding a Parameter to an Operation and Making Another Parameter Optional
 
 This scenario shows how to add a parameter and make another optional in an operation.
