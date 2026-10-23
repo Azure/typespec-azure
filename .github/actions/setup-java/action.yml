@@ -1,5 +1,5 @@
 name: Setup Java
-description: Setup JDK and Maven for typespec-java package development and CI
+description: Setup pinned JDK and Maven with dependency caching for typespec-java
 
 runs:
   using: composite
@@ -9,3 +9,21 @@ runs:
       uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
       with:
         install_args: "java maven"
+        # Keep mise from replacing the Node.js version selected by the job.
+        add_shims_to_path: false
+        env: false
+
+    - name: Configure Java and Maven
+      shell: bash
+      run: |
+        mise bin-paths java maven >> "$GITHUB_PATH"
+        echo "JAVA_HOME=$(mise where java)" >> "$GITHUB_ENV"
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.m2/repository
+        # Generator POMs are copied at build time, so include their pinned sources.
+        key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('mise.toml', 'mise.lock', 'packages/typespec-java/core-commit.json', 'packages/typespec-java/core.patch', 'packages/typespec-java/**/pom.xml') }}
+        restore-keys: |
+          maven-${{ runner.os }}-${{ runner.arch }}-
