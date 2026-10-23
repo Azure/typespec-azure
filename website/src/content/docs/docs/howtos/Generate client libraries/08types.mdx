@@ -1769,6 +1769,28 @@ type Dog struct {
 
 ## Unions
 
+### Define explicit union hierarchies
+
+:::caution
+The `@azure-tools/typespec-client-generator-core/use-union-hierarchy` linter rule requires every named, non-string union to declare an `extends` constraint.
+
+For a model constraint, each model variant must be the base model or inherit from it directly or transitively. Use `model extends` rather than structural compatibility, model spread, or `model is`, because those constructs do not create the nominal inheritance relationship that generated SDKs need. Each model can belong to only one union with a model constraint; separate unions can share a base only when they contain different model variants.
+
+The rule does not require `extends` for named unions whose variants are all assignable to `string`, or for anonymous union expressions such as `Cat | null`. Numeric and other non-string named unions still require a constraint, for example `union Priority extends int32`.
+
+The declared constraint is preserved for SDK emitters. A model constraint describes the union's
+common base, but it does not create inheritance: each model variant must still use `extends` to
+inherit from that model. A scalar constraint determines the generated enum's value type. This is
+especially important for numeric unions, where `union Priority extends int64 { low: 1, high: 2 }`
+preserves `int64` instead of inferring a narrower integer type.
+
+The constraint does not determine whether a scalar union is fixed or extensible. Include the scalar
+as a variant when additional values are allowed, for example
+`union Priority extends int64 { low: 1, high: 2, int64 }`.
+
+See the [`use-union-hierarchy` rule reference](../../libraries/typespec-client-generator-core/rules/use-union-hierarchy.md) for valid and invalid examples, exemptions, and suppression guidance.
+:::
+
 ### Union of literals with same type
 
 All emitters will generate their version of a closed enum.

@@ -230,6 +230,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Enumeration Types:**
 
 - [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- For a union converted to an enum, an explicit scalar `extends` constraint determines `SdkEnumType.valueType` and the value type of its known variants, taking precedence over scalar variants and literal-based inference. For example, `union Priority extends int64 { low: 1, high: 2 }` has an `int64` value type rather than an inferred `int32`. The constraint does not make the enum extensible: `isFixed` remains `true` unless the union includes an open scalar variant, directly or through a nested union.
 
 **Literal Types:**
 
@@ -238,6 +239,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Union Types:**
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
 
 **Model Types:**
 
@@ -327,7 +329,17 @@ The method's return type is determined by the underlying operation's normal resp
 
 The paging method's return type is an array type of the page items type. It is inferred from `@pageItems` or `@items` decorator.
 
-The LRO method's return type is the final response type. It is inferred from `LroMetadata`.
+The LRO method's return type is `lroMetadata.finalResponse.result`, or absent when there is no final response. For native LROs, TCGC selects this client result from Azure.Core's `getLroProtocolMetadata` facts, then translates the selected types into the SDK type graph. The same TCGC selection supplies native LRO model usage, access, and naming.
+
+`LroProtocolMetadata` keeps `operation` at the top level and groups facts into required `initial`, `polling`, and `completion` objects. `initial` contains `initialResponse`, `resourceOperation?`, and `isAction`; `polling` contains `statusMonitorStep?`, `pollingInfo`, and `statusMonitorResult?`; `completion` contains `finalStateVia`, `finalStep?`, and `originalUriHasGetOperation?`. This grouping preserves every leaf's type and semantics; the combined `LroMetadata` and raw compatibility projections remain flat.
+
+Azure.Core remains responsible for polling links, parameter bindings, terminal states, `finalStateVia`, and required final HTTP requests. Client-result selection must not replace or discard a `finalOperationLink` or `finalOperationReference`. The `finalStep` union also retains success-property and no-result variants.
+
+`lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
+
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
+
+The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
 ### HTTP Operation Parameters Handling
 
