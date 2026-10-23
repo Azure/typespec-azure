@@ -87,6 +87,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/no-query-in-point-op`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-in-point-op)                                           | Point operations must not declare query parameters beyond api-version.                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-resource-path-for-put)                                 | ARM PUT paths must end in resource type and resource name pairs.                                                                                                                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-scope-for-extension-routing/)                    | Require scope-based paths when explicitly enabled for RPaaS extension routing.                                                                                                                                                                        |
+| [`@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/provider-or-resource-operation)                       | Ensure every ARM operation is registered as a provider or resource operation.                                                                                                                                                                         |
 
 ## Decorators
 
@@ -112,6 +113,7 @@ Available ruleSets:
 - [`@featureFiles`](#@featurefiles)
 - [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
+- [`@providerOperation`](#@provideroperation)
 - [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
 - [`@singleton`](#@singleton)
@@ -558,6 +560,32 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
+
+#### `@providerOperation`
+
+Marks an operation as a provider operation rather than an operation on a resource.
+Standard provider action and operations list templates apply this decorator automatically.
+Use resource operation templates or decorators for operations on registered resource models.
+
+```typespec
+@Azure.ResourceManager.providerOperation
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+None
+
+##### Examples
+
+```typespec
+@providerOperation
+@get
+op getProviderInformation(): string;
+```
 
 #### `@resourceBaseType`
 

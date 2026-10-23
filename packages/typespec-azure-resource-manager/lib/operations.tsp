@@ -188,6 +188,7 @@ op ArmResourceCheckExistence<
 @autoRoute
 @doc("Get the status of an async operation.")
 @get
+@providerOperation
 @armResourceCollectionAction
 @Private.armUpdateProviderNamespace
 op GetResourceOperationStatus<
@@ -891,6 +892,7 @@ op ArmResourceActionNoContentSync<
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
  */
 @doc("Implements global CheckNameAvailability operations")
+@providerOperation
 op checkGlobalNameAvailability<
   Request extends TypeSpec.Reflection.Model = Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest,
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
@@ -911,6 +913,7 @@ op checkGlobalNameAvailability<
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
  */
 @doc("Implements local CheckNameAvailability operations")
+@providerOperation
 op checkLocalNameAvailability<
   Request extends TypeSpec.Reflection.Model = Azure.ResourceManager.Foundations.CheckNameAvailabilityRequest,
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
@@ -934,6 +937,7 @@ op checkLocalNameAvailability<
 @post
 @action
 @armResourceCollectionAction
+@providerOperation
 @Private.armUpdateProviderNamespace
 @doc("")
 op ArmProviderActionSync<
@@ -966,6 +970,7 @@ op ArmProviderActionSync<
 @post
 @action
 @armResourceCollectionAction
+@providerOperation
 @Private.armUpdateProviderNamespace
 @doc("")
 op ArmProviderActionAsync<
