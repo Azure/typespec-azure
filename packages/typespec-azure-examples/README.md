@@ -8,10 +8,13 @@ The unified examples format replaces the ~282K per-version `x-ms-examples` JSON 
 single version-aware `examples.yaml` per service (or `examples/<Interface>.yaml` for large
 services). See the RFC: _Unified Examples Format_.
 
+See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/)
+for the authoring, versioning, validation, and migration workflow.
+
 ## Format
 
 ```yaml
-$schema: https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/schemas/examples.schema.yaml
+# yaml-language-server: $schema=https://unpkg.com/@azure-tools/typespec-azure-examples@0.2.2/dist/schema/dist/ExamplesYaml.json
 $namespace: Microsoft.EventGrid
 
 CaCertificates.get:
@@ -50,7 +53,8 @@ CaCertificates.get:
 
 ## `tsp-examples validate`
 
-Validate a service's example files against the JSON Schema and the format rules:
+In version `0.2.2` and later, validate a service's example files against both the format rules
+and the current TypeSpec API:
 
 ```bash
 tsp-examples validate <service-dir>
@@ -60,7 +64,12 @@ It discovers `examples.yaml` and `examples/*.yaml` in the directory, reads the a
 `service.yaml` for version metadata, and reports diagnostics. It exits non-zero if any error is
 found (use `--warn-as-error` to also fail on warnings).
 
-### Rules enforced
+API validation uses the project's installed TypeSpec compiler and AutoRest emitter to compile
+`main.tsp` in memory without rewriting generated files. It checks operation keys, parameter names
+and locations, server parameters, request/response values, and response statuses and headers.
+Use `--schema-only` for format-only validation; that does not establish API compatibility.
+
+### Format rules
 
 - Only `$schema`/`$namespace` may be `$`-prefixed; other bare keys are operations that must be a
   list of examples.
@@ -74,6 +83,9 @@ found (use `--warn-as-error` to also fail on warnings).
   request parameter.
 
 ## `tsp-examples add`
+
+This command is available on main but is not shipped in `0.2.2`. Check `tsp-examples --help`
+before using it; otherwise edit YAML directly as described in the authoring guide.
 
 Add examples for a **newly-introduced API version**, adding an entry only where it is actually
 needed:
@@ -168,6 +180,9 @@ Options: `--api-version <v>` (required), `--out <dir>`.
 
 The package's default entrypoint is browser-compatible. It provides the JSON Schema and in-memory
 parsing, validation, resolution, and materialization helpers without Node.js globals or polyfills:
+
+These validation helpers, including `validateExamplesDir`, remain format-only; API-aware validation
+is currently provided by the CLI.
 
 ```ts
 import {

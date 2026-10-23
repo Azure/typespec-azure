@@ -39,7 +39,7 @@ export interface AutorestEmitterOptions {
   "output-file"?: string;
 
   /**
-   * Directory where the examples are located.
+   * Directory containing legacy JSON examples. Unified YAML is discovered at the project root.
    * @default `{project-root}/examples`
    */
   "examples-dir"?: string;
@@ -120,8 +120,8 @@ export interface AutorestEmitterOptions {
   "output-splitting"?: "legacy-feature-files";
 
   /**
-   * When enabled, the emitter will not copy example files to the output directory.
-   * Instead, it will reference the source example files using relative file paths.
+   * For legacy JSON examples, reference source files instead of copying them to the output.
+   * Unified YAML examples are still materialized as JSON.
    * @default false
    */
   "skip-example-copying"?: boolean;
@@ -220,7 +220,8 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
     "examples-dir": {
       type: "string",
       nullable: true,
-      description: "Directory where the examples are located. Default: `{project-root}/examples`.",
+      description:
+        "Directory containing legacy JSON examples. Unified YAML is discovered at the project root. Default: `{project-root}/examples`.",
       format: "absolute-path",
     },
     "examples-directory": {
@@ -311,7 +312,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       default: false,
       description:
-        "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
+        "For legacy JSON examples, reference the source files instead of copying them to the output directory. Unified YAML examples are still materialized as JSON.",
     },
     "type-name-strategy": {
       type: "string",
@@ -335,7 +336,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       default: "auto",
       description:
-        'Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.',
+        'Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.\n\nSee [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/). **Caution:** check SDK emitter support before replacing legacy JSON sources.',
     },
   },
   required: [],

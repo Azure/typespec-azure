@@ -1,5 +1,9 @@
 This diagnostic is issued when TCGC skips loading examples because the examples directory cannot be read, an example file cannot be parsed or validated, or required legacy JSON `operationId` or `title` metadata is missing.
 
+See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/)
+for the unified workflow. **Caution:** the JSON metadata instructions below do not apply to YAML;
+explicitly configuring the SDK's `examples-dir` selects legacy JSON only.
+
 ## Impact
 
 - **Area:** Example and sample loading. Generation continues without the affected example files, so generated samples or example-based tests may be incomplete.
@@ -55,4 +59,5 @@ Add both `operationId` and `title` to the example JSON file.
 
 ## Suppression
 
-This diagnostic should not be suppressed. Fix the example directory/files so they can be loaded, including valid JSON with `operationId` and `title`.
+This diagnostic should not be suppressed. Fix the example directory/files in their authored format.
+Legacy JSON needs `operationId` and `title`; unified YAML uses operation keys and versioned variants.
