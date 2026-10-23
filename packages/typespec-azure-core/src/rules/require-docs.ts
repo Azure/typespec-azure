@@ -35,12 +35,6 @@ import {
 
 type DocumentationTarget = Parameters<typeof getDoc>[1];
 
-const documentationMessages = {
-  default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
-  empty: "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
-  uninformative: paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
-};
-
 function normalizeDocumentation(value: string): string {
   return value.trim().replace(/\./g, "").toLowerCase();
 }
@@ -145,7 +139,11 @@ export const requireDocumentation = createRule({
   description: "Require meaningful documentation over enums, models, and operations.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required",
-  messages: documentationMessages,
+  messages: {
+    default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
+    empty: "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+    uninformative: paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
+  },
   create(context) {
     const discTypes = getDiscriminatedTypes(context.program);
     const needsDocumentation = (target: DocumentationTarget) => {
