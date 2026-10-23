@@ -23,6 +23,7 @@ import {
   type Tuple,
   type Type,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
@@ -90,6 +91,7 @@ import {
   getArmResourceOperations,
   setArmOperationIdentifier,
 } from "./operations.js";
+import { type ResourceNameExpression, setResourceNameExpression } from "./resource-name.js";
 import {
   type ArmResourceDetails,
   type ArmResourceKind,
@@ -649,13 +651,15 @@ export function registerArmResource(
   setArmResource(context.program, resourceType, armResourceDetails);
 }
 
-export function listArmResources(program: Program): ArmResourceDetails[] {
+export function listArmResources(program: Program, realm?: unsafe_Realm): ArmResourceDetails[] {
   // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
   // createSdkContext or autorest's per-version snapshots) re-apply decorators on
   // realm copies, registering them alongside the originals. By keeping only the
   // first entry per qualified name, we ensure each resource appears exactly once.
   const seen = new Set<string>();
   return [...armResourceStateMap(program).values()].filter((r) => {
+    const owningRealm = unsafe_Realm.realmForType.get(r.typespecType);
+    if (realm === undefined ? owningRealm !== undefined : owningRealm !== realm) return false;
     const name = getTypeName(r.typespecType);
     if (seen.has(name)) return false;
     seen.add(name);
@@ -852,19 +856,29 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   ) {
     return;
   }
-  const resolvedResourceName =
-    resourceName === undefined || resourceName.length === 0
-      ? targetResourceType.name === "ScopeParameter"
-        ? extensionResourceType.name
-        : `${targetResourceType.name}${extensionResourceType.name}`
-      : resourceName;
+  const resourceNameExpression: ResourceNameExpression =
+    resourceName !== undefined && resourceName.length > 0
+      ? { kind: "explicit", value: resourceName }
+      : targetResourceType.name === "ScopeParameter"
+        ? { kind: "model", model: extensionResourceType }
+        : {
+            kind: "concat",
+            parts: [
+              { kind: "model", model: targetResourceType },
+              { kind: "model", model: extensionResourceType },
+            ],
+          };
   callOperationDecorator(
     context,
     target,
     extensionResourceType,
-    resolvedResourceName,
+    resourceName ??
+      (targetResourceType.name === "ScopeParameter"
+        ? extensionResourceType.name
+        : `${targetResourceType.name}${extensionResourceType.name}`),
     operationType,
   );
+  setResourceNameExpression(context.program, target, resourceNameExpression);
 };
 
 const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
@@ -883,11 +897,24 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   ) {
     return;
   }
-  const resolvedResourceName =
-    resourceName === undefined || resourceName.length === 0
-      ? `${parentResourceType.name}${builtInResourceType.name}`
-      : resourceName;
-  callOperationDecorator(context, target, builtInResourceType, resolvedResourceName, operationType);
+  const resourceNameExpression: ResourceNameExpression =
+    resourceName !== undefined && resourceName.length > 0
+      ? { kind: "explicit", value: resourceName }
+      : {
+          kind: "concat",
+          parts: [
+            { kind: "model", model: parentResourceType },
+            { kind: "model", model: builtInResourceType },
+          ],
+        };
+  callOperationDecorator(
+    context,
+    target,
+    builtInResourceType,
+    resourceName ?? `${parentResourceType.name}${builtInResourceType.name}`,
+    operationType,
+  );
+  setResourceNameExpression(context.program, target, resourceNameExpression);
 };
 
 const $legacyResourceOperation: LegacyResourceOperationDecorator = (
@@ -905,6 +932,10 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   ) {
     return;
   }
+  const resourceNameExpression: ResourceNameExpression =
+    resourceName !== undefined && resourceName.length > 0
+      ? { kind: "explicit", value: resourceName }
+      : { kind: "legacy-resource", model: resourceType };
   const resolvedResourceName =
     resourceName !== undefined && resourceName.length > 0 ? resourceName : undefined;
   // We can't resolve the operation path yet so treat the operation as a partial
@@ -940,6 +971,7 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
     resourceName: resolvedResourceName,
     resourceKind: "legacy",
   });
+  setResourceNameExpression(context.program, target, resourceNameExpression);
 
   const { program } = context;
   callLifecycleDecorator(context, target, resourceType, operationType);
@@ -971,6 +1003,10 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   ) {
     return;
   }
+  const resourceNameExpression: ResourceNameExpression =
+    resourceName !== undefined && resourceName.length > 0
+      ? { kind: "explicit", value: resourceName }
+      : { kind: "legacy-extension", model: resourceType };
   const resolvedResourceName =
     resourceName !== undefined && resourceName.length > 0 ? resourceName : undefined;
   // We can't resolve the operation path yet so treat the operation as a partial
@@ -1006,6 +1042,7 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
     resourceName: resolvedResourceName,
     resourceKind: "legacy-extension",
   });
+  setResourceNameExpression(context.program, target, resourceNameExpression);
   const { program } = context;
   callLifecycleDecorator(context, target, resourceType, operationType);
   if (operationType === "action") {
