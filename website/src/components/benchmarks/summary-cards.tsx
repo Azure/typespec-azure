@@ -69,6 +69,7 @@ export function SummaryCards({ rows, theme }: { rows: MetricRow[]; theme: Theme 
             <CardFooter
               action={
                 <Sparkline
+                  comparisonKeys={row.comparisonKeys}
                   values={row.values}
                   color={color ?? "currentColor"}
                   ariaLabel={`${row.name} trend`}
