@@ -90,6 +90,20 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("enables the strengthened documentation-required rule without a separate quality rule", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/documentation-required";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], true);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/no-uninformative-doc"
+        ],
+        undefined,
+      );
+    }
+    ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-uninformative-doc"));
+  });
+
   it("keeps RPaaS extension-routing guidance opt-in in the general Azure rulesets", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
