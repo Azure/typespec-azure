@@ -11,6 +11,7 @@ import {
   rlcEmitterFor,
 } from "./test-util.js";
 
+import type { CompilerOptions } from "@typespec/compiler";
 import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { useContext } from "../../src/context-manager.js";
 import { useBinder } from "../../src/framework/hooks/binder.js";
@@ -28,6 +29,7 @@ import { emitTests } from "../../src/modular/emit-tests.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
 
 export interface ModelConfigOptions extends ClientOptions {
+  compilerOptions?: CompilerOptions;
   needOptions?: boolean;
   withRawContent?: boolean;
   needAzureCore?: boolean;
@@ -59,6 +61,7 @@ export async function emitModularModelsFromTypeSpec(
     options["compatibility-mode"] = false;
   }
   const context = await rlcEmitterFor(tspContent, {
+    compilerOptions: options.compilerOptions,
     needNamespaces,
     needAzureCore,
     needTCGC,
@@ -132,6 +135,7 @@ export async function emitRootIndexFromTypeSpec(
     options["compatibility-mode"] = false;
   }
   const context = await rlcEmitterFor(tspContent, {
+    compilerOptions: options.compilerOptions,
     needNamespaces: true,
     needAzureCore,
     needTCGC,
@@ -195,6 +199,7 @@ export async function emitModularOperationsFromTypeSpec(
     options["experimental-extensible-enums"] = false;
   }
   const context = await rlcEmitterFor(tspContent, {
+    compilerOptions: options.compilerOptions,
     needNamespaces: options.needNamespaces,
     needAzureCore: options.needAzureCore ? true : false,
     needTCGC: options["needTCGC"] ? true : false,
@@ -250,6 +255,7 @@ export async function emitModularClientContextFromTypeSpec(
   options: ModelConfigOptions = {},
 ) {
   const context = await rlcEmitterFor(tspContent, {
+    compilerOptions: options.compilerOptions,
     needNamespaces: true,
     needAzureCore: false,
     needTCGC: false,
@@ -289,6 +295,7 @@ export async function emitModularClientFromTypeSpec(
   options: ModelConfigOptions = {},
 ) {
   const context = await rlcEmitterFor(tspContent, {
+    compilerOptions: options.compilerOptions,
     needNamespaces: options.needNamespaces ?? true,
     needAzureCore: false,
     needTCGC: options.needTCGC,
@@ -325,7 +332,7 @@ export async function emitSamplesFromTypeSpec(
   examples: ExampleJson[],
   configs: Record<string, any> = {},
 ) {
-  const context = await compileTypeSpecFor(tspContent, examples);
+  const context = await compileTypeSpecFor(tspContent, examples, configs.compilerOptions);
   configs["typespecTitleMap"] = configs["typespec-title-map"];
   configs["hierarchyClient"] = configs["hierarchy-client"];
   configs["enableOperationGroup"] = configs["enable-operation-group"];
@@ -354,7 +361,7 @@ export async function emitTestsFromTypeSpec(
   examples: ExampleJson[],
   configs: Record<string, any> = {},
 ) {
-  const context = await compileTypeSpecFor(tspContent, examples);
+  const context = await compileTypeSpecFor(tspContent, examples, configs.compilerOptions);
   configs["typespecTitleMap"] = configs["typespec-title-map"];
   configs["hierarchyClient"] = configs["hierarchy-client"];
   configs["enableOperationGroup"] = configs["enable-operation-group"];
