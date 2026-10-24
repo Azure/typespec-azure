@@ -1,3 +1,4 @@
+import type { DiffKind } from "@azure-tools/typespec-azure-core";
 import { getSourceLocation, type Type } from "@typespec/compiler";
 import type { HttpStatusCodesEntry } from "@typespec/http";
 import type {
@@ -10,7 +11,6 @@ import type {
   ModelPropertyHttpCanonicalization,
   OperationHttpCanonicalization,
 } from "@typespec/http-canonicalization";
-import type { DiffKind } from "../diff-kind.js";
 import type { ApiDiff, DiffComponent, OperationDiffIdentity, OperationIdentity } from "../types.js";
 import type { DiffContext } from "./diff-types.js";
 import { compareTypes } from "./diff-types.js";

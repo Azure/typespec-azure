@@ -7,6 +7,11 @@ describe("record comparisons", () => {
     ["Record<string>", "Record<int32>", "ResourcePropertyTypeChanged"],
     ["Record<string>", "Record<string>", undefined],
     ["Record<string>", "string[]", "ResourcePropertyTypeChanged"],
+    ["Record<string>", "Array<string>", "ResourcePropertyTypeChanged"],
+    ["Array<string>", "Record<string>", "ResourcePropertyTypeChanged"],
+    ["Array<string>", "Array<string>", undefined],
+    ["Array<string>", "string[]", undefined],
+    ["string[]", "Array<string>", undefined],
     ["Record<string>", "{}", "ResourcePropertyTypeChanged"],
   ])("compares %s to %s", async (base, head, expectedKind) => {
     const { program } = await TesterWithSuppressions.compile(`

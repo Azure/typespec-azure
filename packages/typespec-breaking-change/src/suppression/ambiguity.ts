@@ -1,6 +1,6 @@
 import type { Finding } from "../types.js";
 import { isOperationIdentity } from "../types.js";
-import { composeFullIdentityPath } from "./suppression.js";
+import { composeFullIdentityPath } from "./target.js";
 
 /**
  * Result of ambiguity detection for a single unscoped approval.

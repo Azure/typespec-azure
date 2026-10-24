@@ -1,6 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { analyzeProgram, analyzeBaseAndHead } from "../src/pipeline/orchestrator.js";
-import { TesterWithArm } from "./test-host.js";
+import { describe, expect, it } from "vitest";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
+import { formatJsonReport } from "../src/reporting/reporter-json.js";
+import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
+import { Tester, TesterWithArm } from "./test-host.js";
 
 /**
  * End-to-end scenario validation tests using real Azure ARM libraries.
@@ -149,15 +151,144 @@ const CONTOSO_PR4 = `
   }
 `;
 
+const CONTOSO_PROPERTY_ADDED = CONTOSO_BASE.replace(
+  "model EmployeeProperties {\n    age?: int32;",
+  "model EmployeeProperties {\n    pooling?: boolean;\n    age?: int32;",
+);
+
 describe("scenario validation: ARM end-to-end", () => {
+  describe("Phase A: anonymous unions across independently compiled programs", () => {
+    const anonymousUnionBase = `
+      @service
+      @versioned(Versions)
+      namespace TestService;
+
+      enum Versions {
+        v1: "2024-01-01",
+      }
+
+      union Status {
+        "active",
+        null,
+      }
+
+      model Widget {
+        status: Status;
+      }
+
+      @route("/widgets/{id}")
+      @get
+      op get(@path id: string): Widget;
+    `;
+
+    it("reports no findings for identical anonymous unions", async () => {
+      const { program: baseProgram } = await Tester.compile(anonymousUnionBase);
+      const { program: headProgram } = await Tester.compile(anonymousUnionBase);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(result.findings).toEqual([]);
+    });
+
+    it("reports only the added anonymous union variant", async () => {
+      const { program: baseProgram } = await Tester.compile(anonymousUnionBase);
+      const { program: headProgram } = await Tester.compile(`
+        @service
+        @versioned(Versions)
+        namespace TestService;
+
+        enum Versions {
+          v1: "2024-01-01",
+        }
+
+        union Status {
+          "active",
+          "pending",
+          null,
+        }
+
+        model Widget {
+          status: Status;
+        }
+
+        @route("/widgets/{id}")
+        @get
+        op get(@path id: string): Widget;
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(
+        result.findings.map((finding) => ({
+          kind: finding.diff.kind,
+          element: finding.diff.identity.element,
+          message: finding.diff.message,
+        })),
+      ).toEqual([
+        {
+          kind: "ResponsePropertyTypeWidened",
+          element: 'body.properties.status.variants."pending"',
+          message: 'Response union at body.properties.status added variant "pending".',
+        },
+      ]);
+    });
+
+    it("reports only the removed anonymous union variant", async () => {
+      const { program: baseProgram } = await Tester.compile(`
+        @service
+        @versioned(Versions)
+        namespace TestService;
+
+        enum Versions {
+          v1: "2024-01-01",
+        }
+
+        union Status {
+          "active",
+          "pending",
+          null,
+        }
+
+        model Widget {
+          status: Status;
+        }
+
+        @route("/widgets/{id}")
+        @get
+        op get(@path id: string): Widget;
+      `);
+      const { program: headProgram } = await Tester.compile(anonymousUnionBase);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(
+        result.findings.map((finding) => ({
+          kind: finding.diff.kind,
+          element: finding.diff.identity.element,
+          message: finding.diff.message,
+        })),
+      ).toEqual([
+        {
+          kind: "ResponsePropertyTypeNarrowed",
+          element: 'body.properties.status.variants."pending"',
+          message: 'Response union at body.properties.status removed variant "pending".',
+        },
+      ]);
+    });
+  });
+
   describe("Phase B: cross-version breaking changes (PR #2 pattern)", () => {
     it("detects type change and property removal across versions", async () => {
       const { program } = await TesterWithArm.compile(CONTOSO_PR2);
       const result = analyzeProgram(program, { phase: "cross-version" });
 
-      const errors = result.findings.filter(
-        (f) => f.severity === "error" && !f.suppressed,
-      );
+      const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
 
       const typeChanged = errors.find((f) => f.diff.kind === "ResourcePropertyTypeChanged");
       const removed = errors.find((f) => f.diff.kind === "ResourcePropertyRemoved");
@@ -181,13 +312,11 @@ describe("scenario validation: ARM end-to-end", () => {
         phase: "same-version",
       });
 
-      const errors = result.findings.filter(
-        (f) => f.severity === "error" && !f.suppressed,
-      );
+      const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
 
       const cityRemoved = errors.filter(
-        (f) => f.diff.kind === "ResourcePropertyRemoved" &&
-          f.diff.identity.element.includes("city"),
+        (f) =>
+          f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("city"),
       );
 
       expect(cityRemoved.length).toBeGreaterThanOrEqual(1);
@@ -196,6 +325,43 @@ describe("scenario validation: ARM end-to-end", () => {
         expect(f.versionPair.baseVersion).toBe(f.versionPair.headVersion);
         expect(f.phase).toBe("same-version");
       }
+    }, 30_000);
+
+    it("reports both source declaration and wire identities for a resource property addition", async () => {
+      const { program: baseProgram } = await TesterWithArm.compile(CONTOSO_BASE);
+      const { program: headProgram } = await TesterWithArm.compile(CONTOSO_PROPERTY_ADDED);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+      const finding = result.findings.find(
+        (candidate) =>
+          candidate.diff.kind === "ResourcePropertyAdded" &&
+          candidate.diff.identity.element.endsWith(".pooling"),
+      );
+
+      expect(finding).toBeDefined();
+      expect(finding!.diff.identity.element).toContain("properties");
+      expect(finding!.diff.origin?.declarationPath).toBe(
+        "Microsoft.Contoso.EmployeeProperties.pooling",
+      );
+      expect(result.summary.versionComparisons[0]).toMatchObject({
+        findingCount: 1,
+        rawFindingCount: 2,
+      });
+
+      const json = JSON.parse(formatJsonReport({ ...result, findings: [finding!] }));
+      expect(json.findings[0]).toMatchObject({
+        element: finding!.diff.identity.element,
+        sourceElementPath: "Microsoft.Contoso.EmployeeProperties.pooling",
+      });
+
+      const markdown = renderMarkdownSummary({ ...result, findings: [finding!] });
+      expect(markdown).toContain("Microsoft.Contoso.EmployeeProperties.pooling");
+      expect(markdown).toContain(`\`${finding!.diff.identity.element}\``);
+      expect(markdown).toContain(
+        "| Kind | Source declaration | Wire identity | Source | Suppression |",
+      );
     }, 30_000);
   });
 

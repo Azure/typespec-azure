@@ -3,13 +3,27 @@ import type {
   DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
+  Interface,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
+  Scalar,
   Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+
+export interface ApprovedBreakingChangeOptions {
+  readonly kind?: string;
+  readonly since?: string;
+  readonly path?: string;
+}
+
+export interface ApprovedUnversionedChangeOptions {
+  readonly kind?: string;
+  readonly path?: string;
+}
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -193,6 +207,59 @@ export type UniqueItemsDecorator = (
   entity: ModelProperty | Model,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Marks a breaking change as intentionally approved for cross-version (Phase B) comparison.
+ *
+ * When placed on a type, property, operation, or namespace, it suppresses
+ * the matching breaking-change finding in the tool output.
+ *
+ * @param reason A required explanation of why the breaking change is approved.
+ * @param options Optional suppression options: kind, since, and path filters.
+ */
+export type ApprovedBreakingChangeDecorator = (
+  context: DecoratorContext,
+  target:
+    | Model
+    | ModelProperty
+    | Operation
+    | Enum
+    | EnumMember
+    | Union
+    | UnionVariant
+    | Scalar
+    | Interface
+    | Namespace,
+  reason: string,
+  options?: ApprovedBreakingChangeOptions,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Marks a same-version (Phase A) structural difference as intentionally approved.
+ *
+ * Phase A compares two compilations of the same version. Any diff indicates a
+ * version projection inconsistency. Use this decorator only when the inconsistency
+ * is known and accepted (e.g., during a refactoring migration).
+ *
+ * @param reason A required explanation of why the unversioned change is approved.
+ * @param options Optional suppression options: kind filter.
+ */
+export type ApprovedUnversionedChangeDecorator = (
+  context: DecoratorContext,
+  target:
+    | Model
+    | ModelProperty
+    | Operation
+    | Enum
+    | EnumMember
+    | Union
+    | UnionVariant
+    | Scalar
+    | Interface
+    | Namespace,
+  reason: string,
+  options?: ApprovedUnversionedChangeOptions,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
@@ -209,4 +276,6 @@ export type AzureCoreDecorators = {
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
   uniqueItems: UniqueItemsDecorator;
+  approvedBreakingChange: ApprovedBreakingChangeDecorator;
+  approvedUnversionedChange: ApprovedUnversionedChangeDecorator;
 };

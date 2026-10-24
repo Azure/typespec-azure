@@ -1,8 +1,11 @@
+import { getFindingIdentity } from "../finding-identity.js";
 import type { AnalysisResult, Finding } from "../types.js";
 import { isOperationIdentity } from "../types.js";
 
 export function formatGithubReport(result: AnalysisResult): string {
-  const errors = result.findings.filter((finding) => finding.severity === "error" && !finding.suppressed);
+  const errors = result.findings.filter(
+    (finding) => finding.severity === "error" && !finding.suppressed,
+  );
   const suppressed = result.findings.filter((finding) => finding.suppressed);
   const lines = [
     "## Breaking Change Analysis",
@@ -19,7 +22,7 @@ export function formatGithubReport(result: AnalysisResult): string {
       ...errors.map(
         (finding) =>
           `| ${escapeCell(finding.diff.kind)} | ${escapeCell(formatOperation(finding))} | ${escapeCell(
-            finding.diff.identity.element,
+            getFindingIdentity(finding).primary,
           )} | ${escapeCell(finding.phase)} | ${escapeCell(formatVersionPair(finding))} |`,
       ),
     );

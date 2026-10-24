@@ -6,7 +6,6 @@
   "license": "MIT",
   "type": "module",
   "main": "dist/src/index.js",
-  "tspMain": "lib/main.tsp",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Azure/typespec-azure.git"
@@ -24,7 +23,6 @@
   },
   "exports": {
     ".": {
-      "typespec": "./lib/main.tsp",
       "import": "./dist/src/index.js"
     }
   },
@@ -44,6 +42,7 @@
     "yargs": "catalog:"
   },
   "peerDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/http-canonicalization": "workspace:^",

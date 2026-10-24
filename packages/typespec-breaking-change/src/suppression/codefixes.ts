@@ -1,5 +1,11 @@
-import { createAddDecoratorCodeFix, type CodeFix, type DiagnosticTarget, type Type } from "@typespec/compiler";
+import {
+  createAddDecoratorCodeFix,
+  type CodeFix,
+  type DiagnosticTarget,
+  type Type,
+} from "@typespec/compiler";
 import type { Finding } from "../types.js";
+import { resolveSuppressionTarget } from "./target.js";
 
 /**
  * Create a codefix that adds @approvedBreakingChange decorator to suppress a finding.
@@ -11,12 +17,16 @@ import type { Finding } from "../types.js";
  * @returns A CodeFix, or undefined if no suitable target exists
  */
 export function createApproveBreakingChangeCodeFix(finding: Finding): CodeFix | undefined {
-  const target = getCodefixTarget(finding);
+  const suppressionTarget = resolveSuppressionTarget(finding);
+  const target = suppressionTarget.target ?? getCodefixTarget(finding);
   if (!target) return undefined;
+  const pathOption = suppressionTarget.path
+    ? `, path: "${escapeString(suppressionTarget.path)}"`
+    : "";
 
   return createAddDecoratorCodeFix(target as DiagnosticTarget, "approvedBreakingChange", [
     `"Approved: ${escapeString(finding.diff.message)}"`,
-    `#{ kind: "${escapeString(finding.diff.kind)}" }`,
+    `#{ kind: "${escapeString(finding.diff.kind)}"${pathOption} }`,
   ]);
 }
 

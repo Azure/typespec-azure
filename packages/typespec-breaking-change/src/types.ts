@@ -1,5 +1,5 @@
 import type { Namespace, Program, SourceLocation, Type, Value } from "@typespec/compiler";
-import type { DiffKind } from "./diff-kind.js";
+import type { DiffKind } from "@azure-tools/typespec-azure-core";
 
 /**
  * The direction component of a diff — request or response.
@@ -169,13 +169,7 @@ export interface OriginDeclaration {
 }
 
 export type SourceTraceLevel =
-  | "direct"
-  | "ancestor"
-  | "origin"
-  | "base"
-  | "parentModel"
-  | "operation"
-  | "namespace";
+  "direct" | "ancestor" | "origin" | "base" | "parentModel" | "operation" | "namespace";
 
 export interface ResolvedLocation {
   location: SourceLocation;
@@ -258,7 +252,10 @@ export interface VersionComparisonSummary {
   baseVersion: string;
   headVersion: string;
   phase: ComparisonPhase;
+  /** Unique findings after the same deduplication/merge used by the final report. */
   findingCount: number;
+  /** Raw per-surface occurrences before report deduplication, when different. */
+  rawFindingCount?: number;
 }
 
 /**
