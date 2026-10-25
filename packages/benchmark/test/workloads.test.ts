@@ -92,6 +92,19 @@ it("uses only emitter sampling, regardless of compiler sampling and noise settin
   expect(shard.noiseGate).toBeUndefined();
 });
 
+it("retries noisy linting even when total compilation time is stable", async () => {
+  const p = plan();
+  let call = 0;
+  const compile = vi.fn(async () => {
+    const sample = stats(1000);
+    sample.runtime.linter.total = ++call % 2 === 0 ? 10 : 100;
+    return sample;
+  });
+  const shard = await measureWorkload(p, p.workloads[0], compile);
+  expect(shard.noiseGate?.rerunsPerformed).toBe(1);
+  expect(shard.rawIterations).toHaveLength(5);
+});
+
 describe("combining independently sampled workloads", () => {
   function shards(p: BenchmarkPlan): BenchmarkShard[] {
     return p.workloads.map((workload) => ({
@@ -110,12 +123,15 @@ describe("combining independently sampled workloads", () => {
     const p = plan();
     const result = combineShards(p, shards(p));
     const spec = result.specs.sample;
-    expect(result.measurementMode).toBe("split");
+    expect(result.measurementMode).toBe("split-warm");
+    expect(spec.warmup).toBe(1);
+    expect(spec.runner).toEqual(runner);
     expect(spec.stats.runtime.total).toBe(20);
     expect(spec.stats.runtime.emit).toEqual({
       total: 200,
       emitters: { sdk: { total: 200, steps: { generate: 199 } } },
     });
+
     expect(spec.iterations).toBe(3);
     expect(spec.rawIterations.every((sample) => sample.runtime.emit.total === 0)).toBe(true);
     expect(spec.emitterMeasurements?.sdk.iterations).toBe(3);

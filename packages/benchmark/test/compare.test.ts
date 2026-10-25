@@ -66,7 +66,10 @@ it("keeps descriptive baseline labels in comments", () => {
   expect(comment).toContain("<code>1234567</code>");
 });
 
-function result(total: number, measurementMode?: "split"): BenchmarkResult {
+function result(
+  total: number,
+  measurementMode?: BenchmarkResult["measurementMode"],
+): BenchmarkResult {
   const stats = {
     complexity: { createdTypes: 1, finishedTypes: 1 },
     runtime: {
@@ -95,9 +98,17 @@ it("rejects incompatible measurement methods in either comparison direction", ()
   expect(() => compareBenchmarks(result(20, "split"), result(100))).toThrow(
     /incompatible measurement/i,
   );
+  expect(() => compareBenchmarks(result(100, "split"), result(20, "split-warm"))).toThrow(
+    /incompatible measurement/i,
+  );
 });
 
-it.each([undefined, "split"] as const)("still compares matching %s measurements", (mode) => {
-  const comparison = compareBenchmarks(result(100, mode), result(120, mode));
-  expect(comparison[0].metrics.find((metric) => metric.label === "total")?.percentChange).toBe(20);
-});
+it.each([undefined, "split", "split-warm"] as const)(
+  "still compares matching %s measurements",
+  (mode) => {
+    const comparison = compareBenchmarks(result(100, mode), result(120, mode));
+    expect(comparison[0].metrics.find((metric) => metric.label === "total")?.percentChange).toBe(
+      20,
+    );
+  },
+);

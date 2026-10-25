@@ -23,7 +23,7 @@ const TSPCONFIG = "tspconfig.yaml";
 export interface ExternalSpecConfig {
   /** Git URL of the repository to sparse-checkout (e.g. azure-rest-api-specs). */
   repository: string;
-  /** Git branch or tag to check out. Defaults to "main". Tracks latest (no pinning). */
+  /** Git commit, branch or tag to check out. Defaults to "main". */
   ref?: string;
   /** Entry directory (containing main.tsp), relative to the repository root. */
   path: string;
@@ -48,6 +48,7 @@ export interface NamedExternalSpecConfig extends ExternalSpecConfig {
 export interface ResolvedExternalSpec {
   name: string;
   dir: string;
+  source: { repository: string; commit: string; path: string };
 }
 
 function git(cwd: string, args: string[]): void {
@@ -78,23 +79,18 @@ function sparseCheckout(repository: string, ref: string, paths: string[]): strin
       "--no-checkout",
       "--depth",
       "1",
-      "--branch",
-      ref,
       repository,
       dest,
     ]);
     git(dest, ["sparse-checkout", "init", "--cone"]);
     git(dest, ["sparse-checkout", "set", ...paths]);
-    git(dest, ["checkout", ref]);
   } else {
-    console.log(`Reusing existing checkout at ${dest} (fetching ref ${ref})...`);
-    git(dest, ["fetch", "--depth", "1", "origin", ref]);
-    git(dest, ["sparse-checkout", "set", ...paths]);
-    // Check out the freshly fetched commit (not a stale local branch) so the
-    // reuse path always lands on the latest of `ref`. --force discards any
-    // tspconfig.yaml we copied into the checkout on a previous run.
-    git(dest, ["checkout", "--force", "FETCH_HEAD"]);
+    console.log(`Reusing existing checkout at ${dest} (ref ${ref})...`);
   }
+  git(dest, ["fetch", "--depth", "1", "origin", ref]);
+  git(dest, ["sparse-checkout", "set", ...paths]);
+  // FETCH_HEAD supports pinned SHAs as well as branches, including on reuse.
+  git(dest, ["checkout", "--force", "FETCH_HEAD"]);
 
   return dest;
 }
@@ -155,7 +151,18 @@ export function resolveExternalSpecs(configs: NamedExternalSpecConfig[]): Resolv
       if (existsSync(tspconfig)) {
         copyFileSync(tspconfig, join(dir, TSPCONFIG));
       }
-      resolved.push({ name: config.name, dir });
+      resolved.push({
+        name: config.name,
+        dir,
+        source: {
+          repository,
+          commit: execFileSync("git", ["rev-parse", "HEAD"], {
+            cwd: checkoutDir,
+            encoding: "utf8",
+          }).trim(),
+          path: config.path,
+        },
+      });
     }
   }
 

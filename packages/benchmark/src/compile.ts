@@ -1,8 +1,9 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import type { Stats } from "./types.js";
+import type { BenchmarkPlan, BenchmarkShard, Stats, Workload } from "./types.js";
 
 const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.url));
+const measureCompilerPath = fileURLToPath(new URL("./measure-compiler.js", import.meta.url));
 
 export type CompilationMode = { kind: "compiler" } | { kind: "emitter"; emitter: string };
 
@@ -21,8 +22,39 @@ export async function compileSpec(
   workerPath = compileOncePath,
   mode: CompilationMode = { kind: "compiler" },
 ): Promise<Stats> {
-  return new Promise<Stats>((resolve, reject) => {
-    const child = spawn(process.execPath, [workerPath, specDir, JSON.stringify(mode)], {
+  return runWorker(specDir, [workerPath, specDir, JSON.stringify(mode)], (stats: Stats) => {
+    if (!Number.isFinite(stats.runtime.total) || !stats.complexity) {
+      throw new Error("Missing runtime or complexity metrics");
+    }
+    validateEmitterStats(stats, Object.keys(stats.runtime.emit.emitters));
+  });
+}
+
+/** Warmups, measurements and noise retries share one isolated compiler process. */
+export function measureCompiler(
+  specDir: string,
+  plan: BenchmarkPlan,
+  workload: Workload,
+  workerPath = measureCompilerPath,
+): Promise<BenchmarkShard> {
+  return runWorker(
+    specDir,
+    ["--expose-gc", workerPath, specDir, JSON.stringify({ plan, workload })],
+    (shard: BenchmarkShard) => {
+      if (
+        shard.planId !== plan.id ||
+        shard.workloadId !== workload.id ||
+        shard.rawIterations.length < plan.compiler.iterations
+      ) {
+        throw new Error("Invalid compiler workload result");
+      }
+    },
+  );
+}
+
+function runWorker<T>(specDir: string, args: string[], validate: (result: T) => void): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const child = spawn(process.execPath, args, {
       stdio: ["ignore", "pipe", "pipe", "pipe"],
     });
     let output = "";
@@ -49,12 +81,9 @@ export async function compileSpec(
         return;
       }
       try {
-        const stats: Stats = JSON.parse(output);
-        if (!Number.isFinite(stats.runtime.total) || !stats.complexity) {
-          throw new Error("Missing runtime or complexity metrics");
-        }
-        validateEmitterStats(stats, Object.keys(stats.runtime.emit.emitters));
-        resolve(stats);
+        const result: T = JSON.parse(output);
+        validate(result);
+        resolve(result);
       } catch (error) {
         reject(
           new Error(`Invalid benchmark stats for ${specDir}:\n${logs.trim()}`, { cause: error }),

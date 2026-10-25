@@ -59,7 +59,10 @@ export async function measureWorkload(
     let rerunsPerformed = 0;
     while (
       rerunsPerformed < maxReruns &&
-      summarize(rawIterations.map((stats) => stats.runtime.total)).cv > noiseCvThreshold
+      Math.max(
+        summarize(rawIterations.map((stats) => stats.runtime.total)).cv,
+        summarize(rawIterations.map((stats) => stats.runtime.linter.total)).cv,
+      ) > noiseCvThreshold
     ) {
       rerunsPerformed++;
       for (let i = 0; i < rerunIterations; i++) {
@@ -81,6 +84,8 @@ export async function measureWorkload(
       os: `${os.platform()}-${os.release()}`,
       arch: os.arch(),
       nodeVersion: process.version,
+      cpuModel: os.cpus()[0]?.model,
+      cpuCount: os.cpus().length,
     },
     rawIterations,
     warmup: sampling.warmup,
@@ -179,8 +184,11 @@ export function combineShards(plan: BenchmarkPlan, shards: BenchmarkShard[]): Be
     commitTimestamp: plan.commitTimestamp,
     timestamp: new Date().toISOString(),
     runner: shards[0].runner,
-    measurementMode: "split",
+    measurementMode: "split-warm",
     externalEmitterVersions: plan.externalEmitterVersions,
+    specSources: Object.fromEntries(
+      plan.specs.flatMap((spec) => (spec.source ? [[spec.name, spec.source]] : [])),
+    ),
     specs: {},
   };
   for (const spec of plan.specs) {
@@ -214,11 +222,14 @@ export function combineShards(plan: BenchmarkPlan, shards: BenchmarkShard[]): Be
     result.specs[spec.name] = {
       name: spec.name,
       iterations: compiler.rawIterations.length,
+      warmup: compiler.warmup,
+      runner: compiler.runner,
       stats,
       rawIterations: compiler.rawIterations,
       emitterMeasurements,
       variability: {
         total: summarize(compiler.rawIterations.map((sample) => sample.runtime.total)),
+        linter: summarize(compiler.rawIterations.map((sample) => sample.runtime.linter.total)),
         noiseGate: compiler.noiseGate,
       },
     };
