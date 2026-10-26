@@ -111,8 +111,10 @@ describe("registered ARM path completeness", () => {
       );
   });
 
-  for (const linkFirst of [true, false]) {
-    const linkAction = `
+  it.each([true, false])(
+    "retains same-name actions across interfaces: linkFirst=%s",
+    async (linkFirst) => {
+      const linkAction = `
       /*links*/@armResourceOperations interface PrivateLinkResources {
         @get @action("privateLinkResources")
         listByWidget is ArmResourceActionSync<
@@ -120,7 +122,7 @@ describe("registered ARM path completeness", () => {
         >;
       }
     `;
-    const otherAction = `
+      const otherAction = `
       @armResourceOperations interface OtherActions {
         @get @action("otherResources")
         listByWidget is ArmResourceActionSync<
@@ -128,8 +130,7 @@ describe("registered ARM path completeness", () => {
         >;
       }
     `;
-    const actions = linkFirst ? linkAction + otherAction : otherAction + linkAction;
-    it(`retains same-name actions across interfaces: linkFirst=${linkFirst}, connections=${linkFirst}`, async () => {
+      const actions = linkFirst ? linkAction + otherAction : otherAction + linkAction;
       const expectation = tester.expect(`${setup}
         @armResourceOperations interface EndpointOperations {
           ${linkFirst ? operations.slice(0, 2).join("\n") : ""}
@@ -146,14 +147,15 @@ describe("registered ARM path completeness", () => {
           })),
         );
       }
-    });
-  }
+    },
+  );
 
-  for (const { legacy, widgetFirst, includeLinks } of [
+  it.each([
     { legacy: false, widgetFirst: true, includeLinks: false },
     { legacy: true, widgetFirst: false, includeLinks: true },
-  ]) {
-    it(`retains same-name read/list registrations: legacy=${legacy}, widgetFirst=${widgetFirst}, links=${includeLinks}`, async () => {
+  ])(
+    "retains same-name read/list registrations: legacy=$legacy, widgetFirst=$widgetFirst, links=$includeLinks",
+    async ({ legacy, widgetFirst, includeLinks }) => {
       const parents = widgetFirst ? ["Widget", "Other"] : ["Other", "Widget"];
       const interfaces = parents.map(
         (parent) => `
@@ -197,14 +199,15 @@ describe("registered ARM path completeness", () => {
           })),
         );
       }
-    });
-  }
+    },
+  );
 
-  for (const { customResource, includeConnections } of [
+  it.each([
     { customResource: false, includeConnections: true },
     { customResource: true, includeConnections: false },
-  ]) {
-    it(`checks legacy operations on an unlisted registered model: custom=${customResource}, connections=${includeConnections}`, async () => {
+  ])(
+    "checks legacy operations on an unlisted registered model: custom=$customResource, connections=$includeConnections",
+    async ({ customResource, includeConnections }) => {
       const expectation = tester.expect(`${setup}
           ${customResource ? "@Legacy.customAzureResource" : ""}
           model LinkInformation {
@@ -234,11 +237,12 @@ describe("registered ARM path completeness", () => {
           })),
         );
       }
-    });
-  }
+    },
+  );
 
-  for (const includeLinks of [true, false]) {
-    it(`checks explicit library resource registrations: links=${includeLinks}`, async () => {
+  it.each([true, false])(
+    "checks explicit library resource registrations: links=%s",
+    async (includeLinks) => {
       const expectation = tester.expect(`${setup}
         /*target*/@armResourceOperations interface Endpoints {
           read is Connections.Read<Widget, Resource = PrivateEndpointConnectionResource>;
@@ -254,11 +258,12 @@ describe("registered ARM path completeness", () => {
           pos: result.pos.target.pos,
         }));
       }
-    });
-  }
+    },
+  );
 
-  for (const includeConnections of [true, false]) {
-    it(`excludes unregistered HTTP private link routes: connections=${includeConnections}`, async () => {
+  it.each([true, false])(
+    "excludes unregistered HTTP private link routes: connections=%s",
+    async (includeConnections) => {
       const expectation = tester.expect(`${setup}
         @armResourceOperations interface Unregistered {
           @get @route("${basePath}/privateLinkResources")
@@ -276,11 +281,12 @@ describe("registered ARM path completeness", () => {
       } else {
         await expectation.toBeValid();
       }
-    });
-  }
+    },
+  );
 
-  for (const includeLinks of [true, false]) {
-    it(`checks concrete inherited operations without generic template companions: links=${includeLinks}`, async () => {
+  it.each([true, false])(
+    "checks concrete inherited operations without generic template companions: links=%s",
+    async (includeLinks) => {
       const expectation = tester.expect(`${setup}
         op GenericOperation<T>(@body input: T): void;
         interface EndpointTemplates<T extends Foundations.SimpleResource> {
@@ -299,27 +305,35 @@ describe("registered ARM path completeness", () => {
           pos: result.pos.target.pos,
         }));
       }
-    });
-  }
+    },
+  );
 
-  for (const [preferred, other, missing] of [
-    [0, 1, 2],
-    [1, 2, 0],
-  ]) {
-    it(`prefers path ${preferred} over earlier path ${other} for the diagnostic target`, async () => {
-      await tester
-        .expect(
-          `${setup}
+  it.each([
+    {
+      name: "connection point over earlier connection collection",
+      preferred: 0,
+      other: 1,
+      missing: 2,
+    },
+    {
+      name: "connection collection over earlier private link collection",
+      preferred: 1,
+      other: 2,
+      missing: 0,
+    },
+  ])("prefers $name for the diagnostic target", async ({ preferred, other, missing }) => {
+    await tester
+      .expect(
+        `${setup}
         @armResourceOperations interface Earlier { ${operations[other]} }
         /*target*/@armResourceOperations interface Preferred { ${operations[preferred]} }
       `,
-        )
-        .toEmitDiagnostics((result) => ({
-          ...diagnostic(basePath + suffixes[missing]),
-          pos: result.pos.target.pos,
-        }));
-    });
-  }
+      )
+      .toEmitDiagnostics((result) => ({
+        ...diagnostic(basePath + suffixes[missing]),
+        pos: result.pos.target.pos,
+      }));
+  });
 
   it("does not let one parent's link collection complete another parent's API set", async () => {
     await tester
