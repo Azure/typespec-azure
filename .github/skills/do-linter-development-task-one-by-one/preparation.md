@@ -15,8 +15,19 @@ harness. All execution checkouts, including auxiliary snapshots, remain inside
 `worktrees_folder`. Read-only instruction/artifact sources are not execution
 checkouts. Existing shared resources require explicit serial ownership.
 
-Resolve latest inputs for a new baseline; a reuse request reads the completed
-baseline's exact specs/closure, not checked-in `_meta.json` or a moving tip.
+Discover the [shared baseline](../analyze-native-lint-coverage/shared-baseline.md)
+before candidate/specs dependency setup. Fetch the metadata branch and pin its
+commit, immutable descriptor and archive identity. Prepare specs at the exact
+descriptor `source.commit`, not the metadata commit, checked-in `_meta.json`,
+or latest `typespec-next`. Resolve the candidate base once, then verify against
+the baseline's recorded closure. Missing/corrupt/incompatible data is a
+prerequisite blocker, never permission to generate Swagger per rule.
+Only an explicitly requested separate producer refresh resolves new specs
+sources and runs Swagger validators. Keep immutable baseline data read-only;
+parallel candidates require separate writable specs runtimes to prevent
+injected-package races. Representative preflight uses lightweight controls;
+the full saved-population readout and full compatible native run remain required.
+Full baseline reuse with `--filter`/`--limit` is not supported.
 Verify candidate core gitlink and compatible package closure. Do not repeatedly
 install passing prerequisites; repair only invalidated layers or proven missing
 tools. Use the [native dependency profile](#native-first-dependency-profile)
@@ -31,7 +42,8 @@ capabilities are established. A missing automatic cache proof needs the
 documented conservative verification, not a silent cache hit.
 
 Persist readiness with native/evidence owners, base/head/refspecs, specs/tooling/
-snapshot paths and identities, baseline choice, membership revision, instruction
+snapshot paths and identities, baseline choice, descriptor metadata commit/hash,
+archive checksum, frozen source/runtime identities, membership revision, instruction
 hashes, dependency fingerprints and recovery counters. No promotion owner or
 promotion source SHA is needed. Both A/B checkpoints run through the same native
 publication owner with separate review invocations. Existing legacy manifests

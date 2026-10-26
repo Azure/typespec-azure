@@ -92,8 +92,15 @@ reused between tasks, serially under a lock; a writable specs runtime must not
 be shared concurrently. Keep task execution logs ignored, with the existing
 append-only timestamps/heartbeat contract.
 
-For new tasks, resolve latest canonical base/specs once. On subsequent runs use
-the selected baseline and recorded SHAs, not a newly fetched specs tip. Never
+For new tasks, discover and pin the
+[shared Swagger baseline first](../analyze-native-lint-coverage/shared-baseline.md),
+before selecting specs or installing dependencies. Record its metadata commit
+and immutable descriptor/archive identity. Select the canonical candidate base
+once, but prepare specs at the descriptor's frozen `source.commit`, not the
+metadata commit or a newly fetched specs tip. Missing/corrupt/incompatible
+shared data blocks migration; only a separately requested producer refresh
+runs the Swagger suite. Changing validator IDs alone does not invalidate the
+all-production-ARM observation baseline. Never
 substitute arbitrary latest compiler packages: use the candidate's compatible
 closure and actual core gitlink. Verify prerequisite layers before installing;
 install only missing/invalid dependencies or changed manifests.
@@ -129,12 +136,17 @@ install only missing/invalid dependencies or changed manifests.
    commit/publication.
 4. **Compare and investigate.** Use
    [official-package coverage](../analyze-native-lint-coverage/SKILL.md), a
-   compatible retained baseline, representative preflight, then the declared
+   pinned shared compatible baseline, lightweight injected positive/compliant
+   preflight controls, then the declared
    full required population. Apply the count policy below and
    [gap analysis](../analyze-swagger-typespec-lint-gap/SKILL.md).
    Keep compile/parse/worker/projection failures unassessed. Investigate every
    one-sided project and both directions of outliers. Do not change the rule
-   simply to equalize counts. A reduced pilot is not a full-run pass.
+   simply to equalize counts. Read the full saved population and selected
+   index/shard; an absent shard requires production-registration/audience proof
+   before reporting zero rather than not-evaluated. A reduced pilot is not a
+   full-run pass. A full unfiltered baseline cannot be reused with a filtered
+   pilot or different scope; do not silently regenerate Swagger.
    For an evidenced template/library outcome without a registered native lint,
    use the explicit [native-package evidence lane](../analyze-native-lint-coverage/package-evidence.md).
    Preserve injection, controls, full population, investigation and both reviews;
@@ -204,8 +216,11 @@ requires a separate design.
 ## Baselines and evidence publication
 
 Follow the [coverage lifecycle](../analyze-native-lint-coverage/SKILL.md#baseline-lifecycle)
-and [evidence contract](evidence.md). Create latest once, reuse compatible
-completed data, and refresh into a new immutable baseline. Separate frozen
+and [evidence contract](evidence.md). Discover/pin shared completed data first,
+reuse it across rules, and reserve fresh source selection/Swagger execution for
+an explicitly requested separate producer refresh into a new immutable baseline.
+Keep shared input read-only and each parallel candidate's writable specs runtime
+separate. Separate frozen
 emitter/Swagger inputs from changed native artifacts. Specs SHA equality alone
 does not establish compatibility; compiler/emitter/metadata/dependency/policy
 changes invalidate affected evidence. Never claim unsupported caching or invent

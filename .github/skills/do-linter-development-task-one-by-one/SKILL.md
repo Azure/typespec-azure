@@ -50,6 +50,10 @@ example. Native-first runs must read [native-first.md](native-first.md), the
 and **must not fall through to the legacy phases below**. Keep one active task
 at a time. Both flows preserve required validation, independent local review,
 bounded GitHub review/fix, publication approval, and quiescence.
+Native-first coverage discovers and pins the
+[shared Swagger baseline](../analyze-native-lint-coverage/shared-baseline.md)
+before specs setup. It reruns native diagnostics, not the Swagger suite.
+Only an explicitly requested separate producer creates or refreshes shared data.
 
 Both flows must create or refresh `migration.md` under the shared
 [five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).

@@ -21,6 +21,7 @@ mise exec $specsManager -- node --import tsx/esm test\harness\native-coverage.ts
   --candidate-repo C:\dev\worktrees\native-candidate `
   --specs-repo $specsRepo `
   --tgz-dir C:\dev\artifacts\candidate `
+  --baseline-run C:\dev\baseline-inputs\verified-shared-baseline `
   --output C:\dev\evidence\fresh-run `
   --validator-rule LongRunningOperationsOptionsValidator `
   --native-package @azure-tools/typespec-azure-core
@@ -32,10 +33,13 @@ paths above illustrate arguments, not permission to create execution checkouts
 outside the queue's selected folder. Use the selected folder and actual paths.
 
 The analyzer injects the clean candidate closure, verifies the selected native
-package and shared compiler identity, captures the real Swagger baseline and
+package and shared compiler identity, consumes the pinned
+[shared Swagger baseline](shared-baseline.md) without Swagger regeneration, and
 compiles the same full source population using its existing configuration.
 It preserves package hashes, raw member observations, native ambient diagnostics
 and failed projects. Existing configured lints are not silently disabled.
+Artifact/runtime compatibility checks and any required
+`--baseline-compatibility-receipt` still apply; same specs SHA alone is not proof.
 
 `coverage.json` uses `assessmentMode: package-evidence` and schema version 3.
 Native diagnostic counts, comparison metrics and coverage percentages are
