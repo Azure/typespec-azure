@@ -682,31 +682,6 @@ op example(): void;
 op example(): void;
 ```
 
-##### Rename only for SDK emitters
-
-When resolving a naming collision in a generated SDK, scope the rename so it does not change the name emitted by other emitters. An unscoped `@clientName` applies to all emitters.
-
-```typespec
-// Apply the rename only to the C# SDK emitter.
-@clientName("DataTransferActionType", "csharp")
-union ActionType {
-  start,
-  stop,
-}
-```
-
-```typespec
-// Apply the rename to client generators, but exclude the autorest emitter
-// so the OpenAPI-emitted name remains `ActionType`.
-@clientName("DataTransferActionType", "!autorest")
-union ActionType {
-  start,
-  stop,
-}
-```
-
-Use a positive scope such as `"csharp"` to target SDK emitters, or a negative scope such as `"!autorest"` to exclude the OpenAPI emitter when preserving emitted OpenAPI names matters.
-
 ### `@clientNamespace` {#@Azure.ClientGenerator.Core.clientNamespace}
 
 Changes the namespace of a client, model, enum or union generated in the client SDK.
