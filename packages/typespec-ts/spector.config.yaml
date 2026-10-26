@@ -54,6 +54,8 @@ specs:
   type/array: true
   type/model/inheritance/recursive: true
   type/union: true
+  # Explicit discriminator cat operations lose meow through the intermediate Mammal model.
+  # Tracking: https://github.com/Azure/typespec-azure/issues/5313
   type/union/discriminated/extends: true
   payload/media-type: true
   payload/multipart: true
