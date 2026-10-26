@@ -40,11 +40,11 @@ TypeSpec provide operation templates that describe the request and response of s
 operations. A description of the options available for each resource template, and how to choose
 which one is described in the sections below.
 
-#### Custom constraints on shared common parameters
+### Custom constraints on shared common parameters
 
-When an operation uses a shared common-types parameter, the emitted OpenAPI may reference the shared parameter definition instead of emitting a locally customized copy. This is expected: local augmentations such as a custom `pattern` or length constraint should not be expected to appear automatically in generated Swagger or downstream documentation.
+When an operation reuses a parameter from ARM common-types, adding a constraint such as `@pattern` or `@minLength` at the use site does not necessarily change the shared TypeSpec parameter definition. As a result, use-site constraints may not be reflected in generated Swagger.
 
-If you need custom constraints to be emitted, define and use a service-specific parameter instead of the shared common parameter. Use a shared common parameter only when its standard emitted shape is sufficient.
+If a parameter needs service-specific constraints, define a service-owned TypeSpec parameter model with those constraints and use it in the operation. Reuse a common-types parameter when its standard definition is sufficient.
 
 ### Synchronous and Asynchronous APIs
 
