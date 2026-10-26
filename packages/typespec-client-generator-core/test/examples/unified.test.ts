@@ -280,33 +280,41 @@ Widgets.get:
     );
   });
 
-  it("falls back to legacy JSON when unified examples are absent", async () => {
-    const instance = await SimpleTester.createInstance();
-    instance.fs.addTypeSpecFile(
-      "examples/get.json",
-      JSON.stringify({
-        operationId: "Widgets_get",
-        title: "Legacy",
-        responses: { "200": { body: "legacy" } },
-      }),
-    );
-    const { program } = await instance.compile(simpleSpec);
-    const context = await createSdkContextForTester(program);
-    expectDiagnostics(context.diagnostics, []);
-    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
-      .examples![0];
-    strictEqual(loaded.name, "Legacy");
-    strictEqual(loaded.filePath, "get.json");
-    strictEqual(loaded.responses[0].bodyValue?.value, "legacy");
-  });
+  it.each(["Widgets_get", "wIDGETS_gET"])(
+    "falls back to case-insensitive legacy JSON matching for %s",
+    async (operationId) => {
+      const instance = await SimpleTester.createInstance();
+      instance.fs.addTypeSpecFile(
+        "examples/get.json",
+        JSON.stringify({
+          operationId,
+          title: "Legacy",
+          responses: { "200": { body: "legacy" } },
+        }),
+      );
+      const { program } = await instance.compile(simpleSpec);
+      const context = await createSdkContextForTester(program);
+      expectDiagnostics(context.diagnostics, []);
+      const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+        .examples![0];
+      strictEqual(loaded.name, "Legacy");
+      strictEqual(loaded.filePath, "get.json");
+      strictEqual(loaded.responses[0].bodyValue?.value, "legacy");
+    },
+  );
 
-  it("honors operationId and language-independent client customization", async () => {
-    const instance = await SimpleBaseTester.createInstance();
-    instance.fs.addTypeSpecFile(
-      "examples.yaml",
-      simpleExample.replace("Widgets.get", "Custom.fetch"),
-    );
-    const { program } = await instance.compile(`
+  it.each([
+    ["Custom_Fetch", "Custom.fetch"],
+    ["custom_fetch", "custom.fetch"],
+    ["customFetch", "customFetch"],
+    ["customFetch", "CUSTOMFETCH"],
+    ["CuStOm_FeTcH", "CUSTOM.FETCH"],
+  ])(
+    "honors explicit operationId %s and language-independent client customization",
+    async (operationId, key) => {
+      const instance = await SimpleBaseTester.createInstance();
+      instance.fs.addTypeSpecFile("examples.yaml", simpleExample.replace("Widgets.get", key));
+      const { program } = await instance.compile(`
       import "@typespec/http";
       import "@typespec/openapi";
       import "@azure-tools/typespec-client-generator-core";
@@ -314,17 +322,77 @@ Widgets.get:
       using Azure.ClientGenerator.Core;
       @service namespace Test;
       interface Widgets {
-        @TypeSpec.OpenAPI.operationId("Custom_Fetch")
+        @TypeSpec.OpenAPI.operationId("${operationId}")
         @clientName("renamed", "python")
         @get op get(): string;
       }
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "python" });
+      const context = await createSdkContextForTester(program, { emitterName: "python" });
+      expectDiagnostics(context.diagnostics, []);
+      const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+        .examples![0];
+      strictEqual(loaded.rawExample.operationId, operationId);
+      strictEqual(loaded.responses[0].bodyValue?.value, "result");
+    },
+  );
+
+  it.each([
+    ["v1", "base-v1"],
+    ["v2", "updated-v2"],
+    ["latest", "updated-v2"],
+    ["all", "updated-v2"],
+  ])("matches migrated standalone operation keys for %s", async (version, expected) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples/SchemaRegistry.yaml",
+      `
+GetSchemaById:
+  - id: GetSchemaById
+    title: Get Schema by ID
+    request: {}
+    responses: {200: {body: "base-{api-version}"}}
+  - id: GetSchemaById
+    title: Get Schema by ID
+    since: "v2"
+    request: {}
+    responses: {200: {body: "updated-{api-version}"}}
+`,
+    );
+    const { program } = await instance.compile(`
+      @service @versioned(Versions) namespace Test;
+      enum Versions { v1, v2 }
+      @get op getSchemaById(): string;
+    `);
+    const context = await createSdkContextForTester(program, { "api-version": version });
     expectDiagnostics(context.diagnostics, []);
-    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
-      .examples![0];
-    strictEqual(loaded.rawExample.operationId, "Custom_Fetch");
-    strictEqual(loaded.responses[0].bodyValue?.value, "result");
+    const loaded = httpMethod(context.sdkPackage.clients[0].methods[0]).operation.examples!;
+    strictEqual(loaded.length, 1);
+    strictEqual(loaded[0].name, "Get Schema by ID");
+    strictEqual(loaded[0].filePath, "examples/SchemaRegistry.yaml");
+    strictEqual(loaded[0].rawExample.operationId, "getSchemaById");
+    strictEqual(loaded[0].responses[0].bodyValue?.value, expected);
+  });
+
+  it.each([
+    "interface widgets { @get op get(): string; }",
+    "namespace widgets { @get op get(): string; }",
+    '@clientName("widgets", "autorest") interface Original { @get op get(): string; }',
+    '@clientLocation("widgets", "autorest") @get op get(): string;',
+  ])("matches inferred operation groups case-insensitively: %s", async (declaration) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample);
+    const { program } = await instance.compile(`@service namespace Test; ${declaration}`);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const client = context.sdkPackage.clients[0];
+    const methods = [
+      ...client.methods,
+      ...(client.children ?? []).flatMap((child) => child.methods),
+    ];
+    const loaded = methods.map(httpMethod).flatMap((method) => method.operation.examples ?? []);
+    strictEqual(loaded.length, 1);
+    strictEqual(loaded[0].rawExample.operationId, "widgets_get");
+    strictEqual(loaded[0].responses[0].bodyValue?.value, "result");
   });
 
   it("follows customized source operations", async () => {
@@ -520,19 +588,22 @@ Widgets.get:
     );
   });
 
-  it("matches unified operation keys with the same casing as AutoRest", async () => {
+  it.each([
+    [simpleSpec, "widgets.get"],
+    [simpleSpec, "WIDGETS.GET"],
+    ["@service namespace Test; @get op getSchemaById(): string;", "getSchemaById"],
+    ["@service namespace Test; @get op getSchemaById(): string;", "GETSCHEMABYID"],
+  ])("matches unified operation key %s / %s case-insensitively", async (input, key) => {
     const instance = await SimpleTester.createInstance();
-    instance.fs.addTypeSpecFile(
-      "examples.yaml",
-      simpleExample.replace("Widgets.get", "widgets.get"),
-    );
-    const { program } = await instance.compile(simpleSpec);
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample.replace("Widgets.get", key));
+    const { program } = await instance.compile(input);
     const context = await createSdkContextForTester(program);
     expectDiagnostics(context.diagnostics, []);
-    strictEqual(
-      httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation.examples,
-      undefined,
-    );
+    const client = context.sdkPackage.clients[0];
+    const method = client.methods[0] ?? client.children![0].methods[0];
+    const loaded = httpMethod(method).operation.examples!;
+    strictEqual(loaded.length, 1);
+    strictEqual(loaded[0].responses[0].bodyValue?.value, "result");
   });
 
   it("rejects operations split across files using shared placement validation", async () => {

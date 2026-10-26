@@ -258,7 +258,7 @@ export async function handleClientExamples(
         for (const honorRenaming of [true, false]) {
           const operationId = resolveOperationId(exampleMatchingContext, operation, honorRenaming);
           if (unified) {
-            const entries = unified.byOperation.get(deriveOperationKey(operationId));
+            const entries = unified.byOperation.get(deriveOperationKey(operationId).toLowerCase());
             if (entries && method.operation.kind === "http") {
               loaded = diagnostics.pipe(
                 materializeUnifiedExamples(
