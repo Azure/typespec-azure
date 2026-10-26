@@ -37,9 +37,11 @@ TCGC consumes these protocol facts and owns selection of the client result and e
 
 ### Combined metadata compatibility
 
-`getLroMetadata(program, operation)` remains available with its existing flat `LroMetadata` contract. The lifecycle grouping applies only to `LroProtocolMetadata`; leaf names, types, optionality, and semantics are unchanged. The combined helper uses the same protocol analysis and a compatibility result resolver for existing emitters and libraries. No migration is required for existing callers.
+`getLroMetadata(program, operation)` remains available with its existing flat `LroMetadata` shape. The lifecycle grouping applies only to `LroProtocolMetadata`. The combined helper uses the same protocol analysis and a separate result resolver for existing emitters and libraries.
 
-The separation preserves current result defaults, raw TypeSpec object identities, and result/envelope/path combinations. It does not correct inconsistent combinations or introduce new result-selection decorators. In particular, resource PUT result selection and a declared polling result property can describe different types; this refactor does not change that behavior.
+When the completion step is `pollingSuccessProperty`, both the combined Core helper and native TCGC metadata select that property's type as the final result, including for resource PUT operations. For example, if the resource and monitor use a `Job` model with `@lroResult result: Result`, the final result is `Result`, the final envelope remains `Job`, and the extraction path is `result`. Previously, resource PUT metadata could select `Job` while retaining a path to `Result`.
+
+This correction preserves protocol facts, raw TypeSpec object identities, polling behavior, and required final requests. It can change generated return types or final-state schemas for affected operations; consumers that relied on the previous resource-type default must review their generated contracts before upgrading.
 
 The Azure.Core library provides a helper that emitters can use to determine if an operation being processed is an LRO, and to provide details about how the LRO should be processed by clients, or about how operations are linked.
 

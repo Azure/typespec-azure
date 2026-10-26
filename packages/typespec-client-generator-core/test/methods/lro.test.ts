@@ -17,7 +17,7 @@ function hasFlag<T extends number>(value: T, flag: T): boolean {
   return (value & flag) !== 0;
 }
 
-it("preserves the resource PUT job result, envelope, and extraction path independently", async () => {
+it("selects the polling success property for a resource PUT", async () => {
   const { program } = await AzureCoreTester.compile(`
     @service namespace TestService;
     model Result { value: string; }
@@ -29,6 +29,8 @@ it("preserves the resource PUT job result, envelope, and extraction path indepen
     }
     @route("/jobs/{id}/status")
     @get op poll(@path id: string): Job;
+    @route("/jobs/{id}")
+    @get op read(@path id: string): Job;
     @pollingOperation(poll)
     @createsOrReplacesResource(Job)
     @route("/jobs/{id}")
@@ -44,18 +46,33 @@ it("preserves the resource PUT job result, envelope, and extraction path indepen
   deepStrictEqual(raw, legacy);
   strictEqual(raw.finalStateVia, FinalStateValue.originalUri);
   strictEqual(raw.finalStep?.kind, "pollingSuccessProperty");
-  strictEqual(raw.finalResult, raw.pollingInfo.responseModel);
+  const result = raw.pollingInfo.responseModel.properties.get("result");
+  ok(result);
+  strictEqual(raw.finalStep.target, result);
+  ok(raw.finalResult && raw.finalResult !== "void");
+  strictEqual(raw.finalResult.name, "Result");
+  strictEqual(raw.finalResult, result.type);
+  strictEqual(raw.logicalResult, result.type);
   strictEqual(raw.finalEnvelopeResult, raw.pollingInfo.responseModel);
   strictEqual(raw.finalResultPath, "result");
   const finalResponse = method.lroMetadata.finalResponse;
   ok(finalResponse);
-  strictEqual(finalResponse.result, finalResponse.envelopeResult);
   strictEqual(finalResponse.result.kind, "model");
-  strictEqual(finalResponse.result.name, "Job");
+  strictEqual(finalResponse.result.name, "Result");
+  strictEqual(finalResponse.envelopeResult.kind, "model");
+  strictEqual(finalResponse.envelopeResult.name, "Job");
+  strictEqual(finalResponse.result.__raw, result.type);
+  strictEqual(finalResponse.envelopeResult.__raw, raw.pollingInfo.responseModel);
   strictEqual(finalResponse.resultSegments?.length, 1);
   strictEqual(finalResponse.resultSegments[0].name, "result");
   strictEqual(finalResponse.resultSegments[0].type.kind, "model");
   strictEqual(finalResponse.resultSegments[0].type.name, "Result");
+  strictEqual(finalResponse.resultSegments[0].__raw, result);
+  strictEqual(finalResponse.resultSegments[0].type, finalResponse.result);
+  ok(hasFlag(finalResponse.result.usage, UsageFlags.Output));
+  ok(hasFlag(finalResponse.envelopeResult.usage, UsageFlags.LroInitial));
+  ok(hasFlag(finalResponse.envelopeResult.usage, UsageFlags.LroPolling));
+  ok(hasFlag(finalResponse.envelopeResult.usage, UsageFlags.LroFinalEnvelope));
   strictEqual(method.response.type, finalResponse.result);
   ok("__raw_lro_metadata" in method);
   strictEqual(method.__raw_lro_metadata, raw);

@@ -36,12 +36,7 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
       ? pollingInfo.responseModel
       : initialResponse;
 
-  if (
-    finalStep &&
-    finalStep.kind !== "noPollingResult" &&
-    (finalStep.kind !== "pollingSuccessProperty" ||
-      resourceOperation?.operation !== "createOrReplace")
-  ) {
+  if (finalStep && finalStep.kind !== "noPollingResult") {
     model = finalStep.responseModel;
   } else if (resourceOperation?.operation === "createOrReplace") {
     model = resourceOperation.resourceType;

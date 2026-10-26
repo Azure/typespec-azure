@@ -51,6 +51,55 @@ it("preserves nested paging paths separately from an LRO result property", async
   strictEqual(method.__raw_lro_metadata, method.lroMetadata.__raw);
 });
 
+it("keeps paging paths separate from a resource PUT polling success property", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service namespace TestService;
+    model Item { value: string; }
+    model Page {
+      nested: { @pageItems items: Item[]; };
+      @TypeSpec.nextLink next?: string;
+    }
+    @resource("jobs")
+    model Job {
+      @key id: string;
+      @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+      @lroResult result: Page;
+    }
+    @route("/jobs/{id}") @get op read(@path id: string): Job;
+    @route("/jobs/{id}/status") @get op poll(@path id: string): Job;
+    @list
+    @pollingOperation(poll)
+    @createsOrReplacesResource(Job)
+    @route("/jobs/{id}") @put op start(@path id: string): Job;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+  ok(method);
+  strictEqual(method.kind, "lropaging");
+  strictEqual(method.response.type?.kind, "array");
+  strictEqual(method.response.type.valueType.kind, "model");
+  strictEqual(method.response.type.valueType.name, "Item");
+  const finalResponse = method.lroMetadata.finalResponse;
+  ok(finalResponse);
+  strictEqual(finalResponse.result.kind, "model");
+  strictEqual(finalResponse.result.name, "Page");
+  strictEqual(finalResponse.envelopeResult.kind, "model");
+  strictEqual(finalResponse.envelopeResult.name, "Job");
+  deepStrictEqual(
+    finalResponse.resultSegments?.map((p) => p.name),
+    ["result"],
+  );
+  deepStrictEqual(
+    method.response.resultSegments?.map((p) => p.name),
+    ["result", "nested", "items"],
+  );
+  strictEqual(method.pagingMetadata.pageItemsSegments, method.response.resultSegments);
+  deepStrictEqual(
+    method.pagingMetadata.nextLinkSegments?.map((p) => p.name),
+    ["result", "next"],
+  );
+});
+
 it("normal paged result", async () => {
   const { program } = await SimpleTesterWithService.compile(`
     @list
