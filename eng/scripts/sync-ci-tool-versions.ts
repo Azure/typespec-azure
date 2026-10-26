@@ -1,10 +1,21 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const actionPath = ".github/actions/setup-python/action.yml";
-const tools = [
-  { tool: "python", action: "actions/setup-python", input: "python-version" },
-  { tool: "uv", action: "astral-sh/setup-uv", input: "version" },
+const actions = [
+  {
+    path: ".github/actions/setup-python/action.yml",
+    tools: [
+      { tool: "python", action: "actions/setup-python", input: "python-version" },
+      { tool: "uv", action: "astral-sh/setup-uv", input: "version" },
+    ],
+  },
+  {
+    path: ".github/actions/setup-java/action.yml",
+    tools: [
+      { tool: "java", action: "actions/setup-java", input: "java-version" },
+      { tool: "maven", action: "stCarolas/setup-maven", input: "maven-version" },
+    ],
+  },
 ];
 
 interface ToolVersionMismatch {
@@ -22,50 +33,68 @@ export function syncCiToolVersions(root: string, mode: "check" | "fix"): ToolVer
     throw new Error("Missing [tools] section in mise.toml.");
   }
 
-  const file = resolve(root, actionPath);
-  const content = readFileSync(file, "utf8");
-  // Edit only the matching step's input, preserving action SHAs, comments and formatting.
-  const steps = content.split(/(?=^ *- )/m);
   const mismatches: ToolVersionMismatch[] = [];
+  const updates: { file: string; content: string }[] = [];
 
-  for (const { tool, action, input } of tools) {
-    const expectedVersion = toolsSection.match(
-      new RegExp(`^${tool}[ \\t]*=[ \\t]*(["'])([^"'\\r\\n]+)\\1[ \\t]*(?:#.*)?\\r?$`, "m"),
-    )?.[2];
-    if (expectedVersion === undefined) {
-      throw new Error(`Expected a quoted ${tool} version in mise.toml [tools].`);
-    }
+  for (const { path: actionPath, tools } of actions) {
+    const file = resolve(root, actionPath);
+    const content = readFileSync(file, "utf8");
+    // Edit only the matching step's input, preserving action SHAs, comments and formatting.
+    const steps = content.split(/(?=^ *- )/m);
 
-    const matchingSteps = steps
-      .map((step, index) => ({ step, index }))
-      .filter(({ step }) =>
-        new RegExp(`^[ \\t]*(?:- )?uses:[ \\t]*["']?${action}@`, "m").test(step),
+    for (const { tool, action, input } of tools) {
+      let expectedVersion = toolsSection.match(
+        new RegExp(`^${tool}[ \\t]*=[ \\t]*(["'])([^"'\\r\\n]+)\\1[ \\t]*(?:#.*)?\\r?$`, "m"),
+      )?.[2];
+      if (expectedVersion === undefined) {
+        throw new Error(`Expected a quoted ${tool} version in mise.toml [tools].`);
+      }
+      if (tool === "java") {
+        const javaVersion = expectedVersion.match(/^microsoft-(\d+(?:\.\d+)*)$/)?.[1];
+        if (javaVersion === undefined) {
+          throw new Error("Expected a microsoft- Java version in mise.toml [tools].");
+        }
+        expectedVersion = javaVersion;
+      }
+
+      const matchingSteps = steps
+        .map((step, index) => ({ step, index }))
+        .filter(({ step }) =>
+          new RegExp(`^[ \\t]*(?:- )?uses:[ \\t]*["']?${action}@`, "m").test(step),
+        );
+      if (matchingSteps.length !== 1) {
+        throw new Error(`Expected exactly one ${action} step in ${actionPath}.`);
+      }
+
+      const { step, index } = matchingSteps[0];
+      const versionPattern = new RegExp(
+        `^([ \\t]+${input}:[ \\t]*)(?:"([^"\\r\\n]+)"|'([^'\\r\\n]+)'|([^\\s#]+))([ \\t]*(?:#.*)?\\r?)$`,
+        "m",
       );
-    if (matchingSteps.length !== 1) {
-      throw new Error(`Expected exactly one ${action} step in ${actionPath}.`);
+      const match = step.match(versionPattern);
+      if (!match) {
+        throw new Error(`Missing or unsupported ${input} input for ${action} in ${actionPath}.`);
+      }
+      const currentVersion = match[2] ?? match[3] ?? match[4];
+      if (currentVersion !== expectedVersion) {
+        mismatches.push({ tool, currentVersion, expectedVersion });
+        steps[index] = step.replace(
+          versionPattern,
+          () => `${match[1]}"${expectedVersion}"${match[5]}`,
+        );
+      }
     }
 
-    const { step, index } = matchingSteps[0];
-    const versionPattern = new RegExp(
-      `^([ \\t]+${input}:[ \\t]*)(?:"([^"\\r\\n]+)"|'([^'\\r\\n]+)'|([^\\s#]+))([ \\t]*(?:#.*)?\\r?)$`,
-      "m",
-    );
-    const match = step.match(versionPattern);
-    if (!match) {
-      throw new Error(`Missing or unsupported ${input} input for ${action} in ${actionPath}.`);
-    }
-    const currentVersion = match[2] ?? match[3] ?? match[4];
-    if (currentVersion !== expectedVersion) {
-      mismatches.push({ tool, currentVersion, expectedVersion });
-      steps[index] = step.replace(
-        versionPattern,
-        () => `${match[1]}"${expectedVersion}"${match[5]}`,
-      );
+    const updated = steps.join("");
+    if (updated !== content) {
+      updates.push({ file, content: updated });
     }
   }
 
-  if (mode === "fix" && mismatches.length > 0) {
-    writeFileSync(file, steps.join(""));
+  if (mode === "fix") {
+    for (const { file, content } of updates) {
+      writeFileSync(file, content);
+    }
   }
   return mismatches;
 }

@@ -7,6 +7,8 @@ import { syncCiToolVersions } from "./sync-ci-tool-versions.ts";
 const mise = `[tools]
 python = "3.12"
 uv = "0.11.30"
+java = "microsoft-11"
+maven = "3.9.16"
 
 [settings]
 python = "not-a-tool-version"
@@ -29,18 +31,38 @@ runs:
         version: "1.0.0"
 `;
 
+const javaAction = `name: Setup Java
+runs:
+  using: composite
+  steps:
+    - name: Setup Java
+      uses: actions/setup-java@java-sha # v6.1.0
+      with:
+        distribution: microsoft
+        java-version: "11"
+        overwrite-settings: false
+    - name: Setup Maven
+      uses: stCarolas/setup-maven@maven-sha # v5.1
+      with:
+        maven-version: "3.9.16" # Keep this comment
+`;
+
 describe("syncCiToolVersions", () => {
   let root: string;
   let misePath: string;
   let actionPath: string;
+  let javaActionPath: string;
 
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), "sync-ci-tool-versions-"));
     misePath = join(root, "mise.toml");
     actionPath = join(root, ".github/actions/setup-python/action.yml");
+    javaActionPath = join(root, ".github/actions/setup-java/action.yml");
     mkdirSync(join(root, ".github/actions/setup-python"), { recursive: true });
+    mkdirSync(join(root, ".github/actions/setup-java"), { recursive: true });
     writeFileSync(misePath, mise);
     writeFileSync(actionPath, action);
+    writeFileSync(javaActionPath, javaAction);
   });
 
   afterEach(() => {
@@ -50,6 +72,7 @@ describe("syncCiToolVersions", () => {
   it.each(["check", "fix"] as const)("leaves matching versions unchanged in %s mode", (mode) => {
     expect(syncCiToolVersions(root, mode)).toEqual([]);
     expect(readFileSync(actionPath, "utf8")).toBe(action);
+    expect(readFileSync(javaActionPath, "utf8")).toBe(javaAction);
   });
 
   it("reports both mismatches without changing either file in check mode", () => {
@@ -83,6 +106,59 @@ describe("syncCiToolVersions", () => {
     writeFileSync(misePath, mise.replace('uv = "0.11.30"', "uv = '0.11.30' # Pin uv"));
     writeFileSync(actionPath, action.replace('"3.12"', "'3.12'").replace('"0.11.30"', "0.11.30"));
     expect(syncCiToolVersions(root, "check")).toEqual([]);
+  });
+
+  it("reports Java and Maven mismatches without writing in check mode", () => {
+    writeFileSync(
+      misePath,
+      mise.replace("microsoft-11", "microsoft-17").replace("3.9.16", "3.9.17"),
+    );
+
+    expect(syncCiToolVersions(root, "check")).toEqual([
+      { tool: "java", currentVersion: "11", expectedVersion: "17" },
+      { tool: "maven", currentVersion: "3.9.16", expectedVersion: "3.9.17" },
+    ]);
+    expect(readFileSync(javaActionPath, "utf8")).toBe(javaAction);
+  });
+
+  it("fixes Java and Maven inputs without changing the distribution or action pins", () => {
+    const updatedMise = mise
+      .replace("microsoft-11", "microsoft-11.0.32")
+      .replace("3.9.16", "3.9.17");
+    writeFileSync(misePath, updatedMise);
+
+    expect(syncCiToolVersions(root, "fix")).toHaveLength(2);
+    expect(readFileSync(javaActionPath, "utf8")).toBe(
+      javaAction
+        .replace('java-version: "11"', 'java-version: "11.0.32"')
+        .replace('maven-version: "3.9.16"', 'maven-version: "3.9.17"'),
+    );
+    expect(readFileSync(actionPath, "utf8")).toBe(action);
+    expect(readFileSync(misePath, "utf8")).toBe(updatedMise);
+    expect(syncCiToolVersions(root, "fix")).toEqual([]);
+  });
+
+  it.each(["temurin-11", "microsoft-"])(
+    "rejects unsupported Java pin %s without writing",
+    (version) => {
+      writeFileSync(misePath, mise.replace("microsoft-11", version).replace("3.12", "3.13"));
+
+      expect(() => syncCiToolVersions(root, "fix")).toThrow("Expected a microsoft- Java version");
+      expect(readFileSync(actionPath, "utf8")).toBe(action);
+      expect(readFileSync(javaActionPath, "utf8")).toBe(javaAction);
+    },
+  );
+
+  it("does not partially update Python when the Java action is invalid", () => {
+    writeFileSync(misePath, mise.replace("3.12", "3.13"));
+    const invalidAction = javaAction.replace("stCarolas/setup-maven@", "example/setup-maven@");
+    writeFileSync(javaActionPath, invalidAction);
+
+    expect(() => syncCiToolVersions(root, "fix")).toThrow(
+      "Expected exactly one stCarolas/setup-maven step",
+    );
+    expect(readFileSync(actionPath, "utf8")).toBe(action);
+    expect(readFileSync(javaActionPath, "utf8")).toBe(invalidAction);
   });
 
   it("preserves CRLF line endings when fixing", () => {
