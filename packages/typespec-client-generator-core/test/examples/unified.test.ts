@@ -81,7 +81,10 @@ describe("unified examples", () => {
 
   it("maps resolved request and response values through the existing example pipeline", async () => {
     const instance = await SimpleTester.createInstance();
-    instance.fs.addTypeSpecFile("examples.yaml", example);
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      example.replace("- title:", "- id: create-widget\n    title:"),
+    );
     const { program } = await instance.compile(spec);
     const context = await createSdkContextForTester(program);
     expectDiagnostics(context.diagnostics, []);
@@ -90,6 +93,7 @@ describe("unified examples", () => {
     ok(examples);
     strictEqual(examples.length, 1);
     const loaded = examples[0];
+    strictEqual(loaded.id, "create-widget");
     strictEqual(loaded.name, "Create widget");
     strictEqual(loaded.doc, "Create widget");
     strictEqual(loaded.filePath, "examples.yaml");
@@ -123,6 +127,7 @@ describe("unified examples", () => {
       const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
         .examples![0];
       strictEqual(loaded.filePath, path);
+      ok(!("id" in loaded));
       strictEqual(loaded.name, "Widgets_get");
       deepStrictEqual(loaded.rawExample.parameters, {});
       strictEqual(loaded.responses[0].bodyValue?.value, "result");
@@ -298,6 +303,7 @@ Widgets.get:
       const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
         .examples![0];
       strictEqual(loaded.name, "Legacy");
+      ok(!("id" in loaded));
       strictEqual(loaded.filePath, "get.json");
       strictEqual(loaded.responses[0].bodyValue?.value, "legacy");
     },
@@ -367,6 +373,7 @@ GetSchemaById:
     expectDiagnostics(context.diagnostics, []);
     const loaded = httpMethod(context.sdkPackage.clients[0].methods[0]).operation.examples!;
     strictEqual(loaded.length, 1);
+    strictEqual(loaded[0].id, "GetSchemaById");
     strictEqual(loaded[0].name, "Get Schema by ID");
     strictEqual(loaded[0].filePath, "examples/SchemaRegistry.yaml");
     strictEqual(loaded[0].rawExample.operationId, "getSchemaById");

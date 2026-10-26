@@ -47,6 +47,7 @@ import { createDiagnostic } from "./lib.js";
 import { resolveOperationId } from "./public-utils.js";
 
 interface LoadedExample {
+  readonly id?: string;
   readonly relativePath: string;
   readonly data: any;
 }
@@ -312,7 +313,7 @@ function materializeUnifiedExamples(
       data.parameters[apiVersionParameter.serializedName] ??= apiVersion;
     }
     const title = uniqueExampleTitle(data.title, usedTitles);
-    normalized.set(title, { relativePath, data });
+    normalized.set(title, { id: example.id, relativePath, data });
   }
   return diagnostics.wrap(Object.fromEntries(normalized));
 }
@@ -355,6 +356,7 @@ function handleHttpOperationExamples(
   for (const [title, example] of Object.entries(examples)) {
     const operationExample: SdkHttpOperationExample = {
       kind: "http",
+      ...(example.id !== undefined ? { id: example.id } : {}),
       name: title,
       doc: title,
       filePath: example.relativePath,
