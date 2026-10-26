@@ -40,6 +40,12 @@ TypeSpec provide operation templates that describe the request and response of s
 operations. A description of the options available for each resource template, and how to choose
 which one is described in the sections below.
 
+#### Custom constraints on shared common parameters
+
+When an operation uses a shared common-types parameter, the emitted OpenAPI may reference the shared parameter definition instead of emitting a locally customized copy. This is expected: local augmentations such as a custom `pattern` or length constraint should not be expected to appear automatically in generated Swagger or downstream documentation.
+
+If you need custom constraints to be emitted, define and use a service-specific parameter instead of the shared common parameter. Use a shared common parameter only when its standard emitted shape is sufficient.
+
 ### Synchronous and Asynchronous APIs
 
 CreateOrUpdate (PUT), Update (Patch), Delete, and Action (POST) operations over a resource may be either synchronous or asynchronous. Synchronous operations complete before a response is returned. Asynchronous operations return an initial response before the operation fully completes, and support long-running operation (LRO) polling. The sections below describe the available templates for both synchronous and asynchronous variants of each operation.
