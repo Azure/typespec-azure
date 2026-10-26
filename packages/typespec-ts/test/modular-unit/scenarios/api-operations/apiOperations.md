@@ -42,6 +42,7 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
 
   return;
 }
+
 export async function uploadFileViaBody(
   context: Client,
   body: Uint8Array,
@@ -100,6 +101,7 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
 
   return;
 }
+
 export async function uploadFileViaBody(
   context: Client,
   body: Uint8Array,
@@ -184,6 +186,7 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
+
 export async function uploadFile(
   context: Client,
   body: {
@@ -277,6 +280,7 @@ export async function _uploadFilesDeserialize(result: PathUncheckedResponse): Pr
 
   return;
 }
+
 export async function uploadFiles(
   context: Client,
   body: {
@@ -335,6 +339,7 @@ export async function _downloadFileDeserialize(result: PathUncheckedResponse): P
 
   return result.body;
 }
+
 export async function downloadFile(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
@@ -392,6 +397,7 @@ export async function _downloadFileDeserialize(result: PathUncheckedResponse): P
 
   return result.body;
 }
+
 export async function downloadFile(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
@@ -450,6 +456,7 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
 
   return;
 }
+
 export async function uploadFileViaBody(
   context: Client,
   contentType: string,
@@ -514,6 +521,7 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
+
 export async function test(
   context: Client,
   apiVersion: string,
@@ -530,11 +538,13 @@ export async function test(
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Testing. */
 export interface TestingContext extends Client {}
 
 /** Optional parameters for the client. */
 export interface TestingClientOptionalParams extends ClientOptions {}
 
+/** Creates a Testing client context. */
 export function createTesting(
   endpointParam: string,
   options: TestingClientOptionalParams = {},
@@ -567,11 +577,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for TestingClient. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -645,6 +657,7 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
+
 export async function test(
   context: Client,
   apiVersion: string,
@@ -661,11 +674,13 @@ export async function test(
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Testing. */
 export interface TestingContext extends Client {}
 
 /** Optional parameters for the client. */
 export interface TestingClientOptionalParams extends ClientOptions {}
 
+/** Creates a Testing client context. */
 export function createTesting(
   endpointParam: string,
   options: TestingClientOptionalParams = {},
@@ -698,11 +713,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for TestingClient. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -760,6 +777,7 @@ export async function _test1Deserialize(result: PathUncheckedResponse): Promise<
 
   return result.body;
 }
+
 export async function test1(
   context: Client,
   options: Test1OptionalParams = { requestOptions: {} },
@@ -796,6 +814,7 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
 
   return result.body;
 }
+
 export async function test(
   context: Client,
   apiVersion: string,
@@ -812,11 +831,13 @@ export async function test(
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Testing. */
 export interface TestingContext extends Client {}
 
 /** Optional parameters for the client. */
 export interface TestingClientOptionalParams extends ClientOptions {}
 
+/** Creates a Testing client context. */
 export function createTesting(
   endpointParam: string,
   options: TestingClientOptionalParams = {},
@@ -849,11 +870,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for TestingClient. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -1027,6 +1050,7 @@ export async function _updateFileShareSnapshotDeserialize(
 
   return fileShareSnapshotDeserializer(result.body);
 }
+
 /** Update a FileShareSnapshot */
 export function updateFileShareSnapshot(
   context: Client,
@@ -1087,6 +1111,7 @@ export async function _listDeserialize(
 
   return _operationListResultDeserializer(result.body);
 }
+
 /** List the operations for the provider */
 export function list(
   context: Client,

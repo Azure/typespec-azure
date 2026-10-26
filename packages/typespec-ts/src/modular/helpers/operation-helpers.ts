@@ -94,7 +94,7 @@ import {
 } from "../type-expressions/get-type-expression.js";
 import { getClientParameterName } from "./client-helpers.js";
 import { getHeaderClientOptions, getRestErrorCodeHeader } from "./client-option-helpers.js";
-import { getDocsFromDescription, getFixmeForMultilineDocs } from "./docs-helpers.js";
+import { getFixmeForMultilineDocs, getOperationDocs } from "./docs-helpers.js";
 import {
   generateLocallyUniqueName,
   getClassicalLayerPrefix,
@@ -1031,7 +1031,13 @@ export function getOperationFunction(
   const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
   const functionStatement = {
     kind: StructureKind.Function,
-    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    docs: [
+      ...getOperationDocs(
+        operation,
+        parameters.map((p) => p.name),
+      ),
+      ...getFixmeForMultilineDocs(fixme),
+    ],
     isAsync: true,
     isExported: true,
     name,
@@ -1468,7 +1474,13 @@ function getStructuredStreamOperationFunction(
 
   return {
     kind: StructureKind.Function,
-    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    docs: [
+      ...getOperationDocs(
+        operation,
+        parameters.map((p) => p.name),
+      ),
+      ...getFixmeForMultilineDocs(fixme),
+    ],
     isAsync: true,
     isExported: true,
     name,
@@ -1650,7 +1662,13 @@ function getLroOnlyOperationFunction(
 
   const functionStatement = {
     kind: StructureKind.Function,
-    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    docs: [
+      ...getOperationDocs(
+        operation,
+        parameters.map((p) => p.name),
+      ),
+      ...getFixmeForMultilineDocs(fixme),
+    ],
     isAsync: false,
     isExported: true,
     name,
@@ -1755,7 +1773,13 @@ function getLroAndPagingOperationFunction(
 
   return {
     kind: StructureKind.Function,
-    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    docs: [
+      ...getOperationDocs(
+        operation,
+        parameters.map((p) => p.name),
+      ),
+      ...getFixmeForMultilineDocs(fixme),
+    ],
     isAsync: false,
     isExported: true,
     isLroPaging: true,
@@ -1845,7 +1869,13 @@ function getPagingOnlyOperationFunction(
   const buildPagedAsyncIteratorReference = resolveReference(PagingHelpers.BuildPagedAsyncIterator);
   const functionStatement = {
     kind: StructureKind.Function,
-    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    docs: [
+      ...getOperationDocs(
+        operation,
+        parameters.map((p) => p.name),
+      ),
+      ...getFixmeForMultilineDocs(fixme),
+    ],
     isAsync: false,
     isExported: true,
     name,

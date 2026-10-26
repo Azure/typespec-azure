@@ -62,11 +62,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { ServiceAClientOptionalParams } from "./api/serviceAContext.js";
 
+/** Client for ServiceAClient. */
 export class ServiceAClient {
   private _client: ServiceAContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of ServiceAClient. */
   constructor(endpointParam: string, options: ServiceAClientOptionalParams = {}) {
     this._client = createServiceA(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -92,11 +94,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { ServiceBClientOptionalParams } from "./api/serviceBContext.js";
 
+/** Client for ServiceBClient. */
 export class ServiceBClient {
   private _client: ServiceBContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of ServiceBClient. */
   constructor(endpointParam: string, options: ServiceBClientOptionalParams = {}) {
     this._client = createServiceB(endpointParam, options);
     this.pipeline = this._client.pipeline;

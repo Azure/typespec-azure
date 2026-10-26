@@ -118,7 +118,7 @@ export function buildClientContext(
     isExported: true,
     name: `${clientName}`,
     extends: [resolveReference(dependencies.Client)],
-    docs: getDocsFromDescription(client.doc),
+    docs: getDocsFromDescription(client.doc?.trim() || `The client context for ${name}.`),
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
   });
 
@@ -170,7 +170,7 @@ export function buildClientContext(
   });
 
   const factoryFunction = clientContextFile.addFunction({
-    docs: getDocsFromDescription(client.doc),
+    docs: getDocsFromDescription(client.doc?.trim() || `Creates a ${name} client context.`),
     name: `create${name}`,
     returnType: `${clientName}`,
     parameters: getClientParametersDeclaration(client, dpgContext, {

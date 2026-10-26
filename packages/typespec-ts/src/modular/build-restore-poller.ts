@@ -50,6 +50,7 @@ export function buildRestorePoller(
   const operationOptionsReference = resolveReference(dependencies.OperationOptions);
   const deserializeStateReference = resolveReference(AzurePollingDependencies.DeserializeState);
   const restorePollerHelperContent = `
+    /** Options for restoring a long-running operation poller. */
     export interface RestorePollerOptions<
       TResult,
       TResponse extends ${pathUncheckedReference} = ${pathUncheckedReference}
