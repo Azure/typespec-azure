@@ -327,9 +327,9 @@ model JobState extends PollingMetadataBase {`,
     ];
 
     for (const testCase of invalidCases) {
-      const { program } = await Tester.compile(testCase.code);
+      const [{ program }, compileDiagnostics] = await Tester.compileAndDiagnose(testCase.code);
       const context = await createSdkContextForTester(program);
-      expect(context.diagnostics.map((x) => x.code)).toContain(
+      expect([...compileDiagnostics, ...context.diagnostics].map((x) => x.code)).toContain(
         `@azure-tools/typespec-client-generator-core/${testCase.diagnostic}`,
       );
     }
@@ -450,8 +450,8 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
     );
   });
 
-  it("reports only overlapping active scoped property decorators", async () => {
-    const { program } = await Tester.compile(
+  it("reports duplicate scoped property decorators when declared", async () => {
+    const [{ program }, compileDiagnostics] = await Tester.compileAndDiagnose(
       operation.replace(
         "@lroStatusMetadata\n  request_token",
         '@lroStatusMetadata\n  @lroStatusMetadata("python")\n  request_token',
@@ -463,12 +463,12 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
     const csharpContext = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-csharp",
     });
-    expect(pythonContext.diagnostics.map((x) => x.code)).toContain(
+    expect(compileDiagnostics.map((x) => x.code)).toContain(
       "@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate",
     );
-    expect(csharpContext.diagnostics.map((x) => x.code)).not.toContain(
-      "@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate",
-    );
+    expect(
+      [...pythonContext.diagnostics, ...csharpContext.diagnostics].map((x) => x.code),
+    ).not.toContain("@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate");
   });
 
   it("does not change undecorated LRO metadata", async () => {

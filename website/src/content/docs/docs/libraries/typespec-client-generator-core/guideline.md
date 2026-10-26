@@ -377,8 +377,7 @@ The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native C
 
 #### LRO status metadata
 
-The TCGC-only `@lroStatusMetadata` decorator lets an SDK expose auxiliary status-monitor metadata
-without changing Azure.Core polling protocol semantics or the normal method response:
+The TCGC-only `@lroStatusMetadata` decorator lets an SDK expose auxiliary status-monitor metadata without changing Azure.Core polling protocol semantics or the normal method response:
 
 ```typespec
 model OperationStatus {
@@ -399,19 +398,9 @@ op getOperationStatus(@path operationId: string): OperationStatus;
 op begin is MyLongRunningOperation;
 ```
 
-`SdkLroServiceMetadata.statusMetadata` contains wrappers around the exact cached
-`SdkModelPropertyType` objects from the polling response model, in deterministic
-direct-then-inherited model/property order. Consequently, client and wire names, optionality,
-decorators, serialization, and property types are preserved. These properties are auxiliary
-operation or poller state, may only be available from the terminal response, and do not affect
-polling, status evaluation, errors, final-result extraction, or polling and final locations. TCGC
-diagnoses attempts to decorate those structural LRO properties.
+`SdkLroServiceMetadata.statusMetadata` contains wrappers around the exact cached `SdkModelPropertyType` objects from the polling response model, in deterministic direct-then-inherited model/property order. Consequently, client and wire names, optionality, decorators, serialization, and property types are preserved. These properties are auxiliary operation or poller state, may only be available from the terminal response, and do not affect polling, status evaluation, errors, final-result extraction, or polling and final locations. TCGC diagnoses attempts to decorate those structural LRO properties.
 
-Each active decorated direct or inherited property applies to every LRO that uses that
-status-monitor model. Nested properties are not scanned; decorate the direct property to expose
-its typed graph. A decorated property unused by an LRO has no generation effect. TCGC retains only
-decorated type graphs for output and continues to honor scoped `@usage`, `@access`, and inclusion
-or negation on each property. SDK placement remains emitter-specific.
+Each active decorated direct or inherited property applies to every LRO that uses that status-monitor model. Nested properties are not scanned; decorate the direct property to expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`, and inclusion or negation on each property. SDK placement remains emitter-specific.
 
 ### HTTP Operation Parameters Handling
 

@@ -6,7 +6,7 @@ import {
   type Operation,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { getLroStatusMetadataDecorators } from "./decorators.js";
+import { getLroStatusMetadataDecorator } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import type { SdkPropertyVisibilityPredicate } from "./types.js";
@@ -69,18 +69,8 @@ function resolve(
 
   for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
     if (!isPropertyVisible(context, property)) continue;
-    const metadataDecorators = getLroStatusMetadataDecorators(context, property);
-    if (metadataDecorators.length === 0) continue;
-
-    if (metadataDecorators.length > 1) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "lro-status-metadata-duplicate",
-          format: { propertyName: property.name },
-          target: metadataDecorators[1].target,
-        }),
-      );
-    }
+    const metadataDecorator = getLroStatusMetadataDecorator(context, property);
+    if (!metadataDecorator) continue;
 
     const structuralRole = getStructuralRole(raw, property);
     if (structuralRole) {
@@ -88,7 +78,7 @@ function resolve(
         createDiagnostic({
           code: "lro-status-metadata-structural-property",
           format: { propertyName: property.name, role: structuralRole },
-          target: metadataDecorators[0].target,
+          target: metadataDecorator.target,
         }),
       );
       continue;

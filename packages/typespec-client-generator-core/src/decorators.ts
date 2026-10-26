@@ -115,7 +115,7 @@ interface ScopedLroDecorator {
 const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
 const [getLroStatusMetadataEntries, setLroStatusMetadataEntries] = useStateMap<
   ModelProperty,
-  ScopedLroDecorator[]
+  ScopedLroDecorator
 >(lroStatusMetadataKey);
 
 export const $lroStatusMetadata: LroStatusMetadataDecorator = (
@@ -123,18 +123,28 @@ export const $lroStatusMetadata: LroStatusMetadataDecorator = (
   target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  const entries = getLroStatusMetadataEntries(context.program, target) ?? [];
-  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
-  setLroStatusMetadataEntries(context.program, target, entries);
+  if (getLroStatusMetadataEntries(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "lro-status-metadata-duplicate",
+      format: { propertyName: target.name },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setLroStatusMetadataEntries(context.program, target, {
+    scope: normalizeScope(scope),
+    target: context.decoratorTarget,
+  });
 };
 
-export function getLroStatusMetadataDecorators(
+export function getLroStatusMetadataDecorator(
   context: TCGCContext,
   target: ModelProperty,
-): ScopedLroDecorator[] {
-  return (getLroStatusMetadataEntries(context.program, target) ?? []).filter(
-    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
-  );
+): ScopedLroDecorator | undefined {
+  const entry = getLroStatusMetadataEntries(context.program, target);
+  return entry && (!entry.scope || isScopeApplicable(entry.scope, context.emitterName))
+    ? entry
+    : undefined;
 }
 
 /**

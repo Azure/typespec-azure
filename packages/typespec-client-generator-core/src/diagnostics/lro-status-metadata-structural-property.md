@@ -1,10 +1,42 @@
-# Structural LRO property selected as status metadata
+This diagnostic is issued when `@lroStatusMetadata` selects a property that already has a structural LRO role, such as status, result, error, polling location, or final location.
 
-`@lroStatusMetadata` is only for auxiliary values from the status-monitor envelope. Status,
-logical result, error, and polling or final-location properties already have dedicated LRO
-semantics.
+## Impact
 
-## How to fix
+- **Area:** LRO status metadata. The structural property is omitted from `SdkLroServiceMetadata.statusMetadata`.
+- **Not affected:** The property's existing LRO protocol role and normal polling behavior are unchanged.
 
-Remove `@lroStatusMetadata` from the structural LRO property. Apply it only to an auxiliary
-status-monitor property such as usage or progress information.
+## ❌ Incorrect Usage
+
+```typespec
+model OperationStatus {
+  @lroStatus
+  @lroStatusMetadata
+  status: OperationState;
+}
+```
+
+## Diagnostic Message
+
+TCGC reports:
+
+```text
+@lroStatusMetadata cannot select the status monitor's status property 'status'.
+```
+
+## ✅ How to Fix
+
+Remove `@lroStatusMetadata` from structural LRO properties and apply it only to auxiliary values.
+
+```typespec
+model OperationStatus {
+  @lroStatus
+  status: OperationState;
+
+  @lroStatusMetadata
+  percentComplete?: int32;
+}
+```
+
+## Suppression
+
+This diagnostic should not be suppressed. Select only auxiliary status-monitor properties.

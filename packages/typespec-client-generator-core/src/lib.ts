@@ -217,7 +217,7 @@ export const $lib = createTypeSpecLibrary({
       ...doc("lro-status-metadata-duplicate"),
       severity: "error",
       messages: {
-        default: paramMessage`@lroStatusMetadata is applied more than once to property '${"propertyName"}' in the active emitter scope.`,
+        default: paramMessage`@lroStatusMetadata is applied more than once to property '${"propertyName"}'.`,
       },
     },
     "lro-status-metadata-name-conflict": {
