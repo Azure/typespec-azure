@@ -117,8 +117,6 @@ After migration, all models (including enums) will have capitalized names.
 
 Some validation rules may fail because TypeSpec fixes certain legacy patterns. Review the known issues below and take appropriate action.
 
-For ordinary `ModelValidation` failures, correct the example or the generated OpenAPI so they match the intended contract; do not treat suppression as the first-line response to a conformance error. If the example is wrong, update it to match the generated schema. If the example is intended and correct, update the TypeSpec or other source definitions so the generated Swagger/OpenAPI reflects that contract. Only consider suppression after confirming the validation result is not a normal schema-example conformance issue.
-
 ### INVALID_FORMAT: Object didn't pass validation for format uri: {nextlink}
 
 #### Root Cause
@@ -133,7 +131,7 @@ This standardized approach changes the `nextLink` type from plain `string` to `u
 
 #### Resolution
 
-Choose one of the following options:
+Do not suppress this schema-example conformance error by default. Instead, choose one of the following options:
 
 1. **Update your example** to include a valid URI value, or
 2. **Modify your TypeSpec response model** to use a custom definition if the nextLink returned by the service is not a URI:
@@ -147,6 +145,8 @@ model ResponseModel {
   nextLink?: string;
 }
 ```
+
+Only consider suppression after confirming the validation result is not a normal schema-example conformance issue.
 
 ### INVALID_FORMAT: Object didn't pass validation for format arm-id
 
