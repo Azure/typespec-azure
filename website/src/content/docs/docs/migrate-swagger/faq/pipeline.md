@@ -117,13 +117,9 @@ After migration, all models (including enums) will have capitalized names.
 
 Some validation rules may fail because TypeSpec fixes certain legacy patterns. Review the known issues below and take appropriate action.
 
-### REQUEST_VALIDATION_ERROR
+### REQUEST_VALIDATION_ERROR / RESPONSE_VALIDATION_ERROR
 
-This error indicates that an example request or request payload failed validation. Check the inner error details to identify the specific mismatch, as described in the [Swagger validation reference](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/Semantic-and-Model-Violations-Reference.md#request_validation_error).
-
-### RESPONSE_VALIDATION_ERROR
-
-This error indicates that an example response failed validation. Check the inner error details to identify the specific mismatch, as described in the [Swagger validation reference](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/Semantic-and-Model-Violations-Reference.md#response_validation_error).
+This error indicates that an example request or request payload failed validation.
 
 For ordinary request or response schema-example conformance failures, correct the example or the generated Swagger/OpenAPI to match the intended contract. If the example is wrong, update it to match the generated schema; if it is intended and correct, update TypeSpec or other source definitions so generation reflects that contract. Do not treat suppression as the first-line response; consider it only after confirming the result is not a normal conformance issue.
 
