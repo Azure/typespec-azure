@@ -356,10 +356,10 @@ function handleHttpOperationExamples(
   for (const [title, example] of Object.entries(examples)) {
     const operationExample: SdkHttpOperationExample = {
       kind: "http",
-      ...(example.id !== undefined ? { id: example.id } : {}),
       name: title,
       doc: title,
-      filePath: example.relativePath,
+      filePath:
+        example.id !== undefined ? `${example.relativePath}#${example.id}` : example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
           operation.bodyParam

@@ -1457,12 +1457,10 @@ export interface DecoratorOptions {
 
 interface SdkExampleBase {
   kind: string;
-  /** Example identifier from the unified YAML definition, when provided. */
-  id?: string;
   /** Unique example name within the operation. */
   name: string;
   doc: string;
-  /** Path to the source JSON or YAML file containing the example. */
+  /** Path to the source JSON or YAML file, with `#id` appended for YAML examples with an explicit ID. */
   filePath: string;
   rawExample: any;
 }

@@ -93,10 +93,10 @@ describe("unified examples", () => {
     ok(examples);
     strictEqual(examples.length, 1);
     const loaded = examples[0];
-    strictEqual(loaded.id, "create-widget");
+    ok(!("id" in loaded));
     strictEqual(loaded.name, "Create widget");
     strictEqual(loaded.doc, "Create widget");
-    strictEqual(loaded.filePath, "examples.yaml");
+    strictEqual(loaded.filePath, "examples.yaml#create-widget");
     deepStrictEqual(loaded.rawExample, {
       title: "Create widget",
       operationId: "Widgets_create",
@@ -373,9 +373,9 @@ GetSchemaById:
     expectDiagnostics(context.diagnostics, []);
     const loaded = httpMethod(context.sdkPackage.clients[0].methods[0]).operation.examples!;
     strictEqual(loaded.length, 1);
-    strictEqual(loaded[0].id, "GetSchemaById");
+    ok(!("id" in loaded[0]));
     strictEqual(loaded[0].name, "Get Schema by ID");
-    strictEqual(loaded[0].filePath, "examples/SchemaRegistry.yaml");
+    strictEqual(loaded[0].filePath, "examples/SchemaRegistry.yaml#GetSchemaById");
     strictEqual(loaded[0].rawExample.operationId, "getSchemaById");
     strictEqual(loaded[0].responses[0].bodyValue?.value, expected);
   });
