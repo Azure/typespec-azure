@@ -11,10 +11,7 @@ const actions = [
   },
   {
     path: ".github/actions/setup-java/action.yml",
-    tools: [
-      { tool: "java", action: "actions/setup-java", input: "java-version" },
-      { tool: "maven", action: "stCarolas/setup-maven", input: "maven-version" },
-    ],
+    tools: [{ tool: "java", action: "actions/setup-java", input: "java-version" }],
   },
 ];
 

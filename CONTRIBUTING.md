@@ -24,17 +24,17 @@ mise is recommended but not required; if you use another version manager,
 install the versions declared in `mise.toml` and the pnpm version declared by
 the `packageManager` field in `package.json`.
 
-The Python and Java CI setup actions use the Python, uv, Microsoft JDK, and Maven
+The Python and Java CI setup actions use the Python, uv, and Microsoft JDK
 versions declared in `mise.toml`. After updating those versions, run `pnpm deps fix`
 to sync the actions. `pnpm deps check` reports version drift as part of the CI
 consistency checks.
 
 Java builds in GitHub Actions use the shared `.github/actions/setup-java` action
-with `actions/setup-java` and `stCarolas/setup-maven`, without running mise or
-changing the job's Node.js version. Maven dependencies are cached by OS,
-architecture, tool configuration, the pinned Java generator sources and patch,
-and package POMs. CI also runs on `main` pushes to populate caches that pull
-requests can restore.
+with `actions/setup-java`, without running mise or changing the job's Node.js
+version. Maven is preinstalled on the hosted runners; its version is logged in
+each job. Maven dependencies are cached by OS, architecture, Java setup
+configuration, the pinned Java generator sources and patch, and package POMs.
+CI also runs on `main` pushes to populate caches that pull requests can restore.
 
 Workspace builds use native TypeScript 7 through the root `typescript-native`
 dependency, which provides `tsc` to package scripts. The `typescript` catalog entry

@@ -1,3 +1,4 @@
+// cspell:ignore temurin
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -39,12 +40,11 @@ runs:
       uses: actions/setup-java@java-sha # v6.1.0
       with:
         distribution: microsoft
-        java-version: "11"
+        java-version: "11" # Keep this comment
         overwrite-settings: false
-    - name: Setup Maven
-      uses: stCarolas/setup-maven@maven-sha # v5.1
-      with:
-        maven-version: "3.9.16" # Keep this comment
+    - name: Log Maven version
+      shell: bash
+      run: mvn --version
 `;
 
 describe("syncCiToolVersions", () => {
@@ -108,34 +108,33 @@ describe("syncCiToolVersions", () => {
     expect(syncCiToolVersions(root, "check")).toEqual([]);
   });
 
-  it("reports Java and Maven mismatches without writing in check mode", () => {
-    writeFileSync(
-      misePath,
-      mise.replace("microsoft-11", "microsoft-17").replace("3.9.16", "3.9.17"),
-    );
+  it("reports Java mismatches without writing in check mode", () => {
+    writeFileSync(misePath, mise.replace("microsoft-11", "microsoft-17"));
 
     expect(syncCiToolVersions(root, "check")).toEqual([
       { tool: "java", currentVersion: "11", expectedVersion: "17" },
-      { tool: "maven", currentVersion: "3.9.16", expectedVersion: "3.9.17" },
     ]);
     expect(readFileSync(javaActionPath, "utf8")).toBe(javaAction);
   });
 
-  it("fixes Java and Maven inputs without changing the distribution or action pins", () => {
-    const updatedMise = mise
-      .replace("microsoft-11", "microsoft-11.0.32")
-      .replace("3.9.16", "3.9.17");
+  it("fixes Java inputs without changing the distribution or action pins", () => {
+    const updatedMise = mise.replace("microsoft-11", "microsoft-11.0.32");
     writeFileSync(misePath, updatedMise);
 
-    expect(syncCiToolVersions(root, "fix")).toHaveLength(2);
+    expect(syncCiToolVersions(root, "fix")).toHaveLength(1);
     expect(readFileSync(javaActionPath, "utf8")).toBe(
-      javaAction
-        .replace('java-version: "11"', 'java-version: "11.0.32"')
-        .replace('maven-version: "3.9.16"', 'maven-version: "3.9.17"'),
+      javaAction.replace('java-version: "11"', 'java-version: "11.0.32"'),
     );
     expect(readFileSync(actionPath, "utf8")).toBe(action);
     expect(readFileSync(misePath, "utf8")).toBe(updatedMise);
     expect(syncCiToolVersions(root, "fix")).toEqual([]);
+  });
+
+  it("does not synchronize the runner's Maven version with the local pin", () => {
+    writeFileSync(misePath, mise.replace("3.9.16", "3.9.17"));
+
+    expect(syncCiToolVersions(root, "fix")).toEqual([]);
+    expect(readFileSync(javaActionPath, "utf8")).toBe(javaAction);
   });
 
   it.each(["temurin-11", "microsoft-"])(
@@ -151,11 +150,11 @@ describe("syncCiToolVersions", () => {
 
   it("does not partially update Python when the Java action is invalid", () => {
     writeFileSync(misePath, mise.replace("3.12", "3.13"));
-    const invalidAction = javaAction.replace("stCarolas/setup-maven@", "example/setup-maven@");
+    const invalidAction = javaAction.replace("actions/setup-java@", "example/setup-java@");
     writeFileSync(javaActionPath, invalidAction);
 
     expect(() => syncCiToolVersions(root, "fix")).toThrow(
-      "Expected exactly one stCarolas/setup-maven step",
+      "Expected exactly one actions/setup-java step",
     );
     expect(readFileSync(actionPath, "utf8")).toBe(action);
     expect(readFileSync(javaActionPath, "utf8")).toBe(invalidAction);

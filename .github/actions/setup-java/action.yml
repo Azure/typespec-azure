@@ -1,5 +1,5 @@
 name: Setup Java
-description: Setup pinned JDK and Maven with dependency caching for typespec-java
+description: Setup JDK with Maven dependency caching for typespec-java
 
 runs:
   using: composite
@@ -12,16 +12,15 @@ runs:
         java-version: "11"
         overwrite-settings: false
 
-    - name: Setup Maven
-      uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
-      with:
-        maven-version: "3.9.16"
+    - name: Log Maven version
+      shell: bash
+      run: mvn --version
 
     - name: Cache Maven dependencies
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ~/.m2/repository
         # Generator POMs are copied at build time, so include their pinned sources.
-        key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('mise.toml', 'mise.lock', 'packages/typespec-java/core-commit.json', 'packages/typespec-java/core.patch', 'packages/typespec-java/**/pom.xml') }}
+        key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.github/actions/setup-java/action.yml', 'packages/typespec-java/core-commit.json', 'packages/typespec-java/core.patch', 'packages/typespec-java/**/pom.xml') }}
         restore-keys: |
           maven-${{ runner.os }}-${{ runner.arch }}-
