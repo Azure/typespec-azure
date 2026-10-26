@@ -120,33 +120,7 @@ You can rename models and attributes. [Renames have a target](https://microsoft.
 - `client` means that all client will use that name
 - `csharp`, `javascript`, `python`, `java` means you target this specific language
 
-Language target takes priority over `client` target.
-
-When resolving a naming collision only in a generated SDK, scope the rename to the affected emitter. An unscoped `@clientName` applies to all emitters. To preserve the original name in OpenAPI output from `typespec-autorest`, exclude `autorest` from the scope.
-
-For example, if `main.tsp` defines `ActionType`, add one of the following augmentations in `client.tsp`:
-
-```typespec title=client.tsp
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ClientGenerator.Core;
-using PetStoreNamespace;
-
-// Rename only in the C# SDK.
-@@clientName(ActionType, "DataTransferActionType", "csharp");
-```
-
-```typespec title=client.tsp
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ClientGenerator.Core;
-using PetStoreNamespace;
-
-// Rename in client generators but leave the OpenAPI-emitted name unchanged.
-@@clientName(ActionType, "DataTransferActionType", "!autorest");
-```
+Language target takes priority over `client` target. By default, an unscoped `@clientName` applies to all emitters. To resolve a naming collision only in a generated SDK, scope the rename to that emitter; exclude `autorest` with `"!autorest"` when you also need to preserve the name emitted in OpenAPI.
 
 > **NOTE:** As model name do not get serialized as JSON, sometimes the best choice is to rename the main TYPESPEC for clarity. Talk to your emitter contact is you're unsure
 > if you should rename the model in the main TYPESPEC or customize it.
@@ -161,6 +135,8 @@ using Azure.ClientGenerator.Core;
 
 @@clientName(InputModel, "InputOptions"); // Use InputOptions as a base name in clients
 @@clientName(InputModel, "ParameterOptions", "csharp"); // Prefer a different name for C# only
+// To preserve the OpenAPI name instead, scope the rename to client emitters:
+// @@clientName(InputModel, "InputOptions", "!autorest");
 
 @@clientName(InputModel.name, "input_name", "python"); // Python may need a different to be idiomatic
 ```
