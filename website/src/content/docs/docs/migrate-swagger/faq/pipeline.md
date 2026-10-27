@@ -115,13 +115,7 @@ After migration, all models (including enums) will have capitalized names.
 
 ## Swagger ModelValidation
 
-Some validation rules may fail because TypeSpec fixes certain legacy patterns. Review the known issues below and take appropriate action.
-
-### REQUEST_VALIDATION_ERROR / RESPONSE_VALIDATION_ERROR
-
-This error indicates that an example request or request payload failed validation.
-
-For ordinary request or response schema-example conformance failures, correct the example or the generated Swagger/OpenAPI to match the intended contract. If the example is wrong, update it to match the generated schema; if it is intended and correct, update TypeSpec or other source definitions so generation reflects that contract. Do not treat suppression as the first-line response; consider it only after confirming the result is not a normal conformance issue.
+Some validation rules may fail because TypeSpec fixes certain legacy patterns. For `REQUEST_VALIDATION_ERROR` or `RESPONSE_VALIDATION_ERROR`, inspect the inner error details to determine whether the example or generated Swagger/OpenAPI needs correction. If the example does not match the generated schema, fix the example; if the example correctly represents the intended contract, update TypeSpec or other source definitions so the generated Swagger/OpenAPI matches it. Do not treat suppression as the first-line response for ordinary schema-example conformance failures; consider it only after confirming the error is not a normal conformance issue. Review the known issues below and take appropriate action.
 
 ### INVALID_FORMAT: Object didn't pass validation for format uri: {nextlink}
 
