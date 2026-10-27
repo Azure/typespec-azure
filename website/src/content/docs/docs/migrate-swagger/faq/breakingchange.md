@@ -6,6 +6,18 @@ The OpenAPI Converter cannot perfectly represent every aspect of every API in Ty
 
 ## Migrating ARM Specifications
 
+### Migrating Private Link, Private Endpoint, and NSP APIs
+
+For new APIs, use the standard resource models and operation templates described in the guides for
+[private links](../../howtos/ARM/private-links.mdx),
+[private endpoints](../../howtos/ARM/private-endpoints.mdx), and
+[NSP configurations](../../howtos/ARM/network-security-perimeter.mdx).
+
+When migrating an existing API, use these same templates and customize them for resource-specific
+details, such as the child-resource name, using the template parameters documented in those guides.
+Deviate from the standard templates only for very non-standard legacy APIs; this is not appropriate
+for new APIs.
+
 ### Customizing Route for Action (POST) Operations
 
 By default, the last segment of a POST action operation route is the operation name. For example:
