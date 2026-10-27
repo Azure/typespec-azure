@@ -116,6 +116,7 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
   }
 
   const namespace = type.namespace;
+  const sourceNamespace = getNamespaceFromType(type.__raw);
   const segments = namespace.split(".");
   let current: SdkPackage<TServiceOperation> | SdkNamespace<TServiceOperation> = sdkPackage;
   let fullName = "";
@@ -125,7 +126,10 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
       (ns) => ns.name === segment,
     );
     if (ns === undefined) {
-      const rawNamespace = getNamespaceFromType(type.__raw);
+      let rawNamespace = sourceNamespace;
+      while (rawNamespace && getNamespaceFullName(rawNamespace) !== fullName) {
+        rawNamespace = rawNamespace.namespace;
+      }
       const newNs = {
         __raw: rawNamespace,
         name: segment,

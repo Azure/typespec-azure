@@ -61,6 +61,33 @@ describe("@dynamicModel", () => {
     });
   }
 
+  it("preserves metadata on enclosing namespaces", async () => {
+    const { program } = await SimpleTester.compile(`
+      @dynamicModel
+      namespace Outer {
+        @service
+        namespace Service {
+          model Pet {
+            name: string;
+          }
+
+          op test(): Pet;
+        }
+      }
+    `);
+
+    const context = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators },
+    );
+    const outer = context.sdkPackage.namespaces[0];
+    ok(outer);
+    deepStrictEqual(outer.decorators, [{ name: decoratorName, arguments: {} }]);
+    deepStrictEqual(outer.namespaces[0].decorators, []);
+    expectDiagnostics(context.diagnostics, []);
+  });
+
   for (const scope of ['"csharp"', '#{ scope: "csharp" }']) {
     for (const language of ["csharp", "python"]) {
       it(`filters model and namespace metadata for ${language} with scope ${scope}`, async () => {
