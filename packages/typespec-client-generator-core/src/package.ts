@@ -158,9 +158,9 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
   let rawNamespace = sourceNamespace;
   while (rawNamespace) {
     const mappedNamespace = getClientNamespace(context, rawNamespace);
-    const segmentIndex = segments.indexOf(mappedNamespace);
+    const namespaceIndex = sdkNamespaces.findIndex((ns) => ns.fullName === mappedNamespace);
     const targetNamespace =
-      sdkNamespaces[segmentIndex < 0 ? sdkNamespaces.length - 1 : segmentIndex];
+      sdkNamespaces[namespaceIndex < 0 ? sdkNamespaces.length - 1 : namespaceIndex];
     if (targetNamespace) {
       let sources = namespaceDecoratorSources.get(targetNamespace);
       if (!sources) {

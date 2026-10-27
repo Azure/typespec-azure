@@ -122,6 +122,43 @@ describe("@dynamicModel", () => {
     expectDiagnostics(context.diagnostics, []);
   });
 
+  it("preserves metadata on a multi-segment enclosing namespace", async () => {
+    const { program } = await SimpleTester.compile(`
+      namespace Root {
+        @dynamicModel
+        namespace Marked {
+          @service
+          namespace Service {
+            model Pet {
+              name: string;
+            }
+
+            op test(): Pet;
+          }
+        }
+      }
+    `);
+
+    const context = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators },
+    );
+    const root = context.sdkPackage.namespaces[0];
+    ok(root);
+    deepStrictEqual(root.name, "Root");
+    deepStrictEqual(root.decorators, []);
+    const marked = root.namespaces[0];
+    ok(marked);
+    deepStrictEqual(marked.name, "Marked");
+    deepStrictEqual(marked.decorators, [{ name: decoratorName, arguments: {} }]);
+    const service = marked.namespaces[0];
+    ok(service);
+    deepStrictEqual(service.name, "Service");
+    deepStrictEqual(service.decorators, []);
+    expectDiagnostics(context.diagnostics, []);
+  });
+
   it("does not add metadata to a sibling namespace", async () => {
     const { program } = await SimpleTester.compile(`
       @service
