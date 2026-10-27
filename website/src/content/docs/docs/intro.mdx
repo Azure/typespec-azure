@@ -1,0 +1,75 @@
+---
+title: Introduction
+description: Choose a starting point for designing Azure APIs and generating OpenAPI specifications and client libraries with TypeSpec.
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+import { baseUrl } from "@typespec/astro-utils/utils/base-url";
+
+TypeSpec describes your service API in a concise, reusable language. The Azure libraries add
+shared patterns and checks for Azure API guidelines, and emitters turn your definition into
+OpenAPI specifications and client libraries.
+
+## Choose your starting point
+
+<CardGrid>
+  <LinkCard
+    title="Azure data-plane service"
+    description="Design the API your customers call to use your service, using Azure.Core."
+    href={baseUrl("/docs/getstarted/azure-core/step01/")}
+  />
+  <LinkCard
+    title="Azure Resource Manager service"
+    description="Define resources and the operations that create, update, and manage them."
+    href={baseUrl("/docs/getstarted/azure-resource-manager/step00/")}
+  />
+</CardGrid>
+
+New to TypeSpec? [Install the tools](./getstarted/installation.md) and
+[create a project](./getstarted/createproject.md).
+You can also <a href={baseUrl("/playground/")}>try the Azure playground</a> without installing anything.
+For language fundamentals, see the [TypeSpec language docs](https://typespec.io/docs/).
+
+Already have a Swagger specification? Start with [Convert OpenAPI to TypeSpec](./migrate-swagger/01-get-started.md).
+
+<span id="typespec-azure-libraries" />
+
+## Packages
+
+<span id="package-layering" />
+
+Choose libraries to describe your service and emitters to generate its outputs.
+
+| Package                                        | Purpose                                                       | Links                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@azure-tools/typespec-azure-core`             | Shared models and operations for Azure data-plane APIs        | [Reference](./libraries/azure-core/reference/index.mdx) · [npm](https://www.npmjs.com/package/@azure-tools/typespec-azure-core) · [Changelog](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-core/CHANGELOG.md)                                     |
+| `@azure-tools/typespec-azure-resource-manager` | Resource models and management operations built on Azure.Core | [Reference](./libraries/azure-resource-manager/reference/index.mdx) · [npm](https://www.npmjs.com/package/@azure-tools/typespec-azure-resource-manager) · [Changelog](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-resource-manager/CHANGELOG.md) |
+| `@azure-tools/typespec-autorest`               | OpenAPI 2.0 (Swagger) output for Azure tooling                | [Reference](./emitters/typespec-autorest/index.md) · [npm](https://www.npmjs.com/package/@azure-tools/typespec-autorest) · [Changelog](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-autorest/CHANGELOG.md)                                              |
+
+Use the stable package versions for your project. The `@next` channel contains prerelease
+builds from `main`; current versions are listed on each package's npm page.
+
+## Generate client libraries
+
+Choose the emitter for your target language:
+
+- [Python](./emitters/clients/typespec-python/reference/index.mdx)
+- [JavaScript](./emitters/clients/typespec-ts/reference/index.mdx)
+- [C#](./emitters/clients/typespec-csharp/reference/index.mdx)
+- [Java](./emitters/clients/typespec-java/reference/index.mdx)
+- [Go](./emitters/clients/typespec-go/reference/index.mdx)
+
+Check <a href={baseUrl("/can-i-use/http/")}>SDK support</a> for scenario coverage across emitters.
+For OpenAPI 3 output, see the [TypeSpec OpenAPI emitter](https://typespec.io/docs/emitters/openapi3/).
+
+## How to get help
+
+- Ask the [TypeSpec community on Discord](https://aka.ms/typespec/discord).
+- [File an issue in the Azure repository](https://github.com/Azure/typespec-azure/issues).
+  Include your TypeSpec code, expected and actual results, and any diagnostics.
+- See [linter suppression guidance](./troubleshoot/suppresswarnings.md) when a guideline does not apply to your API.
+
+## More information about TypeSpec
+
+The [TypeSpec documentation](https://typespec.io/docs/) covers the language, standard libraries,
+and other emitters.

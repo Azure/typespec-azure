@@ -40,3 +40,21 @@ import "@docsearch/css";
   }
   customElements.define("sl-doc-search", StarlightDocSearch);
 </script>
+
+<style>
+  sl-doc-search {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 63.999rem) {
+    sl-doc-search :global(.DocSearch-Button) {
+      margin: 0;
+      padding: 0.5rem;
+    }
+
+    sl-doc-search :global(.DocSearch-Button-Placeholder),
+    sl-doc-search :global(.DocSearch-Button-Keys) {
+      display: none;
+    }
+  }
+</style>

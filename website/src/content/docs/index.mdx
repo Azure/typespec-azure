@@ -1,34 +1,35 @@
 ---
-title: Welcome to TypeSpec Azure
-description: TypeSpec Azure documentation
+title: Design APIs for Azure with TypeSpec
+description: Define Azure service APIs and generate OpenAPI specifications and client libraries with TypeSpec.
 template: splash
 hero:
-  tagline: API first with TypeSpec for Azure services
-  image:
-    file: ../../../public/azure.svg
-  actions:
-    - text: Docs
-      link: docs/intro/
-      icon: right-arrow
-    - text: TypeSpec language docs
-      link: https://typespec.io
-      icon: external
-      variant: minimal
+  tagline: Define your service once. Generate OpenAPI and Azure client libraries.
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+import { baseUrl } from "@typespec/astro-utils/utils/base-url";
 
-<CardGrid stagger>
-  <Card title="Easy to Use" icon="puzzle">
-    TypeSpec was designed from the ground up to be easily installed and used to define your Azure
-    service APIs quickly.
-  </Card>
-  <Card title="Powered by standard libraries" icon="document">
-    Extend or customize your compliant Azure service APIs by reusing standard patterns and templates
-    in the Azure.Core and ARM libraries.
-  </Card>
-  <Card title="Focus on What Matters" icon="magnifier">
-    TypeSpec lets you focus on your service API design, and we'll do the chores to streamline API
-    reviews and SDK generations.
-  </Card>
+## What are you building?
+
+<CardGrid>
+  <LinkCard
+    title="Build a data-plane API"
+    description="Model the operations your customers use with Azure.Core's shared service patterns."
+    href={baseUrl("/docs/getstarted/azure-core/step01/")}
+  />
+  <LinkCard
+    title="Build an ARM API"
+    description="Define Azure resources and their management operations with Azure.ResourceManager."
+    href={baseUrl("/docs/getstarted/azure-resource-manager/step00/")}
+  />
+  <LinkCard
+    title="Generate SDKs"
+    description="Choose a client emitter for Python, JavaScript, C#, Java, or Go."
+    href={baseUrl("/docs/intro/#generate-client-libraries")}
+  />
+  <LinkCard
+    title="Migrate from OpenAPI"
+    description="Convert an existing Swagger specification into a TypeSpec project."
+    href={baseUrl("/docs/migrate-swagger/01-get-started/")}
+  />
 </CardGrid>

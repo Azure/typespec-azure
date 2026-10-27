@@ -65,6 +65,7 @@ export default defineConfig({
       customCss: ["./src/css/custom.css"],
       components: {
         Header: "./src/components/header/header.astro",
+        Hero: "./src/components/home/hero.astro",
       },
     }),
     react(),
