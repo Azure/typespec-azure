@@ -114,6 +114,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
         case "pageableMethod":
           serverResponse = `resp azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
           break;
+        case "sseMethod":
+          if (!method.returns.result || method.returns.result.kind !== "sseResult") {
+            throw new Error("todo");
+          }
+          serverResponse = `resp azfake.SSEResponder[${go.getTypeDeclaration(method.returns.result.type.eventType, pkg)}], errResp azfake.ErrorResponder`;
       }
 
       const operationName = method.name;
@@ -446,7 +451,6 @@ function generateServerTransportMethods(
   imports.addForPkg(pkg.parent);
   imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/fake", "azfake");
   imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/fake/server");
-  imports.add("slices");
 
   const receiverName = serverTransport[0].toLowerCase();
 
@@ -464,6 +468,7 @@ function generateServerTransportMethods(
         content += dispatchForLROBody(pkg, receiverName, method, imports, indent);
         break;
       case "method": {
+        imports.add("slices");
         content += dispatchForOperationBody(pkg, receiverName, method, imports, indent);
         content += `${indent.get()}respContent := server.GetResponseContent(respr)\n`;
         const formattedStatusCodes = helpers.formatStatusCodes(method.httpStatusCodes);
@@ -573,6 +578,9 @@ function generateServerTransportMethods(
       }
       case "pageableMethod":
         content += dispatchForPagerBody(pkg, receiverName, method, imports, indent);
+        break;
+      case "sseMethod":
+        content += dispatchForSseBody(pkg, receiverName, method, imports, indent);
         break;
       default:
         method satisfies never;
@@ -1064,6 +1072,7 @@ function dispatchForLROBody(
   content += `${indent.push().get()}return nil, err\n`;
   content += `${indent.pop().get()}}\n\n`;
 
+  imports.add("slices");
   const formattedStatusCodes = helpers.formatStatusCodes(getMethodStatusCodes(method));
   content += `${indent.get()}if !slices.Contains([]int{${formattedStatusCodes}}, resp.StatusCode) {\n`;
   indent.push();
@@ -1116,6 +1125,7 @@ function dispatchForPagerBody(
   content += `${indent.push().get()}return nil, err\n`;
   content += `${indent.pop().get()}}\n`;
 
+  imports.add("slices");
   const formattedStatusCodes = helpers.formatStatusCodes(method.httpStatusCodes);
   content += `${indent.get()}if !slices.Contains([]int{${formattedStatusCodes}}, resp.StatusCode) {\n`;
   indent.push();
@@ -1126,6 +1136,49 @@ function dispatchForPagerBody(
   content += `${indent.get()}if !server.PagerResponderMore(${localVarName}) {\n`;
   content += `${indent.push().get()}${operationStateMachine}.remove(req)\n`;
   content += `${indent.pop().get()}}\n`;
+  content += `${indent.get()}return resp, nil\n`;
+  return content;
+}
+
+/**
+ * generates the dispatching logic that serializes an SSE responder as an event stream
+ *
+ * @param pkg contains the package contents
+ * @param receiverName the name of the receiver for the dispatch method
+ * @param method the SSE method for which to emit the dispatch logic
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the text for the SSE dispatch logic
+ */
+function dispatchForSseBody(
+  pkg: go.FakePackage,
+  receiverName: string,
+  method: go.SseMethod,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  let content = dispatchForOperationBody(pkg, receiverName, method, imports, indent);
+  if (!method.returns.result || method.returns.result.kind !== "sseResult") {
+    throw new Error("missing result");
+  }
+
+  // when the method has a request body, dispatchForOperationBody
+  // already declared body for it so we need a distinct name
+  const paramGroups = helpers.getMethodParamGroups(method);
+  const hasRequestBody =
+    paramGroups.bodyParam !== undefined ||
+    paramGroups.formBodyParams.length > 0 ||
+    paramGroups.multipartBodyParams.length > 0 ||
+    paramGroups.partialBodyParams.length > 0;
+  const bodyVar = hasRequestBody ? "streamBody" : "body";
+
+  content += `${indent.get()}${bodyVar}, err := server.MarshalSSEResponder(&respr, encode${method.returns.result.type.eventType.name})\n`;
+  content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+  content += `${indent.get()}resp, err := server.NewResponse(server.ResponseContent{HTTPStatus: http.StatusOK}, req, &server.ResponseOptions{\n`;
+  content += `${indent.push().get()}Body: ${bodyVar},\n`;
+  content += `${indent.get()}ContentType: "text/event-stream",\n`;
+  content += `${indent.pop().get()}})\n`;
+  content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
   content += `${indent.get()}return resp, nil\n`;
   return content;
 }
@@ -1255,6 +1308,11 @@ function parseHeaderPathQueryParams(
     // of paramValue will be updated with the var name that
     // contains the unescaped value.
     let paramValue = getRawParamValue(param);
+
+    if (param.kind === "sseLastEventIDParam") {
+      paramValues.set(param.name, paramValue);
+      continue;
+    }
 
     // optional params are pointer-wrapped; dispatch on the unwrapped type.
     const paramType = go.unwrapPtr(param.type);
@@ -1545,6 +1603,8 @@ function parseHeaderPathQueryParams(
           // check array before body in case the body is just an array
           if (param.type.kind === "slice") {
             paramNilCheck.push(`len(${getFinalParamValue(pkg, param, paramValues)}) > 0`);
+          } else if (param.kind === "sseLastEventIDParam") {
+            paramNilCheck.push(`${getFinalParamValue(pkg, param, paramValues)} != ""`);
           } else if (param.kind === "bodyParam") {
             if (param.bodyFormat === "binary") {
               imports.add("io");
@@ -1627,7 +1687,7 @@ function populateApiParams(
           (each: go.MethodParameter) => each.kind !== "resumeTokenParam",
         ).length;
         if (countParams === 0) {
-          // if the options param is empty or only contains the resume token param just pass nil
+          // if the options param only contains client-side options just pass nil
           params.push("nil");
           continue;
         }
@@ -1681,6 +1741,8 @@ function getRawParamValue(param: go.MethodParameter): string {
       return `qp.Get("${param.queryParameter}")`;
     case "uriParam":
       return "req.URL.Host";
+    case "sseLastEventIDParam":
+      return 'req.Header.Get("Last-Event-ID")';
     default:
       throw new CodegenError("InternalError", `unhandled parameter ${param.name}`);
   }

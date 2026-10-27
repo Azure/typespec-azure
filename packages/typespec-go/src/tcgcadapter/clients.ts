@@ -534,7 +534,8 @@ export class ClientAdapter {
   ): void {
     const exportOperation =
       (sdkMethod.kind === "basic" || sdkMethod.kind === "paging") &&
-      sdkMethod.access !== "internal";
+      sdkMethod.access !== "internal" &&
+      !sdkMethod.response.streamMetadata;
     const naming = new go.MethodNaming(
       helpers.getEffectiveName(sdkMethod, !exportOperation),
       helpers.getEffectiveName(sdkMethod, true, "CreateRequest"),
@@ -609,14 +610,25 @@ export class ClientAdapter {
       | undefined;
     switch (sdkMethod.kind) {
       case "basic":
-        method = new go.SyncMethod(
-          methodName,
-          goClient,
-          sdkMethod.operation.path,
-          sdkMethod.operation.verb,
-          statusCodes,
-          naming,
-        );
+        if (sdkMethod.response.sseMetadata) {
+          method = new go.SseMethod(
+            methodName,
+            goClient,
+            sdkMethod.operation.path,
+            sdkMethod.operation.verb,
+            statusCodes,
+            naming,
+          );
+        } else {
+          method = new go.SyncMethod(
+            methodName,
+            goClient,
+            sdkMethod.operation.path,
+            sdkMethod.operation.verb,
+            statusCodes,
+            naming,
+          );
+        }
         break;
       case "paging":
         method = new go.PageableMethod(
@@ -915,6 +927,18 @@ export class ClientAdapter {
           }
         }
       }
+    }
+
+    if (method.kind === "sseMethod") {
+      let name = "LastEventID";
+      let suffix = 0;
+      while (method.optionalParamsGroup.params.some((param) => param.name === name)) {
+        name = `LastEventID${++suffix}`;
+      }
+      const lastEventID = new go.SseLastEventIDParameter(name);
+      lastEventID.group = method.optionalParamsGroup;
+      method.optionalParamsGroup.params.push(lastEventID);
+      method.parameters.push(lastEventID);
     }
 
     // we must do this after adapting method params as it can add optional params
@@ -1692,12 +1716,16 @@ export class ClientAdapter {
     const unexport = sdkMethod.access === "internal";
     switch (sdkMethod.kind) {
       case "basic":
-        methodName = helpers.getEffectiveName(sdkMethod, unexport);
-        if (unexport) {
-          // we add internal to the extra list so we don't end up with a method named "internal"
-          // which will collide with an unexported field with the same name. we don't need to
-          // do this for pagers/pollers as those methods get extra naming.
-          methodName = getEscapedReservedName(methodName, "Method", ["internal"]);
+        if (sdkMethod.response.sseMetadata) {
+          methodName = `${unexport ? "open" : "Open"}${helpers.getEffectiveName(sdkMethod, false)}`;
+        } else {
+          methodName = helpers.getEffectiveName(sdkMethod, unexport);
+          if (unexport) {
+            // we add internal to the extra list so we don't end up with a method named "internal"
+            // which will collide with an unexported field with the same name. we don't need to
+            // do this for pagers/pollers/sse as those methods get extra naming.
+            methodName = getEscapedReservedName(methodName, "Method", ["internal"]);
+          }
         }
         break;
       case "lro":
@@ -1818,6 +1846,9 @@ export class ClientAdapter {
     }
 
     let sdkResponseType = sdkMethod.response.type;
+    if (sdkMethod.response.streamMetadata) {
+      sdkResponseType = sdkMethod.response.streamMetadata.streamType;
+    }
 
     // since HEAD requests don't return a type, we must check this before checking sdkResponseType
     if (
@@ -1962,29 +1993,56 @@ export class ClientAdapter {
       respEnv.result.docs.summary = sdkResponseType.summary;
       respEnv.result.docs.description = sdkResponseType.doc;
     } else if (sdkResponseType.kind === "union") {
-      // multi-response
-      const resultTypes: Record<number, go.WireType> = {};
-      const possibleTypes = new Set<string>();
-      for (const resp of sdkMethod.operation.responses) {
-        if (!resp.type) {
-          // mix of typed and untyped responses, we skip
-          // the status codes that don't return a type
-          continue;
-        }
-
-        const respType = this.ta.getWireType(resp.type, false, true);
-        possibleTypes.add(go.getTypeDeclaration(respType, method.receiver.type.pkg));
-
-        if (isHttpStatusCodeRange(resp.statusCodes)) {
-          for (let code = resp.statusCodes.start; code <= resp.statusCodes.end; ++code) {
-            resultTypes[code] = respType;
+      if (sdkMethod.response.sseMetadata) {
+        let unionType: go.UnionStruct | undefined;
+        const unionName = helpers.getEffectiveName(sdkResponseType).toUpperCase();
+        for (const union of this.ta.getPkg().unions) {
+          if (union.name.toUpperCase() === unionName) {
+            unionType = union;
+            break;
           }
-        } else {
-          resultTypes[resp.statusCodes] = respType;
         }
+        if (!unionType) {
+          throw new AdapterError(
+            "InternalError",
+            `didn't find union type name ${sdkResponseType.name} for response envelope ${respEnv.name}`,
+            sdkResponseType.__raw?.node,
+          );
+        }
+        if (contentType !== "JSON") {
+          throw new AdapterError(
+            "InternalError",
+            `unexpected content type ${contentType} for union ${unionType.name}`,
+          );
+        }
+        respEnv.result = new go.SseResult("Stream", this.ta.getSSEReader(unionType));
+        respEnv.result.docs.summary = sdkResponseType.summary;
+        respEnv.result.docs.description = sdkResponseType.doc;
+      } else {
+        // multi-response
+        const resultTypes: Record<number, go.WireType> = {};
+        const possibleTypes = new Set<string>();
+        for (const resp of sdkMethod.operation.responses) {
+          if (!resp.type) {
+            // mix of typed and untyped responses, we skip
+            // the status codes that don't return a type
+            continue;
+          }
+
+          const respType = this.ta.getWireType(resp.type, false, true);
+          possibleTypes.add(go.getTypeDeclaration(respType, method.receiver.type.pkg));
+
+          if (isHttpStatusCodeRange(resp.statusCodes)) {
+            for (let code = resp.statusCodes.start; code <= resp.statusCodes.end; ++code) {
+              resultTypes[code] = respType;
+            }
+          } else {
+            resultTypes[resp.statusCodes] = respType;
+          }
+        }
+        respEnv.result = new go.AnyResult("Value", contentType, resultTypes);
+        respEnv.result.docs.summary = `Possible types are ${[...possibleTypes].sort().join(", ")}`;
       }
-      respEnv.result = new go.AnyResult("Value", contentType, resultTypes);
-      respEnv.result.docs.summary = `Possible types are ${[...possibleTypes].sort().join(", ")}`;
     } else {
       const resultType = this.ta.getWireType(sdkResponseType, false, false);
 
