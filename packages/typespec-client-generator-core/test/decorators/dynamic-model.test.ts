@@ -65,13 +65,30 @@ describe("@dynamicModel", () => {
     const { program } = await SimpleTester.compile(`
       @dynamicModel
       namespace Outer {
+        model OuterModel {
+          name: string;
+        }
+
         @service
         namespace Service {
-          model Pet {
+          model ServiceModel {
             name: string;
           }
 
-          op test(): Pet;
+          @route("/outer")
+          op getOuter(): OuterModel;
+
+          @route("/service")
+          op getService(): ServiceModel;
+
+          namespace Nested {
+            model NestedModel {
+              name: string;
+            }
+
+            @route("/nested")
+            op getNested(): NestedModel;
+          }
         }
       }
     `);
@@ -83,8 +100,25 @@ describe("@dynamicModel", () => {
     );
     const outer = context.sdkPackage.namespaces[0];
     ok(outer);
+    deepStrictEqual(
+      outer.models.map((model) => model.name),
+      ["OuterModel"],
+    );
     deepStrictEqual(outer.decorators, [{ name: decoratorName, arguments: {} }]);
-    deepStrictEqual(outer.namespaces[0].decorators, []);
+    const service = outer.namespaces[0];
+    ok(service);
+    deepStrictEqual(
+      service.models.map((model) => model.name),
+      ["ServiceModel"],
+    );
+    deepStrictEqual(service.decorators, []);
+    const nested = service.namespaces[0];
+    ok(nested);
+    deepStrictEqual(
+      nested.models.map((model) => model.name),
+      ["NestedModel"],
+    );
+    deepStrictEqual(nested.decorators, []);
     expectDiagnostics(context.diagnostics, []);
   });
 
