@@ -17,8 +17,6 @@
     "@astrojs/check": "catalog:",
     "@astrojs/react": "catalog:",
     "@astrojs/starlight": "catalog:",
-    "@docsearch/css": "catalog:",
-    "@docsearch/js": "catalog:",
     "@fluentui/react-components": "catalog:",
     "@typespec/playground": "workspace:^",
     "astro": "catalog:",
