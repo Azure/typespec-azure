@@ -615,6 +615,50 @@ getHealthStatus(
 @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
 ```
 
+### `@clientLroResult` {#@Azure.ClientGenerator.Core.clientLroResult}
+
+Selects the client-facing result of a long-running operation from a protocol-backed
+response body or property. It does not replace the operation's polling or required final requests.
+
+A model selects the whole response body. A property selects its value. Nested properties
+use `::type`, for example `Job.result::type.items`. Unrelated or ambiguous references are errors.
+A model used by multiple protocol responses keeps the uniquely established completion source;
+otherwise the selection is ambiguous. A nested model must be selected through its property.
+
+This decorator does not change Core's default LRO metadata. Languages without an applicable
+selection retain that default. New optional or nullable projections are not supported;
+an existing optional polling success property retains its polling contract.
+Pageable results must retain their declared page items and continuation paths.
+
+Nested paths, projections from final responses, and retaining a monitor across a required
+final request need explicit support from the consuming emitter. Unsupported selections
+are errors, not ignored customizations.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The long-running operation to customize.
+`Operation`
+
+#### Parameters
+
+| Name   | Type                                                            | Description                                                                         |
+| ------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| result | `Model \| ModelProperty`                                        | A response model or property belonging to the operation's LRO protocol.             |
+| scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | The language scopes to which this selection applies. If omitted, applies generally. |
+
+#### Examples
+
+##### Return the whole status monitor in JavaScript and its payload in Python.
+
+```typespec
+@@clientLroResult(start, Job, "javascript");
+@@clientLroResult(start, Job.result, #{ scope: "python" });
+```
+
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
 
 Overrides the generated name for client SDK elements including clients, methods, parameters,

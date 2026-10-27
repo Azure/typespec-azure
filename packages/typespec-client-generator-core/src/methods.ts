@@ -21,6 +21,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAccess,
+  getClientLroResult,
   getDisablePageable,
   getMarkAsPageable,
   getNextLinkVerb,
@@ -33,6 +34,7 @@ import {
 } from "./decorators.js";
 import { getSdkHttpOperation } from "./http.js";
 import {
+  isSdkBuiltInKind,
   type SdkArrayType,
   type SdkBuiltInType,
   type SdkClient,
@@ -78,6 +80,8 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
+import { preservesLroPagingPath } from "./lro-result.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -120,11 +124,49 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
+): [SdkLroPagingServiceMethod<TServiceOperation> | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const lro = diagnostics.pipe(
+    getSdkLroServiceMethod<TServiceOperation>(context, operation, client),
+  );
+  if (!lro) return diagnostics.wrap(undefined);
+  const paging = diagnostics.pipe(
+    getSdkPagingServiceMethod<TServiceOperation>(context, operation, client),
+  );
+  if (getClientLroResult(context, operation)) {
+    const baseline = getRawLroMetadata(context.program, operation);
+    const paths = [
+      paging.pagingMetadata.pageItemsSegments,
+      paging.pagingMetadata.nextLinkSegments,
+      paging.pagingMetadata.continuationTokenResponseSegments,
+    ];
+    for (const path of paths) {
+      if (!path) continue;
+      const properties = path.flatMap((segment) => (segment.__raw ? [segment.__raw] : []));
+      // Headers retain their existing HTTP-response coordinates, outside the selected body.
+      if (path.at(-1)?.kind === "responseheader") continue;
+      if (
+        properties.length !== path.length ||
+        !baseline ||
+        !preservesLroPagingPath(lro.lroMetadata.__raw, baseline, properties)
+      ) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "invalid-client-lro-result",
+            target: operation,
+            format: {
+              reason:
+                "The selected result must retain the declared page items and continuation paths.",
+            },
+          }),
+        );
+        return diagnostics.wrap(undefined);
+      }
+    }
+  }
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkLroServiceMethod<TServiceOperation>(context, operation, client)),
-    ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation, client)),
+    ...lro,
+    ...paging,
     kind: "lropaging",
   });
 }
@@ -369,9 +411,10 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
+): [SdkLroServiceMethod<TServiceOperation> | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const metadata = diagnostics.pipe(getServiceMethodLroMetadata(context, operation, client))!;
+  const metadata = diagnostics.pipe(getServiceMethodLroMetadata(context, operation, client));
+  if (!metadata) return diagnostics.wrap(undefined);
   const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
@@ -408,6 +451,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   }
 
   const finalResponse = getFinalResponse();
+  if (rawMetadata.finalResultSource && !finalResponse) return diagnostics.wrap(undefined);
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -576,6 +620,63 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     ) {
       return undefined;
     }
+    if (rawMetadata.finalResultSegments !== undefined) {
+      const envelopeResult = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
+      );
+      let result = envelopeResult;
+      const resultSegments: SdkModelPropertyType[] = [];
+      for (const property of rawMetadata.finalResultSegments) {
+        let current = result.kind === "model" ? result : undefined;
+        let segment: SdkModelPropertyType | undefined;
+        while (current && !segment) {
+          segment = current.properties.find(
+            (p) => p.__raw && findRootSourceProperty(p.__raw) === findRootSourceProperty(property),
+          );
+          current = current.baseModel;
+        }
+        if (!segment) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "invalid-client-lro-result",
+              target: property,
+              format: {
+                reason: "The selected property path is not available in the SDK response body.",
+              },
+            }),
+          );
+          return undefined;
+        }
+        resultSegments.push(segment);
+        result = segment.type;
+      }
+      if (!isLroResultType(envelopeResult) || !isLroResultType(result)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "invalid-client-lro-result",
+            target: operation,
+            format: { reason: "The selected value cannot be represented as an SDK LRO result." },
+          }),
+        );
+        return undefined;
+      }
+      const source = rawMetadata.finalResultSource;
+      const resultSource: SdkLroServiceFinalResponse["resultSource"] =
+        source?.kind === "original-uri"
+          ? {
+              kind: "original-uri",
+              operation: diagnostics.pipe(
+                getSdkBasicServiceMethod(context, source.operation, client),
+              ).operation,
+            }
+          : source;
+      return {
+        envelopeResult,
+        result,
+        resultSegments: resultSegments.length > 0 ? resultSegments : undefined,
+        resultSource,
+      };
+    }
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
     ) as SdkModelType | SdkArrayType | SdkBuiltInType;
@@ -604,6 +705,10 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       result,
       resultSegments: sdkProperty !== undefined ? [sdkProperty] : undefined,
     };
+  }
+
+  function isLroResultType(type: SdkType): type is SdkModelType | SdkArrayType | SdkBuiltInType {
+    return type.kind === "model" || type.kind === "array" || isSdkBuiltInKind(type.kind);
   }
 }
 
@@ -765,11 +870,12 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
+): [SdkServiceMethod<TServiceOperation> | undefined, readonly Diagnostic[]] {
   const override = getOverriddenClientMethod(context, operation);
   const responseReplacement =
     override !== undefined && context.program.stateMap(responseOverrideKey).get(override) === true;
   const lro = getTcgcLroMetadata(context, operation, client);
+  if (!lro && getClientLroResult(context, operation)) return [undefined, []];
   // `@disablePageable` disables paging even for operations with @list
   const pagingDisabled = getDisablePageable(context, operation);
   const paging =
@@ -820,9 +926,10 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInClient(context, client)) {
-    retval.push(
-      diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
+    const method = diagnostics.pipe(
+      getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType),
     );
+    if (method) retval.push(method);
   }
   return diagnostics.wrap(retval);
 }

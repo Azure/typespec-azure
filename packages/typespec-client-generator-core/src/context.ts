@@ -176,6 +176,11 @@ export interface CreateSdkContextOptions {
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
   /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
   convertDiscriminatedUnionsToModels?: boolean;
+  /**
+   * Opt in only after implementing source-aware completion and ordered result paths
+   * for `@clientLroResult`. Without this, unsupported advanced selections are errors.
+   */
+  supportsAdvancedLroResultSelection?: boolean;
 }
 
 export async function createSdkContext<
@@ -242,6 +247,7 @@ export async function createSdkContext<
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
     convertDiscriminatedUnionsToModels: options?.convertDiscriminatedUnionsToModels ?? true,
+    supportsAdvancedLroResultSelection: options?.supportsAdvancedLroResultSelection ?? false,
   };
 
   if (context.options["examples-dir"]) {

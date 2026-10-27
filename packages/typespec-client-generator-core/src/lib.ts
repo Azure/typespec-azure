@@ -394,6 +394,21 @@ export const $lib = createTypeSpecLibrary({
           "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
       },
     },
+    "invalid-client-lro-result": {
+      ...doc("invalid-client-lro-result"),
+      severity: "error",
+      messages: {
+        default: paramMessage`${"reason"}`,
+      },
+    },
+    "unsupported-client-lro-result": {
+      ...doc("unsupported-client-lro-result"),
+      severity: "error",
+      messages: {
+        default:
+          "The emitter has not enabled advanced LRO result selection. This selection requires source-aware completion or structured result-path support.",
+      },
+    },
     "non-head-bool-response-decorator": {
       ...doc("non-head-bool-response-decorator"),
       severity: "warning",

@@ -44,6 +44,7 @@ import type {
   ClientDecorator,
   ClientDocDecorator,
   ClientInitializationDecorator,
+  ClientLroResultDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ClientOptionDecorator,
@@ -80,6 +81,7 @@ import {
   AllScopes,
   clientKey,
   clientLocationKey,
+  clientLroResultKey,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
@@ -100,6 +102,7 @@ import {
   usageKey,
 } from "./internal-utils.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
+import { captureClientLroResult, type ClientLroResultReference } from "./lro-result.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -1738,6 +1741,33 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
 
 export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
   return getScopedDecoratorData(context, responseAsBoolKey, target);
+}
+
+export const $clientLroResult: ClientLroResultDecorator = (context, target, result, scope) => {
+  setScopedDecoratorData(
+    context,
+    $clientLroResult,
+    clientLroResultKey,
+    target,
+    captureClientLroResult(context, result),
+    scope,
+  );
+};
+
+/** Get the result reference selected for the current language scope. */
+export function getClientLroResult(
+  context: TCGCContext,
+  target: Operation,
+): Model | ModelProperty | undefined {
+  return getClientLroResultReference(context, target)?.result;
+}
+
+/** @internal */
+export function getClientLroResultReference(
+  context: TCGCContext,
+  target: Operation,
+): ClientLroResultReference | undefined {
+  return getScopedDecoratorData(context, clientLroResultKey, target);
 }
 
 const clientDocKey = createStateSymbol("clientDoc");

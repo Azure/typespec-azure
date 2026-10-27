@@ -2,7 +2,6 @@ import {
   FinalStateValue,
   getEffectiveApiVersionOverride,
   isPreviewVersion,
-  type LroMetadata,
 } from "@azure-tools/typespec-azure-core";
 import {
   type BooleanLiteral,
@@ -64,6 +63,7 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getClientLroResult,
   getIsApiVersion,
   getMarkAsLro,
   getOverriddenClientMethod,
@@ -72,6 +72,7 @@ import {
 import type {
   ApiVersionConfig,
   ApiVersionServiceMap,
+  ClientLroMetadata,
   DecoratorInfo,
   DecoratorOptions,
   ExternalTypeInfo,
@@ -87,7 +88,7 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getRawLroMetadata } from "./lro-metadata.js";
+import { getClientLroMetadata } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -129,6 +130,7 @@ export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 export const responseOverrideKey = createStateSymbol("responseOverride");
+export const clientLroResultKey = createStateSymbol("clientLroResult");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
@@ -1331,9 +1333,9 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): LroMetadata | undefined {
-  const lroMetaData = getRawLroMetadata(context.program, operation);
-  if (lroMetaData) {
+): ClientLroMetadata | undefined {
+  const lroMetaData = getClientLroMetadata(context, operation);
+  if (lroMetaData || getClientLroResult(context, operation)) {
     return lroMetaData;
   }
   if (getMarkAsLro(context, operation)) {

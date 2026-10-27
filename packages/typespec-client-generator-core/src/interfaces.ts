@@ -67,7 +67,10 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
   convertDiscriminatedUnionsToModels?: boolean;
+  /** Whether the emitter handles structured LRO result paths and response-source selection. */
+  supportsAdvancedLroResultSelection?: boolean;
 
+  __clientLroMetadataCache?: Map<Operation, ClientLroMetadata | undefined>;
   __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
@@ -1192,9 +1195,27 @@ interface SdkLroServiceMethodOptions {
 /**
  * Long running operation metadata.
  */
+export type ClientLroResultSource =
+  | { kind: "polling" }
+  | { kind: "original-uri"; operation: Operation }
+  | { kind: "final-operation" };
+
+/**
+ * TCGC-selected raw LRO metadata. Core's default metadata remains unchanged.
+ */
+export interface ClientLroMetadata extends LroMetadata {
+  /** Response supplying the selected value; required completion steps remain in the protocol fields. */
+  finalResultSource?: ClientLroResultSource;
+  /**
+   * Complete extraction path. When present, this replaces the legacy single-property
+   * `finalResultPath` and `logicalPath` fields, which are omitted for nested selections.
+   */
+  finalResultSegments?: ModelProperty[];
+}
+
 export interface SdkLroServiceMetadata {
   /** Core-compatible raw metadata with TCGC-selected client result fields. */
-  __raw: LroMetadata;
+  __raw: ClientLroMetadata;
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
   /** Polling step metadata */
@@ -1335,6 +1356,11 @@ export interface SdkLroServiceFinalResponse {
   result: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
+  /** Selected response source. This does not remove any required completion request. */
+  resultSource?:
+    | { kind: "polling" }
+    | { kind: "original-uri"; operation: SdkServiceOperation }
+    | { kind: "final-operation" };
 }
 
 /**
