@@ -122,6 +122,46 @@ describe("@dynamicModel", () => {
     expectDiagnostics(context.diagnostics, []);
   });
 
+  it("does not add metadata to a sibling namespace", async () => {
+    const { program } = await SimpleTester.compile(`
+      @service
+      @dynamicModel
+      namespace DynamicService {
+        model DynamicPet {
+          name: string;
+        }
+
+        op getDynamicPet(): DynamicPet;
+      }
+
+      @service
+      namespace PlainService {
+        model PlainPet {
+          name: string;
+        }
+
+        op getPlainPet(): PlainPet;
+      }
+    `);
+
+    const context = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators },
+    );
+    const dynamicService = context.sdkPackage.namespaces.find(
+      (namespace) => namespace.name === "DynamicService",
+    );
+    const plainService = context.sdkPackage.namespaces.find(
+      (namespace) => namespace.name === "PlainService",
+    );
+    ok(dynamicService);
+    ok(plainService);
+    deepStrictEqual(dynamicService.decorators, [{ name: decoratorName, arguments: {} }]);
+    deepStrictEqual(plainService.decorators, []);
+    expectDiagnostics(context.diagnostics, []);
+  });
+
   for (const [overrideName, namespaceDecorator, options] of [
     ["@clientNamespace", '@clientNamespace("Renamed")', {}],
     ["namespace option", "", { namespace: "Renamed" }],

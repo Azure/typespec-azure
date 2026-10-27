@@ -856,7 +856,6 @@ model MyModel {
 ### `@dynamicModel` {#@Azure.ClientGenerator.Core.dynamicModel}
 
 Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
-Dynamic-model generation is currently supported only by the C# emitter through its `TypeSpec.HttpClient.CSharp.@dynamicModel` decorator.
 This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
 
 ```typespec
