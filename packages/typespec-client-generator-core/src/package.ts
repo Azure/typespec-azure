@@ -1,6 +1,7 @@
 import {
   createDiagnosticCollector,
   type Diagnostic,
+  type Namespace,
   getNamespaceFullName,
   ignoreDiagnostics,
 } from "@typespec/compiler";
@@ -86,23 +87,24 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   sdkPackage: SdkPackage<TServiceOperation>,
 ) {
+  const namespaceDecoratorSources = new Map<SdkNamespace<TServiceOperation>, Set<Namespace>>();
   const clients = [...sdkPackage.clients];
   let clientIdx = 0;
   while (clientIdx < clients.length) {
     const client = clients[clientIdx++];
-    getSdkNamespace(context, sdkPackage, client).clients.push(client);
+    getSdkNamespace(context, sdkPackage, client, namespaceDecoratorSources).clients.push(client);
     if (client.children && client.children.length > 0) {
       clients.push(...client.children);
     }
   }
   for (const model of sdkPackage.models) {
-    getSdkNamespace(context, sdkPackage, model).models.push(model);
+    getSdkNamespace(context, sdkPackage, model, namespaceDecoratorSources).models.push(model);
   }
   for (const enumType of sdkPackage.enums) {
-    getSdkNamespace(context, sdkPackage, enumType).enums.push(enumType);
+    getSdkNamespace(context, sdkPackage, enumType, namespaceDecoratorSources).enums.push(enumType);
   }
   for (const unionType of sdkPackage.unions) {
-    getSdkNamespace(context, sdkPackage, unionType).unions.push(unionType);
+    getSdkNamespace(context, sdkPackage, unionType, namespaceDecoratorSources).unions.push(unionType);
   }
 }
 
@@ -110,6 +112,7 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   sdkPackage: SdkPackage<TServiceOperation>,
   type: SdkType | SdkClientType<TServiceOperation>,
+  namespaceDecoratorSources: Map<SdkNamespace<TServiceOperation>, Set<Namespace>>,
 ) {
   if (!("namespace" in type)) {
     return sdkPackage;
@@ -120,6 +123,7 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
   const segments = namespace.split(".");
   let current: SdkPackage<TServiceOperation> | SdkNamespace<TServiceOperation> = sdkPackage;
   let fullName = "";
+  const sdkNamespaces: SdkNamespace<TServiceOperation>[] = [];
   for (const segment of segments) {
     fullName = fullName === "" ? segment : `${fullName}.${segment}`;
     const ns: SdkNamespace<TServiceOperation> | undefined = current.namespaces.find(
@@ -139,13 +143,33 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
         enums: [],
         unions: [],
         namespaces: [],
-        decorators: rawNamespace ? ignoreDiagnostics(getTypeDecorators(context, rawNamespace)) : [],
+        decorators: [],
       };
       current.namespaces.push(newNs);
       current = newNs;
     } else {
       current = ns;
     }
+    sdkNamespaces.push(current as SdkNamespace<TServiceOperation>);
+  }
+
+  let rawNamespace = sourceNamespace;
+  while (rawNamespace) {
+    const mappedNamespace = getClientNamespace(context, rawNamespace);
+    const segmentIndex = segments.indexOf(mappedNamespace);
+    const targetNamespace = sdkNamespaces[segmentIndex < 0 ? sdkNamespaces.length - 1 : segmentIndex];
+    if (targetNamespace) {
+      let sources = namespaceDecoratorSources.get(targetNamespace);
+      if (!sources) {
+        sources = new Set();
+        namespaceDecoratorSources.set(targetNamespace, sources);
+      }
+      if (!sources.has(rawNamespace)) {
+        sources.add(rawNamespace);
+        targetNamespace.decorators.push(...ignoreDiagnostics(getTypeDecorators(context, rawNamespace)));
+      }
+    }
+    rawNamespace = rawNamespace.namespace;
   }
   return current;
 }

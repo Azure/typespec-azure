@@ -190,6 +190,48 @@ describe("@dynamicModel", () => {
     });
   }
 
+  for (const [overrideName, namespaceDecorator, options] of [
+    ["@clientNamespace", '@clientNamespace("Renamed")', {}],
+    ["namespace option", "", { namespace: "Renamed" }],
+  ] as const) {
+    it(`preserves enclosing namespace metadata when renamed with ${overrideName}`, async () => {
+      const { program } = await SimpleTester.compile(`
+        @dynamicModel
+        namespace Outer {
+          ${namespaceDecorator}
+          @service
+          namespace Service {
+            model Pet {
+              name: string;
+            }
+
+            op test(): Pet;
+          }
+        }
+
+        @service
+        namespace Unrelated {
+          model OtherPet {
+            name: string;
+          }
+
+          op test(): OtherPet;
+        }
+      `);
+
+      const context = await createSdkContextForTester(program, options, { additionalDecorators });
+      const renamed = context.sdkPackage.namespaces.find(
+        (namespace) => namespace.name === "Renamed",
+      );
+      ok(renamed);
+      deepStrictEqual(renamed.decorators, [{ name: decoratorName, arguments: {} }]);
+      const otherPet = context.sdkPackage.models.find((model) => model.name === "OtherPet");
+      ok(otherPet);
+      deepStrictEqual(otherPet.decorators, []);
+      expectDiagnostics(context.diagnostics, []);
+    });
+  }
+
   for (const scope of ['"csharp"', '#{ scope: "csharp" }']) {
     for (const language of ["csharp", "python"]) {
       it(`filters model and namespace metadata for ${language} with scope ${scope}`, async () => {
