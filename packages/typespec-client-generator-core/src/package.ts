@@ -1,9 +1,9 @@
 import {
   createDiagnosticCollector,
-  type Diagnostic,
-  type Namespace,
   getNamespaceFullName,
   ignoreDiagnostics,
+  type Diagnostic,
+  type Namespace,
 } from "@typespec/compiler";
 
 import { prepareClientAndOperationCache } from "./cache.js";
@@ -104,7 +104,9 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
     getSdkNamespace(context, sdkPackage, enumType, namespaceDecoratorSources).enums.push(enumType);
   }
   for (const unionType of sdkPackage.unions) {
-    getSdkNamespace(context, sdkPackage, unionType, namespaceDecoratorSources).unions.push(unionType);
+    getSdkNamespace(context, sdkPackage, unionType, namespaceDecoratorSources).unions.push(
+      unionType,
+    );
   }
 }
 
@@ -157,7 +159,8 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
   while (rawNamespace) {
     const mappedNamespace = getClientNamespace(context, rawNamespace);
     const segmentIndex = segments.indexOf(mappedNamespace);
-    const targetNamespace = sdkNamespaces[segmentIndex < 0 ? sdkNamespaces.length - 1 : segmentIndex];
+    const targetNamespace =
+      sdkNamespaces[segmentIndex < 0 ? sdkNamespaces.length - 1 : segmentIndex];
     if (targetNamespace) {
       let sources = namespaceDecoratorSources.get(targetNamespace);
       if (!sources) {
@@ -166,7 +169,9 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
       }
       if (!sources.has(rawNamespace)) {
         sources.add(rawNamespace);
-        targetNamespace.decorators.push(...ignoreDiagnostics(getTypeDecorators(context, rawNamespace)));
+        targetNamespace.decorators.push(
+          ...ignoreDiagnostics(getTypeDecorators(context, rawNamespace)),
+        );
       }
     }
     rawNamespace = rawNamespace.namespace;
