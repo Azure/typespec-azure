@@ -7,7 +7,7 @@ import {
 
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
-import { listClients } from "./decorators.js";
+import { getClientNamespace, listClients } from "./decorators.js";
 import type {
   SdkClientType,
   SdkEnumType,
@@ -127,7 +127,7 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
     );
     if (ns === undefined) {
       let rawNamespace = sourceNamespace;
-      while (rawNamespace && getNamespaceFullName(rawNamespace) !== fullName) {
+      while (rawNamespace && getClientNamespace(context, rawNamespace) !== fullName) {
         rawNamespace = rawNamespace.namespace;
       }
       const newNs = {

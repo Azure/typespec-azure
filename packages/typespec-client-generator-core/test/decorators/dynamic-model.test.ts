@@ -122,6 +122,34 @@ describe("@dynamicModel", () => {
     expectDiagnostics(context.diagnostics, []);
   });
 
+  for (const [overrideName, namespaceDecorator, options] of [
+    ["@clientNamespace", '@clientNamespace("Renamed")', {}],
+    ["namespace option", "", { namespace: "Renamed" }],
+  ] as const) {
+    it(`preserves namespace metadata when renamed with ${overrideName}`, async () => {
+      const { program } = await SimpleTester.compile(`
+        ${namespaceDecorator}
+        @service
+        @dynamicModel
+        namespace TestService {
+          model Pet {
+            name: string;
+          }
+
+          op test(): Pet;
+        }
+      `);
+
+      const context = await createSdkContextForTester(program, options, { additionalDecorators });
+      const renamed = context.sdkPackage.namespaces[0];
+      ok(renamed);
+      deepStrictEqual(renamed.fullName, "Renamed");
+      deepStrictEqual(renamed.__raw?.name, "TestService");
+      deepStrictEqual(renamed.decorators, [{ name: decoratorName, arguments: {} }]);
+      expectDiagnostics(context.diagnostics, []);
+    });
+  }
+
   for (const scope of ['"csharp"', '#{ scope: "csharp" }']) {
     for (const language of ["csharp", "python"]) {
       it(`filters model and namespace metadata for ${language} with scope ${scope}`, async () => {
