@@ -6,6 +6,49 @@ The OpenAPI Converter cannot perfectly represent every aspect of every API in Ty
 
 ## Migrating ARM Specifications
 
+### Migrating Private Link, Private Endpoint, and NSP APIs
+
+For new APIs, always use the standard resource models and operation templates for private link,
+private endpoint connections, and Network Security Perimeter (NSP) configurations. For example,
+declare resource models based on `PrivateLink`, `PrivateEndpointConnectionResource`, or
+`NspConfiguration`, then use `PrivateLinks`, `PrivateEndpoints`, or `NspConfigurations` for their
+operations. The default aliases are:
+
+```tsp
+alias PrivateLinkOps = PrivateLinks<MyPrivateLinkResource>;
+alias PrivateEndpointOps = PrivateEndpoints<MyPrivateEndpointConnection>;
+alias NspOps = Azure.ResourceManager.NspConfigurations<MyNspConfiguration>;
+```
+
+Use the corresponding `Read` and `ListByParent` operations, plus private endpoint connection
+create, update, and delete operations or NSP actions as required. These templates provide the
+standard ARM resource paths and operation patterns. Their default resource names are
+`{targetResourceName}PrivateLink`,
+`{targetResourceName}PrivateEndpointConnection`, and
+`{targetResourceName}NetworkSecurityPerimeterConfiguration`, respectively. See the guides for
+[private links](../../howtos/ARM/private-links.mdx),
+[private endpoints](../../howtos/ARM/private-endpoints.mdx), and
+[NSP configurations](../../howtos/ARM/network-security-perimeter.mdx) for the default patterns.
+
+When migrating an existing API, use those same templates and customize their `ResourceName`
+parameter to match the existing child-resource name when it differs from the default. For example:
+
+```tsp
+alias PrivateLinkOps = PrivateLinks<MyPrivateLinkResource, "EmployeePrivateLink">;
+alias PrivateEndpointOps =
+  PrivateEndpoints<MyPrivateEndpointConnection, "EmployeePrivateEndpointConnection">;
+alias NspOps = Azure.ResourceManager.NspConfigurations<
+  MyNspConfiguration,
+  ResourceName = "EmployeeNspConfiguration"
+>;
+```
+
+Avoid replacing templates with custom operations just to preserve a name the template can customize.
+Do not use non-standard patterns for new APIs. A custom definition is appropriate only for a very
+non-standard legacy API whose existing contract cannot be represented by the templates. Before
+migrating a legacy private-link API, check whether adopting the standard resource model would rename
+its resource type and change the generated public SDK or other client-visible surface.
+
 ### Customizing Route for Action (POST) Operations
 
 By default, the last segment of a POST action operation route is the operation name. For example:
