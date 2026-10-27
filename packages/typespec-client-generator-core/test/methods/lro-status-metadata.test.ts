@@ -116,26 +116,41 @@ describe("LRO status metadata", () => {
   });
 
   it("retains only the selected nested graph as output", async () => {
-    const { program } = await Tester.compile(operation);
-    const context = await createSdkContextForTester(program);
-    const { program: undecoratedProgram } = await Tester.compile(
-      operation.replaceAll(/ {2}@lroStatusMetadata(?:\([^)]*\))?\n/g, ""),
+    const scopedOperation = operation.replace(
+      "op getJobStatus",
+      '@scope("!python")\nop getJobStatus',
     );
-    const undecoratedContext = await createSdkContextForTester(undecoratedProgram);
+    const { program } = await Tester.compile(scopedOperation);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const { program: undecoratedProgram } = await Tester.compile(
+      scopedOperation.replaceAll(/ {2}@lroStatusMetadata(?:\([^)]*\))?\n/g, ""),
+    );
+    const undecoratedContext = await createSdkContextForTester(undecoratedProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    expect(context.sdkPackage.clients[0].methods.map((x) => x.name)).toEqual(["start"]);
+    expect(undecoratedContext.sdkPackage.clients[0].methods.map((x) => x.name)).toEqual(["start"]);
     const details = context.sdkPackage.models.find((x) => x.name === "Details");
     const sibling = context.sdkPackage.models.find((x) => x.name === "Sibling");
     const detailMode = context.sdkPackage.enums.find((x) => x.name === "DetailMode");
-    const undecoratedSibling = undecoratedContext.sdkPackage.models.find(
-      (x) => x.name === "Sibling",
+    const undecoratedDetails = undecoratedContext.sdkPackage.models.find(
+      (x) => x.name === "Details",
+    );
+    const undecoratedDetailMode = undecoratedContext.sdkPackage.enums.find(
+      (x) => x.name === "DetailMode",
     );
     ok(details);
     ok(sibling);
     ok(detailMode);
-    ok(undecoratedSibling);
+    ok(undecoratedDetails);
+    ok(undecoratedDetailMode);
     expect(details.usage & UsageFlags.Output).toBe(UsageFlags.Output);
     expect(detailMode.usage & UsageFlags.Output).toBe(UsageFlags.Output);
-    strictEqual(sibling.usage, undecoratedSibling.usage);
-    strictEqual(sibling.access, undecoratedSibling.access);
+    expect(undecoratedDetails.usage & UsageFlags.Output).toBe(0);
+    expect(undecoratedDetailMode.usage & UsageFlags.Output).toBe(0);
+    expect(sibling.usage & UsageFlags.Output).toBe(0);
   });
 
   it("honors scoped inclusion and negation", async () => {
@@ -285,6 +300,53 @@ model JobState extends PollingMetadataBase {`,
     );
   });
 
+  it("promotes a selected graph lifted from a removed base", async () => {
+    const { program } = await Tester.compile(`
+model LiftedDetails {
+  mode: LiftedMode;
+}
+
+enum LiftedMode {
+  fast,
+  slow,
+}
+
+model RemovedBase {
+  @lroStatusMetadata
+  details: LiftedDetails;
+}
+
+model NewBase {}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(NewBase)
+model StatusMonitor extends RemovedBase {
+  status: LroStatus;
+}
+
+@route("/jobs")
+op start(): {
+  @statusCode _: 202;
+
+  @pollingLocation
+  @header("Operation-Location")
+  operationLocation: ResourceLocation<StatusMonitor>;
+};
+`);
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    const details = context.sdkPackage.models.find((x) => x.name === "LiftedDetails");
+    const mode = context.sdkPackage.enums.find((x) => x.name === "LiftedMode");
+    ok(method);
+    ok(details);
+    ok(mode);
+    strictEqual(method.kind, "lro");
+    const metadata = method.lroMetadata.statusMetadata?.find((x) => x.property.name === "details");
+    ok(metadata);
+    strictEqual(metadata.property.type, details);
+    expect(details.usage & UsageFlags.Output).toBe(UsageFlags.Output);
+    expect(mode.usage & UsageFlags.Output).toBe(UsageFlags.Output);
+  });
+
   it("keeps scoped usage authoritative", async () => {
     const { program } = await Tester.compile(
       operation.replace("model Details {", '@usage(Usage.input, "python")\nmodel Details {'),
@@ -363,6 +425,31 @@ model JobState extends PollingMetadataBase {`,
         "@azure-tools/typespec-client-generator-core/lro-status-metadata-structural-property",
       );
     }
+  });
+
+  it("rejects an implicit polling monitor error property as status metadata", async () => {
+    const { program } = await Tester.compile(`
+model StatusMonitor {
+  status: LroStatus;
+
+  @lroErrorResult
+  @lroStatusMetadata
+  error: Foundations.Error;
+}
+
+@route("/jobs")
+op start(): {
+  @statusCode _: 202;
+
+  @pollingLocation
+  @header("Operation-Location")
+  operationLocation: ResourceLocation<StatusMonitor>;
+};
+`);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics.map((x) => x.code)).toContain(
+      "@azure-tools/typespec-client-generator-core/lro-status-metadata-structural-property",
+    );
   });
 
   it("ignores decorated properties that are not used by an LRO", async () => {

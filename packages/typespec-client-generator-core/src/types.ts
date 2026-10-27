@@ -74,6 +74,7 @@ import {
   type SdkArrayType,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
+  type SdkClient,
   type SdkClientType,
   type SdkConstantType,
   type SdkCredentialParameter,
@@ -2225,9 +2226,6 @@ function updateTypesFromOperation(
     popNamingContext(context);
 
     const lroMetaData = getRawLroMetadata(program, operation);
-    const lroStatusMetadata = diagnostics.pipe(
-      resolveLroStatusMetadata(context, operation, lroMetaData, isVisibleSdkProperty),
-    );
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2342,30 +2340,6 @@ function updateTypesFromOperation(
         UsageFlags.LroPolling,
         "PollingResponse",
       );
-    }
-
-    if (lroMetaData) {
-      const pollingModel = diagnostics.pipe(
-        getSdkModelWithDiagnostics(context, lroMetaData.pollingInfo.responseModel),
-      );
-      for (const rawProperty of lroStatusMetadata?.properties ?? []) {
-        const sdkProperty = getEffectiveSdkModelProperty(pollingModel, rawProperty);
-        if (!sdkProperty) continue;
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
-        const operationAccess = getAccessOverride(context, operation) ?? "public";
-        const propertyAccess = getAccessOverride(context, sdkProperty.__raw ?? rawProperty);
-        if (operationAccess === "public" && propertyAccess === "internal") {
-          diagnostics.add(
-            createDiagnostic({
-              code: "conflict-access-override",
-              target: sdkProperty.__raw ?? rawProperty,
-            }),
-          );
-        }
-        const access = propertyAccess ?? operationAccess;
-        diagnostics.pipe(updateUsageOrAccess(context, access, sdkProperty.type));
-        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
-      }
     }
   } finally {
     popNamingContext(context); // pop operation
@@ -2561,6 +2535,59 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+function updateLroStatusMetadataUsageAndAccess(
+  context: TCGCContext,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const processed = new Set<Operation>();
+
+  for (const client of listClients(context)) {
+    updateClientOperations(client);
+    for (const subClient of listSubClients(context, client, true)) {
+      updateClientOperations(subClient);
+    }
+  }
+  return diagnostics.wrap(undefined);
+
+  function updateClientOperations(client: SdkClient): void {
+    for (const operation of listOperationsInClient(context, client)) {
+      if (processed.has(operation)) continue;
+      processed.add(operation);
+
+      const lroMetadata = getRawLroMetadata(context.program, operation);
+      if (!lroMetadata) continue;
+      const statusMetadata = diagnostics.pipe(
+        resolveLroStatusMetadata(context, operation, lroMetadata, isVisibleSdkProperty),
+      );
+      if (!statusMetadata) continue;
+
+      const pollingModel = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, lroMetadata.pollingInfo.responseModel),
+      );
+      for (const rawProperty of statusMetadata.properties) {
+        const sdkProperty = getEffectiveSdkModelProperty(pollingModel, rawProperty);
+        if (!sdkProperty) continue;
+
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
+        const operationAccess = getAccessOverride(context, operation) ?? "public";
+        const propertyAccess = getAccessOverride(context, sdkProperty.__raw ?? rawProperty);
+        if (operationAccess === "public" && propertyAccess === "internal") {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-access-override",
+              target: sdkProperty.__raw ?? rawProperty,
+            }),
+          );
+        }
+        diagnostics.pipe(
+          updateUsageOrAccess(context, propertyAccess ?? operationAccess, sdkProperty.type),
+        );
+        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
+      }
+    }
+  }
 }
 
 /**
@@ -2898,6 +2925,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
+  // Promote the final retained metadata property graphs after hierarchy reconciliation.
+  diagnostics.pipe(updateLroStatusMetadataUsageAndAccess(context));
   // clean up discriminator info when only subtypes have usage
   cleanupDiscriminatorForUnusedBase(context);
   // update generated name
