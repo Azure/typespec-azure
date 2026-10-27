@@ -2584,6 +2584,7 @@ function updateLroStatusMetadataUsageAndAccess(
         diagnostics.pipe(
           updateUsageOrAccess(context, propertyAccess ?? operationAccess, sdkProperty.type),
         );
+        setSerializationOptions(context, sdkProperty, ["application/json"]);
         updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
       }
     }
@@ -2915,8 +2916,6 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   }
   // update for orphan models/enums/unions
   diagnostics.pipe(handleServiceOrphanTypes(context));
-  // update access
-  diagnostics.pipe(updateAccessOverride(context));
   // update usage
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
@@ -2927,6 +2926,9 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // Promote the final retained metadata property graphs after hierarchy reconciliation.
   diagnostics.pipe(updateLroStatusMetadataUsageAndAccess(context));
+  // Apply access overrides after hierarchy reconciliation and metadata graph promotion can
+  // materialize otherwise-unreferenced types.
+  diagnostics.pipe(updateAccessOverride(context));
   // clean up discriminator info when only subtypes have usage
   cleanupDiscriminatorForUnusedBase(context);
   // update generated name

@@ -312,6 +312,7 @@ enum LiftedMode {
 }
 
 model RemovedBase {
+  @clientName("metadataDetails")
   @lroStatusMetadata
   details: LiftedDetails;
 }
@@ -340,11 +341,59 @@ op start(): {
     ok(details);
     ok(mode);
     strictEqual(method.kind, "lro");
-    const metadata = method.lroMetadata.statusMetadata?.find((x) => x.property.name === "details");
+    const metadata = method.lroMetadata.statusMetadata?.find(
+      (x) => x.property.name === "metadataDetails",
+    );
     ok(metadata);
     strictEqual(metadata.property.type, details);
+    strictEqual(metadata.property.serializationOptions.json?.name, "details");
     expect(details.usage & UsageFlags.Output).toBe(UsageFlags.Output);
     expect(mode.usage & UsageFlags.Output).toBe(UsageFlags.Output);
+  });
+
+  it("applies scoped access to a selected graph lifted from a removed base", async () => {
+    const { program } = await Tester.compile(`
+@access(Access.public, "python")
+model LiftedDetails {
+  mode: LiftedMode;
+}
+
+enum LiftedMode {
+  fast,
+  slow,
+}
+
+model RemovedBase {
+  @lroStatusMetadata
+  details: LiftedDetails;
+}
+
+model NewBase {}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(NewBase)
+model StatusMonitor extends RemovedBase {
+  status: LroStatus;
+}
+
+@access(Access.internal)
+@route("/jobs")
+op start(): {
+  @statusCode _: 202;
+
+  @pollingLocation
+  @header("Operation-Location")
+  operationLocation: ResourceLocation<StatusMonitor>;
+};
+`);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const details = context.sdkPackage.models.find((x) => x.name === "LiftedDetails");
+    const mode = context.sdkPackage.enums.find((x) => x.name === "LiftedMode");
+    ok(details);
+    ok(mode);
+    strictEqual(details.access, "public");
+    strictEqual(mode.access, "public");
   });
 
   it("keeps scoped usage authoritative", async () => {
