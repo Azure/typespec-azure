@@ -1,4 +1,5 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { getDirectoryPath, resolveCompilerOptions } from "@typespec/compiler";
+import { expectDiagnostics, resolveVirtualPath } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it, vi } from "vitest";
 import type {
@@ -468,6 +469,86 @@ Widgets.get:
     strictEqual(byPath.get("/b")?.responses[0].bodyValue?.value, "B-v2");
     strictEqual(byPath.get("/a")?.filePath, "A/examples.yaml");
     strictEqual(byPath.get("/b")?.filePath, "B/examples.yaml");
+  });
+
+  it("keeps combined Compute example paths relative to the shared tspconfig.yaml", async () => {
+    const instance = await SimpleBaseTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "sdk/tspconfig.yaml",
+      `
+options:
+  "@azure-tools/typespec-client-generator-core":
+    api-version:
+      Compute: v1
+      ComputeDisk: v2
+`,
+    );
+    for (const [service, group] of [
+      ["Compute", "VirtualMachines"],
+      ["ComputeDisk", "Disks"],
+    ]) {
+      instance.fs.addTypeSpecFile(
+        `sdk/${service}/main.tsp`,
+        `
+import "@typespec/http";
+import "@typespec/versioning";
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+@service @versioned(Versions) namespace ${service};
+enum Versions { v1, v2 }
+interface ${group} { @route("/${service}") @get op get(): string; }
+`,
+      );
+      instance.fs.addTypeSpecFile(
+        `sdk/${service}/examples/${group}.yaml`,
+        `
+$namespace: ${service}
+${group}.get:
+  - id: widgetExamples/GetWidget
+    request: {}
+    responses: {200: {body: "${service}-{api-version}"}}
+`,
+      );
+    }
+    instance.fs.addTypeSpecFile(
+      "sdk/client.tsp",
+      `
+import "@azure-tools/typespec-client-generator-core";
+import "./Compute/main.tsp";
+import "./ComputeDisk/main.tsp";
+using Azure.ClientGenerator.Core;
+@client({name: "Combined", service: [Compute, ComputeDisk], autoMergeService: true})
+namespace Combined {}
+`,
+    );
+    const entrypoint = resolveVirtualPath("sdk/client.tsp");
+    const [compilerOptions, diagnostics] = await resolveCompilerOptions(instance.fs.compilerHost, {
+      cwd: getDirectoryPath(entrypoint),
+      entrypoint,
+    });
+    expectDiagnostics(diagnostics, []);
+    const { program } = await instance.compile('import "./sdk/client.tsp";', { compilerOptions });
+    const context = await createSdkContextForTester(
+      program,
+      compilerOptions.options?.["@azure-tools/typespec-client-generator-core"],
+    );
+    expectDiagnostics(context.diagnostics, []);
+    const methods = context.sdkPackage.clients[0]
+      .children!.flatMap((client) => client.methods)
+      .map(httpMethod);
+    const byPath = new Map(
+      methods.map((method) => [method.operation.path, method.operation.examples![0]]),
+    );
+    strictEqual(
+      byPath.get("/Compute")?.filePath,
+      "Compute/examples/VirtualMachines.yaml#widgetExamples/GetWidget",
+    );
+    strictEqual(
+      byPath.get("/ComputeDisk")?.filePath,
+      "ComputeDisk/examples/Disks.yaml#widgetExamples/GetWidget",
+    );
+    strictEqual(byPath.get("/Compute")?.responses[0].bodyValue?.value, "Compute-v1");
+    strictEqual(byPath.get("/ComputeDisk")?.responses[0].bodyValue?.value, "ComputeDisk-v2");
   });
 
   it("loads unified and legacy examples independently for different services", async () => {
