@@ -55,6 +55,12 @@ Native-first coverage discovers and pins the
 before specs setup. It reruns native diagnostics, not the Swagger suite.
 Only an explicitly requested separate producer creates or refreshes shared data.
 
+Both flows follow the shared
+[analysis-first edit loop](../shared/analysis-first-lint-migration.md).
+Decide source changes through semantic analysis and focused regressions.
+Treat full coverage as an expensive, justified checkpoint after coherent edits
+stabilize, not a per-edit debugger. Preserve all final verification/review gates.
+
 Both flows must create or refresh `migration.md` under the shared
 [five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
 Review the concise report and its linked evidence together: preserve evidenced
@@ -890,6 +896,10 @@ one session to execute both publication phases.
 > development PR URL and pushed head. Pass the shared post-run policy's queue ownership
 > constraint to that skill: do not modify skills or create a skill-update PR;
 > return only evidence-backed, high-confidence suggestions to the outer agent.
+> Carry the shared [analysis-first policy](../shared/analysis-first-lint-migration.md)
+> into development and review handoffs: analyze findings and run focused
+> regressions before expensive corpus execution. Record its purpose and cost;
+> batch justified fixes without skipping required fresh final coverage.
 > Maintain the cycle handoff after every phase, preserving prior heads in history
 > and recording newly verified pushed heads before calling the next skill.
 >

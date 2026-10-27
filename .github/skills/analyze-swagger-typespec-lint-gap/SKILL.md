@@ -10,6 +10,13 @@ TypeSpec lint rule without assuming that raw diagnostic counts must be equal.
 Produce reproducible evidence, decide whether the migrated TypeSpec rule needs
 to change, and give a rule-focused implementation plan when it does.
 
+Follow the shared [analysis-first policy](../shared/analysis-first-lint-migration.md).
+Investigate upstream/native code and saved project diagnostics before requesting
+new coverage. Form a semantic hypothesis and focused reproducer first; do not
+use repeated full runs to discover what to edit. Request fresh real-spec data
+when it answers an unresolved question or satisfies the final candidate's gate,
+with an explicit cost/budget. Old findings cannot validate changed rule code.
+
 For official-package runs, prefer the immutable baseline and candidate receipts
 from [/analyze-native-lint-coverage](../analyze-native-lint-coverage/SKILL.md).
 For explicit many-to-one tasks, apply the

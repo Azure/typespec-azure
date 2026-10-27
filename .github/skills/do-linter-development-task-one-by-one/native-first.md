@@ -117,7 +117,11 @@ install only missing/invalid dependencies or changed manifests.
    or record the exact outstanding handoff. Uncertain classifications block.
 2. **Implement and validate natively.** Use
    [implementation](../typespec-lint-implement/SKILL.md) and
-   [validation](../typespec-lint-validate/SKILL.md). Keep one canonical behavior
+   [validation](../typespec-lint-validate/SKILL.md), following the shared
+   [analysis-first edit loop](../shared/analysis-first-lint-migration.md).
+   Decide fixes from upstream/native semantics and saved evidence, then use
+   focused regressions. Do not launch full coverage for each source edit.
+   Keep one canonical behavior
    suite; test every member's meaningful branches and valid controls. Include
    A-only/B-only/both/neither and interaction cases where authorable; document
    implications rather than invent impossible cases. Map legacy fixtures to
@@ -134,7 +138,9 @@ install only missing/invalid dependencies or changed manifests.
    establish that identity, stop rather than claiming a dirty build came from
    HEAD. Complete required checks and independent local review before the task
    commit/publication.
-4. **Compare and investigate.** Use
+4. **Compare and investigate.** After coherent edits and focused checks stabilize,
+   record the coverage question/gate, estimated cost and runtime budget under the
+   shared analysis-first policy. Use
    [official-package coverage](../analyze-native-lint-coverage/SKILL.md), a
    pinned shared compatible baseline, lightweight injected positive/compliant
    preflight controls, then the declared

@@ -327,6 +327,11 @@ direct linter-package link within the specs checkout.
 
 The top-level worker works only in the supplied typespec-azure worktree.
 
+Follow the shared [analysis-first edit loop](../shared/analysis-first-lint-migration.md):
+use source semantics, saved diagnostics and focused regressions to decide fixes.
+Full corpus execution is an expensive checkpoint, not the default way to decide
+what code to change. Required final validation and review remain unchanged.
+
 ### 1. Establish evidence
 
 - Read the fixture `rule.md`, production TypeSpec rule, fixtures, snapshots,
@@ -636,6 +641,11 @@ use the existing synchronization/recovery contract; fetching alone is not mergin
 
 ### 4. Run the existing corpus analysis
 
+Enter this checkpoint after coherent source edits and focused checks stabilize.
+Record the question or required gate, estimated cost and runtime budget before
+execution. If findings require changes, analyze the saved evidence and batch
+justified fixes with focused regressions before another required full run.
+
 Use the existing full runner; do not add a per-rule runner:
 
 ```powershell
@@ -687,9 +697,10 @@ perform and document this attribution during the migration investigation rather
 than assuming every raw TypeSpec-only diagnostic applies to the retained
 Swagger version.
 
-If a quick iteration is needed first, use the existing `--filter`, `--limit`,
-and `--concurrency` options. The final behavioral check should use the full
-corpus when practical.
+When analysis and focused fixtures leave a specific real-spec question, use the
+existing `--filter`, `--limit`, and `--concurrency` options for a targeted
+reproduction. This supplements, not replaces, the required representative
+preflight and full corpus validation.
 
 `--filter` is one **case-sensitive literal substring** of a dataset project's
 `sourcePath`, not a regex or rule ID. For example, use

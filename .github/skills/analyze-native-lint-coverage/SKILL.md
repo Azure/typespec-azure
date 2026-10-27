@@ -13,6 +13,15 @@ same artifact-injection and comparison path. This is an analysis workflow, not
 authorization to modify the rule, enable it by default, or rewrite the migration
 queue.
 
+## Cost-aware invocation
+
+Read the shared [analysis-first policy](../shared/analysis-first-lint-migration.md)
+before execution. Prefer source/semantic analysis, saved observations and focused
+regressions while editing a rule. Full native verification is expensive even
+when Swagger data is reused; do not invoke it automatically after each edit.
+Record the question or required final gate, estimate and budget before starting.
+Retain required fresh final coverage and every evidence/control gate below.
+
 ## Inputs and contract
 
 Resolve the candidate PR or branch, canonical repository, official native rule
