@@ -160,6 +160,11 @@ export class Emitter {
 
             await write("internal.go", serverContent.internals, fakePkg.kind);
 
+            const sseEncoders = fake.generateSseEncoders(fakePkg);
+            if (sseEncoders.length > 0) {
+              await write("sse_encoders.go", sseEncoders, fakePkg.kind);
+            }
+
             const polymorphics = core.generatePolymorphicHelpers(fakePkg);
             if (polymorphics.length > 0) {
               await write("polymorphic_helpers.go", polymorphics, fakePkg.kind);

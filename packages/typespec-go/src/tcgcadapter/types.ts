@@ -7,6 +7,7 @@
 
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
+import { isEventData } from "@typespec/events";
 import * as http from "@typespec/http";
 import * as go from "../codemodel/index.js";
 import * as naming from "../naming/naming.js";
@@ -28,12 +29,43 @@ export class TypeAdapter {
   private readonly types: Map<string, go.WireType>;
   private readonly constValues: Map<string, go.ConstantValue>;
 
+  // lazily built index of how each tcgc union type is used across the tcgc code model
+  private unionUsage?: Map<tcgc.SdkUnionType, UnionUsage>;
+
+  // SSE events with an envelope, pending resolution of their envelope field
+  private readonly pendingSseEnvelopes: Array<PendingSseEnvelope>;
+
   constructor(ctx: tcgc.SdkContext, codeModel: go.CodeModel) {
     this.ctx = ctx;
     this.codeModel = codeModel;
     this.types = new Map<string, go.WireType>();
     this.constValues = new Map<string, go.ConstantValue>();
     this.fieldsMap = new Map<tcgc.SdkModelPropertyType, go.ModelField>();
+    this.pendingSseEnvelopes = new Array<PendingSseEnvelope>();
+  }
+
+  /**
+   * returns the stream metadata for the specified union type.
+   *
+   * tcgc only exposes SdkStreamMetadata on HTTP bodies/responses, so the tcgc code
+   * model is indexed once and the metadata looked up by union type.
+   * @param sdkUnion the union type to look up
+   * @returns the stream metadata, or undefined if the union isn't the payload of a stream
+   */
+  getStreamMetadata(sdkUnion: tcgc.SdkUnionType): tcgc.SdkStreamMetadata | undefined {
+    return this.getUnionUsage().get(sdkUnion)?.streamMetadata;
+  }
+
+  /**
+   * returns the SSE metadata for the specified union type.
+   *
+   * tcgc only exposes SdkSseMetadata on HTTP bodies/responses, so the tcgc code
+   * model is indexed once and the metadata looked up by union type.
+   * @param sdkUnion the union type to look up
+   * @returns the SSE metadata, or undefined if the union isn't the event type of an SSE stream
+   */
+  getSseMetadata(sdkUnion: tcgc.SdkUnionType): tcgc.SdkSseMetadata | undefined {
+    return this.getUnionUsage().get(sdkUnion)?.sseMetadata;
   }
 
   /**
@@ -152,6 +184,8 @@ export class TypeAdapter {
       }
       this.getPkg().models.push(modelType.go);
     }
+
+    this.resolveSseEnvelopeFields();
   }
 
   // returns the synthesized paged response types
@@ -257,6 +291,7 @@ export class TypeAdapter {
           case "constantDef":
           case "constantValue":
           case "etag":
+          case "sseReader":
             throw new AdapterError(
               "UnsupportedTsp",
               `unsupported kind ${elementType.kind} for slice element type`,
@@ -385,6 +420,22 @@ export class TypeAdapter {
     datetime = new go.Time(encoding, utc);
     this.types.set(keyName, datetime);
     return datetime;
+  }
+
+  /**
+   * returns the cached Go SSE reader type, creating it if needed
+   *
+   * @param eventType the union of possible events read from the stream
+   * @returns the Go code model type for a streaming.SSEReader of the event type
+   */
+  getSSEReader(eventType: go.UnionStruct): go.SSEReader {
+    const keyName = `sse-reader-${eventType.name}`;
+    let ser = this.types.get(keyName);
+    if (!ser) {
+      ser = new go.SSEReader(eventType);
+      this.types.set(keyName, ser);
+    }
+    return <go.SSEReader>ser;
   }
 
   // returns the Go code model type for an io.ReadSeekCloser
@@ -1188,6 +1239,7 @@ export class TypeAdapter {
       case "etag":
       case "multipartContent":
       case "literal":
+      case "sseReader":
         throw new AdapterError(
           "UnsupportedTsp",
           `unsupported kind ${valueType.kind} for map value type`,
@@ -1264,8 +1316,9 @@ export class TypeAdapter {
       return <go.UnionStruct>goUnion;
     }
 
-    goUnion = new go.UnionStruct(this.getPkg(), unionName);
-    for (const variant of sdkUnion.variantTypes) {
+    goUnion = new go.UnionStruct(this.getPkg(), unionName, this.getUnionStructFlags(sdkUnion));
+    const sseMetadata = this.getSseMetadata(sdkUnion);
+    for (const [index, variant] of sdkUnion.variantTypes.entries()) {
       const type = this.getWireType(variant, elementTypeByValue, false);
       if (!go.isUnionVariantType(type)) {
         throw new AdapterError(
@@ -1276,7 +1329,11 @@ export class TypeAdapter {
       }
 
       const fieldType = helpers.isPtrType(type) ? this.getPtrType(type) : type;
-      goUnion.fields.push(new go.UnionField(recursiveVariantFieldName(fieldType), fieldType));
+      const variantField = new go.UnionField(recursiveVariantFieldName(fieldType), fieldType);
+      if (sseMetadata) {
+        variantField.sse = this.getSseEvent(sdkUnion, sseMetadata, variant, index);
+      }
+      goUnion.fields.push(variantField);
     }
 
     goUnion.docs.summary = sdkUnion.summary;
@@ -1293,6 +1350,239 @@ export class TypeAdapter {
 
     this.types.set(unionName, goUnion);
     return goUnion;
+  }
+
+  /**
+   * creates the SSE info for the specified union variant.
+   *
+   * @param sdkUnion the union containing the variant
+   * @param sseMetadata the SSE metadata for sdkUnion
+   * @param variant the variant to adapt
+   * @param variantIndex the index of variant within sdkUnion
+   * @returns the adapted SSE info
+   */
+  private getSseEvent(
+    sdkUnion: tcgc.SdkUnionType,
+    sseMetadata: tcgc.SdkSseMetadata,
+    variant: tcgc.SdkType,
+    variantIndex: number,
+  ): go.SseEvent {
+    // tcgc creates one event per union variant, in variant order. we still match on
+    // the underlying tsp type so we don't silently adapt the wrong event.
+    let event: tcgc.SdkSseEventMetadata | undefined = sseMetadata.events[variantIndex];
+    if (event?.type.__raw !== variant.__raw) {
+      event = sseMetadata.events.find((each) => each.type.__raw === variant.__raw);
+    }
+    if (!event) {
+      throw new AdapterError(
+        "InternalError",
+        `didn't find SSE event for variant ${variant.kind} of union ${sdkUnion.name}`,
+        variant.__raw?.node ?? sdkUnion.__raw?.node,
+      );
+    }
+
+    // the data field contains the payload, which is the complete event
+    // type unless the event type is an envelope
+    const sseEvent = new go.SseEvent(
+      getSseEventFormat(event.payloadContentType, event.payloadType),
+      event.isTerminalEvent,
+    );
+    // unnamed variants have no event field and are received as message events
+    sseEvent.name = event.eventType;
+
+    if (sseEvent.format === "Text" && !isTextPayloadType(event.payloadType)) {
+      throw new AdapterError(
+        "UnsupportedTsp",
+        `unsupported kind ${event.payloadType.kind} for text SSE event payload in union ${sdkUnion.name}`,
+        variant.__raw?.node ?? sdkUnion.__raw?.node,
+      );
+    }
+
+    if (event.isEventEnvelope) {
+      if (event.type.kind !== "model") {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${event.type.kind} for SSE event envelope in union ${sdkUnion.name}`,
+          variant.__raw?.node ?? sdkUnion.__raw?.node,
+        );
+      }
+
+      const payloadProp = event.type.properties.find(
+        (prop) => prop.__raw?.kind === "ModelProperty" && isEventData(this.ctx.program, prop.__raw),
+      );
+      if (!payloadProp) {
+        // the @data property can be nested within the envelope, which we don't support
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `didn't find the @data property on SSE event envelope ${event.type.name} in union ${sdkUnion.name}`,
+          event.type.__raw?.node ?? sdkUnion.__raw?.node,
+        );
+      }
+
+      // model fields are adapted after the unions, so the field is resolved later
+      this.pendingSseEnvelopes.push({ sseEvent: sseEvent, payloadProp: payloadProp });
+    }
+
+    return sseEvent;
+  }
+
+  /**
+   * populates the envelope field for all SSE events adapted so far.
+   * must be called after all model fields have been adapted.
+   */
+  private resolveSseEnvelopeFields(): void {
+    for (const pending of this.pendingSseEnvelopes.splice(0)) {
+      const envelopeField = this.fieldsMap.get(pending.payloadProp);
+      if (!envelopeField) {
+        // the most likely explanation for this is lack of reference equality
+        throw new AdapterError(
+          "InternalError",
+          `missing SSE event envelope field ${pending.payloadProp.name}`,
+          pending.payloadProp.__raw?.node,
+        );
+      }
+      pending.sseEvent.envelopeField = envelopeField;
+    }
+  }
+
+  /**
+   * determines whether a union is used as a sum type, an SSE event type, or both
+   *
+   * @param sdkUnion the union type to inspect
+   * @returns the flags describing the union's usage
+   * @throws AdapterError if no usage is found for the union
+   */
+  private getUnionStructFlags(sdkUnion: tcgc.SdkUnionType): go.UnionStructFlags {
+    const usage = this.getUnionUsage().get(sdkUnion);
+    const noFlags = <go.UnionStructFlags>0;
+    let usageFlags = noFlags;
+
+    if (usage?.sseMetadata) {
+      usageFlags |= go.UnionStructFlags.SseType;
+    }
+    if (usage?.isValueType) {
+      usageFlags |= go.UnionStructFlags.SumType;
+    }
+
+    if (usageFlags === noFlags) {
+      throw new AdapterError(
+        "InternalError",
+        `failed to find usage flags for union ${sdkUnion.name}`,
+        sdkUnion.__raw?.node,
+      );
+    }
+
+    return usageFlags;
+  }
+
+  /**
+   * builds (once) and returns the index of union usage info.
+   *
+   * the index is built by walking the client hierarchy and the models, as tcgc
+   * doesn't surface this info on SdkUnionType. it's keyed by tcgc union type,
+   * which is safe as tcgc caches the SdkUnionType created for a given tsp union,
+   * so instances are stable.
+   * @returns the union usage index for the tcgc code model
+   */
+  private getUnionUsage(): Map<tcgc.SdkUnionType, UnionUsage> {
+    if (this.unionUsage) {
+      return this.unionUsage;
+    }
+
+    const index = new Map<tcgc.SdkUnionType, UnionUsage>();
+
+    const getUsage = function (sdkType?: tcgc.SdkType): UnionUsage | undefined {
+      if (sdkType?.kind !== "union") {
+        return undefined;
+      }
+      let usage = index.get(sdkType);
+      if (!usage) {
+        usage = { isValueType: false };
+        index.set(sdkType, usage);
+      }
+      return usage;
+    };
+
+    // a stream's payload type is the union in the stream metadata. for SSE streams,
+    // the per-event info is in the adjacent SSE metadata.
+    const addStreamUsage = function (
+      streamMetadata?: tcgc.SdkStreamMetadata,
+      sseMetadata?: tcgc.SdkSseMetadata,
+    ): void {
+      const usage = getUsage(streamMetadata?.streamType);
+      if (!usage) {
+        return;
+      }
+      usage.streamMetadata ??= streamMetadata;
+      usage.sseMetadata ??= sseMetadata;
+    };
+
+    // anywhere else a union is referenced it's used as a value. the type can be
+    // nested within containers, e.g. a slice of unions.
+    const recursiveAddValueTypeUsage = function (sdkType?: tcgc.SdkType): void {
+      switch (sdkType?.kind) {
+        case "array":
+          recursiveAddValueTypeUsage(sdkType.valueType);
+          break;
+        case "dict":
+          recursiveAddValueTypeUsage(sdkType.valueType);
+          break;
+        case "nullable":
+          recursiveAddValueTypeUsage(sdkType.type);
+          break;
+        case "union": {
+          const usage = getUsage(sdkType);
+          if (usage) {
+            usage.isValueType = true;
+          }
+          break;
+        }
+      }
+    };
+
+    const recursiveIndexClient = function (
+      sdkClient: tcgc.SdkClientType<tcgc.SdkHttpOperation>,
+    ): void {
+      for (const sdkMethod of sdkClient.methods) {
+        if (sdkMethod.response.streamMetadata) {
+          addStreamUsage(sdkMethod.response.streamMetadata, sdkMethod.response.sseMetadata);
+        } else {
+          recursiveAddValueTypeUsage(sdkMethod.response.type);
+        }
+
+        const bodyParam = sdkMethod.operation.bodyParam;
+        if (bodyParam?.streamMetadata) {
+          addStreamUsage(bodyParam.streamMetadata, bodyParam.sseMetadata);
+        }
+
+        for (const param of sdkMethod.parameters) {
+          recursiveAddValueTypeUsage(param.type);
+        }
+      }
+
+      if (sdkClient.children) {
+        for (const child of sdkClient.children) {
+          recursiveIndexClient(child);
+        }
+      }
+    };
+
+    for (const sdkClient of this.ctx.sdkPackage.clients) {
+      recursiveIndexClient(sdkClient);
+    }
+
+    // unions can also be referenced from model fields or additional properties, never appearing
+    // directly in a method signature
+    for (const sdkModel of this.ctx.sdkPackage.models) {
+      const { props, addlProps } = aggregateProperties(this.ctx, sdkModel);
+      recursiveAddValueTypeUsage(addlProps);
+      for (const property of props) {
+        recursiveAddValueTypeUsage(property.type);
+      }
+    }
+
+    this.unionUsage = index;
+    return index;
   }
 }
 
@@ -1408,6 +1698,74 @@ function recursiveVariantFieldName(type: go.WireType): string {
     default:
       return naming.capitalize(type.kind);
   }
+}
+
+/**
+ * returns the format of an SSE event's data field.
+ *
+ * @param contentType the content type of the event payload, if specified
+ * @param payloadType the type of the event payload
+ * @returns the adapted format
+ */
+function getSseEventFormat(
+  contentType: string | undefined,
+  payloadType: tcgc.SdkType,
+): go.SseEventFormat {
+  if (contentType) {
+    return contentType.match(/json/i) ? "JSON" : "Text";
+  }
+
+  // tcgc leaves the content type unset when @Events.contentType isn't specified,
+  // so it's inferred from the payload type the same way the http lib does it.
+  switch (payloadType.kind) {
+    case "array":
+    case "dict":
+    case "model":
+    case "nullable":
+    case "union":
+      return "JSON";
+    default:
+      return "Text";
+  }
+}
+
+/**
+ * returns true if the SSE event payload type can be received as text,
+ * i.e. the data field is used verbatim.
+ *
+ * @param payloadType the type of the event payload
+ * @returns true if the payload is text
+ */
+function isTextPayloadType(payloadType: tcgc.SdkType): boolean {
+  switch (payloadType.kind) {
+    case "string":
+      return true;
+    case "constant":
+      return payloadType.valueType.kind === "string";
+    default:
+      return false;
+  }
+}
+
+/** an SSE event envelope awaiting resolution of its payload field */
+interface PendingSseEnvelope {
+  /** the event with the envelope */
+  sseEvent: go.SseEvent;
+
+  /** the @data property within the envelope that receives the payload */
+  payloadProp: tcgc.SdkModelPropertyType;
+}
+
+/** how a tcgc union type is used across the tcgc code model */
+interface UnionUsage {
+  /** indicates the union is referenced as a value, e.g. a method parameter or model field */
+  isValueType: boolean;
+
+  /** the stream metadata, when the union is the payload type of a stream */
+  streamMetadata?: tcgc.SdkStreamMetadata;
+
+  /** the SSE metadata, when the union is the event type of an SSE stream */
+  sseMetadata?: tcgc.SdkSseMetadata;
 }
 
 interface ModelTypeSdkModelType {
