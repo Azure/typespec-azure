@@ -49,6 +49,8 @@ Several LintDiff rules require or validate these same extensions in Swagger. Bec
 - `x-ms-azure-resource` — [ResourceHasXMsResourceEnabled (R2019)](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2019), [XmsResourceInPutResponse (R2062)](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2062)
 - `x-ms-secret` — [XMSSecretInResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-secret-in-response.md)
 
+Semantic paging metadata alone does not require an HTTP 200 response. Enable [`pageable-requires-200-response`](../pageable-requires-200-response) to validate that requirement for next-link paging operations.
+
 ## Examples
 
 ### `x-ms-long-running-operation`
