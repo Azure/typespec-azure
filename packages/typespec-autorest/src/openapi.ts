@@ -535,9 +535,10 @@ export async function getOpenAPIForService(
 
   function getXmsPageableForPagingOperation(paging: PagingOperation): XmsPageable | undefined {
     if (paging.output.nextLink) {
-      const itemsName = paging.output.pageItems.property.name;
+      const contentType = specIsOnlyXml ? "application/xml" : "application/json";
+      const itemsName = resolveEncodedName(program, paging.output.pageItems.property, contentType);
       return {
-        nextLinkName: paging.output.nextLink.property.name,
+        nextLinkName: resolveEncodedName(program, paging.output.nextLink.property, contentType),
         itemName: itemsName === "value" ? undefined : itemsName,
       };
     }
