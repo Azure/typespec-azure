@@ -61,6 +61,11 @@ Review the concise report and its linked evidence together: preserve evidenced
 positives, actual counts, core/corner-case context and quickly accessible examples
 without weakening any required investigation or acceptance gate.
 
+All rule PR descriptions follow the shared
+[two-section PR body](../shared/migration-pr-description.md): original Swagger
+documentation/logic links, then the published `migration.md` link. Keep detailed
+analysis and required evidence in that report, not additional PR sections.
+
 ## Legacy contract
 
 Everything below this heading describes `flowVersion: legacy`. Its references to

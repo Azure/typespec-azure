@@ -135,8 +135,11 @@ all runtime dependencies or prove a full rerun.
 Validate immutable candidate snapshot `S` and packages `P`. After required
 checks/local review, commit native task content `C` and verify its source equals
 the tested snapshot; retain both identities where different. Evidence commit
-`E` references `C`, `S`, `P` and baseline `B`; the native PR description links
-to pushed `E`. Do not amend `C` merely to insert its own evidence hash.
+`E` references `C`, `S`, `P` and baseline `B`; the native PR's migration-report
+section links directly to `migration.md` in pushed `E`, under the shared
+[two-section PR body](../shared/migration-pr-description.md). Keep provenance in
+that report or its appendix, not extra PR content.
+Do not amend `C` merely to insert its own evidence hash.
 The evidence publisher returns `E` after pushing; `migration.md` need not
 contain its own commit ID. Subsequent evidence commits can append review and
 publication receipts for `C`, not fictional reviews of themselves.

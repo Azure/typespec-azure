@@ -153,7 +153,9 @@ install only missing/invalid dependencies or changed manifests.
    native finding/comparison metrics are not applicable, not zero or equivalent.
 5. **Checkpoint A: development review.** After all required development checks
    and independent local review, publish/update the one native draft PR, with
-   pushed evidence links. Run a separate
+   the shared [two-section PR body](../shared/migration-pr-description.md).
+   Link the published `migration.md`, which retains all required evidence.
+   Run a separate
    [/loop-for-fix-and-review](../loop-for-fix-and-review/SKILL.md#native-migration-context)
    invocation carrying `flowVersion: native-first`, task/members and
    `checkpoint: development-review`. Preserve the full five-round limit,

@@ -376,7 +376,7 @@ corpus evidence.
 Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
 to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
 comparisons and legacy validator mechanics in a dedicated migration section,
-`migration.md`, and the PR description, rather than teaching them as native usage.
+`migration.md`, or its linked appendix, rather than teaching them as native usage.
 
 #### Native TypeSpec implementation boundary
 
@@ -1000,26 +1000,25 @@ creating a draft PR.
    promotion-style `->` mapping, or append the old `(origin)` suffix.
    The `[WIP]` prefix does not replace the
    requirement to create the PR as a draft.
-   Record the validator-to-local-TypeSpec mapping in the PR body, using the
+   Record the validator-to-local-TypeSpec mapping in `migration.md`, using the
    source lintdiff rule's actual unqualified `createRule({ name })` value.
    Do not substitute a proposed official name that will only be chosen during
    promotion, and confirm the mapping matches the final implementation.
    Do not append environment or execution labels such as `devbox` or `heavy`.
    Record actual base/head identities separately.
    For separately authorized or opted-in queue post-merge source repair, use
-   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and link
-   the original merged migration plus the new defect scope. Preserve an existing
+   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and record
+   the original merged PR link plus the new defect scope in `migration.md`.
+   Preserve an existing
    OPEN task PR's recorded title unless a correction is part of the request;
    this convention alone does not authorize renaming existing PRs.
-7. Write the PR description as an engineering explanation, not only a change
-   list. It must include:
-   - **Original Swagger linter:** include both of these direct GitHub hyperlinks
-     before listing a checklist of every specific check the original rule
-     performs:
-     - `linter code: [<ValidatorRuleId>](<validator source URL>)`
-     - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
-       Use the rule name and links from the fixture `rule.md` or validator
-       repository. Do not omit either link or replace them with unlinked paths.
+7. Use the shared [two-section PR body](../shared/migration-pr-description.md):
+   original Swagger documentation/logic links, then the published `migration.md`
+   link. Add no other body content.
+   Keep the following required explanation in `migration.md` or its linked
+   appendix, within the shared five-section report contract:
+   - **Original Swagger linter:** link the original documentation and
+     implementation and list every specific check the original rule performs.
    - **How the Swagger linter works:** explain the Swagger objects it inspects,
      traversal or lookup strategy, conditions and exemptions, diagnostic
      locations, and any known validator defects, stale maps, emitted-occurrence
@@ -1028,12 +1027,12 @@ creating a draft PR.
      targets inspected, important compiler or library APIs used,
      version/projection handling, diagnostic targeting and deduplication
      decisions, and how these choices match the intended Swagger behavior.
-   - **Migration evidence:** link directly to the rule's `migration.md` for the
-     declared focused tests, real-service project comparison, latest full-corpus
+   - **Migration evidence:** retain the declared focused tests, real-service
+     project comparison, latest full-corpus
      counts, one-sided project explanations, compile failures, and remaining
-     uncertainty. Do not duplicate the detailed migration table or corpus
-     declaration in the PR description when `migration.md` already contains it.
-8. Prefer concrete examples, project names, and before/after evidence. Avoid a
+     uncertainty.
+8. In the migration report, prefer concrete examples, project names, and
+   before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
 9. Return the PR URL as the rule's final workflow result.

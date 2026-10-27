@@ -324,7 +324,9 @@ Do not claim equivalence when one-sided projects or outliers remain unexplained.
 
 For legacy work create `migration.md` beside the rule fixtures. Native-first
 work uses the verified fork [evidence layout](../do-linter-development-task-one-by-one/evidence.md),
-with a group note and per-member notes linked from the native PR.
+with a group note linked from the native PR and per-member notes linked from
+that group note. Follow the shared
+[two-section PR body](../shared/migration-pr-description.md).
 
 This is the shared report contract for migration development, native coverage
 analysis and gap investigation. It changes presentation, not the investigation,
