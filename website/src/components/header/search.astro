@@ -1,65 +1,86 @@
 ---
-import Search from "@astrojs/starlight/components/Search.astro";
+import { Icon } from "@astrojs/starlight/components";
+
+const baseUrl = import.meta.env.BASE_URL;
+const bundlePath = `${baseUrl.replace(/\/$/, "")}/pagefind/`;
+const label = Astro.locals.t("search.label");
 ---
 
-<Search />
+<div class="pagefind-search" data-pagefind-ignore>
+  {import.meta.env.PROD ? (
+    <>
+      <link rel="stylesheet" href={`${bundlePath}pagefind-component-ui.css`} />
+      <template>
+        <pagefind-modal-trigger placeholder={label} />
+        <pagefind-modal />
+      </template>
+      <script type="module" define:vars={{ baseUrl, bundlePath }}>
+        await import(`${bundlePath}pagefind-component-ui.js`);
+        // Configure the instance before the template's components connect.
+        window.PagefindComponents.configureInstance("default", {
+          baseUrl,
+          bundlePath,
+          ranking: {
+            // Avoid favoring short generated API pages over guides and decorator references.
+            pageLength: 0,
+          },
+        });
+        const template = document.querySelector(".pagefind-search template");
+        template.replaceWith(template.content.cloneNode(true));
+      </script>
+    </>
+  ) : (
+    <button type="button" class="search-dev" disabled title={Astro.locals.t("search.devWarning")}>
+      <Icon name="magnifier" />
+      <span>{label}</span>
+    </button>
+  )}
+</div>
 
-<style is:global>
-  site-search {
-    --__sl-font: var(--fontFamilyBase);
-    --sl-text-2xs: var(--fontSizeBase200);
-    --sl-text-sm: var(--fontSizeBase300);
-    --sl-text-xl: var(--fontSizeBase500);
-    --sl-color-white: var(--colorNeutralForeground1);
-    --sl-color-gray-1: var(--colorNeutralForeground1);
-    --sl-color-gray-2: var(--colorNeutralForeground2);
-    --sl-color-gray-3: var(--colorNeutralForeground3);
-    --sl-color-gray-4: var(--colorNeutralStroke2);
-    --sl-color-gray-5: var(--colorNeutralStroke1);
-    --sl-color-gray-6: var(--colorNeutralBackground2);
-    --sl-color-black: var(--colorNeutralBackground1);
-    --sl-color-text: var(--colorNeutralForeground1);
-    --sl-color-text-accent: var(--colorBrandForeground1);
-    --sl-color-text-invert: var(--colorNeutralForegroundOnBrand);
-    --sl-color-accent: var(--colorBrandStroke1);
-    --sl-color-accent-high: var(--colorBrandStroke1);
-    --sl-color-accent-low: var(--colorNeutralBackground1Hover);
-    --sl-shadow-lg: var(--shadow64);
+<style>
+  .pagefind-search {
+    --pf-font: var(--fontFamilyBase);
+    --pf-text: var(--colorNeutralForeground1);
+    --pf-text-secondary: var(--colorNeutralForeground2);
+    --pf-text-muted: var(--colorNeutralForeground3);
+    --pf-background: var(--colorNeutralBackground1);
+    --pf-border: var(--colorNeutralStroke1);
+    --pf-border-focus: var(--colorBrandStroke1);
+    --pf-outline-focus: var(--colorBrandStroke1);
+    --pf-hover: var(--colorNeutralBackground1Hover);
+    --pf-mark: var(--colorBrandForeground1);
+    --pf-skeleton: var(--colorNeutralBackground3);
+    --pf-skeleton-shine: var(--colorNeutralBackground1);
+    --pf-scroll-shadow: var(--colorNeutralShadowAmbient);
+    --pf-shadow-lg: var(--shadow64);
+    --pf-error-bg: var(--colorStatusDangerBackground1);
+    --pf-error-border: var(--colorStatusDangerBorder1);
+    --pf-error-text: var(--colorStatusDangerForeground1);
+    --pf-error-text-secondary: var(--colorStatusDangerForeground1);
+    --pf-modal-backdrop: var(--colorNeutralBackgroundAlpha);
+    --pf-modal-max-width: 40rem;
+    --pf-modal-max-height: calc(100dvh - 8rem);
+    --pf-modal-top: 4rem;
+    --pf-border-radius: var(--borderRadiusMedium);
   }
 
-  site-search > button {
-    border-radius: var(--borderRadiusMedium);
-  }
-
-  site-search .dialog-frame,
-  site-search button[data-close-modal] {
+  .search-dev {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--colorNeutralStroke1);
+    border-radius: var(--borderRadiusMedium);
+    background: var(--colorNeutralBackground1);
+    color: var(--colorNeutralForeground3);
+    font: inherit;
   }
 
-  site-search > button > span,
-  site-search > button > kbd {
-    display: none;
-  }
-
-  site-search dialog::backdrop {
-    background-color: var(--colorNeutralBackgroundAlpha);
-  }
-
-  @media (min-width: 50rem) {
-    site-search dialog {
-      margin: 4rem auto auto;
-    }
-
-    site-search > button > span {
-      display: block;
-    }
-
-    site-search > button > kbd {
-      display: flex;
-    }
-
-    site-search button[data-close-modal] {
-      display: none;
+  @media (max-width: 640px) {
+    .pagefind-search :global(.pf-trigger-text),
+    .pagefind-search :global(.pf-trigger-shortcut) {
+      /* Override the Component UI's high-specificity reset for a compact mobile trigger. */
+      display: none !important;
     }
   }
 </style>
