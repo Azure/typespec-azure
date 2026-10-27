@@ -152,6 +152,59 @@ it("accepts a response containing only value and nextLink", async () => {
     .toBeValid();
 });
 
+it.each(["@header", "@bodyIgnore", "@visibility(Lifecycle.Create)"])(
+  "reports an inherited nextLink excluded from the response body by %s",
+  async (decorator) => {
+    await tester
+      .expect(
+        `
+          model PageBase {
+            @pageItems value: string[];
+            ${decorator}
+            @nextLink nextLink?: string;
+          }
+          model Page extends PageBase {}
+
+          @list @get op list(): Page;
+        `,
+      )
+      .toEmitDiagnostics({ code: diagnosticCode });
+  },
+);
+
+it("accepts an inherited nextLink visible in the response body", async () => {
+  await tester
+    .expect(
+      `
+        model PageBase {
+          @pageItems value: string[];
+          @visibility(Lifecycle.Read)
+          @nextLink nextLink?: string;
+        }
+        model Page extends PageBase {}
+
+        @list @get op list(): Page;
+      `,
+    )
+    .toBeValid();
+});
+
+it("counts metadata annotations as payload properties inside an explicit body", async () => {
+  await tester
+    .expect(
+      `
+        model Page {
+          @pageItems value: string[];
+          #suppress "@typespec/http/metadata-ignored" "The header annotation is intentionally ignored in the explicit body."
+          @header @nextLink nextLink?: string;
+        }
+
+        @list @get op list(): { @body body: Page; };
+      `,
+    )
+    .toBeValid();
+});
+
 it("accepts a named array response body", async () => {
   await tester
     .expect(
