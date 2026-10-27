@@ -1003,8 +1003,9 @@ model MyModel {
 
 #### `@dynamicModel`
 
-Marks a model or all models in a namespace for dynamic model generation.
-The C# emitter generates dynamic models with a JSON Patch field.
+Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+Dynamic-model generation is currently supported only by the C# emitter through its `TypeSpec.HttpClient.CSharp.@dynamicModel` decorator.
+This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
 
 ```typespec
 @Azure.ClientGenerator.Core.dynamicModel(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
@@ -1017,9 +1018,9 @@ The model or namespace to mark as dynamic.
 
 ##### Parameters
 
-| Name  | Type                                                            | Description                                                                                                                                |
-| ----- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. If not set, the decorator applies to all language emitters. Currently supported by the C# emitter. |
+| Name  | Type                                                            | Description                                                                                        |
+| ----- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. If not set, all emitters may opt in to receive it. |
 
 ##### Examples
 
@@ -1032,7 +1033,7 @@ model Pet {
 }
 ```
 
-###### Enable dynamic models for a namespace in C#
+###### Mark a namespace for C# dynamic-model metadata
 
 ```typespec
 @dynamicModel("csharp")
