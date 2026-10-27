@@ -50,6 +50,12 @@ Native-first tasks consume the
 [pinned shared baseline](../analyze-native-lint-coverage/shared-baseline.md);
 they do not regenerate Swagger to debug a native edit. Distinguish inexpensive
 report reanalysis from fresh native execution and from Swagger data production.
+Reuse one frozen specs snapshot through the monthly dependency-upgrade cycle
+under the [monthly evaluation policy](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot).
+Keep native development on current canonical main. Check actual compatibility
+changes rather than treating each new PR or Git SHA as a refresh trigger;
+current verifier limitations remain explicit blockers, not proof of changed
+Swagger or permission to bypass validation.
 
 ## Final evidence remains mandatory
 

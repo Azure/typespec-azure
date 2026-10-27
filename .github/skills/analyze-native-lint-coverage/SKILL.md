@@ -91,6 +91,12 @@ not automatically normalize cross-validator overlap or actionable units.
 
 ## Shared baseline first, immutable run
 
+Follow the [monthly evaluation snapshot](shared-baseline.md#monthly-evaluation-snapshot):
+reuse one frozen specs commit across the dependency-upgrade cycle while new
+native branches start from current canonical main. Assess actual compatibility
+before proposing refresh; Git SHA differences alone are not semantic evidence.
+Current analyzer restrictions still apply; this policy adds no bypass or new CLI.
+
 1. Record the caller's current branch before any checkout. Do not change its
    base merely because the candidate targets `main`.
 2. Discover and pin the shared descriptor **before** choosing specs or installing
@@ -162,9 +168,11 @@ assertions. See the exact receipt schema and compatibility boundary in
 [native-coverage.md](../../../packages/typespec-lintdiff/docs/native-coverage.md).
 This is not a signed attestation or automatic semantic proof. Review changed
 lint code, installation manifests/locks and emission effects; uncertainty,
-changed dependencies/metadata/emitter or an unsupported closure blocks migration
-pending a separately authorized shared producer refresh, not an unsupported
-`--force` flag or per-rule regeneration.
+changed dependencies/metadata/emitter or an unsupported closure blocks the
+comparison pending supported compatibility verification or a separately
+authorized shared producer refresh. Distinguish a verifier restriction from
+proven emission changes; do not use an unsupported `--force` flag or regenerate
+per rule by default.
 
 A receipt-required attempt preserves both identities in its manifest/error.
 Review that evidence, then use a new output directory for the approved run;

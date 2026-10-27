@@ -4,6 +4,56 @@ Native-first migration consumes a shared sealed Swagger baseline by default.
 Legacy migration remains the default queue flow and is unchanged.
 Do not regenerate Swagger for each rule or candidate.
 
+## Monthly evaluation snapshot
+
+Use one frozen specs commit across migrations in a TypeSpec dependency-upgrade
+cycle, normally about one month. Select that commit after the specs repository's
+dependency upgrade and generate one shared baseline for the cycle. This is an
+upgrade-cycle policy, not automatic expiration on a calendar date.
+
+Keep three identities separate:
+
+- Develop each new native rule on a branch based on current canonical
+  `Azure/typespec-azure:main`; do not move development onto the baseline producer.
+- Evaluate coverage against the selected baseline's exact specs `source.commit`,
+  population and recorded dependency/runtime context. Do not fetch a newer specs
+  tip for each PR. Scope conclusions to this frozen corpus, not latest specs.
+- Record the actual injected candidate artifacts and compiler/library closure.
+  The baseline producer's runtime is provenance, not permission to relabel the
+  candidate or silently replace its dependencies with older packages.
+
+Reuse is the default within the cycle. A new PR, different validator selection,
+new repository commit or matching package-version string alone neither requires
+refresh nor proves compatibility. Expect newer libraries to remain compatible,
+but verify that expectation: successful compilation establishes authorability,
+not unchanged emitted paths or schemas.
+
+Before deciding on refresh, inspect actual source/artifact changes from the
+producer to the candidate. Distinguish unrelated changes and lint-only changes
+from compiler, emitter, decorators, libraries, dependencies and settings that
+can affect emission. Retain the change inventory, rationale, focused relevant
+controls and compatibility-verifier result. Check the mapped validator's relevant
+wire behavior; do not infer whole-corpus equivalence from a few passing controls.
+Required final native execution, activation/suppression controls, population and
+count investigations, integration checks and independent reviews remain intact.
+
+The **current analyzer is stricter than this lifecycle policy**: it rejects core
+changes and packed changes outside its lint-only allowlist, even when source
+analysis suggests compatibility. A rejection establishes unsupported reuse,
+not proof that Swagger changed. Report this as a verifier capability gap when
+appropriate; do not present refresh as the only possible design remedy.
+Broader reuse requires a separately implemented, tested and reviewed verifier
+extension. Until supported verification passes, the comparison gate remains
+blocked. Do not edit sealed identities, invent receipts/flags, bypass checks or
+claim this skill update implements broader compatibility.
+
+Refresh normally follows the next specs dependency upgrade. An exceptional
+refresh needs evidence of material incompatibility or unresolved validity after
+the compatibility assessment, plus separate authorization. Disclose whether the
+reason is a real behavior change, unavailable proof or a tooling limitation.
+The alternative is approved verifier work, not an automatic per-rule refresh.
+Keep old baselines immutable and finish an active run on its selected snapshot.
+
 ## Discover before setup
 
 1. Discover the published baseline in the verified specs fork. The initial
@@ -47,7 +97,8 @@ Do not regenerate Swagger for each rule or candidate.
    Never inject packages into the shared baseline or a concurrent runtime.
 
 Missing publication, access, descriptor fields, checksums, source, inventory,
-schemas or compatibility is an exact prerequisite blocker. The helper does not
+schemas or supported compatibility is an exact prerequisite blocker. Apply the
+monthly compatibility assessment before proposing a refresh. The helper does not
 fetch latest refs, install packages, compile, emit, run validators, refresh data
 or retry downloads. Preserve failed evidence and report the required immutable
 asset/descriptor/source or explicitly requested producer refresh.
@@ -150,6 +201,8 @@ equivalence or replace a fresh native run after a relevant rule change.
 
 ## Explicit producer refresh
 
+Use the monthly upgrade-cycle policy above; neither a new PR nor a Git SHA
+difference alone authorizes or establishes the need for production.
 Only a separately requested producer/refresh resolves fresh candidate/specs refs
 once, freezes source/runtime/compiler/emission/validator/tooling identities, and
 runs the Swagger suite. The existing analyzer without `--baseline-run` remains

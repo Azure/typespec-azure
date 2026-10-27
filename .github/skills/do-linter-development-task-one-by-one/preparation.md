@@ -20,7 +20,12 @@ before candidate/specs dependency setup. Fetch the metadata branch and pin its
 commit, immutable descriptor and archive identity. Prepare specs at the exact
 descriptor `source.commit`, not the metadata commit, checked-in `_meta.json`,
 or latest `typespec-next`. Resolve the candidate base once, then verify against
-the baseline's recorded closure. Missing/corrupt/incompatible data is a
+the baseline's recorded closure. Apply the
+[monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
+keep the specs commit across the dependency-upgrade cycle without freezing new
+native branches to old main. Inspect actual compatibility changes before proposing
+refresh; distinguish unsupported verification from proven emission differences.
+Missing/corrupt/incompatible data is a
 prerequisite blocker, never permission to generate Swagger per rule.
 Only an explicitly requested separate producer refresh resolves new specs
 sources and runs Swagger validators. Keep immutable baseline data read-only;

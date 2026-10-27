@@ -105,6 +105,14 @@ substitute arbitrary latest compiler packages: use the candidate's compatible
 closure and actual core gitlink. Verify prerequisite layers before installing;
 install only missing/invalid dependencies or changed manifests.
 
+Apply the [monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
+new native branches use current canonical main, but coverage reuses the same
+specs commit throughout the dependency-upgrade cycle. New PRs or source SHAs
+alone do not justify baseline refresh. Assess actual changes and distinguish
+semantic incompatibility from the current verifier's stricter restrictions.
+Unsupported reuse remains a comparison blocker, not automatic refresh approval
+or permission to skip any required gate.
+
 ## Execute one implementation, with two review checkpoints
 
 1. **Classify and discover.** Run the native
