@@ -574,6 +574,35 @@ export type UseSystemTextJsonConverterDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Marks a model or all models in a namespace for dynamic model generation.
+ * The C# emitter generates dynamic models with a JSON Patch field.
+ *
+ * @param target The model or namespace to mark as dynamic.
+ * @param scope Specifies the target language emitters. If not set, the decorator applies to all language emitters. Currently supported by the C# emitter.
+ * @example Mark a model as dynamic
+ * ```typespec
+ * @dynamicModel
+ * model Pet {
+ *   name: string;
+ * }
+ * ```
+ * @example Enable dynamic models for a namespace in C#
+ * ```typespec
+ * @dynamicModel("csharp")
+ * namespace PetStore {
+ *   model Pet {
+ *     name: string;
+ *   }
+ * }
+ * ```
+ */
+export type DynamicModelDecorator = (
+  context: DecoratorContext,
+  target: Model | Namespace,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Allows customization of how clients are initialized in the generated SDK.
  * By default, the root client is initialized independently, while sub clients are initialized through their parent client.
  * Initialization parameters typically include endpoint, credential, and API version.
@@ -1163,6 +1192,7 @@ export type AzureClientGeneratorCoreDecorators = {
   access: AccessDecorator;
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
+  dynamicModel: DynamicModelDecorator;
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
   clientNamespace: ClientNamespaceDecorator;

@@ -619,6 +619,33 @@ extern dec override(
 extern dec useSystemTextJsonConverter(target: Model, scope?: valueof DecoratorOptions | string);
 
 /**
+ * Marks a model or all models in a namespace for dynamic model generation.
+ * The C# emitter generates dynamic models with a JSON Patch field.
+ *
+ * @param target The model or namespace to mark as dynamic.
+ * @param scope Specifies the target language emitters. If not set, the decorator applies to all language emitters. Currently supported by the C# emitter.
+ *
+ * @example Mark a model as dynamic
+ * ```typespec
+ * @dynamicModel
+ * model Pet {
+ *   name: string;
+ * }
+ * ```
+ *
+ * @example Enable dynamic models for a namespace in C#
+ * ```typespec
+ * @dynamicModel("csharp")
+ * namespace PetStore {
+ *   model Pet {
+ *     name: string;
+ *   }
+ * }
+ * ```
+ */
+extern dec dynamicModel(target: Model | Namespace, scope?: valueof DecoratorOptions | string);
+
+/**
  * InitializedBy value.
  */
 enum InitializedBy {

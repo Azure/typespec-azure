@@ -853,6 +853,48 @@ model MyModel {
 }
 ```
 
+### `@dynamicModel` {#@Azure.ClientGenerator.Core.dynamicModel}
+
+Marks a model or all models in a namespace for dynamic model generation.
+The C# emitter generates dynamic models with a JSON Patch field.
+
+```typespec
+@Azure.ClientGenerator.Core.dynamicModel(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The model or namespace to mark as dynamic.
+`Model | Namespace`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                                                                                                                                |
+| ----- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. If not set, the decorator applies to all language emitters. Currently supported by the C# emitter. |
+
+#### Examples
+
+##### Mark a model as dynamic
+
+```typespec
+@dynamicModel
+model Pet {
+  name: string;
+}
+```
+
+##### Enable dynamic models for a namespace in C#
+
+```typespec
+@dynamicModel("csharp")
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+}
+```
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Define the sub client generated in the client SDK.

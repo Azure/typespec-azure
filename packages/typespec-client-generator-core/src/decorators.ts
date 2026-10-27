@@ -49,6 +49,7 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  DynamicModelDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -1223,6 +1224,12 @@ export function getAlternateType(
 export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {};
+
+export const $dynamicModel: DynamicModelDecorator = (
+  context: DecoratorContext,
+  target: Model | Namespace,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {};
 
