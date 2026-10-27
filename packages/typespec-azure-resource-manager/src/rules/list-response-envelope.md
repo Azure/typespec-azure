@@ -17,6 +17,11 @@ Inherited envelope properties are included. The `value` property must be an arra
 and the next-link property must be named `nextLink`, not a custom envelope name.
 Prefer standard ARM list operation templates, which provide this envelope.
 
+For authored paged operations, required envelope properties must be part of the HTTP response
+body. Inherited headers, properties marked `@bodyIgnore`, and properties hidden from read
+visibility do not satisfy the envelope requirement. Metadata annotations inside an explicit
+`@body` retain the HTTP library's payload interpretation.
+
 ## ❌ Incorrect
 
 ```tsp
@@ -56,6 +61,11 @@ The checks formerly proposed as `list-response-value-array` are part of the exis
 | [CollectionObjectPropertiesNaming](https://github.com/Azure/azure-openapi-validator/blob/main/docs/collection-object-properties-naming.md)                                                 | Requires the `value` property to be an array and combines that requirement with the standard envelope names.                                 |
 
 Both applicability populations are retained: ARM-provider collection GET paths and authored `@list` operations whose paging metadata has a `@nextLink`, including POST actions and provider-free operations. Checks use HTTP 200 response bodies. Paging metadata alone does not prove the array or envelope shape; `list-operation-missing-pageable` remains a separate metadata check.
+
+This also partially covers [XmsPageableMustHaveCorrespondingResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-pageable-must-have-corresponding-response.md):
+for authored paged operations, `nextLink` must be in the HTTP 200 response body, not only in
+source-model metadata or non-read properties. This rule does not reproduce the legacy rule's
+fallback selection of other successful or default responses.
 
 The combined native contract intentionally rejects a custom next-link property name even when it has valid paging metadata. These mappings describe TypeSpec response models and metadata, not emitted Swagger inspection or unchanged historical diagnostic counts.
 

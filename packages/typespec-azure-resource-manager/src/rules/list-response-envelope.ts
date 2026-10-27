@@ -14,7 +14,12 @@ import {
   isList,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { type HttpOperationResponse, getHttpOperation } from "@typespec/http";
+import {
+  type HttpOperationResponse,
+  Visibility,
+  createMetadataInfo,
+  getHttpOperation,
+} from "@typespec/http";
 import { getArmProviderNamespace } from "../namespace.js";
 
 export const listResponseEnvelopeRule = createRule({
@@ -29,6 +34,7 @@ export const listResponseEnvelopeRule = createRule({
     valueArray: "Paged ARM list responses must declare a 'value' property of array type.",
   },
   create(context) {
+    const metadataInfo = createMetadataInfo(context.program);
     return {
       operation: (operation) => {
         const [httpOperation] = getHttpOperation(context.program, operation);
@@ -61,7 +67,15 @@ export const listResponseEnvelopeRule = createRule({
                 return;
               }
               if (body.type.kind === "Model") {
-                const invalidTargets = getInvalidTargets(body.type);
+                const invalidTargets = getInvalidTargets(body.type, (property) =>
+                  metadataInfo.isPayloadProperty(
+                    property,
+                    Visibility.Read,
+                    body.bodyKind === "single" &&
+                      body.isExplicit &&
+                      body.containsMetadataAnnotations,
+                  ),
+                );
                 for (const invalidTarget of invalidTargets) {
                   context.reportDiagnostic({
                     target: getDiagnosticTarget(context.program, operation, invalidTarget),
@@ -135,12 +149,16 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
   return undefined;
 }
 
-function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
+function getInvalidTargets(
+  responseModel: Model,
+  isPayloadProperty?: (property: ModelProperty) => boolean,
+): (Model | ModelProperty)[] {
   const invalidTargets: ModelProperty[] = [];
   let hasValue = false;
   let hasNextLink = false;
 
   for (const property of walkPropertiesInherited(responseModel)) {
+    if (isPayloadProperty && !isPayloadProperty(property)) continue;
     if (property.name === "value") {
       hasValue = true;
     } else if (property.name === "nextLink") {
