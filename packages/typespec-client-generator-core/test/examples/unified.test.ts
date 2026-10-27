@@ -1,4 +1,4 @@
-import { getDirectoryPath, resolveCompilerOptions } from "@typespec/compiler";
+import { compile, getDirectoryPath, resolveCompilerOptions } from "@typespec/compiler";
 import { expectDiagnostics, resolveVirtualPath } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it, vi } from "vitest";
@@ -527,7 +527,14 @@ namespace Combined {}
       entrypoint,
     });
     expectDiagnostics(diagnostics, []);
-    const { program } = await instance.compile('import "./sdk/client.tsp";', { compilerOptions });
+    const host = {
+      ...instance.fs.compilerHost,
+      // Direct compilation does not register the test-only standard library.
+      getLibDirs: () =>
+        instance.fs.compilerHost.getLibDirs().filter((path) => !path.endsWith("/test-lib")),
+    };
+    const program = await compile(host, entrypoint, compilerOptions);
+    expectDiagnostics(program.diagnostics, []);
     const context = await createSdkContextForTester(
       program,
       compilerOptions.options?.["@azure-tools/typespec-client-generator-core"],
