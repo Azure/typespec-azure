@@ -8,10 +8,14 @@ runs:
     - name: Setup mise
       uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
       with:
+        version: "2026.10.19"
         install_args: "java maven"
         # Keep mise from replacing the Node.js version selected by the job.
         add_shims_to_path: false
         env: false
+      env:
+        # Avoid resolving unsupported Java targets from the shared lockfile.
+        MISE_LOCKFILE_MODE: merge
 
     - name: Configure Java and Maven
       shell: bash

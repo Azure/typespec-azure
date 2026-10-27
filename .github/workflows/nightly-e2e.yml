@@ -94,7 +94,11 @@ jobs:
         if: matrix.mise-install-args
         uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
+          version: "2026.10.19"
           install_args: ${{ matrix.mise-install-args }}
+        env:
+          # Install selected tools without regenerating cross-platform lock entries.
+          MISE_LOCKFILE_MODE: merge
 
       - uses: ./.github/actions/setup-java
         if: matrix.lang == 'java'
