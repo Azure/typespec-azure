@@ -30,7 +30,7 @@ export class TypeAdapter {
   private readonly constValues: Map<string, go.ConstantValue>;
 
   // lazily built index of how each tcgc union type is used across the tcgc code model
-  private unionUsage?: Map<tcgc.SdkUnionType, UnionUsage>;
+  private unionUsage?: Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>;
 
   // SSE events with an envelope, pending resolution of their envelope field
   private readonly pendingSseEnvelopes: Array<PendingSseEnvelope>;
@@ -64,8 +64,20 @@ export class TypeAdapter {
    * @param sdkUnion the union type to look up
    * @returns the SSE metadata, or undefined if the union isn't the event type of an SSE stream
    */
-  getSseMetadata(sdkUnion: tcgc.SdkUnionType): tcgc.SdkSseMetadata | undefined {
+  getSseMetadata(sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType): tcgc.SdkSseMetadata | undefined {
     return this.getUnionUsage().get(sdkUnion)?.sseMetadata;
+  }
+
+  /** returns the event union, including unions folded into enums by tcgc */
+  getSseUnionType(sdkType: tcgc.SdkType): go.UnionStruct {
+    if ((sdkType.kind !== "union" && sdkType.kind !== "enum") || !this.getSseMetadata(sdkType)) {
+      throw new AdapterError(
+        "InternalError",
+        `missing SSE union metadata for kind ${sdkType.kind}`,
+        sdkType.__raw?.node,
+      );
+    }
+    return this.getUnionStruct(sdkType, this.codeModel.options["slice-elements-byval"] ?? false);
   }
 
   /**
@@ -97,6 +109,9 @@ export class TypeAdapter {
       }
       const constType = this.getConstantType(enumType);
       this.getPkg().constants.push(constType);
+      if (this.getSseMetadata(enumType)) {
+        this.getPkg().unions.push(this.getSseUnionType(enumType));
+      }
     }
 
     for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
@@ -1305,12 +1320,17 @@ export class TypeAdapter {
     return sliceArray;
   }
 
-  private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {
+  private getUnionStruct(
+    sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType,
+    elementTypeByValue: boolean,
+  ): go.UnionStruct {
     if (sdkUnion.name.length === 0) {
       throw new AdapterError("InternalError", "unnamed union", sdkUnion.__raw?.node);
     }
 
-    const unionName = helpers.getEffectiveName(sdkUnion);
+    // Keep an enum's ordinary value representation separate from its event representation.
+    const unionName =
+      helpers.getEffectiveName(sdkUnion) + (sdkUnion.kind === "enum" ? "Event" : "");
     let goUnion = this.types.get(unionName);
     if (goUnion) {
       return <go.UnionStruct>goUnion;
@@ -1318,7 +1338,11 @@ export class TypeAdapter {
 
     goUnion = new go.UnionStruct(this.getPkg(), unionName, this.getUnionStructFlags(sdkUnion));
     const sseMetadata = this.getSseMetadata(sdkUnion);
-    for (const [index, variant] of sdkUnion.variantTypes.entries()) {
+    const variants =
+      sdkUnion.kind === "union"
+        ? sdkUnion.variantTypes
+        : sseMetadata!.events.map((event) => event.type);
+    for (const [index, variant] of variants.entries()) {
       const type = this.getWireType(variant, elementTypeByValue, false);
       if (!go.isUnionVariantType(type)) {
         throw new AdapterError(
@@ -1362,7 +1386,7 @@ export class TypeAdapter {
    * @returns the adapted SSE info
    */
   private getSseEvent(
-    sdkUnion: tcgc.SdkUnionType,
+    sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType,
     sseMetadata: tcgc.SdkSseMetadata,
     variant: tcgc.SdkType,
     variantIndex: number,
@@ -1450,9 +1474,8 @@ export class TypeAdapter {
    *
    * @param sdkUnion the union type to inspect
    * @returns the flags describing the union's usage
-   * @throws AdapterError if no usage is found for the union
    */
-  private getUnionStructFlags(sdkUnion: tcgc.SdkUnionType): go.UnionStructFlags {
+  private getUnionStructFlags(sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType): go.UnionStructFlags {
     const usage = this.getUnionUsage().get(sdkUnion);
     const noFlags = <go.UnionStructFlags>0;
     let usageFlags = noFlags;
@@ -1460,16 +1483,13 @@ export class TypeAdapter {
     if (usage?.sseMetadata) {
       usageFlags |= go.UnionStructFlags.SseType;
     }
-    if (usage?.isValueType) {
+    if (usage?.isValueType && sdkUnion.kind === "union") {
       usageFlags |= go.UnionStructFlags.SumType;
     }
 
     if (usageFlags === noFlags) {
-      throw new AdapterError(
-        "InternalError",
-        `failed to find usage flags for union ${sdkUnion.name}`,
-        sdkUnion.__raw?.node,
-      );
+      // Explicit @usage can retain unions that have no method or model references.
+      usageFlags = go.UnionStructFlags.SumType;
     }
 
     return usageFlags;
@@ -1484,15 +1504,15 @@ export class TypeAdapter {
    * so instances are stable.
    * @returns the union usage index for the tcgc code model
    */
-  private getUnionUsage(): Map<tcgc.SdkUnionType, UnionUsage> {
+  private getUnionUsage(): Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage> {
     if (this.unionUsage) {
       return this.unionUsage;
     }
 
-    const index = new Map<tcgc.SdkUnionType, UnionUsage>();
+    const index = new Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>();
 
     const getUsage = function (sdkType?: tcgc.SdkType): UnionUsage | undefined {
-      if (sdkType?.kind !== "union") {
+      if (sdkType?.kind !== "union" && sdkType?.kind !== "enum") {
         return undefined;
       }
       let usage = index.get(sdkType);

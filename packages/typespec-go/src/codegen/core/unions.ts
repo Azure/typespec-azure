@@ -82,9 +82,6 @@ function generateUnionsSerde(pkg: go.PackageContent): string {
   const indent = new helpers.Indentation();
   const imports = new ImportManager(pkg);
 
-  imports.add("encoding/json");
-  imports.add("fmt");
-
   const sse = generateSerdeSseType(pkg.unions, imports, indent);
   const sum = generateSerdeSumType(pkg.unions, imports, indent);
   let content = sse.content + sum.content;
@@ -133,6 +130,8 @@ function generateSerdeSumType(
     }
 
     imports.add("errors");
+    imports.add("encoding/json");
+    imports.add("fmt");
     content += generateMarshalJson(goUnion, indent);
     const result = generateUnmarshalJson(goUnion, indent);
     content += result.content;
@@ -877,8 +876,14 @@ function generateSseDecoder(
   text += `func ${funcName}(frame streaming.SSEFrame) (${goUnion.name}, bool, error) {\n`;
 
   if (events.terminal) {
+    let condition = `s := string(frame.Data); s == ${getSseTerminalValue(goUnion, events.terminal)}`;
+    if (events.terminal.sse?.format === "JSON") {
+      imports.add("encoding/json");
+      text += `${indent.get()}var s string\n`;
+      condition = `json.Unmarshal(frame.Data, &s) == nil && s == ${getSseTerminalValue(goUnion, events.terminal)}`;
+    }
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
-      condition: `s := string(frame.Data); s == ${getSseTerminalValue(goUnion, events.terminal)}`,
+      condition: condition,
       body: (indent) => `${indent.get()}return ${goUnion.name}{}, false, io.EOF\n`,
     })}\n`;
   }
@@ -959,6 +964,8 @@ function generateSseMessageClause(
       `multiple unnamed events in union ${goUnion.name} require JSON object payloads`,
     );
   }
+  imports.add("encoding/json");
+  imports.add("fmt");
   let text = `${indent.get()}var rawMsg map[string]json.RawMessage\n`;
   text += `${indent.get()}${helpers.buildIfBlock(indent, {
     condition: "err := json.Unmarshal(frame.Data, &rawMsg); err != nil",

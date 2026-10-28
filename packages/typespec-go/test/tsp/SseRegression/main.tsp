@@ -40,6 +40,44 @@ model EventResponse extends SSEStream<Events> {
 @route("/events")
 op receive(): EventResponse;
 
+@TypeSpec.Events.events
+union JsonEvents {
+  Info,
+  @TypeSpec.Events.contentType("application/json") @terminalEvent "[DONE]",
+}
+
+model JsonEventResponse extends SSEStream<JsonEvents> {
+  @statusCode statusCode: 201;
+  @header("x-stream") stream: string;
+}
+
+@get
+@route("/json-events")
+op jsonEvents(): JsonEventResponse;
+
+@TypeSpec.Events.events
+union TextEvents {
+  text: string,
+  @terminalEvent "[DONE]",
+}
+
+@get
+@route("/text-events")
+op textEvents(): SSEStream<TextEvents>;
+
+model TextEnvelope {
+  @TypeSpec.Events.data @TypeSpec.Events.contentType("text/plain") e: string;
+}
+
+@TypeSpec.Events.events
+union TextEnvelopeEvents {
+  text: TextEnvelope,
+}
+
+@get
+@route("/text-envelopes")
+op textEnvelopes(): SSEStream<TextEnvelopeEvents>;
+
 model Completion {
   total: int32;
 }

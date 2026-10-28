@@ -140,6 +140,7 @@ function generateSseFrame(
       const local = naming.getEscapedReservedName(
         naming.uncapitalize(sse.envelopeField.name),
         "Val",
+        [receiverName],
       );
       text = `${indent.get()}var ${local} ${go.getTypeDeclaration(go.unwrapPtr(payload.type), goUnion.pkg)}\n`;
       text += `${indent.get()}${helpers.buildIfBlock(indent, {

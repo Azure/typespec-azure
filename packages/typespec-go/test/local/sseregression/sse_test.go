@@ -15,8 +15,11 @@ import (
 	"time"
 
 	"sseregression"
+	"sseregression/fake"
 
+	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming"
 )
 
 type transportFunc func(*http.Request) (*http.Response, error)
@@ -136,6 +139,56 @@ func TestUnnamedTerminalModel(t *testing.T) {
 	}
 	if !body.closed {
 		t.Fatal("closing the completed reader must close the body")
+	}
+}
+
+func TestJsonSentinelAndStreamHeader(t *testing.T) {
+	for _, sentinel := range []string{`"[DONE]"`, `"\u005bDONE]"`} {
+		t.Run(sentinel, func(t *testing.T) {
+			client := newClient(t, func(req *http.Request) (*http.Response, error) {
+				headers := responseHeaders()
+				headers.Set("x-stream", "session")
+				return &http.Response{
+					StatusCode: http.StatusCreated,
+					Header:     headers,
+					Body:       io.NopCloser(strings.NewReader("data: " + sentinel + "\n\ndata: invalid\n\n")),
+					Request:    req,
+				}, nil
+			})
+			resp, err := client.OpenJSONEvents(context.Background(), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				_ = resp.Stream.Close()
+			}()
+			if resp.StreamHeader == nil || *resp.StreamHeader != "session" {
+				t.Fatalf("unexpected stream header: %v", resp.StreamHeader)
+			}
+			if _, err := resp.Stream.Next(); !errors.Is(err, io.EOF) {
+				t.Fatalf("expected JSON sentinel to end the stream, got %v", err)
+			}
+		})
+	}
+}
+
+func TestFakeSseCreatedResponse(t *testing.T) {
+	srv := &fake.Server{
+		OpenJSONEvents: func(ctx context.Context, options *sseregression.ClientOpenJSONEventsOptions) (resp azfake.SSEResponder[sseregression.JSONEvents], errResp azfake.ErrorResponder) {
+			resp.AddFrame(streaming.SSEFrame{Data: []byte(`"[DONE]"`)})
+			return
+		},
+	}
+	client := newClient(t, fake.NewServerTransport(srv).Do)
+	resp, err := client.OpenJSONEvents(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		_ = resp.Stream.Close()
+	}()
+	if _, err := resp.Stream.Next(); !errors.Is(err, io.EOF) {
+		t.Fatalf("expected the fake's JSON sentinel to end the stream, got %v", err)
 	}
 }
 

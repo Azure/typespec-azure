@@ -13,6 +13,131 @@ describe("SSE connectors and resumption options", () => {
     @route("/events") @get op receive(): SSEStream<Events>;
   `;
 
+  it.each(["application/json", "text/plain"])(
+    "only imports packages used by a single unnamed %s event",
+    async (contentType) => {
+      const files = await emitGoFor(`
+        using TypeSpec.SSE;
+        @service namespace Test;
+        model Info { message: string; }
+        @TypeSpec.Events.events union Events {
+          @TypeSpec.Events.contentType("${contentType}") ${contentType === "text/plain" ? "string" : "Info"},
+        }
+        @route("/events") @get op receive(): SSEStream<Events>;
+      `);
+      const serde = files.get("zz_unions_serde.go")!;
+      expect(serde).not.toContain('"fmt"');
+      expect(serde.includes('"encoding/json"')).toBe(contentType === "application/json");
+    },
+  );
+
+  it("does not shadow the fake encoder receiver with an envelope payload local", async () => {
+    const files = await emitGoFor(
+      `
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Envelope { @TypeSpec.Events.data @TypeSpec.Events.contentType("text/plain") e: string; }
+      @TypeSpec.Events.events union Events { text: Envelope }
+      @route("/events") @get op receive(): SSEStream<Events>;
+    `,
+      { "generate-fakes": true },
+    );
+    const encoder = files.get("fake/zz_sse_encoders.go")!;
+    expect(encoder).toContain("var eVal string");
+    expect(encoder).toContain("eVal = *e.Envelope.E");
+    expect(encoder).toContain("Data: []byte(eVal)");
+  });
+
+  it("preserves exported raw-stream operations for JSONL", async () => {
+    const files = await emitGoFor(`
+      @service namespace Test;
+      model Thing { value: string; }
+      @route("/things") @get op receive(): TypeSpec.Http.Streams.JsonlStream<Thing>;
+    `);
+    expect(files.get("zz_test_client.go")).toContain("func (client *TestClient) Receive(");
+    expect(files.get("zz_responses.go")).toContain("Body io.ReadCloser");
+  });
+
+  it("adapts enum-folded text events without changing their ordinary value type", async () => {
+    const files = await emitGoFor(
+      `
+      using TypeSpec.SSE;
+      @service namespace Test;
+      @TypeSpec.Events.events union Events { text: string, @terminalEvent "[DONE]" }
+      @route("/events") @get op receive(): SSEStream<Events>;
+      @route("/value") @get op value(): {
+        @header contentType: "application/json";
+        @body value: Events;
+      };
+    `,
+      { "generate-fakes": true },
+    );
+    expect(files.get("zz_unions_serde.go")).toContain("s := string(frame.Data)");
+    expect(files.get("zz_unions_serde.go")).toContain('s == "[DONE]"');
+    expect(files.get("zz_unions.go")).toContain("String *string");
+    expect(files.get("zz_responses.go")).toContain("*streaming.SSEReader[EventsEvent]");
+    expect(files.get("zz_constants.go")).toContain("type Events string");
+  });
+
+  it("reserves the reader field when adapting response headers", async () => {
+    const files = await emitGoFor(
+      spec
+        .replace(
+          '@route("/events")',
+          'model EventResponse extends SSEStream<Events> { @header("x-stream") stream: string; @header("x-stream-value") streamHeader: string; } @route("/events")',
+        )
+        .replace("receive(): SSEStream<Events>", "receive(): EventResponse"),
+    );
+    const response = files.get("zz_responses.go")!;
+    expect(response).toContain("Stream *streaming.SSEReader[Events]");
+    expect(response).not.toContain("Stream *string");
+    expect(response).toContain("StreamHeader *string");
+    expect(response).toContain("StreamHeader1 *string");
+    const client = files.get("zz_test_client.go")!;
+    expect(client).toContain('Header.Get("X-Stream")');
+    expect(client).toContain("result.StreamHeader = &val");
+    expect(client).toContain("result.Stream = reader");
+  });
+
+  it("retains orphan output unions in models-only generation", async () => {
+    const files = await emitGoFor(`
+      @service namespace Test;
+      model Info { message: string; }
+      @usage(Usage.output) union Retained { Info, string }
+    `);
+    expect(files.get("zz_unions.go")).toContain("type Retained struct");
+    expect(files.get("zz_unions_serde.go")).toContain("func (r *Retained) UnmarshalJSON(");
+  });
+
+  it("decodes JSON terminal sentinel values before comparing them", async () => {
+    const files = await emitGoFor(`
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Info { message: string; }
+      @TypeSpec.Events.events union Events {
+        Info,
+        @TypeSpec.Events.contentType("application/json") @terminalEvent "[DONE]",
+      }
+      @route("/events") @get op receive(): SSEStream<Events>;
+    `);
+    const serde = files.get("zz_unions_serde.go")!;
+    expect(serde).toContain('json.Unmarshal(frame.Data, &s) == nil && s == "[DONE]"');
+    expect(serde).toContain("return Events{}, false, io.EOF");
+  });
+
+  it("uses the authored success status for SSE fake responses", async () => {
+    const files = await emitGoFor(
+      spec
+        .replace(
+          '@route("/events")',
+          'model EventResponse extends SSEStream<Events> { @statusCode statusCode: 201; } @route("/events")',
+        )
+        .replace("receive(): SSEStream<Events>", "receive(): EventResponse"),
+      { "generate-fakes": true },
+    );
+    expect(files.get("fake/zz_test_server.go")).toContain("HTTPStatus: http.StatusCreated");
+  });
+
   it.each([false, true])("matches all unnamed object variants (dual use: %s)", async (dualUse) => {
     const files = await emitGoFor(`
       using TypeSpec.SSE;
