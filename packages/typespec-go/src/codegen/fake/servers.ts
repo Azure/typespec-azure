@@ -1174,7 +1174,7 @@ function dispatchForSseBody(
 
   content += `${indent.get()}${bodyVar}, err := server.MarshalSSEResponder(&respr, encode${method.returns.result.type.eventType.name})\n`;
   content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
-  content += `${indent.get()}resp, err := server.NewResponse(server.ResponseContent{HTTPStatus: http.StatusOK}, req, &server.ResponseOptions{\n`;
+  content += `${indent.get()}resp, err := server.NewResponse(server.ResponseContent{HTTPStatus: ${helpers.formatStatusCode(method.httpStatusCodes[0])}}, req, &server.ResponseOptions{\n`;
   content += `${indent.push().get()}Body: ${bodyVar},\n`;
   content += `${indent.get()}ContentType: "text/event-stream",\n`;
   content += `${indent.pop().get()}})\n`;
