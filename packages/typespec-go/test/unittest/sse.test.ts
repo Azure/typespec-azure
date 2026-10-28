@@ -13,7 +13,7 @@ describe("SSE connectors and resumption options", () => {
     @route("/events") @get op receive(): SSEStream<Events>;
   `;
 
-  it("imports the types declared by JSON event envelope payloads", async () => {
+  it("uses the modeled codec for JSON event envelope payloads", async () => {
     const files = await emitGoFor(`
       using TypeSpec.SSE;
       @service namespace Test;
@@ -22,8 +22,9 @@ describe("SSE connectors and resumption options", () => {
       @route("/events") @get op receive(): SSEStream<Events>;
     `);
     const serde = files.get("zz_unions_serde.go")!;
-    expect(serde).toContain("var v time.Time");
-    expect(serde).toMatch(/^\t"time"$/m);
+    expect(serde).toContain("var v Envelope");
+    expect(serde).toContain('json.Marshal(map[string]json.RawMessage{"timestamp": frame.Data})');
+    expect(serde).not.toContain("var v time.Time");
   });
 
   it.each([
@@ -70,7 +71,7 @@ describe("SSE connectors and resumption options", () => {
     expect(serde).toContain('hasRequiredFields(rawMsg, "kind")');
     expect(serde).not.toContain('hasRequiredFields(rawMsg, "kind","detail")');
     expect(serde).not.toContain('hasRequiredFields(rawMsg, "detail")');
-    expect(serde).toContain("hasRequiredFields(rawMsg)");
+    expect(serde).toContain("else if rawMsg != nil");
   });
 
   it("preserves JSON serde for event unions nested in union variants", async () => {
@@ -100,27 +101,35 @@ describe("SSE connectors and resumption options", () => {
         @route("/events") @get op receive(): SSEStream<Events>;
       `);
       const serde = files.get("zz_unions_serde.go")!;
-      expect(serde).not.toContain('"fmt"');
+      expect(serde).toContain('"fmt"');
       expect(serde.includes('"encoding/json"')).toBe(contentType === "application/json");
+      expect(serde).toContain("switch frame.Type");
+      expect(serde).toContain('case "", "message":');
+      expect(serde).toContain('fmt.Errorf("unknown SSE event %q", frame.Type)');
     },
   );
 
-  it("does not shadow the fake encoder receiver with an envelope payload local", async () => {
-    const files = await emitGoFor(
-      `
+  it.each(["e", "streaming"])(
+    "does not shadow receiver or package names with a %s payload local",
+    async (name) => {
+      const files = await emitGoFor(
+        `
       using TypeSpec.SSE;
       @service namespace Test;
-      model Envelope { @TypeSpec.Events.data @TypeSpec.Events.contentType("text/plain") e: string; }
+      model Envelope { @TypeSpec.Events.data @TypeSpec.Events.contentType("text/plain") ${name}: string; }
       @TypeSpec.Events.events union Events { text: Envelope }
       @route("/events") @get op receive(): SSEStream<Events>;
     `,
-      { "generate-fakes": true },
-    );
-    const encoder = files.get("fake/zz_sse_encoders.go")!;
-    expect(encoder).toContain("var eVal string");
-    expect(encoder).toContain("eVal = *e.Envelope.E");
-    expect(encoder).toContain("Data: []byte(eVal)");
-  });
+        { "generate-fakes": true },
+      );
+      const encoder = files.get("fake/zz_sse_encoders.go")!;
+      expect(encoder).toContain(`var ${name}Val string`);
+      expect(encoder).toContain(
+        `${name}Val = *e.Envelope.${name[0].toUpperCase() + name.slice(1)}`,
+      );
+      expect(encoder).toContain(`Data: []byte(${name}Val)`);
+    },
+  );
 
   it("preserves exported raw-stream operations for JSONL", async () => {
     const files = await emitGoFor(`
@@ -195,7 +204,7 @@ describe("SSE connectors and resumption options", () => {
       @route("/events") @get op receive(): SSEStream<Events>;
     `);
     const serde = files.get("zz_unions_serde.go")!;
-    expect(serde).toContain('json.Unmarshal(frame.Data, &s) == nil && s == "[DONE]"');
+    expect(serde).toContain('json.Unmarshal(frame.Data, &s) == nil && s != nil && *s == "[DONE]"');
     expect(serde).toContain("return Events{}, false, io.EOF");
   });
 
@@ -211,6 +220,49 @@ describe("SSE connectors and resumption options", () => {
     );
     expect(files.get("fake/zz_test_server.go")).toContain("HTTPStatus: http.StatusCreated");
   });
+
+  it("recognizes every unnamed terminal sentinel in its authored payload format", async () => {
+    const files = await emitGoFor(`
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Info { message: string; }
+      @TypeSpec.Events.events union Events {
+        Info,
+        @TypeSpec.Events.contentType("text/plain") @terminalEvent "[DONE]",
+        @TypeSpec.Events.contentType("application/json") @terminalEvent "[CANCELLED]",
+      }
+      @route("/events") @get op receive(): SSEStream<Events>;
+    `);
+    const serde = files.get("zz_unions_serde.go")!;
+    expect(serde).toContain('s == "[DONE]"');
+    expect(serde).toContain('*s == "[CANCELLED]"');
+    expect(serde.match(/return Events\{\}, false, io.EOF/g)).toHaveLength(2);
+    expect(files.get("zz_unions.go")).not.toContain("LiteralString");
+  });
+
+  it.each([false, true])(
+    "closes generated sample readers (response example: %s)",
+    async (hasResponse) => {
+      const files = await emitGoFor(
+        spec,
+        { "generate-samples": true },
+        {
+          "examples/receive.json": JSON.stringify({
+            operationId: "receive",
+            title: "receive",
+            parameters: {},
+            responses: hasResponse ? { "200": { body: "data: example\n\n" } } : {},
+          }),
+        },
+      );
+      const sample = files.get("zz_test_client_example_test.go")!;
+      expect(sample).toContain("res, err := client.OpenReceive(");
+      expect(sample).toContain("_ = res.Stream.Close()");
+      expect(sample.indexOf("failed to finish the request")).toBeLessThan(
+        sample.indexOf("res.Stream.Close()"),
+      );
+    },
+  );
 
   it.each([false, true])("matches all unnamed object variants (dual use: %s)", async (dualUse) => {
     const files = await emitGoFor(`
@@ -269,12 +321,8 @@ describe("SSE connectors and resumption options", () => {
     expect(serde).toContain('case "":');
     expect(serde).toContain('hasLiteralValue[string](rawMsg, "kind", "connected")');
     expect(serde).not.toContain('hasRequiredFields(rawMsg, "payload")');
-    expect(serde).toContain(
-      "return Events{ConnectedEnvelope: &ConnectedEnvelope{Payload: &v}}, false, nil",
-    );
-    expect(serde).toContain(
-      "return Events{DisconnectedEnvelope: &DisconnectedEnvelope{Payload: &v}}, true, nil",
-    );
+    expect(serde).toContain("return Events{ConnectedEnvelope: &v}, false, nil");
+    expect(serde).toContain("return Events{DisconnectedEnvelope: &v}, true, nil");
     expect(serde).toMatch(/case "message":[\s\S]*return Events\{Named: &v\}, false, nil/);
   });
 
@@ -437,7 +485,7 @@ describe("SSE connectors and resumption options", () => {
     const files = await emitGoFor(
       spec.replace(
         "receive()",
-        "receive(@query connectionOptions: string, @query connectionOptions1: string, @query connect: string, @query lastEventID: string, @query reader: string)",
+        "receive(@query connectionOptions: string, @query connectionOptions1: string, @query connect: string, @query lastEventID: string, @query reader: string, @query streaming: boolean)",
       ),
     );
     const client = files.get("zz_test_client.go");
@@ -447,7 +495,7 @@ describe("SSE connectors and resumption options", () => {
     );
     expect(client).toContain("connectionOptions2.LastEventID = lastEventID1");
     expect(client).toContain(
-      "httpResp, respErr := client.receive(ctx, connectionOptions, connectionOptions1, connect, lastEventID, reader, &connectionOptions2)",
+      "httpResp, respErr := client.receive(ctx, connectionOptions, connectionOptions1, connect, lastEventID, reader, streamingParam, &connectionOptions2)",
     );
     expect(client).toContain("reader1, err := streaming.NewSSEReader(ctx, connect1,");
     expect(client).toContain("return TestClientOpenReceiveResponse{Stream: reader1}, nil");

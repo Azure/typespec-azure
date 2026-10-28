@@ -59,6 +59,7 @@ op jsonEvents(): JsonEventResponse;
 union TextEvents {
   text: string,
   @terminalEvent "[DONE]",
+  @TypeSpec.Events.contentType("application/json") @terminalEvent "[CANCELLED]",
 }
 
 @get
@@ -69,9 +70,14 @@ model TextEnvelope {
   @TypeSpec.Events.data @TypeSpec.Events.contentType("text/plain") e: string;
 }
 
+model StreamingEnvelope {
+  @TypeSpec.Events.data @TypeSpec.Events.contentType("text/plain") streaming: string;
+}
+
 @TypeSpec.Events.events
 union TextEnvelopeEvents {
   text: TextEnvelope,
+  streaming: StreamingEnvelope,
 }
 
 @get
@@ -216,7 +222,7 @@ union NamedEvents {
 
 @get
 @route("/named")
-op named(): SSEStream<NamedEvents>;
+op named(@query streaming: boolean): SSEStream<NamedEvents>;
 
 @TypeSpec.Events.events
 union LiteralEvents {
@@ -271,3 +277,75 @@ model BatchRequest {
 @post
 @route("/batch")
 op batch(@body body: BatchRequest): void;
+
+model UnixEnvelope {
+  @TypeSpec.Events.data
+  @TypeSpec.Events.contentType("application/json")
+  @encodedName("application/json", "wire-time")
+  @encode("unixTimestamp", int64)
+  timestamp: utcDateTime;
+}
+
+model HttpDateEnvelope {
+  @TypeSpec.Events.data
+  @TypeSpec.Events.contentType("application/json")
+  @encode("rfc7231")
+  timestamp: utcDateTime;
+}
+
+@encode("unixTimestamp", int64)
+scalar UnixTime extends utcDateTime;
+
+model TimesEnvelope {
+  @TypeSpec.Events.data timestamps: UnixTime[];
+}
+
+model BytesEnvelope {
+  @TypeSpec.Events.data
+  @TypeSpec.Events.contentType("application/json")
+  @encode("base64url")
+  payload: bytes;
+}
+
+@discriminator("kind")
+model Pet {
+  kind: string;
+  name: string;
+}
+
+model Cat extends Pet {
+  kind: "cat";
+  purrs: boolean;
+}
+
+model PetEnvelope {
+  @TypeSpec.Events.data payload: Pet;
+}
+
+model PetsEnvelope {
+  @TypeSpec.Events.data payload: Pet[];
+}
+
+model PetMapEnvelope {
+  @TypeSpec.Events.data payload: Record<Pet>;
+}
+
+model PetNestedEnvelope {
+  @TypeSpec.Events.data payload: Record<Pet[]>;
+}
+
+@TypeSpec.Events.events
+union EncodedEvents {
+  unix: UnixEnvelope,
+  httpDate: HttpDateEnvelope,
+  times: TimesEnvelope,
+  bytes: BytesEnvelope,
+  pet: PetEnvelope,
+  pets: PetsEnvelope,
+  petMap: PetMapEnvelope,
+  petNested: PetNestedEnvelope,
+}
+
+@get
+@route("/encoded")
+op encoded(): SSEStream<EncodedEvents>;
