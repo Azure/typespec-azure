@@ -343,7 +343,8 @@ function generateObjectMatch(
       }
       return `hasLiteralValue[${go.getTypeDeclaration(literal.type, goUnion.pkg)}](rawMsg, ${JSON.stringify(modelField.serializedName)}, ${helpers.formatLiteralValue(literal, false)})`;
     });
-    conditions.push(`hasRequiredFields(rawMsg, ${getJsonFieldsForProbe(type.ptrType)})`);
+    const probeArgs = ["rawMsg", ...getJsonFieldsForProbe(type.ptrType)].join(", ");
+    conditions.push(`hasRequiredFields(${probeArgs})`);
     const condition = conditions.join(" && ");
     const body = (indent: helpers.Indentation) => onMatch(field, indent);
     if (i === 0) {
@@ -406,17 +407,16 @@ function hasLiteralFields(
 
 /**
  * returns the JSON field names used to probe if the JSON contains the target object.
- * the result is a comma delimited list of strings (`"foo", "bar", "baz"`)
+ * only required fields are used; optional properties can be absent from valid payloads.
  *
  * @param model the model from which to select the probing fields
  * @returns the list of field names
  */
-function getJsonFieldsForProbe(model: go.Model): string {
-  const fields = new Array<go.ModelField>();
-  for (let i = 0; i < 4 && i < model.fields.length; ++i) {
-    fields.push(model.fields[i]);
-  }
-  return fields.map((f) => `"${f.serializedName}"`).join();
+function getJsonFieldsForProbe(model: go.Model): Array<string> {
+  return model.fields
+    .filter((field) => field.annotations.required)
+    .slice(0, 4)
+    .map((field) => JSON.stringify(field.serializedName));
 }
 
 /** info for emitting mixed types */
@@ -576,14 +576,15 @@ function groupJsonObjects(
   }
 
   // Literal constraints are stronger evidence than field presence.
-  // Field count breaks ties; maps remain the fallback.
+  // Required field count breaks ties; maps remain the fallback.
   objectFields.sort((a, b) => {
     const aType = getType(a);
     const bType = getType(b);
     if (go.isPtr(aType, "model") && go.isPtr(bType, "model")) {
       return (
         getLiteralFields(bType.ptrType).length - getLiteralFields(aType.ptrType).length ||
-        bType.ptrType.fields.length - aType.ptrType.fields.length
+        bType.ptrType.fields.filter((field) => field.annotations.required).length -
+          aType.ptrType.fields.filter((field) => field.annotations.required).length
       );
     } else if (aType.kind === "map" && bType.kind === "map") {
       return 0;
@@ -756,7 +757,7 @@ func hasRequiredFields(rawMsg map[string]json.RawMessage, fields ...string) bool
 			return false
 		}
 	}
-	return len(fields) > 0
+	return rawMsg != nil
 }
 `;
 
@@ -1012,6 +1013,7 @@ function generateSseEventClause(
     payloadVar = "s";
   } else {
     imports.add("encoding/json");
+    imports.addForType(payloadType);
     text = `${indent.get()}var v ${go.getTypeDeclaration(go.unwrapPtr(payloadType), goUnion.pkg)}\n`;
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: "err := json.Unmarshal(frame.Data, &v); err != nil",

@@ -461,3 +461,129 @@ func TestRecordFallback(t *testing.T) {
 		})
 	}
 }
+
+func TestFakeNamedEventsWithSharedPayloads(t *testing.T) {
+	first, second := "one", "two"
+	timestamp := time.Date(2026, 10, 28, 12, 0, 0, 0, time.UTC)
+	srv := &fake.Server{
+		OpenNamed: func(ctx context.Context, options *sseregression.ClientOpenNamedOptions) (resp azfake.SSEResponder[sseregression.NamedEvents], errResp azfake.ErrorResponder) {
+			resp.AddEvent(sseregression.NamedEvents{Info: &sseregression.Info{Message: &first}})
+			resp.AddEvent(sseregression.NamedEvents{Info1: &sseregression.Info{Message: &second}})
+			resp.AddEvent(sseregression.NamedEvents{TimestampEnvelope: &sseregression.TimestampEnvelope{Timestamp: &timestamp}})
+			return
+		},
+	}
+	resp, err := newClient(t, fake.NewServerTransport(srv).Do).OpenNamed(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		_ = resp.Stream.Close()
+	}()
+	a, err := resp.Stream.Next()
+	if err != nil || a.Info == nil || a.Info.Message == nil || *a.Info.Message != first || a.Info1 != nil {
+		t.Fatalf("unexpected first event: %+v, %v", a, err)
+	}
+	b, err := resp.Stream.Next()
+	if err != nil || b.Info1 == nil || b.Info1.Message == nil || *b.Info1.Message != second || b.Info != nil {
+		t.Fatalf("unexpected second event: %+v, %v", b, err)
+	}
+	c, err := resp.Stream.Next()
+	if err != nil || c.TimestampEnvelope == nil || c.TimestampEnvelope.Timestamp == nil || !c.TimestampEnvelope.Timestamp.Equal(timestamp) {
+		t.Fatalf("unexpected timestamp event: %+v, %v", c, err)
+	}
+}
+
+func TestFakeNamedLiteralEvents(t *testing.T) {
+	first, second := "one", "two"
+	srv := &fake.Server{
+		OpenLiterals: func(ctx context.Context, options *sseregression.ClientOpenLiteralsOptions) (resp azfake.SSEResponder[sseregression.LiteralEventsEvent], errResp azfake.ErrorResponder) {
+			resp.AddEvent(sseregression.LiteralEventsEvent{LiteralString: &first})
+			resp.AddEvent(sseregression.LiteralEventsEvent{LiteralString1: &second})
+			return
+		},
+	}
+	resp, err := newClient(t, fake.NewServerTransport(srv).Do).OpenLiterals(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		_ = resp.Stream.Close()
+	}()
+	a, err := resp.Stream.Next()
+	if err != nil || a.LiteralString == nil || *a.LiteralString != first || a.LiteralString1 != nil {
+		t.Fatalf("unexpected first literal: %+v, %v", a, err)
+	}
+	b, err := resp.Stream.Next()
+	if err != nil || b.LiteralString1 == nil || *b.LiteralString1 != second || b.LiteralString != nil {
+		t.Fatalf("unexpected second literal: %+v, %v", b, err)
+	}
+}
+
+func TestUnnamedEventsWithOptionalProperties(t *testing.T) {
+	for _, tc := range []struct {
+		payload string
+		variant string
+	}{
+		{`{"kind":"connected"}`, "connected"},
+		{`{"kind":"disconnected"}`, "disconnected"},
+		{`{"id":"one"}`, "required"},
+		{`{}`, "optional"},
+		{`{"detail":"one"}`, "optional"},
+		{`null`, "invalid"},
+	} {
+		t.Run(tc.payload, func(t *testing.T) {
+			client := newClient(t, func(req *http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Header:     responseHeaders(),
+					Body:       io.NopCloser(strings.NewReader("data: " + tc.payload + "\n\n")),
+					Request:    req,
+				}, nil
+			})
+			resp, err := client.OpenOptional(context.Background(), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				_ = resp.Stream.Close()
+			}()
+			event, err := resp.Stream.Next()
+			if tc.variant == "invalid" {
+				if err == nil || errors.Is(err, io.EOF) {
+					t.Fatalf("expected a matching error, got %+v, %v", event, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if (event.OptionalConnected != nil) != (tc.variant == "connected") ||
+				(event.OptionalDisconnected != nil) != (tc.variant == "disconnected") ||
+				(event.RequiredPayload != nil) != (tc.variant == "required") ||
+				(event.OptionalPayload != nil) != (tc.variant == "optional") {
+				t.Fatalf("expected %s variant, got %+v", tc.variant, event)
+			}
+		})
+	}
+}
+
+func TestNestedEventUnionJsonSerde(t *testing.T) {
+	const payload = `{"batch":[{"message":"hello"}]}`
+	var request sseregression.BatchRequest
+	if err := json.Unmarshal([]byte(payload), &request); err != nil {
+		t.Fatal(err)
+	}
+	if request.Batch == nil || len(request.Batch.SliceOfUnionStruct) != 1 || request.Batch.SliceOfUnionStruct[0] == nil ||
+		request.Batch.SliceOfUnionStruct[0].Info == nil || request.Batch.SliceOfUnionStruct[0].Info.Message == nil ||
+		*request.Batch.SliceOfUnionStruct[0].Info.Message != "hello" {
+		t.Fatalf("unexpected nested event: %+v", request)
+	}
+	data, err := json.Marshal(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != payload {
+		t.Fatalf("unexpected JSON representation: %s", data)
+	}
+}

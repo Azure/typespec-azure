@@ -13,6 +13,80 @@ describe("SSE connectors and resumption options", () => {
     @route("/events") @get op receive(): SSEStream<Events>;
   `;
 
+  it("imports the types declared by JSON event envelope payloads", async () => {
+    const files = await emitGoFor(`
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Envelope { @TypeSpec.Events.data @TypeSpec.Events.contentType("application/json") timestamp: utcDateTime; }
+      @TypeSpec.Events.events union Events { time: Envelope }
+      @route("/events") @get op receive(): SSEStream<Events>;
+    `);
+    const serde = files.get("zz_unions_serde.go")!;
+    expect(serde).toContain("var v time.Time");
+    expect(serde).toMatch(/^\t"time"$/m);
+  });
+
+  it.each([
+    { variants: 'first: "one", second: "two"', field: "LiteralString", type: "string" },
+    { variants: "first: Info, second: Info", field: "Info", type: "Info" },
+  ])(
+    "disambiguates repeated $type variant fields for decoding and encoding",
+    async ({ variants, field, type }) => {
+      const files = await emitGoFor(
+        `
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Info { message: string; }
+      @TypeSpec.Events.events union Events { ${variants} }
+      @route("/events") @get op receive(): SSEStream<Events>;
+    `,
+        { "generate-fakes": true },
+      );
+      const unions = files.get("zz_unions.go")!;
+      expect(unions).toContain(`${field} *${type}`);
+      expect(unions).toContain(`${field}1 *${type}`);
+      const serde = files.get("zz_unions_serde.go")!;
+      const name = type === "string" ? "EventsEvent" : "Events";
+      expect(serde).toMatch(new RegExp(`case "first":[\\s\\S]*?return ${name}\\{${field}: &`));
+      expect(serde).toMatch(new RegExp(`case "second":[\\s\\S]*?return ${name}\\{${field}1: &`));
+      const encoder = files.get("fake/zz_sse_encoders.go")!;
+      expect(encoder).toContain(`e.${field}1`);
+      expect(encoder).toContain('Type: "first"');
+      expect(encoder).toContain('Type: "second"');
+    },
+  );
+
+  it("only probes required fields for unnamed events, including all-optional payloads", async () => {
+    const files = await emitGoFor(`
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Connected { kind: "connected"; detail?: string; }
+      model Disconnected { kind: "disconnected"; }
+      model Optional { detail?: string; }
+      @TypeSpec.Events.events union Events { Connected, Disconnected, Optional }
+      @route("/events") @get op receive(): SSEStream<Events>;
+    `);
+    const serde = files.get("zz_unions_serde.go")!;
+    expect(serde).toContain('hasRequiredFields(rawMsg, "kind")');
+    expect(serde).not.toContain('hasRequiredFields(rawMsg, "kind","detail")');
+    expect(serde).not.toContain('hasRequiredFields(rawMsg, "detail")');
+    expect(serde).toContain("hasRequiredFields(rawMsg)");
+  });
+
+  it("preserves JSON serde for event unions nested in union variants", async () => {
+    const files = await emitGoFor(
+      spec +
+        `
+      union Batch { Events[], string }
+      model Request { batch: Batch; }
+      @route("/batch") @post op send(@body body: Request): void;
+    `,
+    );
+    const serde = files.get("zz_unions_serde.go")!;
+    expect(serde).toContain("func (e Events) MarshalJSON()");
+    expect(serde).toContain("func (e *Events) UnmarshalJSON(");
+  });
+
   it.each(["application/json", "text/plain"])(
     "only imports packages used by a single unnamed %s event",
     async (contentType) => {
