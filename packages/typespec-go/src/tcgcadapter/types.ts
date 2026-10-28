@@ -1342,6 +1342,7 @@ export class TypeAdapter {
       sdkUnion.kind === "union"
         ? sdkUnion.variantTypes
         : sseMetadata!.events.map((event) => event.type);
+    const fieldNames = new Set<string>();
     for (const [index, variant] of variants.entries()) {
       const type = this.getWireType(variant, elementTypeByValue, false);
       if (!go.isUnionVariantType(type)) {
@@ -1353,7 +1354,13 @@ export class TypeAdapter {
       }
 
       const fieldType = helpers.isPtrType(type) ? this.getPtrType(type) : type;
-      const variantField = new go.UnionField(recursiveVariantFieldName(fieldType), fieldType);
+      const baseName = recursiveVariantFieldName(fieldType);
+      let fieldName = baseName;
+      for (let suffix = 1; fieldNames.has(fieldName); suffix++) {
+        fieldName = `${baseName}${suffix}`;
+      }
+      fieldNames.add(fieldName);
+      const variantField = new go.UnionField(fieldName, fieldType);
       if (sseMetadata) {
         variantField.sse = this.getSseEvent(sdkUnion, sseMetadata, variant, index);
       }
@@ -1539,8 +1546,13 @@ export class TypeAdapter {
 
     // anywhere else a union is referenced it's used as a value. the type can be
     // nested within containers, e.g. a slice of unions.
+    const valueTypes = new Set<tcgc.SdkType>();
     const recursiveAddValueTypeUsage = function (sdkType?: tcgc.SdkType): void {
-      switch (sdkType?.kind) {
+      if (!sdkType || valueTypes.has(sdkType)) {
+        return;
+      }
+      valueTypes.add(sdkType);
+      switch (sdkType.kind) {
         case "array":
           recursiveAddValueTypeUsage(sdkType.valueType);
           break;
@@ -1554,6 +1566,9 @@ export class TypeAdapter {
           const usage = getUsage(sdkType);
           if (usage) {
             usage.isValueType = true;
+          }
+          for (const variant of sdkType.variantTypes) {
+            recursiveAddValueTypeUsage(variant);
           }
           break;
         }

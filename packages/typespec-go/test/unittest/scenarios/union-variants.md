@@ -224,7 +224,7 @@ func hasRequiredFields(rawMsg map[string]json.RawMessage, fields ...string) bool
 			return false
 		}
 	}
-	return len(fields) > 0
+	return rawMsg != nil
 }
 ```
 
