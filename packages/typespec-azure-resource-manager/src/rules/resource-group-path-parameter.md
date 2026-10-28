@@ -2,7 +2,7 @@ ARM resource-group paths must use the `resourceGroupName` path parameter after
 `resourceGroups`. A custom base parameter with a different name, a literal group
 value, or a missing group parameter can produce a nonstandard resource scope.
 
-This opt-in rule checks concrete GET, PUT, PATCH, and DELETE operations in ARM
+This rule checks concrete GET, PUT, PATCH, and DELETE operations in ARM
 namespaces. Matching is case-insensitive. Paths without `/resourceGroups/`,
 including subscription-scoped paths, are outside this check. POST and HEAD
 operations are not checked.
@@ -11,15 +11,8 @@ Use the standard ARM template base parameters. When customization is necessary,
 retain `ResourceGroupParameter` rather than replacing it with a differently named
 property.
 
-Enable the rule explicitly:
-
-```yaml
-linter:
-  enable:
-    "@azure-tools/typespec-azure-resource-manager/resource-group-path-parameter": true
-```
-
-The ARM `all` and Azure resource-manager rulesets leave this rule disabled.
+The ARM `all` ruleset enables this rule. The Azure resource-manager ruleset
+leaves it disabled.
 
 ## Impact
 
