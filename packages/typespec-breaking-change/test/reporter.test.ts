@@ -119,6 +119,24 @@ function createResult(): AnalysisResult {
 }
 
 describe("reporters", () => {
+  it.each([formatGithubReport, renderMarkdownSummary])(
+    "escapes backslashes before pipes in both errors and suppression reasons",
+    (format) => {
+      const result = createResult();
+      const value = String.raw`first\|second\\|third` + "\r\nlast";
+      result.findings[0].diff.identity.element = value;
+      result.findings[1].suppressionReason = value;
+      const report = format(result);
+      const escaped = String.raw`first\\\|second\\\\\|third`;
+      expect(report.split(escaped)).toHaveLength(3);
+      const tables = report
+        .split("\n")
+        .filter((line) => line.startsWith("|"))
+        .join("\n");
+      expect(tables).not.toContain(String.raw`first\|second\\|third`);
+      expect(tables).not.toContain("\r");
+    },
+  );
   it("formats a console report", () => {
     expect(formatConsoleReport(createResult())).toMatchInlineSnapshot(`
       "ERROR  ResponsePropertyRemoved
