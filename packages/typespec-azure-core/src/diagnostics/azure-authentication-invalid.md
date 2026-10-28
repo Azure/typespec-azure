@@ -55,11 +55,414 @@ namespace Logs {
 }
 ```
 
-For other reported reasons, apply the corresponding constraint:
+An empty catalog also fails the default check because it has no configuration to select.
 
-- Declare named configuration records and select an existing default by name.
-- Each configuration needs a nonempty endpoint string literal and ordinary HTTP authentication requirements. Endpoint template parameters use a model, as in `@server`; `description`, when provided, is a string literal.
-- Every configuration must include OAuth2. OAuth flows, URLs, scopes, and authentication requirements may differ between configurations, including API-key alternatives and AND groups.
-- Do not combine `@azureServiceConfigurations` with direct `@server` or `@useAuth` declarations on the same namespace. The pairing decorator calls those HTTP APIs itself, exposing all servers and one OR of authentication requirements.
+The remaining examples assume `using Azure.Core;`, `using TypeSpec.Http;`, and the `ServiceAuth` model shown above.
+
+## Configuration records
+
+Each configuration must be a model record, not a scalar or another type.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: string;
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Each service configuration must be a named endpoint and authentication record.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Configuration names
+
+Names must not be empty or contain only whitespace.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  ` `: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, " ")
+namespace Logs {
+
+}
+```
+
+Reported message: `Each service configuration must be a named endpoint and authentication record.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Known properties
+
+A record accepts only `endpoint`, `authentication`, `parameters`, and `description`.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+    descripton: "Public cloud";
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Unknown service configuration property 'descripton'.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+    description: "Public cloud";
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Endpoint string literals
+
+The endpoint must be a nonempty string literal, not the `string` type.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: string;
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Configuration 'Public' must declare a non-empty endpoint string literal.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Required authentication
+
+Every configuration needs an `authentication` property.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Configuration 'Public' must declare authentication requirements.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Authentication requirement syntax
+
+Use ordinary HTTP authentication models, OR unions, or AND tuples of models.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: string;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Authentication must be a model, an OR union, or an AND tuple of models.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: [ServiceAuth, ApiKeyAuth<ApiKeyLocation.header, "api-key">] | NoAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Endpoint template parameters
+
+Declare `parameters` as a model containing the endpoint template's parameters, as for `@server`.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://{region}.example.com";
+    parameters: string;
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Configuration 'Public' parameters must be a model.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://{region}.example.com";
+    parameters: {
+      region: string;
+    };
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Description string literals
+
+The optional `description` must be a string literal.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+    description: string;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Configuration 'Public' description must be a string literal.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+    description: "Public cloud";
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## OAuth2 presence
+
+Every configuration must include OAuth2. Key alternatives and AND groups are supported, and configurations may have different authentication requirements.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Service configurations must include an OAuth2 authentication scheme.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth | ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+## Conflicting HTTP decorators
+
+Do not combine the pairing decorator with `@server` or `@useAuth` on the same namespace; it calls those HTTP APIs itself.
+
+Incorrect:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@server("https://api.loganalytics.io")
+@useAuth(ServiceAuth)
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
+
+Reported message: `Do not combine @azureServiceConfigurations with @server or @useAuth on the same namespace.`
+
+Correct:
+
+```typespec
+model Configurations {
+  Public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
+}
+
+@service
+@azureServiceConfigurations(Configurations, "Public")
+namespace Logs {
+
+}
+```
 
 Challenge processing and endpoint-derived audience resolution are outside this feature.

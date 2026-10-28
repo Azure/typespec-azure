@@ -2531,19 +2531,24 @@ export function getAllReferencedTypes(
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
-  for (const root of listClients(context)) {
-    const clients = [root, ...listSubClients(context, root, true)];
-    for (const client of clients) {
-      for (const operation of listOperationsInClient(context, client)) {
+  for (const client of listClients(context)) {
+    for (const operation of listOperationsInClient(context, client)) {
+      // operations on a client
+      diagnostics.pipe(updateTypesFromOperation(context, operation));
+    }
+    for (const sc of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, sc)) {
+        // operations on sub clients
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
     }
-    for (const client of clients) {
-      const catalog = getClientServiceConfigurations(context, client);
+    // server parameters
+    for (const current of [client, ...listSubClients(context, client, true)]) {
+      const catalog = getClientServiceConfigurations(context, current);
       const servers = catalog
         ? catalog.configurations.map((configuration) => configuration.server)
-        : client === root
-          ? getServers(context.program, client.services[0])?.slice(0, 1)
+        : current === client
+          ? getServers(context.program, current.services[0])?.slice(0, 1)
           : undefined;
       for (const server of servers ?? []) {
         for (const param of server.parameters.values()) {
@@ -2552,7 +2557,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
         }
       }
     }
-    root.services.map((s) => services.add(s));
+    client.services.map((s) => services.add(s));
   }
   for (const service of services) {
     // versioned enums

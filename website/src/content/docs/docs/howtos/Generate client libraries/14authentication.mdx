@@ -58,16 +58,7 @@ For services with caller-supplied instance endpoints, use `endpoint: "{endpoint}
 
 ## Generate the data-plane client
 
-Compile the service using your language emitter as described in [Setup](./01setup.mdx). Keep client customizations in `client.tsp`; for example, rename the generated client without repeating its endpoint or OAuth declarations.
-
-```typespec title=client.tsp
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-
-@@Azure.ClientGenerator.Core.clientName(Logs, "LogsQueryClient");
-```
-
-When using this customization, compile `client.tsp` as the entry point, not `main.tsp`.
+Compile `main.tsp` using your language emitter as described in [Setup](./01setup.mdx).
 
 TCGC keeps the existing client endpoint, credential, and authentication fields aligned with the explicit Public default. The complete catalog is available on `client.clientInitialization.serviceConfigurations`:
 

@@ -204,7 +204,7 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
       const option: HttpAuth[] = [];
       for (const model of requirement.models) {
         const scheme = schemes.get(model);
-        // @useAuth already diagnoses invalid authentication models.
+        // `@useAuth` already diagnoses invalid authentication models.
         if (!scheme) return;
         option.push(scheme);
       }

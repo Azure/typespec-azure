@@ -1,6 +1,7 @@
 import { Tester } from "#test/test-host.js";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { getAuthentication, getServers } from "@typespec/http";
+import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import { getAzureServiceConfigurations } from "./azure-service-configurations.js";
 
@@ -39,7 +40,7 @@ describe("Azure service configurations", () => {
       auth?.options.map((option) => option.schemes.map((scheme) => scheme.model.name)),
     ).toEqual([["PublicAuth"], ["GovernmentAuth"]]);
     const government = auth?.options[1].schemes[0];
-    if (government?.type !== "oauth2") throw new Error("Missing Government OAuth configuration");
+    ok(government?.type === "oauth2");
     expect(government.flows[0]).toMatchObject({
       authorizationUrl: "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
       tokenUrl: "https://login.microsoftonline.us/common/oauth2/v2.0/token",
@@ -51,11 +52,10 @@ describe("Azure service configurations", () => {
     const { program, Service } = await Tester.compile(t.code`
       ${authentication}
       model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
-      union PublicRequirements { [PublicAuth, Key], NoAuth }
       model Configurations {
         Public: {
           endpoint: "https://public.example.com";
-          authentication: PublicRequirements;
+          authentication: [PublicAuth, Key] | NoAuth;
         };
         Government: {
           endpoint: "https://government.example.com";
@@ -140,7 +140,7 @@ describe("Azure service configurations", () => {
       namespace ${t.namespace("Service")} {}
     `);
     const scheme = getAuthentication(program, Service)?.options[0].schemes[0];
-    if (scheme?.type !== "oauth2") throw new Error("Missing OAuth configuration");
+    ok(scheme?.type === "oauth2");
     expect(scheme.flows[0].scopes.map((scope) => scope.value)).toEqual(["read", "write"]);
   });
 

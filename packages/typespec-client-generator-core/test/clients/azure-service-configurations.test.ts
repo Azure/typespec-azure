@@ -1,5 +1,6 @@
 import { expectDiagnostics, resolveVirtualPath } from "@typespec/compiler/testing";
 import { getAuthentication, getHttpOperation } from "@typespec/http";
+import { ok } from "assert";
 import { expect, it } from "vitest";
 import { parse } from "yaml";
 import { type SdkClientType, UsageFlags } from "../../src/interfaces.js";
@@ -22,7 +23,7 @@ function getCredential(client: SdkClientType) {
   const credential = client.clientInitialization.parameters.find(
     (parameter) => parameter.kind === "credential",
   );
-  if (!credential) throw new Error("Missing credential parameter");
+  ok(credential);
   return credential;
 }
 
@@ -60,8 +61,7 @@ it.each(["python", "csharp", "java", "go", "ts"])(
         },
       ],
     });
-    if (government?.credential?.type.kind !== "credential")
-      throw new Error("Missing Government credential");
+    ok(government?.credential?.type.kind === "credential");
     expect(government.credential.type.scheme).toMatchObject({
       model: { name: "GovernmentAuth" },
       flows: [{ scopes: [{ value: "https://api.loganalytics.us/.default" }] }],
@@ -108,9 +108,7 @@ it("keeps ordinary multi-flow OAuth scopes unchanged without a configuration cat
   const client = context.sdkPackage.clients[0];
   expect(client.clientInitialization).not.toHaveProperty("serviceConfigurations");
   const credential = getCredential(client);
-  if (credential.type.kind !== "credential" || credential.type.scheme.type !== "oauth2") {
-    throw new Error("Missing OAuth credential");
-  }
+  ok(credential.type.kind === "credential" && credential.type.scheme.type === "oauth2");
   expect(
     credential.type.scheme.flows.map((flow) => flow.scopes.map((scope) => scope.value)),
   ).toEqual([["read"], ["write", "read"]]);
@@ -136,7 +134,7 @@ it("preserves ordinary OR-of-AND authentication and client initialization order"
   ).toEqual([["oauth2", "apiKey"], ["noAuth"]]);
   const credential = getCredential(client);
   expect(credential.optional).toBe(false);
-  if (credential.type.kind !== "union") throw new Error("Missing credential union");
+  ok(credential.type.kind === "union");
   expect(credential.type.variantTypes.map((type) => type.scheme.type)).toEqual([
     "oauth2",
     "apiKey",
@@ -229,7 +227,7 @@ it.each(["virtual", "auto-merged"])(
     const child = client.children?.find(
       (candidate) => candidate.name === (kind === "virtual" ? "Moved" : "Operations"),
     );
-    if (!child) throw new Error("Missing customized child");
+    ok(child);
     expect(child.clientInitialization.serviceConfigurations).toMatchObject({
       defaultConfiguration: "Private",
       configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
@@ -264,7 +262,7 @@ it("prefers a child namespace's catalog over a customized SDK parent", async () 
   const child = client.children?.[0];
   expect(client.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("Private");
   expect(child?.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("Local");
-  if (!child) throw new Error("Missing child");
+  ok(child);
   expect(getCredential(child).type).toMatchObject({
     kind: "credential",
     scheme: { model: { name: "GovernmentAuth" } },
@@ -317,7 +315,7 @@ it("preserves matching catalogs on merged children and grandchildren", async () 
     defaultConfiguration: "Nested",
     configurations: [{ endpoint: { serverUrl: "https://nested.example.com" } }],
   });
-  if (!child || !grandchild) throw new Error("Missing merged client hierarchy");
+  ok(child && grandchild);
   for (const client of [child, grandchild]) {
     expect(getCredential(client).type).toMatchObject({
       kind: "credential",
@@ -551,7 +549,7 @@ it.each(["scopes", "flows", "schemes", "options"])(
       auth?.options.map((option) => option.schemes.map((scheme) => scheme.model.name)),
     ).toEqual([["FirstAuth", "Key"], ["NoAuth"]]);
     const scheme = auth?.options[0].schemes[0];
-    if (scheme?.type !== "oauth2") throw new Error("Missing OAuth configuration");
+    ok(scheme?.type === "oauth2");
     expect(scheme.flows.map((flow) => flow.type)).toEqual([
       "clientCredentials",
       "authorizationCode",
@@ -825,7 +823,7 @@ it("serializes every paired configuration without compiler model references", as
   const context = await createSdkContextForTester(program, {}, { exportTCGCoutput: true });
   expect(context.diagnostics).toEqual([]);
   const output = fs.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-  if (!output) throw new Error("Missing serialized SDK package");
+  ok(output);
   const catalog = parse(output).clients[0].clientInitialization.serviceConfigurations;
   expect(catalog.defaultConfiguration).toBe("Public");
   expect(
@@ -861,7 +859,7 @@ it("includes endpoint parameter types reachable only from a non-default configur
   const configuration =
     context.sdkPackage.clients[0].clientInitialization.serviceConfigurations?.configurations[1];
   const region = configuration?.endpoint.templateArguments[0].type;
-  if (region?.kind !== "enum") throw new Error("Missing regional endpoint enum");
+  ok(region?.kind === "enum");
   expect(region.usage & UsageFlags.Input).toBeTruthy();
   expect(context.sdkPackage.enums).toContain(region);
 });
@@ -895,7 +893,7 @@ it.each(["child", "grandchild"])(
     const client = level === "child" ? child : child?.children?.[0];
     const configuration = client?.clientInitialization.serviceConfigurations?.configurations[1];
     const region = configuration?.endpoint.templateArguments[0].type;
-    if (region?.kind !== "enum") throw new Error("Missing child endpoint enum");
+    ok(region?.kind === "enum");
     expect(region.usage & UsageFlags.Input).toBeTruthy();
     expect(context.sdkPackage.enums).toContain(region);
   },
