@@ -4,6 +4,34 @@ This is the native-first evidence role, not a second implementation/promotion
 PR. Read [native-first.md](native-first.md) for the scheduling and acceptance
 contract. Keep publication identities distinct from the native code owner.
 
+## Shared Swagger publication and discovery
+
+Native-first consumers discover the shared Swagger baseline before specs setup;
+follow the [consumer/producer contract](../analyze-native-lint-coverage/shared-baseline.md).
+The initial publication uses the verified `msyyc/azure-rest-api-specs` fork,
+branch `evidence/shared-swagger-baseline`, with `.lintdiff-baselines\current.json`
+and immutable `.lintdiff-baselines\swagger-arm-20261026-2cd3c5dd\baseline.json`.
+Pin the fetched metadata commit and version descriptor before reading data.
+The metadata branch is derived from frozen source, but its new metadata commit
+is not the tested source commit. Runtimes use descriptor `source.commit`.
+
+The large archive belongs to the same specs repository's release
+`swagger-lint-baseline-20261026-2cd3c5dd`, asset
+`swagger-arm-20261026-2cd3c5dd.tar.gz`. Record descriptor SHA-256, archive size/hash,
+baseline identity, source preservation tuple and verified download receipt.
+Archive root retains `manifest.json`, `baseline.json`, `dataset\**`; do not
+commit the unpacked large dataset to Git. The unchanged source preservation ref
+`evidence/long-running-operations-options-validator-20261022-source` remains
+separate from metadata discovery and runtime injection.
+
+Shared Swagger-only completion is not native completion. Native execution,
+full population, controls, investigations, independent local reviews and A/B
+checkpoints remain required. Changing a validator selector alone does not
+require a refresh. Missing/incompatible publication blocks consumers with an
+exact prerequisite; only an explicitly requested producer runs the Swagger
+suite. Refresh appends new immutable assets and advances discovery only after
+verification, retaining prior versions. Legacy flow stays unchanged.
+
 ## Publication binding and layout
 
 Before setup, resolve the signed-in user's actual personal fork of
@@ -12,9 +40,13 @@ account. Verify write permission and the exact evidence branch/ref, existing
 ownership and remote SHA. Permission for evidence does not authorize native
 or skill PR heads in a fork. Do not create another fork automatically.
 
-Use a dedicated in-folder evidence worktree; do not put output inside clean
-candidate/specs inputs. Record any session-bound publication owner and supported
-push controls. Never assume a directory change changes publication identity.
+Use one dedicated in-folder worktree for coverage generation, local replay,
+evidence publication and `migration.md`; do not put output inside clean
+candidate/specs inputs. Prefer a verified existing evidence worktree under the
+[reuse contract](preparation.md#native-first-worktree-reuse). Do not require a
+fourth persistent replay worktree. Record any session-bound publication owner
+and supported push controls. Never assume a directory change changes
+publication identity.
 
 ```text
 migration-evidence\
@@ -39,6 +71,10 @@ not an invented cache schema. Singleton evidence may retain an existing per-rule
 layout with explicit links. Baselines are shared by reference, not copied per
 member. Store mutable local logs, unpacked Swagger, dependencies and archives in
 an ignored local area. An ignored file is not backed up by pushing the branch.
+Retain verified downloaded assets and unpacked baseline/replay inputs here for
+later runs. Preserve each prior run and use a new empty directory for every
+coverage invocation; local caches never replace integrity/compatibility checks,
+fresh required native execution, or durable publication.
 
 Commit compact sanitized manifests, project inventory/failed population, member
 diagnostic shards, reports, fixture/claim mapping and `migration.md`. Remove
@@ -47,6 +83,18 @@ identity and portable project-relative source locations. Preserve the original
 raw receipts locally; sanitization must not alter diagnostic counts or targets.
 Never publish credentials, environment dumps, user mail, `node_modules`, raw
 `log.txt` or unrelated/private inputs.
+
+Before committing, compare the complete publication inventory with Git's staged
+paths. Directory staging can omit ignored manifests and `.log` receipts. When
+necessary, force-add only explicitly inventoried sanitized receipts; never
+force-add raw execution logs, dependencies or unrelated output.
+
+After committing and before pushing, verify each recorded published SHA-256
+against the actual Git blob bytes, not just working files. Git text filters can
+change line endings. Preserve exact evidence bytes with task-scoped
+`.gitattributes`, or explicitly record intentional normalization, retain original
+hashes and recompute published hashes. Verify the declared hashes again from a
+fresh checkout. Do not waive mismatches as harmless formatting differences.
 
 Measure dataset size before choosing Git versus artifact storage. Retain large
 Swagger/packages/build logs as durable downloadable fork release assets or
@@ -107,11 +155,19 @@ all runtime dependencies or prove a full rerun.
 Validate immutable candidate snapshot `S` and packages `P`. After required
 checks/local review, commit native task content `C` and verify its source equals
 the tested snapshot; retain both identities where different. Evidence commit
-`E` references `C`, `S`, `P` and baseline `B`; the native PR description links
-to pushed `E`. Do not amend `C` merely to insert its own evidence hash.
+`E` references `C`, `S`, `P` and baseline `B`; the native PR's migration-report
+section links directly to `migration.md` on the actual evidence branch whose
+verified pushed head is `E`, under the shared
+[two-section PR body](../shared/migration-pr-description.md). Keep provenance in
+that report or its appendix, not extra PR content.
+Do not amend `C` merely to insert its own evidence hash.
 The evidence publisher returns `E` after pushing; `migration.md` need not
 contain its own commit ID. Subsequent evidence commits can append review and
 publication receipts for `C`, not fictional reviews of themselves.
+Keep the evidence branch and report path stable, including after the native PR
+merges; do not delete or rename them as routine PR cleanup. Later report commits
+use the same branch-based PR URL. Record each new pushed SHA and its immutable
+report/receipt links in append-only audit records instead of rewriting that URL.
 
 Baseline identity includes schemas, specs/core/compiler/library/emitter closure,
 lock/integrity data, actual AutoRest/validator/rulesets, generator/worker identity,
@@ -125,14 +181,15 @@ evaluation; current-time reassessment needs a fresh validator run.
 ## Migration note and replay
 
 Write singleton, group and member `migration.md` using the shared
-[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Lead with evidenced standard-case successes alongside remaining limits. Make
-actual counts easy to find, distinguish targeted representation corner cases
-from production coverage, and show a working example plus representative gaps.
-Link each additional material case directly to a short source/schema example.
-Preserve long investigations and replay instructions in `evidence-details.md`
-or an existing linked appendix; it is part of the published evidence, not omitted
-validation.
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Keep the linked original Swagger linter and supported conclusion short, and
+diagnostic totals distinct from project counts. Section 4 covers only differing
+projects/diagnostic groups; the appendix groups their exact targets and both
+linters' counts, causes and dispositions. Retain matching controls separately.
+Put technical context in NOTES and source/schema examples, full investigations
+and replay instructions in `evidence-details.md` or an existing linked appendix.
+Do not add a standalone fifth examples/actions section. Supporting evidence
+remains required; moving it does not waive validation or hide material limits.
 
 The group note retains the member status matrix, combined raw/comparable counts,
 directional gaps and explanations in the corresponding sections. Link every
@@ -148,9 +205,19 @@ original development worktree or Copilot session directory. A replay must use
 the recorded specs commit and closure, not resolve latest again. Test this
 round trip before claiming portable reuse.
 
+Use a temporary clean checkout of the published evidence commit for this
+independent recovery check, not a fourth persistent role. Do not seed it from
+unpublished local evidence or treat replay in the populated evidence worktree
+as fresh-checkout proof. After verification, retain the receipt and verified
+downloaded inputs in the persistent evidence role; remove only the task-owned
+temporary checkout after preserving any unique files and stopping its activity.
+This keeps the recovery gate intact while allowing later runs to reuse inputs.
+
 Push the evidence branch and return its repository/ref, actual pushed commit,
-immutable `migration.md` link, specs retention tuple and asset/verification
-receipts. Local commits or ignored output alone do not satisfy publication.
+branch-based `migration.md` URL for the PR, separate immutable report/receipt
+links for audit and replay, specs retention tuple and asset/verification receipts.
+Verify both URL forms against the actual pushed branch head. Local commits or
+ignored output alone do not satisfy publication.
 Preserve the following distinct recovery paths:
 
 - **Read saved evidence:** retrieve the committed note, manifests and linked

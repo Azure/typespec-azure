@@ -651,6 +651,11 @@ failed wrapper to bypass an exhausted budget or retry an external operation.
 
 ## Publication checks
 
+For rule PR creation and description updates in either flow, require the shared
+[two-section PR body](../shared/migration-pr-description.md). Keep mappings,
+provenance, validation and other detailed evidence in the linked `migration.md`
+or its appendix. This restriction does not apply to skill-update PRs.
+
 First reverify the selected worktree's physical containment under the inherited
 queue folder. For `update-existing`, follow
 [existing PR updates](#existing-pr-updates), including explicit PR targeting, and
@@ -682,17 +687,18 @@ Before creating a rule PR or making an authorized title correction, apply the
 phase-specific title contract in
 [development](../develop-lintdiff-rule/SKILL.md#9-commit-push-and-create-the-draft-pr)
 or [promotion](../lintdiff-rule-promote/SKILL.md#10-review-commit-push-and-create-a-draft-pr).
-New source-development PRs use
+New legacy source-development PRs use
 `[WIP][Swagger Linter Development] <ValidatorRuleId>`, with no summary,
 `->` mapping, or `(origin)` suffix; record the validator-to-local-TypeSpec mapping
-in the PR body instead. Promotion PRs retain
+in `migration.md` instead. Promotion and native-first rule implementation PRs use
 `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`.
 For mappings, use the actual unqualified `createRule({ name })` from that phase's
-implementation: the local lintdiff name for development and the official
-destination name for promotion. Do not use the validator slug as a substitute
+implementation: the local lintdiff name for legacy development and the official
+destination name for promotion or native-first implementation. Do not use the validator slug as a substitute
 for a differently named rule. Separately authorized or opted-in queue post-merge source repair
 retains the development skill's `[Swagger Linter Repair]` title pattern.
-Read back the published title to confirm it matches the intended title before
+Read back the published title and complete body to confirm they match the title
+and two-section description contracts before
 handoff. Preserve existing task PR titles unless correction was requested; do
 not rename them merely to apply the new convention during recovery or resumption.
 

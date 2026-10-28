@@ -8,20 +8,69 @@ the legacy three-resource procedure below. Keep the shared coordinator/folder
 resolution, physical containment, ownership, dependency-layer fingerprints,
 readiness persistence and invalidation requirements in this file.
 
-Prepare one canonical-main-based native publisher, the selected immutable specs
-runtime, and the separately verified fork evidence checkout/publisher. Record
-versioned tooling outside the native PR when canonical `main` lacks the coverage
-harness. All execution checkouts, including auxiliary snapshots, remain inside
-`worktrees_folder`. Read-only instruction/artifact sources are not execution
-checkouts. Existing shared resources require explicit serial ownership.
+Prepare three persistent worktrees: one canonical-main-based native publisher,
+the selected immutable specs runtime, and one combined coverage/evidence
+checkout with its separately verified fork publisher. Do not provision a fourth
+persistent replay worktree. Record versioned tooling outside the native PR when
+canonical `main` lacks the coverage harness; reuse verified existing tooling or
+recover pinned tooling into the evidence worktree's ignored local area.
+Required isolated validation snapshots and fresh recovery checkouts are
+temporary, not additional persistent roles. All execution checkouts, including
+temporary snapshots, remain inside `worktrees_folder`. Read-only
+instruction/artifact sources are not execution checkouts.
 
-Resolve latest inputs for a new baseline; a reuse request reads the completed
-baseline's exact specs/closure, not checked-in `_meta.json` or a moving tip.
+### Native-first worktree reuse
+
+Before creating any role, inventory recorded resources and local Git worktrees
+inside `worktrees_folder`. Prefer an existing compatible checkout, not a new
+date-stamped copy. Verify physical containment, canonical repository and remote
+identities, branch/HEAD, task/publication binding, tracked/staged/untracked state,
+and quiescence. A directory name or existing `node_modules` is not readiness.
+Record each selected path, owner, identity and reuse/create decision.
+
+Reuse native development for the same task only at its recorded branch/PR and
+verified head. A new task needs its own canonical-main-based branch and valid
+publication binding; never retarget an active or historically bound owner merely
+to save setup. Specs and evidence may serve sequential tasks when explicitly
+recorded as shared resources under exclusive ownership. Specs must match the
+selected baseline source commit; evidence must match its verified fork/ref/head.
+Preserve all task histories, immutable baselines, outputs and unfinished edits.
+Do not reset, clean, stash or overwrite an incompatible checkout to make it fit.
+Create only a missing or ineligible role, recording why reuse was unsafe.
+
+Revalidate dependency fingerprints, package-manager/runtime versions, core
+gitlink and candidate artifact identities before reusing installed or built
+layers. Repair only missing/invalidated layers. Reuse local baseline archives,
+unpacked data and replay inputs only after the required identity, completeness,
+checksum and compatibility checks; do not download another copy solely because
+the task changed. Failed/partial inputs are not reusable completed baselines.
+Each coverage invocation still uses a new empty run directory and fresh native
+execution. Keep reusable local inputs and run outputs in the evidence role,
+outside clean candidate/specs inputs.
+
+Discover the [shared baseline](../analyze-native-lint-coverage/shared-baseline.md)
+before candidate/specs dependency setup. Fetch the metadata branch and pin its
+commit, immutable descriptor and archive identity. Prepare specs at the exact
+descriptor `source.commit`, not the metadata commit, checked-in `_meta.json`,
+or latest `typespec-next`. Resolve the candidate base once, then verify against
+the baseline's recorded closure. Apply the
+[monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
+keep the specs commit across the dependency-upgrade cycle without freezing new
+native branches to old main. Inspect actual compatibility changes before proposing
+refresh; distinguish unsupported verification from proven emission differences.
+Missing/corrupt/incompatible data is a
+prerequisite blocker, never permission to generate Swagger per rule.
+Only an explicitly requested separate producer refresh resolves new specs
+sources and runs Swagger validators. Keep immutable baseline data read-only;
+parallel candidates require separate writable specs runtimes to prevent
+injected-package races. Representative preflight uses lightweight controls;
+the full saved-population readout and full compatible native run remain required.
+Full baseline reuse with `--filter`/`--limit` is not supported.
 Verify candidate core gitlink and compatible package closure. Do not repeatedly
 install passing prerequisites; repair only invalidated layers or proven missing
-tools. Native-first dependency recipes come from the official destination and
-the coverage skill: build/pack the candidate's compatible closure and use the
-specs checkout's declared manager for injection. Do not run the legacy lintdiff
+tools. Use the [native dependency profile](#native-first-dependency-profile)
+below, then build/pack the candidate's compatible closure and use the specs
+checkout's declared manager for injection. Do not run the legacy lintdiff
 installation/link profile or assume specs uses `npm ci`. Reuse common readiness
 checks without inheriting temporary-library dependencies.
 
@@ -31,11 +80,68 @@ capabilities are established. A missing automatic cache proof needs the
 documented conservative verification, not a silent cache hit.
 
 Persist readiness with native/evidence owners, base/head/refspecs, specs/tooling/
-snapshot paths and identities, baseline choice, membership revision, instruction
+snapshot paths and identities, baseline choice, descriptor metadata commit/hash,
+archive checksum, frozen source/runtime identities, membership revision, instruction
 hashes, dependency fingerprints and recovery counters. No promotion owner or
 promotion source SHA is needed. Both A/B checkpoints run through the same native
 publication owner with separate review invocations. Existing legacy manifests
 are never adopted/retargeted as native-first.
+
+### Native-first dependency profile
+
+Before installation, read each checkout's `packageManager` and verify the actual
+launcher with `--version` in that checkout. A working global launcher does not
+prove that mise, a shim or the child install selects the same version. Use the
+declared version through mise when available. If the launcher is broken and the
+checkout provides `npm run install-pnpm`, inspect that script before using its
+repository-supported bootstrap. Do not reinstall a working launcher or hard-code
+one checkout's version for the other checkouts.
+
+Query the selected manager's effective registry in the target checkout before
+downloads. Do not assume pnpm inherits npm's registry configuration. When the
+selected manager loses an existing approved registry, preserve that registry
+process-locally for the integration/analyzer process and verify the effective
+value again. pnpm 12 uses `PNPM_CONFIG_REGISTRY`; use the configuration mechanism
+supported by the selected version. Record the registry selection and launcher
+version without credentials. Do not force public npm or hard-code a
+machine-specific feed. Persistent user/global configuration changes require an
+explicit user choice; never disable certificate verification. Successful metadata
+access alone does not prove tarball integrity or candidate installation.
+
+Derive readiness probes and required build selectors from the destination and
+coverage plan before installation. Check repository/core tooling, the actual
+test runner and required workspace entrypoints. A missing workspace `dist` needs
+its dependency-closure build, not another install.
+
+When a required dependency is missing, use a frozen, filtered install with
+`--ignore-scripts`, as in the existing development and promotion setup profiles.
+For an implementation requiring real-spec coverage, substitute the actual owning
+package in this command; omit only selectors not needed by the declared plan:
+
+```powershell
+mise exec -- pnpm install --filter . --filter ./core `
+  --filter "<owning-package>..." `
+  --filter "@azure-tools/typespec-autorest..." `
+  --filter "@azure-tools/typespec-azure-rulesets..." `
+  --filter "@typespec/integration-tester..." `
+  --filter "@typespec/prettier-plugin-typespec..." `
+  --frozen-lockfile --ignore-scripts
+```
+
+The root/core selectors materialize build tools; the remaining selectors cover
+native validation, emission/injection and TypeSpec formatting without selecting
+the temporary linter. Keep the configured registry and lockfile unchanged.
+Do not escalate to a script-enabled full-workspace install merely because one
+link or build output is missing: unrelated emitter lifecycle hooks can provision
+Python environments and contact PyPI outside the native task's dependency plan.
+
+Ignoring install scripts is not a build/test pass. Run the declared dependency
+builds, import/bin smoke checks and required native validation afterward. If a
+required package needs a lifecycle output, inspect its exact script and apply
+the existing dependency/recovery policy at that scope. Never disable TLS checks
+or call unrelated lifecycle failures passing. Preserve an accidentally broader
+command's failed receipt and reconcile it under the existing bounded correction
+policy; this profile grants no new external-operation retry or gate waiver.
 
 ## Legacy preparation
 

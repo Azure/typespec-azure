@@ -1,6 +1,6 @@
 ---
 name: analyze-native-lint-coverage
-description: Run merged or unmerged official TypeSpec Azure lints against real specs. Compare one-to-one, one-to-many or explicit many-to-one mappings using fresh or verified reusable Swagger baselines. Preserve member evidence and diagnostic counts without assuming equal totals prove equivalence; defer general many-to-many.
+description: Run merged or unmerged official TypeSpec Azure lints against real specs using a pinned shared Swagger baseline first. Compare one-to-one, one-to-many or explicit many-to-one mappings without regenerating Swagger. Preserve member evidence and diagnostic counts; defer general many-to-many.
 argument-hint: "[PR URL or native rule] [Swagger validator IDs] [optional baseline run or specs filter]"
 user-invocable: true
 ---
@@ -12,6 +12,15 @@ it into `tsp-lintdiff-local-linter`. Merged and unmerged implementations use the
 same artifact-injection and comparison path. This is an analysis workflow, not
 authorization to modify the rule, enable it by default, or rewrite the migration
 queue.
+
+## Cost-aware invocation
+
+Read the shared [analysis-first policy](../shared/analysis-first-lint-migration.md)
+before execution. Prefer source/semantic analysis, saved observations and focused
+regressions while editing a rule. Full native verification is expensive even
+when Swagger data is reused; do not invoke it automatically after each edit.
+Record the question or required final gate, estimate and budget before starting.
+Retain required fresh final coverage and every evidence/control gate below.
 
 ## Inputs and contract
 
@@ -51,6 +60,13 @@ multiple validators combined with multiple native rules are rejected. Do not
 invent a mapping-file CLI option. Separate historical member comparisons remain
 scoped evidence; do not add their shared native counts together.
 
+For an evidenced template/library outcome without a registered native lint,
+use the [native-package evidence lane](package-evidence.md) instead of inventing
+a mapping. Its explicit `--native-package` selector retains artifact injection,
+full-population source/Swagger observations and the existing acceptance gates.
+Native finding counts and comparison metrics are not applicable, not zero or
+equivalent. Successful compilation alone does not prove native enforcement.
+
 For many-to-one comparisons, a shared native rule can report checks unrelated
 to the selected Swagger rule. Matching project sets can therefore hide a missing
 check. Verify each validator's material checks with discriminating violating and
@@ -73,29 +89,46 @@ distinct observations; location coincidence does not establish semantic overlap.
 The tool sums raw member occurrences and counts native diagnostics once. It does
 not automatically normalize cross-validator overlap or actionable units.
 
-## Fresh selection, immutable run
+## Shared baseline first, immutable run
+
+Follow the [monthly evaluation snapshot](shared-baseline.md#monthly-evaluation-snapshot):
+reuse one frozen specs commit across the dependency-upgrade cycle while new
+native branches start from current canonical main. Assess actual compatibility
+before proposing refresh; Git SHA differences alone are not semantic evidence.
+Current analyzer restrictions still apply; this policy adds no bypass or new CLI.
 
 1. Record the caller's current branch before any checkout. Do not change its
    base merely because the candidate targets `main`.
-2. Discover or prepare dedicated candidate and specs checkouts. Never reset,
-   clean, or appropriate another task's checkout. Keep auxiliary checkouts under
-   the caller's worktrees boundary, default `C:\dev\worktrees`.
-3. For a new baseline, fetch the candidate's current head and the current
-   `Azure/azure-rest-api-specs:typespec-next` branch. Select them once for this
-   run. For a merged pilot, use current canonical `main` containing the merge,
-   not a historical merge SHA as the permanent default. For explicit reuse,
-   read the baseline's specs/closure instead of resolving latest again.
-4. Resolve a compatible compiler/library closure from the candidate checkout,
+2. Discover and pin the shared descriptor **before** choosing specs or installing
+   dependencies. Follow [shared-baseline.md](shared-baseline.md): fetch the metadata
+   branch, record its exact commit, and read the descriptor at that commit.
+   Resolve its immutable version descriptor, archive and frozen `source.commit`.
+   Missing, corrupt, unavailable or incompatible data blocks migration with the
+   exact prerequisite; never silently run the Swagger generator.
+3. Prefer verified compatible local candidate, specs and combined
+   coverage/evidence worktrees before creating missing roles. Follow the
+   [reuse contract](../do-linter-development-task-one-by-one/preparation.md#native-first-worktree-reuse).
+   Native-first queues use three persistent worktrees; replay shares the
+   evidence role, with temporary isolation for required recovery verification.
+   Never reset, clean, or appropriate another task's checkout. Keep auxiliary
+   checkouts under the caller's worktrees boundary, default `C:\dev\worktrees`.
+   Prepare each candidate's separate writable specs runtime at the descriptor's
+   frozen source commit, not the metadata commit or latest `typespec-next`.
+4. Resolve the candidate's current head once. For a merged candidate, select
+   canonical `main` containing the merge. Keep this identity separate from the
+   baseline producer's candidate. Do not fetch moving refs again midtask.
+5. Resolve a compatible compiler/library closure from the candidate checkout,
    including its actual `core` gitlink. Do not independently install arbitrary
    `latest` compiler and Azure packages. If newer specs require newer APIs,
    report the mismatch; do not silently downgrade specs or drop failed projects.
-5. Record the resolved SHAs, package/tool versions, selection policies and
-   build/pack commands. Freeze them through the run. A baseline refresh resolves
-   fresh references; second/third candidate runs can select the same completed
-   baseline. Never refresh a moving ref halfway through a comparison.
+6. Record the descriptor commit, resolved SHAs, package/tool versions, selection policies and
+   build/pack commands. Freeze them through the run. Related rule comparisons
+   reuse the same shared baseline; changing the validator selector alone does
+   not invalidate it. Only a separately requested producer refresh resolves new
+   specs sources and executes the Swagger suite.
 
 The tool snapshots the supplied clean checkouts, not remote branch names. The
-skill owns freshness selection. Preserve build logs proving that artifacts were
+skill owns descriptor selection and pinning. Preserve build logs proving that artifacts were
 built from the selected candidate; artifact hashes alone do not prove that
 source-to-build relationship.
 
@@ -103,17 +136,27 @@ For related mapping comparisons, resolve the candidate and specs references
 once, then replay those exact commits and artifacts for each invocation instead
 of fetching a new latest snapshot between comparisons. Use a distinct empty
 output directory for every invocation and record all policy differences.
-Run them serially when they share a writable specs checkout.
+Shared immutable baseline data stays read-only. Parallel candidates require
+separate writable specs runtimes: injection patches dependencies and must not
+race. A shared writable checkout can only be used serially under exclusive ownership.
 
 ### Baseline lifecycle
 
-Without `--baseline-run`, the analyzer generates a fresh dataset and writes
-schema-2 `manifest.json` plus schema-1 `baseline.json`. To reuse that completed
-run, pass `--baseline-run <absolute-completed-run-directory>` with the usual
+Default to a downloaded, verified shared Swagger-only sealed run. Pass
+`--baseline-run <absolute-completed-run-directory>` with the usual
 candidate/specs/tarball options and a **new empty output directory**. This skips
 both Swagger generation and validator execution. It still patches/installs the
 candidate and reruns native workers; it does not reuse stale native findings.
-The old schema-1 pilot manifests are evidence, not reusable schema-2 baselines.
+The shared run has schema-2 `manifest.json`, schema-1 `baseline.json`, and all
+schema-4 dataset files. Its `assessmentMode: swagger-baseline`,
+`completionScope: swagger-only` and `nativeAssessment: not-run` seal only Swagger
+completion. They do not claim a native pass. The old schema-1 pilot manifests
+are evidence, not reusable schema-2 baselines.
+
+Without `--baseline-run`, the existing analyzer generates Swagger and executes
+validators. That path is **producer-only**, for a separately requested shared
+baseline creation/refresh, not a missing-cache recovery during migration.
+Retain older immutable assets. See the [producer procedure](shared-baseline.md#explicit-producer-refresh).
 
 Reuse verifies completion, source/runtime/generator/settings compatibility,
 project success/inventory, dataset schema/index/shards and every retained file's
@@ -129,8 +172,11 @@ assertions. See the exact receipt schema and compatibility boundary in
 [native-coverage.md](../../../packages/typespec-lintdiff/docs/native-coverage.md).
 This is not a signed attestation or automatic semantic proof. Review changed
 lint code, installation manifests/locks and emission effects; uncertainty,
-changed dependencies/metadata/emitter or an unsupported closure requires a new
-baseline, not an unsupported `--force` flag.
+changed dependencies/metadata/emitter or an unsupported closure blocks the
+comparison pending supported compatibility verification or a separately
+authorized shared producer refresh. Distinguish a verifier restriction from
+proven emission changes; do not use an unsupported `--force` flag or regenerate
+per rule by default.
 
 A receipt-required attempt preserves both identities in its manifest/error.
 Review that evidence, then use a new output directory for the approved run;
@@ -159,6 +205,11 @@ prove portable CLI reuse.
 Read that checkout's toolchain and package-manager configuration. Check mise
 first and use `mise exec --` where available. Initialize `core` at its gitlink.
 Install only missing prerequisites or changed dependency manifests.
+Use the [native dependency profile](../do-linter-development-task-one-by-one/preparation.md#native-first-dependency-profile)
+for candidate setup: select the required official-package/tool closures, install
+with `--frozen-lockfile --ignore-scripts`, then run the required builds and smoke
+checks explicitly. Do not invoke unrelated emitter lifecycle setup as a proxy
+for candidate readiness.
 
 Use the existing external-integration architecture:
 
@@ -198,7 +249,8 @@ node --import tsx/esm test\harness\native-coverage.ts `
   --tgz-dir C:\dev\coverage-artifacts\candidate `
   --validator-rule EnumInsteadOfBoolean `
   --tsp-rule @azure-tools/typespec-azure-core/no-boolean `
-  --scope boolean-http `
+  --scope source `
+  --baseline-run C:\dev\coverage-baselines\verified-compatible-baseline `
   --output C:\dev\coverage-runs\enum-pilot `
   --concurrency 2
 ```
@@ -208,12 +260,15 @@ both input checkouts. Never overwrite a prior run. The package script
 `coverage:native` is also available when both checkouts use the same manager.
 Do not insert an extra `--` between that package script and its options.
 
-Start with a representative `--filter <literal-substring>` and optional
-`--limit <positive-integer>`. The filter is case-sensitive and is not a regex.
-Verify a nonempty selected population and target activation with known
-violating/compliant controls before an expensive corpus run. Then omit both
-options for the full discovered ARM corpus when required. A scoped pilot is
-partial evidence, never full-corpus validation.
+Use injected positive/compliant lightweight controls as representative preflight,
+then run the full compatible baseline population. The published full ARM
+`scope: source`, no-filter/no-limit baseline cannot be reused with a different
+`boolean-http` scope, a `--filter`, or a `--limit`. Select a separately produced
+compatible baseline or report that exact blocker; do not invent filtered reuse.
+The example still requires artifact/runtime compatibility with the selected asset.
+An explicitly requested separate pilot producer may use a case-sensitive literal
+`--filter` and optional positive `--limit`, but its reduced population is partial
+evidence and never substitutes for the full saved-population readout/native run.
 
 From the tooling repository root, run the injected-package controls with
 `NATIVE_COVERAGE_SPECS_REPO` set to the prepared specs checkout:
@@ -247,8 +302,8 @@ production semantics as part of this analysis.
 Repeat `--tsp-rule` for an explicit one-to-many mapping. Do not credit unrelated
 diagnostics from an existing rule without investigating their attribution.
 For an admitted many-to-one group, repeat `--validator-rule` instead and retain
-exactly one native ID. For a second candidate run add `--baseline-run` and, when
-required, a reviewed compatibility receipt; all other required options remain.
+exactly one native ID. Every migration candidate run uses `--baseline-run`; add a reviewed compatibility
+receipt when required. All other required options remain.
 Production ruleset enablement is not changed: the worker explicitly enables the
 mapped rules only for the comparison, removes conflicting configuration-level
 disable entries, preserves directly configured and inherited rule options, and
@@ -340,11 +395,14 @@ to equalize counts.
 ## Deliverable
 
 Write `migration.md` using the shared
-[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Highlight evidenced core behavior alongside remaining gaps, distinguish targeted
-corner-case tests from production prevalence, and provide quick inline examples
-with direct links to the others. Keep full evidence and reproduction details in
-a linked appendix; brevity does not waive any required control or investigation.
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Link the original Swagger linter in the short conclusion. Keep raw diagnostic
+totals distinct from project counts and justified after-analysis counts. Explain
+only differing projects/diagnostic groups in section 4, with direct links to
+grouped evidence and code-backed examples in the appendix. Put technical context
+in NOTES, not a standalone fifth examples/actions section. Preserve behavior
+coverage, material gaps and all required controls, investigations and replay
+evidence; test-case counts do not measure production prevalence.
 
 Return the report path, candidate/specs identities, actual loaded packages,
 selected/assessable/failed population, raw and aligned results, scope limitations,
@@ -356,7 +414,10 @@ percentage.
 For publication, put concise, reproducible pilot evidence in authored tooling
 documentation; keep generated corpora and machine-specific payloads out of Git.
 The skill's orchestration must push the dedicated personal-fork evidence branch,
-verify its actual remote head and return immutable note/receipt links. Include
+verify its actual remote head and return the actual branch-based report URL for
+the PR plus separate immutable note/receipt links for audit and replay. Keep the
+PR URL unchanged across report updates under the
+[shared PR description contract](../shared/migration-pr-description.md). Include
 the specs retention method and the instructions needed to recover inputs and
 regenerate data and `migration.md`. Distinguish reading saved evidence,
 reanalyzing downloaded observations and fully rerunning the frozen comparison;

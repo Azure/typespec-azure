@@ -73,30 +73,57 @@ and a history-preserving handoff, never fresh retry budgets.
 
 Follow [preparation](preparation.md#native-first-preparation) and
 [publication](app-session-execution.md#native-first-publication). Verify the
-whole input and both publication roles before costly setup. Resources are:
+whole input and both publication roles before costly setup. Use three persistent
+worktrees, preferring compatible local resources under the
+[reuse contract](preparation.md#native-first-worktree-reuse):
 
 - Native task worktree/branch based on fetched canonical `main`; canonical
   head and one PR against `Azure/typespec-azure:main`.
 - Isolated writable specs runtime at the selected baseline's specs commit.
-- Evidence worktree/branch in the verified signed-in user's personal fork.
+- Combined coverage/evidence worktree/branch in the verified signed-in user's
+  personal fork.
+  Store coverage runs, replay inputs, reports and `migration.md` here; large or
+  machine-specific local inputs stay ignored. No fourth persistent replay
+  worktree is required.
   The evidence role is not permission for a fork native/skill PR.
+
+Additional required inputs and checks do not add persistent worktree roles:
+
 - Specs source retention under the [evidence contract](evidence.md#specs-source-retention):
   prefer a verified personal specs preservation branch at the frozen source SHA,
   with source recovery and publication capability recorded separately.
-- A versioned tooling checkout and immutable validation snapshot only when
-  needed. Canonical `main` need not contain the comparison package or skills.
+- Pinned tooling reused from a verified existing source or recovered in the
+  evidence worktree's ignored local area. Canonical `main` need not contain the
+  comparison package or skills. Keep required immutable validation snapshots
+  and independent fresh-checkout recovery verification temporary.
 
 All execution checkouts obey `worktrees_folder` physical containment, ownership
-and non-overlap checks. Only recorded shared tooling/evidence resources may be
+and non-overlap checks. Recorded shared specs/tooling/evidence resources may be
 reused between tasks, serially under a lock; a writable specs runtime must not
-be shared concurrently. Keep task execution logs ignored, with the existing
-append-only timestamps/heartbeat contract.
+be shared concurrently. Do not reuse a native publisher for an unrelated task
+without the required new branch/publication binding. Keep task execution logs
+ignored, with the existing append-only timestamps/heartbeat contract.
 
-For new tasks, resolve latest canonical base/specs once. On subsequent runs use
-the selected baseline and recorded SHAs, not a newly fetched specs tip. Never
+For new tasks, discover and pin the
+[shared Swagger baseline first](../analyze-native-lint-coverage/shared-baseline.md),
+before selecting specs or installing dependencies. Record its metadata commit
+and immutable descriptor/archive identity. Select the canonical candidate base
+once, but prepare specs at the descriptor's frozen `source.commit`, not the
+metadata commit or a newly fetched specs tip. Missing/corrupt/incompatible
+shared data blocks migration; only a separately requested producer refresh
+runs the Swagger suite. Changing validator IDs alone does not invalidate the
+all-production-ARM observation baseline. Never
 substitute arbitrary latest compiler packages: use the candidate's compatible
 closure and actual core gitlink. Verify prerequisite layers before installing;
 install only missing/invalid dependencies or changed manifests.
+
+Apply the [monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
+new native branches use current canonical main, but coverage reuses the same
+specs commit throughout the dependency-upgrade cycle. New PRs or source SHAs
+alone do not justify baseline refresh. Assess actual changes and distinguish
+semantic incompatibility from the current verifier's stricter restrictions.
+Unsupported reuse remains a comparison blocker, not automatic refresh approval
+or permission to skip any required gate.
 
 ## Execute one implementation, with two review checkpoints
 
@@ -110,7 +137,11 @@ install only missing/invalid dependencies or changed manifests.
    or record the exact outstanding handoff. Uncertain classifications block.
 2. **Implement and validate natively.** Use
    [implementation](../typespec-lint-implement/SKILL.md) and
-   [validation](../typespec-lint-validate/SKILL.md). Keep one canonical behavior
+   [validation](../typespec-lint-validate/SKILL.md), following the shared
+   [analysis-first edit loop](../shared/analysis-first-lint-migration.md).
+   Decide fixes from upstream/native semantics and saved evidence, then use
+   focused regressions. Do not launch full coverage for each source edit.
+   Keep one canonical behavior
    suite; test every member's meaningful branches and valid controls. Include
    A-only/B-only/both/neither and interaction cases where authorable; document
    implications rather than invent impossible cases. Map legacy fixtures to
@@ -127,17 +158,34 @@ install only missing/invalid dependencies or changed manifests.
    establish that identity, stop rather than claiming a dirty build came from
    HEAD. Complete required checks and independent local review before the task
    commit/publication.
-4. **Compare and investigate.** Use
+4. **Compare and investigate.** After coherent edits and focused checks stabilize,
+   record the coverage question/gate, estimated cost and runtime budget under the
+   shared analysis-first policy. Use
    [official-package coverage](../analyze-native-lint-coverage/SKILL.md), a
-   compatible retained baseline, representative preflight, then the declared
+   pinned shared compatible baseline, lightweight injected positive/compliant
+   preflight controls, then the declared
    full required population. Apply the count policy below and
    [gap analysis](../analyze-swagger-typespec-lint-gap/SKILL.md).
    Keep compile/parse/worker/projection failures unassessed. Investigate every
    one-sided project and both directions of outliers. Do not change the rule
-   simply to equalize counts. A reduced pilot is not a full-run pass.
+   simply to equalize counts. Read the full saved population and selected
+   index/shard; an absent shard requires production-registration/audience proof
+   before reporting zero rather than not-evaluated. A reduced pilot is not a
+   full-run pass. A full unfiltered baseline cannot be reused with a filtered
+   pilot or different scope; do not silently regenerate Swagger.
+   For an evidenced template/library outcome without a registered native lint,
+   use the explicit [native-package evidence lane](../analyze-native-lint-coverage/package-evidence.md).
+   Preserve injection, controls, full population, investigation and both reviews;
+   native finding/comparison metrics are not applicable, not zero or equivalent.
 5. **Checkpoint A: development review.** After all required development checks
    and independent local review, publish/update the one native draft PR, with
-   pushed evidence links. Run a separate
+   the shared [PR title and two-section body](../shared/migration-pr-description.md).
+   Native rule implementations use
+   `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`,
+   matching promotion PRs; the destination name is the final unqualified
+   `createRule({ name })` value, not the validator slug.
+   Link the published `migration.md`, which retains all required evidence.
+   Run a separate
    [/loop-for-fix-and-review](../loop-for-fix-and-review/SKILL.md#native-migration-context)
    invocation carrying `flowVersion: native-first`, task/members and
    `checkpoint: development-review`. Preserve the full five-round limit,
@@ -200,8 +248,11 @@ requires a separate design.
 ## Baselines and evidence publication
 
 Follow the [coverage lifecycle](../analyze-native-lint-coverage/SKILL.md#baseline-lifecycle)
-and [evidence contract](evidence.md). Create latest once, reuse compatible
-completed data, and refresh into a new immutable baseline. Separate frozen
+and [evidence contract](evidence.md). Discover/pin shared completed data first,
+reuse it across rules, and reserve fresh source selection/Swagger execution for
+an explicitly requested separate producer refresh into a new immutable baseline.
+Keep shared input read-only and each parallel candidate's writable specs runtime
+separate. Separate frozen
 emitter/Swagger inputs from changed native artifacts. Specs SHA equality alone
 does not establish compatibility; compiler/emitter/metadata/dependency/policy
 changes invalidate affected evidence. Never claim unsupported caching or invent
@@ -261,7 +312,10 @@ reconciliation procedure, not an unlimited wait or polling loop.
 
 Finish the task and review loops before applying the existing independent skill-update
 policy; native-first does not authorize recursive or mixed post-run skill PRs.
-Keep legacy as the default until singleton and many-to-one pilots, cached second/
-third runs, fork replay, failure/attribution controls, both review checkpoints
-and app/explicit publication routing have actually passed. Text instructions
-or a historical eight-project pilot do not satisfy those rollout gates.
+Native-first is the default for new rule-ID and task-file queues, not a waiver
+of validation or evidence requirements. Keep singleton and many-to-one pilots,
+cached second/third runs, fork replay, failure/attribution controls, both review
+checkpoints and app/explicit publication routing in acceptance tracking.
+Record unverified paths as unverified; changing the default does not establish
+that these checks passed. Text instructions or a historical eight-project pilot
+do not replace the required evidence or any applicable task gate.

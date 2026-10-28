@@ -1,7 +1,7 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Support opt-in native-first development on canonical main, explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
-argument-hint: "[--flow legacy|native-first] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
+argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
 user-invocable: true
 ---
 
@@ -18,16 +18,22 @@ This skill has two versioned execution contracts:
 
 Accept exactly one optional queue-level `--flow legacy|native-first`. Parse and
 remove it before applying the selected input grammar; reject duplicate, unknown
-or missing values before setup. With no selector, preserve `legacy` until a
-separately reviewed default switch verifies the native-first acceptance gates.
-Never edit or push directly to `main`.
+or missing values before setup. New rule-ID and task-file queues default to
+`native-first`; `--flow native-first` remains valid but is not required.
+Use `--flow legacy` for new rule-ID queues that need temporary-library development
+and separate promotion. Never edit or push directly to `main`.
 
-Read the recorded `flowVersion` first on resumption. A selector cannot retarget
-an existing task, change its ownership, or reset its budgets. Put queue options
+Read the recorded `flowVersion` first on resumption, before applying any default.
+Resume that flow when the selector is omitted; reject a conflicting selector.
+A default change cannot retarget an existing task, change its ownership, or reset
+its budgets. Put queue options
 on separate lines outside prepared worker commands; never extract `--flow` or
 `--worktrees-folder` from inside their strict command grammar. Old prepared
 `/develop-lintdiff-rule --worker` commands remain legacy; reject them with
 `--flow native-first`, rather than rewriting their branch or arguments.
+For compatibility, a new queue containing prepared worker commands and no
+selector uses `legacy` for the whole queue, including any mixed rule-ID entries.
+This exception does not apply to ordinary rule-ID or task-file queues.
 
 In native-first mode, rule-ID tokens create singleton tasks. Alternatively,
 accept exactly one `--task-file <absolute-json-path>` for an ordered list of
@@ -39,8 +45,8 @@ Queue options belong outside the JSON. In legacy mode reject `--task-file`;
 the legacy worker grammar is unchanged.
 
 ```text
-/do-linter-development-task-one-by-one --flow native-first EnumInsteadOfBoolean
-/do-linter-development-task-one-by-one --flow native-first --task-file C:\dev\migration-tasks.json
+/do-linter-development-task-one-by-one EnumInsteadOfBoolean
+/do-linter-development-task-one-by-one --task-file C:\dev\migration-tasks.json
 ```
 
 These are alternative invocations, not instructions to remigrate the merged
@@ -50,12 +56,34 @@ example. Native-first runs must read [native-first.md](native-first.md), the
 and **must not fall through to the legacy phases below**. Keep one active task
 at a time. Both flows preserve required validation, independent local review,
 bounded GitHub review/fix, publication approval, and quiescence.
+Native-first coverage discovers and pins the
+[shared Swagger baseline](../analyze-native-lint-coverage/shared-baseline.md)
+before specs setup. It reruns native diagnostics, not the Swagger suite.
+Only an explicitly requested separate producer creates or refreshes shared data.
+
+Native-first tasks use three persistent worktrees: native development, specs
+runtime, and combined coverage/evidence. Prefer verified compatible local
+worktrees before creating missing roles; follow the
+[reuse and isolation checks](preparation.md#native-first-worktree-reuse).
+Fresh-checkout recovery verification remains required, but uses temporary
+isolation rather than a fourth persistent replay worktree.
+
+Both flows follow the shared
+[analysis-first edit loop](../shared/analysis-first-lint-migration.md).
+Decide source changes through semantic analysis and focused regressions.
+Treat full coverage as an expensive, justified checkpoint after coherent edits
+stabilize, not a per-edit debugger. Preserve all final verification/review gates.
 
 Both flows must create or refresh `migration.md` under the shared
-[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
 Review the concise report and its linked evidence together: preserve evidenced
 positives, actual counts, core/corner-case context and quickly accessible examples
 without weakening any required investigation or acceptance gate.
+
+All rule PR descriptions follow the shared
+[two-section PR body](../shared/migration-pr-description.md): original Swagger
+documentation/logic links, then the published `migration.md` link. Keep detailed
+analysis and required evidence in that report, not additional PR sections.
 
 ## Legacy contract
 
@@ -160,8 +188,8 @@ that line retains its strict grammar below. For prepared-command input, place
 resolved folder to subskills as handoff metadata, not as a new worker flag.
 
 ```text
-/do-linter-development-task-one-by-one TagsAreNotAllowedForProxyResources
-/do-linter-development-task-one-by-one --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --flow legacy TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --flow legacy --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
 ```
 
 These are alternative invocations, not a two-entry queue.
@@ -184,7 +212,7 @@ Every prepared worker command must:
 - include exactly one `--target-branch feature/lintdiff-migration-new`
 - contain no other flags or positional arguments
 
-For example, `/do-linter-development-task-one-by-one ParametersInPointGet PatchBodyParametersSchema`
+For example, `/do-linter-development-task-one-by-one --flow legacy ParametersInPointGet PatchBodyParametersSchema`
 prepares and completes the first rule before preparing the second.
 
 Determine the form for each line before parsing: a line beginning with
@@ -881,6 +909,10 @@ one session to execute both publication phases.
 > development PR URL and pushed head. Pass the shared post-run policy's queue ownership
 > constraint to that skill: do not modify skills or create a skill-update PR;
 > return only evidence-backed, high-confidence suggestions to the outer agent.
+> Carry the shared [analysis-first policy](../shared/analysis-first-lint-migration.md)
+> into development and review handoffs: analyze findings and run focused
+> regressions before expensive corpus execution. Record its purpose and cost;
+> batch justified fixes without skipping required fresh final coverage.
 > Maintain the cycle handoff after every phase, preserving prior heads in history
 > and recording newly verified pushed heads before calling the next skill.
 >

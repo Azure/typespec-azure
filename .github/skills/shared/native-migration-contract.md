@@ -32,6 +32,10 @@ One group has one native policy, not an arbitrary bundle hidden under one ID.
 
 ## Completeness and test design
 
+Use the shared [analysis-first edit loop](analysis-first-lint-migration.md).
+Decide changes from semantic analysis and focused regressions; use costly
+real-spec coverage at justified checkpoints without weakening final evidence.
+
 Trace every material validator check, valid exception and branch to native
 metadata, discriminating tests or an explicitly justified structural prevention.
 Keep a separate member matrix for groups. A missing low-frequency member is not

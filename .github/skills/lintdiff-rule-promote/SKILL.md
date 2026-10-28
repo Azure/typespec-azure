@@ -290,7 +290,7 @@ validation commands below and only use bounded `validate:pr` with
    checkout as part of promotion; a separately requested source workspace follows
    the shared development preparation contract.
 5. If there are uncommitted source-rule changes, treat the current working tree
-   as the source only after making that explicit in the PR description.
+   as the source only after making that explicit in `migration.md`.
 
 ### 2. Recommend and select the destination library
 
@@ -1074,7 +1074,7 @@ Replace `<ValidatorRuleId>` with the original Swagger validator rule ID and
 `createRule({ name })` value, not the canonical validator slug or the source
 lintdiff rule name. For example:
 `[Swagger Linter Migration] XmsResourceInPutResponse -> use-resource-model-for-put`.
-Keep both names in the title even when the PR body already explains the mapping;
+Keep both names in the title and record the mapping details in `migration.md`;
 this preserves migration traceability in future Git history. See the
 [review suggestion on PR #5503](https://github.com/Azure/typespec-azure/pull/5503#discussion_r4046613960).
 Do not append environment or execution labels such as `devbox` or `heavy`.
@@ -1083,17 +1083,15 @@ implementation, including any rename made during promotion or review. Preserve
 an existing OPEN task PR's recorded title unless a correction is part of the
 request; this convention alone does not authorize renaming existing PRs.
 
-Write the PR description as an engineering explanation, not only a change list.
-It must include:
+Use the shared [two-section PR body](../shared/migration-pr-description.md):
+original Swagger documentation/logic links, then the published `migration.md`
+link. Add no other body content.
 
-- **Original Swagger linter:** include both of these direct GitHub hyperlinks
-  before listing a checklist of every specific check the original rule performs:
-  - `linter code: [<ValidatorRuleId>](<validator source URL>)`
-  - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
+Keep all of the following required analysis in `migration.md` or its linked
+appendix, within the shared four-section report plus NOTES contract:
 
-  Use the rule name and links from the fixture `rule.md` or validator repository.
-  Do not omit either link or replace them with unlinked paths.
-
+- **Original Swagger linter:** link the original documentation and implementation
+  and list every specific check the original rule performs.
 - **How the Swagger linter works:** explain the Swagger objects it inspects,
   traversal or lookup strategy, conditions and exemptions, diagnostic locations,
   and any known validator defects, stale maps, emitted-occurrence duplication, or
@@ -1132,14 +1130,14 @@ It must include:
   snapshots were not copied. For framework-only fixtures, write
   `Not ported (framework-only)` in the native-case column and explain which
   framework guarantee they exercise; do not create a rule test to fill the row.
-- **Migration evidence:** link directly to the rule's `migration.md` for the
-  declared focused tests, real-service project comparison, latest full-corpus
+- **Migration evidence:** retain the declared focused tests, real-service
+  project comparison, latest full-corpus
   counts, one-sided project explanations, compile failures, and remaining
-  uncertainty. Do not duplicate the detailed migration table or corpus
-  declaration in the PR description when `migration.md` already contains it.
+  uncertainty.
 - **Validation:** state the required checks and their outcomes. Failed or
   incomplete required checks block new publication; on an existing PR report
-  them as **Validation blocker** and stop the affected workflow.
+  them as **Validation blocker** in the migration report and workflow result,
+  and stop the affected workflow.
 - **Validation limitations:** disclose any failed, skipped or deadline-limited
   supplemental run with its command, scope, evidence, unresolved cause and
   disposition. Distinguish it from a required blocker; never claim the full
@@ -1151,7 +1149,8 @@ It must include:
   bounded return-to-development flow and refresh this PR only after clean source
   review. Never describe source-rule edits as part of promotion itself.
 
-Prefer concrete examples, project names, and before/after evidence. Avoid a
+In the migration report, prefer concrete examples, project names, and
+before/after evidence. Avoid a
 generic bullet such as "promote lint rule" without explaining the actual rule
 behavior and why the destination package is correct.
 

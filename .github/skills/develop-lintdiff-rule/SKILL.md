@@ -12,7 +12,8 @@ Use this skill to implement or correct migrated Swagger validator rules in
 
 This remains the legacy temporary-library workflow. For direct official-package
 development use
-[/do-linter-development-task-one-by-one --flow native-first](../do-linter-development-task-one-by-one/native-first.md).
+[/do-linter-development-task-one-by-one](../do-linter-development-task-one-by-one/native-first.md),
+which defaults new rule-ID and task-file queues to native-first.
 Do not rewrite prepared worker commands, retarget an existing development PR,
 or invoke this worker from a native-first task. The native boundary/completeness
 sections below remain reusable requirements through the
@@ -327,6 +328,11 @@ direct linter-package link within the specs checkout.
 
 The top-level worker works only in the supplied typespec-azure worktree.
 
+Follow the shared [analysis-first edit loop](../shared/analysis-first-lint-migration.md):
+use source semantics, saved diagnostics and focused regressions to decide fixes.
+Full corpus execution is an expensive checkpoint, not the default way to decide
+what code to change. Required final validation and review remain unchanged.
+
 ### 1. Establish evidence
 
 - Read the fixture `rule.md`, production TypeSpec rule, fixtures, snapshots,
@@ -376,7 +382,7 @@ corpus evidence.
 Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
 to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
 comparisons and legacy validator mechanics in a dedicated migration section,
-`migration.md`, and the PR description, rather than teaching them as native usage.
+`migration.md`, or its linked appendix, rather than teaching them as native usage.
 
 #### Native TypeSpec implementation boundary
 
@@ -636,6 +642,11 @@ use the existing synchronization/recovery contract; fetching alone is not mergin
 
 ### 4. Run the existing corpus analysis
 
+Enter this checkpoint after coherent source edits and focused checks stabilize.
+Record the question or required gate, estimated cost and runtime budget before
+execution. If findings require changes, analyze the saved evidence and batch
+justified fixes with focused regressions before another required full run.
+
 Use the existing full runner; do not add a per-rule runner:
 
 ```powershell
@@ -687,9 +698,10 @@ perform and document this attribution during the migration investigation rather
 than assuming every raw TypeSpec-only diagnostic applies to the retained
 Swagger version.
 
-If a quick iteration is needed first, use the existing `--filter`, `--limit`,
-and `--concurrency` options. The final behavioral check should use the full
-corpus when practical.
+When analysis and focused fixtures leave a specific real-spec question, use the
+existing `--filter`, `--limit`, and `--concurrency` options for a targeted
+reproduction. This supplements, not replaces, the required representative
+preflight and full corpus validation.
 
 `--filter` is one **case-sensitive literal substring** of a dataset project's
 `sourcePath`, not a regex or rule ID. For example, use
@@ -731,15 +743,17 @@ the newly generated results. This step is required for every rule that proceeds
 through the Development workflow, including runs that started with an empty
 diff or required no production rule change.
 
-#### Use the shared five-section report
+#### Use the shared four-section report plus NOTES
 
 Follow the [migration report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note):
 conclusion and scope; actual coverage; function-level coverage; count differences;
-examples and required action. Lead with evidenced standard-case successes as
-well as remaining limits. Separate representation corner cases from missing
-core behavior; a targeted stress-test percentage is not production coverage.
-Include a working example when supported and link each remaining material case
-directly to its small source/schema explanation.
+then NOTES. Name and hyperlink the original Swagger linter, state the
+evidence-backed conclusion briefly, and distinguish diagnostic totals from
+project counts. Keep only differing projects/diagnostic groups in the difference
+section. Put technical context in NOTES and code-backed examples under directly
+linked appendix groups; do not add a standalone fifth examples/actions section.
+Separate representation corner cases from missing core behavior; a targeted
+stress-test percentage is not production coverage.
 
 If comparison is blocked, state the blocker instead of implying parity. If
 counts match, do not treat equality as proof of equivalence. Do not lead with
@@ -880,7 +894,7 @@ The reviewer must:
   `refs/remotes/origin/<target-branch>`, not a same-named local branch
 - inspect the production rule, fixtures, snapshots, `rule.md`, `migration.md`
   and its linked supporting evidence
-- verify the shared five-section migration report: evidenced positives,
+- verify the shared four-section migration report plus NOTES: evidenced positives,
   actual counts, core/corner-case context, concrete causes, rule-change decision
   and material uncertainty must agree with the linked evidence; examples must
   be easy to reach, and stress-test percentages must not imply production coverage
@@ -1000,26 +1014,25 @@ creating a draft PR.
    promotion-style `->` mapping, or append the old `(origin)` suffix.
    The `[WIP]` prefix does not replace the
    requirement to create the PR as a draft.
-   Record the validator-to-local-TypeSpec mapping in the PR body, using the
+   Record the validator-to-local-TypeSpec mapping in `migration.md`, using the
    source lintdiff rule's actual unqualified `createRule({ name })` value.
    Do not substitute a proposed official name that will only be chosen during
    promotion, and confirm the mapping matches the final implementation.
    Do not append environment or execution labels such as `devbox` or `heavy`.
    Record actual base/head identities separately.
    For separately authorized or opted-in queue post-merge source repair, use
-   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and link
-   the original merged migration plus the new defect scope. Preserve an existing
+   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and record
+   the original merged PR link plus the new defect scope in `migration.md`.
+   Preserve an existing
    OPEN task PR's recorded title unless a correction is part of the request;
    this convention alone does not authorize renaming existing PRs.
-7. Write the PR description as an engineering explanation, not only a change
-   list. It must include:
-   - **Original Swagger linter:** include both of these direct GitHub hyperlinks
-     before listing a checklist of every specific check the original rule
-     performs:
-     - `linter code: [<ValidatorRuleId>](<validator source URL>)`
-     - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
-       Use the rule name and links from the fixture `rule.md` or validator
-       repository. Do not omit either link or replace them with unlinked paths.
+7. Use the shared [two-section PR body](../shared/migration-pr-description.md):
+   original Swagger documentation/logic links, then the published `migration.md`
+   link. Add no other body content.
+   Keep the following required explanation in `migration.md` or its linked
+   appendix, within the shared four-section report plus NOTES contract:
+   - **Original Swagger linter:** link the original documentation and
+     implementation and list every specific check the original rule performs.
    - **How the Swagger linter works:** explain the Swagger objects it inspects,
      traversal or lookup strategy, conditions and exemptions, diagnostic
      locations, and any known validator defects, stale maps, emitted-occurrence
@@ -1028,12 +1041,12 @@ creating a draft PR.
      targets inspected, important compiler or library APIs used,
      version/projection handling, diagnostic targeting and deduplication
      decisions, and how these choices match the intended Swagger behavior.
-   - **Migration evidence:** link directly to the rule's `migration.md` for the
-     declared focused tests, real-service project comparison, latest full-corpus
+   - **Migration evidence:** retain the declared focused tests, real-service
+     project comparison, latest full-corpus
      counts, one-sided project explanations, compile failures, and remaining
-     uncertainty. Do not duplicate the detailed migration table or corpus
-     declaration in the PR description when `migration.md` already contains it.
-8. Prefer concrete examples, project names, and before/after evidence. Avoid a
+     uncertainty.
+8. In the migration report, prefer concrete examples, project names, and
+   before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
 9. Return the PR URL as the rule's final workflow result.

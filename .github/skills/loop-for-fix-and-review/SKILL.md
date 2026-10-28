@@ -772,6 +772,13 @@ eligible for the per-test reduced-concurrency diagnostic above.
 
 ### Linter source changes
 
+For migration findings, apply the
+[analysis-first policy](../shared/analysis-first-lint-migration.md).
+Establish validity from source semantics and focused regressions, not an
+automatic full corpus run per comment. Batch the current round's justified
+fixes before expensive verification; preserve the required scope below and
+all inherited review/recovery limits.
+
 In native migration PR mode, follow the
 [official migration contract](../shared/native-migration-contract.md) and the
 task's predeclared required scope. Do not invoke temporary-rule development,
