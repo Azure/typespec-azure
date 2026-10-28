@@ -3,7 +3,7 @@ import {
   fileRef,
   getPagingOperation,
   isList,
-  isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
@@ -20,9 +20,9 @@ export const pageableRequires200ResponseRule = createRule({
     return {
       operation: (operation) => {
         if (
-          !isList(context.program, operation) ||
-          isTemplateDeclaration(operation) ||
-          (operation.interface && isTemplateDeclaration(operation.interface))
+          isTemplateDeclarationOrInstance(operation) ||
+          (operation.interface && isTemplateDeclarationOrInstance(operation.interface)) ||
+          !isList(context.program, operation)
         ) {
           return;
         }
