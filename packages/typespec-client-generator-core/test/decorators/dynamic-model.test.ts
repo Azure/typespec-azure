@@ -1,5 +1,5 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
@@ -261,47 +261,13 @@ describe("@dynamicModel", () => {
         (namespace) => namespace.name === "Renamed",
       );
       ok(renamed);
-      deepStrictEqual(
-        renamed.decorators,
-        overrideName === "namespace option" ? [] : [{ name: decoratorName, arguments: {} }],
-      );
+      deepStrictEqual(renamed.decorators, [{ name: decoratorName, arguments: {} }]);
       const otherPet = context.sdkPackage.models.find((model) => model.name === "OtherPet");
       ok(otherPet);
       deepStrictEqual(otherPet.decorators, []);
-      if (overrideName === "namespace option") {
-        const pet = context.sdkPackage.models.find((model) => model.name === "Pet");
-        ok(pet);
-        const isEffectivelyDynamic = (modelName: string) => {
-          const model = context.sdkPackage.models.find((item) => item.name === modelName);
-          ok(model);
-          const namespacePath: typeof context.sdkPackage.namespaces = [];
-          const findNamespacePath = (
-            namespaces: typeof context.sdkPackage.namespaces,
-            path: typeof context.sdkPackage.namespaces = [],
-          ): boolean => {
-            for (const namespace of namespaces) {
-              const nextPath = [...path, namespace];
-              if (namespace.models.includes(model)) {
-                namespacePath.push(...nextPath);
-                return true;
-              }
-              if (findNamespacePath(namespace.namespaces, nextPath)) {
-                return true;
-              }
-            }
-            return false;
-          };
-          findNamespacePath(context.sdkPackage.namespaces);
-          return (
-            model.decorators.some((decorator) => decorator.name === decoratorName) ||
-            namespacePath.some((namespace) =>
-              namespace.decorators.some((decorator) => decorator.name === decoratorName),
-            )
-          );
-        };
-        strictEqual(isEffectivelyDynamic("Pet"), true);
-        strictEqual(isEffectivelyDynamic("OtherPet"), false);
-      }
+      const pet = context.sdkPackage.models.find((model) => model.name === "Pet");
+      ok(pet);
+      deepStrictEqual(pet.decorators, []);
       expectDiagnostics(context.diagnostics, []);
     });
   }

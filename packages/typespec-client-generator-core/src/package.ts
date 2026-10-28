@@ -108,7 +108,6 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
       unionType,
     );
   }
-  preserveDynamicModelScope(context, sdkPackage, namespaceDecoratorSources);
 }
 
 function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
@@ -178,68 +177,6 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
     rawNamespace = rawNamespace.namespace;
   }
   return current;
-}
-
-function preserveDynamicModelScope<TServiceOperation extends SdkServiceOperation>(
-  context: TCGCContext,
-  sdkPackage: SdkPackage<TServiceOperation>,
-  namespaceDecoratorSources: Map<SdkNamespace<TServiceOperation>, Set<Namespace>>,
-) {
-  const dynamicModelDecoratorName = "Azure.ClientGenerator.Core.@dynamicModel";
-  const getNamespaceModels = (namespace: SdkNamespace<TServiceOperation>): SdkModelType[] => [
-    ...namespace.models,
-    ...namespace.namespaces.flatMap(getNamespaceModels),
-  ];
-  const isWithinNamespace = (model: SdkModelType, sourceNamespace: Namespace) => {
-    let namespace = getNamespaceFromType(model.__raw);
-    while (namespace) {
-      if (namespace === sourceNamespace) {
-        return true;
-      }
-      namespace = namespace.namespace;
-    }
-    return false;
-  };
-  const sameDecorator = (
-    left: SdkModelType["decorators"][number],
-    right: SdkModelType["decorators"][number],
-  ) =>
-    left.name === right.name && JSON.stringify(left.arguments) === JSON.stringify(right.arguments);
-
-  const namespaces = [...sdkPackage.namespaces];
-  while (namespaces.length > 0) {
-    const namespace = namespaces.pop()!;
-    namespaces.push(...namespace.namespaces);
-    const sourceDecorators = [...(namespaceDecoratorSources.get(namespace) ?? [])].flatMap(
-      (sourceNamespace) =>
-        ignoreDiagnostics(getTypeDecorators(context, sourceNamespace))
-          .filter((decorator) => decorator.name === dynamicModelDecoratorName)
-          .map((decorator) => ({ sourceNamespace, decorator })),
-    );
-    if (sourceDecorators.length === 0) {
-      continue;
-    }
-
-    const models = getNamespaceModels(namespace);
-    for (const { sourceNamespace, decorator } of sourceDecorators) {
-      const applicableModels = models.filter((model) => isWithinNamespace(model, sourceNamespace));
-      if (applicableModels.length === models.length || models.length === 0) {
-        continue;
-      }
-
-      const namespaceDecoratorIndex = namespace.decorators.findIndex((existing) =>
-        sameDecorator(existing, decorator),
-      );
-      if (namespaceDecoratorIndex >= 0) {
-        namespace.decorators.splice(namespaceDecoratorIndex, 1);
-      }
-      for (const model of applicableModels) {
-        if (!model.decorators.some((existing) => sameDecorator(existing, decorator))) {
-          model.decorators.push(decorator);
-        }
-      }
-    }
-  }
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
