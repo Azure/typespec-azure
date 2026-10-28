@@ -501,6 +501,189 @@ it("rejects merged catalogs with different password-flow token URLs", async () =
   ]);
 });
 
+it.each(["scopes", "flows", "schemes", "options"])(
+  "merges equivalent authentication with reordered %s without changing metadata order",
+  async (reordered) => {
+    const flows = [
+      `{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/token";
+        scopes: ["write", "read"];
+      }`,
+      `{
+        type: OAuth2FlowType.authorizationCode;
+        authorizationUrl: "https://login.example.com/authorize";
+        tokenUrl: "https://login.example.com/token";
+        scopes: ["write", "read"];
+      }`,
+    ];
+    const secondFlows = flows.map((flow) =>
+      reordered === "scopes" ? flow.replace('["write", "read"]', '["read", "write"]') : flow,
+    );
+    if (reordered === "flows") secondFlows.reverse();
+    const secondGroup = reordered === "schemes" ? "[Key, SecondAuth]" : "[SecondAuth, Key]";
+    const secondRequirements =
+      reordered === "options" ? `NoAuth | ${secondGroup}` : `${secondGroup} | NoAuth`;
+    const { program } = await AzureCoreTester.compile(`
+      model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+      model FirstAuth is OAuth2Auth<[${flows.join(",")}]>;
+      model SecondAuth is OAuth2Auth<[${secondFlows.join(",")}]>;
+      model FirstConfigurations {
+        Public: { endpoint: "https://example.com"; authentication: [FirstAuth, Key] | NoAuth };
+      }
+      model SecondConfigurations {
+        Public: { endpoint: "https://example.com"; authentication: ${secondRequirements} };
+      }
+      @service @azureServiceConfigurations(FirstConfigurations, "Public")
+      namespace First { @get @route("/first") op first(): void; }
+      @service @azureServiceConfigurations(SecondConfigurations, "Public")
+      namespace Second { @get @route("/second") op second(): void; }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
+    const client = context.sdkPackage.clients[0];
+    expect(client.methods.map((method) => method.name)).toEqual(["first", "second"]);
+    const auth =
+      client.clientInitialization.serviceConfigurations?.configurations[0].authentication;
+    expect(
+      auth?.options.map((option) => option.schemes.map((scheme) => scheme.model.name)),
+    ).toEqual([["FirstAuth", "Key"], ["NoAuth"]]);
+    const scheme = auth?.options[0].schemes[0];
+    if (scheme?.type !== "oauth2") throw new Error("Missing OAuth configuration");
+    expect(scheme.flows.map((flow) => flow.type)).toEqual([
+      "clientCredentials",
+      "authorizationCode",
+    ]);
+    expect(scheme.flows.map((flow) => flow.scopes.map((scope) => scope.value))).toEqual([
+      ["write", "read"],
+      ["write", "read"],
+    ]);
+  },
+);
+
+it.each([false, true])(
+  "compares OpenID Connect scopes in OAuth configurations: conflict=%s",
+  async (conflict) => {
+    const diagnostics = await AzureCoreTester.diagnose(`
+      ${definitions}
+      model FirstIdentity is OpenIdConnectAuth<"https://login.example.com", ["read", "write"]>;
+      model SecondIdentity is OpenIdConnectAuth<
+        "https://login.example.com",
+        ["${conflict ? "other" : "write"}", "read"]
+      >;
+      model FirstConfigurations {
+        Public: {
+          endpoint: "https://example.com";
+          authentication: PublicAuth | FirstIdentity;
+        };
+      }
+      model SecondConfigurations {
+        Public: {
+          endpoint: "https://example.com";
+          authentication: PublicAuth | SecondIdentity;
+        };
+      }
+      @service @azureServiceConfigurations(FirstConfigurations, "Public")
+      namespace First { @get @route("/first") op read(): void; }
+      @service @azureServiceConfigurations(SecondConfigurations, "Public")
+      namespace Second { @get @route("/second") op read(): void; }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    expectDiagnostics(
+      diagnostics,
+      conflict
+        ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
+        : [],
+    );
+  },
+);
+
+it.each([
+  {
+    name: "AND/OR grouping",
+    first: "[PublicAuth, Key] | GovernmentAuth",
+    second: "PublicAuth | [Key, GovernmentAuth]",
+  },
+  {
+    name: "repeated schemes",
+    first: "[PublicAuth, PublicAuth, Key]",
+    second: "[PublicAuth, Key, Key]",
+  },
+])("rejects merged authentication with different $name", async ({ first, second }) => {
+  const diagnostics = await AzureCoreTester.diagnose(`
+    ${definitions}
+    model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+    model FirstConfigurations {
+      Public: { endpoint: "https://example.com"; authentication: ${first} };
+    }
+    model SecondConfigurations {
+      Public: { endpoint: "https://example.com"; authentication: ${second} };
+    }
+    @service @azureServiceConfigurations(FirstConfigurations, "Public")
+    namespace First { @get @route("/first") op read(): void; }
+    @service @azureServiceConfigurations(SecondConfigurations, "Public")
+    namespace Second { @get @route("/second") op read(): void; }
+    @client({service: [First, Second], autoMergeService: true})
+    namespace Combined {}
+  `);
+  expectDiagnostics(diagnostics, [
+    { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
+  ]);
+});
+
+it("projects configuration-specific authentication and credential alternatives", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    ${definitions}
+    model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+    model GovernmentTokenAuth is OAuth2Auth<[{
+      type: OAuth2FlowType.clientCredentials;
+      tokenUrl: "https://government.example.com/token";
+      scopes: ["government.read"];
+    }]>;
+    model MixedConfigurations {
+      Public: {
+        endpoint: "https://public.example.com";
+        authentication: [PublicAuth, Key] | NoAuth;
+      };
+      Government: {
+        endpoint: "https://government.example.com";
+        authentication: GovernmentTokenAuth | Key;
+      };
+    }
+    @service @azureServiceConfigurations(MixedConfigurations, "Public")
+    namespace Service { @get op read(): void; }
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const client = context.sdkPackage.clients[0];
+  const configurations = client.clientInitialization.serviceConfigurations?.configurations;
+  expect(
+    configurations?.map((configuration) =>
+      configuration.authentication.options.map((option) =>
+        option.schemes.map((scheme) => scheme.model.name),
+      ),
+    ),
+  ).toEqual([
+    [["PublicAuth", "Key"], ["NoAuth"]],
+    [["GovernmentTokenAuth"], ["Key"]],
+  ]);
+  expect(
+    configurations?.map((configuration) =>
+      configuration.credential?.type.kind === "union"
+        ? configuration.credential.type.variantTypes.map((type) =>
+            type.kind === "credential" ? type.scheme.model.name : type.kind,
+          )
+        : [],
+    ),
+  ).toEqual([
+    ["PublicAuth", "Key", "NoAuth"],
+    ["GovernmentTokenAuth", "Key"],
+  ]);
+});
+
 it("rejects incompatible pairings even when flat HTTP servers and auth alternatives agree", async () => {
   const diagnostics = await AzureCoreTester.diagnose(`
         model AuthA is AadOauth2Auth<["a.read"]>;

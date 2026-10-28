@@ -88,10 +88,6 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
     return;
   }
   const entries = [...walkPropertiesInherited(configurations)];
-  if (entries.length === 0) {
-    invalid(configurations, "At least one service configuration is required.");
-    return;
-  }
   const selected = entries.find((entry) => entry.name === defaultConfiguration);
   if (!selected) {
     invalid(configurations, `The default configuration '${defaultConfiguration}' is not declared.`);
@@ -219,39 +215,9 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
       invalid(target, "Service configurations must include an OAuth2 authentication scheme.");
       return;
     }
-    if (
-      result.length > 0 &&
-      authenticationShape(auth) !== authenticationShape(result[0].authentication)
-    ) {
-      invalid(
-        target,
-        "Service configurations must have the same authentication requirements except for OAuth URLs and scopes.",
-      );
-      return;
-    }
     context.call($server, target, record.endpoint, record.description, record.parameters);
     const server = getServers(program, target)![result.length];
     result.push({ name: record.name, server, authentication: auth });
   }
   setConfigurations(program, target, { defaultConfiguration, configurations: result });
 };
-
-function authenticationShape(authentication: Authentication): string {
-  return JSON.stringify(
-    authentication.options
-      .map((option) =>
-        option.schemes
-          .map((scheme) => {
-            if (scheme.type === "oauth2") {
-              return { type: scheme.type, flows: scheme.flows.map((flow) => flow.type).sort() };
-            }
-            const { model, id, description, ...definition } = scheme;
-            return definition;
-          })
-          .map((definition) => JSON.stringify(definition, Object.keys(definition).sort()))
-          .sort(),
-      )
-      .map((option) => JSON.stringify(option))
-      .sort(),
-  );
-}

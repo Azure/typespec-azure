@@ -8,7 +8,7 @@ namespace Azure.Core {
    *
    * The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
    *
-   * Configurations vary OAuth URLs and scopes, not authentication mechanisms. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+   * Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
    *
    * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
    *

@@ -2,6 +2,7 @@ import { Tester } from "#test/test-host.js";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { getAuthentication, getServers } from "@typespec/http";
 import { describe, expect, it } from "vitest";
+import { getAzureServiceConfigurations } from "./azure-service-configurations.js";
 
 const authentication = `
   model PublicAuth is AadOauth2Auth<["https://api.loganalytics.io/.default"]>;
@@ -92,6 +93,43 @@ describe("Azure service configurations", () => {
     });
   });
 
+  it("preserves different OAuth flows and authentication requirements per configuration", async () => {
+    const { program, Service } = await Tester.compile(t.code`
+      ${authentication}
+      model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
+      model GovernmentTokenAuth is OAuth2Auth<[{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://government.example.com/token";
+        scopes: ["government.read"];
+      }]>;
+      model Configurations {
+        Public: {
+          endpoint: "https://public.example.com";
+          authentication: PublicAuth | Key;
+        };
+        Government: {
+          endpoint: "https://government.example.com";
+          authentication: [GovernmentTokenAuth, Key];
+        };
+      }
+      @azureServiceConfigurations(Configurations, "Public")
+      namespace ${t.namespace("Service")} {}
+    `);
+    const catalog = getAzureServiceConfigurations(program, Service);
+    expect(
+      catalog?.configurations.map((configuration) =>
+        configuration.authentication.options.map((option) =>
+          option.schemes.map((scheme) => scheme.model.name),
+        ),
+      ),
+    ).toEqual([[["PublicAuth"], ["Key"]], [["GovernmentTokenAuth", "Key"]]]);
+    expect(
+      getAuthentication(program, Service)?.options.map((option) =>
+        option.schemes.map((scheme) => scheme.model.name),
+      ),
+    ).toEqual([["PublicAuth"], ["Key"], ["GovernmentTokenAuth", "Key"]]);
+  });
+
   it("preserves ordinary OAuth scopes", async () => {
     const { program, Service } = await Tester.compile(t.code`
       model Auth is AadOauth2Auth<["read", "write"]>;
@@ -111,7 +149,7 @@ describe("Azure service configurations", () => {
       name: "an empty catalog",
       configurations: "model Configurations {}",
       defaultName: "Public",
-      message: "At least one service configuration is required.",
+      message: "The default configuration 'Public' is not declared.",
     },
     {
       name: "a missing default",
@@ -151,20 +189,6 @@ describe("Azure service configurations", () => {
         }`,
       defaultName: "Public",
       message: "Service configurations must include an OAuth2 authentication scheme.",
-    },
-    {
-      name: "different authentication mechanisms",
-      configurations: `
-        model Configurations {
-          Public: {
-            endpoint: "https://public.example.com";
-            authentication: PublicAuth | ApiKeyAuth<ApiKeyLocation.header, "api-key">;
-          };
-          Government: { endpoint: "https://government.example.com"; authentication: GovernmentAuth };
-        }`,
-      defaultName: "Public",
-      message:
-        "Service configurations must have the same authentication requirements except for OAuth URLs and scopes.",
     },
   ])("rejects $name", async ({ configurations, defaultName, message }) => {
     expectDiagnostics(

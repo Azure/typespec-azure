@@ -57,9 +57,9 @@ namespace Logs {
 
 For other reported reasons, apply the corresponding constraint:
 
-- Declare a nonempty model of named configuration records and select an existing default by name.
+- Declare named configuration records and select an existing default by name.
 - Each configuration needs a nonempty endpoint string literal and ordinary HTTP authentication requirements. Endpoint template parameters use a model, as in `@server`; `description`, when provided, is a string literal.
-- Every configuration must include OAuth2 and preserve the same authentication mechanisms and requirement groups. Only OAuth URLs and scopes vary; existing key alternatives and AND groups remain intact.
+- Every configuration must include OAuth2. OAuth flows, URLs, scopes, and authentication requirements may differ between configurations, including API-key alternatives and AND groups.
 - Do not combine `@azureServiceConfigurations` with direct `@server` or `@useAuth` declarations on the same namespace. The pairing decorator calls those HTTP APIs itself, exposing all servers and one OR of authentication requirements.
 
 Challenge processing and endpoint-derived audience resolution are outside this feature.

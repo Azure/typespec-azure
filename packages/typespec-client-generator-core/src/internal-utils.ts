@@ -51,6 +51,7 @@ import {
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
+  type HttpAuth,
   type HttpOperation,
   type HttpOperationResponseContent,
   type HttpPayloadBody,
@@ -1537,6 +1538,58 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
   return true;
 }
 
+function unorderedArrayEquals<T>(
+  left: readonly T[],
+  right: readonly T[],
+  equals: (left: T, right: T) => boolean,
+): boolean {
+  if (left.length !== right.length) return false;
+  const remaining = [...right];
+  return left.every((item) => {
+    const index = remaining.findIndex((other) => equals(item, other));
+    if (index === -1) return false;
+    remaining.splice(index, 1);
+    return true;
+  });
+}
+
+function isSameConfigurationAuthScheme(left: HttpAuth, right: HttpAuth): boolean {
+  if (left.type === "oauth2" && right.type === "oauth2") {
+    return unorderedArrayEquals(left.flows, right.flows, (leftFlow, rightFlow) => {
+      if (
+        !unorderedArrayEquals(
+          leftFlow.scopes,
+          rightFlow.scopes,
+          (leftScope, rightScope) => leftScope.value === rightScope.value,
+        )
+      )
+        return false;
+      // Scope ordering is handled above; reuse the existing flow URL comparison.
+      return isSameAuth(
+        { options: [{ schemes: [{ ...left, flows: [{ ...leftFlow, scopes: [] }] }] }] },
+        { options: [{ schemes: [{ ...right, flows: [{ ...rightFlow, scopes: [] }] }] }] },
+      );
+    });
+  }
+  if (
+    left.type === "openIdConnect" &&
+    right.type === "openIdConnect" &&
+    !unorderedArrayEquals(
+      left.scopes,
+      right.scopes,
+      (leftScope, rightScope) => leftScope === rightScope,
+    )
+  )
+    return false;
+  return isSameAuth({ options: [{ schemes: [left] }] }, { options: [{ schemes: [right] }] });
+}
+
+function isSameConfigurationAuth(left: Authentication, right: Authentication): boolean {
+  return unorderedArrayEquals(left.options, right.options, (leftOption, rightOption) =>
+    unorderedArrayEquals(leftOption.schemes, rightOption.schemes, isSameConfigurationAuthScheme),
+  );
+}
+
 export function isSameServiceConfigurations(
   left: AzureServiceConfigurations | undefined,
   right: AzureServiceConfigurations | undefined,
@@ -1556,7 +1609,7 @@ export function isSameServiceConfigurations(
       !other ||
       configuration.server.url !== other.server.url ||
       configuration.server.parameters.size !== other.server.parameters.size ||
-      !isSameAuth(configuration.authentication, other.authentication)
+      !isSameConfigurationAuth(configuration.authentication, other.authentication)
     )
       return false;
     for (const [name, parameter] of configuration.server.parameters) {
