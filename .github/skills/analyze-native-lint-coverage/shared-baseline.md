@@ -24,36 +24,42 @@ Keep three identities separate:
   The baseline producer's runtime is provenance, not permission to relabel the
   candidate or silently replace its dependencies with older packages.
 
-Reuse is the default within the cycle. A new PR, different validator selection,
-new repository commit or matching package-version string alone neither requires
-refresh nor proves compatibility. Expect newer libraries to remain compatible,
-but verify that expectation: successful compilation establishes authorability,
-not unchanged emitted paths or schemas.
+Reuse is the default within the cycle. Assume the compiler and libraries built
+from current canonical `Azure/typespec-azure:main` remain backward-compatible
+with the frozen specs source. Use the supported
+`--baseline-policy frozen-reference` together with `--baseline-run`: reuse saved
+Swagger diagnostics and run fresh native diagnostics across the full frozen
+corpus. A newer core/compiler/library/emitter version or commit alone is not a
+blocker and does not require a lint-only receipt or baseline refresh.
+
+This is an explicit backward-compatibility assumption, not proof of unchanged
+emission, dependencies or rule inputs. Preserve the baseline producer's identities
+and record the candidate's actual identities separately. Successful compilation
+establishes authorability, not identical emitted paths or schemas. Investigate
+actual failures and diagnostic-count gaps; never infer equivalence from this
+assumption alone.
 
 Before deciding on refresh, inspect actual source/artifact changes from the
 producer to the candidate. Distinguish unrelated changes and lint-only changes
 from compiler, emitter, decorators, libraries, dependencies and settings that
 can affect emission. Retain the change inventory, rationale, focused relevant
-controls and compatibility-verifier result. Check the mapped validator's relevant
+controls and selected baseline-policy result. Check the mapped validator's relevant
 wire behavior; do not infer whole-corpus equivalence from a few passing controls.
 Required final native execution, activation/suppression controls, population and
 count investigations, integration checks and independent reviews remain intact.
 
-The **current analyzer is stricter than this lifecycle policy**: it rejects core
-changes and packed changes outside its lint-only allowlist, even when source
-analysis suggests compatibility. A rejection establishes unsupported reuse,
-not proof that Swagger changed. Report this as a verifier capability gap when
-appropriate; do not present refresh as the only possible design remedy.
-Broader reuse requires a separately implemented, tested and reviewed verifier
-extension. Until supported verification passes, the comparison gate remains
-blocked. Do not edit sealed identities, invent receipts/flags, bypass checks or
-claim this skill update implements broader compatibility.
+The analyzer defaults to `strict`, which rejects core changes and packed changes
+outside its lint-only allowlist. Select `frozen-reference` explicitly for this
+consumer workflow; a strict-policy closure mismatch alone does not establish a
+migration blocker. Keep `strict` for an explicitly requested identical-runtime
+or reviewed lint-only comparison. Verify that pinned tooling supports the chosen
+policy before execution; missing support is a tooling prerequisite, not permission
+to invent flags, edit sealed identities or fabricate compatibility receipts.
 
 Refresh normally follows the next specs dependency upgrade. An exceptional
 refresh needs evidence of material incompatibility or unresolved validity after
 the compatibility assessment, plus separate authorization. Disclose whether the
 reason is a real behavior change, unavailable proof or a tooling limitation.
-The alternative is approved verifier work, not an automatic per-rule refresh.
 Keep old baselines immutable and finish an active run on its selected snapshot.
 
 ## Discover before setup
@@ -186,6 +192,7 @@ mapping and policy options, adding:
 ```powershell
 --scope source `
 --baseline-run C:\dev\baseline-inputs\swagger-arm-20261026-2cd3c5dd `
+--baseline-policy frozen-reference `
 --output C:\dev\coverage-runs\unique-candidate-run
 ```
 
@@ -195,14 +202,20 @@ scope also changes context. For a justified pilot, request a separate explicit
 pilot producer with its own compatible population/context. Never silently
 generate filtered Swagger as migration preflight.
 
-Identical candidate artifacts need no compatibility receipt. Changed lint
-artifacts require the existing
-`--baseline-compatibility-receipt <absolute-json-path>` with content-bound,
-reviewed assertions and an unchanged closure outside the documented lint
-allowlist. Same specs SHA is insufficient. A changed compiler, emitter,
-metadata, dependencies, runtime, generator or policy can block reuse.
-Retain failed compatibility evidence and use a new analyzer output after review.
-Do not invent force flags or weaken compatibility to consume this baseline.
+Do not combine `--baseline-policy frozen-reference` with
+`--baseline-compatibility-receipt`. It retains the historical
+Swagger runtime while evaluating the current candidate under the explicit
+backward-compatibility assumption. Exact specs source, package manager, selection,
+sealed completion, population and inventory/hash checks remain mandatory.
+Record the policy and both runtime contexts; the tool leaves equivalence
+`not-determined`, so semantic controls and gap investigations must establish the
+supported migration conclusion separately.
+
+Only an explicitly selected `strict` comparison requires identical artifacts or
+the existing reviewed, content-bound lint-only compatibility receipt. A changed
+compiler/emitter/library/dependency closure cannot be certified by that receipt.
+Retain failed attempts and use a new analyzer output for an authorized corrected
+invocation; policy selection does not grant retries or waive required checks.
 
 `--baseline-run` skips Swagger generation and validator execution, not candidate
 injection or native execution. Run native across the full required compatible

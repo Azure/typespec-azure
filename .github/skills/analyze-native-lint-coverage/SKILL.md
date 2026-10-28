@@ -93,9 +93,12 @@ not automatically normalize cross-validator overlap or actionable units.
 
 Follow the [monthly evaluation snapshot](shared-baseline.md#monthly-evaluation-snapshot):
 reuse one frozen specs commit across the dependency-upgrade cycle while new
-native branches start from current canonical main. Assess actual compatibility
-before proposing refresh; Git SHA differences alone are not semantic evidence.
-Current analyzer restrictions still apply; this policy adds no bypass or new CLI.
+native branches start from current canonical main. Assume current-main compiler
+and libraries remain backward-compatible with the frozen specs, and explicitly
+select the supported `--baseline-policy frozen-reference`. Reuse saved Swagger
+diagnostics and rerun native diagnostics across the full frozen corpus.
+Investigate actual failures and gaps; different runtime versions alone do not
+require refresh or prove incompatibility.
 
 1. Record the caller's current branch before any checkout. Do not change its
    base merely because the candidate targets `main`.
@@ -143,8 +146,8 @@ race. A shared writable checkout can only be used serially under exclusive owner
 ### Baseline lifecycle
 
 Default to a downloaded, verified shared Swagger-only sealed run. Pass
-`--baseline-run <absolute-completed-run-directory>` with the usual
-candidate/specs/tarball options and a **new empty output directory**. This skips
+`--baseline-run <absolute-completed-run-directory> --baseline-policy frozen-reference`
+with the usual candidate/specs/tarball options and a **new empty output directory**. This skips
 both Swagger generation and validator execution. It still patches/installs the
 candidate and reruns native workers; it does not reuse stale native findings.
 The shared run has schema-2 `manifest.json`, schema-1 `baseline.json`, and all
@@ -158,25 +161,31 @@ validators. That path is **producer-only**, for a separately requested shared
 baseline creation/refresh, not a missing-cache recovery during migration.
 Retain older immutable assets. See the [producer procedure](shared-baseline.md#explicit-producer-refresh).
 
-Reuse verifies completion, source/runtime/generator/settings compatibility,
+Reuse verifies completion, exact specs source/package manager/selection,
 project success/inventory, dataset schema/index/shards and every retained file's
 SHA-256 before and after copying. Corrupt, partial, failed, escaping or symlinked
 inputs fail explicitly; no silent refresh or compliant fallback occurs.
 Retain all dataset files needed by the baseline inventory.
 
-Identical candidate artifacts need no compatibility receipt. Changed lint
-artifacts require `--baseline-compatibility-receipt <absolute-json-path>`.
+Historical-reference comparison assumes backward compatibility across current
+candidate compiler/library/runtime upgrades; it does not assert identical
+emission or require a lint-only compatibility receipt. Keep the saved producer
+context and actual candidate context distinct. The tool records equivalence as
+`not-determined`; discriminating semantic controls, fresh full native execution,
+and investigations of failures and count gaps remain required.
+
+Use `strict` only for an explicitly requested identical-runtime or reviewed
+lint-only comparison. In that mode, identical candidate artifacts need no receipt;
+changed lint artifacts require `--baseline-compatibility-receipt <absolute-json-path>`.
 The tool verifies unchanged packed compiler/emission/library/metadata closure
-outside the documented lint-file allowlist and requires content-bound reviewed
-assertions. See the exact receipt schema and compatibility boundary in
+outside the documented lint-file allowlist and content-bound reviewed assertions.
+See both supported policies and the exact receipt boundary in
 [native-coverage.md](../../../packages/typespec-lintdiff/docs/native-coverage.md).
-This is not a signed attestation or automatic semantic proof. Review changed
-lint code, installation manifests/locks and emission effects; uncertainty,
-changed dependencies/metadata/emitter or an unsupported closure blocks the
-comparison pending supported compatibility verification or a separately
-authorized shared producer refresh. Distinguish a verifier restriction from
-proven emission changes; do not use an unsupported `--force` flag or regenerate
-per rule by default.
+A strict closure mismatch alone is not a migration blocker under the default
+historical-reference policy. Neither policy is automatic semantic proof or
+permission to use an unsupported `--force` flag, fabricate a receipt or regenerate
+Swagger per rule. Actual required failures and unexplained gaps still block their
+corresponding claims.
 
 A receipt-required attempt preserves both identities in its manifest/error.
 Review that evidence, then use a new output directory for the approved run;
@@ -251,6 +260,7 @@ node --import tsx/esm test\harness\native-coverage.ts `
   --tsp-rule @azure-tools/typespec-azure-core/no-boolean `
   --scope source `
   --baseline-run C:\dev\coverage-baselines\verified-compatible-baseline `
+  --baseline-policy frozen-reference `
   --output C:\dev\coverage-runs\enum-pilot `
   --concurrency 2
 ```
@@ -265,7 +275,8 @@ then run the full compatible baseline population. The published full ARM
 `scope: source`, no-filter/no-limit baseline cannot be reused with a different
 `boolean-http` scope, a `--filter`, or a `--limit`. Select a separately produced
 compatible baseline or report that exact blocker; do not invent filtered reuse.
-The example still requires artifact/runtime compatibility with the selected asset.
+The example assumes backward compatibility across recorded runtime upgrades;
+it does not assert identical artifacts or emission.
 An explicitly requested separate pilot producer may use a case-sensitive literal
 `--filter` and optional positive `--limit`, but its reduced population is partial
 evidence and never substitutes for the full saved-population readout/native run.
@@ -302,8 +313,9 @@ production semantics as part of this analysis.
 Repeat `--tsp-rule` for an explicit one-to-many mapping. Do not credit unrelated
 diagnostics from an existing rule without investigating their attribution.
 For an admitted many-to-one group, repeat `--validator-rule` instead and retain
-exactly one native ID. Every migration candidate run uses `--baseline-run`; add a reviewed compatibility
-receipt when required. All other required options remain.
+exactly one native ID. Every migration candidate run uses `--baseline-run` and
+defaults to explicit `--baseline-policy frozen-reference`, without a lint-only
+receipt. All other required options remain.
 Production ruleset enablement is not changed: the worker explicitly enables the
 mapped rules only for the comparison, removes conflicting configuration-level
 disable entries, preserves directly configured and inherited rule options, and
