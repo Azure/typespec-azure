@@ -1029,7 +1029,7 @@ The model or namespace to mark as dynamic.
 ###### Mark a model as dynamic
 
 ```typespec
-@dynamicModel
+@dynamicModel("csharp")
 model Pet {
   name: string;
 }

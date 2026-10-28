@@ -583,7 +583,7 @@ export type UseSystemTextJsonConverterDecorator = (
  * @param scope Specifies which emitters receive this metadata. If not set, all emitters may opt in to receive it.
  * @example Mark a model as dynamic
  * ```typespec
- * @dynamicModel
+ * @dynamicModel("csharp")
  * model Pet {
  *   name: string;
  * }

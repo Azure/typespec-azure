@@ -629,7 +629,7 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof DecoratorOp
  *
  * @example Mark a model as dynamic
  * ```typespec
- * @dynamicModel
+ * @dynamicModel("csharp")
  * model Pet {
  *   name: string;
  * }
