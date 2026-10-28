@@ -167,7 +167,11 @@ or permission to skip any required gate.
    native finding/comparison metrics are not applicable, not zero or equivalent.
 5. **Checkpoint A: development review.** After all required development checks
    and independent local review, publish/update the one native draft PR, with
-   the shared [two-section PR body](../shared/migration-pr-description.md).
+   the shared [PR title and two-section body](../shared/migration-pr-description.md).
+   Native rule implementations use
+   `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`,
+   matching promotion PRs; the destination name is the final unqualified
+   `createRule({ name })` value, not the validator slug.
    Link the published `migration.md`, which retains all required evidence.
    Run a separate
    [/loop-for-fix-and-review](../loop-for-fix-and-review/SKILL.md#native-migration-context)

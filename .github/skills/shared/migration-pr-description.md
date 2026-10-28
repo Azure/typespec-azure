@@ -4,13 +4,24 @@ Use this contract for Swagger lint migration PRs: legacy development, promotion,
 native-first implementation or guidance, and follow-up repair. It does not apply
 to skill-update PRs or unrelated PRs.
 
+For native-first rule implementation and promotion PRs, use the title pattern
+`[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`.
+Use the original validator ID and the final unqualified `createRule({ name })`
+value. For example:
+`[Swagger Linter Migration] PathContainsResourceGroup -> resource-group-path-parameter`.
+For an explicit many-to-one group, join the original IDs with `+` in frozen
+membership order before the arrow. Keep legacy development and source-repair
+titles under their phase-specific contracts; do not invent a native rule name
+for a guidance-only outcome. Preserve existing PR titles unless correction is
+requested.
+
 The entire PR body must contain exactly these two sections, in this order:
 
 ```markdown
 ## Original Swagger linter
 
-- [Documentation: <ValidatorRuleId>](<original Swagger rule documentation URL>)
-- [Logic: <ValidatorRuleId>](<original Swagger rule implementation URL>)
+- linter code: [<ValidatorRuleId>](<original Swagger rule implementation URL>)
+- linter doc: [<documentation filename>.md](<original Swagger rule documentation URL>)
 
 ## Migration report
 
@@ -20,8 +31,10 @@ The entire PR body must contain exactly these two sections, in this order:
 Use direct, verified GitHub links to the original validator documentation and
 the code implementing that rule. Resolve them from the rule's intake evidence,
 fixture `rule.md`, or upstream repository; do not guess URLs or substitute a
-generic repository homepage. For a group, repeat the documentation/logic link
-pair for each original Swagger rule inside the first section.
+generic repository homepage. For a group, repeat the code/documentation link
+pair for each original Swagger rule inside the first section, with code before
+documentation. Keep the exact heading and lowercase `linter code:` /
+`linter doc:` labels. Use the actual documentation basename as its link text.
 
 The second section links directly to the task's pushed, readable `migration.md`,
 not a local path, folder, archive, or unpublished branch. For native-first
