@@ -42,6 +42,7 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { resourceGroupPathParameterRule } from "./rules/resource-group-path-parameter.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -119,6 +120,7 @@ const rules = [
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
+  resourceGroupPathParameterRule,
 ];
 
 export const $linter = defineLinter({
@@ -128,7 +130,7 @@ export const $linter = defineLinter({
       enable: Object.fromEntries(
         rules.map((rule) => [
           `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-          rule !== useScopeForExtensionRoutingRule,
+          rule !== useScopeForExtensionRoutingRule && rule !== resourceGroupPathParameterRule,
         ]),
       ),
     },

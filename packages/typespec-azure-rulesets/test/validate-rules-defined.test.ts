@@ -124,4 +124,10 @@ describe("expect all rules to be defined", () => {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }
   });
+
+  it("keeps ARM resource-group path guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/resource-group-path-parameter";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
 });
