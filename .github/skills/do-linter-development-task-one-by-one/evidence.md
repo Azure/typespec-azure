@@ -76,6 +76,18 @@ raw receipts locally; sanitization must not alter diagnostic counts or targets.
 Never publish credentials, environment dumps, user mail, `node_modules`, raw
 `log.txt` or unrelated/private inputs.
 
+Before committing, compare the complete publication inventory with Git's staged
+paths. Directory staging can omit ignored manifests and `.log` receipts. When
+necessary, force-add only explicitly inventoried sanitized receipts; never
+force-add raw execution logs, dependencies or unrelated output.
+
+After committing and before pushing, verify each recorded published SHA-256
+against the actual Git blob bytes, not just working files. Git text filters can
+change line endings. Preserve exact evidence bytes with task-scoped
+`.gitattributes`, or explicitly record intentional normalization, retain original
+hashes and recompute published hashes. Verify the declared hashes again from a
+fresh checkout. Do not waive mismatches as harmless formatting differences.
+
 Measure dataset size before choosing Git versus artifact storage. Retain large
 Swagger/packages/build logs as durable downloadable fork release assets or
 another explicitly approved backend, recording stable references, byte hashes
