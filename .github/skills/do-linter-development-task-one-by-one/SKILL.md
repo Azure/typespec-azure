@@ -55,6 +55,13 @@ Native-first coverage discovers and pins the
 before specs setup. It reruns native diagnostics, not the Swagger suite.
 Only an explicitly requested separate producer creates or refreshes shared data.
 
+Native-first tasks use three persistent worktrees: native development, specs
+runtime, and combined coverage/evidence. Prefer verified compatible local
+worktrees before creating missing roles; follow the
+[reuse and isolation checks](preparation.md#native-first-worktree-reuse).
+Fresh-checkout recovery verification remains required, but uses temporary
+isolation rather than a fourth persistent replay worktree.
+
 Both flows follow the shared
 [analysis-first edit loop](../shared/analysis-first-lint-migration.md).
 Decide source changes through semantic analysis and focused regressions.

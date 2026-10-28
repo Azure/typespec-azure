@@ -72,7 +72,16 @@ Keep old baselines immutable and finish an active run on its selected snapshot.
    `2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9`.
    Recover it from `source.repository` or the recorded preservation repository/ref.
    Verify the source SHA before preparing a clean isolated runtime.
-3. Download and verify the baseline with the stdlib helper:
+3. Check the combined coverage/evidence worktree's local area for the selected
+   baseline before downloading. Reuse a complete matching local run read-only
+   only after verifying its descriptor/source identity, completion, inventory,
+   file hashes and required compatibility. Prior success or directory existence
+   alone is insufficient. Retain the verification receipt; partial replay
+   extractions and failed runs are not sealed baselines.
+
+   If a complete verified local run is unavailable, recover it with the stdlib
+   helper below. Prefer a retained archive through `--archive` after checking
+   its descriptor-bound size/hash; download only when the archive is missing.
 
    ```powershell
    mise exec -- python -X utf8 -B C:\dev\worktrees\tooling\.github\skills\analyze-native-lint-coverage\shared_baseline.py fetch `
@@ -80,7 +89,8 @@ Keep old baselines immutable and finish an active run on its selected snapshot.
      --output C:\dev\baseline-inputs\swagger-arm-20261026-2cd3c5dd
    ```
 
-   Use actual paths. Output must not exist. To operate without network, add
+   Use actual paths. Helper output must not exist; do not overwrite a retained
+   run or invoke `fetch` on its populated directory. To use a local archive, add
    `--archive C:\dev\baseline-inputs\swagger-arm-20261026-2cd3c5dd.tar.gz`.
    Otherwise the helper invokes `gh release download` once with the descriptor's
    explicit repository/release/name. Use the caller's authorized GitHub CLI

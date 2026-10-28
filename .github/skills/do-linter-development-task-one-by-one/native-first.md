@@ -73,24 +73,36 @@ and a history-preserving handoff, never fresh retry budgets.
 
 Follow [preparation](preparation.md#native-first-preparation) and
 [publication](app-session-execution.md#native-first-publication). Verify the
-whole input and both publication roles before costly setup. Resources are:
+whole input and both publication roles before costly setup. Use three persistent
+worktrees, preferring compatible local resources under the
+[reuse contract](preparation.md#native-first-worktree-reuse):
 
 - Native task worktree/branch based on fetched canonical `main`; canonical
   head and one PR against `Azure/typespec-azure:main`.
 - Isolated writable specs runtime at the selected baseline's specs commit.
-- Evidence worktree/branch in the verified signed-in user's personal fork.
+- Combined coverage/evidence worktree/branch in the verified signed-in user's
+  personal fork.
+  Store coverage runs, replay inputs, reports and `migration.md` here; large or
+  machine-specific local inputs stay ignored. No fourth persistent replay
+  worktree is required.
   The evidence role is not permission for a fork native/skill PR.
+
+Additional required inputs and checks do not add persistent worktree roles:
+
 - Specs source retention under the [evidence contract](evidence.md#specs-source-retention):
   prefer a verified personal specs preservation branch at the frozen source SHA,
   with source recovery and publication capability recorded separately.
-- A versioned tooling checkout and immutable validation snapshot only when
-  needed. Canonical `main` need not contain the comparison package or skills.
+- Pinned tooling reused from a verified existing source or recovered in the
+  evidence worktree's ignored local area. Canonical `main` need not contain the
+  comparison package or skills. Keep required immutable validation snapshots
+  and independent fresh-checkout recovery verification temporary.
 
 All execution checkouts obey `worktrees_folder` physical containment, ownership
-and non-overlap checks. Only recorded shared tooling/evidence resources may be
+and non-overlap checks. Recorded shared specs/tooling/evidence resources may be
 reused between tasks, serially under a lock; a writable specs runtime must not
-be shared concurrently. Keep task execution logs ignored, with the existing
-append-only timestamps/heartbeat contract.
+be shared concurrently. Do not reuse a native publisher for an unrelated task
+without the required new branch/publication binding. Keep task execution logs
+ignored, with the existing append-only timestamps/heartbeat contract.
 
 For new tasks, discover and pin the
 [shared Swagger baseline first](../analyze-native-lint-coverage/shared-baseline.md),

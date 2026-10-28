@@ -105,9 +105,13 @@ Current analyzer restrictions still apply; this policy adds no bypass or new CLI
    Resolve its immutable version descriptor, archive and frozen `source.commit`.
    Missing, corrupt, unavailable or incompatible data blocks migration with the
    exact prerequisite; never silently run the Swagger generator.
-3. Discover or prepare dedicated candidate and specs checkouts. Never reset,
-   clean, or appropriate another task's checkout. Keep auxiliary checkouts under
-   the caller's worktrees boundary, default `C:\dev\worktrees`.
+3. Prefer verified compatible local candidate, specs and combined
+   coverage/evidence worktrees before creating missing roles. Follow the
+   [reuse contract](../do-linter-development-task-one-by-one/preparation.md#native-first-worktree-reuse).
+   Native-first queues use three persistent worktrees; replay shares the
+   evidence role, with temporary isolation for required recovery verification.
+   Never reset, clean, or appropriate another task's checkout. Keep auxiliary
+   checkouts under the caller's worktrees boundary, default `C:\dev\worktrees`.
    Prepare each candidate's separate writable specs runtime at the descriptor's
    frozen source commit, not the metadata commit or latest `typespec-next`.
 4. Resolve the candidate's current head once. For a merged candidate, select

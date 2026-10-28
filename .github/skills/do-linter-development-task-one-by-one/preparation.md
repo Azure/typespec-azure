@@ -8,12 +8,45 @@ the legacy three-resource procedure below. Keep the shared coordinator/folder
 resolution, physical containment, ownership, dependency-layer fingerprints,
 readiness persistence and invalidation requirements in this file.
 
-Prepare one canonical-main-based native publisher, the selected immutable specs
-runtime, and the separately verified fork evidence checkout/publisher. Record
-versioned tooling outside the native PR when canonical `main` lacks the coverage
-harness. All execution checkouts, including auxiliary snapshots, remain inside
-`worktrees_folder`. Read-only instruction/artifact sources are not execution
-checkouts. Existing shared resources require explicit serial ownership.
+Prepare three persistent worktrees: one canonical-main-based native publisher,
+the selected immutable specs runtime, and one combined coverage/evidence
+checkout with its separately verified fork publisher. Do not provision a fourth
+persistent replay worktree. Record versioned tooling outside the native PR when
+canonical `main` lacks the coverage harness; reuse verified existing tooling or
+recover pinned tooling into the evidence worktree's ignored local area.
+Required isolated validation snapshots and fresh recovery checkouts are
+temporary, not additional persistent roles. All execution checkouts, including
+temporary snapshots, remain inside `worktrees_folder`. Read-only
+instruction/artifact sources are not execution checkouts.
+
+### Native-first worktree reuse
+
+Before creating any role, inventory recorded resources and local Git worktrees
+inside `worktrees_folder`. Prefer an existing compatible checkout, not a new
+date-stamped copy. Verify physical containment, canonical repository and remote
+identities, branch/HEAD, task/publication binding, tracked/staged/untracked state,
+and quiescence. A directory name or existing `node_modules` is not readiness.
+Record each selected path, owner, identity and reuse/create decision.
+
+Reuse native development for the same task only at its recorded branch/PR and
+verified head. A new task needs its own canonical-main-based branch and valid
+publication binding; never retarget an active or historically bound owner merely
+to save setup. Specs and evidence may serve sequential tasks when explicitly
+recorded as shared resources under exclusive ownership. Specs must match the
+selected baseline source commit; evidence must match its verified fork/ref/head.
+Preserve all task histories, immutable baselines, outputs and unfinished edits.
+Do not reset, clean, stash or overwrite an incompatible checkout to make it fit.
+Create only a missing or ineligible role, recording why reuse was unsafe.
+
+Revalidate dependency fingerprints, package-manager/runtime versions, core
+gitlink and candidate artifact identities before reusing installed or built
+layers. Repair only missing/invalidated layers. Reuse local baseline archives,
+unpacked data and replay inputs only after the required identity, completeness,
+checksum and compatibility checks; do not download another copy solely because
+the task changed. Failed/partial inputs are not reusable completed baselines.
+Each coverage invocation still uses a new empty run directory and fresh native
+execution. Keep reusable local inputs and run outputs in the evidence role,
+outside clean candidate/specs inputs.
 
 Discover the [shared baseline](../analyze-native-lint-coverage/shared-baseline.md)
 before candidate/specs dependency setup. Fetch the metadata branch and pin its

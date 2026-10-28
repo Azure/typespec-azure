@@ -40,9 +40,13 @@ account. Verify write permission and the exact evidence branch/ref, existing
 ownership and remote SHA. Permission for evidence does not authorize native
 or skill PR heads in a fork. Do not create another fork automatically.
 
-Use a dedicated in-folder evidence worktree; do not put output inside clean
-candidate/specs inputs. Record any session-bound publication owner and supported
-push controls. Never assume a directory change changes publication identity.
+Use one dedicated in-folder worktree for coverage generation, local replay,
+evidence publication and `migration.md`; do not put output inside clean
+candidate/specs inputs. Prefer a verified existing evidence worktree under the
+[reuse contract](preparation.md#native-first-worktree-reuse). Do not require a
+fourth persistent replay worktree. Record any session-bound publication owner
+and supported push controls. Never assume a directory change changes
+publication identity.
 
 ```text
 migration-evidence\
@@ -67,6 +71,10 @@ not an invented cache schema. Singleton evidence may retain an existing per-rule
 layout with explicit links. Baselines are shared by reference, not copied per
 member. Store mutable local logs, unpacked Swagger, dependencies and archives in
 an ignored local area. An ignored file is not backed up by pushing the branch.
+Retain verified downloaded assets and unpacked baseline/replay inputs here for
+later runs. Preserve each prior run and use a new empty directory for every
+coverage invocation; local caches never replace integrity/compatibility checks,
+fresh required native execution, or durable publication.
 
 Commit compact sanitized manifests, project inventory/failed population, member
 diagnostic shards, reports, fixture/claim mapping and `migration.md`. Remove
@@ -190,6 +198,14 @@ assets, verify hashes and compatibility, and reconstruct inputs without the
 original development worktree or Copilot session directory. A replay must use
 the recorded specs commit and closure, not resolve latest again. Test this
 round trip before claiming portable reuse.
+
+Use a temporary clean checkout of the published evidence commit for this
+independent recovery check, not a fourth persistent role. Do not seed it from
+unpublished local evidence or treat replay in the populated evidence worktree
+as fresh-checkout proof. After verification, retain the receipt and verified
+downloaded inputs in the persistent evidence role; remove only the task-owned
+temporary checkout after preserving any unique files and stopping its activity.
+This keeps the recovery gate intact while allowing later runs to reuse inputs.
 
 Push the evidence branch and return its repository/ref, actual pushed commit,
 immutable `migration.md` link, specs retention tuple and asset/verification
