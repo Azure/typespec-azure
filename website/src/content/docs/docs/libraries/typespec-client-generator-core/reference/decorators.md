@@ -855,11 +855,11 @@ model MyModel {
 
 ### `@lroOperationId` {#@Azure.ClientGenerator.Core.lroOperationId}
 
-Identifies the status-monitor path parameter containing a server-issued long-running operation
-identifier for a legacy service that exposes the identifier only through the returned polling
-URI. This compatibility metadata does not drive polling and is distinct from a caller-supplied
-`Operation-Id` API parameter. Conforming services with modeled operation identity do not need
-this decorator. Emitters choose their idiomatic accessor and storage.
+Identifies a server-issued long-running operation identifier exposed by a legacy service through
+either the status-monitor URI or its response body. This compatibility metadata does not drive
+polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+accessor and storage.
 
 ```typespec
 @Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
@@ -867,7 +867,8 @@ this decorator. Emitters choose their idiomatic accessor and storage.
 
 #### Target
 
-The operation identifier path parameter on the linked status-monitor operation.
+The operation identifier path parameter on the linked status-monitor operation, or
+a string-like property on its response model.
 `ModelProperty`
 
 #### Parameters

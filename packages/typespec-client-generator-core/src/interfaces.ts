@@ -1223,11 +1223,11 @@ export interface SdkLroServiceMetadata {
    */
   statusMetadata?: SdkLroStatusMetadata[];
   /**
-   * Server-issued SDK long-running operation identifier selected from the linked status-monitor
-   * operation, when requested with `@lroOperationId`. This does not drive polling and is distinct
-   * from a caller-supplied `Operation-Id` API parameter.
+   * Server-issued SDK long-running operation identifiers selected from the linked status-monitor
+   * operation, ordered by availability: polling URL path first, then status-monitor body property.
+   * This does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter.
    */
-  operationId?: SdkLroOperationIdMetadata;
+  operationId?: SdkLroOperationIdMetadata[];
 }
 
 export interface SdkLroStatusMetadata {
@@ -1238,12 +1238,24 @@ export interface SdkLroStatusMetadata {
   property: SdkModelPropertyType;
 }
 
-export interface SdkLroOperationIdMetadata {
+export type SdkLroOperationIdMetadata =
+  SdkLroOperationIdPathMetadata | SdkLroOperationIdPropertyMetadata;
+
+export interface SdkLroOperationIdPathMetadata {
+  kind: "path";
   /** Exact URI link from the status-monitor step. */
   source: SdkOperationLink;
   /** Exact path parameter selected from the linked status-monitor operation. */
   pathParameter: SdkPathParameter;
 }
+
+export interface SdkLroOperationIdPropertyMetadata {
+  kind: "property";
+  /** Exact property selected from the status-monitor response model. */
+  property: SdkModelPropertyType;
+}
+
+// A response-header variant can be added when a service needs a server-issued operation ID there.
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
   kind: "nextOperationReference";

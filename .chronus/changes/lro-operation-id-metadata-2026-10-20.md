@@ -6,4 +6,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add scoped `@lroOperationId` metadata for legacy services that expose server-issued operation identity only through a linked status-monitor URI, plus a Document Intelligence-shaped Spector scenario.
+Add scoped, source-tagged `@lroOperationId` metadata for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both, plus representative Spector scenarios.

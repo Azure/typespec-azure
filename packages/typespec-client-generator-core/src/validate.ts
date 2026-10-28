@@ -8,10 +8,10 @@ import { validatePackage } from "./validations/package.js";
 import { validateTypes } from "./validations/types.js";
 
 export function $onValidate(program: Program) {
-  validateLroDecoratorTargets(program);
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core", {
     mutateNamespace: false,
   });
+  validateLroDecoratorTargets(tcgcContext);
 
   validatePackage(tcgcContext);
   validateClients(tcgcContext);

@@ -77,3 +77,74 @@ op analyze(
   ...global.Azure.Core.Foundations.ApiVersionParameter,
 ): global.Azure.Core.Foundations.AcceptedResponse &
   global.Azure.Core.Foundations.LongRunningStatusLocation<DocumentAnalysisStatus>;
+
+model TranslationStatus {
+  @lroOperationId
+  id: string;
+
+  status: global.Azure.Core.Foundations.OperationState;
+  result?: TranslationResult;
+}
+
+model TranslationResult {
+  translatedCharacters: int32;
+}
+
+@route("/translations/status")
+@get
+op getTranslationStatus(...global.Azure.Core.Foundations.ApiVersionParameter): TranslationStatus;
+
+@scenario
+@scenarioDoc("""
+  Declares a status-body operation ID flow where the polling URI does not contain the identifier.
+  
+  Expected calls:
+  - POST `/translations:start` returns 202 with
+    `Operation-Location: {endpoint}/translations/status?api-version=2022-12-01-preview`
+  - GET that exact status-monitor URI returns a running status with `id: translation-123`
+  - GET that exact status-monitor URI returns a succeeded status with the same ID and result
+  """)
+@route("/translations:start")
+@post
+@pollingOperation(getTranslationStatus)
+op startTranslation(
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): global.Azure.Core.Foundations.AcceptedResponse &
+  global.Azure.Core.Foundations.LongRunningStatusLocation<TranslationStatus>;
+
+model TranslationWithPathStatus {
+  @lroOperationId
+  id: string;
+
+  status: global.Azure.Core.Foundations.OperationState;
+  result?: TranslationResult;
+}
+
+@route("/translations/operations/{operationId}")
+@get
+op getTranslationWithPathStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): TranslationWithPathStatus;
+
+@scenario
+@scenarioDoc("""
+  Declares a Translation-shaped fallback flow with operation identity in both the
+  Operation-Location path and the status-monitor body.
+  
+  Expected calls:
+  - POST `/translations:start-with-path` returns 202 with
+    `Operation-Location: {endpoint}/translations/operations/translation-456?api-version=2022-12-01-preview`
+  - GET that exact status-monitor URI returns a running status with `id: translation-456`
+  - GET that exact status-monitor URI returns a succeeded status with the same ID and result
+  """)
+@route("/translations:start-with-path")
+@post
+@pollingOperation(getTranslationWithPathStatus)
+op startTranslationWithPath(
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): global.Azure.Core.Foundations.AcceptedResponse &
+  global.Azure.Core.Foundations.LongRunningStatusLocation<TranslationWithPathStatus>;

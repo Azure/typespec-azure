@@ -234,11 +234,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@lroStatusMetadata cannot select the status monitor's ${"role"} property '${"propertyName"}'.`,
       },
     },
-    "lro-operation-id-not-path": {
-      ...doc("lro-operation-id-not-path"),
+    "lro-operation-id-invalid-target": {
+      ...doc("lro-operation-id-invalid-target"),
       severity: "error",
       messages: {
-        default: "@lroOperationId can only be applied to a status-monitor path parameter.",
+        default:
+          "@lroOperationId can only be applied to a path parameter of the linked status-monitor operation or a string-like property of its response model.",
       },
     },
     "lro-operation-id-duplicate": {
@@ -246,7 +247,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default:
-          "@lroOperationId selects more than one path parameter on the linked status-monitor operation in the active emitter scope.",
+          "@lroOperationId selects more than one source of the same kind on the linked status-monitor operation in the active emitter scope.",
       },
     },
     "lro-operation-id-missing-link": {

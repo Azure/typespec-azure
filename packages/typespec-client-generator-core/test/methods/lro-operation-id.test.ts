@@ -42,6 +42,27 @@ op start is Azure.Core.Foundations.LongRunningOperation<
 >;
 `;
 
+const propertyOperation = `
+model PropertyJobState {
+  @lroOperationId
+  operationId: string;
+  status: LroStatus;
+}
+
+@route("/property-jobs/status")
+@get
+op getPropertyJobStatus(): PropertyJobState;
+
+@route("/property-jobs")
+@pollingOperation(getPropertyJobStatus)
+op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
+  {},
+  AcceptedResponse,
+  {},
+  {}
+>;
+`;
+
 describe("LRO operation ID", () => {
   it("accepts a next-operation reference with a status-monitor link", () => {
     const link = {
@@ -61,7 +82,7 @@ describe("LRO operation ID", () => {
     strictEqual(getStatusMonitorLink(step), link);
   });
 
-  it("requires the operation ID target to be a path parameter", async () => {
+  it("requires the operation ID target to belong to a linked status monitor", async () => {
     const diagnostics = await Tester.diagnose(`
 model Invalid {
   @lroOperationId
@@ -69,7 +90,7 @@ model Invalid {
 }
 `);
     expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/lro-operation-id-not-path",
+      code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
     });
   });
 
@@ -82,18 +103,25 @@ model Invalid {
     strictEqual(method.lroMetadata.statusMonitorStep?.kind, "nextOperationLink");
     if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationLink") {
       strictEqual(
-        method.lroMetadata.operationId?.source,
+        method.lroMetadata.operationId?.[0].kind === "path"
+          ? method.lroMetadata.operationId[0].source
+          : undefined,
         method.lroMetadata.statusMonitorStep.target,
       );
       strictEqual(
-        method.lroMetadata.operationId?.pathParameter,
+        method.lroMetadata.operationId?.[0].kind === "path"
+          ? method.lroMetadata.operationId[0].pathParameter
+          : undefined,
         method.lroMetadata.statusMonitorStep.operation?.parameters.find(
           (x) => x.kind === "path" && x.name === "jobId",
         ),
       );
     }
-    strictEqual(method.lroMetadata.operationId?.pathParameter.name, "jobId");
-    strictEqual(method.lroMetadata.operationId?.pathParameter.__raw?.name, "jobId");
+    strictEqual(method.lroMetadata.operationId?.[0].kind, "path");
+    if (method.lroMetadata.operationId?.[0].kind === "path") {
+      strictEqual(method.lroMetadata.operationId[0].pathParameter.name, "jobId");
+      strictEqual(method.lroMetadata.operationId[0].pathParameter.__raw?.name, "jobId");
+    }
   });
 
   it("honors emitter scope", async () => {
@@ -116,8 +144,180 @@ model Invalid {
     ok(csharpMethod);
     strictEqual(pythonMethod.kind, "lro");
     strictEqual(csharpMethod.kind, "lro");
-    strictEqual(pythonMethod.lroMetadata.operationId?.pathParameter.name, "jobId");
+    strictEqual(pythonMethod.lroMetadata.operationId?.[0].kind, "path");
+    if (pythonMethod.lroMetadata.operationId?.[0].kind === "path") {
+      strictEqual(pythonMethod.lroMetadata.operationId[0].pathParameter.name, "jobId");
+    }
     strictEqual(csharpMethod.lroMetadata.operationId, undefined);
+  });
+
+  it("exposes a status-monitor response property", async () => {
+    const { program } = await Tester.compile(propertyOperation);
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId?.length, 1);
+    strictEqual(method.lroMetadata.operationId?.[0].kind, "property");
+    if (method.lroMetadata.operationId?.[0].kind === "property") {
+      strictEqual(method.lroMetadata.operationId[0].property.name, "operationId");
+      strictEqual(method.lroMetadata.operationId[0].property.__raw?.name, "operationId");
+      strictEqual(
+        method.lroMetadata.operationId[0].property,
+        method.lroMetadata.pollingInfo.responseModel.properties.find(
+          (x) => x.name === "operationId",
+        ),
+      );
+    }
+  });
+
+  it("exposes an inherited status-monitor response property", async () => {
+    const { program } = await Tester.compile(`
+model PropertyJobStateBase {
+  @lroOperationId
+  operationId: string;
+}
+model PropertyJobState extends PropertyJobStateBase {
+  status: LroStatus;
+}
+@route("/property-jobs/status") @get
+op getPropertyJobStatus(): PropertyJobState;
+@route("/property-jobs") @pollingOperation(getPropertyJobStatus)
+op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
+  {}, AcceptedResponse, {}, {}
+>;
+`);
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId?.[0].kind, "property");
+    if (method.lroMetadata.operationId?.[0].kind === "property") {
+      strictEqual(
+        method.lroMetadata.operationId[0].property,
+        method.lroMetadata.pollingInfo.responseModel.baseModel?.properties.find(
+          (x) => x.name === "operationId",
+        ),
+      );
+    }
+  });
+
+  it("rejects a non-string status-monitor response property", async () => {
+    const diagnostics = await Tester.diagnose(
+      propertyOperation.replace("operationId: string", "operationId: int32"),
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
+    });
+  });
+
+  it("rejects a property outside the linked status-monitor response model", async () => {
+    const diagnostics = await Tester.diagnose(`
+model OtherStatus {
+  @lroOperationId operationId: string;
+}
+${propertyOperation.replace("@lroOperationId\n  operationId: string;", "operationId: string;")}
+`);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
+    });
+  });
+
+  it("honors decorator scope for a status-monitor response property", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation.replace("@lroOperationId\n", '@lroOperationId("python")\n'),
+    );
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const pythonMethod = pythonContext.sdkPackage.clients[0].methods.find(
+      (x) => x.name === "startPropertyJob",
+    );
+    const csharpMethod = csharpContext.sdkPackage.clients[0].methods.find(
+      (x) => x.name === "startPropertyJob",
+    );
+    ok(pythonMethod);
+    ok(csharpMethod);
+    strictEqual(pythonMethod.kind, "lro");
+    strictEqual(csharpMethod.kind, "lro");
+    strictEqual(pythonMethod.lroMetadata.operationId?.[0].kind, "property");
+    strictEqual(csharpMethod.lroMetadata.operationId, undefined);
+  });
+
+  it("excludes a response property outside the emitter scope", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation.replace(
+        "@lroOperationId\n  operationId",
+        '@lroOperationId\n  @scope("python")\n  operationId',
+      ),
+    );
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const pythonMethod = pythonContext.sdkPackage.clients[0].methods.find(
+      (x) => x.name === "startPropertyJob",
+    );
+    const csharpMethod = csharpContext.sdkPackage.clients[0].methods.find(
+      (x) => x.name === "startPropertyJob",
+    );
+    ok(pythonMethod);
+    ok(csharpMethod);
+    strictEqual(pythonMethod.kind, "lro");
+    strictEqual(csharpMethod.kind, "lro");
+    strictEqual(pythonMethod.lroMetadata.operationId?.[0].kind, "property");
+    strictEqual(csharpMethod.lroMetadata.operationId, undefined);
+  });
+
+  it("excludes a response property without read visibility", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation.replace(
+        "@lroOperationId\n  operationId",
+        "@lroOperationId\n  @visibility(Lifecycle.Create)\n  operationId",
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId, undefined);
+  });
+
+  it("preserves ordered operation IDs alongside status metadata", async () => {
+    const { program } = await Tester.compile(`
+model CombinedJobState {
+  @lroOperationId operationId: string;
+  @lroStatusMetadata percentComplete?: int32;
+  status: LroStatus;
+}
+@route("/combined-jobs/{operationId}") @get
+op getCombinedJobStatus(
+  @lroOperationId @path operationId: string
+): CombinedJobState;
+@route("/combined-jobs") @pollingOperation(getCombinedJobStatus)
+op startCombinedJob is Azure.Core.Foundations.LongRunningOperation<
+  {}, AcceptedResponse, {}, {}
+>;
+`);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startCombinedJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId?.length, 2);
+    strictEqual(method.lroMetadata.operationId?.[0].kind, "path");
+    strictEqual(method.lroMetadata.operationId?.[1].kind, "property");
+    const progressProperty = method.lroMetadata.pollingInfo.responseModel.properties.find(
+      (x) => x.name === "percentComplete",
+    );
+    ok(progressProperty);
+    strictEqual(method.lroMetadata.statusMetadata?.length, 1);
+    strictEqual(method.lroMetadata.statusMetadata[0].property, progressProperty);
   });
 
   it("reports duplicate active operation ID parameters", async () => {
@@ -127,6 +327,21 @@ model Invalid {
         `@path jobId: string,
   @lroOperationId
   @path otherId: string`,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics.map((x) => x.code)).toContain(
+      "@azure-tools/typespec-client-generator-core/lro-operation-id-duplicate",
+    );
+  });
+
+  it("reports duplicate active operation ID response properties", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation.replace(
+        "status: LroStatus;",
+        `@lroOperationId
+  alternateOperationId: string;
+  status: LroStatus;`,
       ),
     );
     const context = await createSdkContextForTester(program);
@@ -199,11 +414,16 @@ op createWidget(@path id: string): {
     if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationReference") {
       ok(method.lroMetadata.statusMonitorStep.target.link);
       strictEqual(
-        method.lroMetadata.operationId?.source,
+        method.lroMetadata.operationId?.[0].kind === "path"
+          ? method.lroMetadata.operationId[0].source
+          : undefined,
         method.lroMetadata.statusMonitorStep.target.link,
       );
     }
-    strictEqual(method.lroMetadata.operationId?.pathParameter.name, "operationId");
+    strictEqual(method.lroMetadata.operationId?.[0].kind, "path");
+    if (method.lroMetadata.operationId?.[0].kind === "path") {
+      strictEqual(method.lroMetadata.operationId[0].pathParameter.name, "operationId");
+    }
   });
 
   it("retains a spread operation ID path parameter", async () => {
@@ -231,7 +451,10 @@ op createWidget(): {
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "createWidget");
     ok(method);
     strictEqual(method.kind, "lro");
-    strictEqual(method.lroMetadata.operationId?.pathParameter.name, "operationId");
+    strictEqual(method.lroMetadata.operationId?.[0].kind, "path");
+    if (method.lroMetadata.operationId?.[0].kind === "path") {
+      strictEqual(method.lroMetadata.operationId[0].pathParameter.name, "operationId");
+    }
   });
 
   it("accepts a URL-valued polling location in the response body", async () => {
@@ -262,7 +485,9 @@ op createWidget(): {
     if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationLink") {
       strictEqual(method.lroMetadata.statusMonitorStep.target.location, "ResponseBody");
       strictEqual(
-        method.lroMetadata.operationId?.source,
+        method.lroMetadata.operationId?.[0].kind === "path"
+          ? method.lroMetadata.operationId[0].source
+          : undefined,
         method.lroMetadata.statusMonitorStep.target,
       );
     }

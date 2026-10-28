@@ -2,13 +2,16 @@ import { type LroMetadata, type OperationLink } from "@azure-tools/typespec-azur
 import {
   createDiagnosticCollector,
   type Diagnostic,
+  type DiagnosticTarget,
   ignoreDiagnostics,
+  type Model,
   type ModelProperty,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getHttpOperation } from "@typespec/http";
-import { getLroOperationIdDecorators } from "./decorators.js";
+import { getHttpOperation, isVisible, Visibility } from "@typespec/http";
+import { getLroOperationIdDecorators, isInScope } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
+import { hasNoneVisibility } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
 type StatusMonitorLinkStep<TLink> =
@@ -37,37 +40,57 @@ export function getLroOperationIdLink(
 export function resolveLroOperationId(
   context: TCGCContext,
   raw: LroMetadata | undefined,
-): [ModelProperty | undefined, readonly Diagnostic[]] {
+): [LroOperationIdSelection[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (!raw) {
-    return diagnostics.wrap(undefined);
+    return diagnostics.wrap([]);
   }
 
-  const selections = getOperationIdSelections(context, raw);
-  if (selections.length > 1) {
+  const pathSelections = getPathSelections(context, raw);
+  if (pathSelections.length > 1) {
     diagnostics.add(
       createDiagnostic({
         code: "lro-operation-id-duplicate",
-        target: selections[1].target,
+        target: pathSelections[1].target,
       }),
     );
   }
 
-  let property: ModelProperty | undefined = selections[0]?.property;
-  if (property && !getLroOperationIdLink(context, raw.statusMonitorStep)) {
+  const propertySelections = getPropertySelections(context, raw.pollingInfo.responseModel);
+  if (propertySelections.length > 1) {
     diagnostics.add(
       createDiagnostic({
-        code: "lro-operation-id-missing-link",
-        target: selections[0].target,
+        code: "lro-operation-id-duplicate",
+        target: propertySelections[1].target,
       }),
     );
-    property = undefined;
   }
 
-  return diagnostics.wrap(property);
+  const selections: LroOperationIdSelection[] = [];
+  const pathSelection = pathSelections[0];
+  if (pathSelection) {
+    if (getLroOperationIdLink(context, raw.statusMonitorStep)) {
+      selections.push({ kind: "path", property: pathSelection.property });
+    } else {
+      diagnostics.add(
+        createDiagnostic({
+          code: "lro-operation-id-missing-link",
+          target: pathSelection.target,
+        }),
+      );
+    }
+  }
+  if (propertySelections[0]) {
+    selections.push({ kind: "property", property: propertySelections[0].property });
+  }
+
+  return diagnostics.wrap(selections);
 }
 
-function getOperationIdSelections(context: TCGCContext, raw: LroMetadata) {
+export type LroOperationIdSelection =
+  { kind: "path"; property: ModelProperty } | { kind: "property"; property: ModelProperty };
+
+function getPathSelections(context: TCGCContext, raw: LroMetadata) {
   const statusMonitorOperation =
     raw.statusMonitorStep?.kind === "nextOperationReference"
       ? raw.statusMonitorStep.target.operation
@@ -84,4 +107,26 @@ function getOperationIdSelections(context: TCGCContext, raw: LroMetadata) {
       target: decorator.target,
     }));
   });
+}
+
+function getPropertySelections(context: TCGCContext, responseModel: Model) {
+  const selections: { property: ModelProperty; target: DiagnosticTarget }[] = [];
+  for (let model: Model | undefined = responseModel; model; model = model.baseModel) {
+    for (const property of model.properties.values()) {
+      if (
+        !isInScope(context, property) ||
+        hasNoneVisibility(context, property) ||
+        !isVisible(context.program, property, Visibility.Read)
+      ) {
+        continue;
+      }
+      selections.push(
+        ...getLroOperationIdDecorators(context, property).map((decorator) => ({
+          property,
+          target: decorator.target,
+        })),
+      );
+    }
+  }
+  return selections;
 }
