@@ -117,7 +117,7 @@ export const BrandedSdkEmitterOptions = {
       nullable: true,
       format: "absolute-path",
       description:
-        "Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.",
+        "Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.",
     },
   },
   namespace: {
@@ -171,6 +171,20 @@ function doc(code: string) {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "union-model-discriminator-conflict": {
+      ...doc("union-model-discriminator-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' cannot be converted to a polymorphic SDK model because model '${"modelName"}' in its hierarchy uses @discriminator. Use @discriminated on the union without @discriminator on its model hierarchy, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
+    "union-model-conversion-conflict": {
+      ...doc("union-model-conversion-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
     "union-null": {
       ...doc("union-null"),
       severity: "warning",

@@ -1,4 +1,4 @@
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -712,7 +712,12 @@ export function getUsage(context: TCGCContext, entity: Model | Enum | Union): Us
   switch (entity.kind) {
     case "Union":
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "model" ||
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.usage;
       }
       return UsageFlags.None;
@@ -771,7 +776,12 @@ export function getAccess(
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "model" ||
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.access;
       }
       return "public";
@@ -1907,7 +1917,7 @@ export const $markAsLro: MarkAsLroDecorator = (
     });
     return;
   }
-  if (getLroMetadata(context.program, target)) {
+  if (getLroProtocolMetadata(context.program, target)) {
     reportDiagnostic(context.program, {
       code: "mark-as-lro-ineffective",
       format: {

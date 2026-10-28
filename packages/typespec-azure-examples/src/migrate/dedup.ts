@@ -29,8 +29,8 @@ export interface BuildLineagesOptions {
 /**
  * Collapse an operation's collected examples into unified variants: group by lineage (example
  * name), order by version, keep one base entry, and emit a `since` variant only when the content
- * changes from the previously-emitted entry. If the operation has a single lineage, the `title` is
- * omitted (single-example case).
+ * or its field order changes from the previously-emitted entry. If the operation has a single
+ * lineage, the `title` is omitted (single-example case).
  */
 export function buildLineages(
   examples: readonly CollectedExample[],
@@ -52,7 +52,11 @@ export function buildLineages(
     let lastContent: string | undefined;
     let isFirst = true;
     for (const entry of ordered) {
-      const content = canonicalize(entry.variant);
+      // Include field order so each version reproduces its original payload.
+      const content = JSON.stringify({
+        request: entry.variant.request,
+        responses: entry.variant.responses,
+      });
       if (!isFirst && content === lastContent) continue;
 
       const variant: MigratedVariant = {
@@ -80,28 +84,12 @@ export function buildLineages(
   return result;
 }
 
-/** Stable, key-order-independent serialization used to compare variant content for equality. */
-function canonicalize(variant: MigratedVariant): string {
-  return JSON.stringify(sortValue({ request: variant.request, responses: variant.responses }));
-}
-
-function sortValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sortValue);
-  if (value !== null && typeof value === "object") {
-    const out: Record<string, unknown> = {};
-    for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-      out[key] = sortValue((value as Record<string, unknown>)[key]);
-    }
-    return out;
-  }
-  return value;
-}
-
-/** Present keys in the canonical emission order: title, since, legacyFilename, request, responses. */
+/** Present keys in the canonical emission order: title, since, id, request, responses. */
 function orderKeys(variant: MigratedVariant): MigratedVariant {
   return {
     ...(variant.title !== undefined ? { title: variant.title } : {}),
     ...(variant.since !== undefined ? { since: variant.since } : {}),
+    ...(variant.id !== undefined ? { id: variant.id } : {}),
     ...(variant.legacyFilename !== undefined ? { legacyFilename: variant.legacyFilename } : {}),
     request: variant.request,
     responses: variant.responses,
@@ -109,7 +97,7 @@ function orderKeys(variant: MigratedVariant): MigratedVariant {
 }
 
 /**
- * Assign the minimal `title` / `legacyFilename` needed for the emitter to reconstruct the original
+ * Assign the minimal `title` / `id` needed for the emitter to reconstruct the original
  * x-ms-examples key and file name. Both are omitted whenever they follow the default convention
  * (key = `operationId`, file = `<operationId>.json`), so the common case stays clean.
  */
@@ -126,7 +114,7 @@ function assignNaming(
     }
     // The key is recoverable from the file name (`Foo.json` -> key `Foo`) => store only the file.
     if (key === stripJsonExtension(fileName)) {
-      variant.legacyFilename = fileName;
+      variant.id = stripJsonExtension(fileName);
       return;
     }
   }
@@ -135,6 +123,6 @@ function assignNaming(
   // the file name only needs storing when it deviates from the `operationId`+`title` default.
   variant.title = key;
   if (fileName !== defaultLegacyExampleFilename(operationId, key)) {
-    variant.legacyFilename = fileName;
+    variant.id = stripJsonExtension(fileName);
   }
 }

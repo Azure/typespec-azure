@@ -133,3 +133,67 @@ files even though most generated client implementation files are ignored.
   cite the governing rule or the relevant `file:line`, and suggest a concrete fix in
   one or two sentences. Prioritize correctness, compatibility, release impact, and
   meaningful coverage; don't repeat another finding or post speculative suggestions.
+
+## Linter PR review guidelines
+
+Apply these guidelines to all linter PRs. See the
+[rule authoring guide](../../../website/src/content/docs/docs/howtos/contributing/creating-linter-rules.md)
+for package selection, scaffolding, and registration.
+
+### Implementation and scope
+
+- Reuse existing rules, supported APIs and native callbacks; avoid custom dispatchers or redundant
+  program walks. Collect cross-node state in callbacks and report in `exit` when needed.
+- Evaluate simplification and consolidation against the native guideline and released
+  compatibility, not merely the proposed design or its tests. Justify custom resolvers and
+  special cases with supported inputs that need them.
+- Use the narrowest semantic APIs needed. Prefer native types and structured metadata over
+  generated-output heuristics; handle returned resolution diagnostics explicitly rather than
+  treating failed resolution as compliance.
+- Keep applicability, exceptions, targets, and enablement consistent across code, registration,
+  rulesets, tests, docs, and changelogs. Distinguish registration from ruleset activation.
+- Keep PRs focused. Separate behavior-preserving cleanup from intentional policy changes.
+
+### Tests
+
+- Use shared package testers and `createLinterRuleTester`; no file-local `createTester` definitions.
+  Assert shipped behavior through valid/invalid inputs and diagnostic messages/counts/targets.
+  Use built-in markers, not calculated offsets.
+- Extend the existing canonical behavior suite for each rule, including when its filename
+  differs from the public rule name. Avoid duplicate suites and per-rule tests that inspect
+  implementation source to enforce architecture.
+- Keep tests lean and scoped to the rule's responsibilities. Use representative valid/invalid
+  cases and distinct boundaries, not exhaustive cross-products; avoid redundant permutations
+  and assertions about unrelated behavior. Preserve regressions that protect distinct
+  rule-owned behavior.
+- Avoid duplicating compiler behavior or another rule's independent assertions. Keep integration
+  tests for concrete interactions and registration/default checks in public-entry/ruleset suites.
+  Prefer behavioral assertions; do not hide unexpected diagnostics with filtering.
+- Reconcile final PR acceptance claims with evidence at the appropriate test layer. Preserve
+  distinct rule-owned coverage during cleanup; remove framework-only cases and stale claims
+  rather than relocating redundant tests.
+- Run existing checks and distinguish local results from pending or failed CI.
+  Measure representative timing and memory for substantial traversal/resolution changes.
+
+### Rule documentation
+
+- Write for TypeSpec authors: explain the requirement, applicability, rationale, and correction.
+  Keep implementation details and agent instructions out of public rule pages.
+- Edit `packages/<pkg>/src/rules/<rule-name>.md` and regenerate reference docs with the owning
+  package's command; do not patch generated pages alone.
+
+### Documentation examples
+
+- Show a minimal incorrect/correct pair. Omit unrelated setup and state assumed context;
+  each excerpt need not be standalone.
+- Prefer audience-appropriate standard templates and supported customization arguments.
+  Both examples must reach the intended check; fix the violation rather than bypassing it.
+- Validate the actual published excerpts with the target rule explicitly enabled and
+  reproducible public setup. Both must compile without unrelated errors; assert the intended
+  diagnostics for the incorrect example and none from that rule for the correction.
+  Do not add bespoke Markdown parsers or fence-count tests.
+
+### Changelog entries
+
+- When reviewing a PR, check for redundant changelog entries. Ensure entries describe the
+  final changes, not the PR's revision history or intermediate review-driven cleanup.

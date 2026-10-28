@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-examples",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "author": "Microsoft Corporation",
   "description": "Tooling for the Azure unified examples format (examples.yaml): JSON Schema and the tsp-examples CLI",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -19,16 +19,25 @@
     "examples"
   ],
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/src/node.js",
   "exports": {
     ".": {
+      "node": {
+        "types": "./dist/src/node.d.ts",
+        "default": "./dist/src/node.js"
+      },
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
+    },
+    "./node": {
+      "types": "./dist/src/node.d.ts",
+      "default": "./dist/src/node.js"
     }
   },
   "bin": {
     "tsp-examples": "./dist/src/cli.js",
-    "tsp-examples-migrate": "./dist/src/migrate-cli.js"
+    "tsp-examples-migrate": "./dist/src/migrate-cli.js",
+    "tsp-examples-legacy-expand": "./dist/src/legacy-expand-cli.js"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -53,9 +62,18 @@
   ],
   "dependencies": {
     "ajv": "catalog:",
+    "ajv-formats": "catalog:",
     "picocolors": "catalog:",
     "yaml": "catalog:",
     "yargs": "catalog:"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@typespec/compiler": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -63,6 +81,7 @@
     "@typespec/compiler": "workspace:^",
     "@typespec/json-schema": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
+    "esbuild": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
