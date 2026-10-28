@@ -176,10 +176,7 @@ export interface CreateSdkContextOptions {
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
   /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
   convertDiscriminatedUnionsToModels?: boolean;
-  /**
-   * Opt in only after implementing source-aware completion and ordered result paths
-   * for `@clientLroResult`. Without this, unsupported advanced selections are errors.
-   */
+  /** Whether the emitter supports response-source selection and nested LRO result paths. Default: false. */
   supportsAdvancedLroResultSelection?: boolean;
 }
 

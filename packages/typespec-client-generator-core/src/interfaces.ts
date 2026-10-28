@@ -1193,7 +1193,7 @@ interface SdkLroServiceMethodOptions {
 }
 
 /**
- * Long running operation metadata.
+ * Response source for a selected LRO result.
  */
 export type ClientLroResultSource =
   | { kind: "polling" }
@@ -1201,18 +1201,21 @@ export type ClientLroResultSource =
   | { kind: "final-operation" };
 
 /**
- * TCGC-selected raw LRO metadata. Core's default metadata remains unchanged.
+ * Raw LRO metadata with the selected client result.
  */
 export interface ClientLroMetadata extends LroMetadata {
-  /** Response supplying the selected value; required completion steps remain in the protocol fields. */
+  /** Response containing the selected result. */
   finalResultSource?: ClientLroResultSource;
   /**
-   * Complete extraction path. When present, this replaces the legacy single-property
-   * `finalResultPath` and `logicalPath` fields, which are omitted for nested selections.
+   * Ordered extraction path; empty for a whole body.
+   * Nested paths omit the legacy `finalResultPath` and `logicalPath` fields.
    */
   finalResultSegments?: ModelProperty[];
 }
 
+/**
+ * Long running operation metadata.
+ */
 export interface SdkLroServiceMetadata {
   /** Core-compatible raw metadata with TCGC-selected client result fields. */
   __raw: ClientLroMetadata;
@@ -1356,7 +1359,7 @@ export interface SdkLroServiceFinalResponse {
   result: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
-  /** Selected response source. This does not remove any required completion request. */
+  /** Response containing the selected result. */
   resultSource?:
     | { kind: "polling" }
     | { kind: "original-uri"; operation: SdkServiceOperation }
