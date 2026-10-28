@@ -172,11 +172,7 @@ describe("@clientLroResult paging", () => {
       };
       @@clientLroResult(start, ${selected});
     `);
-    const context = await createSdkContextForTester(
-      program,
-      {},
-      { supportsAdvancedLroResultSelection: true },
-    );
+    const context = await createSdkContextForTester(program);
     expectDiagnostics(context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-client-lro-result",
       severity: "error",
@@ -185,8 +181,52 @@ describe("@clientLroResult paging", () => {
     strictEqual(context.sdkPackage.clients[0].methods.length, 0);
   });
 
-  it("preserves header-based continuation outside the selected body", async () => {
+  it("preserves nested page and body-continuation coordinates", async () => {
     const { program } = await AzureCoreTester.compile(`
+      @service namespace TestService;
+      model Item { value: string; }
+      model Page {
+        @pageItems items: Item[];
+        @TypeSpec.nextLink next?: string;
+        @continuationToken token?: string;
+      }
+      model Envelope { page: Page; }
+      model Status {
+        @lroStatus status: "Succeeded" | "Failed" | "Canceled";
+        @lroResult result: Envelope;
+      }
+      @list @post op start(@continuationToken @query token?: string): {
+        @pollingLocation @header location: ResourceLocation<Status>;
+        @body body: Status;
+      };
+      @@clientLroResult(start, Status.result::type.page);
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnosticEmpty(context.diagnostics);
+    const method = getServiceMethodOfClient(context.sdkPackage);
+    strictEqual(method.kind, "lropaging");
+    deepStrictEqual(
+      method.lroMetadata.finalResponse?.resultSegments?.map((property) => property.name),
+      ["result", "page"],
+    );
+    deepStrictEqual(
+      method.response.resultSegments?.map((property) => property.name),
+      ["result", "page", "items"],
+    );
+    deepStrictEqual(
+      method.pagingMetadata.nextLinkSegments?.map((property) => property.name),
+      ["result", "page", "next"],
+    );
+    deepStrictEqual(
+      method.pagingMetadata.continuationTokenResponseSegments?.map((property) => property.name),
+      ["result", "page", "token"],
+    );
+  });
+
+  it.each(["Status.result", "Status.result::type.items"])(
+    "preserves header-based continuation when selecting %s",
+    async (selected) => {
+      const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Item { value: string; }
       model Page { @pageItems items: Item[]; }
@@ -199,15 +239,16 @@ describe("@clientLroResult paging", () => {
         @TypeSpec.nextLink @header next?: string;
         @body body: Page;
       };
-      @@clientLroResult(start, Status.result);
+      @@clientLroResult(start, ${selected});
     `);
-    const context = await createSdkContextForTester(program);
-    expectDiagnosticEmpty(context.diagnostics);
-    const method = getServiceMethodOfClient(context.sdkPackage);
-    strictEqual(method.kind, "lropaging");
-    strictEqual(method.pagingMetadata.nextLinkSegments?.[0].kind, "responseheader");
-    strictEqual(method.pagingMetadata.nextLinkSegments[0].name, "next");
-  });
+      const context = await createSdkContextForTester(program);
+      expectDiagnosticEmpty(context.diagnostics);
+      const method = getServiceMethodOfClient(context.sdkPackage);
+      strictEqual(method.kind, "lropaging");
+      strictEqual(method.pagingMetadata.nextLinkSegments?.[0].kind, "responseheader");
+      strictEqual(method.pagingMetadata.nextLinkSegments[0].name, "next");
+    },
+  );
 });
 
 it("normal paged result", async () => {

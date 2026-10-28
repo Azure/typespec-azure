@@ -67,10 +67,14 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
   convertDiscriminatedUnionsToModels?: boolean;
-  /** Whether the emitter handles structured LRO result paths and response-source selection. */
-  supportsAdvancedLroResultSelection?: boolean;
-
-  __clientLroMetadataCache?: Map<Operation, ClientLroMetadata | undefined>;
+  __clientLroMetadataCache?: Map<
+    Operation,
+    {
+      metadata: LroMetadata | undefined;
+      resultProperties?: ModelProperty[];
+      diagnostics: readonly Diagnostic[];
+    }
+  >;
   __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
@@ -1193,32 +1197,11 @@ interface SdkLroServiceMethodOptions {
 }
 
 /**
- * Response source for a selected LRO result.
- */
-export type ClientLroResultSource =
-  | { kind: "polling" }
-  | { kind: "original-uri"; operation: Operation }
-  | { kind: "final-operation" };
-
-/**
- * Raw LRO metadata with the selected client result.
- */
-export interface ClientLroMetadata extends LroMetadata {
-  /** Response containing the selected result. */
-  finalResultSource?: ClientLroResultSource;
-  /**
-   * Ordered extraction path; empty for a whole body.
-   * Nested paths omit the legacy `finalResultPath` and `logicalPath` fields.
-   */
-  finalResultSegments?: ModelProperty[];
-}
-
-/**
  * Long running operation metadata.
  */
 export interface SdkLroServiceMetadata {
   /** Core-compatible raw metadata with TCGC-selected client result fields. */
-  __raw: ClientLroMetadata;
+  __raw: LroMetadata;
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
   /** Polling step metadata */
@@ -1359,11 +1342,6 @@ export interface SdkLroServiceFinalResponse {
   result: SdkModelType | SdkArrayType | SdkBuiltInType;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
-  /** Response containing the selected result. */
-  resultSource?:
-    | { kind: "polling" }
-    | { kind: "original-uri"; operation: SdkServiceOperation }
-    | { kind: "final-operation" };
 }
 
 /**

@@ -405,8 +405,7 @@ export const $lib = createTypeSpecLibrary({
       ...doc("unsupported-client-lro-result"),
       severity: "error",
       messages: {
-        default:
-          "The emitter has not enabled advanced LRO result selection. This selection requires source-aware completion or structured result-path support.",
+        default: paramMessage`${"reason"}`,
       },
     },
     "non-head-bool-response-decorator": {

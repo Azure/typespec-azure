@@ -4,12 +4,13 @@ import { getClientNameOverride } from "../decorators.js";
 import type { TCGCContext } from "../interfaces.js";
 import {
   clientLroResultKey,
+  type ClientLroResultReference,
   listScopedDecoratorData,
   negationScopesKey,
   overrideKey,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
-import { type ClientLroResultReference, resolveClientLroResult } from "../lro-result.js";
+import { resolveClientLroResult } from "../lro-metadata.js";
 
 export function validateMethods(context: TCGCContext) {
   validateClientNameNotOnOverriddenMethods(context);
@@ -25,13 +26,15 @@ function validateClientLroResults(context: TCGCContext) {
     }
     const protocol = getLroProtocolMetadata(context.program, operation);
     for (const reference of references) {
-      const [, diagnostics] = resolveClientLroResult(
-        context.program,
-        operation,
-        protocol,
-        reference,
+      const [, diagnostics] = resolveClientLroResult(context.program, protocol, reference);
+      // Completion-source restrictions apply only in the active language context.
+      context.program.reportDiagnostics(
+        diagnostics.filter(
+          (diagnostic) =>
+            diagnostic.code !==
+            "@azure-tools/typespec-client-generator-core/unsupported-client-lro-result",
+        ),
       );
-      context.program.reportDiagnostics(diagnostics);
     }
   }
 }

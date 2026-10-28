@@ -766,10 +766,10 @@ getHealthStatus(
 #### `@clientLroResult`
 
 Selects the client result of a long-running operation without changing its protocol.
-A model selects the whole response body; a property selects its value.
+A model selects the whole completion body; a property selects its value.
 
 See [LRO result customization](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
-for supported selections and emitter requirements.
+for supported selections.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
