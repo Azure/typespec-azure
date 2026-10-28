@@ -69,6 +69,14 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("enables dynamic-model C# scope guidance in SDK rulesets", () => {
+    const ruleName =
+      "@azure-tools/typespec-client-generator-core/use-csharp-scope-for-dynamic-model";
+    for (const rulesetName of ["client-sdk", "data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], true);
+    }
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);

@@ -6,6 +6,7 @@ import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { useCorrectVerbRule } from "./rules/use-correct-verb.js";
+import { useCsharpScopeForDynamicModelRule } from "./rules/use-csharp-scope-for-dynamic-model.js";
 import { useUnionHierarchyRule } from "./rules/use-union-hierarchy.js";
 
 const rules = [
@@ -17,6 +18,7 @@ const rules = [
   csharpUseStandardAcronymsRule,
   getOperationNameRule,
   useUnionHierarchyRule,
+  useCsharpScopeForDynamicModelRule,
 ];
 
 const csharpRules = [
@@ -24,6 +26,7 @@ const csharpRules = [
   csharpNoUrlSuffixRule,
   csharpModelSuffixRule,
   csharpUseStandardAcronymsRule,
+  useCsharpScopeForDynamicModelRule,
 ];
 
 export const $linter = defineLinter({
