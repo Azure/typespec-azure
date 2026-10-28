@@ -411,7 +411,10 @@ percentage.
 For publication, put concise, reproducible pilot evidence in authored tooling
 documentation; keep generated corpora and machine-specific payloads out of Git.
 The skill's orchestration must push the dedicated personal-fork evidence branch,
-verify its actual remote head and return immutable note/receipt links. Include
+verify its actual remote head and return the actual branch-based report URL for
+the PR plus separate immutable note/receipt links for audit and replay. Keep the
+PR URL unchanged across report updates under the
+[shared PR description contract](../shared/migration-pr-description.md). Include
 the specs retention method and the instructions needed to recover inputs and
 regenerate data and `migration.md`. Distinguish reading saved evidence,
 reanalyzing downloaded observations and fully rerunning the frozen comparison;

@@ -156,13 +156,18 @@ Validate immutable candidate snapshot `S` and packages `P`. After required
 checks/local review, commit native task content `C` and verify its source equals
 the tested snapshot; retain both identities where different. Evidence commit
 `E` references `C`, `S`, `P` and baseline `B`; the native PR's migration-report
-section links directly to `migration.md` in pushed `E`, under the shared
+section links directly to `migration.md` on the actual evidence branch whose
+verified pushed head is `E`, under the shared
 [two-section PR body](../shared/migration-pr-description.md). Keep provenance in
 that report or its appendix, not extra PR content.
 Do not amend `C` merely to insert its own evidence hash.
 The evidence publisher returns `E` after pushing; `migration.md` need not
 contain its own commit ID. Subsequent evidence commits can append review and
 publication receipts for `C`, not fictional reviews of themselves.
+Keep the evidence branch and report path stable, including after the native PR
+merges; do not delete or rename them as routine PR cleanup. Later report commits
+use the same branch-based PR URL. Record each new pushed SHA and its immutable
+report/receipt links in append-only audit records instead of rewriting that URL.
 
 Baseline identity includes schemas, specs/core/compiler/library/emitter closure,
 lock/integrity data, actual AutoRest/validator/rulesets, generator/worker identity,
@@ -208,8 +213,10 @@ temporary checkout after preserving any unique files and stopping its activity.
 This keeps the recovery gate intact while allowing later runs to reuse inputs.
 
 Push the evidence branch and return its repository/ref, actual pushed commit,
-immutable `migration.md` link, specs retention tuple and asset/verification
-receipts. Local commits or ignored output alone do not satisfy publication.
+branch-based `migration.md` URL for the PR, separate immutable report/receipt
+links for audit and replay, specs retention tuple and asset/verification receipts.
+Verify both URL forms against the actual pushed branch head. Local commits or
+ignored output alone do not satisfy publication.
 Preserve the following distinct recovery paths:
 
 - **Read saved evidence:** retrieve the committed note, manifests and linked

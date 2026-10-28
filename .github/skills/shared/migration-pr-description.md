@@ -25,7 +25,7 @@ The entire PR body must contain exactly these two sections, in this order:
 
 ## Migration report
 
-[migration.md](<published migration.md URL>)
+[migration.md](<published branch-based migration.md URL>)
 ```
 
 Use direct, verified GitHub links to the original validator documentation and
@@ -37,10 +37,21 @@ documentation. Keep the exact heading and lowercase `linter code:` /
 `linter doc:` labels. Use the actual documentation basename as its link text.
 
 The second section links directly to the task's pushed, readable `migration.md`,
-not a local path, folder, archive, or unpublished branch. For native-first
-evidence, use the immutable evidence commit. A group links its group note here;
-the group note links all member notes. Verify the links before publication and
-read back the complete PR body after creation or a description update.
+using the actual report branch rather than a commit SHA:
+`https://github.com/<owner>/<repo>/blob/<actual-report-branch>/<report-path>/migration.md`.
+Resolve the repository, branch and path from the verified publication binding;
+do not guess a branch, use `HEAD`, or substitute `main` for the evidence branch.
+For native-first evidence, use the actual pushed evidence branch. Do not use a
+local path, folder, archive, or unpublished branch. A group links its group note
+here; the group note links all member notes.
+
+Keep the branch and report path stable so later evidence commits appear through
+the same PR link. Do not replace the URL with a new commit permalink after each
+report update. Retain the published commit SHA and immutable report/receipt
+permalinks in audit records, not in place of the branch-based PR report link.
+Verify that the branch resolves to the recorded pushed commit and the report
+exists there before publication. Read back the complete PR body after creation
+or a description update, and recheck the unchanged link after report updates.
 
 Do not add an introduction, summary, checklist, implementation explanation,
 validation section, provenance block, local worktree paths, footer, or other
