@@ -742,15 +742,17 @@ the newly generated results. This step is required for every rule that proceeds
 through the Development workflow, including runs that started with an empty
 diff or required no production rule change.
 
-#### Use the shared five-section report
+#### Use the shared four-section report plus NOTES
 
 Follow the [migration report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note):
 conclusion and scope; actual coverage; function-level coverage; count differences;
-examples and required action. Lead with evidenced standard-case successes as
-well as remaining limits. Separate representation corner cases from missing
-core behavior; a targeted stress-test percentage is not production coverage.
-Include a working example when supported and link each remaining material case
-directly to its small source/schema explanation.
+then NOTES. Name and hyperlink the original Swagger linter, state the
+evidence-backed conclusion briefly, and distinguish diagnostic totals from
+project counts. Keep only differing projects/diagnostic groups in the difference
+section. Put technical context in NOTES and code-backed examples under directly
+linked appendix groups; do not add a standalone fifth examples/actions section.
+Separate representation corner cases from missing core behavior; a targeted
+stress-test percentage is not production coverage.
 
 If comparison is blocked, state the blocker instead of implying parity. If
 counts match, do not treat equality as proof of equivalence. Do not lead with
@@ -891,7 +893,7 @@ The reviewer must:
   `refs/remotes/origin/<target-branch>`, not a same-named local branch
 - inspect the production rule, fixtures, snapshots, `rule.md`, `migration.md`
   and its linked supporting evidence
-- verify the shared five-section migration report: evidenced positives,
+- verify the shared four-section migration report plus NOTES: evidenced positives,
   actual counts, core/corner-case context, concrete causes, rule-change decision
   and material uncertainty must agree with the linked evidence; examples must
   be easy to reach, and stress-test percentages must not imply production coverage
@@ -1027,7 +1029,7 @@ creating a draft PR.
    original Swagger documentation/logic links, then the published `migration.md`
    link. Add no other body content.
    Keep the following required explanation in `migration.md` or its linked
-   appendix, within the shared five-section report contract:
+   appendix, within the shared four-section report plus NOTES contract:
    - **Original Swagger linter:** link the original documentation and
      implementation and list every specific check the original rule performs.
    - **How the Swagger linter works:** explain the Swagger objects it inspects,

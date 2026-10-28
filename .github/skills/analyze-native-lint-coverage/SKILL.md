@@ -395,11 +395,14 @@ to equalize counts.
 ## Deliverable
 
 Write `migration.md` using the shared
-[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Highlight evidenced core behavior alongside remaining gaps, distinguish targeted
-corner-case tests from production prevalence, and provide quick inline examples
-with direct links to the others. Keep full evidence and reproduction details in
-a linked appendix; brevity does not waive any required control or investigation.
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Link the original Swagger linter in the short conclusion. Keep raw diagnostic
+totals distinct from project counts and justified after-analysis counts. Explain
+only differing projects/diagnostic groups in section 4, with direct links to
+grouped evidence and code-backed examples in the appendix. Put technical context
+in NOTES, not a standalone fifth examples/actions section. Preserve behavior
+coverage, material gaps and all required controls, investigations and replay
+evidence; test-case counts do not measure production prevalence.
 
 Return the report path, candidate/specs identities, actual loaded packages,
 selected/assessable/failed population, raw and aligned results, scope limitations,

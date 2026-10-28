@@ -63,5 +63,6 @@ in the migration report or its appendix.
 Keep all required analysis and evidence in `migration.md` or its linked appendix:
 validator/native mapping, original and native logic, examples, source provenance,
 destination rationale, fixture-to-test mapping, counts, validation outcomes and
-limitations, and repair/sync policy. Follow the shared five-section migration
-report contract; the short PR body does not waive any checks or disclosures.
+limitations, and repair/sync policy. Follow the shared
+[four-section migration report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note);
+the short PR body does not waive any checks or disclosures.

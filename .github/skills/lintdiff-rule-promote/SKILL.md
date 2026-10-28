@@ -1088,7 +1088,7 @@ original Swagger documentation/logic links, then the published `migration.md`
 link. Add no other body content.
 
 Keep all of the following required analysis in `migration.md` or its linked
-appendix, within the shared five-section report contract:
+appendix, within the shared four-section report plus NOTES contract:
 
 - **Original Swagger linter:** link the original documentation and implementation
   and list every specific check the original rule performs.

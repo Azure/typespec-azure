@@ -181,14 +181,15 @@ evaluation; current-time reassessment needs a fresh validator run.
 ## Migration note and replay
 
 Write singleton, group and member `migration.md` using the shared
-[five-section report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Lead with evidenced standard-case successes alongside remaining limits. Make
-actual counts easy to find, distinguish targeted representation corner cases
-from production coverage, and show a working example plus representative gaps.
-Link each additional material case directly to a short source/schema example.
-Preserve long investigations and replay instructions in `evidence-details.md`
-or an existing linked appendix; it is part of the published evidence, not omitted
-validation.
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Keep the linked original Swagger linter and supported conclusion short, and
+diagnostic totals distinct from project counts. Section 4 covers only differing
+projects/diagnostic groups; the appendix groups their exact targets and both
+linters' counts, causes and dispositions. Retain matching controls separately.
+Put technical context in NOTES and source/schema examples, full investigations
+and replay instructions in `evidence-details.md` or an existing linked appendix.
+Do not add a standalone fifth examples/actions section. Supporting evidence
+remains required; moving it does not waive validation or hide material limits.
 
 The group note retains the member status matrix, combined raw/comparable counts,
 directional gaps and explanations in the corresponding sections. Link every
