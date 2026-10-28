@@ -1669,6 +1669,8 @@ export function getEffectiveSdkModelProperty(
 ): SdkModelPropertyType | undefined {
   let current: SdkModelType | undefined = model;
   while (current) {
+    // Raw selection already excludes overridden base properties. Legacy hierarchy rebasing can
+    // replace a selected property with a same-named property whose __raw has a different identity.
     const property = current.properties.find(
       (candidate) => candidate.__raw === rawProperty || candidate.__raw?.name === rawProperty.name,
     );
@@ -2584,6 +2586,7 @@ function updateLroStatusMetadataUsageAndAccess(
         diagnostics.pipe(
           updateUsageOrAccess(context, propertyAccess ?? operationAccess, sdkProperty.type),
         );
+        // Match the existing LRO serialization path's JSON assumption, not arbitrary media types.
         setSerializationOptions(context, sdkProperty, ["application/json"]);
         updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
       }

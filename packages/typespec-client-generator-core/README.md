@@ -1013,6 +1013,9 @@ Emitters expose these values on their idiomatic poller or operation object and s
 current after each poll. Metadata is not part of the continuation token; after rehydration, the
 next poll populates it again.
 
+Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
+are diagnosed once at declaration time.
+
 ```typespec
 @Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
 ```

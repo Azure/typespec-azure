@@ -407,6 +407,8 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   const diagnostics = createDiagnosticCollector();
   // TCGC selects the client result; Core remains responsible for protocol steps.
   const nativeMetadata = getRawLroMetadata(context.program, operation);
+  // Native discovery returns the same cached object through both helpers. Only the legacy
+  // @markAsLro fallback differs, and it intentionally does not supply status metadata selections.
   const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return diagnostics.wrap(undefined);

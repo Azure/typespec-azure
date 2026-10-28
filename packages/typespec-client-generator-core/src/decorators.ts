@@ -115,7 +115,7 @@ interface ScopedLroDecorator {
 const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
 const [getLroStatusMetadataEntries, setLroStatusMetadataEntries] = useStateMap<
   ModelProperty,
-  ScopedLroDecorator
+  ScopedLroDecorator[]
 >(lroStatusMetadataKey);
 
 export const $lroStatusMetadata: LroStatusMetadataDecorator = (
@@ -123,7 +123,9 @@ export const $lroStatusMetadata: LroStatusMetadataDecorator = (
   target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  if (getLroStatusMetadataEntries(context.program, target)) {
+  const entries = getLroStatusMetadataEntries(context.program, target) ?? [];
+  const normalizedScope = normalizeScope(scope);
+  if (entries.some((entry) => scopesOverlap(entry.scope, normalizedScope))) {
     reportDiagnostic(context.program, {
       code: "lro-status-metadata-duplicate",
       format: { propertyName: target.name },
@@ -131,20 +133,19 @@ export const $lroStatusMetadata: LroStatusMetadataDecorator = (
     });
     return;
   }
-  setLroStatusMetadataEntries(context.program, target, {
-    scope: normalizeScope(scope),
-    target: context.decoratorTarget,
-  });
+  setLroStatusMetadataEntries(context.program, target, [
+    ...entries,
+    { scope: normalizedScope, target: context.decoratorTarget },
+  ]);
 };
 
 export function getLroStatusMetadataDecorator(
   context: TCGCContext,
   target: ModelProperty,
 ): ScopedLroDecorator | undefined {
-  const entry = getLroStatusMetadataEntries(context.program, target);
-  return entry && (!entry.scope || isScopeApplicable(entry.scope, context.emitterName))
-    ? entry
-    : undefined;
+  return getLroStatusMetadataEntries(context.program, target)?.find(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
 }
 
 /**
@@ -172,6 +173,22 @@ function getEffectiveScope(scope: string): EffectiveScope {
   return positives.length === 0
     ? { kind: "all-except", scopes: [] }
     : { kind: "only", scopes: positives };
+}
+
+function scopesOverlap(left: string | undefined, right: string | undefined): boolean {
+  const a = getEffectiveScope(left ?? "");
+  const b = getEffectiveScope(right ?? "");
+  if (a.kind === "only" && b.kind === "only") {
+    return a.scopes.some((scope) => b.scopes.includes(scope));
+  }
+  if (a.kind === "only") {
+    return a.scopes.some((scope) => !b.scopes.includes(scope));
+  }
+  if (b.kind === "only") {
+    return b.scopes.some((scope) => !a.scopes.includes(scope));
+  }
+  // Two finite exclusion lists always leave some emitter scopes in common.
+  return true;
 }
 
 function isSemanticallyEqualScope(left: string, right: string): boolean {

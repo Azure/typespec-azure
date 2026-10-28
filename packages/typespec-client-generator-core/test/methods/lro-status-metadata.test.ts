@@ -747,6 +747,123 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
     ).not.toContain("@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate");
   });
 
+  it.each([
+    { left: "python", right: "javascript", duplicate: false, selected: ["python", "javascript"] },
+    { left: "javascript", right: "python", duplicate: false, selected: ["python", "javascript"] },
+    {
+      left: undefined,
+      right: "python",
+      duplicate: true,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+    { left: "python", right: undefined, duplicate: true, selected: ["python"] },
+    { left: "!python", right: "java", duplicate: true, selected: ["javascript", "java", "csharp"] },
+    { left: "java", right: "!python", duplicate: true, selected: ["java"] },
+    {
+      left: "!python",
+      right: "python",
+      duplicate: false,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+    {
+      left: "python",
+      right: "!python",
+      duplicate: false,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+    { left: "python", right: "python", duplicate: true, selected: ["python"] },
+    {
+      left: "python, javascript",
+      right: "javascript, java",
+      duplicate: true,
+      selected: ["python", "javascript"],
+    },
+    {
+      left: "python, javascript",
+      right: "java, csharp",
+      duplicate: false,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+    {
+      left: "!(python, javascript)",
+      right: "python,javascript",
+      duplicate: false,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+    {
+      left: "!python",
+      right: "!java",
+      duplicate: true,
+      selected: ["javascript", "java", "csharp"],
+    },
+    {
+      left: "!python,python",
+      right: "python",
+      duplicate: true,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+  ])(
+    "checks declaration overlap for $left + $right",
+    async ({ left, right, duplicate, selected }) => {
+      const augment = (scope: string | undefined) =>
+        `@@lroStatusMetadata(PollingMetadataBase.request_token${scope === undefined ? "" : `, ${JSON.stringify(scope)}`});`;
+      const [{ program }, compileDiagnostics] = await Tester.compileAndDiagnose(
+        operation.replace("@lroStatusMetadata\n  request_token", "request_token") +
+          augment(left) +
+          augment(right),
+      );
+      expect(compileDiagnostics.map((x) => x.code)).toEqual(
+        duplicate
+          ? ["@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate"]
+          : [],
+      );
+      for (const emitter of ["python", "javascript", "java", "csharp"]) {
+        const context = await createSdkContextForTester(program, {
+          emitterName: `@azure-tools/typespec-${emitter}`,
+        });
+        expect(context.diagnostics).toHaveLength(0);
+        const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+        ok(method);
+        strictEqual(method.kind, "lro");
+        const properties = method.lroMetadata.statusMetadata?.map((x) => x.property.name);
+        expect(properties).toEqual([
+          "percentComplete",
+          "details",
+          ...(selected.includes(emitter) ? ["requestToken"] : []),
+        ]);
+      }
+    },
+  );
+
+  it("checks later augments against every accepted declaration, including options bags", async () => {
+    const [{ program }, diagnostics] = await Tester.compileAndDiagnose(
+      operation.replace("@lroStatusMetadata\n  request_token", "request_token") +
+        `
+@@lroStatusMetadata(PollingMetadataBase.request_token, #{scope: "python"});
+@@lroStatusMetadata(PollingMetadataBase.request_token, #{scope: "javascript"});
+@@lroStatusMetadata(PollingMetadataBase.request_token, "javascript");
+@@lroStatusMetadata(PollingMetadataBase.request_token, "java");
+`,
+    );
+    expect(diagnostics.map((x) => x.code)).toEqual([
+      "@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate",
+    ]);
+    for (const emitter of ["python", "javascript", "java"]) {
+      const context = await createSdkContextForTester(program, {
+        emitterName: `@azure-tools/typespec-${emitter}`,
+      });
+      expect(context.diagnostics).toHaveLength(0);
+      const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+      ok(method);
+      strictEqual(method.kind, "lro");
+      expect(method.lroMetadata.statusMetadata?.map((x) => x.property.name)).toEqual([
+        "percentComplete",
+        "details",
+        "requestToken",
+      ]);
+    }
+  });
+
   it("does not change undecorated LRO metadata", async () => {
     const { program } = await Tester.compile(
       operation.replaceAll(/ {2}@lroStatusMetadata(?:\([^)]*\))?\n/g, ""),
