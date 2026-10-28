@@ -32,6 +32,7 @@ export interface NativeProjectResult {
   diagnostics: NativeDiagnostic[];
   packages: NativePackage[];
   defaultTargetDiagnostics?: Array<{ rule: string; message: string }>;
+  defaultActivation?: "not-assessed";
 }
 
 interface DatasetProject {
@@ -54,7 +55,7 @@ interface ProjectCounts {
   validatorRawCount: number;
   validatorFileIndependentCount: number;
   nativeRawCount: number;
-  nativeDefaultCount: number;
+  nativeDefaultCount: number | null;
   nativeAlignedCount: number;
   nativeSourceCount: number;
   nativeLocationlessCount: number;
@@ -77,6 +78,10 @@ export interface Config {
   limit?: number;
   baselineRun?: string;
   baselineCompatibilityReceipt?: string;
+  baselinePolicy?: "strict" | "frozen-reference";
+  candidateWorkingTree?: boolean;
+  nativeBudgetSeconds?: number;
+  nativeMode?: "configured" | "target-only";
 }
 
 export function parseNativeCoverageArgs(args: string[]): Config {
@@ -97,6 +102,10 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     "--limit",
     "--baseline-run",
     "--baseline-compatibility-receipt",
+    "--baseline-policy",
+    "--candidate-working-tree",
+    "--native-budget-seconds",
+    "--native-mode",
   ]);
   for (let index = 0; index < args.length; index += 2) {
     const name = args[index];
@@ -158,6 +167,28 @@ export function parseNativeCoverageArgs(args: string[]): Config {
   if (values.has("--baseline-compatibility-receipt") && !values.has("--baseline-run")) {
     throw new Error("--baseline-compatibility-receipt requires --baseline-run.");
   }
+  const baselinePolicy = values.get("--baseline-policy") ?? "strict";
+  if (baselinePolicy !== "strict" && baselinePolicy !== "frozen-reference") {
+    throw new Error(`Unsupported baseline policy: ${baselinePolicy}`);
+  }
+  if (
+    baselinePolicy === "frozen-reference" &&
+    (!values.has("--baseline-run") || values.has("--baseline-compatibility-receipt"))
+  ) {
+    throw new Error("frozen-reference requires --baseline-run without a lint-only receipt.");
+  }
+  const candidateWorkingTree = values.get("--candidate-working-tree") ?? "false";
+  if (candidateWorkingTree !== "true" && candidateWorkingTree !== "false") {
+    throw new Error("--candidate-working-tree must be true or false.");
+  }
+  const nativeMode = values.get("--native-mode") ?? "configured";
+  if (nativeMode !== "configured" && nativeMode !== "target-only") {
+    throw new Error(`Unsupported native mode: ${nativeMode}`);
+  }
+  const nativeBudgetSeconds = positiveInteger("--native-budget-seconds");
+  if (nativeBudgetSeconds !== undefined && nativeBudgetSeconds > 2_147_483) {
+    throw new Error("--native-budget-seconds exceeds the supported timer range.");
+  }
   if (
     scope === "boolean-http" &&
     (tspRules.length !== 1 || tspRules[0] !== "@azure-tools/typespec-azure-core/no-boolean")
@@ -179,6 +210,10 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     limit: positiveInteger("--limit"),
     baselineRun: values.get("--baseline-run"),
     baselineCompatibilityReceipt: values.get("--baseline-compatibility-receipt"),
+    baselinePolicy,
+    candidateWorkingTree: candidateWorkingTree === "true",
+    nativeBudgetSeconds,
+    nativeMode,
   };
 }
 
@@ -242,7 +277,10 @@ export function buildNativeCoverageReport(
       validatorRawCount: swagger.length,
       validatorFileIndependentCount,
       nativeRawCount: receipt.rawDiagnostics.length,
-      nativeDefaultCount: receipt.defaultTargetDiagnostics?.length ?? 0,
+      nativeDefaultCount:
+        receipt.defaultActivation === "not-assessed"
+          ? null
+          : (receipt.defaultTargetDiagnostics?.length ?? 0),
       nativeAlignedCount: receipt.diagnostics.length,
       nativeSourceCount,
       nativeLocationlessCount: receipt.diagnostics.filter(
@@ -270,7 +308,6 @@ export function buildNativeCoverageReport(
       | "validatorRawCount"
       | "validatorFileIndependentCount"
       | "nativeRawCount"
-      | "nativeDefaultCount"
       | "nativeAlignedCount"
       | "nativeSourceCount"
       | "nativeLocationlessCount",
@@ -315,7 +352,13 @@ export function buildNativeCoverageReport(
     validatorRawCount: sum("validatorRawCount"),
     validatorFileIndependentCount: sum("validatorFileIndependentCount"),
     nativeRawCount: sum("nativeRawCount"),
-    nativeDefaultCount: sum("nativeDefaultCount"),
+    nativeDefaultCount: native.some((item) => item.defaultActivation === "not-assessed")
+      ? null
+      : rows.reduce((total, item) => total + (item.nativeDefaultCount ?? 0), 0),
+    defaultActivationUnassessedProjects: native
+      .filter((item) => item.defaultActivation === "not-assessed")
+      .map((item) => item.project)
+      .sort(),
     nativeAlignedCount: sum("nativeAlignedCount"),
     nativeSourceCount: sum("nativeSourceCount"),
     nativeLocationlessCount: sum("nativeLocationlessCount"),
@@ -434,14 +477,57 @@ function git(root: string, args: string[]): string {
   return execFileSync("git", ["-C", root, ...args], { encoding: "utf8" }).trim();
 }
 
-function snapshot(root: string) {
-  if (git(root, ["status", "--porcelain"])) {
+export function snapshot(root: string, allowWorkingTree = false) {
+  const status = git(root, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  if (status && !allowWorkingTree) {
     throw new Error(`Comparison input must be clean: ${root}`);
   }
+  const changedFiles = allowWorkingTree
+    ? [
+        ...new Set(
+          execFileSync("git", ["-C", root, "diff", "--name-only", "-z", "--no-renames", "HEAD"], {
+            encoding: "utf8",
+          })
+            .split("\0")
+            .filter(Boolean)
+            .concat(
+              execFileSync(
+                "git",
+                ["-C", root, "ls-files", "-z", "--others", "--exclude-standard"],
+                { encoding: "utf8" },
+              )
+                .split("\0")
+                .filter(Boolean),
+            ),
+        ),
+      ]
+        .sort()
+        .map((file) => {
+          const absolute = path.resolve(root, file);
+          const relative = path.relative(root, absolute);
+          if (relative.startsWith("..") || path.isAbsolute(relative)) {
+            throw new Error(`Source path escapes the checkout: ${file}`);
+          }
+          const stat = fs.lstatSync(absolute, { throwIfNoEntry: false });
+          if (!stat) return { file, sha256: null };
+          if (!stat.isFile()) {
+            throw new Error(`Changed source must be a regular file: ${file}`);
+          }
+          return { file, sha256: hash(fs.readFileSync(absolute)) };
+        })
+    : undefined;
   return {
     root,
     repository: git(root, ["remote", "get-url", "origin"]),
     commit: git(root, ["rev-parse", "HEAD"]),
+    ...(allowWorkingTree
+      ? {
+          status,
+          diffSha256: hash(execFileSync("git", ["-C", root, "diff", "--binary", "HEAD"])),
+          indexDiffSha256: hash(execFileSync("git", ["-C", root, "diff", "--cached", "--binary"])),
+          changedFiles,
+        }
+      : {}),
   };
 }
 
@@ -711,7 +797,25 @@ export function validateBaselineCompatibility(
   evidence: BaselineEvidence,
   context: BaselineContext,
   receipt?: unknown,
+  policy: Config["baselinePolicy"] = "strict",
 ): void {
+  if (policy === "frozen-reference") {
+    const selection = (value: BaselineContext) => ({
+      specsCommit: value.specsCommit,
+      specsRepository: value.specsRepository,
+      specsPackageManager: value.specsPackageManager,
+      scope: value.scope,
+      filter: value.filter,
+      limit: value.limit,
+    });
+    if (
+      receipt !== undefined ||
+      contentIdentity(selection(evidence.context)) !== contentIdentity(selection(context))
+    ) {
+      throw new Error("Frozen baseline source or selection is incompatible.");
+    }
+    return;
+  }
   const {
     candidateCommit: beforeCommit,
     artifacts: beforeArtifacts,
@@ -812,6 +916,7 @@ export function reuseBaseline(
   destination: string,
   context: BaselineContext,
   receipt?: unknown,
+  policy: Config["baselinePolicy"] = "strict",
 ) {
   const manifestFile = containedFile(run, "manifest.json");
   const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
@@ -828,7 +933,7 @@ export function reuseBaseline(
   ) {
     throw new Error("Only a completed, sealed schema-2 baseline run can be reused.");
   }
-  validateBaselineCompatibility(evidence, context, receipt);
+  validateBaselineCompatibility(evidence, context, receipt, policy);
   const datasetDir = containedFile(run, "dataset");
   if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
     throw new Error("Baseline dataset inventory or file hashes are corrupt.");
@@ -848,6 +953,12 @@ export function reuseBaseline(
       run: path.resolve(run),
       manifestSha256: hash(fs.readFileSync(manifestFile)),
       baselineIdentity: contentIdentity(evidence),
+      policy,
+      candidateContextIdentity: contentIdentity(context),
+      compatibilityAssumption:
+        policy === "frozen-reference"
+          ? "Candidate runtime is assumed backward compatible; historical Swagger is not re-emitted or proven identical."
+          : null,
       compatibilityReceipt: receipt ?? null,
       compatibilityReceiptIdentity: receipt === undefined ? null : contentIdentity(receipt),
     },
@@ -855,7 +966,7 @@ export function reuseBaseline(
 }
 
 export async function prepareCoverageBaseline(
-  config: Pick<Config, "baselineRun" | "baselineCompatibilityReceipt">,
+  config: Pick<Config, "baselineRun" | "baselineCompatibilityReceipt" | "baselinePolicy">,
   datasetDir: string,
   context: BaselineContext,
   generateSwaggerAndValidate: () => Promise<void>,
@@ -864,7 +975,13 @@ export async function prepareCoverageBaseline(
     const receipt = config.baselineCompatibilityReceipt
       ? JSON.parse(fs.readFileSync(config.baselineCompatibilityReceipt, "utf8"))
       : undefined;
-    return reuseBaseline(path.resolve(config.baselineRun), datasetDir, context, receipt);
+    return reuseBaseline(
+      path.resolve(config.baselineRun),
+      datasetDir,
+      context,
+      receipt,
+      config.baselinePolicy,
+    );
   }
   await generateSwaggerAndValidate();
   const generated = readCoverageDataset(datasetDir, context);
@@ -879,7 +996,15 @@ export async function prepareCoverageBaseline(
   };
 }
 
-async function command(cwd: string, args: string[], log: string): Promise<void> {
+export async function command(
+  cwd: string,
+  args: string[],
+  log: string,
+  deadline?: number,
+): Promise<void> {
+  if (deadline !== undefined && Date.now() >= deadline) {
+    throw new Error("Native execution budget exhausted before project launch.");
+  }
   console.log(`Running ${path.basename(log)}; raw output: ${log}`);
   const fd = fs.openSync(log, "w");
   fs.writeSync(fd, `${JSON.stringify({ cwd, executable: process.execPath, args })}\n`);
@@ -887,9 +1012,26 @@ async function command(cwd: string, args: string[], log: string): Promise<void> 
   try {
     await new Promise<void>((resolve, reject) => {
       const child = spawn(process.execPath, args, { cwd, stdio: ["ignore", fd, fd] });
-      child.once("error", reject);
+      let expired = false;
+      const timeout =
+        deadline === undefined
+          ? undefined
+          : setTimeout(
+              () => {
+                expired = true;
+                child.kill();
+              },
+              Math.max(1, deadline - Date.now()),
+            );
+      child.once("error", (error) => {
+        clearTimeout(timeout);
+        reject(error);
+      });
       child.once("exit", (code, signal) => {
-        if (code === 0) resolve();
+        clearTimeout(timeout);
+        if (expired)
+          reject(new Error(`Native execution budget exhausted; worker stopped; inspect ${log}`));
+        else if (code === 0) resolve();
         else reject(new Error(`Command failed (${code ?? signal}); inspect ${log}`));
       });
     });
@@ -924,7 +1066,7 @@ function markdown(report: ReturnType<typeof buildNativeCoverageReport>, config: 
     `| Observed validator-project coverage | ${report.observedProjectCoveragePercent ?? "N/A"} |`,
     `| Validator raw / file-independent paths | ${report.validatorRawCount} / ${report.validatorFileIndependentCount} |`,
     `| Native raw / aligned / source targets | ${report.nativeRawCount} / ${report.nativeAlignedCount} / ${report.nativeSourceCount} |`,
-    `| Native findings under project defaults | ${report.nativeDefaultCount} |`,
+    `| Native findings under project defaults | ${report.nativeDefaultCount ?? "not assessed"} |`,
     `| Validator excess / native excess | ${report.validatorExcess} / ${report.nativeExcess} |`,
     `| Raw validator excess / raw native excess (primary) | ${report.rawValidatorExcess} / ${report.rawNativeExcess} |`,
     "",
@@ -980,7 +1122,7 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       throw new Error("Output must be outside input checkouts and retained baseline runs.");
     }
   }
-  const candidate = snapshot(candidateRepo);
+  const candidate = snapshot(candidateRepo, config.candidateWorkingTree);
   const specs = snapshot(specsRepo);
   const tgzDir = path.resolve(config.tgzDir);
   const artifacts = fs
@@ -1034,12 +1176,18 @@ export async function runNativeCoverage(config: Config): Promise<void> {
       swagger: "latest-emitted-api-version; production ARM validator; no readme suppressions",
       native: config.nativePackage
         ? "package evidence only; existing project configuration; no selected native lint or comparable finding counts"
-        : "existing project configuration plus explicit mapped-rule enablement; source suppressions retained",
+        : config.nativeMode === "target-only"
+          ? "mapped rules only; configured/inherited target options and source suppressions retained; project default activation not assessed"
+          : "existing project configuration plus explicit mapped-rule enablement; source suppressions retained",
       equivalence: "manual decision required; no fuzzy matching or name-only normalization",
+      baseline: config.baselinePolicy ?? "strict",
     },
     baselineIdentity: undefined as string | undefined,
     baselineReuse: undefined as ReturnType<typeof reuseBaseline>["provenance"] | undefined,
     baselineContext: undefined as BaselineContext | undefined,
+    nativeExecution: undefined as
+      | { startedAt: string; budgetSeconds?: number; finishedAt?: string; budgetExceeded?: boolean }
+      | undefined,
   };
   writeJson(path.join(output, "manifest.json"), manifest);
   try {
@@ -1147,6 +1295,17 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     const { dataset, members } = readCoverageDataset(datasetDir, context);
     const validator = config.validatorRules.flatMap((rule) => members.get(rule) ?? []);
     const native: NativeProjectResult[] = [];
+    const nativeStarted = Date.now();
+    const deadline =
+      config.nativeBudgetSeconds === undefined
+        ? undefined
+        : nativeStarted + config.nativeBudgetSeconds * 1000;
+    const nativeExecution: NonNullable<typeof manifest.nativeExecution> = {
+      startedAt: new Date(nativeStarted).toISOString(),
+      budgetSeconds: config.nativeBudgetSeconds,
+    };
+    manifest.nativeExecution = nativeExecution;
+    writeJson(path.join(output, "manifest.json"), manifest);
     let next = 0;
     await Promise.all(
       Array.from({ length: Math.min(config.concurrency, dataset.projects.length) }, async () => {
@@ -1163,12 +1322,14 @@ export async function runNativeCoverage(config: Config): Promise<void> {
             tspRules: config.tspRules,
             nativePackage: config.nativePackage,
             scope: config.scope,
+            nativeMode: config.nativeMode,
           });
           try {
             await command(
               specsRepo,
               [path.join(import.meta.dirname, "native-coverage-worker.mjs"), input, receipt],
               path.join(output, `native-${index}.log`),
+              deadline,
             );
             native.push(JSON.parse(fs.readFileSync(receipt, "utf8")));
           } catch (error) {
@@ -1187,6 +1348,9 @@ export async function runNativeCoverage(config: Config): Promise<void> {
               rawDiagnostics: [],
               diagnostics: [],
               packages: [],
+              ...(config.nativeMode === "target-only"
+                ? { defaultActivation: "not-assessed" as const }
+                : {}),
             };
             writeJson(receipt, failure);
             native.push(failure);
@@ -1194,6 +1358,8 @@ export async function runNativeCoverage(config: Config): Promise<void> {
         }
       }),
     );
+    nativeExecution.finishedAt = new Date().toISOString();
+    nativeExecution.budgetExceeded = deadline !== undefined && Date.now() >= deadline;
     const report = config.nativePackage
       ? buildNativePackageEvidenceReport(
           dataset.projects,
@@ -1203,13 +1369,20 @@ export async function runNativeCoverage(config: Config): Promise<void> {
           config.validatorRules,
         )
       : buildNativeCoverageReport(dataset.projects, validator, native, config.validatorRules);
-    writeJson(path.join(output, "coverage.json"), report);
+    writeJson(path.join(output, "coverage.json"), {
+      ...report,
+      baselineComparison: manifest.baselineReuse ?? { policy: "fresh" },
+      nativeExecution: manifest.nativeExecution,
+    });
     fs.writeFileSync(
       path.join(output, "coverage.md"),
       "assessmentMode" in report ? packageEvidenceMarkdown(report) : markdown(report, config),
     );
     if (
-      snapshot(candidateRepo).commit !== candidate.commit ||
+      contentIdentity(snapshot(candidateRepo, config.candidateWorkingTree)) !==
+        contentIdentity(candidate) ||
+      git(path.join(candidateRepo, "core"), ["rev-parse", "HEAD"]) !== manifest.coreCommit ||
+      git(path.join(candidateRepo, "core"), ["status", "--porcelain"]) !== "" ||
       snapshot(specsRepo).commit !== specs.commit
     ) {
       throw new Error("An input checkout moved during the comparison.");

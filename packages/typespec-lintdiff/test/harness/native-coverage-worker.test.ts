@@ -12,6 +12,7 @@ const prelude = `
   import "@typespec/versioning";
   import "@azure-tools/typespec-autorest";
   import "@azure-tools/typespec-azure-core";
+  import "@azure-tools/typespec-azure-resource-manager";
   using TypeSpec.Http;
   using TypeSpec.Versioning;
 `;
@@ -100,28 +101,118 @@ linter:
       expect(result.rawDiagnostics).toEqual([]);
     });
 
-    it("loads an explicit native package without claiming lint findings", () => {
-      const result = evaluate("model Widget { enabled: boolean; }", {
-        tspRules: [],
-        nativePackage: "@azure-tools/typespec-azure-core",
-      });
-      expect(result.status).toBe("success");
-      expect(result.assessmentMode).toBe("package-evidence");
-      expect(result.nativePackage).toBe("@azure-tools/typespec-azure-core");
-      expect(result.rawDiagnostics).toEqual([]);
-      expect(result.packages).toContainEqual(
-        expect.objectContaining({
-          name: "@azure-tools/typespec-azure-core",
-          sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
-        }),
-      );
-    });
+    it.each(["configured", "target-only"])(
+      "loads an explicit native package without claiming lint findings in %s mode",
+      (nativeMode) => {
+        const result = evaluate("model Widget { enabled: boolean; }", {
+          tspRules: [],
+          nativePackage: "@azure-tools/typespec-azure-core",
+          nativeMode,
+        });
+        expect(result.status).toBe("success");
+        expect(result.assessmentMode).toBe("package-evidence");
+        expect(result.nativePackage).toBe("@azure-tools/typespec-azure-core");
+        expect(result.rawDiagnostics).toEqual([]);
+        expect(result.packages).toContainEqual(
+          expect.objectContaining({
+            name: "@azure-tools/typespec-azure-core",
+            sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          }),
+        );
+      },
+    );
 
     it("rejects an implicit empty target rather than manufacturing native compliance", () => {
       const result = evaluate("model Widget {}", { tspRules: [] });
       expect(result.status).toBe("failed");
       expect(result.error).toMatch(/No native lint/);
     });
+    it("runs only the target and leaves default activation explicitly unassessed", () => {
+      const result = evaluate("model Widget { enabled: boolean; }", { nativeMode: "target-only" });
+      expect(result.error).toBeUndefined();
+      expect(result.rawDiagnostics).toHaveLength(1);
+      expect(result.defaultActivation).toBe("not-assessed");
+      expect(result.defaultTargetDiagnostics).toBeUndefined();
+    });
+
+    it.each(["http-reachable", "boolean-http"])(
+      "retains unassessed default activation after %s alignment",
+      (scope) => {
+        const result = evaluate(
+          `
+          @service namespace Contoso;
+          model Widget { enabled: boolean; }
+          @get @route("/widgets") op read(): Widget;
+          `,
+          { scope, nativeMode: "target-only" },
+        );
+        expect(result.status).toBe("success");
+        expect(result.diagnostics).toHaveLength(1);
+        expect(result.defaultActivation).toBe("not-assessed");
+        expect(result.defaultTargetDiagnostics).toBeUndefined();
+      },
+    );
+
+    it("retains unassessed default activation when a target-only worker throws", () => {
+      const result = evaluate("model Widget {}", {
+        nativeMode: "target-only",
+        tspRules: ["@azure-tools/typespec-azure-core/not-a-real-rule"],
+      });
+      expect(result.status).toBe("failed");
+      expect(result.error).toContain("does not register");
+      expect(result.defaultActivation).toBe("not-assessed");
+    });
+
+    it.each(["configured", "target-only"])(
+      "preserves inherited short-name options and source suppression in %s mode",
+      (nativeMode) => {
+        const casing = "@azure-tools/typespec-azure-core/casing-style";
+        const result = evaluate(
+          `model Widget {
+            UpperName: string;
+            #suppress "${casing}" "Control: intentional casing."
+            lowerName: string;
+          }`,
+          { nativeMode, tspRules: [casing] },
+          {
+            config: `linter:\n  extends:\n    - file:./rules.yaml\n  disable:\n    "azure-core/casing-style": "Control: explicit opt-in."\n`,
+            ruleset: "enable:\n  azure-core/casing-style:\n    modelProperty: PascalCase\n",
+          },
+        );
+        expect(result.error).toBeUndefined();
+        expect(result.rawDiagnostics).toEqual([]);
+      },
+    );
+
+    it.each([
+      ["configured", "get", "fixedGroup", false, 1],
+      ["configured", "get", "{resourceGroupName}", false, 0],
+      ["target-only", "get", "fixedGroup", false, 1],
+      ["target-only", "get", "{resourceGroupName}", false, 0],
+      ["target-only", "post", "fixedGroup", false, 0],
+      ["target-only", "get", "fixedGroup", true, 0],
+    ] as const)(
+      "evaluates injected resource-group rule: mode=%s verb=%s segment=%s suppressed=%s",
+      (nativeMode, verb, segment, suppressed, count) => {
+        const target = "@azure-tools/typespec-azure-resource-manager/resource-group-path-parameter";
+        const result = evaluate(
+          `
+          using Azure.ResourceManager;
+          @service @armProviderNamespace namespace Microsoft.Coverage;
+          ${suppressed ? `#suppress "${target}" "Control: intentional path."` : ""}
+          @${verb} @route("/resourceGroups/${segment}/providers/Microsoft.Coverage/widgets")
+          op read(${segment.startsWith("{") ? "@path resourceGroupName: string" : ""}): void;
+          `,
+          { nativeMode, validatorRule: "PathContainsResourceGroup", tspRules: [target] },
+          { config: `linter:\n  disable:\n    "${target}": "Control: explicit opt-in."\n` },
+        );
+        expect(result.error).toBeUndefined();
+        expect(result.status).toBe("success");
+        expect(result.rawDiagnostics).toHaveLength(count);
+        if (nativeMode === "configured") expect(result.defaultTargetDiagnostics).toEqual([]);
+        else expect(result.defaultActivation).toBe("not-assessed");
+      },
+    );
 
     it("resolves the import-only official Resource Manager rulesets package", () => {
       const result = evaluate(

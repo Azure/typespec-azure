@@ -92,20 +92,26 @@ is rejected: general many-to-many analysis is not supported.
 
 Optional options:
 
-| Option                                  | Meaning                                                                                        |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `--scope source`                        | Default. Source findings; versions are not aligned.                                            |
-| `--scope http-reachable`                | Retain source locations in the selected-version HTTP graph.                                    |
-| `--scope boolean-http`                  | Boolean HTTP metadata alignment; only Azure Core `no-boolean`.                                 |
-| `--concurrency N`                       | Positive integer, default `2`.                                                                 |
-| `--filter TEXT`                         | Case-sensitive literal project-path substring, not a regex.                                    |
-| `--limit N`                             | Positive integer; omit with the filter for the full discovered population.                     |
-| `--baseline-run PATH`                   | Completed retained schema-2 run; bypass Swagger generation and validation.                     |
-| `--baseline-compatibility-receipt PATH` | Reviewed JSON receipt for a changed candidate/runtime installation; requires `--baseline-run`. |
+| Option                                  | Meaning                                                                                                                                         |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--scope source`                        | Default. Source findings; versions are not aligned.                                                                                             |
+| `--scope http-reachable`                | Retain source locations in the selected-version HTTP graph.                                                                                     |
+| `--scope boolean-http`                  | Boolean HTTP metadata alignment; only Azure Core `no-boolean`.                                                                                  |
+| `--concurrency N`                       | Positive integer, default `2`.                                                                                                                  |
+| `--filter TEXT`                         | Case-sensitive literal project-path substring, not a regex.                                                                                     |
+| `--limit N`                             | Positive integer; omit with the filter for the full discovered population.                                                                      |
+| `--baseline-run PATH`                   | Completed retained schema-2 run; bypass Swagger generation and validation.                                                                      |
+| `--baseline-compatibility-receipt PATH` | Reviewed JSON receipt for a changed candidate/runtime installation; requires `--baseline-run`.                                                  |
+| `--baseline-policy strict`              | Default. Require identical or reviewed lint-only compatible runtimes.                                                                           |
+| `--baseline-policy frozen-reference`    | Compare against historical Swagger under an explicit backward-compatibility assumption; requires `--baseline-run`, without a lint-only receipt. |
+| `--candidate-working-tree true`         | Content-bind an uncommitted candidate instead of requiring a clean candidate checkout.                                                          |
+| `--native-mode target-only`             | Compile once with only mapped rules; retain target options and source suppressions. Default is `configured`.                                    |
+| `--native-budget-seconds N`             | Positive native-stage time limit, up to 2147483 seconds. Setup and baseline verification are excluded.                                          |
 
 Unknown options and duplicate singleton options are errors. Output must be new
 or empty and outside both input checkouts. Candidate and specs inputs must be
-clean. The tool never fetches or refreshes refs. The caller resolves latest
+clean unless candidate working-tree snapshots are explicitly selected.
+The tool never fetches or refreshes refs. The caller resolves latest
 inputs for the first run, then explicitly selects frozen inputs for reuse.
 The existing candidate integration patch/install stages still run during reuse.
 Specs package-manager handling is unchanged; do not run through a mismatched
@@ -115,6 +121,26 @@ the legacy `validatorRule` field contains the first validator ID. Other fields
 use camel case: `candidateRepo`, `specsRepo`, `tgzDir`, `output`, `scope`,
 `concurrency`, optional `filter`, `limit`, `baselineRun`, and
 `baselineCompatibilityReceipt`. There is no mapping-file CLI option.
+
+Working-tree snapshots record the base commit, status, binary diff and index-diff
+hashes, and hashes of changed tracked/untracked files, including deleted paths.
+The complete snapshot, candidate core commit/cleanliness and packed artifacts
+are checked again after compilation. A source change invalidates the run.
+This does not prove that tarballs were built from that source: retain successful
+build/pack logs and their source/artifact provenance separately.
+
+`target-only` does not run other configured lints or a per-project default-lint
+compile. It retains compiler/configuration errors, configured/inherited target
+options and authored source suppressions. Receipts mark default activation
+`not-assessed`; report default counts are `null`, not zero. Run separate
+default-activation and injected-package controls before using this optimization.
+This execution policy is distinct from historical configured-mode evidence.
+
+The native deadline starts after setup and verified baseline preparation.
+At expiry, the tool stops its own active worker processes and does not launch
+queued projects. It retains completed results and writes failed/unassessed
+receipts for interrupted and queued projects. An incomplete report exits nonzero.
+The final integrity checks and report writing can finish after the native limit.
 
 ## Baseline retention and compatibility
 
@@ -158,7 +184,7 @@ or incompatible baselines never become successful cache hits. A retained run
 with any unassessed project is not reusable. Fresh failed runs still retain
 their evidence and report unassessed projects.
 
-Automatic compatibility requires identical candidate commit, tarball inventory
+The default strict policy requires identical candidate commit, tarball inventory
 and hashes, installation fingerprints, core commit, generator files, tooling
 dependency fingerprints, Node/package-manager identities, specs identity, and
 selection/profile settings. These are conservative content checks, not a new
@@ -166,7 +192,7 @@ engine-locking system or complete source-to-build attestation.
 
 ### Changed lint candidates: explicit review receipt
 
-A changed candidate can reuse unchanged Swagger only with a reviewed,
+Under the strict policy, a changed candidate can reuse unchanged Swagger only with a reviewed,
 content-bound compatibility receipt. Compiler/emitter artifact changes,
 artifact additions/removals/renames, core changes, tooling dependency changes,
 generator changes, and selection/runtime-policy changes invalidate reuse even
@@ -223,6 +249,30 @@ required content identities. Review that snapshot and the original artifacts,
 prepare the receipt, and rerun with a **different empty output directory**.
 Any changed context requires a new matching receipt. The tool never silently
 falls back to regeneration or accepts a partial baseline.
+
+### Frozen historical reference across runtime upgrades
+
+Select `--baseline-policy frozen-reference` to compare a current candidate with
+an immutable historical Swagger baseline. The baseline pins its original
+compiler/library artifacts and runtime. The current candidate pins its own
+compiler/library closure; package-version equality or different commit hashes
+establish neither compatibility nor incompatibility.
+
+This mode assumes backward compatibility. It does **not** assert unchanged
+emission, unchanged dependencies or identical rule inputs, and does not require
+a false lint-only compatibility receipt. Compiler, library, emitter, Node,
+tooling and installation identities may differ. The exact specs commit and
+repository, specs package manager, selection/profile, sealed completion,
+population and complete dataset inventory/hash checks remain mandatory.
+Corruption, failed baselines and source/population drift still fail closed.
+No Swagger regeneration occurs.
+
+`baseline.json` remains the original producer's evidence. The run manifest
+records the actual candidate/runtime context separately. `baselineReuse` and
+`coverage.json.baselineComparison` retain the policy, assumption, baseline
+identity and current candidate-context identity. Investigate compile failures,
+one-sided projects and diagnostic-count gaps; a runtime assumption is not proof
+that a gap is semantic or harmless. Equivalence remains `not-determined`.
 
 ## Group counting and completeness
 

@@ -9,11 +9,13 @@ if (!inputFile || !outputFile) throw new Error("Expected input and output receip
 const input = JSON.parse(fs.readFileSync(inputFile, "utf8"));
 const { specsRepo, project, tspRules, scope, nativePackage } = input;
 const assessment = nativePackage ? { assessmentMode: "package-evidence", nativePackage } : {};
+const targetOnly = input.nativeMode === "target-only";
 const requireFromSpecs = createRequire(path.join(specsRepo, "package.json"));
 const packages = [];
 let rawDiagnostics = [];
 let ambientDiagnostics = [];
 let compiler;
+const libraries = new Map();
 
 async function identify(name, baseFile = path.join(specsRepo, "package.json")) {
   const resolved =
@@ -56,7 +58,9 @@ async function identify(name, baseFile = path.join(specsRepo, "package.json")) {
 }
 
 async function load(name, baseFile) {
-  return import(pathToFileURL(await identify(name, baseFile)).href);
+  const library = await import(pathToFileURL(await identify(name, baseFile)).href);
+  if (library.$lib) libraries.set(name, library.$lib);
+  return library;
 }
 
 async function run() {
@@ -137,16 +141,31 @@ async function run() {
     entrypoint: mainPath,
     overrides: { emit: [] },
   });
-  const defaultProgram = await compile(NodeHost, mainPath, {
-    ...options,
-    emit: [],
-    noEmit: true,
-    warningAsError: false,
-  });
-  const defaultTargetDiagnostics = defaultProgram.diagnostics
+  const defaultProgram = targetOnly
+    ? undefined
+    : await compile(NodeHost, mainPath, {
+        ...options,
+        emit: [],
+        noEmit: true,
+        warningAsError: false,
+      });
+  const defaultTargetDiagnostics = defaultProgram?.diagnostics
     .filter((diagnostic) => tspRules.includes(diagnostic.code))
     .map((diagnostic) => ({ rule: diagnostic.code, message: diagnostic.message }));
-  const canonical = (name) => defaultProgram.diagnosticCodeResolver?.resolveCode(name) ?? name;
+  const canonical = (name) => {
+    if (defaultProgram) return defaultProgram.diagnosticCodeResolver?.resolveCode(name) ?? name;
+    if (name.startsWith("@")) return name;
+    const matches = [...libraries].filter(([packageName, library]) => {
+      const short =
+        library.alias ??
+        /^@typespec\/(.+)$/.exec(packageName)?.[1] ??
+        /^@[^/]+\/typespec-(.+)$/.exec(packageName)?.[1] ??
+        /^typespec-(.+)$/.exec(packageName)?.[1];
+      return short && name.startsWith(`${short}/`);
+    });
+    if (matches.length > 1) throw new Error(`Ambiguous short lint identifier: ${name}`);
+    return matches.length === 1 ? `${matches[0][0]}/${name.slice(name.indexOf("/") + 1)}` : name;
+  };
   const targetOptions = Object.fromEntries(tspRules.map((rule) => [rule, true]));
   // Opt-in changes activation, not the last configured options of a disabled rule.
   async function collectTargetOptions(ruleSet, baseDir, stack = []) {
@@ -193,11 +212,13 @@ async function run() {
     emit: [],
     noEmit: true,
     warningAsError: false,
-    linterRuleSet: {
-      ...options.linterRuleSet,
-      disable,
-      enable: { ...enable, ...targetOptions },
-    },
+    linterRuleSet: targetOnly
+      ? { enable: targetOptions }
+      : {
+          ...options.linterRuleSet,
+          disable,
+          enable: { ...enable, ...targetOptions },
+        },
   });
   const location = (target) => {
     const source = getSourceLocation(target, { locateId: true });
@@ -211,7 +232,7 @@ async function run() {
   };
   const diagnostics = [
     ...configDiagnostics,
-    ...defaultProgram.diagnostics.filter((diagnostic) => diagnostic.severity === "error"),
+    ...(defaultProgram?.diagnostics ?? []).filter((diagnostic) => diagnostic.severity === "error"),
     ...program.diagnostics,
   ];
   const errors = diagnostics.filter((diagnostic) => diagnostic.severity === "error");
@@ -240,6 +261,7 @@ async function run() {
       ambientDiagnostics,
       packages,
       defaultTargetDiagnostics,
+      ...(targetOnly ? { defaultActivation: "not-assessed" } : {}),
     };
   }
   if (scope === "source") {
@@ -251,6 +273,7 @@ async function run() {
       ambientDiagnostics,
       packages,
       defaultTargetDiagnostics,
+      ...(targetOnly ? { defaultActivation: "not-assessed" } : {}),
     };
   }
   if (!project.apiVersion) throw new Error("Selected Swagger API version is missing.");
@@ -506,6 +529,7 @@ async function run() {
     ambientDiagnostics,
     packages,
     defaultTargetDiagnostics,
+    ...(targetOnly ? { defaultActivation: "not-assessed" } : {}),
   };
 }
 
@@ -524,6 +548,7 @@ try {
         diagnostics: [],
         ambientDiagnostics,
         packages,
+        ...(targetOnly ? { defaultActivation: "not-assessed" } : {}),
       },
       null,
       2,

@@ -1,17 +1,21 @@
+import { execFileSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { gzipSync } from "node:zlib";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildNativeCoverageReport,
   buildNativePackageEvidenceReport,
+  command,
   inventoryDataset,
   packedFileInventory,
   parseNativeCoverageArgs,
   prepareCoverageBaseline,
   readCoverageDataset,
   reuseBaseline,
+  snapshot,
   validateBaselineCompatibility,
   type BaselineContext,
   type BaselineEvidence,
@@ -100,6 +104,48 @@ describe("native coverage arguments", () => {
     expect(
       parseNativeCoverageArgs([...args, "--validator-rule", "OtherRule"]).validatorRules,
     ).toEqual(["EnumInsteadOfBoolean", "OtherRule"]);
+  });
+
+  it("explicitly selects a frozen reference, source snapshot and native budget", () => {
+    expect(
+      parseNativeCoverageArgs([
+        ...args,
+        "--baseline-run",
+        "C:\\baseline",
+        "--baseline-policy",
+        "frozen-reference",
+        "--candidate-working-tree",
+        "true",
+        "--native-budget-seconds",
+        "3600",
+        "--native-mode",
+        "target-only",
+      ]),
+    ).toMatchObject({
+      baselinePolicy: "frozen-reference",
+      candidateWorkingTree: true,
+      nativeBudgetSeconds: 3600,
+      nativeMode: "target-only",
+    });
+  });
+
+  it.each([
+    ["--baseline-policy", "frozen-reference"],
+    ["--baseline-policy", "force"],
+    ["--native-budget-seconds", "0"],
+    ["--candidate-working-tree", "guess"],
+    ["--native-mode", "unknown"],
+    ["--native-budget-seconds", "2147484"],
+    [
+      "--baseline-run",
+      "C:\\baseline",
+      "--baseline-policy",
+      "frozen-reference",
+      "--baseline-compatibility-receipt",
+      "receipt.json",
+    ],
+  ])("rejects invalid reference policy and execution controls: %j", (...extra) => {
+    expect(() => parseNativeCoverageArgs([...args, ...extra])).toThrow();
   });
 
   it.each([
@@ -231,6 +277,85 @@ describe("native package evidence accounting", () => {
 });
 
 describe("native coverage accounting", () => {
+  it("does not turn skipped default activation into zero default findings", () => {
+    const report = buildNativeCoverageReport(
+      [datasetProject()],
+      [],
+      [{ ...nativeResult(), defaultActivation: "not-assessed" }],
+    );
+    expect(report.nativeDefaultCount).toBeNull();
+    expect(report.projects[0].nativeDefaultCount).toBeNull();
+    expect(report.defaultActivationUnassessedProjects).toEqual([project]);
+  });
+
+  it("content-binds staged, unstaged, added and deleted candidate source", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "native-coverage-source-"));
+    const git = (...args: string[]) =>
+      execFileSync("git", ["-C", root, ...args], { stdio: "pipe" });
+    try {
+      git("init", "--quiet");
+      git("remote", "add", "origin", "https://example.invalid/coverage-test.git");
+      fs.writeFileSync(path.join(root, "source.tsp"), "model Original {}\n");
+      fs.writeFileSync(path.join(root, "deleted.tsp"), "model Deleted {}\n");
+      git("add", ".");
+      git(
+        "-c",
+        "user.name=Coverage Test",
+        "-c",
+        "user.email=coverage-test@example.invalid",
+        "-c",
+        "commit.gpgSign=false",
+        "commit",
+        "--quiet",
+        "-m",
+        "Test fixture",
+      );
+      fs.writeFileSync(path.join(root, "source.tsp"), "model Changed {}\n");
+      fs.writeFileSync(path.join(root, "added.tsp"), "model Added {}\n");
+      git("add", "source.tsp", "added.tsp");
+      fs.unlinkSync(path.join(root, "deleted.tsp"));
+      fs.writeFileSync(path.join(root, "untracked.tsp"), "model Untracked {}\n");
+      expect(() => snapshot(root)).toThrow(/must be clean/);
+      const before = snapshot(root, true);
+      expect(before.changedFiles?.map((item) => item.file)).toEqual([
+        "added.tsp",
+        "deleted.tsp",
+        "source.tsp",
+        "untracked.tsp",
+      ]);
+      expect(before.changedFiles?.find((item) => item.file === "deleted.tsp")?.sha256).toBeNull();
+      expect(snapshot(root, true)).toEqual(before);
+      fs.writeFileSync(path.join(root, "untracked.tsp"), "model Drifted {}\n");
+      expect(snapshot(root, true)).not.toEqual(before);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("stops an owned worker when its native deadline expires", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "native-coverage-deadline-"));
+    try {
+      await expect(
+        command(
+          root,
+          ["-e", "setInterval(() => {}, 1000)"],
+          path.join(root, "worker.log"),
+          Date.now() + 1_000,
+        ),
+      ).rejects.toThrow(/budget exhausted/);
+      await expect(
+        command(
+          root,
+          ["-e", "process.exit(0)"],
+          path.join(root, "not-launched.log"),
+          Date.now() - 1,
+        ),
+      ).rejects.toThrow(/before project launch/);
+      expect(fs.existsSync(path.join(root, "not-launched.log"))).toBe(false);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
   it("reports project coverage separately from raw and conservative deduplicated counts", () => {
     const report = buildNativeCoverageReport(
       [datasetProject()],
@@ -479,6 +604,62 @@ describe("native coverage accounting", () => {
       expect(generate).toHaveBeenCalledOnce();
       expect(result.provenance).toBeUndefined();
       expect(result.evidence.files).toEqual(test.evidence.files);
+    });
+
+    it("reuses a frozen historical reference across runtime changes without regeneration", async () => {
+      const test = fixture();
+      const context = {
+        ...test.context,
+        coreCommit: "new-core",
+        candidateCommit: "new-candidate",
+        nodeVersion: "new-node",
+        generatorFiles: [{ file: "new-comparison-tool", sha256: "new-tool" }],
+        artifacts: [{ file: "typespec-compiler-new.tgz", sha256: "new-compiler" }],
+        runtimeInstallation: [{ file: "new-lock", sha256: "new-runtime" }],
+      };
+      const generate = vi.fn();
+      const result = await prepareCoverageBaseline(
+        { baselineRun: test.run, baselinePolicy: "frozen-reference" },
+        test.destination,
+        context,
+        generate,
+      );
+      expect(generate).not.toHaveBeenCalled();
+      expect(result.evidence.context).toEqual(test.context);
+      expect(result.provenance).toMatchObject({
+        policy: "frozen-reference",
+        candidateContextIdentity: identity(context),
+        baselineIdentity: identity(test.evidence),
+      });
+      expect(inventoryDataset(test.destination)).toEqual(test.evidence.files);
+    });
+
+    it.each([
+      { specsCommit: "other-specs" },
+      { specsRepository: "other-repository" },
+      { scope: "http-reachable" as const },
+      { filter: "different" },
+      { limit: 1 },
+      { specsPackageManager: "other-manager" },
+    ])("never changes the frozen reference source or population: %j", (change) => {
+      const test = fixture();
+      expect(() =>
+        reuseBaseline(
+          test.run,
+          test.destination,
+          { ...test.context, ...change },
+          undefined,
+          "frozen-reference",
+        ),
+      ).toThrow(/incompatible/);
+    });
+
+    it("still rejects corrupt historical-reference content", () => {
+      const test = fixture();
+      write(path.join(test.dataset, "raw.json"), { corrupt: true });
+      expect(() =>
+        reuseBaseline(test.run, test.destination, test.context, undefined, "frozen-reference"),
+      ).toThrow(/inventory|hash/);
     });
 
     it("does not fall back to generation when the retained run is missing", async () => {
