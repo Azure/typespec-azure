@@ -38,9 +38,14 @@ export interface DecoratorOptions {
 
 /**
  * Exposes an auxiliary status-monitor model property as typed SDK operation metadata. The property
- * does not affect polling, status evaluation, errors, or final-result extraction and may only be
- * available from the terminal response. Emitters expose it through their idiomatic operation or
- * poller state.
+ * does not affect polling, status evaluation, errors, or final-result extraction.
+ *
+ * Values come from the most recent status-monitor response the SDK has received, including the
+ * initial response when it contains the status-monitor model. Any value may be absent until a
+ * response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+ * Emitters expose these values on their idiomatic poller or operation object and should keep them
+ * current after each poll. Metadata is not part of the continuation token; after rehydration, the
+ * next poll populates it again.
  *
  * @param target The status-monitor model property.
  * @param scope Specifies the target language emitters.

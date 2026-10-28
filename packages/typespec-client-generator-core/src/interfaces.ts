@@ -1216,7 +1216,10 @@ export interface SdkLroServiceMetadata {
   finalResultPath?: string;
   /**
    * Auxiliary status-monitor properties marked with `@lroStatusMetadata`, in deterministic
-   * direct-then-inherited model/property order.
+   * direct-then-inherited model/property order. Emitters expose values from the latest received
+   * status-monitor response (including initial, failed, and canceled responses) on the poller or
+   * operation. Values may be absent until received and are refreshed after each poll, not persisted
+   * in continuation tokens; the next poll repopulates them after rehydration.
    */
   statusMetadata?: SdkLroStatusMetadata[];
 }

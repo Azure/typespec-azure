@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add a Content Understanding-shaped HTTP scenario for nested typed LRO status metadata.
+Add Content Understanding and Language-shaped HTTP scenarios for typed LRO status metadata, including initial values, changing progress metadata, and auxiliary errors on failure.

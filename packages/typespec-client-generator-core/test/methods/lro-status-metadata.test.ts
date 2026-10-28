@@ -153,6 +153,146 @@ describe("LRO status metadata", () => {
     expect(sibling.usage & UsageFlags.Output).toBe(0);
   });
 
+  it("preserves direct-then-inherited metadata order when two LROs share a monitor", async () => {
+    const { program } = await Tester.compile(`
+model JobTimestamps {
+  @lroStatusMetadata
+  createdDateTime: utcDateTime;
+  @lroStatusMetadata
+  lastUpdatedDateTime: utcDateTime;
+  @lroStatusMetadata
+  expirationDateTime: utcDateTime;
+}
+
+model JobStatistics {
+  succeeded: int32;
+  failed: int32;
+}
+
+model JobItemError {
+  code: string;
+  target: string;
+}
+
+model StatusMonitor extends JobTimestamps {
+  status: LroStatus;
+  @lroStatusMetadata
+  jobId: string;
+  @lroStatusMetadata
+  displayName: string;
+  @lroStatusMetadata
+  statistics?: JobStatistics;
+  @lroStatusMetadata
+  errors?: JobItemError[];
+  @lroErrorResult
+  error?: Foundations.Error;
+  @lroResult
+  result?: JobResult;
+}
+
+model JobResult { documents: string[]; }
+
+alias JobAcceptedResponse = Foundations.AcceptedResponse<StatusMonitor> & {
+  @pollingLocation
+  @header("Operation-Location")
+  operationLocation: ResourceLocation<StatusMonitor>;
+};
+
+@route("/jobs:first")
+@post
+op first(): JobAcceptedResponse;
+
+@route("/jobs:second")
+@post
+op second(): JobAcceptedResponse;
+`);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toHaveLength(0);
+    const methods = context.sdkPackage.clients[0].methods;
+    expect(methods.map((x) => x.name)).toEqual(["first", "second"]);
+    for (const method of methods) {
+      strictEqual(method.kind, "lro");
+      expect(method.lroMetadata.statusMetadata?.map((x) => x.property.name)).toEqual([
+        "jobId",
+        "displayName",
+        "statistics",
+        "errors",
+        "createdDateTime",
+        "lastUpdatedDateTime",
+        "expirationDateTime",
+      ]);
+    }
+    const [first, second] = methods;
+    strictEqual(first.kind, "lro");
+    strictEqual(second.kind, "lro");
+    for (let index = 0; index < first.lroMetadata.statusMetadata!.length; index++) {
+      strictEqual(
+        first.lroMetadata.statusMetadata![index].property,
+        second.lroMetadata.statusMetadata![index].property,
+      );
+    }
+  });
+
+  it.each(["failed", "canceled"])(
+    "retains auxiliary errors independently of the %s terminal state and logical result",
+    async (terminalState) => {
+      const { program } = await Tester.compile(`
+@lroStatus
+union JobStatus {
+  Running: "Running",
+  @lroSucceeded Succeeded: "Succeeded",
+  @lroFailed failed: "failed",
+  @lroCanceled canceled: "canceled",
+}
+
+model JobItemError {
+  code: string;
+  message: string;
+  target: string;
+}
+
+model StatusMonitor {
+  status: JobStatus;
+  @lroStatusMetadata
+  errors?: JobItemError[];
+  @lroErrorResult
+  error?: Foundations.Error;
+  @lroResult
+  result?: JobResult;
+}
+
+model JobResult { value: string; }
+
+@route("/jobs")
+@post
+op start(): Foundations.AcceptedResponse & {
+  @pollingLocation
+  @header("Operation-Location")
+  operationLocation: ResourceLocation<StatusMonitor>;
+};
+`);
+      const context = await createSdkContextForTester(program);
+      expect(context.diagnostics).toHaveLength(0);
+      const method = context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.kind, "lro");
+      const metadata = method.lroMetadata.statusMetadata;
+      ok(metadata);
+      expect(metadata.map((x) => x.property.name)).toEqual(["errors"]);
+      const property = metadata[0].property;
+      strictEqual(property.optional, true);
+      strictEqual(property.type.kind, "array");
+      const errorModel = context.sdkPackage.models.find((x) => x.name === "JobItemError");
+      ok(errorModel);
+      strictEqual(property.type.valueType, errorModel);
+      expect(errorModel.usage & UsageFlags.Output).toBe(UsageFlags.Output);
+      const termination = method.lroMetadata.pollingInfo.terminationStatus;
+      strictEqual(termination.kind, "model-property");
+      expect(termination[terminalState === "failed" ? "failedState" : "canceledState"]).toContain(
+        terminalState,
+      );
+    },
+  );
+
   it("honors scoped inclusion and negation", async () => {
     const { program } = await Tester.compile(
       operation
