@@ -140,7 +140,7 @@ function generateSseFrame(
       const local = naming.getEscapedReservedName(
         naming.uncapitalize(sse.envelopeField.name),
         "Val",
-        [receiverName],
+        [receiverName, "streaming"],
       );
       text = `${indent.get()}var ${local} ${go.getTypeDeclaration(go.unwrapPtr(payload.type), goUnion.pkg)}\n`;
       text += `${indent.get()}${helpers.buildIfBlock(indent, {
@@ -154,8 +154,18 @@ function generateSseFrame(
     }
   } else {
     imports.add("encoding/json");
-    text = `${indent.get()}data, err := json.Marshal(${payload.name})\n`;
+    // Envelope codecs preserve the payload property's encoding and polymorphic types.
+    const source = sse.envelopeField ? `${receiverName}.${field.name}` : payload.name;
+    text = `${indent.get()}data, err := json.Marshal(${source})\n`;
     text += `${indent.get()}${helpers.buildErrCheck(indent, "err", "streaming.SSEFrame{}")}\n`;
+    if (sse.envelopeField) {
+      text += `${indent.get()}rawMsg := map[string]json.RawMessage{${JSON.stringify(sse.envelopeField.serializedName)}: json.RawMessage("null")}\n`;
+      text += `${indent.get()}${helpers.buildIfBlock(indent, {
+        condition: "err := json.Unmarshal(data, &rawMsg); err != nil",
+        body: (indent) => `${indent.get()}return streaming.SSEFrame{}, err\n`,
+      })}\n`;
+      text += `${indent.get()}data = rawMsg[${JSON.stringify(sse.envelopeField.serializedName)}]\n`;
+    }
     dataVar = "data";
   }
 

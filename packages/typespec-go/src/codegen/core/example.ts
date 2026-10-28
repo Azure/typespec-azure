@@ -177,7 +177,7 @@ export function generateExamples(
         const methodOptionalParameters = example.optionalParamsGroup.filter(
           (p) => p.parameter.location === "method",
         );
-        const checkResponse = example.responseEnvelope !== undefined;
+        const checkResponse = example.responseEnvelope !== undefined || method.kind === "sseMethod";
 
         let methodOptionalParametersText = "nil";
         if (methodOptionalParameters.length > 0) {
@@ -210,6 +210,11 @@ export function generateExamples(
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
+            if (method.kind === "sseMethod") {
+              exampleText += `${indent.get()}defer func() {\n`;
+              exampleText += `${indent.push().get()}_ = res.Stream.Close()\n`;
+              exampleText += `${indent.pop().get()}}()\n`;
+            }
             break;
           case "pageableMethod":
             exampleText += `${indent.get()}pager := ${clientRef}.${method.name}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;

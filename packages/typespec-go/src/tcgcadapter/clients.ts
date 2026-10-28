@@ -1494,6 +1494,7 @@ export class ClientAdapter {
     const paramName = getEscapedReservedName(
       helpers.getEffectiveName(methodParam, paramStyle === "required"),
       "Param",
+      method.kind === "sseMethod" ? ["streaming"] : undefined,
     );
     // required and literal params are always passed by value
     const byVal = go.isRequiredParameter(paramStyle) || paramStyle === "literal";

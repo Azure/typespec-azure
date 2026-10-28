@@ -5,6 +5,34 @@ import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
 describe("Union usage in JSON additional properties", () => {
+  it.each([false, true])(
+    "preserves optional-field shape discrimination for JSON unions (also SSE: %s)",
+    async (sse) => {
+      const files = await emitGoFor(`
+        @service namespace Test;
+        model WidgetData1 { kind: "kind1"; start: utcDateTime; end?: utcDateTime; }
+        model WidgetData2 { kind: "kind1"; start: string; }
+        ${sse ? "@TypeSpec.Events.events" : ""}
+        union Value { WidgetData2, WidgetData1 }
+        model Container { name: string; ...Record<Value>; }
+        @route("/properties") @post op roundTrip(@body body: Container): Container;
+        ${sse ? '@route("/events") @get op receive(): TypeSpec.SSE.SSEStream<Value>;' : ""}
+      `);
+      const serde = files.get("zz_unions_serde.go")!;
+      const jsonDecoder = serde.slice(serde.indexOf("func (v *Value) UnmarshalJSON("));
+      expect(jsonDecoder).toContain('hasRequiredFields(rawMsg, "kind", "start", "end")');
+      expect(jsonDecoder).toContain('hasRequiredFields(rawMsg, "kind", "start")');
+      expect(jsonDecoder.indexOf("json.Unmarshal(data, &v.WidgetData1)")).toBeLessThan(
+        jsonDecoder.indexOf("json.Unmarshal(data, &v.WidgetData2)"),
+      );
+      if (sse) {
+        const eventDecoder = serde.slice(0, serde.indexOf("func (v Value) MarshalJSON("));
+        expect(eventDecoder).toContain('hasRequiredFields(rawMsg, "kind", "start")');
+        expect(eventDecoder).not.toContain('hasRequiredFields(rawMsg, "kind", "start", "end")');
+      }
+    },
+  );
+
   it.each([
     {
       name: "multiple spread records",
