@@ -3,6 +3,8 @@ import "@azure-tools/typespec-client-generator-core";
 import "@typespec/spector";
 import "@typespec/versioning";
 
+// cspell:ignore operationid
+
 using Azure.ClientGenerator.Core;
 using Azure.Core;
 using Spector;
