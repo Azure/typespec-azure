@@ -292,7 +292,7 @@ it.each(["get", "post"])("checks synchronous %s error responses", async (verb) =
     )
     .toEmitDiagnostics(diagnostic);
 });
-it.each(["get", "post", "head"])(
+it.each(["get", "post"])(
   "requires an error response on synchronous %s operations",
   async (verb) => {
     await tester
@@ -323,30 +323,6 @@ it.each(["get", "post"])("accepts standard synchronous %s errors", async (verb) 
       `${header}
       @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
     `,
-    )
-    .toBeValid();
-});
-
-it("accepts a bodyless explicit HEAD error", async () => {
-  await tester
-    .expect(
-      `${header}
-        @error model HeadError { @statusCode statusCode: 400; }
-        @head @route("/exists")
-        op exists(): { @statusCode statusCode: 204; } | HeadError;
-      `,
-    )
-    .toBeValid();
-});
-
-it("accepts a bodyless default HEAD error", async () => {
-  await tester
-    .expect(
-      `${header}
-        @error model HeadError { @header requestId?: string; }
-        @head @route("/exists")
-        op exists(): { @statusCode statusCode: 204; } | HeadError;
-      `,
     )
     .toBeValid();
 });
@@ -391,7 +367,7 @@ it.each([
     });
 });
 
-it("requires a marked error even on HEAD", async () => {
+it("ignores HEAD operations without marked errors", async () => {
   await tester
     .expect(
       `${header}
@@ -399,10 +375,34 @@ it("requires a marked error even on HEAD", async () => {
       op unmarked(): { @statusCode statusCode: 204; } | { @statusCode statusCode: 400; };
     `,
     )
-    .toEmitDiagnostics({
-      ...diagnostic,
-      message: useStandardErrorRule.messages.missingErrorResponse,
-    });
+    .toBeValid();
+});
+
+it.each([
+  "ArmResourceCheckExistence<Widget>",
+  "Extension.CheckExistence<Extension.Subscription, Widget>",
+  "ArmResourceCheckExistence<Widget, Error = CustomError>",
+  "Extension.CheckExistence<Extension.Subscription, Widget, Error = CustomError>",
+])("ignores HEAD error payloads from CheckExistence templates: %s", async (template) => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      @armCommonTypesVersion(CommonTypes.Versions.v5)
+      namespace Microsoft.Contoso;
+
+      model Widget is ProxyResource<{}> {
+        ...ResourceNameParameter<Widget>;
+      }
+      @error model CustomError { code: string; }
+
+      @armResourceOperations
+      interface Widgets {
+        checkExistence is ${template};
+      }
+    `,
+    )
+    .toBeValid();
 });
 
 it.each(["string", "CommonTypes.ErrorResponse"])(
@@ -507,20 +507,6 @@ it("checks marked errors inside nested return unions", async () => {
     `,
     )
     .toEmitDiagnostics(diagnostic);
-});
-
-it("accepts bodyless marked HEAD errors with Content-Type metadata", async () => {
-  await tester
-    .expect(
-      `${header}
-      @error model HeadError {
-        @statusCode statusCode: 400;
-        @header contentType: "application/json";
-      }
-      @head @route("/exists") op exists(): HeadError;
-    `,
-    )
-    .toBeValid();
 });
 
 it("does not treat error models nested inside a discriminated payload as error responses", async () => {

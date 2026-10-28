@@ -18,7 +18,7 @@ export const useStandardErrorRule = createRule({
   docs: fileRef.fromPackageRoot("src/rules/use-standard-error.md"),
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-error",
   description:
-    "Operations must define a response marked with @error and use ErrorResponse from ARM common types for marked error payloads.",
+    "Non-HEAD operations must define a response marked with @error and use ErrorResponse from ARM common types for marked error payloads.",
   severity: "warning",
   messages: {
     default:
@@ -35,7 +35,8 @@ export const useStandardErrorRule = createRule({
         if (
           reported.has(source) ||
           isTemplateDeclarationOrInstance(operation) ||
-          isTemplatedInterfaceOperation(operation)
+          isTemplatedInterfaceOperation(operation) ||
+          getOperationVerb(program, operation) === "head"
         ) {
           return;
         }
@@ -49,15 +50,13 @@ export const useStandardErrorRule = createRule({
           return;
         }
 
-        const isHead = getOperationVerb(program, operation) === "head";
         const invalidBody = errorTypes.some((type) => {
           // Resolve each marked variant separately: status groups retain only their first type.
           const [responses] = getResponsesForOperation(program, { ...operation, returnType: type });
           return responses.some((response) =>
-            response.responses.some(({ body }) =>
-              body === undefined
-                ? !isHead
-                : body.bodyKind !== "single" || !isStandardError(body.type),
+            response.responses.some(
+              ({ body }) =>
+                body === undefined || body.bodyKind !== "single" || !isStandardError(body.type),
             ),
           );
         });
