@@ -57,30 +57,23 @@ jobs:
 
       # --- Measure the base branch ---
       - name: Checkout base
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          path: temp/bundle-size/base-checkout
-          submodules: recursive
-
-      # A separate checkout prevents head-generated files from contaminating the base build.
-      # Use the head's measurement scripts even if they do not exist on the base branch.
-      - name: Restore size scripts from PR head
         run: |
-          mkdir -p temp/bundle-size/base-checkout/eng/scripts
-          cp -R eng/scripts/bundle-size temp/bundle-size/base-checkout/eng/scripts/
+          git checkout ${{ github.event.pull_request.base.sha }}
+          git submodule update --init --recursive
+
+      # The measure/compare scripts are added by this PR, so restore them from the PR
+      # head after checking out the (possibly script-less) base commit.
+      - name: Restore size scripts from PR head
+        run: git checkout ${{ github.sha }} -- eng/scripts/bundle-size
 
       - name: Install dependencies (base)
-        working-directory: temp/bundle-size/base-checkout
         run: pnpm install
 
       - name: Build (base)
-        working-directory: temp/bundle-size/base-checkout
         run: pnpm run-all build
 
       - name: Measure base sizes
-        working-directory: temp/bundle-size/base-checkout
-        run: node eng/scripts/bundle-size/measure.ts --out "$GITHUB_WORKSPACE/temp/bundle-size/base.json"
+        run: node eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/base.json
 
       # --- Compare and prepare the comment payload ---
       - name: Compare sizes
