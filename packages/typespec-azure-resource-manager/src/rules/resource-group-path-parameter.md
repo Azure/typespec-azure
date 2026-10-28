@@ -11,9 +11,6 @@ Use the standard ARM template base parameters. When customization is necessary,
 retain `ResourceGroupParameter` rather than replacing it with a differently named
 property.
 
-The ARM `all` ruleset enables this rule. The Azure resource-manager ruleset
-leaves it disabled.
-
 ## Impact
 
 - **Area:** API, SDK
