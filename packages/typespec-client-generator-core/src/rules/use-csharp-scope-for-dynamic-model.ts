@@ -5,6 +5,7 @@ import {
   createRule,
   fileRef,
   getLocationContext,
+  getNamespaceFullName,
 } from "@typespec/compiler";
 import type { DecoratorOptions, LanguageScopes } from "../interfaces.js";
 import { normalizeScope, parseScopes } from "../internal-utils.js";
@@ -21,7 +22,10 @@ export const useCsharpScopeForDynamicModelRule = createRule({
   create(context) {
     function checkDecorators(type: DecoratedType & (Model | Namespace)) {
       for (const decorator of type.decorators) {
-        if (decorator.decorator.name !== "$dynamicModel") {
+        if (
+          decorator.definition?.name !== "@dynamicModel" ||
+          getNamespaceFullName(decorator.definition.namespace) !== "Azure.ClientGenerator.Core"
+        ) {
           continue;
         }
         if (

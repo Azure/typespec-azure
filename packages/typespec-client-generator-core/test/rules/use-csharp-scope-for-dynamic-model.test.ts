@@ -1,4 +1,8 @@
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  mockFile,
+  type LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { useCsharpScopeForDynamicModelRule } from "../../src/rules/use-csharp-scope-for-dynamic-model.js";
 import { ArmTester, AzureCoreTester, SimpleTester } from "../tester.js";
@@ -49,6 +53,33 @@ describe("use-csharp-scope-for-dynamic-model", () => {
   it("does not report when the decorator is absent", async () => {
     await tester.expect(`model Example {}`).toBeValid();
   });
+
+  it.each(["model Example {}", "namespace Example {}"])(
+    "does not report the legacy C# decorator on %s",
+    async (target) => {
+      const runner = await SimpleTester.files({
+        "csharp.js": mockFile.js({
+          namespace: "TypeSpec.HttpClient.CSharp",
+          $dynamicModel: function $dynamicModel() {},
+        }),
+        "csharp.tsp": `
+          import "./csharp.js";
+          using TypeSpec.Reflection;
+          namespace TypeSpec.HttpClient.CSharp {
+            extern dec dynamicModel(target: Model | Namespace);
+          }
+        `,
+      })
+        .import("./csharp.tsp")
+        .createInstance();
+      const legacyTester = createLinterRuleTester(
+        runner,
+        useCsharpScopeForDynamicModelRule,
+        libraryName,
+      );
+      await legacyTester.expect(`@TypeSpec.HttpClient.CSharp.dynamicModel ${target}`).toBeValid();
+    },
+  );
 
   it("does not report library types from Azure.Core", async () => {
     const runner = await AzureCoreTester.createInstance();
