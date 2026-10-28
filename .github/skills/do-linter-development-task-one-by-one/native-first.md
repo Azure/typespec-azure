@@ -312,7 +312,10 @@ reconciliation procedure, not an unlimited wait or polling loop.
 
 Finish the task and review loops before applying the existing independent skill-update
 policy; native-first does not authorize recursive or mixed post-run skill PRs.
-Keep legacy as the default until singleton and many-to-one pilots, cached second/
-third runs, fork replay, failure/attribution controls, both review checkpoints
-and app/explicit publication routing have actually passed. Text instructions
-or a historical eight-project pilot do not satisfy those rollout gates.
+Native-first is the default for new rule-ID and task-file queues, not a waiver
+of validation or evidence requirements. Keep singleton and many-to-one pilots,
+cached second/third runs, fork replay, failure/attribution controls, both review
+checkpoints and app/explicit publication routing in acceptance tracking.
+Record unverified paths as unverified; changing the default does not establish
+that these checks passed. Text instructions or a historical eight-project pilot
+do not replace the required evidence or any applicable task gate.

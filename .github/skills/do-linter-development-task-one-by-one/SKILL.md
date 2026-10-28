@@ -1,7 +1,7 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Support opt-in native-first development on canonical main, explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
-argument-hint: "[--flow legacy|native-first] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
+argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
 user-invocable: true
 ---
 
@@ -18,16 +18,22 @@ This skill has two versioned execution contracts:
 
 Accept exactly one optional queue-level `--flow legacy|native-first`. Parse and
 remove it before applying the selected input grammar; reject duplicate, unknown
-or missing values before setup. With no selector, preserve `legacy` until a
-separately reviewed default switch verifies the native-first acceptance gates.
-Never edit or push directly to `main`.
+or missing values before setup. New rule-ID and task-file queues default to
+`native-first`; `--flow native-first` remains valid but is not required.
+Use `--flow legacy` for new rule-ID queues that need temporary-library development
+and separate promotion. Never edit or push directly to `main`.
 
-Read the recorded `flowVersion` first on resumption. A selector cannot retarget
-an existing task, change its ownership, or reset its budgets. Put queue options
+Read the recorded `flowVersion` first on resumption, before applying any default.
+Resume that flow when the selector is omitted; reject a conflicting selector.
+A default change cannot retarget an existing task, change its ownership, or reset
+its budgets. Put queue options
 on separate lines outside prepared worker commands; never extract `--flow` or
 `--worktrees-folder` from inside their strict command grammar. Old prepared
 `/develop-lintdiff-rule --worker` commands remain legacy; reject them with
 `--flow native-first`, rather than rewriting their branch or arguments.
+For compatibility, a new queue containing prepared worker commands and no
+selector uses `legacy` for the whole queue, including any mixed rule-ID entries.
+This exception does not apply to ordinary rule-ID or task-file queues.
 
 In native-first mode, rule-ID tokens create singleton tasks. Alternatively,
 accept exactly one `--task-file <absolute-json-path>` for an ordered list of
@@ -39,8 +45,8 @@ Queue options belong outside the JSON. In legacy mode reject `--task-file`;
 the legacy worker grammar is unchanged.
 
 ```text
-/do-linter-development-task-one-by-one --flow native-first EnumInsteadOfBoolean
-/do-linter-development-task-one-by-one --flow native-first --task-file C:\dev\migration-tasks.json
+/do-linter-development-task-one-by-one EnumInsteadOfBoolean
+/do-linter-development-task-one-by-one --task-file C:\dev\migration-tasks.json
 ```
 
 These are alternative invocations, not instructions to remigrate the merged
@@ -182,8 +188,8 @@ that line retains its strict grammar below. For prepared-command input, place
 resolved folder to subskills as handoff metadata, not as a new worker flag.
 
 ```text
-/do-linter-development-task-one-by-one TagsAreNotAllowedForProxyResources
-/do-linter-development-task-one-by-one --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --flow legacy TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --flow legacy --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
 ```
 
 These are alternative invocations, not a two-entry queue.
@@ -206,7 +212,7 @@ Every prepared worker command must:
 - include exactly one `--target-branch feature/lintdiff-migration-new`
 - contain no other flags or positional arguments
 
-For example, `/do-linter-development-task-one-by-one ParametersInPointGet PatchBodyParametersSchema`
+For example, `/do-linter-development-task-one-by-one --flow legacy ParametersInPointGet PatchBodyParametersSchema`
 prepares and completes the first rule before preparing the second.
 
 Determine the form for each line before parsing: a line beginning with

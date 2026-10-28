@@ -1,7 +1,9 @@
 # Shared Swagger baseline consumer and producer
 
 Native-first migration consumes a shared sealed Swagger baseline by default.
-Legacy migration remains the default queue flow and is unchanged.
+Native-first is the default for new rule-ID and task-file queues. Legacy
+migration remains available through `--flow legacy` and compatibility/resumption
+routing; its execution contract is unchanged.
 Do not regenerate Swagger for each rule or candidate.
 
 ## Monthly evaluation snapshot

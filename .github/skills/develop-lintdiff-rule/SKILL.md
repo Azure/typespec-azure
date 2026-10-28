@@ -12,7 +12,8 @@ Use this skill to implement or correct migrated Swagger validator rules in
 
 This remains the legacy temporary-library workflow. For direct official-package
 development use
-[/do-linter-development-task-one-by-one --flow native-first](../do-linter-development-task-one-by-one/native-first.md).
+[/do-linter-development-task-one-by-one](../do-linter-development-task-one-by-one/native-first.md),
+which defaults new rule-ID and task-file queues to native-first.
 Do not rewrite prepared worker commands, retarget an existing development PR,
 or invoke this worker from a native-first task. The native boundary/completeness
 sections below remain reusable requirements through the
