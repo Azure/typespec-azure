@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-website"
 ---
 
-Enable Up/Down result navigation and Enter to open results using Pagefind's new modal search components.
+Use the shared astro-utils Pagefind search component for Up/Down result navigation and Enter activation.
