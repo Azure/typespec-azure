@@ -1272,3 +1272,26 @@ extern dec clientOption(
   value: unknown | (valueof unknown),
   scope?: valueof DecoratorOptions | string
 );
+
+/**
+ * Selects the client result of a long-running operation without changing its protocol.
+ * A model selects the whole completion body; a property selects its value.
+ *
+ * See [LRO result customization](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
+ * for supported selections.
+ *
+ * @param target The long-running operation to customize.
+ * @param result A response model or property belonging to the operation's LRO protocol.
+ * @param scope Specifies the target language emitters. If omitted, applies to all language emitters.
+ *
+ * @example Return the whole status monitor in JavaScript and its payload in Python.
+ * ```typespec
+ * @@clientLroResult(start, Job, "javascript");
+ * @@clientLroResult(start, Job.result, #{ scope: "python" });
+ * ```
+ */
+extern dec clientLroResult(
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: valueof DecoratorOptions | string
+);

@@ -1,5 +1,5 @@
 import { paramMessage } from "@typespec/compiler";
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, ok } from "assert";
 import { it } from "vitest";
 import { compileOpenAPI } from "./test-host.js";
 
@@ -73,6 +73,46 @@ it("includes x-ms-long-running-operation", async () => {
     undefined,
   );
 });
+
+it.each(["all", "final-state-only", "none", undefined] as const)(
+  "selects the polling success property for a resource PUT with emit-lro-options=%s",
+  async (emitLroOptions) => {
+    const openapi = await compileOpenAPI(
+      `
+      @service namespace Test;
+      model Result { value: string; }
+      @resource("jobs")
+      model Job {
+        @key id: string;
+        @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+        @lroResult result: Result;
+      }
+      @route("/jobs/{id}") @get op read(@path id: string): Job;
+      @route("/jobs/{id}/status") @get op poll(@path id: string): Job;
+      @pollingOperation(poll)
+      @createsOrReplacesResource(Job)
+      @route("/jobs/{id}") @put op start(@path id: string): Job;
+      `,
+      { preset: "azure", options: { "emit-lro-options": emitLroOptions } },
+    );
+    const operation = openapi.paths["/jobs/{id}"].put;
+    ok(operation);
+    deepStrictEqual(operation["x-ms-long-running-operation"], true);
+    deepStrictEqual(
+      operation["x-ms-long-running-operation-options"],
+      emitLroOptions === "none"
+        ? undefined
+        : {
+            "final-state-via": "original-uri",
+            ...(emitLroOptions === "all" ? { "final-state-schema": "#/definitions/Result" } : {}),
+          },
+    );
+    const response = operation.responses?.["200"];
+    ok(response && !("$ref" in response));
+    deepStrictEqual(response.schema, { $ref: "#/definitions/Job" });
+    ok(openapi.definitions?.Result);
+  },
+);
 
 it("includes x-ms-long-running-operation for lro get", async () => {
   const openapi = await compileOpenAPI(

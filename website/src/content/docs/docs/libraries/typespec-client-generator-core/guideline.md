@@ -369,11 +369,44 @@ The LRO method's return type is `lroMetadata.finalResponse.result`, or absent wh
 
 Azure.Core remains responsible for polling links, parameter bindings, terminal states, `finalStateVia`, and required final HTTP requests. Client-result selection must not replace or discard a `finalOperationLink` or `finalOperationReference`. The `finalStep` union also retains success-property and no-result variants.
 
-`lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
+`lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. When the completion step is `pollingSuccessProperty`, its property type is the result, including for resource PUT operations; the envelope remains the polling response model. For example, `Job.result: Result` produces a `Result` return type, a `Job` envelope, and a single `result` segment. Nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
 
-The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
+The Core `getLroMetadata` API remains unscoped. Without a client override, `lroMetadata.__raw` and the method's `__raw_lro_metadata` retain their existing shapes. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Core and TCGC both use the corrected success-property default. This can change generated return types for resource PUT operations that previously selected the resource model despite extracting a different property type.
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
+
+### Customizing LRO Results
+
+Use `@clientLroResult` to select the established completion response or one of its properties. It changes the client result, not the wire schema, polling termination, error handling, parameter bindings, or required final requests. For example, given a polling response `Job` with `@lroResult result: Payload`:
+
+```typespec
+@@clientLroResult(start, Job, "javascript");
+@@clientLroResult(start, Job.result, #{ scope: "python" });
+```
+
+JavaScript selects the whole monitor body, while Python selects the payload. Other languages retain the default result. The decorator supports the existing language-scope options, exclusions, and specific-scope overrides. A whole body does not include HTTP headers or a raw HTTP response.
+
+Supported selections are the whole body returned by the existing completion strategy or a property path within that body. Use `::type` for nested properties, for example `Job.result::type.items`. Include the path from the completion response model; TCGC does not search for a route from a nested leaf-property alias.
+
+Unrelated replacement models, unreadable/HTTP-metadata properties, and nullable/union projections are errors. New optional projections and traversal through optional properties require missing-value semantics and are not supported; selecting an existing optional polling success property directly retains its current contract.
+
+TCGC uses the same normalized completion envelope as its default LRO result policy, including for resource PUTs and future protocol patterns. The decorator does not independently rediscover polling, final-operation, or original-URI response sources.
+
+For LRO+paging, the selection must retain the declared page items and body-based continuation paths. Selecting a sibling occurrence of the same model is not equivalent to selecting the declared page. Header-based continuation keeps its HTTP-response coordinates. Paging paths remain separate from LRO result extraction paths.
+
+#### TCGC metadata and emitter support
+
+The decorator uses existing metadata fields; emitters receive no new options or response-source fields. Whole-body and nested-property selections preserve the existing completion strategy. Retaining a monitor across a mandatory final request or introducing a result for a no-result polling protocol reports `unsupported-client-lro-result`.
+
+**Valid TCGC metadata does not guarantee end-to-end SDK support.** Language emitters must traverse every result segment and deserialize the selected leaf type. Some existing emitter/runtime implementations assume a single result property; those limitations require emitter changes, not a TCGC capability flag or rejection of a valid nested path. Check your emitter's support before using nested selection.
+
+When a selector applies:
+
+- `finalResponse.envelopeResult` is the completion response body, and `result` is the converted selected type. `resultSegments` is absent for a whole body or contains the complete ordered SDK-property path. Property wire names come from serialization metadata, not client-renamed identifiers.
+- Raw `LroMetadata.finalResultPath` and `logicalPath` identify a single direct property. They are absent for whole-body or nested selections; consumers must use `finalResponse.resultSegments` for nested extraction.
+- The method response and Output usage use the same selected SDK type, including property-level alternate-type customizations. Core's `getLroMetadata` and the native unscoped defaults do not change.
+
+Invalid or unsupported selections are blocking errors; TCGC does not emit a basic/default-result method as a fallback. Only result types representable by the SDK LRO result contract are accepted.
 
 ### HTTP Operation Parameters Handling
 

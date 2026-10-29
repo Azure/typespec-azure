@@ -118,7 +118,10 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getRawLroMetadata } from "./lro-metadata.js";
+import {
+  getClientLroMetadataWithDiagnostics,
+  getClientLroResultProperties,
+} from "./lro-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -2174,7 +2177,8 @@ function updateTypesFromOperation(
     }
     popNamingContext(context);
 
-    const lroMetaData = getRawLroMetadata(program, operation);
+    // Method construction reports selection diagnostics.
+    const lroMetaData = ignoreDiagnostics(getClientLroMetadataWithDiagnostics(context, operation));
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2274,7 +2278,15 @@ function updateTypesFromOperation(
 
     if (lroMetaData && generateConvenient) {
       // the final result will be normal output usage.
-      updateUsageOrAccessForLroComponent(lroMetaData.finalResult, UsageFlags.Output, "FinalResult");
+      const resultProperty = getClientLroResultProperties(context, operation)?.at(-1);
+      updateUsageOrAccessForLroComponent(
+        lroMetaData.finalResult,
+        UsageFlags.Output,
+        "FinalResult",
+        resultProperty
+          ? diagnostics.pipe(getSdkModelPropertyType(context, resultProperty, operation)).type
+          : undefined,
+      );
 
       // the final envelope result will have LroFinalEnvelope.
       updateUsageOrAccessForLroComponent(
@@ -2299,10 +2311,12 @@ function updateTypesFromOperation(
     model: Model | Scalar | "void" | IntrinsicType | undefined,
     usage: UsageFlags,
     label: string,
+    selectedType?: SdkType,
   ) {
     if (model === undefined || model === "void") return;
     pushNamingContext(context, label, model as ContextNode["type"]);
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, model, operation));
+    const sdkType =
+      selectedType ?? diagnostics.pipe(getClientTypeWithDiagnostics(context, model, operation));
     popNamingContext(context);
     diagnostics.pipe(updateUsageOrAccess(context, usage, sdkType));
     const access = getAccessOverride(context, operation) ?? "public";

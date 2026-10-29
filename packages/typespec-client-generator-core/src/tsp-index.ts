@@ -13,6 +13,7 @@ import {
   $clientDoc,
   $clientInitialization,
   $clientLocation,
+  $clientLroResult,
   $clientName,
   $clientNamespace,
   $clientOption,
@@ -70,6 +71,7 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
+    clientLroResult: $clientLroResult,
     clientOption: $clientOption,
   } satisfies AzureClientGeneratorCoreDecorators,
 

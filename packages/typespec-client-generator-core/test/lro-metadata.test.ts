@@ -20,6 +20,19 @@ it.each([
      @pollingOperation(poll)
      op start is Operations.LongRunningResourceCreateOrReplace<Widget>;`,
   ],
+  [
+    "resource PUT with a different polling result",
+    `@resource("jobs") model Job {
+       @key id: string;
+       @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+       @lroResult result: Widget;
+     }
+     @route("/jobs/{id}") @get op read(@path id: string): Job;
+     @route("/jobs/{id}/status") @get op poll(@path id: string): Job;
+     @pollingOperation(poll)
+     @createsOrReplacesResource(Job)
+     @route("/jobs/{id}") @put op start(@path id: string): Job;`,
+  ],
   ["resource DELETE", "op start is Operations.LongRunningResourceDelete<Widget>;"],
   ["resource action", "op start is Operations.LongRunningResourceAction<Widget, {}, Widget>;"],
   [
@@ -71,6 +84,15 @@ it.each([
   Object.freeze(protocol.completion);
   if (protocol.completion.finalStep) Object.freeze(protocol.completion.finalStep);
   const selected = resolveLroClientResult(protocol);
+  if (protocol.completion.finalStep?.kind === "pollingSuccessProperty") {
+    strictEqual(
+      selected.finalResult === "void" ? "void" : selected.finalResult?.name,
+      protocol.completion.finalStep.responseModel.name,
+    );
+    strictEqual(selected.finalResult, protocol.completion.finalStep.target.type);
+    strictEqual(selected.finalEnvelopeResult, protocol.polling.pollingInfo.responseModel);
+    strictEqual(selected.finalResultPath, protocol.completion.finalStep.target.name);
+  }
   const native = getRawLroMetadata(program, operation);
   const legacy = getLroMetadata(program, operation);
   ok(native);

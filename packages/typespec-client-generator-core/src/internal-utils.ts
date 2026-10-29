@@ -9,6 +9,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   type Diagnostic,
+  type DiagnosticTarget,
   type Enum,
   getDeprecationDetails,
   getDoc,
@@ -87,7 +88,7 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getRawLroMetadata } from "./lro-metadata.js";
+import { getClientLroMetadataWithDiagnostics } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -129,6 +130,15 @@ export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 export const responseOverrideKey = createStateSymbol("responseOverride");
+
+/** Stored state for an explicit client LRO result selection. @internal */
+export interface ClientLroResultReference {
+  result: Model | ModelProperty;
+  propertyPath?: ModelProperty[];
+  diagnosticTarget: DiagnosticTarget;
+}
+
+export const clientLroResultKey = createStateSymbol("clientLroResult");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
@@ -1332,9 +1342,18 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
-  const lroMetaData = getRawLroMetadata(context.program, operation);
-  if (lroMetaData) {
-    return lroMetaData;
+  return ignoreDiagnostics(getTcgcLroMetadataWithDiagnostics(context, operation, client));
+}
+
+/** Resolves TCGC LRO metadata and returns any diagnostics. @internal */
+export function getTcgcLroMetadataWithDiagnostics<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  operation: Operation,
+  client: SdkClientType<TServiceOperation>,
+): [LroMetadata | undefined, readonly Diagnostic[]] {
+  const [metadata, diagnostics] = getClientLroMetadataWithDiagnostics(context, operation);
+  if (metadata || diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
+    return [metadata, diagnostics];
   }
   if (getMarkAsLro(context, operation)) {
     // we guard against this in the setting of `@markAsLro`
@@ -1353,23 +1372,26 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
           `LRO method ${operation.name} with @markAsLro must have a model return type.`,
         );
     }
-    return {
-      operation,
-      logicalResult: returnType,
-      finalStateVia: FinalStateValue.location,
-      pollingInfo: {
-        kind: "pollingOperationStep",
-        responseModel: returnType,
-        terminationStatus: {
-          kind: "status-code",
+    return [
+      {
+        operation,
+        logicalResult: returnType,
+        finalStateVia: FinalStateValue.location,
+        pollingInfo: {
+          kind: "pollingOperationStep",
+          responseModel: returnType,
+          terminationStatus: {
+            kind: "status-code",
+          },
         },
+        envelopeResult: returnType,
+        finalEnvelopeResult: returnType,
+        finalResult: returnType,
       },
-      envelopeResult: returnType,
-      finalEnvelopeResult: returnType,
-      finalResult: returnType,
-    };
+      diagnostics,
+    ];
   }
-  return undefined;
+  return [undefined, diagnostics];
 }
 
 export function getActualClientType(client: SdkClient): Namespace | Interface {
