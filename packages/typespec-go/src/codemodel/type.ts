@@ -190,8 +190,7 @@ export interface Map<T extends MapValueType = MapValueType> {
 
   /**
    * the type of values in the map.
-   * note that the type is always pointer-to-type
-   * unless the type is implicitly nil-able.
+   * model/body maps normally use pointers; parameter maps can use values.
    */
   itemType: T;
 }
@@ -200,6 +199,7 @@ export interface Map<T extends MapValueType = MapValueType> {
 export type MapValueType =
   | Any
   | EncodedBytes
+  | Exclude<PtrType, ETag | Literal | MultipartContent>
   | Interface
   | Map
   | Ptr<Exclude<PtrType, ETag | Literal>>

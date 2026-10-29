@@ -92,6 +92,7 @@ export class TypeAdapter {
    * converts all tcgc model/enum types to Go code model types
    */
   adaptTypes() {
+    const queryOnlyModels = this.getQueryOnlyModels();
     for (const enumType of this.ctx.sdkPackage.enums) {
       if ((enumType.usage & tcgc.UsageFlags.ApiVersionEnum) !== 0) {
         // skip enums that are used for API version
@@ -119,6 +120,9 @@ export class TypeAdapter {
     }
 
     for (const modelType of this.ctx.sdkPackage.models) {
+      if (queryOnlyModels.has(modelType)) {
+        continue;
+      }
       if (modelType.name.length === 0) {
         // tcgc creates some unnamed models for spread params.
         // we don't use these so just skip them.
@@ -162,6 +166,84 @@ export class TypeAdapter {
         this.getPkg().models.push(model);
       }
     }
+  }
+
+  private getQueryOnlyModels(): Set<tcgc.SdkModelType> {
+    const queryTypes = new Set<tcgc.SdkType>();
+    const queryModels = new Set<tcgc.SdkModelType>();
+    const payloadTypes = new Set<tcgc.SdkType>();
+    const bodyTypes = new Set<tcgc.SdkType>();
+    const visitType = (type: tcgc.SdkType, types: Set<tcgc.SdkType>): void => {
+      if (types.has(type)) {
+        return;
+      }
+      types.add(type);
+      switch (type.kind) {
+        case "array":
+        case "dict":
+          visitType(type.valueType, types);
+          break;
+        case "nullable":
+          visitType(type.type, types);
+          break;
+        case "union":
+          type.variantTypes.forEach((variant) => visitType(variant, types));
+          break;
+        case "model":
+          type.properties.forEach((prop) => visitType(prop.type, types));
+          if (type.baseModel) {
+            visitType(type.baseModel, types);
+          }
+          if (type.additionalProperties) {
+            visitType(type.additionalProperties, types);
+          }
+          Object.values(type.discriminatedSubtypes ?? {}).forEach((subtype) =>
+            visitType(subtype, types),
+          );
+          break;
+      }
+    };
+    const visitClient = (client: tcgc.SdkClientType<tcgc.SdkHttpOperation>): void => {
+      for (const method of client.methods) {
+        for (const param of method.operation.parameters) {
+          const type = param.type.kind === "nullable" ? param.type.type : param.type;
+          if (param.kind === "query" && type.kind === "model") {
+            queryModels.add(type);
+          }
+          visitType(
+            type,
+            param.kind === "query" && type.kind === "model" ? queryTypes : payloadTypes,
+          );
+        }
+        if (method.operation.bodyParam) {
+          visitType(method.operation.bodyParam.type, bodyTypes);
+        }
+        for (const response of [
+          ...method.operation.responses.values(),
+          ...method.operation.exceptions.values(),
+        ]) {
+          if (response.type) {
+            visitType(response.type, bodyTypes);
+          }
+        }
+      }
+      client.children?.forEach(visitClient);
+    };
+    this.ctx.sdkPackage.clients.forEach(visitClient);
+    for (const model of queryModels) {
+      if (bodyTypes.has(model)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `model ${model.name} cannot be used for both bundled query parameters and request/response bodies`,
+          model.__raw?.node,
+        );
+      }
+    }
+    return new Set(
+      this.ctx.sdkPackage.models.filter(
+        (model) => queryTypes.has(model) && !payloadTypes.has(model) && !bodyTypes.has(model),
+      ),
+    );
   }
 
   // returns the synthesized paged response types
@@ -320,7 +402,7 @@ export class TypeAdapter {
           substituteDiscriminator,
         );
         const keyName = recursiveKeyName(
-          `dict${valueType.kind === "ptr" ? "-ptr" : ""}`,
+          `dict-${elementTypeByValue}${valueType.kind === "ptr" ? "-ptr" : ""}`,
           type.valueType,
           substituteDiscriminator,
         );
@@ -1251,7 +1333,9 @@ export class TypeAdapter {
           sdkType.__raw?.node,
         );
       default:
-        return helpers.isPtrType(valueType) ? this.getPtrType(valueType) : valueType;
+        return !elementTypeByValue && helpers.isPtrType(valueType)
+          ? this.getPtrType(valueType)
+          : valueType;
     }
   }
 
@@ -1768,7 +1852,7 @@ interface UnionUsage {
 
 // aggregate the properties from the provided type and its parent types.
 // this includes any inherited additional properties.
-function aggregateProperties(
+export function aggregateProperties(
   sdkContext: tcgc.SdkContext,
   model: tcgc.SdkModelType,
 ): { props: Array<tcgc.SdkModelPropertyType>; addlProps?: tcgc.SdkType } {

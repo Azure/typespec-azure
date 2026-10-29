@@ -107,6 +107,11 @@ export class Emitter {
           await write(`${snakeClientFileName(op.name)}.go`, op.content);
         }
 
+        const pathExpansionHelpers = core.generatePathExpansionHelpers(pkg);
+        if (pathExpansionHelpers.length > 0) {
+          await write("path_helpers.go", pathExpansionHelpers);
+        }
+
         const models = core.generateModels(pkg, this.codeModel.options, emitter);
         if (models.models.length > 0) {
           await write("models.go", models.models);
