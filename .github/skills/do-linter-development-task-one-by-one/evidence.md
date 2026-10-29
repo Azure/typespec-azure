@@ -84,6 +84,16 @@ raw receipts locally; sanitization must not alter diagnostic counts or targets.
 Never publish credentials, environment dumps, user mail, `node_modules`, raw
 `log.txt` or unrelated/private inputs.
 
+Write generated publication text, including JSON and task-scoped
+`.gitattributes`, as UTF-8 with LF endings before freezing published hashes.
+Preserve original raw receipts separately. A `-text` attribute preserves CRLF
+too; it does not normalize generated files or make them pass Git's whitespace
+check. Validate the actual staged text with `git diff --cached --check` before
+commit/publication, and verify staged blob hashes after any intentional
+normalization. Do not disable whitespace checks or rewrite immutable raw
+receipts to fix publication formatting. A failed check still follows the
+existing bounded correction policy.
+
 Before committing, compare the complete publication inventory with Git's staged
 paths. Directory staging can omit ignored manifests and `.log` receipts. When
 necessary, force-add only explicitly inventoried sanitized receipts; never

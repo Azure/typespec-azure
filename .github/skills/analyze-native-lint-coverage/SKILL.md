@@ -281,7 +281,19 @@ An explicitly requested separate pilot producer may use a case-sensitive literal
 `--filter` and optional positive `--limit`, but its reduced population is partial
 evidence and never substitutes for the full saved-population readout/native run.
 
-From the tooling repository root, run the injected-package controls with
+Before declaring the injected-control population required, inspect the pinned
+suite's fixtures and the candidate's actual rule registrations. Separate
+portable harness controls from fixtures that require another migration's rule.
+Record each group's applicability and the documented runner selection before
+execution. An unrelated unmerged rule need not be added to the candidate just
+to satisfy its fixtures. Retain every applicable portable control and add
+positive/compliant controls for the selected rule. Disclose non-applicable
+fixtures and selection counts; never call them passes or silently skip them.
+This preflight does not authorize reclassifying a required failed suite after
+execution or reducing the full baseline population.
+
+When all fixtures apply, run the complete injected-package control suite from
+the tooling repository root with
 `NATIVE_COVERAGE_SPECS_REPO` set to the prepared specs checkout:
 
 ```powershell
