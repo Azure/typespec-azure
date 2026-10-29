@@ -249,11 +249,12 @@ function validateClientNamesPerNamespace(
   movedTo: Map<Namespace | Interface, Operation[]>,
   namespace: Namespace,
 ) {
-  // Check for duplicate client names for models, enums, and unions
+  // Check for duplicate client names for models, enums, unions, and interfaces
   validateClientNamesCore(tcgcContext, scope, [
     ...namespace.models.values(),
     ...namespace.enums.values(),
     ...namespace.unions.values(),
+    ...namespace.interfaces.values(),
   ]);
 
   // Check for duplicate client names for operations
@@ -271,9 +272,6 @@ function validateClientNamesPerNamespace(
       adjustOperations(item.operations.values(), moved, movedTo, item),
     );
   }
-
-  // Check for duplicate client names for interfaces
-  validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
 
   // Check for duplicate client names for scalars
   validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());

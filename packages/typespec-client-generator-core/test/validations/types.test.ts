@@ -431,6 +431,79 @@ it("error for duplicate model name within same service namespace", async () => {
   ]);
 });
 
+it.each(["model Item {}", "enum Item { one }", 'union Item { one: "one", two: "two" }'])(
+  "error for interface client name conflicting with %s",
+  async (declaration) => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService;
+
+      ${declaration}
+      @clientName("Item")
+      interface Items {
+        @get op read(): Item;
+      }
+    `);
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        severity: "error",
+        message:
+          'Client name: "Item" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        severity: "error",
+        message: 'Client name: "Item" is duplicated in language scope: "AllScopes"',
+      },
+    ]);
+  },
+);
+
+it("error for interface and model client name conflict in a language scope", async () => {
+  const diagnostics = await SimpleTester.diagnose(`
+    @service
+    namespace MyService;
+
+    @clientName("Item", "csharp")
+    model Value {}
+    @clientName("Item", "csharp")
+    interface Items {
+      @get op read(): Value;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      severity: "error",
+      message: 'Client name: "Item" is duplicated in language scope: "csharp"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      severity: "error",
+      message: 'Client name: "Item" is duplicated in language scope: "csharp"',
+    },
+  ]);
+});
+
+it("no error for interface and model client names in different language scopes", async () => {
+  const diagnostics = await SimpleTester.diagnose(`
+    @service
+    namespace MyService;
+
+    @clientName("Item", "csharp")
+    model Value {}
+    @clientName("Item", "java")
+    interface Items {
+      @get op read(): Value;
+    }
+  `);
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
 it("no duplicate operation with @clientLocation", async () => {
   const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `

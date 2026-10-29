@@ -1,8 +1,10 @@
-This diagnostic is issued when two generated SDK declarations have the same client name in the same language scope and the duplicate is an error for that scope.
+This diagnostic is issued when two declarations have the same effective client name in the same language scope and the duplicate is an error for that scope.
+
+Within each declared namespace, interfaces are checked together with models, enums, and unions. This declaration-level check honors `@clientName` overrides but does not account for emitter-specific suffixes such as `Operations` or `Client`.
 
 ## Impact
 
-- **Area:** SDK symbol naming. Blocks generation of two declarations with the same client name in one language scope because they would collide in the emitted API.
+- **Area:** SDK symbol naming. Blocks compilation when declarations have conflicting effective client names in one language scope.
 - **Not affected:** Wire names and service operation routes are unchanged.
 
 ## Decorator-applied duplicate
