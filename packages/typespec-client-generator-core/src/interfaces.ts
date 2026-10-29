@@ -1214,6 +1214,22 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * Auxiliary status-monitor properties marked with `@lroStatusMetadata`, in deterministic
+   * direct-then-inherited model/property order. Emitters expose values from the latest received
+   * status-monitor response (including initial, failed, and canceled responses) on the poller or
+   * operation. Values may be absent until received and are refreshed after each poll, not persisted
+   * in continuation tokens; the next poll repopulates them after rehydration.
+   */
+  statusMetadata?: SdkLroStatusMetadata[];
+}
+
+export interface SdkLroStatusMetadata {
+  /**
+   * Exact effective property from `pollingInfo.responseModel`. The value is auxiliary operation
+   * state, not the LRO status, error, logical result, or a polling/final location.
+   */
+  property: SdkModelPropertyType;
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {

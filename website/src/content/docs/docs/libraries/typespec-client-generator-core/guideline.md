@@ -375,6 +375,41 @@ The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
+#### LRO status metadata
+
+The TCGC-only `@lroStatusMetadata` decorator lets an SDK expose auxiliary status-monitor metadata without changing Azure.Core polling protocol semantics or the normal method response:
+
+```typespec
+model OperationStatus {
+  status: OperationState;
+
+  @lroStatusMetadata
+  percentComplete?: int32;
+
+  @lroStatusMetadata
+  requestId?: string;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(@path operationId: string): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.statusMetadata` contains wrappers around the exact cached `SdkModelPropertyType` objects from the polling response model, in deterministic direct-then-inherited model/property order. Consequently, client and wire names, optionality, decorators, serialization, and property types are preserved. These properties are auxiliary operation or poller state and do not affect polling, status evaluation, error handling, final-result extraction, or polling and final locations. TCGC diagnoses attempts to decorate those structural LRO properties. An auxiliary `errors` array containing per-item diagnostics may be selected, but a property designated as the structural LRO error by `@lroErrorResult` or Azure.Core conventions may not.
+
+Each active decorated direct or inherited property applies to every LRO that uses that status-monitor model. Decorate each property to expose several values; the decorator is property-level only. Nested properties are not scanned; decorate the direct property to expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`, and inclusion or negation on each property.
+
+Values come from the most recent status-monitor response the SDK has received, including the initial response when it contains the status-monitor model. Any value may be absent until a response containing it arrives. Metadata remains exposed on failed or canceled terminal responses, independently of whether a logical final result is available. Emitters expose these values on their idiomatic poller or operation object and should keep them current after each poll. Metadata is not part of the continuation token; after rehydration, it is populated again by the next poll.
+
+TCGC describes the selected properties, not runtime response values. Language emitters must implement this lifecycle and their public accessor shape; Spector HTTP scenarios alone do not demonstrate generated poller access or removal of SDK customizations. An emitter that already exposes a typed status-monitor response may satisfy this contract through its existing operation or poller API, provided it reflects the latest received response and remains accessible after failure or cancellation.
+
+Separate `@lroStatusMetadata` declarations on one property may use disjoint emitter scopes. Overlapping scopes, including an unscoped declaration combined with any other declaration, are diagnosed once at declaration time.
+
+Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
+
 ### HTTP Operation Parameters Handling
 
 The HTTP operation's parameters are inferred from TypeSpec HTTP lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different HTTP parameters are handled by specific logic based on the info from TypeSpec HTTP lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).
