@@ -34,7 +34,7 @@ it("keeps enum values and types separate from JSON and XML wire values", async (
       status: Status;
       initial: Status.unspecified;
     }
-    op get(): Result;
+    op send(@header contentType: "application/xml", @body body: Result): Result;
   `);
   const context = await createSdkContextForTester(program);
   const sdkEnum = context.sdkPackage.enums[0];
@@ -45,14 +45,14 @@ it("keeps enum values and types separate from JSON and XML wire values", async (
   strictEqual(sdkEnum.valueType.kind, "int32");
   strictEqual(sdkEnum.values[0].name, "Unspecified");
   strictEqual(sdkEnum.values[0].valueType.kind, "int32");
-  deepStrictEqual(sdkEnum.values[0].serializationOptions, {
-    json: { value: "unknown" },
-    xml: { value: "Unknown" },
-  });
-  deepStrictEqual(sdkEnum.values[1].serializationOptions, {
-    json: { value: "active" },
-  });
-  strictEqual(sdkEnum.values[2].serializationOptions, undefined);
+  strictEqual(sdkEnum.values[0].serializationOptions?.json?.name, "unknown");
+  strictEqual(sdkEnum.values[0].serializationOptions?.json?.value, "unknown");
+  strictEqual(sdkEnum.values[0].serializationOptions?.xml?.name, "Unknown");
+  strictEqual(sdkEnum.values[0].serializationOptions?.xml?.value, "Unknown");
+  strictEqual(sdkEnum.values[1].serializationOptions?.json?.value, "active");
+  strictEqual(sdkEnum.values[1].serializationOptions?.xml?.value, 1);
+  strictEqual(sdkEnum.values[2].serializationOptions?.json?.value, 2);
+  strictEqual(sdkEnum.values[2].serializationOptions?.xml?.value, 2);
   strictEqual(sdkEnum.serializationOptions?.json?.valueType.kind, "string");
   strictEqual(sdkEnum.serializationOptions?.xml?.valueType.kind, "string");
   const initial = context.sdkPackage.models[0].properties.find((prop) => prop.name === "initial");
@@ -83,8 +83,14 @@ it("preserves encoded values when flattening enums into a union", async () => {
     ["ready", "empty"],
   );
   deepStrictEqual(
-    sdkEnum.values.map((value) => value.serializationOptions),
-    [{ json: { value: "wire-ready" } }, { json: { value: "" }, xml: { value: "Empty" } }],
+    sdkEnum.values.map((value) => [
+      value.serializationOptions?.json?.value,
+      value.serializationOptions?.xml?.value,
+    ]),
+    [
+      ["wire-ready", undefined],
+      ["", "Empty"],
+    ],
   );
 });
 

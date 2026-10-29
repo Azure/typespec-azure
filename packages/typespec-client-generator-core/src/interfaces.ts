@@ -509,17 +509,7 @@ export interface SdkEnumType extends SdkTypeBase {
   apiVersions: string[];
   isUnionAsEnum: boolean;
   /** Protocol-specific wire value types. Unset protocols use `valueType`. */
-  serializationOptions?: EnumSerializationOptions;
-}
-
-export interface EnumSerializationOptions {
-  json?: { valueType: SdkBuiltInType };
-  xml?: { valueType: SdkBuiltInType };
-}
-
-export interface EnumValueSerializationOptions {
-  json?: { value: string | number };
-  xml?: { value: string | number };
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkEnumValueType<
@@ -532,7 +522,7 @@ export interface SdkEnumValueType<
   /** Original enum member value, or its TypeSpec name when no value is specified. */
   value: string | number;
   /** Protocol-specific wire values from `@encodedName`. Unset protocols use `value`. */
-  serializationOptions?: EnumValueSerializationOptions;
+  serializationOptions?: SerializationOptions;
   enumType: SdkEnumType;
   valueType: TValueType;
   /** Unique ID for the current type. */
@@ -719,6 +709,10 @@ export interface SerializationOptions {
  */
 export interface JsonSerializationOptions {
   name: string;
+  /** Serialized enum member value. */
+  value?: string | number;
+  /** Serialized enum value type. */
+  valueType?: SdkBuiltInType;
 }
 
 /**
@@ -730,6 +724,10 @@ export interface JsonSerializationOptions {
  */
 export interface XmlSerializationOptions {
   name: string;
+  /** Serialized enum member value. */
+  value?: string | number;
+  /** Serialized enum value type. */
+  valueType?: SdkBuiltInType;
   attribute?: boolean;
   ns?: {
     namespace: string;

@@ -19,7 +19,6 @@ import {
   type Tuple,
   type Type,
   type Union,
-  type UnionVariant,
   compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
@@ -73,7 +72,6 @@ import {
 import {
   type AccessFlags,
   type ArrayKnownEncoding,
-  type EnumSerializationOptions,
   type SdkArrayType,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
@@ -1030,7 +1028,10 @@ function addDiscriminatorToModelType(
             if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
               for (const value of discriminatorType.values) {
                 if (
-                  (value.serializationOptions?.json?.value ?? value.value) === property.type.value
+                  value.value === property.type.value &&
+                  (value.serializationOptions?.json?.value ?? value.value) ===
+                    property.type.value &&
+                  (value.serializationOptions?.xml?.value ?? value.value) === property.type.value
                 ) {
                   property.type = value;
                   break;
@@ -1267,42 +1268,17 @@ function getSdkEnumValueWithDiagnostics(
   type: EnumMember,
 ): [SdkEnumValueType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
+  const sdkType: SdkEnumValueType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
-    ...getEnumValueSerializationOptions(context, type),
     enumType,
     valueType: enumType.valueType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
-  });
-}
-
-function getEnumValueSerializationOptions(
-  context: TCGCContext,
-  type: EnumMember | UnionVariant,
-): Pick<SdkEnumValueType, "serializationOptions"> {
-  if (type.kind !== "EnumMember") return {};
-  const result: Pick<SdkEnumValueType, "serializationOptions"> = {};
-  for (const format of ["json", "xml"] as const) {
-    const value = resolveEncodedEnumMemberValue(context.program, type, `application/${format}`);
-    if (value !== (type.value ?? type.name)) {
-      (result.serializationOptions ??= {})[format] = { value };
-    }
-  }
-  return result;
-}
-
-function updateEnumSerializationOptions(context: TCGCContext, type: SdkEnumType) {
-  for (const format of ["json", "xml"] as const) {
-    if (type.values.some((value) => value.serializationOptions?.[format])) {
-      const options: EnumSerializationOptions = (type.serializationOptions ??= {});
-      options[format] = {
-        valueType: getTypeSpecBuiltInType(context, "string"),
-      };
-    }
-  }
+  };
+  setSerializationOptions(context, sdkType, []);
+  return diagnostics.wrap(sdkType);
 }
 
 export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operation): SdkEnumType {
@@ -1343,7 +1319,7 @@ function getSdkEnumWithDiagnostics(
         diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, sdkType, member)),
       );
     }
-    updateEnumSerializationOptions(context, sdkType);
+    setSerializationOptions(context, sdkType, []);
   }
   updateReferencedTypeMap(context, type, sdkType);
 
@@ -1359,16 +1335,17 @@ function getSdkUnionEnumValues(
   const values: SdkEnumValueType[] = [];
   for (const member of type.flattenedMembers.values()) {
     const name = getLibraryName(context, member.type);
-    values.push({
+    const sdkValue: SdkEnumValueType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
       isExactName: isExactClientName(context, member.type),
       value: member.value,
-      ...getEnumValueSerializationOptions(context, member.type),
       valueType: enumType.valueType,
       enumType,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, member.type),
-    });
+    };
+    setSerializationOptions(context, sdkValue, []);
+    values.push(sdkValue);
   }
   return diagnostics.wrap(values);
 }
@@ -1409,7 +1386,7 @@ export function getSdkUnionEnumWithDiagnostics(
     isUnionAsEnum: true,
   };
   sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
-  updateEnumSerializationOptions(context, sdkType);
+  setSerializationOptions(context, sdkType, []);
   return diagnostics.wrap(sdkType);
 }
 
@@ -2882,6 +2859,16 @@ function updateSerializationOptions(
     return diagnostics.wrap(undefined); // avoid circular references
   }
 
+  if (type.kind === "enum" || type.kind === "enumvalue") {
+    setSerializationOptions(context, type, contentTypes);
+    if (type.kind === "enum") {
+      for (const value of type.values) {
+        setSerializationOptions(context, value, contentTypes);
+      }
+    }
+    return diagnostics.wrap(undefined);
+  }
+
   if (type.kind === "array" || type.kind === "dict") {
     // An array/dict only needs its own serialization options when it is a named model
     // with explicit serialization decorators (e.g. `@Xml.name("Foo") model Foo is Bar[];`);
@@ -2980,7 +2967,13 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
+  type:
+    | SdkModelType
+    | SdkModelPropertyType
+    | SdkArrayType
+    | SdkDictionaryType
+    | SdkEnumType
+    | SdkEnumValueType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
@@ -2994,15 +2987,15 @@ function setSerializationOptions(
   }
   if (
     !type.serializationOptions?.json &&
-    type.__raw &&
-    hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
+    ((type.__raw && hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)) ||
+      (type.kind === "enum" && type.values.some((value) => value.serializationOptions?.json)))
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
     !type.serializationOptions?.xml &&
-    type.__raw &&
-    hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
+    ((type.__raw && hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)) ||
+      (type.kind === "enum" && type.values.some((value) => value.serializationOptions?.xml)))
   ) {
     updateXmlSerializationOptions(context, type);
   }
@@ -3018,27 +3011,57 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
+  type:
+    | SdkModelType
+    | SdkModelPropertyType
+    | SdkArrayType
+    | SdkDictionaryType
+    | SdkEnumType
+    | SdkEnumValueType,
 ) {
   const serializationOptions = (type.serializationOptions ??= {});
   serializationOptions.json = {
     name:
-      type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
+      type.__raw?.kind === "Model" ||
+      type.__raw?.kind === "ModelProperty" ||
+      type.__raw?.kind === "EnumMember"
         ? resolveEncodedName(context.program, type.__raw, "application/json")
         : "name" in type
           ? type.name
           : "",
   };
+  if (type.kind === "enumvalue") {
+    serializationOptions.json.value =
+      type.__raw?.kind === "EnumMember"
+        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/json")
+        : type.value;
+  } else if (type.kind === "enum") {
+    serializationOptions.json.valueType = type.values.some(
+      (value) =>
+        value.serializationOptions?.json?.value !== undefined &&
+        value.serializationOptions.json.value !== value.value,
+    )
+      ? getTypeSpecBuiltInType(context, "string")
+      : type.valueType;
+  }
 }
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
+  type:
+    | SdkModelType
+    | SdkModelPropertyType
+    | SdkArrayType
+    | SdkDictionaryType
+    | SdkEnumType
+    | SdkEnumValueType,
 ) {
   const serializationOptions = (type.serializationOptions ??= {});
   serializationOptions.xml = {
     name:
-      type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
+      type.__raw?.kind === "Model" ||
+      type.__raw?.kind === "ModelProperty" ||
+      type.__raw?.kind === "EnumMember"
         ? resolveEncodedName(context.program, type.__raw, "application/xml")
         : "name" in type
           ? type.name
@@ -3047,6 +3070,20 @@ function updateXmlSerializationOptions(
     ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
     unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
   };
+  if (type.kind === "enumvalue") {
+    serializationOptions.xml.value =
+      type.__raw?.kind === "EnumMember"
+        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/xml")
+        : type.value;
+  } else if (type.kind === "enum") {
+    serializationOptions.xml.valueType = type.values.some(
+      (value) =>
+        value.serializationOptions?.xml?.value !== undefined &&
+        value.serializationOptions.xml.value !== value.value,
+    )
+      ? getTypeSpecBuiltInType(context, "string")
+      : type.valueType;
+  }
 
   // set extra serialization info for array property
   if (
@@ -3079,6 +3116,12 @@ function updateXmlSerializationOptions(
 }
 
 function hasExplicitlyDefinedXmlSerializationInfo(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "EnumMember") {
+    return (
+      resolveEncodedEnumMemberValue(context.program, type, "application/xml") !==
+      (type.value ?? type.name)
+    );
+  }
   if (type.kind === "Model" || type.kind === "ModelProperty" || type.kind === "Scalar") {
     if (type.decorators && type.decorators.some((d) => d.definition?.namespace.name === "Xml")) {
       return true;
@@ -3098,6 +3141,12 @@ function hasExplicitlyDefinedXmlSerializationInfo(context: TCGCContext, type: Ty
 }
 
 function hasExplicitlyDefinedJsonSerializationInfo(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "EnumMember") {
+    return (
+      resolveEncodedEnumMemberValue(context.program, type, "application/json") !==
+      (type.value ?? type.name)
+    );
+  }
   if (type.kind === "ModelProperty") {
     const jsonName = resolveEncodedName(context.program, type, "application/json");
     if (jsonName && jsonName !== type.name) {

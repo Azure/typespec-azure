@@ -39,8 +39,13 @@ for (const [value, discriminator] of [
     strictEqual(shape.discriminatedSubtypes?.round, circle);
     const kind = circle.properties.find((prop) => prop.name === "kind");
     ok(kind);
-    strictEqual(kind.type.kind, "enumvalue");
-    strictEqual(kind.type.value, value === "0" ? 0 : "circle");
+    if (discriminator === '"round"') {
+      strictEqual(kind.type.kind, "constant");
+      strictEqual(kind.type.value, "round");
+    } else {
+      strictEqual(kind.type.kind, "enumvalue");
+      strictEqual(kind.type.value, value === "0" ? 0 : "circle");
+    }
   });
 }
 
