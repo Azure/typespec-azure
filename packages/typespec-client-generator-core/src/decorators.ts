@@ -27,6 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getAuthentication,
   getHttpOperation,
@@ -50,6 +51,7 @@ import type {
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   DynamicModelDecorator,
+  LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -89,6 +91,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -104,6 +107,47 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+interface ScopedLroDecorator {
+  scope?: string;
+  target: DiagnosticTarget;
+}
+
+const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
+const [getLroStatusMetadataEntries, setLroStatusMetadataEntries] = useStateMap<
+  ModelProperty,
+  ScopedLroDecorator[]
+>(lroStatusMetadataKey);
+
+export const $lroStatusMetadata: LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries = getLroStatusMetadataEntries(context.program, target) ?? [];
+  const normalizedScope = normalizeScope(scope);
+  if (entries.some((entry) => scopesOverlap(entry.scope, normalizedScope))) {
+    reportDiagnostic(context.program, {
+      code: "lro-status-metadata-duplicate",
+      format: { propertyName: target.name },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setLroStatusMetadataEntries(context.program, target, [
+    ...entries,
+    { scope: normalizedScope, target: context.decoratorTarget },
+  ]);
+};
+
+export function getLroStatusMetadataDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): ScopedLroDecorator | undefined {
+  return getLroStatusMetadataEntries(context.program, target)?.find(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
 
 /**
  * The set of emitters a scope string effectively selects.
@@ -130,6 +174,22 @@ function getEffectiveScope(scope: string): EffectiveScope {
   return positives.length === 0
     ? { kind: "all-except", scopes: [] }
     : { kind: "only", scopes: positives };
+}
+
+function scopesOverlap(left: string | undefined, right: string | undefined): boolean {
+  const a = getEffectiveScope(left ?? "");
+  const b = getEffectiveScope(right ?? "");
+  if (a.kind === "only" && b.kind === "only") {
+    return a.scopes.some((scope) => b.scopes.includes(scope));
+  }
+  if (a.kind === "only") {
+    return a.scopes.some((scope) => !b.scopes.includes(scope));
+  }
+  if (b.kind === "only") {
+    return b.scopes.some((scope) => !a.scopes.includes(scope));
+  }
+  // Two finite exclusion lists always leave some emitter scopes in common.
+  return true;
 }
 
 function isSemanticallyEqualScope(left: string, right: string): boolean {
