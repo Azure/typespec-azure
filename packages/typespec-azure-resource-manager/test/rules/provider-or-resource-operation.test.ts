@@ -82,23 +82,29 @@ describe("provider-or-resource-operation", () => {
       .toBeValid();
   });
 
-  it("supports an explicitly justified suppression", async () => {
-    await Tester.compile(
-      `${service}
-        #suppress "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation" "Approved exception."
-        @get op custom(): string;
+  it.each(["@get custom(): string;", "@get @armResourceRead(NotAResource) custom(): string;"])(
+    "supports an explicitly justified suppression for %s",
+    async (declaration) => {
+      await Tester.compile(
+        `${service}
+        model NotAResource {}
+        interface Custom {
+          #suppress "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation" "Approved exception."
+          ${declaration}
+        }
       `,
-      {
-        compilerOptions: {
-          linterRuleSet: {
-            enable: {
-              "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation": true,
+        {
+          compilerOptions: {
+            linterRuleSet: {
+              enable: {
+                "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation": true,
+              },
             },
           },
         },
-      },
-    );
-  });
+      );
+    },
+  );
 
   it("accepts name availability and operation status templates", async () => {
     await tester
@@ -132,7 +138,6 @@ describe("provider-or-resource-operation", () => {
     "interface Custom { @get custom(): string; }",
     "op Custom<T>(): T; op custom is Custom<string>;",
     "interface Custom<T> { @get custom(): T; } interface Concrete extends Custom<string> {}",
-    "model NotAResource {} interface Custom { @get @armResourceRead(NotAResource) custom(): string; }",
     "interface Custom { @post @armResourceCollectionAction custom(): void; }",
   ]) {
     it(`warns on unregistered concrete operations: ${declaration}`, async () => {
@@ -145,4 +150,80 @@ describe("provider-or-resource-operation", () => {
       ]);
     });
   }
+
+  it("does not infer resource registration from an operation return type", async () => {
+    await tester
+      .expect(
+        `${service}${resource}
+        interface Widgets { @get custom(): Widget; }
+      `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
+          severity: "warning",
+          message,
+        },
+      ]);
+  });
+
+  for (const decorator of [
+    "armResourceRead(NotAResource)",
+    "armResourceCreateOrUpdate(NotAResource)",
+    "armResourceUpdate(NotAResource)",
+    "armResourceDelete(NotAResource)",
+    "armResourceList(NotAResource)",
+    "armResourceAction(NotAResource)",
+    "armResourceCheckExistence(NotAResource)",
+    'armResourceRead(NotAResource, "CustomResourceName")',
+    'Azure.ResourceManager.Private.extensionResourceOperation(Extension.Subscription, NotAResource, "read")',
+    'Azure.ResourceManager.Private.builtInResourceOperation(Extension.Subscription, NotAResource, "read")',
+    'Azure.ResourceManager.Private.legacyResourceOperation(NotAResource, "read")',
+    'Azure.ResourceManager.Private.legacyExtensionResourceOperation(NotAResource, "read")',
+  ]) {
+    it(`identifies the unregistered resource for @${decorator}`, async () => {
+      await tester
+        .expect(
+          `${service}
+          model NotAResource {}
+          interface Custom {
+            @get
+            @${decorator}
+            custom(): string;
+          }
+        `,
+        )
+        .toEmitDiagnostics([
+          {
+            code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
+            severity: "warning",
+            message:
+              'The resource "NotAResource" for this operation is not a registered ARM resource. Use standard resource templates to create resources.',
+          },
+        ]);
+    });
+  }
+
+  it("names the resource from an inherited operation registration", async () => {
+    await tester
+      .expect(
+        `${service}
+        model UnregisteredWidget {}
+        interface Custom<T extends {}> {
+          @get
+          @armResourceRead(T)
+          custom(): string;
+        }
+        interface Concrete extends Custom<UnregisteredWidget> {}
+      `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
+          severity: "warning",
+          message:
+            'The resource "UnregisteredWidget" for this operation is not a registered ARM resource. Use standard resource templates to create resources.',
+        },
+      ]);
+  });
 });
