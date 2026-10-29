@@ -5,7 +5,7 @@ export const CompilerTester = createTester(resolvePath(import.meta.dirname, ".."
   libraries: [],
 });
 
-export const UnwrappedTester = createTester(resolvePath(import.meta.dirname, ".."), {
+export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -13,11 +13,6 @@ export const UnwrappedTester = createTester(resolvePath(import.meta.dirname, "..
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-azure-resource-manager",
   ],
-});
-
-export const Tester = UnwrappedTester.importLibraries().using(
-  "Http",
-  "Rest",
-  "Versioning",
-  "Azure.ResourceManager",
-);
+})
+  .importLibraries()
+  .using("Http", "Rest", "Versioning", "Azure.ResourceManager");

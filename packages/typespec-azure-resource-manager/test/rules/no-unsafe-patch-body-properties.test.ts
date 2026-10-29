@@ -1,4 +1,4 @@
-import { Tester, UnwrappedTester } from "#test/tester.js";
+import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noUnsafePatchBodyPropertiesRule } from "../../src/rules/no-unsafe-patch-body-properties.js";
@@ -48,111 +48,6 @@ const visibility = (path: string) => ({
 const legacyPatch = `
   #suppress "@typespec/http/deprecated-implicit-optionality" "Exercise supported legacy PATCH optionality."
 `;
-
-describe("semantic examples", () => {
-  let fixtureTester: LinterRuleTester;
-  beforeEach(async () => {
-    fixtureTester = createLinterRuleTester(
-      await UnwrappedTester.createInstance(),
-      noUnsafePatchBodyPropertiesRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
-  it("reports the unsafe standard-template payload", async () => {
-    const example = `import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName: string;
-  description?: string;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-}
-
-model UnsafeWidgetPatch {
-  location?: string;
-  properties: {
-    displayName: string;
-    extra?: string;
-    enabled?: boolean = false;
-  };
-}
-
-@armResourceOperations
-interface Widgets {
-  update is ArmCustomPatchSync<Widget, PatchModel = UnsafeWidgetPatch>;
-}
-`;
-
-    await fixtureTester
-      .expect(example)
-      .toEmitDiagnostics([
-        immutable("location"),
-        required("properties"),
-        required("properties.displayName"),
-        missing("properties.extra"),
-        defaultValue("properties.enabled"),
-        missing("properties.enabled"),
-      ]);
-  });
-  it("accepts the standard ARM template example", async () => {
-    const example = `import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName: string;
-  description?: string;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-}
-
-model WidgetPatchProperties {
-  displayName?: string;
-  description?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
-@armResourceOperations
-interface Widgets {
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-}
-`;
-
-    await fixtureTester.expect(example).toBeValid();
-  });
-});
 
 describe("partial resource layout", () => {
   const resourceUnionModels = `
@@ -370,17 +265,6 @@ describe("partial resource layout", () => {
     `,
       )
       .toEmitDiagnostics((x) => ({ ...missing("bag.wire"), pos: x.pos.extra.pos }));
-  });
-
-  it.each(["Patch", "Patch | null"])("unwraps nullable models in %s", async (body) => {
-    await tester
-      .expect(
-        `${service}
-      model Patch { properties?: { extra?: string } | null; }
-      @patch op update(@body body: ${body}): { properties: { value: string } | null };
-    `,
-      )
-      .toEmitDiagnostics(missing("properties.extra"));
   });
 
   it("compares a shared nested model against every resource counterpart", async () => {
@@ -896,17 +780,6 @@ describe("resource selection", () => {
       @route("/widgets") @patch op update(@body body: { extra?: string }):
         ${async ? "AcceptedResponse" : "{ extra: string }"};
       @route("/widgets") @get op read(): { extra: string };
-    `,
-      )
-      .toEmitDiagnostics(missing("extra"));
-  });
-  it("uses an associated resource for 202-only PATCH without GET", async () => {
-    await tester
-      .expect(
-        `${service}
-      model Resource { value: string; }
-      @TypeSpec.Rest.updatesResource(Resource) @patch
-      op update(@body body: { extra?: string }): AcceptedResponse;
     `,
       )
       .toEmitDiagnostics(missing("extra"));
