@@ -14,6 +14,32 @@ import {
 import { getSdkTypeHelper } from "./utils.js";
 
 describe("inline discriminated union conversion", () => {
+  it("matches spec tags to enum values independently of encoded names", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      enum Kind {
+        @encodedName("application/json", "feline")
+        @encodedName("application/xml", "Feline")
+        cat: "cat",
+      }
+      model Base { kind: Kind | string; }
+      model Cat extends Base { kind: "cat"; meows: boolean; }
+      @discriminated(#{ envelope: "none" })
+      union Pet extends Base { cat: Cat }
+      op send(@body pet: Pet): Pet;
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const cat = context.sdkPackage.models.find((model) => model.name === "Cat");
+    ok(cat);
+    strictEqual(cat.discriminatorValue, "cat");
+    const kind = cat.properties.find((property) => property.name === "kind");
+    ok(kind);
+    strictEqual(kind.type.kind, "enumvalue");
+    strictEqual(kind.type.value, "cat");
+    strictEqual(kind.type.serializationOptions?.json?.name, "feline");
+    strictEqual(kind.type.serializationOptions?.xml?.name, "Feline");
+  });
+
   it.each([false, true])(
     "converts the hierarchy with injected discriminator=%s",
     async (injected) => {

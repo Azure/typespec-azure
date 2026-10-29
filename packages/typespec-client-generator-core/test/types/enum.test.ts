@@ -16,6 +16,80 @@ import {
   SimpleTester,
   SimpleTesterWithService,
 } from "../tester.js";
+
+it("keeps enum values and types separate from JSON and XML wire values", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    enum Status {
+      @encodedName("application/json", "unknown")
+      @encodedName("application/xml", "Unknown")
+      @clientName("Unspecified")
+      unspecified: 0,
+      @encodedName("application/json", "active")
+      active: 1,
+      other: 2,
+    }
+
+    model Result {
+      status: Status;
+      initial: Status.unspecified;
+    }
+    op send(@header contentType: "application/xml", @body body: Result): Result;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkEnum = context.sdkPackage.enums[0];
+  deepStrictEqual(
+    sdkEnum.values.map((value) => value.value),
+    [0, 1, 2],
+  );
+  strictEqual(sdkEnum.valueType.kind, "int32");
+  strictEqual(sdkEnum.values[0].name, "Unspecified");
+  strictEqual(sdkEnum.values[0].valueType.kind, "int32");
+  strictEqual(sdkEnum.values[0].serializationOptions?.json?.name, "unknown");
+  strictEqual(sdkEnum.values[0].serializationOptions?.xml?.name, "Unknown");
+  strictEqual(sdkEnum.values[1].serializationOptions?.json?.name, "active");
+  strictEqual(sdkEnum.values[1].serializationOptions?.xml, undefined);
+  strictEqual(sdkEnum.values[2].serializationOptions?.json, undefined);
+  strictEqual(sdkEnum.values[2].serializationOptions?.xml, undefined);
+  const initial = context.sdkPackage.models[0].properties.find((prop) => prop.name === "initial");
+  ok(initial);
+  strictEqual(initial.type.kind, "enumvalue");
+  strictEqual(initial.type.value, 0);
+  deepStrictEqual(initial.type.serializationOptions, sdkEnum.values[0].serializationOptions);
+});
+
+it("preserves encoded values when flattening enums into a union", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Status {
+      @encodedName("application/json", "wire-ready")
+      ready: "ready",
+      @encodedName("application/xml", "Empty")
+      @encodedName("application/json", "")
+      empty,
+    }
+    @usage(Usage.input | Usage.output)
+    union ExtendedStatus { Status, string }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkEnum = context.sdkPackage.enums.find((type) => type.name === "ExtendedStatus");
+  ok(sdkEnum);
+  strictEqual(sdkEnum.isUnionAsEnum, true);
+  deepStrictEqual(
+    sdkEnum.values.map((value) => value.value),
+    ["ready", "empty"],
+  );
+  deepStrictEqual(
+    sdkEnum.values.map((value) => [
+      value.serializationOptions?.json?.name,
+      value.serializationOptions?.xml?.name,
+    ]),
+    [
+      ["wire-ready", undefined],
+      ["", "Empty"],
+    ],
+  );
+});
+
 it("string extensible", async function () {
   const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)

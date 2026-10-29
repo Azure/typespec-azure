@@ -37,6 +37,32 @@ export interface DecoratorOptions {
 }
 
 /**
+ * Marks a status-monitor model property as transient polling data that the SDK should expose to
+ * callers while the long-running operation is in progress, for scenarios like reporting progress,
+ * usage, or job statistics. Emitters whose operations return only the final result, such as Python
+ * and JavaScript, would otherwise need handwritten code to surface these values; marked properties
+ * appear on the emitter's idiomatic poller or operation object instead. The property does not affect
+ * polling, status evaluation, errors, or final-result extraction.
+ *
+ * Values come from the most recent status-monitor response the SDK has received, including the
+ * initial response when it contains the status-monitor model. Any value may be absent until a
+ * response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+ * Emitters should keep these values current after each poll. Metadata is not part of the
+ * continuation token; after rehydration, the next poll populates it again.
+ *
+ * Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
+ * are diagnosed once at declaration time.
+ *
+ * @param target The status-monitor model property.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -1154,6 +1180,7 @@ export type ClientOptionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
+  lroStatusMetadata: LroStatusMetadataDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;
