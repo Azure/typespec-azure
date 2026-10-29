@@ -16,4 +16,6 @@ Skip descendant layout comparison for present unsupported resource unions withou
 
 Request visibility governs both input membership and optionality. Excluded properties are not checked, and absent or optional discriminators are not made required by emitter behavior.
 
+Respect effective payload properties, write-only resource members, and arbitrary keys permitted by resource records. Keep definite layout errors across equally preferred response entries and shared-route GETs, and support namespace-local GET fallback without service metadata. Exclude inherited native File members without exempting authored JSON overrides, and check concrete endpoints without duplicate template-instance warnings.
+
 Keep `arm-resource-patch`, `patch-envelope`, and PATCH-to-PUT correspondence separate. The shared resource-manager ruleset registration remains disabled.

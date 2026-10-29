@@ -6,6 +6,8 @@ import {
   getVisibilityForClass,
   isArrayModelType,
   isNeverType,
+  isRecordModelType,
+  isTemplateDeclarationOrInstance,
   paramMessage,
   type DiagnosticTarget,
   type Model,
@@ -17,6 +19,7 @@ import {
   getAllHttpServices,
   getHttpOperation,
   isHttpFile,
+  listHttpOperationsIn,
   resolveRequestVisibility,
   Visibility,
   type HttpOperation,
@@ -29,6 +32,7 @@ import {
   selectResponseBody,
 } from "./http-response-utils.js";
 import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noUnsafePatchBodyPropertiesRule = createRule({
   name: "no-unsafe-patch-body-properties",
@@ -49,59 +53,88 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
     const metadata = createMetadataInfo(program);
     const lifecycle = getLifecycleVisibilityEnum(program);
     const update = lifecycle.members.get("Update")!;
-    const resourceProperties = new Map<Model, Map<string, ModelProperty>>();
+    const modelProperties = new Map<Model, [string, ModelProperty][]>();
     let services: ReturnType<typeof getAllHttpServices>[0] | undefined;
 
-    function propertiesOf(model: Model) {
-      let properties = resourceProperties.get(model);
-      if (properties === undefined) {
-        properties = new Map();
-        for (const [name, property] of walkJsonProperties(program, model)) {
-          if (!isNeverType(property.type) && !properties.has(name)) {
-            properties.set(name, property);
-          }
+    function propertiesOf(
+      model: Model,
+      visibility: Visibility,
+      isExplicit: boolean,
+      writableVisibility?: Visibility,
+      skipFileMembers = false,
+    ) {
+      let candidates = modelProperties.get(model);
+      if (candidates === undefined) {
+        candidates = [...walkJsonProperties(program, model)];
+        modelProperties.set(model, candidates);
+      }
+      const properties = new Map<string, ModelProperty>();
+      for (const [name, property] of candidates) {
+        if (
+          !isNeverType(property.type) &&
+          !properties.has(name) &&
+          !(skipFileMembers && property.model && isHttpFile(program, property.model)) &&
+          (metadata.isPayloadProperty(property, visibility, isExplicit) ||
+            (writableVisibility !== undefined &&
+              metadata.isPayloadProperty(property, writableVisibility, isExplicit)))
+        ) {
+          properties.set(name, property);
         }
-        resourceProperties.set(model, properties);
       }
       return properties;
     }
 
-    function comparisonBody(operation: HttpOperation): ComparisonBody | undefined {
+    function comparisonBodies(operation: HttpOperation): (ComparisonBody | undefined)[] {
       const associated = getResourceOperation(program, operation.operation)?.resourceType;
-      if (associated !== undefined) return { type: associated, isExplicit: false };
-      const response =
-        responseBody(operation.responses, 200) ?? responseBody(operation.responses, 201);
-      if (response !== undefined) return response;
+      if (associated !== undefined) {
+        return [{ type: associated, isExplicit: false, visibility: Visibility.All }];
+      }
+      const response = responseBodies(operation.responses, 200);
+      if (response.length > 0) return response;
+      const created = responseBodies(operation.responses, 201);
+      if (created.length > 0) return created;
       services ??= getAllHttpServices(program)[0];
       const service = services.find((s) =>
         s.operations.some((o) => o.operation === operation.operation),
       );
-      const get = service?.operations.find((o) => o.verb === "get" && o.path === operation.path);
-      return responseBody(get?.responses, 200) ?? responseBody(get?.responses, 201);
+      const operations =
+        service?.operations ??
+        listHttpOperationsIn(
+          program,
+          operation.operation.namespace ?? program.getGlobalNamespaceType(),
+          { listOptions: { recursive: false } },
+        )[0];
+      const responses = operations
+        .filter((o) => o.verb === "get" && o.path === operation.path)
+        .flatMap((o) => o.responses);
+      const read = responseBodies(responses, 200);
+      return read.length > 0 ? read : responseBodies(responses, 201);
     }
 
     return {
       operation(operation) {
-        if (getLocationContext(program, operation).type !== "project") {
+        if (
+          getLocationContext(program, operation).type !== "project" ||
+          isTemplateDeclarationOrInstance(operation) ||
+          isTemplatedInterfaceOperation(operation)
+        ) {
           return;
         }
         const [http] = getHttpOperation(program, operation);
         const patchBody = http.parameters.body;
         if (http.verb !== "patch" || patchBody?.bodyKind !== "single") return;
         const inExplicitBody = patchBody.isExplicit;
-        const resource = comparisonBody(http);
+        const resources = comparisonBodies(http);
+        let resource: ComparisonBody | undefined;
+        let diagnostics: PatchDiagnostic[];
         const active: TraversalFrame[] = [];
 
         function report(
-          messageId: "missing" | "immutable" | "required" | "default" | "visibility",
+          messageId: PatchDiagnostic["messageId"],
           target: DiagnosticTarget,
           path: string[],
         ) {
-          context.reportDiagnostic({
-            messageId,
-            target,
-            format: { propertyName: path.join(".") },
-          });
+          diagnostics.push({ messageId, target, path });
         }
 
         // The active stack, rather than a global visited set, preserves sibling uses.
@@ -152,26 +185,34 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
             return false;
           }
 
+          const resourceProperties =
+            counterpart === undefined
+              ? undefined
+              : propertiesOf(
+                  counterpart,
+                  (resource?.visibility ?? Visibility.All) | (state.visibility & Visibility.Item),
+                  resource?.isExplicit ?? false,
+                  resource?.visibility === Visibility.Read ? state.visibility : undefined,
+                );
           let hasProperties = false;
-          for (const [name, property] of propertiesOf(model)) {
-            if (!metadata.isPayloadProperty(property, state.visibility, inExplicitBody)) continue;
+          for (const [name, property] of propertiesOf(
+            model,
+            state.visibility,
+            inExplicitBody,
+            undefined,
+            true,
+          )) {
             hasProperties = true;
             const path = [...state.path, name];
             const target =
               getLocationContext(program, property).type === "project" ? property : state.target;
             const safety =
               state.safety && !(state.path.length === 0 && name.toLowerCase() === "identity");
-            const candidate =
-              counterpart === undefined ? undefined : propertiesOf(counterpart).get(name);
-            const resourceProperty =
-              candidate !== undefined &&
-              metadata.isPayloadProperty(
-                candidate,
-                Visibility.All | (state.visibility & Visibility.Item),
-                resource?.isExplicit,
-              )
-                ? candidate
-                : undefined;
+            const resourceProperty = resourceProperties?.get(name);
+            const indexed =
+              resourceProperty === undefined &&
+              counterpart !== undefined &&
+              isRecordModelType(counterpart);
             if (isImmutablePath(path)) report("immutable", target, path);
             if (safety) {
               if (
@@ -189,11 +230,11 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
               path,
               visibility: state.visibility,
               resource: resourceProperty?.type,
-              shape: state.shape,
+              shape: state.shape && !indexed,
               safety,
               target,
             });
-            if (state.shape && resourceProperty === undefined && !hasChildren) {
+            if (state.shape && resourceProperty === undefined && !indexed && !hasChildren) {
               report("missing", target, path);
             }
           }
@@ -201,14 +242,51 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
           return hasProperties;
         }
 
-        visit(patchBody.type, {
-          path: [],
-          visibility: resolveRequestVisibility(program, operation, "patch"),
-          resource: resource?.type,
-          shape: resource !== undefined,
-          safety: true,
-          target: operation,
+        const results = (resources.length === 0 ? [undefined] : resources).map((candidate) => {
+          resource = candidate;
+          diagnostics = [];
+          visit(patchBody.type, {
+            path: [],
+            visibility: resolveRequestVisibility(program, operation, "patch"),
+            resource: resource?.type,
+            shape: resource !== undefined,
+            safety: true,
+            target: operation,
+          });
+          return diagnostics;
         });
+        const targets = new Map<DiagnosticTarget, number>();
+        function diagnosticKey(diagnostic: PatchDiagnostic): string {
+          let target = targets.get(diagnostic.target);
+          if (target === undefined) {
+            target = targets.size;
+            targets.set(diagnostic.target, target);
+          }
+          return JSON.stringify([target, diagnostic.messageId, diagnostic.path]);
+        }
+        const missing = results.map(
+          (result) => new Set(result.filter((d) => d.messageId === "missing").map(diagnosticKey)),
+        );
+        const reported = new Set<string>();
+        // Keep definite layout errors across candidates without repeating independent safety checks.
+        for (const [index, result] of results.entries()) {
+          for (const diagnostic of result) {
+            const key = diagnosticKey(diagnostic);
+            if (
+              diagnostic.messageId === "missing"
+                ? index !== 0 || !missing.every((keys) => keys.has(key))
+                : index !== 0 && reported.has(key)
+            ) {
+              continue;
+            }
+            reported.add(key);
+            context.reportDiagnostic({
+              messageId: diagnostic.messageId,
+              target: diagnostic.target,
+              format: { propertyName: diagnostic.path.join(".") },
+            });
+          }
+        }
       },
     };
   },
@@ -243,22 +321,36 @@ function objectModel(type: Type | undefined): Model | undefined {
   return member?.kind === "Model" ? member : undefined;
 }
 
-function responseBody(
-  responses: HttpOperationResponse[] | undefined,
+function responseBodies(
+  responses: HttpOperationResponse[],
   status: number,
-): ComparisonBody | undefined {
-  const response =
-    responses?.find((r) => matchesStatusCode(r.statusCodes, status)) ??
-    responses?.find((r) => containsStatusCode(r.statusCodes, status));
-  const selection = selectResponseBody(
-    response?.responses.flatMap(({ body }) => (body === undefined ? [] : [body])) ?? [],
-  );
-  return selection.kind === "body" && selection.body.bodyKind === "single"
-    ? selection.body
-    : undefined;
+): (ComparisonBody | undefined)[] {
+  const exact = responses.filter((r) => matchesStatusCode(r.statusCodes, status));
+  const preferred =
+    exact.length > 0 ? exact : responses.filter((r) => containsStatusCode(r.statusCodes, status));
+  const bodies: ComparisonBody[] = [];
+  let ambiguous = false;
+  for (const response of preferred) {
+    const selection = selectResponseBody(
+      response.responses.flatMap(({ body }) => (body === undefined ? [] : [body])),
+    );
+    if (selection.kind === "body" && selection.body.bodyKind === "single") {
+      bodies.push({ ...selection.body, visibility: Visibility.Read });
+    } else if (selection.kind !== "missing") {
+      ambiguous = true;
+    }
+  }
+  return bodies.length > 0 && ambiguous ? [...bodies, undefined] : bodies;
 }
 
 interface ComparisonBody {
   type: Type;
   isExplicit: boolean;
+  visibility: Visibility;
+}
+
+interface PatchDiagnostic {
+  messageId: "missing" | "immutable" | "required" | "default" | "visibility";
+  target: DiagnosticTarget;
+  path: string[];
 }

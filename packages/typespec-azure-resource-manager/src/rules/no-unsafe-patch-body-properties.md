@@ -23,7 +23,9 @@ Authored optionality and legacy implicit PATCH optionality are respected.
 HTTP metadata inside an explicit `@body` remains JSON input even when an HTTP
 annotation is ignored; `@bodyRoot` transport properties stay outside the document.
 Resource comparison excludes transport-only properties and retains explicit
-response-body and collection-item metadata context.
+response-body and collection-item metadata context. Response-derived resource
+members may be readable or writable for the PATCH operation; write-only members
+are not rejected merely because they are absent from Read output.
 
 The case-insensitive, encoded top-level `identity` property and its descendants
 are exempt from optionality, default, and lifecycle-visibility checks.
@@ -50,22 +52,33 @@ asynchronous PATCH operations. Otherwise comparison uses, in order:
 3. Same-service, same-path GET 200 response body.
 4. Same-service, same-path GET 201 response body.
 
+Without service metadata, GET fallback stays within the PATCH operation's
+namespace. A GET from an unrelated namespace or service is not a comparison
+resource.
+
 Exact status codes take precedence over ranges containing the same code.
 Singleton ranges are exact status codes. Content variants with different body
 types, body kinds, or explicit-body metadata are ambiguous and are not used as
 comparison resources; identical body variants may be used.
+Across equally preferred status entries or shared-route GET operations, layout
+errors must hold for every comparison candidate. A property absent from every
+candidate is still reported; declaration order does not select an arbitrary
+resource. Partial-update safety checks remain independent of these alternatives.
 Without a comparison resource, only layout validation is skipped; immutable and
 partial-update safety checks still run.
 
 The rule traverses single HTTP document bodies, object properties, inherited
 properties, nullable single-model unions, and array elements. `never` is omitted.
-Records retain named-property checks, but record indexer values, tuples, and
-multi-model unions are not expanded. When a present resource counterpart is an
+Resource records permit arbitrary string keys while retaining layout checks on
+their declared named members. Record indexer values, tuples, and multi-model
+unions are not expanded. When a present resource counterpart is an
 unsupported union, only descendant layout comparison is skipped; required,
 default, visibility, and immutable checks still run. Genuinely absent properties
 and supported single-model or nullable counterparts retain layout comparison.
 Multipart transport wrappers, native File models and primitive binary bodies
-are not PATCH document-property models.
+are not PATCH document-property models. Inherited native File members are also
+excluded in derived files, but authored JSON property overrides retain their
+partial-update checks.
 An array-versus-scalar mismatch alone is not a type-equality diagnostic.
 
 Recursive active-context tracking terminates cycles without suppressing sibling
@@ -117,7 +130,8 @@ rather than changing only their authored TypeSpec name.
 Enable this rule for compilations that should follow ARM PATCH guidance. It
 checks project PATCH operations in ordinary and nested namespaces, including
 interfaces, without requiring `@armProviderNamespace`. Imported library
-operations and uninstantiated templates are excluded. It does not distinguish
+operations and non-endpoint template declarations/instances are excluded.
+Concrete operations defined using templates remain checked. It does not distinguish
 ARM and data-plane services within the same compilation.
 
 The shared `@azure-tools/typespec-azure-rulesets/resource-manager` ruleset leaves
