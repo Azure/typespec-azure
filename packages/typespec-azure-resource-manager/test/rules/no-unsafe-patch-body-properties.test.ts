@@ -1,0 +1,1183 @@
+import { Tester } from "#test/tester.js";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
+import { noUnsafePatchBodyPropertiesRule } from "../../src/rules/no-unsafe-patch-body-properties.js";
+
+let tester: LinterRuleTester;
+
+beforeEach(async () => {
+  tester = createLinterRuleTester(
+    await Tester.createInstance(),
+    noUnsafePatchBodyPropertiesRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+const service = `
+  @Azure.ResourceManager.armProviderNamespace
+  @service namespace Microsoft.TestService;
+`;
+
+const code = "@azure-tools/typespec-azure-resource-manager/no-unsafe-patch-body-properties";
+
+const required = (path: string) => ({
+  code,
+  message: `Properties of a PATCH request body must not be required, property:${path}.`,
+});
+
+const defaultValue = (path: string) => ({
+  code,
+  message: `Properties of a PATCH request body must not have default value, property:${path}.`,
+});
+
+const missing = (path: string) => ({
+  code,
+  message: `The property '${path}' in the request body either does not appear in the resource model or is nested at the wrong level.`,
+});
+
+const immutable = (path: string) => ({
+  code,
+  message: `PATCH request body property '${path}' is immutable and must be excluded from PATCH input.`,
+});
+
+const visibility = (path: string) => ({
+  code,
+  message: `PATCH request body property '${path}' must include Lifecycle.Update visibility.`,
+});
+
+const legacyPatch = `
+  #suppress "@typespec/http/deprecated-implicit-optionality" "Exercise supported legacy PATCH optionality."
+`;
+
+describe("partial resource layout", () => {
+  const resourceUnionModels = `
+    model LocalConfig { kind: "local"; timeout?: int32; path?: string; }
+    model RemoteConfig { kind: "remote"; timeout?: int32; endpoint?: string; }
+  `;
+
+  it.each(["ArmCustomPatchSync", "ArmCustomPatchAsync"])(
+    "skips unsupported resource union descendants in %s",
+    async (template) => {
+      await tester
+        .expect(
+          `${service}${resourceUnionModels}
+          model Widget is TrackedResource<{ config?: LocalConfig | RemoteConfig }> {
+            @key("widgetName") @segment("widgets") @path name: string;
+          }
+          model WidgetPatch {
+            tags?: Record<string>;
+            properties?: { config?: { timeout?: int32; }; };
+          }
+          @armResourceOperations interface Widgets {
+            update is ${template}<Widget, PatchModel = WidgetPatch>;
+          }
+        `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each(["LocalConfig", "LocalConfig | null"])(
+    "retains resource layout comparison for %s",
+    async (counterpart) => {
+      await tester
+        .expect(
+          `${service}${resourceUnionModels}
+          model Widget is TrackedResource<{ config?: ${counterpart} }> {
+            @key("widgetName") @segment("widgets") @path name: string;
+          }
+          model WidgetPatch {
+            tags?: Record<string>;
+            properties?: { config?: { timeout?: int32; /*extra*/extra?: string; }; };
+          }
+          @armResourceOperations interface Widgets {
+            update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+          }
+        `,
+        )
+        .toEmitDiagnostics((x) => ({
+          ...missing("properties.config.extra"),
+          pos: x.pos.extra.pos,
+        }));
+    },
+  );
+
+  it("retains safety checks and recursion under unsupported resource unions", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Left { timeout?: int32; }
+        model Right { timeout?: int32; other?: string; }
+        model Config {
+          /*timeout*/timeout: int32;
+          /*enabled*/enabled?: boolean = false;
+          /*created*/@visibility(Lifecycle.Create) created?: string;
+          next?: Config;
+        }
+        @parameterVisibility(Lifecycle.Create) @patch
+        op update(@body body: {
+          properties?: {
+            config?: Config;
+            /*provisioningState*/provisioningState?: string;
+          };
+        }): { properties: Left | Right };
+      `,
+      )
+      .toEmitDiagnostics((x) => [
+        { ...required("properties.config.timeout"), pos: x.pos.timeout.pos },
+        { ...defaultValue("properties.config.enabled"), pos: x.pos.enabled.pos },
+        { ...visibility("properties.config.created"), pos: x.pos.created.pos },
+        { ...immutable("properties.provisioningState"), pos: x.pos.provisioningState.pos },
+      ]);
+  });
+
+  it("keeps genuinely absent resource descendants beside an unsupported union", async () => {
+    await tester
+      .expect(
+        `${service}${resourceUnionModels}
+        model Patch {
+          properties?: {
+            config?: { timeout?: int32; };
+            absent?: { /*timeout*/timeout?: int32; };
+          };
+        }
+        @patch op update(@body body: Patch):
+          { properties: { config: LocalConfig | RemoteConfig } };
+      `,
+      )
+      .toEmitDiagnostics((x) => ({
+        ...missing("properties.absent.timeout"),
+        pos: x.pos.timeout.pos,
+      }));
+  });
+
+  it.each([false, true])("compares nullable model layouts, extra: %s", async (extra) => {
+    const expectation = tester.expect(`${service}
+      @patch op update(@body body: { details?: { value?: string; ${extra ? "extra?: string;" : ""} } | null } | null):
+        { details: { value: string } | null };
+    `);
+    if (extra) await expectation.toEmitDiagnostics(missing("details.extra"));
+    else await expectation.toBeValid();
+  });
+  it("excludes transport headers from an associated resource layout", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Resource { @header extra?: string; value?: string; }
+      @TypeSpec.Rest.updatesResource(Resource) @patch
+      op update(@body body: { extra?: string }): Resource;
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it("preserves metadata properties in explicit response bodies and array items", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Resource {
+        #suppress "@typespec/http/metadata-ignored" "Explicit JSON response property."
+        @header extra?: string;
+      }
+      @patch op update(@body body: { extra?: string }): { @body body: Resource };
+      @route("/array") @patch
+      op updateArray(@bodyRoot body: { items?: { extra?: string }[] }): { items: Resource[] };
+    `,
+      )
+      .toBeValid();
+  });
+  it("allows partial resource layouts without checking type assignability", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Resource { required: string; properties: { value: int32; omitted: string; }; }
+      @patch op update(@body body: { properties?: { value?: string } }): Resource;
+    `,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    ["extra?: string;", "extra"],
+    ["value?: string;", "value"],
+    ["properties?: { extra?: string; };", "properties.extra"],
+    ["extra?: { nested?: { leaf?: string } };", "extra.nested.leaf"],
+    ["properties?: { value?: { nested?: string } };", "properties.value.nested"],
+  ])("reports missing or incorrectly nested layout: %s", async (properties, path) => {
+    await tester
+      .expect(
+        `${service}
+      @patch op update(@body body: { ${properties} }):
+        { properties: { value: string; } };
+    `,
+      )
+      .toEmitDiagnostics(missing(path));
+  });
+
+  it("matches encoded names and inherited overrides, including never", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Base { @encodedName("application/json", "old") value?: string; removed?: string; }
+      model Patch extends Base {
+        @encodedName("application/json", "wire") value?: string;
+        removed?: never;
+      }
+      model Middle extends Patch {}
+      @patch op update(@body body: Middle): { wire: int32 };
+    `,
+      )
+      .toBeValid();
+  });
+
+  it("does not let a never declaration hide an unrelated inherited encoded property", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Base { @encodedName("application/json", "wire") present?: string; }
+      model Patch extends Base { @encodedName("application/json", "wire") removed?: never; }
+      @patch op update(@body body: Patch): { value: string };
+    `,
+      )
+      .toEmitDiagnostics(missing("wire"));
+  });
+
+  it("filters transport properties before choosing an inherited encoded PATCH field", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Base { /*actual*/@encodedName("application/json", "wire") actual: string; }
+        model Patch extends Base {
+          @header @encodedName("application/json", "wire") transport?: string;
+        }
+        @patch op update(@bodyRoot body: Patch): void;
+      `,
+      )
+      .toEmitDiagnostics((x) => ({ ...required("wire"), pos: x.pos.actual.pos }));
+  });
+
+  it("filters transport properties before choosing an inherited resource field", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Base { @encodedName("application/json", "wire") actual?: string; }
+        model Resource extends Base {
+          @header @encodedName("application/json", "wire") transport?: string;
+        }
+        @TypeSpec.Rest.updatesResource(Resource) @patch
+        op update(@body body: { wire?: string }): Resource;
+      `,
+      )
+      .toBeValid();
+  });
+
+  it.each([false, true])(
+    "chooses inherited encoded fields independently for each operation visibility (%s)",
+    async (reverse) => {
+      const ordinary = '@route("/ordinary") @patch op ordinary(@body body: Patch): void;';
+      const read =
+        '@route("/read") @parameterVisibility(Lifecycle.Read) @patch op read(@body body: Patch): void;';
+      await tester
+        .expect(
+          `${service}
+          model Base { @encodedName("application/json", "wire") actual: string; }
+          model Patch extends Base {
+            @visibility(Lifecycle.Read) @encodedName("application/json", "wire") output?: string;
+          }
+          ${reverse ? read + ordinary : ordinary + read}
+        `,
+        )
+        .toEmitDiagnostics(
+          reverse ? [visibility("wire"), required("wire")] : [required("wire"), visibility("wire")],
+        );
+    },
+  );
+
+  it.each(["Read", "Update", "Query"])(
+    "compares response members with %s visibility without rejecting write-only input",
+    async (lifecycle) => {
+      const expectation = tester.expect(`${service}
+        model Resource { details: { @visibility(Lifecycle.${lifecycle}) value?: string; }; }
+        @patch op update(@body body: { details?: { value?: string } }): Resource;
+      `);
+      if (lifecycle === "Query") await expectation.toEmitDiagnostics(missing("details.value"));
+      else await expectation.toBeValid();
+    },
+  );
+
+  it("accepts named PATCH keys permitted by a resource record", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op update(@body body: { tags?: { owner?: string } }): { tags: Record<string> };
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("retains safety checks on keys permitted by a resource record", async () => {
+    await tester
+      .expect(
+        `${service}
+        @parameterVisibility(Lifecycle.Create) @patch
+        op update(@body body: {
+          tags?: { owner: string; enabled?: boolean = false;
+            @visibility(Lifecycle.Create) created?: string; };
+        }): { tags: Record<unknown> };
+      `,
+      )
+      .toEmitDiagnostics([
+        required("tags.owner"),
+        defaultValue("tags.enabled"),
+        visibility("tags.created"),
+      ]);
+  });
+
+  it("retains named-member layout checks on an open resource model", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Resource extends Record<unknown> { details: { known: string }; }
+        @patch op update(@body body: { details?: { extra?: string } }): Resource;
+      `,
+      )
+      .toEmitDiagnostics(missing("details.extra"));
+  });
+
+  it("reports a resource property hidden by an inherited never override", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Base { extra?: string; }
+      model Removed extends Base { extra?: never; }
+      model Resource extends Removed {}
+      @patch op update(@body body: { extra?: string }): Resource;
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+
+  it("targets the authored encoded nested property", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch { @encodedName("application/json", "bag") details?: {
+        /*extra*/@encodedName("application/json", "wire") extra?: string;
+      }; }
+      @patch op update(@body body: Patch): { bag: {} };
+    `,
+      )
+      .toEmitDiagnostics((x) => ({ ...missing("bag.wire"), pos: x.pos.extra.pos }));
+  });
+
+  it("compares a shared nested model against every resource counterpart", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Shared { value?: string; extra?: string; }
+      @patch op update(@body body: { first?: Shared; second?: Shared; }):
+        { first: { value: string }; second: { extra: string }; };
+    `,
+      )
+      .toEmitDiagnostics([missing("first.extra"), missing("second.value")]);
+  });
+
+  it("keeps sibling paths even when resource counterparts and source targets are shared", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Shared { extra?: string; }
+      model Resource {}
+      @patch op update(@body body: { first?: Shared; second?: Shared; }):
+        { first: Resource; second: Resource; };
+    `,
+      )
+      .toEmitDiagnostics([missing("first.extra"), missing("second.extra")]);
+  });
+});
+
+describe("immutable paths and effective input", () => {
+  it("checks inherited encoded immutable envelope names", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Base { @encodedName("application/json", "location") region?: string; }
+        model Patch extends Base {}
+        @patch op update(@body body: Patch): void;
+      `,
+      )
+      .toEmitDiagnostics(immutable("location"));
+  });
+  it("checks ignored HTTP annotations in explicit PATCH JSON bodies", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch {
+        #suppress "@typespec/http/metadata-ignored" "Explicit JSON body property."
+        @header location?: string;
+        #suppress "@typespec/http/metadata-ignored" "Explicit JSON body property."
+        @header value: string = "fixed";
+      }
+      @patch op update(@body body: Patch): void;
+    `,
+      )
+      .toEmitDiagnostics([immutable("location"), required("value"), defaultValue("value")]);
+  });
+  it("does not inspect transport headers from bodyRoot as JSON fields", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch { @header location?: string; @header value: string = "fixed"; actual?: string; }
+      @patch op update(@bodyRoot body: Patch): void;
+    `,
+      )
+      .toBeValid();
+  });
+  it.each(["id", "name", "type", "location"])("rejects writable top-level %s", async (name) => {
+    await tester
+      .expect(
+        `${service}
+      @patch op update(@body body: { ${name}?: string }): void;
+    `,
+      )
+      .toEmitDiagnostics(immutable(name));
+  });
+
+  it("rejects the encoded provisioning-state path only at its reserved level", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Base { @encodedName("application/json", "provisioningState") state?: string; }
+      @patch op update(@body body: {
+        @encodedName("application/json", "properties") bag?: Base;
+        nested?: { id?: string; name?: string; type?: string; location?: string; provisioningState?: string };
+        provisioningState?: string;
+        @encodedName("application/json", "properties.provisioningState") dotted?: string;
+      }): void;
+    `,
+      )
+      .toEmitDiagnostics(immutable("properties.provisioningState"));
+  });
+
+  it("excludes Read/Create properties and descendants from ordinary PATCH", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch {
+        @visibility(Lifecycle.Read, Lifecycle.Create) location: string = "west";
+        @visibility(Lifecycle.Read, Lifecycle.Create) ignored: { required: string; enabled?: boolean = false; };
+        value?: string;
+      }
+      @patch op update(@body body: Patch): { value: string };
+    `,
+      )
+      .toBeValid();
+  });
+
+  it.each(["", "@visibility(Lifecycle.Read, Lifecycle.Query) unrelated?: string;"])(
+    "does not let an unrelated Read/Query field change existing warnings: %s",
+    async (extra) => {
+      await tester
+        .expect(
+          `${service}
+        model Patch {
+          @visibility(Lifecycle.Read) id: string = "server";
+          @visibility(Lifecycle.Create) creator?: string;
+          value: string;
+          ${extra}
+        }
+        @patch op update(@body body: Patch): void;
+      `,
+        )
+        .toEmitDiagnostics(required("value"));
+    },
+  );
+
+  it("checks exposed non-Update Create input", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch { @visibility(Lifecycle.Create) value?: string; }
+      @parameterVisibility(Lifecycle.Create) @patch op update(@body body: Patch): void;
+    `,
+      )
+      .toEmitDiagnostics(visibility("value"));
+  });
+
+  it("does not let Update visibility permit an immutable field", async () => {
+    await tester
+      .expect(
+        `${service}
+      @patch op update(@body body: { @visibility(Lifecycle.Update) id?: string }): void;
+    `,
+      )
+      .toEmitDiagnostics(immutable("id"));
+  });
+
+  it("reports independent categories without suppressing a finding", async () => {
+    await tester
+      .expect(
+        `${service}
+      @parameterVisibility(Lifecycle.Create) @patch
+      op update(@body body: { @visibility(Lifecycle.Create) id: string = "fixed" }): { value: string };
+    `,
+      )
+      .toEmitDiagnostics([
+        immutable("id"),
+        required("id"),
+        defaultValue("id"),
+        visibility("id"),
+        missing("id"),
+      ]);
+  });
+
+  it.each([false, true])(
+    "isolates shared models in both visibility orders (%s)",
+    async (reverse) => {
+      const ordinary = '@route("/ordinary") @patch op ordinary(@body body: Patch): void;';
+      const override =
+        '@route("/override") @parameterVisibility(Lifecycle.Create) @patch op override(@body body: Patch): void;';
+      await tester
+        .expect(
+          `${service}
+      model Patch {
+        @visibility(Lifecycle.Create) creator: string;
+        @visibility(Lifecycle.Update) value: string;
+      }
+      ${reverse ? override + ordinary : ordinary + override}
+    `,
+        )
+        .toEmitDiagnostics(
+          reverse
+            ? [required("creator"), visibility("creator"), required("value")]
+            : [required("value"), required("creator"), visibility("creator")],
+        );
+    },
+  );
+});
+
+describe("partial-update safety and traversal policies", () => {
+  it.each([false, true])("checks required nullable input, nested: %s", async (nested) => {
+    await tester
+      .expect(
+        `${service}
+        model Details { value: string; }
+        @patch op update(@body body: ${nested ? "{ details?: Details | null }" : "Details | null"}): void;
+      `,
+      )
+      .toEmitDiagnostics(required(nested ? "details.value" : "value"));
+  });
+  it("does not exempt identity encoded away from the envelope path", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op update(@body body: {
+          @encodedName("application/json", "configuration") identity: { value: string };
+        }): void;
+      `,
+      )
+      .toEmitDiagnostics([required("configuration"), required("configuration.value")]);
+  });
+  it("checks a falsy default", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op update(@body body: { value?: boolean = false }): void;
+      `,
+      )
+      .toEmitDiagnostics(defaultValue("value"));
+  });
+
+  it.each([false, true])(
+    "isolates explicit/implicit optionality in both orders (%s)",
+    async (reverse) => {
+      const explicit =
+        '@route("/explicit") @patch(#{implicitOptionality: false}) op explicit(@body body: Patch): void;';
+      const implicit = `${legacyPatch} @route("/implicit") @patch(#{implicitOptionality: true}) op implicit(@body body: Patch): void;`;
+      await tester
+        .expect(
+          `${service}
+      model Patch { value: string; }
+      ${reverse ? implicit + explicit : explicit + implicit}
+    `,
+        )
+        .toEmitDiagnostics(required("value"));
+    },
+  );
+
+  it.each(["identity", "IDENTITY"])(
+    "exempts top-level encoded %s safety, not shape",
+    async (name) => {
+      await tester
+        .expect(
+          `${service}
+      @patch op update(@body body: {
+        @encodedName("application/json", "${name}") envelope: { required: string; extra?: boolean = false; };
+        nested?: { identity: string };
+      }): { ${name}: { required: string }; nested: { identity: string }; };
+    `,
+        )
+        .toEmitDiagnostics([missing(`${name}.extra`), required("nested.identity")]);
+    },
+  );
+
+  it("applies safety outside identity when a model is shared across policies", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Shared { value: string; enabled?: boolean = false; }
+      @patch op update(@body body: { identity: Shared; other?: Shared }): void;
+    `,
+      )
+      .toEmitDiagnostics([required("other.value"), defaultValue("other.enabled")]);
+  });
+
+  it("reports every imported Page occurrence at its local use", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Item { value?: string; }
+      @patch op update(@body body: {
+        /*first*/first?: Azure.Core.Page<Item>;
+        /*second*/second?: Azure.Core.Page<Item>;
+        identity: Azure.ResourceManager.CommonTypes.ManagedServiceIdentity;
+      }): void;
+    `,
+      )
+      .toEmitDiagnostics((x) => [
+        { ...required("first.value"), pos: x.pos.first.pos },
+        { ...required("second.value"), pos: x.pos.second.pos },
+      ]);
+  });
+
+  it("terminates recursive layout comparison without skipping later siblings", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Node { next?: Node; extra?: string; }
+      model Resource { next?: Resource; }
+      @patch op update(@body body: { first?: Node; second?: Node }):
+        { first: Resource; second: Resource };
+    `,
+      )
+      .toEmitDiagnostics([missing("first.extra"), missing("second.extra")]);
+  });
+
+  it("checks recursive policy transitions under identity and array elements", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Node { value: string; next?: Node; }
+      @patch op update(@body body: { identity: Node; nodes?: Node[]; other?: Node }): void;
+    `,
+      )
+      .toEmitDiagnostics(required("other.value"));
+  });
+
+  it("permits required array element descendants but checks defaults and shape", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Item { id: string; nested: { value: string }; enabled?: boolean = false; extra?: string; }
+      @patch op update(@body body: { items?: Item[] }):
+        { items: { id: string; nested: { value: string }; enabled: boolean }[] };
+    `,
+      )
+      .toEmitDiagnostics([defaultValue("items[].enabled"), missing("items[].extra")]);
+  });
+
+  it("keeps visibility and HTTP item metadata active for array elements", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Item { @header header: string; @visibility(Lifecycle.Create) created: string; }
+      @parameterVisibility(Lifecycle.Create) @patch
+      op update(@bodyRoot body: { items?: Item[] }): { items: { header: string; created: string }[] };
+    `,
+      )
+      .toEmitDiagnostics(visibility("items[].created"));
+  });
+
+  it("does not exempt required array properties themselves", async () => {
+    await tester
+      .expect(
+        `${service}
+      @patch op update(@body body: { items: { value: string }[] }): void;
+    `,
+      )
+      .toEmitDiagnostics(required("items"));
+  });
+
+  it.each([
+    "Record<{ required: string; enabled?: boolean = false }>",
+    "[{ required: string; enabled?: boolean = false }]",
+    "{ a: string } | { b: string }",
+  ])("does not expand excluded collection/union values: %s", async (type) => {
+    await tester
+      .expect(
+        `${service}
+      @patch op update(@body body: { value?: ${type} }): { value: string };
+    `,
+      )
+      .toBeValid();
+  });
+
+  it("does not add array-versus-scalar type equality checks", async () => {
+    await tester
+      .expect(
+        `${service}
+      @patch op update(@body body: { value?: { id: string }[] }): { value: string };
+    `,
+      )
+      .toBeValid();
+  });
+});
+
+describe("native discriminators", () => {
+  it.each(["", "kind?: string;", "@visibility(Lifecycle.Read) kind: string;"])(
+    "does not synthesize or force discriminator properties: %s",
+    async (property) => {
+      await tester
+        .expect(
+          `${service}
+        @discriminator("kind") model Patch { ${property} value?: string; }
+        @patch op update(@body body: Patch): { kind?: string; value?: string; };
+      `,
+        )
+        .toBeValid();
+    },
+  );
+  it("does not synthesize a missing PATCH discriminator for shape comparison", async () => {
+    await tester
+      .expect(
+        `${service}
+      @discriminator("kind") model Patch { value?: string; }
+      @patch op update(@body body: Patch): { value?: string };
+    `,
+      )
+      .toBeValid();
+  });
+  it("does not synthesize a missing resource discriminator", async () => {
+    await tester
+      .expect(
+        `${service}
+      @discriminator("kind") model Resource { value?: string; }
+      @patch op update(@body body: { kind?: string }): Resource;
+    `,
+      )
+      .toEmitDiagnostics(missing("kind"));
+  });
+  it("checks an inherited required authored discriminator at its declaration", async () => {
+    await tester
+      .expect(
+        `${service}
+      @discriminator("kind") model Base { /*kind*/kind: string; }
+      model Patch extends Base {}
+      model Concrete extends Patch { kind: "concrete"; }
+      @patch op update(@body body: Patch): Base;
+    `,
+      )
+      .toEmitDiagnostics((x) => ({ ...required("kind"), pos: x.pos.kind.pos }));
+  });
+  it("respects implicit optionality for authored discriminators", async () => {
+    await tester
+      .expect(
+        `${service}
+      @discriminator("kind") model Patch { kind: string; }
+      ${legacyPatch} @patch(#{implicitOptionality: true})
+      op update(@body body: Patch): Patch;
+    `,
+      )
+      .toBeValid();
+  });
+  it("excludes an inherited Read-only discriminator and respects never overrides", async () => {
+    await tester
+      .expect(
+        `${service}
+      @discriminator("kind") model Base { @visibility(Lifecycle.Read) kind: string; }
+      model Patch extends Base { extra?: never; }
+      model Concrete extends Patch { kind: "concrete"; }
+      @patch op update(@body body: Patch): { value: string };
+    `,
+      )
+      .toBeValid();
+  });
+  it("compares the authored inherited encoded object instead of synthetic metadata", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Base { @encodedName("application/json", "kind") value?: { extra?: string }; }
+      @discriminator("kind") model Patch extends Base {}
+      @patch op update(@body body: { details?: Patch }): { details: { kind: string } };
+    `,
+      )
+      .toEmitDiagnostics(missing("details.kind.extra"));
+  });
+  it("uses the authored inherited encoded resource discriminator shape", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Base { @encodedName("application/json", "kind") value?: { extra?: string }; }
+        @discriminator("kind") model Resource extends Base {}
+        @patch op update(@body body: { details?: { kind?: { extra?: string } } }):
+          { details: Resource };
+      `,
+      )
+      .toBeValid();
+  });
+});
+
+describe("resource selection", () => {
+  it.each([false, true])(
+    "retains definite layout errors across shared GET routes in either order (%s)",
+    async (reverse) => {
+      const first = '@sharedRoute @route("/widgets") @get op first(): First;';
+      const second = '@sharedRoute @route("/widgets") @get op second(): Second;';
+      await tester
+        .expect(
+          `${service}
+          model First { value: string; enabled: boolean; }
+          model Second { other: string; enabled: boolean; }
+          @route("/widgets") @patch op update(@body body: {
+            value?: string; /*extra*/extra?: string; /*enabled*/enabled?: boolean = false;
+          }): AcceptedResponse;
+          ${reverse ? second + first : first + second}
+        `,
+        )
+        .toEmitDiagnostics((x) => [
+          { ...missing("extra"), pos: x.pos.extra.pos },
+          { ...defaultValue("enabled"), pos: x.pos.enabled.pos },
+        ]);
+    },
+  );
+
+  it("finds a usable response after a shared GET with no comparison body", async () => {
+    await tester
+      .expect(
+        `${service}
+        @route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse;
+        @sharedRoute @route("/widgets") @get op empty(): NoContentResponse;
+        @sharedRoute @route("/widgets") @get op read(): { value: string };
+      `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+
+  it("prefers GET 200 across shared routes over another GET's 201", async () => {
+    await tester
+      .expect(
+        `${service}
+        @route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse;
+        @sharedRoute @route("/widgets") @get op created():
+          { @statusCode status: 201; @body body: { extra: string } };
+        @sharedRoute @route("/widgets") @get op read(): { value: string };
+      `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+
+  it.each([false, true])(
+    "retains definite layout errors across equivalent exact status entries (%s)",
+    async (reverse) => {
+      await tester
+        .expect(
+          `${service}
+          model First { value: string; }
+          model Second { other: string; }
+          model Literal { @statusCode status: 200; @body body: First; }
+          model Singleton {
+            @minValue(200) @maxValue(200) @statusCode status: int32;
+            @body body: Second;
+          }
+          @patch op update(@body body: { value?: string; /*extra*/extra?: string }):
+            ${reverse ? "Singleton | Literal" : "Literal | Singleton"};
+        `,
+        )
+        .toEmitDiagnostics((x) => ({ ...missing("extra"), pos: x.pos.extra.pos }));
+    },
+  );
+
+  it.each([200, 201])("uses PATCH %s", async (status) => {
+    await tester
+      .expect(
+        `${service}
+      @route("/widgets") @patch op update(@body body: { extra?: string }):
+        { @statusCode status: ${status}; @body body: { value: string }; };
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it.each([200, 201])("uses same-path GET %s for asynchronous PATCH", async (status) => {
+    await tester
+      .expect(
+        `${service}
+      @route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse;
+      @route("/widgets") @get op read():
+        { @statusCode status: ${status}; @body body: { value: string }; };
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it("prefers PATCH 200 over PATCH 201 and GET", async () => {
+    await tester
+      .expect(
+        `${service}
+      @route("/widgets") @patch op update(@body body: { extra?: string }):
+        { @statusCode status: 200; @body body: string } |
+        { @statusCode status: 201; @body body: { extra: string } };
+      @route("/widgets") @get op read(): { extra: string };
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it.each(["", '@route("/different") @get op read(): { value: string };'])(
+    "skips only shape when no comparison resource exists: %s",
+    async (get) => {
+      await tester
+        .expect(
+          `${service}
+        @route("/widgets") @patch op update(@body body: { value: string }): AcceptedResponse;
+        ${get}
+      `,
+        )
+        .toEmitDiagnostics(required("value"));
+    },
+  );
+  it.each([false, true])("prefers explicit resource association, async: %s", async (async) => {
+    await tester
+      .expect(
+        `${service}
+      model Resource { value: string; }
+      @TypeSpec.Rest.updatesResource(Resource)
+      @route("/widgets") @patch op update(@body body: { extra?: string }):
+        ${async ? "AcceptedResponse" : "{ extra: string }"};
+      @route("/widgets") @get op read(): { extra: string };
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it.each([false, true])("uses status ranges after exact codes (exact: %s)", async (exact) => {
+    await tester
+      .expect(
+        `${service}
+      model Range {
+        @minValue(200) @maxValue(299) @statusCode status: int32;
+        @body body: { ${exact ? "extra" : "value"}: string };
+      }
+      model Exact { @statusCode status: 200; @body body: { value: string }; }
+      @patch op update(@body body: { extra?: string }): Range ${exact ? "| Exact" : ""};
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it("prefers PATCH 201 over same-path GET 200", async () => {
+    await tester
+      .expect(
+        `${service}
+      @route("/widgets") @patch op update(@body body: { extra?: string }):
+        { @statusCode status: 201; @body body: { value: string } };
+      @route("/widgets") @get op read(): { extra: string };
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  it("prefers GET 200 over GET 201", async () => {
+    await tester
+      .expect(
+        `${service}
+      @route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse;
+      @route("/widgets") @get op read():
+        { @statusCode status: 200; @body body: { value: string } } |
+        { @statusCode status: 201; @body body: { extra: string } };
+    `,
+      )
+      .toEmitDiagnostics(missing("extra"));
+  });
+  describe("ambiguous response content", () => {
+    it.each([false, true])(
+      "does not select an arbitrary comparison resource from ambiguous content variants (%s)",
+      async (reverse) => {
+        await tester
+          .expect(
+            `${service}
+            model First { first: string; }
+            model Second { second: string; }
+            model JsonResponse {
+              @statusCode status: 200;
+              @header contentType: "application/json";
+              @body body: First;
+            }
+            model XmlResponse {
+              @statusCode status: 200;
+              @header contentType: "application/xml";
+              @body body: Second;
+            }
+            @patch op update(@body body: { extra?: string }):
+              ${reverse ? "XmlResponse | JsonResponse" : "JsonResponse | XmlResponse"};
+          `,
+          )
+          .toBeValid();
+      },
+    );
+  });
+});
+
+describe("scope and registration", () => {
+  it("does not check inherited native File members in a nested derived file", async () => {
+    await tester
+      .expect(
+        `${service}
+        model CustomFile extends File {}
+        @patch op update(@body body: { attachment?: CustomFile }): void;
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("retains safety checks on authored JSON overrides in a derived file", async () => {
+    await tester
+      .expect(
+        `${service}
+        model CustomFile extends File<Contents = string> { contents: string = "fixed"; }
+        @patch op update(@body body: { attachment?: CustomFile }): void;
+      `,
+      )
+      .toEmitDiagnostics([required("attachment.contents"), defaultValue("attachment.contents")]);
+  });
+
+  it("checks each concrete endpoint without also checking its local template instance", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op Template<T>(@body body: T): void;
+        model Patch { /*value*/value: string; }
+        @route("/first") op first is Template<Patch>;
+        @route("/second") op second is Template<Patch>;
+      `,
+      )
+      .toEmitDiagnostics((x) => [
+        { ...required("value"), pos: x.pos.value.pos },
+        { ...required("value"), pos: x.pos.value.pos },
+      ]);
+  });
+
+  it.each([
+    '@header contentType: "multipart/form-data", @multipartBody body: { required: HttpPart<string> }',
+    '@header contentType: "multipart/form-data", @multipartBody body: [HttpPart<string, #{name: "required"}>]',
+    "@bodyRoot body: File",
+    '@header contentType: "application/octet-stream", @body body: bytes',
+  ])("does not inspect transport payload: %s", async (parameters) => {
+    await tester.expect(`${service} @patch op update(${parameters}): void;`).toBeValid();
+  });
+
+  describe("applicability", () => {
+    it("uses a namespaced GET without service metadata", async () => {
+      await tester
+        .expect(
+          `
+          namespace Microsoft.TestService;
+          @route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse;
+          @route("/widgets") @get op read(): { value: string };
+        `,
+        )
+        .toEmitDiagnostics(missing("extra"));
+    });
+
+    it("does not borrow a same-path GET from another non-service namespace", async () => {
+      await tester
+        .expect(
+          `
+          namespace First {
+            @route("/widgets") @patch op update(@body body: { value: string }): AcceptedResponse;
+          }
+          namespace Second { @route("/widgets") @get op read(): { other: string }; }
+        `,
+        )
+        .toEmitDiagnostics(required("value"));
+    });
+
+    it("does not borrow a same-path GET from another service", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace First {
+            @route("/widgets") @patch op update(@body body: { value: string }): AcceptedResponse;
+          }
+          @service namespace Second { @route("/widgets") @get op read(): { other: string }; }
+        `,
+        )
+        .toEmitDiagnostics(required("value"));
+    });
+
+    it("checks PATCH bodies without provider metadata", async () => {
+      await tester
+        .expect(
+          `
+          namespace Microsoft.TestService;
+          model WidgetPatchBody {
+            displayName: string;
+            enabled?: boolean = false;
+            @visibility(Lifecycle.Create) createdBy?: string;
+          }
+          @route("/widgets/{name}") @patch
+          op update(@path name: string, @body body: WidgetPatchBody): void;
+        `,
+        )
+        .toEmitDiagnostics([required("displayName"), defaultValue("enabled")]);
+    });
+    it.each(["post", "put"])("ignores %s request bodies", async (verb) => {
+      await tester
+        .expect(
+          `
+          namespace Microsoft.TestService;
+          @${verb} op write(@body body: { value: string; enabled?: boolean = false }): void;
+        `,
+        )
+        .toBeValid();
+    });
+  });
+});
+
+describe("PATCH resource and envelope boundaries", () => {
+  const definitions = `
+    @Azure.ResourceManager.armProviderNamespace
+    @service namespace Microsoft.TestService;
+      model Widget is TrackedResource<{ value?: string }> {
+        @key("widgetName") @segment("widgets") @path name: string;
+      }
+    `;
+
+  let tester: ReturnType<typeof createLinterRuleTester>;
+
+  beforeEach(async () => {
+    tester = createLinterRuleTester(
+      await Tester.createInstance(),
+      noUnsafePatchBodyPropertiesRule,
+      "@azure-tools/typespec-azure-resource-manager",
+    );
+  });
+
+  it("reports extra properties in a standard ARM PATCH payload", async () => {
+    const snippet = `${definitions}
+        model Patch { tags?: Record<string>; extra?: string; }
+        @armResourceOperations interface Widgets {
+          update is ArmCustomPatchSync<Widget, Patch>;
+        }
+      `;
+    await tester.expect(snippet).toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-unsafe-patch-body-properties",
+      message:
+        "The property 'extra' in the request body either does not appear in the resource model or is nested at the wrong level.",
+    });
+  });
+
+  it("allows omission of supported envelope properties", async () => {
+    const snippet = `${definitions}
+        model Patch { properties?: { value?: string }; }
+        @armResourceOperations interface Widgets {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+          update is ArmCustomPatchSync<Widget, Patch>;
+        }
+      `;
+    await tester.expect(snippet).toBeValid();
+  });
+});
