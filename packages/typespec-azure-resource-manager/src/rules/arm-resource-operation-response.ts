@@ -3,12 +3,16 @@ import {
   type LinterRuleContext,
   type Model,
   type Operation,
+  type Type,
   createRule,
   fileRef,
   getEffectiveModelType,
+  getProperty,
+  isArrayModelType,
   isErrorType,
   isType,
 } from "@typespec/compiler";
+import { getHttpOperation } from "@typespec/http";
 
 import { type ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
 import { getArmResource } from "../resource.js";
@@ -38,7 +42,7 @@ export const armResourceOperationsRule = createRule({
               );
             const lists = resourceOperations.lists;
             for (const key in lists) {
-              checkArmResourceOperationReturnType(context, model, lists[key].operation);
+              checkArmResourceListOperationReturnType(context, model, lists[key].operation);
             }
           }
         }
@@ -46,6 +50,53 @@ export const armResourceOperationsRule = createRule({
     };
   },
 });
+
+function checkArmResourceListOperationReturnType(
+  context: LinterRuleContext<DiagnosticMessages>,
+  model: Model,
+  operation: Operation,
+) {
+  if (isInternalTypeSpec(context.program, operation)) {
+    return;
+  }
+
+  const [httpOperation] = getHttpOperation(context.program, operation);
+  for (const response of httpOperation.responses) {
+    if (response.statusCodes !== 200) {
+      continue;
+    }
+
+    for (const { body } of response.responses) {
+      if (body?.bodyKind !== "single") {
+        continue;
+      }
+
+      if (hasMismatchedItems(body.type)) {
+        context.reportDiagnostic({ target: operation });
+        return;
+      }
+    }
+  }
+
+  checkArmResourceOperationReturnType(context, model, operation);
+
+  function hasMismatchedItems(type: Type): boolean {
+    if (type.kind === "Union") {
+      return [...type.variants.values()].some((variant) => hasMismatchedItems(variant.type));
+    }
+    if (type.kind !== "Model") {
+      return false;
+    }
+
+    const value = getProperty(type, "value")?.type;
+    if (value?.kind !== "Model" || !isArrayModelType(value)) {
+      return false;
+    }
+
+    const item = value.indexer.value;
+    return item.kind !== "Model" || getEffectiveModelType(context.program, item) !== model;
+  }
+}
 
 function checkArmResourceOperationReturnType(
   context: LinterRuleContext<DiagnosticMessages>,
