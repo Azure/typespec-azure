@@ -116,6 +116,14 @@ coverage plan before installation. Check repository/core tooling, the actual
 test runner and required workspace entrypoints. A missing workspace `dist` needs
 its dependency-closure build, not another install.
 
+If the declared validation includes root type-aware lint, inspect its tsconfig
+scan scope as well as the owning package's dependency closure. It can read
+unselected playground projects that require types such as `vite/client`.
+Install an additional frozen, scripts-disabled package closure only after a
+probe or the required lint command proves it missing; do not preemptively
+install every playground. Rerun the original required lint command after repair,
+without excluding the failing project or relaxing the gate.
+
 When a required dependency is missing, use a frozen, filtered install with
 `--ignore-scripts`, as in the existing development and promotion setup profiles.
 For an implementation requiring real-spec coverage, substitute the actual owning

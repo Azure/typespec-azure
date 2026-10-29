@@ -84,6 +84,12 @@ raw receipts locally; sanitization must not alter diagnostic counts or targets.
 Never publish credentials, environment dumps, user mail, `node_modules`, raw
 `log.txt` or unrelated/private inputs.
 
+Distinguish actual machine paths from documented virtual compiler-test paths.
+A verified harness-owned prefix such as `Z:/test/` is diagnostic evidence, not
+a machine-local checkout to rewrite or reject. Verify that provenance before
+preserving it; this is not permission to allow arbitrary drive paths or skip
+the remaining sanitization checks.
+
 Before committing, compare the complete publication inventory with Git's staged
 paths. Directory staging can omit ignored manifests and `.log` receipts. When
 necessary, force-add only explicitly inventoried sanitized receipts; never
@@ -95,6 +101,13 @@ change line endings. Preserve exact evidence bytes with task-scoped
 `.gitattributes`, or explicitly record intentional normalization, retain original
 hashes and recompute published hashes. Verify the declared hashes again from a
 fresh checkout. Do not waive mismatches as harmless formatting differences.
+
+When appending review/status metadata, read existing text explicitly as UTF-8
+and serialize new text with explicit UTF-8/LF, including on Windows. Byte-preserving
+`-text` attributes do not repair encoding or newline changes introduced by a
+writer. Preserve unchanged report/receipt bytes, verify their hashes before
+publication, and keep `git diff --check` enabled. Normalize only the explicitly
+changed metadata, never the sealed baseline or historical raw receipts.
 
 Measure dataset size before choosing Git versus artifact storage. Retain large
 Swagger/packages/build logs as durable downloadable fork release assets or

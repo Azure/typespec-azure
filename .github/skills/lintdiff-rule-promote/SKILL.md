@@ -759,6 +759,12 @@ format, package names and change kinds.
 
 Validate with plain `pnpm chronus status`; do not assume `status` accepts
 `--since`. Check the installed command's help before adding options.
+If supported `--only` selectors are needed for multiple touched packages, repeat
+the option for each package, for example
+`--only "<destination-package>" --only "@azure-tools/typespec-azure-rulesets"`.
+Do not pass the second package as a bare positional argument: the installed
+array-option parser may disable greedy arrays. Include every touched package
+whose change coverage is required.
 
 Chronus change files must use LF line endings. Do not run Prettier directly on a
 new change file when the Windows checkout would rewrite it with CRLF. Normalize
