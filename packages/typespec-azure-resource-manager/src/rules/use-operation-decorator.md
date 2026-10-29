@@ -12,13 +12,18 @@ Validate that ARM Resource operations use the correct decorator for the HTTP ver
 This rule only applies to custom operations. Operations using standard ARM resource templates (e.g. `ArmResourceRead`, `ArmResourceCreateOrReplaceAsync`) automatically satisfy this rule unless the http verb is overridden in the spec with additional http verb decorators.
 :::
 
-| HTTP Verb | Required decorator(s)                                  |
-| --------- | ------------------------------------------------------ |
-| PUT       | `@armResourceCreateOrUpdate`                           |
-| GET       | `@armResourceRead` or `@armResourceList`               |
-| PATCH     | `@armResourceUpdate`                                   |
-| DELETE    | `@armResourceDelete`                                   |
-| POST      | `@armResourceAction` or `@armResourceCollectionAction` |
+| HTTP Verb | Required decorator(s)                                                                           |
+| --------- | ----------------------------------------------------------------------------------------------- |
+| PUT       | `@armResourceCreateOrUpdate`                                                                    |
+| GET       | `@armResourceRead`, `@armResourceList`, `@armResourceAction`, or `@armResourceCollectionAction` |
+| PATCH     | `@armResourceUpdate`                                                                            |
+| DELETE    | `@armResourceDelete`                                                                            |
+| POST      | `@armResourceAction` or `@armResourceCollectionAction`                                          |
+| HEAD      | `@armResourceCheckExistence`                                                                    |
+
+Provider operations may use GET or POST, including operations using the `ArmProviderActionSync` and `ArmProviderActionAsync` templates. Other verbs require the corresponding resource operation decorator; a provider-scoped path alone does not exempt an operation from this rule.
+
+Private extension, legacy, and built-in resource operation decorators are also accepted when their `operationType` matches the HTTP verb: `createOrUpdate` for PUT, `read`, `list`, or `action` for GET, `update` for PATCH, `delete` for DELETE, `action` for POST, and `checkExistence` for HEAD.
 
 ## Impact
 

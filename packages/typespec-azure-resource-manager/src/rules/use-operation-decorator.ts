@@ -8,10 +8,7 @@ import { createRule, isTemplateInstance, paramMessage } from "@typespec/compiler
 import type { HttpVerb } from "@typespec/http";
 import { getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
-import {
-  isSourceOperationResourceManagerInternal,
-  isTemplatedInterfaceOperation,
-} from "./utils.js";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const useOperationDecoratorRule = createRule({
   name: "use-operation-decorator",
@@ -25,10 +22,7 @@ export const useOperationDecoratorRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (
-          !isSourceOperationResourceManagerInternal(operation) &&
-          !isTemplateInstance(operation)
-        ) {
+        if (!isTemplateInstance(operation)) {
           const verb = getOperationVerb(context.program, operation);
           if (verb && isTemplatedInterfaceOperation(operation) === false) {
             const requiredDecorators = resourceOperationDecorators[verb];
@@ -36,7 +30,10 @@ export const useOperationDecoratorRule = createRule({
               const decorator = operation.decorators.find(
                 (d) => requiredDecorators.indexOf(d.decorator.name) >= 0,
               );
-              if (!decorator && !isArmProviderOperation(context.program, operation)) {
+              const isProviderOperation =
+                (verb === "get" || verb === "post") &&
+                isArmProviderOperation(context.program, operation);
+              if (!decorator && !isProviderOperation) {
                 context.reportDiagnostic({
                   messageId: "default",
                   target: operation,
@@ -98,26 +95,36 @@ const operationTypeArgIndexByDecorator: Record<GenericArmResourceDecorator, numb
 
 const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
   put: ["$armResourceCreateOrUpdate", ...genericArmResourceDecorators],
-  get: ["$armResourceRead", "$armResourceList", ...genericArmResourceDecorators],
+  get: [
+    "$armResourceRead",
+    "$armResourceList",
+    "$armResourceAction",
+    "$armResourceCollectionAction",
+    ...genericArmResourceDecorators,
+  ],
   patch: ["$armResourceUpdate", ...genericArmResourceDecorators],
   delete: ["$armResourceDelete", ...genericArmResourceDecorators],
   post: ["$armResourceAction", "$armResourceCollectionAction", ...genericArmResourceDecorators],
-  head: [],
+  head: ["$armResourceCheckExistence", ...genericArmResourceDecorators],
 };
+
+const resourceOperationDecoratorNames = new Set(Object.values(resourceOperationDecorators).flat());
 
 // ARM operationType conventions:
 // - PUT => createOrUpdate
-// - GET => read or list
+// - GET => read, list, or action
 // - PATCH => update
 // - DELETE => delete
 // - POST => action
+// - HEAD => checkExistence
 // This map is used only for generic private decorators that encode operation type as an argument.
 const operationTypesByVerb: Partial<Record<HttpVerb, readonly string[]>> = {
   put: ["createOrUpdate"],
-  get: ["read", "list"],
+  get: ["read", "list", "action"],
   patch: ["update"],
   delete: ["delete"],
   post: ["action"],
+  head: ["checkExistence"],
 };
 
 function isGenericArmResourceDecorator(name: string): name is GenericArmResourceDecorator {
@@ -143,9 +150,13 @@ function isStaticSegment(segment: string | undefined): boolean {
 }
 
 function isArmProviderOperation(program: Program, operation: Operation): boolean {
+  if (operation.decorators.some((d) => resourceOperationDecoratorNames.has(d.decorator.name))) {
+    return false;
+  }
+
   let isProviderAction = false;
 
-  for (const [index, [, property]] of [...operation.parameters.properties].entries()) {
+  for (const property of operation.parameters.properties.values()) {
     const segment = getSegment(program, property);
 
     if (segment === "providers") {
@@ -153,12 +164,7 @@ function isArmProviderOperation(program: Program, operation: Operation): boolean
     } else if (isProviderAction && !isStaticSegment(segment)) {
       return false;
     }
-
-    const isLastSegment = index === operation.parameters.properties.size - 1;
-    if (isLastSegment && !segment) {
-      return true;
-    }
   }
 
-  return false;
+  return isProviderAction;
 }

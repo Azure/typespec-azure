@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
@@ -39,6 +39,7 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
           @patch(#{implicitOptionality: true}) update(...ResourceInstanceParameters<FooResource>, @bodyRoot properties: Foundations.ResourceUpdateModel<FooResource, {}>): ArmResponse<FooResource> | ErrorResponse;
           @delete delete(...ResourceInstanceParameters<FooResource>): | ArmDeletedResponse | ArmDeleteAcceptedResponse | ArmDeletedNoContentResponse | ErrorResponse;
           @post action(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
+          @head exists(...ResourceInstanceParameters<FooResource>): ArmResourceExistsResponse | ArmResourceNotFoundResponse;
         }
       `,
     )
@@ -51,7 +52,7 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @armResourceAction or @armResourceCollectionAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
@@ -68,10 +69,15 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
         message:
           "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
       },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message:
+          "Resource HEAD operation must be decorated with @armResourceCheckExistence or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+      },
     ]);
 });
 
-it("doesn't emit diagnostic for internal operations", async () => {
+it("doesn't emit diagnostic for provider action templates using GET", async () => {
   await tester
     .expect(
       `
@@ -90,6 +96,112 @@ it("doesn't emit diagnostic for internal operations", async () => {
     `,
     )
     .toBeValid();
+});
+
+describe("Resource operation verbs", () => {
+  function resourceOperationSetup(operation: string): string {
+    return `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+
+      @armResourceOperations
+      interface FooResources {
+        ${operation}
+      }
+    `;
+  }
+
+  it("accepts explicitly decorated HEAD operations", async () => {
+    await tester
+      .expect(
+        resourceOperationSetup(`
+        @armResourceCheckExistence(FooResource)
+        @head
+        exists(...ResourceInstanceParameters<FooResource>): ArmResourceExistsResponse | ArmResourceNotFoundResponse;
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("accepts the standard HEAD template", async () => {
+    await tester
+      .expect(resourceOperationSetup(`exists is ArmResourceCheckExistence<FooResource>;`))
+      .toBeValid();
+  });
+
+  it.each(["armResourceAction(FooResource)", "armResourceCollectionAction"])(
+    "accepts GET actions decorated with @%s",
+    async (decorator) => {
+      await tester
+        .expect(
+          resourceOperationSetup(`
+          @${decorator}
+          @get
+          action(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
+        `),
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each([
+    ["armResourceRead(FooResource)", "head", "HEAD", "@armResourceCheckExistence"],
+    ["armResourceCheckExistence(FooResource)", "get", "GET", "@armResourceRead"],
+  ])("rejects @%s on %s", async (decorator, verb, upperVerb, requiredDecorator) => {
+    await tester
+      .expect(
+        resourceOperationSetup(`
+        @${decorator}
+        @${verb}
+        operation(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
+      `),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message: new RegExp(
+          `Resource ${upperVerb} operation must be decorated with ${requiredDecorator}`,
+        ),
+      });
+  });
+
+  it.each([
+    ["ArmResourceCreateOrReplaceAsync<FooResource>", "get", "GET", "@armResourceRead"],
+    ["ArmResourceRead<FooResource>", "post", "POST", "@armResourceAction"],
+    ["ArmResourceListByParent<FooResource>", "post", "POST", "@armResourceAction"],
+    ["ArmResourcePatchSync<FooResource, {}>", "get", "GET", "@armResourceRead"],
+    ["ArmResourceDeleteSync<FooResource>", "get", "GET", "@armResourceRead"],
+    ["ArmResourceCheckExistence<FooResource>", "get", "GET", "@armResourceRead"],
+  ])(
+    "rejects an invalid verb override on %s",
+    async (template, verb, upperVerb, requiredDecorator) => {
+      await tester
+        .expect(
+          resourceOperationSetup(`
+        @${verb}
+        operation is ${template};
+      `),
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+          message: new RegExp(
+            `Resource ${upperVerb} operation must be decorated with ${requiredDecorator}`,
+          ),
+        });
+    },
+  );
+
+  it("does not mistake an undecorated operation without provider parameters for a provider operation", async () => {
+    await tester
+      .expect(resourceOperationSetup(`@get operation(query: string): string;`))
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message: /Resource GET operation must be decorated with @armResourceRead/,
+      });
+  });
 });
 
 it("doesn't emit diagnostic for operation templates", async () => {
@@ -131,6 +243,52 @@ describe("Private ARM resource decorators", () => {
       }
     `;
   }
+
+  const privateDecorators = [
+    "extensionResourceOperation(FooResource, BarResource,",
+    "legacyResourceOperation(FooResource,",
+    "builtInResourceOperation(FooResource, BarResource,",
+    "legacyExtensionResourceOperation(FooResource,",
+  ];
+
+  it.each(privateDecorators)("accepts HEAD with @%s checkExistence", async (decorator) => {
+    await tester
+      .expect(
+        buildPrivateDecoratorTestSpec(`
+        @${decorator} "checkExistence")
+        @head
+        exists(...ResourceInstanceParameters<FooResource>): ArmResourceExistsResponse | ArmResourceNotFoundResponse;
+      `),
+      )
+      .toBeValid();
+  });
+
+  it.each(privateDecorators)("rejects HEAD with @%s read", async (decorator) => {
+    await tester
+      .expect(
+        buildPrivateDecoratorTestSpec(`
+        @${decorator} "read")
+        @head
+        exists(...ResourceInstanceParameters<FooResource>): ArmResourceExistsResponse | ArmResourceNotFoundResponse;
+      `),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message: `Resource HEAD operation decorator @${decorator.split("(")[0]} must use operationType "checkExistence".`,
+      });
+  });
+
+  it.each(privateDecorators)("accepts GET with @%s action", async (decorator) => {
+    await tester
+      .expect(
+        buildPrivateDecoratorTestSpec(`
+        @${decorator} "action")
+        @get
+        action(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
+      `),
+      )
+      .toBeValid();
+  });
 
   it("doesn't emit a diagnostic for operations with @extensionResourceOperation", async () => {
     const content = buildPrivateDecoratorTestSpec(`
@@ -271,7 +429,7 @@ describe("Provider operations", () => {
     await tester.expect(content).toBeValid();
   });
 
-  it("emit diagnostic for provider operations if it has dynamic segments", async () => {
+  it("accepts provider GET actions with dynamic segments", async () => {
     const content = providerOperationSetup(
       `
         @autoRoute
@@ -292,10 +450,77 @@ describe("Provider operations", () => {
         `,
     );
 
-    await tester.expect(content).toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
-      message:
-        "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
-    });
+    await tester.expect(content).toBeValid();
   });
+
+  it.each(["get", "post"])("accepts custom provider operations using %s", async (verb) => {
+    await tester
+      .expect(
+        providerOperationSetup(`
+        @${verb}
+        operation(
+          ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>,
+          ...Azure.ResourceManager.Foundations.DefaultProviderNamespace
+        ): string;
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("requires a resource decorator after a dynamic provider path segment", async () => {
+    await tester
+      .expect(
+        providerOperationSetup(`
+        @get
+        operation(
+          ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>,
+          ...Azure.ResourceManager.Foundations.DefaultProviderNamespace,
+          @path @segment("employees") employeeName: string,
+          @query filter: string
+        ): string;
+      `),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message: /Resource GET operation must be decorated with @armResourceRead/,
+      });
+  });
+
+  it.each(["put", "patch", "delete", "head"])(
+    "rejects custom provider operations using %s",
+    async (verb) => {
+      await tester
+        .expect(
+          providerOperationSetup(`
+          @${verb}
+          operation(
+            ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>,
+            ...Azure.ResourceManager.Foundations.DefaultProviderNamespace,
+            @query filter: string
+          ): string;
+        `),
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+          message: new RegExp(`Resource ${verb.toUpperCase()} operation must be decorated with`),
+        });
+    },
+  );
+
+  it.each(["put", "patch", "delete", "head"])(
+    "rejects provider action templates overridden to %s",
+    async (verb) => {
+      await tester
+        .expect(
+          providerOperationSetup(`
+          @${verb}
+          operation is ArmProviderActionSync;
+        `),
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+          message: new RegExp(`Resource ${verb.toUpperCase()} operation must be decorated with`),
+        });
+    },
+  );
 });
