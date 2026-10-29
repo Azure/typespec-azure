@@ -2601,14 +2601,6 @@ export function getSerializationExpression(
   const nullOrUndefinedPrefix = getPropertySerializationPrefix(context, property, propertyPath);
 
   const propertyFullName = getPropertyFullName(context, property, propertyPathWithDot);
-  if (
-    property.discriminator &&
-    property.type.kind === "enumvalue" &&
-    property.type.serializationOptions?.json?.name !== undefined &&
-    property.type.serializationOptions.json.name !== property.type.value
-  ) {
-    return `${nullOrUndefinedPrefix}${JSON.stringify(property.type.serializationOptions.json.name)}`;
-  }
   const serializeFunctionName = buildModelSerializer(context, getNullableValidType(property.type), {
     nameOnly: true,
     skipDiscriminatedUnionSuffix: false,
@@ -2742,15 +2734,6 @@ export function getResponseMapping(
           skipDiscriminatedUnionSuffix: false,
         });
     const propertyName = normalizeModelPropertyName(context, property);
-    if (
-      property.discriminator &&
-      property.type.kind === "enumvalue" &&
-      property.type.serializationOptions?.json?.name !== undefined &&
-      property.type.serializationOptions.json.name !== property.type.value
-    ) {
-      props.push(`${propertyName}: ${nullOrUndefinedPrefix}${JSON.stringify(property.type.value)}`);
-      continue;
-    }
     if (deserializeFunctionName) {
       if (isSupportedFlatten) {
         props.push(`...${nullOrUndefinedPrefix}${deserializeFunctionName}(${restValue})`);

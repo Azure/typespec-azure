@@ -13,21 +13,21 @@ import {
   SimpleTesterWithService,
 } from "../tester.js";
 
-for (const [value, discriminator, wireValue] of [
-  ['"circle"', "ShapeKind.circle", "round"],
-  ["0", "ShapeKind.circle", "round"],
-  ['"circle"', '"round"', "round"],
-  ['"circle"', "ShapeKind.circle", "__proto__"],
+for (const [discriminator, tag, wireValue] of [
+  ["ShapeKind.circle", "circle", "round"],
+  ['"circle"', "circle", "round"],
+  ['"round"', "round", "round"],
+  ["ShapeKind.circle", "circle", "__proto__"],
 ]) {
-  it(`uses the JSON wire value of discriminator ${discriminator} with original value ${value}`, async () => {
+  it(`keeps spec tag ${tag} for discriminator ${discriminator} encoded as ${wireValue}`, async () => {
     const { program } = await SimpleTesterWithService.compile(`
       enum ShapeKind {
         @encodedName("application/json", ${JSON.stringify(wireValue)})
         @encodedName("application/xml", "Round")
-        circle: ${value},
+        circle: "circle",
       }
       @discriminator("kind")
-      model Shape { kind: ${discriminator === '"round"' ? "ShapeKind | string" : "ShapeKind"}; }
+      model Shape { kind: ${discriminator.startsWith('"') ? "ShapeKind | string" : "ShapeKind"}; }
       model Circle extends Shape { kind: ${discriminator}; radius: int32; }
       op get(): Shape;
     `);
@@ -36,10 +36,10 @@ for (const [value, discriminator, wireValue] of [
     const circle = context.sdkPackage.models.find((type) => type.name === "Circle");
     ok(shape);
     ok(circle);
-    strictEqual(circle.discriminatorValue, wireValue);
+    strictEqual(circle.discriminatorValue, tag);
     ok(shape.discriminatedSubtypes);
-    deepStrictEqual(Object.keys(shape.discriminatedSubtypes), [wireValue]);
-    strictEqual(shape.discriminatedSubtypes[wireValue], circle);
+    deepStrictEqual(Object.keys(shape.discriminatedSubtypes), [tag]);
+    strictEqual(shape.discriminatedSubtypes[tag], circle);
     const kind = circle.properties.find((prop) => prop.name === "kind");
     ok(kind);
     if (discriminator === '"round"') {
@@ -47,7 +47,8 @@ for (const [value, discriminator, wireValue] of [
       strictEqual(kind.type.value, "round");
     } else {
       strictEqual(kind.type.kind, "enumvalue");
-      strictEqual(kind.type.value, value === "0" ? 0 : "circle");
+      strictEqual(kind.type.value, "circle");
+      strictEqual(kind.type.serializationOptions?.json?.name, wireValue);
     }
   });
 }

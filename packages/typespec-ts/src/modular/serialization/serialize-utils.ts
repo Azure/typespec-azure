@@ -14,27 +14,17 @@ import { getDirectSubtypes } from "../helpers/type-helpers.js";
  */
 export function getAllDiscriminatedValues(
   type: SdkModelType,
-  discriminatorProperty: SdkModelPropertyType | undefined,
-  useClientValues: true,
-): (string | number)[];
-export function getAllDiscriminatedValues(
-  type: SdkModelType,
   discriminatorProperty?: SdkModelPropertyType,
-): string[];
-export function getAllDiscriminatedValues(
-  type: SdkModelType,
-  discriminatorProperty?: SdkModelPropertyType,
-  useClientValues = false,
-): (string | number)[] {
-  if (type.discriminatorValue === undefined) {
+) {
+  if (!type.discriminatorValue) {
     return [];
   }
-  const values: (string | number)[] = [];
+  const values: string[] = [];
   const children = [type];
   while (children.length > 0) {
     const model = children.shift()!;
     // skip if no discriminator value
-    if (model.discriminatorValue === undefined) {
+    if (!model.discriminatorValue) {
       continue;
     }
     // Check if this model is a subtype of the given discriminator property
@@ -42,14 +32,7 @@ export function getAllDiscriminatedValues(
       !!discriminatorProperty &&
       model.baseModel?.discriminatorProperty?.name === discriminatorProperty?.name
     ) {
-      const property = useClientValues
-        ? [model, ...getAllAncestors(model)]
-            .flatMap((ancestor) => (ancestor.kind === "model" ? ancestor.properties : []))
-            .find((property) => property.name === discriminatorProperty.name)
-        : undefined;
-      values.push(
-        property?.type.kind === "enumvalue" ? property.type.value : model.discriminatorValue,
-      );
+      values.push(model.discriminatorValue);
       if (model.discriminatorProperty?.name === discriminatorProperty.name) {
         // Traverse subtypes also if they have the same discriminator property
         children.push(...getDirectSubtypes(model));

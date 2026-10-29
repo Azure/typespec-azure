@@ -14,7 +14,7 @@ import {
 import { getSdkTypeHelper } from "./utils.js";
 
 describe("inline discriminated union conversion", () => {
-  it("preserves literal tags when an enum member has a different encoded name", async () => {
+  it("matches spec tags to enum values independently of encoded names", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       enum Kind {
         @encodedName("application/json", "feline")
@@ -34,8 +34,10 @@ describe("inline discriminated union conversion", () => {
     strictEqual(cat.discriminatorValue, "cat");
     const kind = cat.properties.find((property) => property.name === "kind");
     ok(kind);
-    strictEqual(kind.type.kind, "constant");
+    strictEqual(kind.type.kind, "enumvalue");
     strictEqual(kind.type.value, "cat");
+    strictEqual(kind.type.serializationOptions?.json?.name, "feline");
+    strictEqual(kind.type.serializationOptions?.xml?.name, "Feline");
   });
 
   it.each([false, true])(

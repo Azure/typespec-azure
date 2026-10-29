@@ -268,11 +268,7 @@ function buildDiscriminatedUnionSerializer(
       continue;
     }
     // get all discriminated values that is linked by this discriminator property
-    const discriminatedValues = getAllDiscriminatedValues(
-      subType,
-      type.discriminatorProperty,
-      true,
-    );
+    const discriminatedValues = getAllDiscriminatedValues(subType, type.discriminatorProperty);
     const union = subType.discriminatedSubtypes ? "Union" : "";
     const subTypeName = normalizeModelName(context, subType, NameType.Interface, !union);
     // Get the serializer name and ensure reference tracking
@@ -281,7 +277,7 @@ function buildDiscriminatedUnionSerializer(
       skipDiscriminatedUnionSuffix: false,
     }) as string;
 
-    const caseLabels = discriminatedValues.map((value) => `case ${JSON.stringify(value)}:`);
+    const caseLabels = discriminatedValues.map((value) => `case "${value}":`);
     cases.push(`
       ${caseLabels.join("\n")}
         return ${subtypeSerializerName}(item as ${subTypeName});
