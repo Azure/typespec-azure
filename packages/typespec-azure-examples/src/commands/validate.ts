@@ -3,16 +3,18 @@ import { resolve } from "path";
 import type { CommandModule } from "yargs";
 import { validateExamplesDir } from "../discover.js";
 import { formatDiagnostics, formatSummary } from "../reporter.js";
+import { validateProjectExamples } from "../validate-project.js";
 
 interface ValidateArgs {
   dir: string;
   "warn-as-error": boolean;
+  "schema-only": boolean;
 }
 
 /** `tsp-examples validate` — validate the unified examples files in a service directory. */
 export const validateCommand: CommandModule<unknown, ValidateArgs> = {
   command: "validate [dir]",
-  describe: "Validate unified examples format files (examples.yaml)",
+  describe: "Validate unified examples and their API request/response values",
   builder: (yargs) =>
     yargs
       .positional("dir", {
@@ -24,6 +26,11 @@ export const validateCommand: CommandModule<unknown, ValidateArgs> = {
         type: "boolean",
         default: false,
         describe: "Treat warnings as errors (non-zero exit)",
+      })
+      .option("schema-only", {
+        type: "boolean",
+        default: false,
+        describe: "Only check the YAML format; do not compile main.tsp or validate API values",
       }),
   handler: async (args) => {
     const dir = resolve(process.cwd(), args.dir);
@@ -34,6 +41,13 @@ export const validateCommand: CommandModule<unknown, ValidateArgs> = {
         `No examples files found in ${dir} (looked for examples.yaml and examples/*.yaml).`,
       );
       process.exit(1);
+    }
+
+    if (
+      !args["schema-only"] &&
+      !diagnostics.some((diagnostic) => diagnostic.severity === "error")
+    ) {
+      diagnostics.push(...(await validateProjectExamples(dir)));
     }
 
     if (diagnostics.length > 0) {

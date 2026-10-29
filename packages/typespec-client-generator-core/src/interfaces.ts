@@ -66,7 +66,9 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
+  convertDiscriminatedUnionsToModels?: boolean;
 
+  __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
@@ -1458,7 +1460,7 @@ interface SdkExampleBase {
   /** Unique example name within the operation. */
   name: string;
   doc: string;
-  /** Path to the source JSON or YAML file containing the example. */
+  /** Path to the source JSON or YAML file, with `#id` appended for YAML examples with an explicit ID. */
   filePath: string;
   rawExample: any;
 }
