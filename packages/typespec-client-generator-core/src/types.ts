@@ -19,6 +19,7 @@ import {
   type Tuple,
   type Type,
   type Union,
+  type UnionVariant,
   compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
@@ -33,6 +34,7 @@ import {
   isNeverType,
   isNullType,
   isTemplateDeclaration,
+  resolveEncodedEnumMemberValue,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { isEvents } from "@typespec/events";
@@ -71,6 +73,7 @@ import {
 import {
   type AccessFlags,
   type ArrayKnownEncoding,
+  type EnumSerializationOptions,
   type SdkArrayType,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
@@ -1023,25 +1026,32 @@ function addDiscriminatorToModelType(
               `Discriminator "${property.name}" has to be constant`,
               childModel,
             );
-            compilerAssert(
-              typeof property.type.value === "string",
-              `Value of discriminator "${property.name}" has to be a string`,
-              type,
-            );
             // map string value type to enum value type
             if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
               for (const value of discriminatorType.values) {
-                if (value.value === property.type.value) {
+                if (
+                  (value.serializationOptions?.json?.value ?? value.value) === property.type.value
+                ) {
                   property.type = value;
+                  break;
                 }
               }
             }
-            childModelSdkType.discriminatorValue = property.type.value as string;
+            const discriminatorValue =
+              property.type.kind === "enumvalue"
+                ? (property.type.serializationOptions?.json?.value ?? property.type.value)
+                : property.type.value;
+            compilerAssert(
+              typeof discriminatorValue === "string",
+              `Value of discriminator "${property.name}" has to be a string`,
+              type,
+            );
+            childModelSdkType.discriminatorValue = discriminatorValue;
             property.discriminator = true;
             if (model.discriminatedSubtypes === undefined) {
               model.discriminatedSubtypes = {};
             }
-            model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
+            model.discriminatedSubtypes[discriminatorValue] = childModelSdkType;
             discriminatorProperty = property;
           }
         }
@@ -1262,10 +1272,37 @@ function getSdkEnumValueWithDiagnostics(
     name: getLibraryName(context, type),
     isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
+    ...getEnumValueSerializationOptions(context, type),
     enumType,
     valueType: enumType.valueType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
+}
+
+function getEnumValueSerializationOptions(
+  context: TCGCContext,
+  type: EnumMember | UnionVariant,
+): Pick<SdkEnumValueType, "serializationOptions"> {
+  if (type.kind !== "EnumMember") return {};
+  const result: Pick<SdkEnumValueType, "serializationOptions"> = {};
+  for (const format of ["json", "xml"] as const) {
+    const value = resolveEncodedEnumMemberValue(context.program, type, `application/${format}`);
+    if (value !== (type.value ?? type.name)) {
+      (result.serializationOptions ??= {})[format] = { value };
+    }
+  }
+  return result;
+}
+
+function updateEnumSerializationOptions(context: TCGCContext, type: SdkEnumType) {
+  for (const format of ["json", "xml"] as const) {
+    if (type.values.some((value) => value.serializationOptions?.[format])) {
+      const options: EnumSerializationOptions = (type.serializationOptions ??= {});
+      options[format] = {
+        valueType: getTypeSpecBuiltInType(context, "string"),
+      };
+    }
+  }
 }
 
 export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operation): SdkEnumType {
@@ -1306,6 +1343,7 @@ function getSdkEnumWithDiagnostics(
         diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, sdkType, member)),
       );
     }
+    updateEnumSerializationOptions(context, sdkType);
   }
   updateReferencedTypeMap(context, type, sdkType);
 
@@ -1326,6 +1364,7 @@ function getSdkUnionEnumValues(
       name: name ? name : `${member.value}`,
       isExactName: isExactClientName(context, member.type),
       value: member.value,
+      ...getEnumValueSerializationOptions(context, member.type),
       valueType: enumType.valueType,
       enumType,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, member.type),
@@ -1370,6 +1409,7 @@ export function getSdkUnionEnumWithDiagnostics(
     isUnionAsEnum: true,
   };
   sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
+  updateEnumSerializationOptions(context, sdkType);
   return diagnostics.wrap(sdkType);
 }
 

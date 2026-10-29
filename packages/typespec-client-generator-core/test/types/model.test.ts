@@ -13,6 +13,37 @@ import {
   SimpleTesterWithService,
 } from "../tester.js";
 
+for (const [value, discriminator] of [
+  ['"circle"', "ShapeKind.circle"],
+  ["0", "ShapeKind.circle"],
+  ['"circle"', '"round"'],
+]) {
+  it(`uses the JSON wire value of discriminator ${discriminator} with original value ${value}`, async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      enum ShapeKind {
+        @encodedName("application/json", "round")
+        @encodedName("application/xml", "Round")
+        circle: ${value},
+      }
+      @discriminator("kind")
+      model Shape { kind: ${discriminator === '"round"' ? "ShapeKind | string" : "ShapeKind"}; }
+      model Circle extends Shape { kind: ${discriminator}; radius: int32; }
+      op get(): Shape;
+    `);
+    const context = await createSdkContextForTester(program);
+    const shape = context.sdkPackage.models.find((type) => type.name === "Shape");
+    const circle = context.sdkPackage.models.find((type) => type.name === "Circle");
+    ok(shape);
+    ok(circle);
+    strictEqual(circle.discriminatorValue, "round");
+    strictEqual(shape.discriminatedSubtypes?.round, circle);
+    const kind = circle.properties.find((prop) => prop.name === "kind");
+    ok(kind);
+    strictEqual(kind.type.kind, "enumvalue");
+    strictEqual(kind.type.value, value === "0" ? 0 : "circle");
+  });
+}
+
 it("basic", async () => {
   const { program } = await SimpleTester.compile(`
     @service
