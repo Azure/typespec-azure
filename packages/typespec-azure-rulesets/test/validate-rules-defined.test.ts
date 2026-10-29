@@ -69,6 +69,13 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("enables ARM resource metadata name conflict detection", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
