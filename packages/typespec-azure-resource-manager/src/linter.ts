@@ -38,6 +38,7 @@ import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
 import { noQueryInPostRule } from "./rules/no-query-in-post.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
+import { noResourceNameConflictRule } from "./rules/no-resource-name-conflict.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
@@ -121,6 +122,7 @@ const rules = [
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
+  noResourceNameConflictRule,
 ];
 
 export const $linter = defineLinter({
