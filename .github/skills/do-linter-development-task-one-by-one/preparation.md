@@ -52,14 +52,17 @@ Discover the [shared baseline](../analyze-native-lint-coverage/shared-baseline.m
 before candidate/specs dependency setup. Fetch the metadata branch and pin its
 commit, immutable descriptor and archive identity. Prepare specs at the exact
 descriptor `source.commit`, not the metadata commit, checked-in `_meta.json`,
-or latest `typespec-next`. Resolve the candidate base once, then verify against
-the baseline's recorded closure. Apply the
+or latest `typespec-next`. Resolve the candidate base once, retain the baseline's
+recorded closure as provenance, and record the actual candidate closure. Apply the
 [monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
 keep the specs commit across the dependency-upgrade cycle without freezing new
-native branches to old main. Inspect actual compatibility changes before proposing
-refresh; distinguish unsupported verification from proven emission differences.
-Missing/corrupt/incompatible data is a
-prerequisite blocker, never permission to generate Swagger per rule.
+native branches to old main. Assume current-main compiler and libraries remain
+backward-compatible with that source and explicitly select the supported
+`--baseline-policy frozen-reference` for saved Swagger versus fresh full native
+diagnostics. Retain both runtime contexts and investigate actual failures and
+gaps; runtime-version differences or a strict closure mismatch alone do not block
+this historical comparison. Missing/corrupt/incompatible source or population data
+is a prerequisite blocker, never permission to generate Swagger per rule.
 Only an explicitly requested separate producer refresh resolves new specs
 sources and runs Swagger validators. Keep immutable baseline data read-only;
 parallel candidates require separate writable specs runtimes to prevent
