@@ -270,7 +270,16 @@ it("checks children at location scope", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-it("accepts a collection GET implemented as an action on the parent", async () => {
+it.each([
+  // Synthetic missing-operation regression: https://github.com/Azure/typespec-azure/issues/5886
+  { name: "without a parent read", parentRead: "" },
+  // Production authoring pattern; Automation also exposes a parent read:
+  // https://github.com/MaryGao/azure-rest-api-specs/blob/2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9/specification/automation/resource-manager/Microsoft.Automation/Automation/AutomationAccount.tsp#L137-L160
+  {
+    name: "with a parent read (Automation pattern)",
+    parentRead: "get is ArmResourceRead<Widget>;",
+  },
+])("accepts a collection GET implemented as a parent action $name", async ({ parentRead }) => {
   await tester
     .expect(
       `${service}
@@ -278,6 +287,7 @@ it("accepts a collection GET implemented as an action on the parent", async () =
         get is ArmResourceRead<Part>;
       }
       @armResourceOperations interface Widgets {
+        ${parentRead}
         @get @action("parts")
         listParts is ArmResourceActionSync<Widget, void, ArmResponse<{ value: Part[] }>>;
       }
