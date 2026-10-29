@@ -50,16 +50,27 @@ it("accepts a child with the standard parent list", async () => {
     .toBeValid();
 });
 
-it("does not require a list for a top-level resource or an unused parent", async () => {
-  await tester
-    .expect(
-      `${service}
-      @armResourceOperations interface Widgets {
-        get is ArmResourceRead<Widget>;
-      }
-    `,
-    )
-    .toBeValid();
+it.each(["resource-group", "subscription"])(
+  "does not report nested-resource diagnostics for a top-level %s resource without lists",
+  async (scope) => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace @service namespace Microsoft.Contoso;
+        model WidgetProperties { label?: string; }
+        model Widget is TrackedResource<WidgetProperties> { ...ResourceNameParameter<Widget>; }
+        ${scope === "subscription" ? "@@subscriptionResource(Widget);" : ""}
+        @armResourceOperations interface Widgets {
+          get is ArmResourceRead<Widget>;
+        }
+      `,
+      )
+      .toBeValid();
+  },
+);
+
+it("does not report unused nested resource declarations", async () => {
+  await tester.expect(service).toBeValid();
 });
 
 it("does not let a parent or unrelated list satisfy the child", async () => {
