@@ -884,7 +884,9 @@ function getUnionDiscriminatorProperty(
     property.type.kind === "constant" &&
     discriminatorType?.kind === "enum"
   ) {
-    const value = discriminatorType.values.find((value) => value.value === tag);
+    const value = discriminatorType.values.find((value) =>
+      isEnumValueEquivalentToLiteral(value, tag),
+    );
     if (value) property.type = value;
   }
   property.optional = false;
@@ -993,6 +995,17 @@ export function getSdkConstant(
   return ignoreDiagnostics(getSdkConstantWithDiagnostics(context, type, operation));
 }
 
+function isEnumValueEquivalentToLiteral(
+  value: SdkEnumValueType,
+  literal: SdkConstantType["value"],
+): boolean {
+  return (
+    value.value === literal &&
+    (value.serializationOptions?.json?.name ?? value.value) === literal &&
+    (value.serializationOptions?.xml?.name ?? value.value) === literal
+  );
+}
+
 function addDiscriminatorToModelType(
   context: TCGCContext,
   type: Model,
@@ -1027,12 +1040,7 @@ function addDiscriminatorToModelType(
             // map string value type to enum value type
             if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
               for (const value of discriminatorType.values) {
-                if (
-                  value.value === property.type.value &&
-                  (value.serializationOptions?.json?.value ?? value.value) ===
-                    property.type.value &&
-                  (value.serializationOptions?.xml?.value ?? value.value) === property.type.value
-                ) {
+                if (isEnumValueEquivalentToLiteral(value, property.type.value)) {
                   property.type = value;
                   break;
                 }
@@ -1040,7 +1048,7 @@ function addDiscriminatorToModelType(
             }
             const discriminatorValue =
               property.type.kind === "enumvalue"
-                ? (property.type.serializationOptions?.json?.value ?? property.type.value)
+                ? (property.type.serializationOptions?.json?.name ?? property.type.value)
                 : property.type.value;
             compilerAssert(
               typeof discriminatorValue === "string",
@@ -1050,7 +1058,7 @@ function addDiscriminatorToModelType(
             childModelSdkType.discriminatorValue = discriminatorValue;
             property.discriminator = true;
             if (model.discriminatedSubtypes === undefined) {
-              model.discriminatedSubtypes = {};
+              model.discriminatedSubtypes = Object.create(null) as Record<string, SdkModelType>;
             }
             model.discriminatedSubtypes[discriminatorValue] = childModelSdkType;
             discriminatorProperty = property;
@@ -1319,7 +1327,6 @@ function getSdkEnumWithDiagnostics(
         diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, sdkType, member)),
       );
     }
-    setSerializationOptions(context, sdkType, []);
   }
   updateReferencedTypeMap(context, type, sdkType);
 
@@ -1386,7 +1393,6 @@ export function getSdkUnionEnumWithDiagnostics(
     isUnionAsEnum: true,
   };
   sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
-  setSerializationOptions(context, sdkType, []);
   return diagnostics.wrap(sdkType);
 }
 
@@ -2860,11 +2866,12 @@ function updateSerializationOptions(
   }
 
   if (type.kind === "enum" || type.kind === "enumvalue") {
-    setSerializationOptions(context, type, contentTypes);
     if (type.kind === "enum") {
       for (const value of type.values) {
         setSerializationOptions(context, value, contentTypes);
       }
+    } else {
+      setSerializationOptions(context, type, contentTypes);
     }
     return diagnostics.wrap(undefined);
   }
@@ -2967,13 +2974,7 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type:
-    | SdkModelType
-    | SdkModelPropertyType
-    | SdkArrayType
-    | SdkDictionaryType
-    | SdkEnumType
-    | SdkEnumValueType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType | SdkEnumValueType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
@@ -2987,15 +2988,15 @@ function setSerializationOptions(
   }
   if (
     !type.serializationOptions?.json &&
-    ((type.__raw && hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)) ||
-      (type.kind === "enum" && type.values.some((value) => value.serializationOptions?.json)))
+    type.__raw &&
+    hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
     !type.serializationOptions?.xml &&
-    ((type.__raw && hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)) ||
-      (type.kind === "enum" && type.values.some((value) => value.serializationOptions?.xml)))
+    type.__raw &&
+    hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
   }
@@ -3011,57 +3012,47 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type:
-    | SdkModelType
-    | SdkModelPropertyType
-    | SdkArrayType
-    | SdkDictionaryType
-    | SdkEnumType
-    | SdkEnumValueType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType | SdkEnumValueType,
 ) {
+  if (type.kind === "enumvalue") {
+    const name =
+      type.__raw?.kind === "EnumMember"
+        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/json")
+        : type.value;
+    if (typeof name === "string") {
+      (type.serializationOptions ??= {}).json = { name };
+    }
+    return;
+  }
   const serializationOptions = (type.serializationOptions ??= {});
   serializationOptions.json = {
     name:
-      type.__raw?.kind === "Model" ||
-      type.__raw?.kind === "ModelProperty" ||
-      type.__raw?.kind === "EnumMember"
+      type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/json")
         : "name" in type
           ? type.name
           : "",
   };
-  if (type.kind === "enumvalue") {
-    serializationOptions.json.value =
-      type.__raw?.kind === "EnumMember"
-        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/json")
-        : type.value;
-  } else if (type.kind === "enum") {
-    serializationOptions.json.valueType = type.values.some(
-      (value) =>
-        value.serializationOptions?.json?.value !== undefined &&
-        value.serializationOptions.json.value !== value.value,
-    )
-      ? getTypeSpecBuiltInType(context, "string")
-      : type.valueType;
-  }
 }
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type:
-    | SdkModelType
-    | SdkModelPropertyType
-    | SdkArrayType
-    | SdkDictionaryType
-    | SdkEnumType
-    | SdkEnumValueType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType | SdkEnumValueType,
 ) {
+  if (type.kind === "enumvalue") {
+    const name =
+      type.__raw?.kind === "EnumMember"
+        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/xml")
+        : type.value;
+    if (typeof name === "string") {
+      (type.serializationOptions ??= {}).xml = { name };
+    }
+    return;
+  }
   const serializationOptions = (type.serializationOptions ??= {});
   serializationOptions.xml = {
     name:
-      type.__raw?.kind === "Model" ||
-      type.__raw?.kind === "ModelProperty" ||
-      type.__raw?.kind === "EnumMember"
+      type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/xml")
         : "name" in type
           ? type.name
@@ -3070,20 +3061,6 @@ function updateXmlSerializationOptions(
     ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
     unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
   };
-  if (type.kind === "enumvalue") {
-    serializationOptions.xml.value =
-      type.__raw?.kind === "EnumMember"
-        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/xml")
-        : type.value;
-  } else if (type.kind === "enum") {
-    serializationOptions.xml.valueType = type.values.some(
-      (value) =>
-        value.serializationOptions?.xml?.value !== undefined &&
-        value.serializationOptions.xml.value !== value.value,
-    )
-      ? getTypeSpecBuiltInType(context, "string")
-      : type.valueType;
-  }
 
   // set extra serialization info for array property
   if (

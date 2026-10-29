@@ -199,7 +199,7 @@ function buildPolymorphicDeserializer(
     }) as string;
 
     cases.push(`
-        case "${discriminatedValue}":
+        case ${JSON.stringify(discriminatedValue)}:
           return ${subtypeDeserializerName}(item as ${subTypeName});
       `);
   });
@@ -273,7 +273,7 @@ function buildDiscriminatedUnionDeserializer(
       skipDiscriminatedUnionSuffix: false,
     }) as string;
 
-    const caseLabels = discriminatedValues.map((value) => `case "${value}":`);
+    const caseLabels = discriminatedValues.map((value) => `case ${JSON.stringify(value)}:`);
     cases.push(`
       ${caseLabels.join("\n")}
         return ${subtypeDeserializerName}(item as ${subTypeName});

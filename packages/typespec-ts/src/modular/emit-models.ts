@@ -928,13 +928,13 @@ function buildModelProperty(
   }
 
   let typeExpression: string;
-  const allDiscriminatorValues = getAllDiscriminatedValues(model, property);
+  const allDiscriminatorValues = getAllDiscriminatedValues(model, property, true);
 
   // We need refine the discriminator property if
   // 1. it is discriminated union
   // 2. it has other discriminator values except itself
   if (isDiscriminatedUnion(model) && allDiscriminatorValues.length > 1) {
-    typeExpression = allDiscriminatorValues.map((value) => `"${value}"`).join(" | ");
+    typeExpression = allDiscriminatorValues.map((value) => JSON.stringify(value)).join(" | ");
   } else if (property.kind === "property" && property.serializationOptions.multipart?.isFilePart) {
     typeExpression = getMultipartFileTypeExpression(context, property);
   } else {

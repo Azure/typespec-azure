@@ -576,6 +576,20 @@ function getParameterValue(
     overrides?: ModelOverrideOptions;
   },
 ): string {
+  if (value.kind === "string" || value.kind === "number") {
+    const members =
+      value.type.kind === "enum"
+        ? value.type.values
+        : value.type.kind === "enumvalue"
+          ? [value.type]
+          : [];
+    const member = members.find(
+      (member) => (member.serializationOptions?.json?.name ?? member.value) === value.value,
+    );
+    if (member) {
+      return JSON.stringify(member.value);
+    }
+  }
   let retValue = `{} as any`;
   switch (value.kind) {
     case "string": {

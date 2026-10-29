@@ -46,15 +46,11 @@ it("keeps enum values and types separate from JSON and XML wire values", async (
   strictEqual(sdkEnum.values[0].name, "Unspecified");
   strictEqual(sdkEnum.values[0].valueType.kind, "int32");
   strictEqual(sdkEnum.values[0].serializationOptions?.json?.name, "unknown");
-  strictEqual(sdkEnum.values[0].serializationOptions?.json?.value, "unknown");
   strictEqual(sdkEnum.values[0].serializationOptions?.xml?.name, "Unknown");
-  strictEqual(sdkEnum.values[0].serializationOptions?.xml?.value, "Unknown");
-  strictEqual(sdkEnum.values[1].serializationOptions?.json?.value, "active");
-  strictEqual(sdkEnum.values[1].serializationOptions?.xml?.value, 1);
-  strictEqual(sdkEnum.values[2].serializationOptions?.json?.value, 2);
-  strictEqual(sdkEnum.values[2].serializationOptions?.xml?.value, 2);
-  strictEqual(sdkEnum.serializationOptions?.json?.valueType.kind, "string");
-  strictEqual(sdkEnum.serializationOptions?.xml?.valueType.kind, "string");
+  strictEqual(sdkEnum.values[1].serializationOptions?.json?.name, "active");
+  strictEqual(sdkEnum.values[1].serializationOptions?.xml, undefined);
+  strictEqual(sdkEnum.values[2].serializationOptions?.json, undefined);
+  strictEqual(sdkEnum.values[2].serializationOptions?.xml, undefined);
   const initial = context.sdkPackage.models[0].properties.find((prop) => prop.name === "initial");
   ok(initial);
   strictEqual(initial.type.kind, "enumvalue");
@@ -84,8 +80,8 @@ it("preserves encoded values when flattening enums into a union", async () => {
   );
   deepStrictEqual(
     sdkEnum.values.map((value) => [
-      value.serializationOptions?.json?.value,
-      value.serializationOptions?.xml?.value,
+      value.serializationOptions?.json?.name,
+      value.serializationOptions?.xml?.name,
     ]),
     [
       ["wire-ready", undefined],

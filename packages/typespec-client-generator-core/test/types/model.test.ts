@@ -13,15 +13,16 @@ import {
   SimpleTesterWithService,
 } from "../tester.js";
 
-for (const [value, discriminator] of [
-  ['"circle"', "ShapeKind.circle"],
-  ["0", "ShapeKind.circle"],
-  ['"circle"', '"round"'],
+for (const [value, discriminator, wireValue] of [
+  ['"circle"', "ShapeKind.circle", "round"],
+  ["0", "ShapeKind.circle", "round"],
+  ['"circle"', '"round"', "round"],
+  ['"circle"', "ShapeKind.circle", "__proto__"],
 ]) {
   it(`uses the JSON wire value of discriminator ${discriminator} with original value ${value}`, async () => {
     const { program } = await SimpleTesterWithService.compile(`
       enum ShapeKind {
-        @encodedName("application/json", "round")
+        @encodedName("application/json", ${JSON.stringify(wireValue)})
         @encodedName("application/xml", "Round")
         circle: ${value},
       }
@@ -35,8 +36,10 @@ for (const [value, discriminator] of [
     const circle = context.sdkPackage.models.find((type) => type.name === "Circle");
     ok(shape);
     ok(circle);
-    strictEqual(circle.discriminatorValue, "round");
-    strictEqual(shape.discriminatedSubtypes?.round, circle);
+    strictEqual(circle.discriminatorValue, wireValue);
+    ok(shape.discriminatedSubtypes);
+    deepStrictEqual(Object.keys(shape.discriminatedSubtypes), [wireValue]);
+    strictEqual(shape.discriminatedSubtypes[wireValue], circle);
     const kind = circle.properties.find((prop) => prop.name === "kind");
     ok(kind);
     if (discriminator === '"round"') {

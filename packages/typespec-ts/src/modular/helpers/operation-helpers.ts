@@ -2604,10 +2604,10 @@ export function getSerializationExpression(
   if (
     property.discriminator &&
     property.type.kind === "enumvalue" &&
-    property.type.serializationOptions?.json?.value !== undefined &&
-    property.type.serializationOptions.json.value !== property.type.value
+    property.type.serializationOptions?.json?.name !== undefined &&
+    property.type.serializationOptions.json.name !== property.type.value
   ) {
-    return `${nullOrUndefinedPrefix}${JSON.stringify(property.type.serializationOptions.json.value)}`;
+    return `${nullOrUndefinedPrefix}${JSON.stringify(property.type.serializationOptions.json.name)}`;
   }
   const serializeFunctionName = buildModelSerializer(context, getNullableValidType(property.type), {
     nameOnly: true,
@@ -2745,8 +2745,8 @@ export function getResponseMapping(
     if (
       property.discriminator &&
       property.type.kind === "enumvalue" &&
-      property.type.serializationOptions?.json?.value !== undefined &&
-      property.type.serializationOptions.json.value !== property.type.value
+      property.type.serializationOptions?.json?.name !== undefined &&
+      property.type.serializationOptions.json.name !== property.type.value
     ) {
       props.push(`${propertyName}: ${nullOrUndefinedPrefix}${JSON.stringify(property.type.value)}`);
       continue;
