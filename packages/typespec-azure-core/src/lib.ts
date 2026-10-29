@@ -280,6 +280,7 @@ export const $lib = createTypeSpecLibrary({
   },
 
   state: {
+    lroDeclaration: { description: "Accepted explicit operation LRO declaration" },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },

@@ -31,6 +31,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noGetLroRule } from "./rules/no-get-lro.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
@@ -113,6 +114,7 @@ const rules = [
   useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
+  noGetLroRule,
   noReservedResourcePropertyRule,
   noTagsOnProxyResourceRule,
   noTenantLevelApisRule,
@@ -128,7 +130,7 @@ export const $linter = defineLinter({
       enable: Object.fromEntries(
         rules.map((rule) => [
           `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-          rule !== useScopeForExtensionRoutingRule,
+          rule !== useScopeForExtensionRoutingRule && rule !== noGetLroRule,
         ]),
       ),
     },

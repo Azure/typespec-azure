@@ -1,4 +1,4 @@
-import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata, setLroDeclaration } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -94,6 +94,7 @@ import {
   normalizeScope,
   omitOperation,
   overrideKey,
+  parseEmitterName,
   parseScopes,
   responseOverrideKey,
   scopeKey,
@@ -1928,6 +1929,12 @@ export const $markAsLro: MarkAsLroDecorator = (
     return;
   }
   setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
+  setLroDeclaration(context.program, target, (program, operation, emitterName) => {
+    const [scope] = parseEmitterName(program, emitterName);
+    return (
+      getScopedDecoratorData({ program, emitterName: scope }, markAsLroKey, operation) === true
+    );
+  });
 };
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {

@@ -25,6 +25,11 @@ export {
 } from "./decorators/private/embedding-vector.js";
 export { getParameterizedNextLinkArguments } from "./decorators/private/parameterized-next-link-config.js";
 export { getUnionAsEnum, type UnionEnum } from "./helpers/union-enums.js";
+export {
+  isLroDeclared,
+  setLroDeclaration,
+  type LroDeclarationEvaluator,
+} from "./lro-declaration.js";
 export * from "./lro-helpers.js";
 export * from "./rules/prevent-rest-library.js";
 export * from "./rules/use-standard-operations.js";

@@ -62,6 +62,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/scope-path-segment-casing": false,
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
+    "@azure-tools/typespec-azure-resource-manager/no-get-lro": false,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": true,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations": true,
