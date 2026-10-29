@@ -10,11 +10,6 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
   },
   {
-    "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
-    "severity": "warning",
-    "message": "Top-level resource 'Widget' should define a list by resource group operation."
-  },
-  {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
     "severity": "warning",
     "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."

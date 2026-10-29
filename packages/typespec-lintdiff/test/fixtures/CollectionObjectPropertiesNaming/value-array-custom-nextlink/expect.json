@@ -18,6 +18,10 @@
       "count": 10
     },
     {
+      "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "count": 1
+    },
+    {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
       "count": 5
     }
