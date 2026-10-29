@@ -3,20 +3,26 @@ import {
   fileRef,
   isArrayModelType,
   paramMessage,
+  type Model,
   type Program,
 } from "@typespec/compiler";
 import {
   createMetadataInfo,
   getAllHttpServices,
+  Visibility,
   type HttpOperation,
   type MetadataInfo,
-  Visibility,
 } from "@typespec/http";
 import { getActionDetails, getParentResource, getResourceOperation } from "@typespec/rest";
 import { getArmProviderNamespace } from "../namespace.js";
 import { getArmOperationList } from "../operations.js";
 import { getResourceBaseType, ResourceBaseType } from "../resource.js";
 import { walkJsonProperties } from "./model-utils.js";
+
+interface ArmServiceOperations {
+  operations: readonly HttpOperation[];
+  collectionPaths: ReadonlySet<string>;
+}
 
 export const nestedResourceMissingListRule = createRule({
   name: "nested-resource-missing-list",
@@ -30,7 +36,8 @@ export const nestedResourceMissingListRule = createRule({
   create(context) {
     const metadata = createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read });
     const [services] = getAllHttpServices(context.program);
-    const httpServices = services
+    const armServices = services
+      // REST metadata also exists in non-ARM services. Do not apply ARM list requirements there.
       .filter(
         (service) => getArmProviderNamespace(context.program, service.namespace) !== undefined,
       )
@@ -55,42 +62,60 @@ export const nestedResourceMissingListRule = createRule({
           return;
         }
 
-        const registeredLifecycle = new Set(
-          [...(getArmOperationList(context.program, model) ?? [])]
-            .filter((op) => op.kind !== "list" && op.kind !== "action" && op.kind !== "other")
-            .map((op) => op.operation),
+        const instanceOperations = getResourceInstanceOperations(
+          context.program,
+          model,
+          armServices,
         );
-        const lifecycle = httpServices.flatMap(({ operations, collectionPaths }) =>
-          operations
-            .filter((op) => {
-              if (getActionDetails(context.program, op.operation) !== undefined) return false;
-              const resourceOperation = getResourceOperation(context.program, op.operation);
-              return (
-                registeredLifecycle.has(op.operation) ||
-                (resourceOperation?.resourceType === model &&
-                  resourceOperation.operation !== "list")
-              );
-            })
-            .map((op) => ({ op, collectionPaths })),
-        );
-        if (lifecycle.length === 0) return;
+        if (instanceOperations.length === 0) return;
 
-        if (
-          lifecycle.every(({ op, collectionPaths }) =>
-            collectionPaths.has(normalizeRoute(op.path.slice(0, op.path.lastIndexOf("/")))),
-          )
-        ) {
-          return;
-        }
+        // Check lists within the same service; another service's matching route cannot satisfy this one.
+        const hasAllCollectionGets = instanceOperations.every(
+          ({ httpOperation, collectionPaths }) =>
+            collectionPaths.has(getCollectionPath(httpOperation.path)),
+        );
+        if (hasAllCollectionGets) return;
 
         context.reportDiagnostic({
-          target: lifecycle[0].op.operation.interface ?? model,
+          target: instanceOperations[0].httpOperation.operation.interface ?? model,
           format: { name: model.name },
         });
       },
     };
   },
 });
+
+function getResourceInstanceOperations(
+  program: Program,
+  resource: Model,
+  services: readonly ArmServiceOperations[],
+) {
+  // ARM calls individual-resource read/create/update/delete/existence operations "lifecycle" operations.
+  const lifecycleOperations = new Set(
+    [...(getArmOperationList(program, resource) ?? [])]
+      .filter((op) => op.kind !== "list" && op.kind !== "action" && op.kind !== "other")
+      .map((op) => op.operation),
+  );
+
+  return services.flatMap(({ operations, collectionPaths }) =>
+    operations
+      .filter(({ operation }) => {
+        // An action can inherit a read template's metadata without being an individual-resource endpoint.
+        if (getActionDetails(program, operation) !== undefined) return false;
+        if (lifecycleOperations.has(operation)) return true;
+
+        // Legacy/custom templates can describe resource operations using REST metadata without ARM registration.
+        const restOperation = getResourceOperation(program, operation);
+        return restOperation?.resourceType === resource && restOperation.operation !== "list";
+      })
+      .map((httpOperation) => ({ httpOperation, collectionPaths })),
+  );
+}
+
+function getCollectionPath(instancePath: string): string {
+  // /widgets/{widgetName}/parts/{partName} -> /widgets/{widgetName}/parts
+  return normalizeRoute(instancePath.slice(0, instancePath.lastIndexOf("/")));
+}
 
 function normalizeRoute(path: string): string {
   return path.replace(/\{[^}]+\}/g, "{}").replace(/\/+$/, "");
@@ -101,27 +126,30 @@ function isCollectionGet(
   metadata: MetadataInfo,
   program: Program,
 ): boolean {
-  return (
-    operation.verb === "get" &&
-    operation.responses.some(
-      (response) =>
-        typeof response.statusCodes === "number" &&
-        response.statusCodes >= 200 &&
-        response.statusCodes < 300 &&
-        response.responses.some(({ body }) => {
-          if (body?.bodyKind !== "single" || body.type.kind !== "Model") return false;
-          for (const [name, property] of walkJsonProperties(program, body.type)) {
-            if (
-              name === "value" &&
-              metadata.isPayloadProperty(property, Visibility.Read, body.isExplicit) &&
-              property.type.kind === "Model" &&
-              isArrayModelType(property.type)
-            ) {
-              return true;
-            }
-          }
-          return false;
-        }),
-    )
-  );
+  if (operation.verb !== "get") return false;
+
+  for (const response of operation.responses) {
+    const isSuccess =
+      typeof response.statusCodes === "number" &&
+      response.statusCodes >= 200 &&
+      response.statusCodes < 300;
+    if (!isSuccess) continue;
+
+    for (const { body } of response.responses) {
+      if (body?.bodyKind !== "single" || body.type.kind !== "Model") continue;
+
+      // Inspect the response-visible JSON payload: source names and request-only properties can differ.
+      for (const [name, property] of walkJsonProperties(program, body.type)) {
+        if (
+          name === "value" &&
+          metadata.isPayloadProperty(property, Visibility.Read, body.isExplicit) &&
+          property.type.kind === "Model" &&
+          isArrayModelType(property.type)
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
