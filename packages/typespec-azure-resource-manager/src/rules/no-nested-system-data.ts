@@ -3,6 +3,7 @@ import {
   fileRef,
   getDiscriminatedUnionFromInheritance,
   getDiscriminator,
+  isNeverType,
   isTemplateDeclaration,
   type ModelProperty,
   type Type,
@@ -34,6 +35,7 @@ export const noNestedSystemDataRule = createRule({
         }
       } else if (type.kind === "Model") {
         for (const [name, property] of walkJsonProperties(context.program, type)) {
+          if (isNeverType(property.type)) continue;
           if (name === "systemData" || name === "SystemData") {
             const target = getSourceProperty(property);
             if (!reported.has(target)) {
@@ -50,7 +52,12 @@ export const noNestedSystemDataRule = createRule({
         if (indexedModel.indexer) {
           check(indexedModel.indexer.value);
         }
-        const discriminator = getDiscriminator(context.program, type);
+        let discriminatorModel = type;
+        let discriminator = getDiscriminator(context.program, discriminatorModel);
+        while (!discriminator && discriminatorModel.baseModel) {
+          discriminatorModel = discriminatorModel.baseModel;
+          discriminator = getDiscriminator(context.program, discriminatorModel);
+        }
         if (discriminator) {
           const [alternatives] = getDiscriminatedUnionFromInheritance(
             context.program,

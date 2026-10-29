@@ -41,6 +41,10 @@ it("accepts envelope system data and unrelated property names", async () => {
     .toBeValid();
 });
 
+it("accepts never-typed system data because it is not emitted", async () => {
+  await tester.expect(`model Resource { properties: { systemData?: never }; }`).toBeValid();
+});
+
 it("checks standard ARM resource property bags", async () => {
   await tester
     .expect(
@@ -207,6 +211,28 @@ it("traverses applicable discriminator alternatives", async () => {
         ${t.modelProperty("systemData")}?: string;
       }
       model Resource { properties: Bag; }
+    `,
+    )
+    .toEmitDiagnostics(({ systemData }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(systemData).pos,
+      end: getSourceLocation(systemData).end,
+    }));
+});
+
+it("traverses discriminator alternatives through an undecorated intermediate", async () => {
+  await tester
+    .expect(
+      t.code`
+      @discriminator("kind")
+      model Base { kind: string; }
+      model Intermediate extends Base {}
+      model Good extends Base { kind: "good"; }
+      model Bad extends Intermediate {
+        kind: "bad";
+        ${t.modelProperty("systemData")}?: string;
+      }
+      model Resource { properties: Intermediate; }
     `,
     )
     .toEmitDiagnostics(({ systemData }) => ({
