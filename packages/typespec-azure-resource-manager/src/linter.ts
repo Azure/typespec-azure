@@ -31,6 +31,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
@@ -113,6 +114,7 @@ const rules = [
   useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
+  noEmptyPostResponseRule,
   noReservedResourcePropertyRule,
   noTagsOnProxyResourceRule,
   noTenantLevelApisRule,
