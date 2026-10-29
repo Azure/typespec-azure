@@ -638,6 +638,9 @@ function getSdkMethodResponse(
     type = ignoreDiagnostics(
       getClientTypeWithDiagnostics(context, responseOverrideType, operation),
     );
+    if (type.kind === "bytes") {
+      type = { ...type, encode: "bytes" };
+    }
   } else if (getResponseAsBool(context, operation)) {
     type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
