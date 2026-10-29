@@ -42,7 +42,6 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
-import { resourceGroupPathParameterRule } from "./rules/resource-group-path-parameter.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -57,6 +56,7 @@ import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
 import { useScopeForExtensionRoutingRule } from "./rules/use-scope-for-extension-routing.js";
+import { useScopePathStandardNameRule } from "./rules/use-scope-path-standard-name.js";
 import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
@@ -120,7 +120,7 @@ const rules = [
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
-  resourceGroupPathParameterRule,
+  useScopePathStandardNameRule,
 ];
 
 export const $linter = defineLinter({

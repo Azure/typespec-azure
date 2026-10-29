@@ -2,10 +2,11 @@ import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { resourceGroupPathParameterRule } from "../../src/rules/resource-group-path-parameter.js";
+import { useScopePathStandardNameRule } from "../../src/rules/use-scope-path-standard-name.js";
 
-const code = "@azure-tools/typespec-azure-resource-manager/resource-group-path-parameter";
+const code = "@azure-tools/typespec-azure-resource-manager/use-scope-path-standard-name";
 const message = "Resource-group paths must include '/resourceGroups/{resourceGroupName}'.";
+const subscriptionMessage = "Subscription paths must include '/subscriptions/{subscriptionId}'.";
 const service = "@service @armProviderNamespace namespace Microsoft.Test;";
 let tester: LinterRuleTester;
 
@@ -13,7 +14,7 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    resourceGroupPathParameterRule,
+    useScopePathStandardNameRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -49,6 +50,103 @@ it("reports a differently named resource-group parameter", async () => {
     `,
     )
     .toEmitDiagnostics([{ code, severity: "warning", message }]);
+});
+
+it("reports a differently named subscription parameter", async () => {
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("/subscriptions/{subId}/providers/Microsoft.Test/widgets")
+      op read(@path subId: string): void;
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code,
+        severity: "warning",
+        message: subscriptionMessage,
+      },
+    ]);
+});
+
+it("reports both independently actionable scope naming failures", async () => {
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("/subscriptions/{subId}/resourceGroups/{groupName}/widgets")
+      op /*target*/read(@path subId: string, @path groupName: string): void;
+    `,
+    )
+    .toEmitDiagnostics(({ target }) => [
+      {
+        code,
+        severity: "warning",
+        message,
+        pos: getSourceLocation(target).pos,
+        end: getSourceLocation(target).end,
+      },
+      {
+        code,
+        severity: "warning",
+        message: subscriptionMessage,
+        pos: getSourceLocation(target).pos,
+        end: getSourceLocation(target).end,
+      },
+    ]);
+});
+
+it.each([
+  "/subscriptions/providers/Microsoft.Test/widgets",
+  "/SUBSCRIPTIONS/fixedSubscription/widgets",
+  "/subscriptions/fixedSubscription/widgets/{subscriptionId}",
+])("reports a noncanonical subscription scope in %s", async (path) => {
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("${path}")
+      op read(${path.includes("{subscriptionId}") ? "@path subscriptionId: string" : ""}): void;
+    `,
+    )
+    .toEmitDiagnostics([{ code, severity: "warning", message: subscriptionMessage }]);
+});
+
+it.each([
+  "/SUBSCRIPTIONS/{SUBSCRIPTIONID}/widgets",
+  "/subscriptions/{SUBSCRIPTIONID}/widgets/subscriptions/other",
+])("accepts a canonical full-path subscription occurrence in %s", async (path) => {
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("${path}")
+      op read(@path SUBSCRIPTIONID: string): void;
+    `,
+    )
+    .toBeValid();
+});
+
+it("uses the serialized subscription parameter name in both directions", async () => {
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("/subscriptions/{subscriptionId}/widgets")
+      op read(@path("subscriptionId") subId: string): void;
+    `,
+    )
+    .toBeValid();
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("/subscriptions/{subId}/widgets")
+      op read(@path("subId") subscriptionId: string): void;
+    `,
+    )
+    .toEmitDiagnostics([{ code, severity: "warning", message: subscriptionMessage }]);
 });
 
 it("reports a literal resource-group value", async () => {
@@ -169,12 +267,12 @@ it("accepts a canonical occurrence even when another resourceGroups segment diff
     .toBeValid();
 });
 
-it.each(["post", "head"])("does not check %s resource-group paths", async (verb) => {
+it.each(["post", "head"])("does not check %s scope paths", async (verb) => {
   await tester
     .expect(
       `
       ${service}
-      @${verb} @route("/resourceGroups/fixedGroup/providers/Microsoft.Test/widgets")
+      @${verb} @route("/subscriptions/fixedSubscription/resourceGroups/fixedGroup/providers/Microsoft.Test/widgets")
       op probe(): void;
     `,
     )
@@ -186,7 +284,7 @@ it("does not check a non-ARM service", async () => {
     .expect(
       `
       @service namespace Example;
-      @get @route("/resourceGroups/fixedGroup/providers/Example/widgets")
+      @get @route("/subscriptions/fixedSubscription/resourceGroups/fixedGroup/providers/Example/widgets")
       op read(): void;
     `,
     )
@@ -315,6 +413,45 @@ it("accepts a custom base that retains the standard resource-group parameter", a
         ...ResourceGroupParameter;
       }
     `),
+    )
+    .toBeValid();
+});
+
+it.each([
+  { subscription: "subscriptionId", group: "resourceGroupName", messages: [] },
+  { subscription: "subscriptionId", group: "groupName", messages: [message] },
+  { subscription: "subId", group: "resourceGroupName", messages: [subscriptionMessage] },
+  { subscription: "subId", group: "groupName", messages: [message, subscriptionMessage] },
+])(
+  "checks standard ARM templates with $subscription and $group independently",
+  async ({ subscription, group, messages }) => {
+    const result = tester.expect(
+      templateFixture(`
+        model CustomBase {
+          ...CommonTypes.ApiVersionParameter;
+          @path @segment("subscriptions") ${subscription}: string;
+          @path @segment("resourceGroups") ${group}: string;
+        }
+      `),
+    );
+    if (messages.length === 0) {
+      await result.toBeValid();
+    } else {
+      await result.toEmitDiagnostics(
+        messages.map((message) => ({ code, severity: "warning", message })),
+      );
+    }
+  },
+);
+
+it("accepts routes without either scope segment", async () => {
+  await tester
+    .expect(
+      `
+      ${service}
+      @get @route("/providers/Microsoft.Test/widgets")
+      op read(): void;
+    `,
     )
     .toBeValid();
 });
