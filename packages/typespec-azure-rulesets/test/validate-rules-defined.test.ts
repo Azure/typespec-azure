@@ -124,4 +124,13 @@ describe("expect all rules to be defined", () => {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }
   });
+
+  it("keeps nested system data guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-nested-system-data";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+      ok(!ruleset.enable?.[ruleName]);
+    }
+  });
 });

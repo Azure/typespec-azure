@@ -9,11 +9,12 @@ const source = `
   op read(@path parentName: string, @path bindingName: string): void;
 `;
 
-it("keeps only RPaaS-specific routing outside the general ARM all ruleset", () => {
+it("keeps opt-in rules outside the general ARM all ruleset", () => {
+  const optInRules = new Set(["use-scope-for-extension-routing", "no-nested-system-data"]);
   for (const rule of $linter.rules) {
     expect(
       $linter.ruleSets?.all.enable?.[`@azure-tools/typespec-azure-resource-manager/${rule.name}`],
-    ).toBe(rule.name !== "use-scope-for-extension-routing");
+    ).toBe(!optInRules.has(rule.name));
   }
 });
 
