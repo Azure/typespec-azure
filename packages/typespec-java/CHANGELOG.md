@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- [#5873](https://github.com/Azure/typespec-azure/pull/5873) Update the Java generator to TypeSpec core commit `d771b2957` to fix empty model packages in module-info ([microsoft/typespec#12429](https://github.com/microsoft/typespec/pull/12429)), discriminator key collisions ([microsoft/typespec#12428](https://github.com/microsoft/typespec/pull/12428)), ARM resource ID parsing ([microsoft/typespec#12373](https://github.com/microsoft/typespec/pull/12373)), and Create visibility handling ([microsoft/typespec#12378](https://github.com/microsoft/typespec/pull/12378)). Includes generator performance improvements ([microsoft/typespec#12346](https://github.com/microsoft/typespec/pull/12346)).
+- Update the Java generator to TypeSpec core commit `d771b2957` to fix empty model packages in module-info ([microsoft/typespec#12429](https://github.com/microsoft/typespec/pull/12429)), discriminator key collisions ([microsoft/typespec#12428](https://github.com/microsoft/typespec/pull/12428)), ARM resource ID parsing ([microsoft/typespec#12373](https://github.com/microsoft/typespec/pull/12373)), and Create visibility handling ([microsoft/typespec#12378](https://github.com/microsoft/typespec/pull/12378)). Includes generator performance improvements ([microsoft/typespec#12346](https://github.com/microsoft/typespec/pull/12346)).
 
 
 ## 0.48.3
