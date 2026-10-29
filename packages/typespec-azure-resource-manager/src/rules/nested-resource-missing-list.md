@@ -18,6 +18,14 @@ Listing application versions does not replace listing applications in a gallery.
 Add `ArmResourceListByParent<Part>` alongside the `Part` lifecycle operations to provide the
 required list.
 
+This initial implementation checks resource identities and instance operations returned by
+`resolveArmResources`. Unregistered custom resources and REST-only instance routes missing from
+that graph are not checked. REST-only associations are tracked in
+[typespec-azure#5885](https://github.com/Azure/typespec-azure/issues/5885); the intentional exclusion of
+`CustomAzureProxyResource<false>` is discussed in
+[typespec-azure#4798](https://github.com/Azure/typespec-azure/issues/4798).
+Legacy-specific test coverage is temporarily deferred.
+
 This rule applies to nested resources with lifecycle operations at resource-group, subscription,
 or location scope, including read-only and singleton resources. It does not require lists for
 top-level resources, unused resource declarations, action-only resources, or tenant/extension scopes.
