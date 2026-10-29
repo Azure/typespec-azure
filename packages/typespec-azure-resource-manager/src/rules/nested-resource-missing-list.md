@@ -20,9 +20,7 @@ required list.
 
 This initial implementation checks resource identities and instance operations returned by
 `resolveArmResources`. Unregistered custom resources and REST-only instance routes missing from
-that graph are not checked. REST-only associations are tracked in
-[typespec-azure#5885](https://github.com/Azure/typespec-azure/issues/5885); the intentional exclusion of
-`CustomAzureProxyResource<false>` is discussed in
+that graph are not checked. The intentional exclusion of `CustomAzureProxyResource<false>` is discussed in
 [typespec-azure#4798](https://github.com/Azure/typespec-azure/issues/4798).
 Legacy-specific test coverage is temporarily deferred.
 
@@ -32,9 +30,16 @@ top-level resources, unused resource declarations, action-only resources, or ten
 Top-level list requirements are separate policies. Listing `Widget` instances, another resource type,
 or `Part` instances across a subscription does not replace listing `Part` instances within one `Widget`.
 
-The collection GET can use a standard list template or be authored on another interface,
-including as an action on the containing resource. It must return a successful response with a `value` array;
-the array items may use a separate collection representation of the resource.
+The collection GET must appear in the resource's resolved `operations.lists`. Registered list
+operations can be authored on another interface. They must return a successful response with a
+`value` array; the items may use a separate collection representation of the resource.
+
+Collections authored only as actions are not recognized unless the resolver exposes them as lists.
+This can produce a warning even when the HTTP collection GET exists. Collection associations are
+tracked in [typespec-azure#5080](https://github.com/Azure/typespec-azure/issues/5080), and a dropped
+parent-action operation is tracked in
+[typespec-azure#5886](https://github.com/Azure/typespec-azure/issues/5886).
+This rule does not work around those helper limitations.
 
 The rule evaluates source declarations, consistent with existing missing-operation rules.
 It does not check operation availability separately for each API version. General version-aware

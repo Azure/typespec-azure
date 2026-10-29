@@ -1,4 +1,4 @@
-import { isArrayModelType, type Operation, type Program } from "@typespec/compiler";
+import { isArrayModelType, type Namespace, type Operation, type Program } from "@typespec/compiler";
 import {
   getAllHttpServices,
   Visibility,
@@ -8,41 +8,16 @@ import {
 import { getArmProviderNamespace } from "../namespace.js";
 import { walkJsonProperties } from "./model-utils.js";
 
-interface ArmServiceOperations {
-  operations: readonly HttpOperation[];
-  collectionPaths: ReadonlySet<string>;
-}
-
-export function createArmServiceIndex(program: Program, metadata: MetadataInfo) {
+export function createArmServiceIndex(program: Program) {
   const [services] = getAllHttpServices(program);
-  const armServices = services
-    // REST metadata also exists in non-ARM services. Do not apply ARM list requirements there.
-    .filter((service) => getArmProviderNamespace(program, service.namespace) !== undefined)
-    .map(({ operations }) => ({
-      operations,
-      collectionPaths: new Set(
-        operations
-          .filter((op) => isCollectionGet(op, metadata, program))
-          .map((op) => normalizeRoute(op.path)),
-      ),
-    }));
-  const serviceByOperation = new Map<Operation, ArmServiceOperations>();
-  for (const service of armServices) {
+  const serviceByOperation = new Map<Operation, Namespace>();
+  for (const service of services) {
+    if (getArmProviderNamespace(program, service.namespace) === undefined) continue;
     for (const { operation } of service.operations) {
-      serviceByOperation.set(operation, service);
+      serviceByOperation.set(operation, service.namespace);
     }
   }
   return serviceByOperation;
-}
-
-export function hasHttpCollectionGet(
-  operation: Operation,
-  collectionPath: string,
-  serviceByOperation: ReadonlyMap<Operation, ArmServiceOperations>,
-): boolean {
-  // Collection GETs authored as actions may be missing from the resolved graph or its lists.
-  // https://github.com/Azure/typespec-azure/issues/5886; see also #5080.
-  return serviceByOperation.get(operation)?.collectionPaths.has(collectionPath) ?? false;
 }
 
 export function getCollectionPath(instancePath: string): string {

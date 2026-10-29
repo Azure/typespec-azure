@@ -12,7 +12,6 @@ import { getResourceBaseType, resolveArmResources, ResourceBaseType } from "../r
 import {
   createArmServiceIndex,
   getCollectionPath,
-  hasHttpCollectionGet,
   isCollectionGet,
   normalizeRoute,
 } from "./nested-resource-missing-list-utils.js";
@@ -29,7 +28,7 @@ export const nestedResourceMissingListRule = createRule({
   create(context) {
     const metadata = createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read });
     const reportedModels = new Set<Model>();
-    const serviceByOperation = createArmServiceIndex(context.program, metadata);
+    const serviceByOperation = createArmServiceIndex(context.program);
 
     return {
       root(program) {
@@ -58,11 +57,10 @@ export const nestedResourceMissingListRule = createRule({
           );
           const hasAllCollectionGets = instanceOperations.every(({ operation }) => {
             const service = serviceByOperation.get(operation);
-            if (service === undefined) return false;
-            if (matchingLists.some((list) => serviceByOperation.get(list.operation) === service)) {
-              return true;
-            }
-            return hasHttpCollectionGet(operation, collectionPath, serviceByOperation);
+            return (
+              service !== undefined &&
+              matchingLists.some((list) => serviceByOperation.get(list.operation) === service)
+            );
           });
           if (hasAllCollectionGets) continue;
 
