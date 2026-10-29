@@ -63,6 +63,23 @@ export type LroStatusMetadataDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Identifies a server-issued long-running operation identifier exposed by a legacy service through
+ * either the status-monitor URI or its response body. This compatibility metadata does not drive
+ * polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+ * with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+ * accessor and storage.
+ *
+ * @param target The operation identifier path parameter on the linked status-monitor operation, or
+ * a string-like property on its response model.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -1181,6 +1198,7 @@ export type ClientOptionDecorator = (
 
 export type AzureClientGeneratorCoreDecorators = {
   lroStatusMetadata: LroStatusMetadataDecorator;
+  lroOperationId: LroOperationIdDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;

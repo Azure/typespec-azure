@@ -1,5 +1,6 @@
 import type { Program } from "@typespec/compiler";
 import { createTCGCContext } from "./context.js";
+import { validateLroDecoratorTargets } from "./decorators.js";
 import { validateClients } from "./validations/clients.js";
 import { validateHttp } from "./validations/http.js";
 import { validateMethods } from "./validations/methods.js";
@@ -10,6 +11,7 @@ export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core", {
     mutateNamespace: false,
   });
+  validateLroDecoratorTargets(tcgcContext);
 
   validatePackage(tcgcContext);
   validateClients(tcgcContext);

@@ -1316,6 +1316,52 @@ Expected calls:
 - GET the status-monitor URI returns a running status with nested `usage`
 - GET the status-monitor URI returns a succeeded status with nested `usage` and the result
 
+### Azure_ClientGenerator_Core_Lro_OperationId_analyze
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/documentModels/{modelId}:analyze`
+
+Declares a legacy Document Intelligence-shaped flow for emitter tests of
+`@lroOperationId` on the status-monitor operation ID path parameter.
+
+The status-monitor body does not model the server-issued result ID. The service returns the
+complete opaque status-monitor URI, including its API-version query, and polling must continue
+with that URI. Emitter-specific client tests can separately expose `analysis-123` as operation
+identity by binding the decorated `resultId` parameter to the returned URI.
+
+Expected calls:
+
+- POST `/documentModels/document-1:analyze` returns 202 with
+  `Operation-Location: {endpoint}/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status
+- GET that exact status-monitor URI returns a succeeded status with the analysis result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_startTranslation
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start`
+
+Declares a status-body operation ID flow where the polling URI does not contain the identifier.
+
+Expected calls:
+
+- POST `/translations:start` returns 202 with
+  `Operation-Location: {endpoint}/translations/status?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status with `id: translation-123`
+- GET that exact status-monitor URI returns a succeeded status with the same ID and result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_startTranslationWithPath
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start-with-path`
+
+Declares a Translation-shaped fallback flow with operation identity in both the
+Operation-Location path and the status-monitor body.
+
+Expected calls:
+
+- POST `/translations:start-with-path` returns 202 with
+  `Operation-Location: {endpoint}/translations/operations/translation-456?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status with `id: translation-456`
+- GET that exact status-monitor URI returns a succeeded status with the same ID and result
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`
