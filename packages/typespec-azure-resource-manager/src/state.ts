@@ -21,6 +21,7 @@ export const ArmStateKeys = {
   providerOperation: azureResourceManagerCreateStateSymbol("providerOperation"),
   resourceOperationResource: azureResourceManagerCreateStateSymbol("resourceOperationResource"),
   resourceOperationList: azureResourceManagerCreateStateSymbol("resourceOperationList"),
+  armResourceNameExpression: azureResourceManagerCreateStateSymbol("armResourceNameExpression"),
 
   // resource.ts
   armResolvedResources: azureResourceManagerCreateStateSymbol("armResolvedResources"),

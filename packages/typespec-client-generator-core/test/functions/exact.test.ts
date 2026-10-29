@@ -4,6 +4,7 @@ import {
   createClientCustomizationInput,
   createSdkContextForTester,
   SimpleBaseTester,
+  SimpleTesterWithService,
 } from "../tester.js";
 
 describe("exact", () => {
@@ -131,6 +132,21 @@ describe("exact", () => {
   });
 
   describe("exact naming on properties", () => {
+    it("preserves exact names when synthesizing a model discriminator from a subtype property", async () => {
+      const { program } = await SimpleTesterWithService.compile(`
+        @discriminator("kind")
+        model PetBase {}
+        model Cat extends PetBase {
+          @clientName(exact("Pet_KIND")) kind: "cat";
+        }
+        op get(): PetBase;
+      `);
+      const context = await createSdkContextForTester(program);
+      const base = context.sdkPackage.models.find((model) => model.name === "PetBase");
+      strictEqual(base?.discriminatorProperty?.name, "Pet_KIND");
+      strictEqual(base?.discriminatorProperty?.isExactName, true);
+    });
+
     it("marks property name as exact", async () => {
       const { program } = await SimpleBaseTester.compile(
         createClientCustomizationInput(

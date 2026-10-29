@@ -47,6 +47,7 @@ import { createDiagnostic } from "./lib.js";
 import { resolveOperationId } from "./public-utils.js";
 
 interface LoadedExample {
+  readonly id?: string;
   readonly relativePath: string;
   readonly data: any;
 }
@@ -258,7 +259,7 @@ export async function handleClientExamples(
         for (const honorRenaming of [true, false]) {
           const operationId = resolveOperationId(exampleMatchingContext, operation, honorRenaming);
           if (unified) {
-            const entries = unified.byOperation.get(deriveOperationKey(operationId));
+            const entries = unified.byOperation.get(deriveOperationKey(operationId).toLowerCase());
             if (entries && method.operation.kind === "http") {
               loaded = diagnostics.pipe(
                 materializeUnifiedExamples(
@@ -312,7 +313,7 @@ function materializeUnifiedExamples(
       data.parameters[apiVersionParameter.serializedName] ??= apiVersion;
     }
     const title = uniqueExampleTitle(data.title, usedTitles);
-    normalized.set(title, { relativePath, data });
+    normalized.set(title, { id: example.id, relativePath, data });
   }
   return diagnostics.wrap(Object.fromEntries(normalized));
 }
@@ -357,7 +358,8 @@ function handleHttpOperationExamples(
       kind: "http",
       name: title,
       doc: title,
-      filePath: example.relativePath,
+      filePath:
+        example.id !== undefined ? `${example.relativePath}#${example.id}` : example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
           operation.bodyParam
