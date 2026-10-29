@@ -6,7 +6,6 @@ export default {
   enable: {
     "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
     "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
-    "@azure-tools/typespec-client-generator-core/use-csharp-scope-for-dynamic-model": true,
     "@azure-tools/typespec-client-generator-core/use-union-hierarchy": true,
     "@azure-tools/typespec-client-generator-core/get-operation-name": false,
     "@azure-tools/typespec-client-generator-core/use-correct-verb": false,

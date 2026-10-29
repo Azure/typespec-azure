@@ -625,7 +625,7 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof DecoratorOp
  * This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
  *
  * @param target The model or namespace to mark as dynamic.
- * @param scope Specifies which emitters receive this metadata. If not set, all emitters may opt in to receive it.
+ * @param scope Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning.
  *
  * @example Mark a model as dynamic
  * ```typespec

@@ -871,9 +871,9 @@ The model or namespace to mark as dynamic.
 
 #### Parameters
 
-| Name  | Type                                                            | Description                                                                                        |
-| ----- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. If not set, all emitters may opt in to receive it. |
+| Name  | Type                                                            | Description                                                                                                                        |
+| ----- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning. |
 
 #### Examples
 

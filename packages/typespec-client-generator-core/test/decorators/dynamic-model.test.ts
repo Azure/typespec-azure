@@ -1,4 +1,4 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, mockFile } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
@@ -7,9 +7,62 @@ const decoratorName = "Azure.ClientGenerator.Core.@dynamicModel";
 const additionalDecorators = ["Azure\\.ClientGenerator\\.Core\\.@dynamicModel"];
 
 describe("@dynamicModel", () => {
+  for (const target of ["model Example {}", "namespace Example {}"]) {
+    for (const scope of [
+      '"csharp"',
+      '#{ scope: "csharp" }',
+      '"python, csharp"',
+      '#{ scope: "python, csharp" }',
+    ]) {
+      it(`accepts ${scope} on ${target}`, async () => {
+        expectDiagnostics(await SimpleTester.diagnose(`@dynamicModel(${scope}) ${target}`), []);
+      });
+    }
+
+    for (const scope of [
+      "",
+      '("")',
+      "(#{})",
+      '("python")',
+      '(#{ scope: "python" })',
+      '("!(csharp)")',
+      '("!(python)")',
+    ]) {
+      it(`reports decorator-requires-scope for @dynamicModel${scope} on ${target}`, async () => {
+        expectDiagnostics(await SimpleTester.diagnose(`@dynamicModel${scope} ${target}`), [
+          {
+            code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+            severity: "warning",
+            message: '@dynamicModel should be applied with a language scope of "csharp".',
+          },
+        ]);
+      });
+    }
+
+    it(`does not report the legacy C# decorator on ${target}`, async () => {
+      const diagnostics = await SimpleTester.files({
+        "csharp.js": mockFile.js({
+          namespace: "TypeSpec.HttpClient.CSharp",
+          $dynamicModel: function $dynamicModel() {},
+        }),
+        "csharp.tsp": `
+          import "./csharp.js";
+          using TypeSpec.Reflection;
+          namespace TypeSpec.HttpClient.CSharp {
+            extern dec dynamicModel(target: Model | Namespace);
+          }
+        `,
+      })
+        .import("./csharp.tsp")
+        .diagnose(`@TypeSpec.HttpClient.CSharp.dynamicModel ${target}`);
+      expectDiagnostics(diagnostics, []);
+    });
+  }
+
   for (const language of ["csharp", "python"]) {
     it(`preserves model metadata for ${language}`, async () => {
       const { program } = await SimpleTesterWithService.compile(`
+        #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "Testing unscoped metadata."
         @dynamicModel
         model Dynamic {
           name: string;
@@ -39,6 +92,7 @@ describe("@dynamicModel", () => {
     it(`preserves namespace metadata for ${language}`, async () => {
       const { program } = await SimpleTester.compile(`
         @service
+        #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "Testing unscoped metadata."
         @dynamicModel
         namespace TestService {
           model Pet {
@@ -64,6 +118,7 @@ describe("@dynamicModel", () => {
   it("does not add metadata to a sibling namespace", async () => {
     const { program } = await SimpleTester.compile(`
       @service
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "Testing unscoped metadata."
       @dynamicModel
       namespace DynamicService {
         model DynamicPet {
@@ -109,6 +164,7 @@ describe("@dynamicModel", () => {
       const { program } = await SimpleTester.compile(`
         ${namespaceDecorator}
         @service
+        #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "Testing unscoped metadata."
         @dynamicModel
         namespace TestService {
           model Pet {
