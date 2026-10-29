@@ -1,41 +1,65 @@
 ---
-import "@docsearch/css";
+import Search from "@astrojs/starlight/components/Search.astro";
 ---
 
-<sl-doc-search>
-  <button type="button" class="DocSearch DocSearch-Button" aria-label="Search">
-    <span class="DocSearch-Button-Container">
-      <svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20">
-        <path
-          d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z"
-          stroke="currentColor"
-          fill="none"
-          fill-rule="evenodd"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path>
-      </svg>
-      <span class="DocSearch-Button-Placeholder">Search...</span>
-    </span>
-    <span class="DocSearch-Button-Keys"></span>
-  </button>
-</sl-doc-search>
+<Search />
 
-<script>
-  import algoliaConfig from "../../../algolia";
+<style is:global>
+  site-search {
+    --__sl-font: var(--fontFamilyBase);
+    --sl-text-2xs: var(--fontSizeBase200);
+    --sl-text-sm: var(--fontSizeBase300);
+    --sl-text-xl: var(--fontSizeBase500);
+    --sl-color-white: var(--colorNeutralForeground1);
+    --sl-color-gray-1: var(--colorNeutralForeground1);
+    --sl-color-gray-2: var(--colorNeutralForeground2);
+    --sl-color-gray-3: var(--colorNeutralForeground3);
+    --sl-color-gray-4: var(--colorNeutralStroke2);
+    --sl-color-gray-5: var(--colorNeutralStroke1);
+    --sl-color-gray-6: var(--colorNeutralBackground2);
+    --sl-color-black: var(--colorNeutralBackground1);
+    --sl-color-text: var(--colorNeutralForeground1);
+    --sl-color-text-accent: var(--colorBrandForeground1);
+    --sl-color-text-invert: var(--colorNeutralForegroundOnBrand);
+    --sl-color-accent: var(--colorBrandStroke1);
+    --sl-color-accent-high: var(--colorBrandStroke1);
+    --sl-color-accent-low: var(--colorNeutralBackground1Hover);
+    --sl-shadow-lg: var(--shadow64);
+  }
 
-  class StarlightDocSearch extends HTMLElement {
-    constructor() {
-      super();
-      window.addEventListener("DOMContentLoaded", async () => {
-        const { default: docsearch } = await import("@docsearch/js/docsearch");
-        const options: Parameters<typeof docsearch>[0] = {
-          ...algoliaConfig,
-          container: "sl-doc-search",
-          keyboardShortcuts: { "/": false },
-        };
-        docsearch(options);
-      });
+  site-search > button {
+    border-radius: var(--borderRadiusMedium);
+  }
+
+  site-search .dialog-frame,
+  site-search button[data-close-modal] {
+    display: flex;
+  }
+
+  site-search > button > span,
+  site-search > button > kbd {
+    display: none;
+  }
+
+  site-search dialog::backdrop {
+    background-color: var(--colorNeutralBackgroundAlpha);
+  }
+
+  @media (min-width: 50rem) {
+    site-search dialog {
+      margin: 4rem auto auto;
+    }
+
+    site-search > button > span {
+      display: block;
+    }
+
+    site-search > button > kbd {
+      display: flex;
+    }
+
+    site-search button[data-close-modal] {
+      display: none;
     }
   }
-  customElements.define("sl-doc-search", StarlightDocSearch);
-</script>
+</style>

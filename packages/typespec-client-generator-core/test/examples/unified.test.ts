@@ -1,0 +1,784 @@
+import { compile, getDirectoryPath, resolveCompilerOptions } from "@typespec/compiler";
+import { expectDiagnostics, resolveVirtualPath } from "@typespec/compiler/testing";
+import { deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, it, vi } from "vitest";
+import type {
+  SdkHttpOperation,
+  SdkMethod,
+  SdkServiceMethod,
+  SdkServiceOperation,
+} from "../../src/interfaces.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
+
+const spec = `
+  @service
+  @versioned(Versions)
+  namespace Test;
+  enum Versions { v1, v2, v3 }
+  model Widget { name: string; }
+  interface Widgets {
+    @post @route("/widgets/{id}")
+    op create(
+      @path id: string,
+      @query("api-version") apiVersion: Versions,
+      @header("x-region") region: string,
+      @body payload: Widget,
+    ): {
+      @statusCode code: 200;
+      @header etag: string;
+      @body body: Widget;
+    };
+  }
+`;
+
+const example = `
+Widgets.create:
+  - title: Create widget
+    request:
+      path:
+        id: example
+      headers:
+        x-region: west
+      body:
+        name: widget-{api-version}
+    responses:
+      200:
+        headers:
+          etag: tag
+        body:
+          name: result-{api-version}
+`;
+
+const simpleSpec = `
+  @service namespace Test;
+  interface Widgets { @get op get(): string; }
+`;
+
+const simpleExample = `
+Widgets.get:
+  - request: {}
+    responses:
+      200:
+        body: result
+`;
+
+function httpMethod(method: SdkMethod<SdkServiceOperation>): SdkServiceMethod<SdkHttpOperation> {
+  strictEqual(method.operation.kind, "http");
+  return method;
+}
+
+describe("unified examples", () => {
+  it("does not load examples when no clients are generated", async () => {
+    const { program } = await SimpleTester.compile("model Unused {}");
+    const context = await createSdkContextForTester(program, { "examples-dir": "./missing" });
+    strictEqual(context.sdkPackage.clients.length, 0);
+    expectDiagnostics(context.diagnostics, []);
+  });
+
+  it("maps resolved request and response values through the existing example pipeline", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      example.replace("- title:", "- id: create-widget\n    title:"),
+    );
+    const { program } = await instance.compile(spec);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const method = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]);
+    const examples = method.operation.examples;
+    ok(examples);
+    strictEqual(examples.length, 1);
+    const loaded = examples[0];
+    ok(!("id" in loaded));
+    strictEqual(loaded.name, "Create widget");
+    strictEqual(loaded.doc, "Create widget");
+    strictEqual(loaded.filePath, "examples.yaml#create-widget");
+    deepStrictEqual(loaded.rawExample, {
+      title: "Create widget",
+      operationId: "Widgets_create",
+      parameters: {
+        "api-version": "v3",
+        id: "example",
+        "x-region": "west",
+        payload: { name: "widget-v3" },
+      },
+      responses: { "200": { headers: { etag: "tag" }, body: { name: "result-v3" } } },
+    });
+    strictEqual(loaded.parameters.length, 4);
+    strictEqual(loaded.parameters.find((p) => p.parameter.kind === "body")?.value.kind, "model");
+    strictEqual(loaded.responses[0].statusCode, 200);
+    strictEqual(loaded.responses[0].headers[0].value.value, "tag");
+    strictEqual(loaded.responses[0].bodyValue?.kind, "model");
+    strictEqual(context.__httpOperationExamples.get(method.operation.__raw), examples);
+  });
+
+  it.each(["examples/Widgets.yaml", "examples/Widgets.yml"])(
+    "loads unversioned examples from %s without inventing an api-version parameter",
+    async (path) => {
+      const instance = await SimpleTester.createInstance();
+      instance.fs.addTypeSpecFile(path, simpleExample);
+      const { program } = await instance.compile(simpleSpec);
+      const context = await createSdkContextForTester(program);
+      expectDiagnostics(context.diagnostics, []);
+      const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+        .examples![0];
+      strictEqual(loaded.filePath, path);
+      ok(!("id" in loaded));
+      strictEqual(loaded.name, "Widgets_get");
+      deepStrictEqual(loaded.rawExample.parameters, {});
+      strictEqual(loaded.responses[0].bodyValue?.value, "result");
+    },
+  );
+
+  it("produces the same typed values as equivalent legacy JSON", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", example);
+    instance.fs.addTypeSpecFile(
+      "examples/v3/create.json",
+      JSON.stringify({
+        title: "Create widget",
+        operationId: "Widgets_create",
+        parameters: {
+          "api-version": "v3",
+          id: "example",
+          "x-region": "west",
+          payload: { name: "widget-v3" },
+        },
+        responses: { "200": { headers: { etag: "tag" }, body: { name: "result-v3" } } },
+      }),
+    );
+    const { program } = await instance.compile(spec);
+    const unified = await createSdkContextForTester(program);
+    const legacy = await createSdkContextForTester(program, { "examples-dir": "./examples" });
+    expectDiagnostics(unified.diagnostics, []);
+    expectDiagnostics(legacy.diagnostics, []);
+    const unifiedExample = httpMethod(unified.sdkPackage.clients[0].children![0].methods[0])
+      .operation.examples![0];
+    const legacyExample = httpMethod(legacy.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples![0];
+    deepStrictEqual(unifiedExample.rawExample, legacyExample.rawExample);
+    deepStrictEqual(
+      unifiedExample.parameters.map((p) => [
+        p.parameter.serializedName,
+        p.value.kind,
+        p.value.value,
+      ]),
+      legacyExample.parameters.map((p) => [
+        p.parameter.serializedName,
+        p.value.kind,
+        p.value.value,
+      ]),
+    );
+    deepStrictEqual(
+      unifiedExample.responses.map((r) => [r.statusCode, r.bodyValue?.value]),
+      legacyExample.responses.map((r) => [r.statusCode, r.bodyValue?.value]),
+    );
+  });
+
+  it("uses the actual API-version wire parameter name", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", example);
+    const { program } = await instance.compile(
+      spec.replace('@query("api-version")', '@query("version")'),
+    );
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples![0];
+    strictEqual(loaded.rawExample.parameters.version, "v3");
+    strictEqual(loaded.rawExample.parameters["api-version"], undefined);
+  });
+
+  it.each([
+    ["v1", "base"],
+    ["v2", "second"],
+    ["latest", "third"],
+    ["all", "third"],
+  ])("selects the correct lineage variant for %s", async (version, expected) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      `
+Widgets.get:
+  - request: {}
+    responses: {200: {body: base}}
+  - since: "v2"
+    request: {}
+    responses: {200: {body: second}}
+  - since: "v3"
+    request: {}
+    responses: {200: {body: third}}
+`,
+    );
+    const { program } = await instance.compile(`
+      @service @versioned(Versions) namespace Test;
+      enum Versions { v1, v2, v3 }
+      interface Widgets { @get op get(): string; }
+    `);
+    const context = await createSdkContextForTester(program, { "api-version": version });
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples![0];
+    strictEqual(loaded.responses[0].bodyValue?.value, expected);
+  });
+
+  it("keeps independent title lineages and omits future examples", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      `
+Widgets.get:
+  - title: First
+    request: {}
+    responses: {200: {body: first}}
+  - title: Second
+    request: {}
+    responses: {200: {body: second}}
+  - title: Future
+    since: "v3"
+    request: {}
+    responses: {200: {body: future}}
+`,
+    );
+    const { program } = await instance.compile(`
+      @service @versioned(Versions) namespace Test;
+      enum Versions { v1, v2, v3 }
+      interface Widgets { @get op get(): string; }
+    `);
+    const context = await createSdkContextForTester(program, { "api-version": "v2" });
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples!;
+    deepStrictEqual(
+      loaded.map((item) => item.name),
+      ["First", "Second"],
+    );
+  });
+
+  it("prefers YAML for a service but preserves an explicit examples-dir override", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample);
+    instance.fs.addTypeSpecFile(
+      "examples/get.json",
+      JSON.stringify({
+        operationId: "Widgets_get",
+        title: "Legacy",
+        responses: { "200": { body: "legacy" } },
+      }),
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const automatic = await createSdkContextForTester(program);
+    strictEqual(
+      httpMethod(automatic.sdkPackage.clients[0].children![0].methods[0]).operation.examples![0]
+        .name,
+      "Widgets_get",
+    );
+    const legacy = await createSdkContextForTester(program, { "examples-dir": "./examples" });
+    expectDiagnostics(legacy.diagnostics, []);
+    strictEqual(
+      httpMethod(legacy.sdkPackage.clients[0].children![0].methods[0]).operation.examples![0].name,
+      "Legacy",
+    );
+  });
+
+  it.each(["Widgets_get", "wIDGETS_gET"])(
+    "falls back to case-insensitive legacy JSON matching for %s",
+    async (operationId) => {
+      const instance = await SimpleTester.createInstance();
+      instance.fs.addTypeSpecFile(
+        "examples/get.json",
+        JSON.stringify({
+          operationId,
+          title: "Legacy",
+          responses: { "200": { body: "legacy" } },
+        }),
+      );
+      const { program } = await instance.compile(simpleSpec);
+      const context = await createSdkContextForTester(program);
+      expectDiagnostics(context.diagnostics, []);
+      const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+        .examples![0];
+      strictEqual(loaded.name, "Legacy");
+      ok(!("id" in loaded));
+      strictEqual(loaded.filePath, "get.json");
+      strictEqual(loaded.responses[0].bodyValue?.value, "legacy");
+    },
+  );
+
+  it.each([
+    ["Custom_Fetch", "Custom.fetch"],
+    ["custom_fetch", "custom.fetch"],
+    ["customFetch", "customFetch"],
+    ["customFetch", "CUSTOMFETCH"],
+    ["CuStOm_FeTcH", "CUSTOM.FETCH"],
+  ])(
+    "honors explicit operationId %s and language-independent client customization",
+    async (operationId, key) => {
+      const instance = await SimpleBaseTester.createInstance();
+      instance.fs.addTypeSpecFile("examples.yaml", simpleExample.replace("Widgets.get", key));
+      const { program } = await instance.compile(`
+      import "@typespec/http";
+      import "@typespec/openapi";
+      import "@azure-tools/typespec-client-generator-core";
+      using Http;
+      using Azure.ClientGenerator.Core;
+      @service namespace Test;
+      interface Widgets {
+        @TypeSpec.OpenAPI.operationId("${operationId}")
+        @clientName("renamed", "python")
+        @get op get(): string;
+      }
+    `);
+      const context = await createSdkContextForTester(program, { emitterName: "python" });
+      expectDiagnostics(context.diagnostics, []);
+      const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+        .examples![0];
+      strictEqual(loaded.rawExample.operationId, operationId);
+      strictEqual(loaded.responses[0].bodyValue?.value, "result");
+    },
+  );
+
+  it.each([
+    ["v1", "base-v1"],
+    ["v2", "updated-v2"],
+    ["latest", "updated-v2"],
+    ["all", "updated-v2"],
+  ])("matches migrated standalone operation keys for %s", async (version, expected) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples/SchemaRegistry.yaml",
+      `
+GetSchemaById:
+  - id: GetSchemaById
+    title: Get Schema by ID
+    request: {}
+    responses: {200: {body: "base-{api-version}"}}
+  - id: GetSchemaById
+    title: Get Schema by ID
+    since: "v2"
+    request: {}
+    responses: {200: {body: "updated-{api-version}"}}
+`,
+    );
+    const { program } = await instance.compile(`
+      @service @versioned(Versions) namespace Test;
+      enum Versions { v1, v2 }
+      @get op getSchemaById(): string;
+    `);
+    const context = await createSdkContextForTester(program, { "api-version": version });
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].methods[0]).operation.examples!;
+    strictEqual(loaded.length, 1);
+    ok(!("id" in loaded[0]));
+    strictEqual(loaded[0].name, "Get Schema by ID");
+    strictEqual(loaded[0].filePath, "examples/SchemaRegistry.yaml#GetSchemaById");
+    strictEqual(loaded[0].rawExample.operationId, "getSchemaById");
+    strictEqual(loaded[0].responses[0].bodyValue?.value, expected);
+  });
+
+  it.each([
+    "interface widgets { @get op get(): string; }",
+    "namespace widgets { @get op get(): string; }",
+    '@clientName("widgets", "autorest") interface Original { @get op get(): string; }',
+    '@clientLocation("widgets", "autorest") @get op get(): string;',
+  ])("matches inferred operation groups case-insensitively: %s", async (declaration) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample);
+    const { program } = await instance.compile(`@service namespace Test; ${declaration}`);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const client = context.sdkPackage.clients[0];
+    const methods = [
+      ...client.methods,
+      ...(client.children ?? []).flatMap((child) => child.methods),
+    ];
+    const loaded = methods.map(httpMethod).flatMap((method) => method.operation.examples ?? []);
+    strictEqual(loaded.length, 1);
+    strictEqual(loaded[0].rawExample.operationId, "widgets_get");
+    strictEqual(loaded[0].responses[0].bodyValue?.value, "result");
+  });
+
+  it("follows customized source operations", async () => {
+    const instance = await SimpleBaseTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample);
+    const { program } = await instance.compile(
+      createClientCustomizationInput(
+        simpleSpec,
+        `@client({name: "CustomClient", service: Test})
+       namespace Customizations { op renamed is Test.Widgets.get; }`,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    strictEqual(
+      httpMethod(context.sdkPackage.clients[0].methods[0]).operation.examples![0].rawExample
+        .operationId,
+      "Widgets_get",
+    );
+  });
+
+  it("isolates the same operation key in multiple services with different target versions", async () => {
+    const instance = await SimpleBaseTester.createInstance();
+    for (const service of ["A", "B"]) {
+      instance.fs.addTypeSpecFile(
+        `${service}/examples.yaml`,
+        `
+$namespace: Test.${service}
+Widgets.get:
+  - request: {}
+    responses: {200: {body: "${service}-base"}}
+  - since: "v2"
+    request: {}
+    responses: {200: {body: "${service}-v2"}}
+`,
+      );
+    }
+    const { program } = await instance.compile(
+      createClientCustomizationInput(
+        `
+      @service @versioned(Versions) namespace Test.A {
+        enum Versions { v1, v2 }
+        interface Widgets { @route("/a") @get op get(): string; }
+      }
+      @service @versioned(Versions) namespace Test.B {
+        enum Versions { v1, v2 }
+        interface Widgets { @route("/b") @get op get(): string; }
+      }
+    `,
+        `
+      @client({name: "Combined", service: [Test.A, Test.B], autoMergeService: true})
+      namespace Combined {}
+    `,
+      ),
+    );
+    const context = await createSdkContextForTester(program, {
+      "api-version": { Test: { A: "v1", B: "v2" } },
+    });
+    const methods = context.sdkPackage.clients[0]
+      .children!.flatMap((client) => client.methods)
+      .map(httpMethod);
+    const byPath = new Map(
+      methods.map((method) => [method.operation.path, method.operation.examples![0]]),
+    );
+    strictEqual(byPath.get("/a")?.responses[0].bodyValue?.value, "A-base");
+    strictEqual(byPath.get("/b")?.responses[0].bodyValue?.value, "B-v2");
+    strictEqual(byPath.get("/a")?.filePath, "A/examples.yaml");
+    strictEqual(byPath.get("/b")?.filePath, "B/examples.yaml");
+  });
+
+  it("keeps combined Compute example paths relative to the shared tspconfig.yaml", async () => {
+    const instance = await SimpleBaseTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "sdk/tspconfig.yaml",
+      `
+options:
+  "@azure-tools/typespec-client-generator-core":
+    api-version:
+      Compute: v1
+      ComputeDisk: v2
+`,
+    );
+    for (const [service, group] of [
+      ["Compute", "VirtualMachines"],
+      ["ComputeDisk", "Disks"],
+    ]) {
+      instance.fs.addTypeSpecFile(
+        `sdk/${service}/main.tsp`,
+        `
+import "@typespec/http";
+import "@typespec/versioning";
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+@service @versioned(Versions) namespace ${service};
+enum Versions { v1, v2 }
+interface ${group} { @route("/${service}") @get op get(): string; }
+`,
+      );
+      instance.fs.addTypeSpecFile(
+        `sdk/${service}/examples/${group}.yaml`,
+        `
+$namespace: ${service}
+${group}.get:
+  - id: widgetExamples/GetWidget
+    request: {}
+    responses: {200: {body: "${service}-{api-version}"}}
+`,
+      );
+    }
+    instance.fs.addTypeSpecFile(
+      "sdk/client.tsp",
+      `
+import "@azure-tools/typespec-client-generator-core";
+import "./Compute/main.tsp";
+import "./ComputeDisk/main.tsp";
+using Azure.ClientGenerator.Core;
+@client({name: "Combined", service: [Compute, ComputeDisk], autoMergeService: true})
+namespace Combined {}
+`,
+    );
+    const entrypoint = resolveVirtualPath("sdk/client.tsp");
+    const [compilerOptions, diagnostics] = await resolveCompilerOptions(instance.fs.compilerHost, {
+      cwd: getDirectoryPath(entrypoint),
+      entrypoint,
+    });
+    expectDiagnostics(diagnostics, []);
+    const host = {
+      ...instance.fs.compilerHost,
+      // Direct compilation does not register the test-only standard library.
+      getLibDirs: () =>
+        instance.fs.compilerHost.getLibDirs().filter((path) => !path.endsWith("/test-lib")),
+    };
+    const program = await compile(host, entrypoint, compilerOptions);
+    expectDiagnostics(program.diagnostics, []);
+    const context = await createSdkContextForTester(
+      program,
+      compilerOptions.options?.["@azure-tools/typespec-client-generator-core"],
+    );
+    expectDiagnostics(context.diagnostics, []);
+    const methods = context.sdkPackage.clients[0]
+      .children!.flatMap((client) => client.methods)
+      .map(httpMethod);
+    const byPath = new Map(
+      methods.map((method) => [method.operation.path, method.operation.examples![0]]),
+    );
+    strictEqual(
+      byPath.get("/Compute")?.filePath,
+      "Compute/examples/VirtualMachines.yaml#widgetExamples/GetWidget",
+    );
+    strictEqual(
+      byPath.get("/ComputeDisk")?.filePath,
+      "ComputeDisk/examples/Disks.yaml#widgetExamples/GetWidget",
+    );
+    strictEqual(byPath.get("/Compute")?.responses[0].bodyValue?.value, "Compute-v1");
+    strictEqual(byPath.get("/ComputeDisk")?.responses[0].bodyValue?.value, "ComputeDisk-v2");
+  });
+
+  it("loads unified and legacy examples independently for different services", async () => {
+    const instance = await SimpleBaseTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "A/examples.yaml",
+      `
+$namespace: Test.A
+Widgets.get:
+  - request: {}
+    responses: {200: {body: "A-base"}}
+  - since: "v2"
+    request: {}
+    responses: {200: {body: "A-v2"}}
+`,
+    );
+    instance.fs.addTypeSpecFile(
+      "B/examples/v2/get.json",
+      JSON.stringify({
+        operationId: "Widgets_get",
+        title: "B-v2",
+        responses: { "200": { body: "B-v2" } },
+      }),
+    );
+    const { program } = await instance.compile(
+      createClientCustomizationInput(
+        `
+      @service @versioned(Versions) namespace Test.A {
+        enum Versions { v1, v2 }
+        @clientName("AWidgets", "python")
+        interface Widgets { @route("/a") @get op get(): string; }
+      }
+      @service @versioned(Versions) namespace Test.B {
+        enum Versions { v1, v2 }
+        @clientName("BWidgets", "python")
+        interface Widgets { @route("/b") @get op get(): string; }
+      }
+    `,
+        `
+      @client({name: "Combined", service: [Test.A, Test.B], autoMergeService: true})
+      namespace Combined {}
+    `,
+      ),
+    );
+    const context = await createSdkContextForTester(program, {
+      "api-version": { Test: { A: "v1", B: "v2" } },
+    });
+    expectDiagnostics(context.diagnostics, []);
+    const methods = context.sdkPackage.clients[0]
+      .children!.flatMap((client) => client.methods)
+      .map(httpMethod);
+    const byPath = new Map(
+      methods.map((method) => [method.operation.path, method.operation.examples![0]]),
+    );
+    strictEqual(byPath.get("/a")?.name, "Widgets_get");
+    strictEqual(byPath.get("/a")?.responses[0].bodyValue?.value, "A-base");
+    strictEqual(byPath.get("/a")?.filePath, "A/examples.yaml");
+    strictEqual(byPath.get("/b")?.name, "B-v2");
+    strictEqual(byPath.get("/b")?.responses[0].bodyValue?.value, "B-v2");
+    strictEqual(byPath.get("/b")?.filePath, "v2/get.json");
+  });
+
+  it.each(["Widgets.get", "Renamed.fetch"])(
+    "matches %s across language-specific client names and locations",
+    async (key) => {
+      const instance = await SimpleTester.createInstance();
+      instance.fs.addTypeSpecFile("examples.yaml", simpleExample.replace("Widgets.get", key));
+      const { program } = await instance.compile(`
+      @service namespace Test;
+      @clientName("Renamed")
+      interface Widgets {
+        @clientName("fetch")
+        @clientLocation("PythonWidgets", "python")
+        @get op get(): string;
+      }
+    `);
+      const context = await createSdkContextForTester(program, { emitterName: "python" });
+      expectDiagnostics(context.diagnostics, []);
+      const loaded = context.sdkPackage.clients[0]
+        .children!.flatMap((client) => client.methods)
+        .map(httpMethod)
+        .flatMap((method) => method.operation.examples ?? []);
+      strictEqual(loaded.length, 1);
+      strictEqual(loaded[0].responses[0].bodyValue?.value, "result");
+    },
+  );
+
+  it("preserves a migrated legacy filename as the default title", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      simpleExample.replace("- request:", "- legacyFilename: GetWidgetExample.json\n    request:"),
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples![0];
+    strictEqual(loaded.name, "GetWidgetExample");
+    strictEqual(loaded.filePath, "examples.yaml");
+  });
+
+  it("preserves title collisions after legacy normalization like AutoRest", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      `${simpleExample}
+  - title: Widgets_get
+    request: {}
+    responses: {200: {body: other}}
+`,
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples!;
+    deepStrictEqual(
+      loaded.map((item) => item.name),
+      ["Widgets_get", "Widgets_get_2"],
+    );
+    deepStrictEqual(
+      loaded.map((item) => item.rawExample.title),
+      ["Widgets_get", "Widgets_get"],
+    );
+  });
+
+  it.each([
+    [simpleSpec, "widgets.get"],
+    [simpleSpec, "WIDGETS.GET"],
+    ["@service namespace Test; @get op getSchemaById(): string;", "getSchemaById"],
+    ["@service namespace Test; @get op getSchemaById(): string;", "GETSCHEMABYID"],
+  ])("matches unified operation key %s / %s case-insensitively", async (input, key) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample.replace("Widgets.get", key));
+    const { program } = await instance.compile(input);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const client = context.sdkPackage.clients[0];
+    const method = client.methods[0] ?? client.children![0].methods[0];
+    const loaded = httpMethod(method).operation.examples!;
+    strictEqual(loaded.length, 1);
+    strictEqual(loaded[0].responses[0].bodyValue?.value, "result");
+  });
+
+  it("rejects operations split across files using shared placement validation", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample);
+    instance.fs.addTypeSpecFile("examples/Widgets.yaml", simpleExample);
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    ok(
+      context.diagnostics.some(
+        (diagnostic) =>
+          diagnostic.code === "@azure-tools/typespec-client-generator-core/example-loading",
+      ),
+    );
+    strictEqual(
+      httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation.examples,
+      undefined,
+    );
+  });
+
+  it.each([
+    ["invalid YAML", "Widgets.get: ["],
+    ["invalid structure", "Widgets.get: [{request: false, responses: {}}]"],
+    ["unknown version", simpleExample.replace("- request:", '- since: "v4"\n    request:')],
+    ["wrong namespace", `$namespace: Other\n${simpleExample}`],
+    ["unversioned placeholder", simpleExample.replace("body: result", 'body: "{api-version}"')],
+  ])("reports %s without falling back to legacy files", async (_, yaml) => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", yaml);
+    instance.fs.addTypeSpecFile(
+      "examples/get.json",
+      JSON.stringify({
+        operationId: "Widgets_get",
+        title: "Legacy",
+        responses: {},
+      }),
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    ok(
+      context.diagnostics.some(
+        (diagnostic) =>
+          diagnostic.code === "@azure-tools/typespec-client-generator-core/example-loading",
+      ),
+    );
+    strictEqual(
+      httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation.examples,
+      undefined,
+    );
+  });
+
+  it("retains typed-value diagnostics after shared resolution", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      simpleExample.replace("body: result", "body: 123"),
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+    });
+  });
+
+  it("reports unreadable YAML instead of failing SDK generation", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile("examples.yaml", simpleExample);
+    const { program } = await instance.compile(simpleSpec);
+    const readFile = program.host.readFile.bind(program.host);
+    const mock = vi.spyOn(program.host, "readFile").mockImplementation((path) => {
+      if (path.endsWith("/examples.yaml")) {
+        return Promise.reject(new Error("Cannot read examples"));
+      }
+      return readFile(path);
+    });
+    const context = await createSdkContextForTester(program);
+    mock.mockRestore();
+    expectDiagnostics(context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/example-loading",
+      message: /Cannot read examples/,
+    });
+  });
+});

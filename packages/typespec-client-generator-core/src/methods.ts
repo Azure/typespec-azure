@@ -401,6 +401,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   client: SdkClientType<TServiceOperation>,
 ): [SdkLroServiceMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  // TCGC selects the client result; Core remains responsible for protocol steps.
   const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return diagnostics.wrap(undefined);
@@ -648,6 +649,7 @@ function getSdkMethodResponse(
         access: "public",
         usage: UsageFlags.Output,
         variantTypes: allResponseBodies,
+        variants: new Map(allResponseBodies.map((type) => [Symbol("variant"), type])),
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
         isExactName: false,

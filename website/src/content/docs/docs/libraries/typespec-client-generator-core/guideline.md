@@ -62,6 +62,8 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 TCGC provides flags to control the client type graph style, such as enabling or disabling convenience and protocol APIs for Java and C# emitters. Other emitters should not set `generate-convenience-methods` or `generate-protocol-methods`; TCGC reports an `unnecessary-emitter-option` warning when either option is explicitly set for another language. See the [documentation](../reference/emitter/#emitter-options) for details.
 
+By default, `createSdkContext` converts eligible inline-discriminated unions to the existing polymorphic model representation. Emitters that use native discriminated unions, such as Rust, can opt out with `{ convertDiscriminatedUnionsToModels: false }` in the third argument to `createSdkContext`.
+
 ## TCGC Raw Types and Helpers
 
 In order to introduce the client concept, TCGC introduces some new raw types and helper functions.
@@ -230,6 +232,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Enumeration Types:**
 
 - [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- For a union converted to an enum, an explicit scalar `extends` constraint determines `SdkEnumType.valueType` and the value type of its known variants, taking precedence over scalar variants and literal-based inference. For example, `union Priority extends int64 { low: 1, high: 2 }` has an `int64` value type rather than an inferred `int32`. The constraint does not make the enum extensible: `isFixed` remains `true` unless the union includes an open scalar variant, directly or through a nested union.
 
 **Literal Types:**
 
@@ -238,6 +241,39 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Union Types:**
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
+
+#### Inline-discriminated union conversion
+
+An inline-discriminated union handled by the SDK context is converted when it uses `@discriminated(#{ envelope: "none" })`, explicitly extends a named model, and every alternative is a named variant whose model nominally inherits from that base, directly or transitively. Unhandled unions do not reshape otherwise-used models.
+
+```tsp
+model PetBase {
+  name: string;
+}
+model Cat extends PetBase {
+  meows: boolean;
+}
+model Dog extends PetBase {
+  barks: boolean;
+}
+
+@discriminated(#{ envelope: "none" })
+union Pet extends PetBase {
+  cat: Cat,
+  dog: Dog,
+}
+
+@post op echo(@body pet: Pet): Pet;
+```
+
+References to `Pet` resolve to the existing `PetBase` SDK model, including operation parameters/responses, model properties, containers, and nullable uses. The base's `discriminatorProperty` and `discriminatedSubtypes`, plus each variant's `discriminatorValue` and discriminator property, describe the inline tags. Missing discriminator properties are synthesized; the compiler type graph is not changed. The projected model retains the base model's name and identity rather than introducing a model named after the union.
+
+Ordinary unions, object-envelope unions, structural-only variants, unions without a model constraint, and unions containing defaults or the base model itself as an alternative are not converted. Alternate types and legacy hierarchy rebasing retain their existing handling. Eligible unions always resolve to their base SDK model. Conflicting discriminator metadata produces a `union-model-conversion-conflict` error rather than overwriting an existing hierarchy or falling back to a union representation.
+
+Compatible unions sharing the same base share its SDK model and combined subtype map; the polymorphic representation does not enforce each union's subset separately. Synthesized inline discriminator properties also appear on directly used SDK variants. Disable conversion when an emitter needs union-specific serialization or exact alternative-set information.
+
+Do not combine `@discriminated` unions with `@discriminator` on their variant models or ancestors. Conversion reports `union-model-discriminator-conflict` for such hierarchies, including when both decorators use the same property name. Use one discriminator mechanism, or disable union conversion.
 
 **Model Types:**
 
@@ -327,7 +363,17 @@ The method's return type is determined by the underlying operation's normal resp
 
 The paging method's return type is an array type of the page items type. It is inferred from `@pageItems` or `@items` decorator.
 
-The LRO method's return type is the final response type. It is inferred from `LroMetadata`.
+The LRO method's return type is `lroMetadata.finalResponse.result`, or absent when there is no final response. For native LROs, TCGC selects this client result from Azure.Core's `getLroProtocolMetadata` facts, then translates the selected types into the SDK type graph. The same TCGC selection supplies native LRO model usage, access, and naming.
+
+`LroProtocolMetadata` keeps `operation` at the top level and groups facts into required `initial`, `polling`, and `completion` objects. `initial` contains `initialResponse`, `resourceOperation?`, and `isAction`; `polling` contains `statusMonitorStep?`, `pollingInfo`, and `statusMonitorResult?`; `completion` contains `finalStateVia`, `finalStep?`, and `originalUriHasGetOperation?`. This grouping preserves every leaf's type and semantics; the combined `LroMetadata` and raw compatibility projections remain flat.
+
+Azure.Core remains responsible for polling links, parameter bindings, terminal states, `finalStateVia`, and required final HTTP requests. Client-result selection must not replace or discard a `finalOperationLink` or `finalOperationReference`. The `finalStep` union also retains success-property and no-result variants.
+
+`lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
+
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
+
+The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
 ### HTTP Operation Parameters Handling
 

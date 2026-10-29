@@ -22,6 +22,12 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 - Use `pnpm -r --filter "<pkgName>..." build` to build to a specific package `<pkgName>`
 - Use `pnpm format` to format all files
 
+## Tests
+
+- Add tests only for meaningful observable behavior, realistic regressions, or important edge cases. Before adding a test, identify the behavioral failure it would catch and check whether existing coverage already catches it.
+- Do not add tests that merely assert source content or implementation details, duplicate existing coverage, or check things already caught by the build or type checker.
+- For mechanical changes such as updating an import path without changing runtime behavior, validate with the relevant build or type check instead of adding tests. If a change needs no additional behavioral coverage, do not add tests.
+
 ## Commit Rules
 
 - Always run `pnpm format && pnpm lint` before committing.
