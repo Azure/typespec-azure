@@ -38,7 +38,8 @@ export const nestedResourceMissingListRule = createRule({
             continue;
           }
 
-          // Synthetic parents have no lifecycle operations; do not report them as authored resources.
+          // Skip resources with no eligible instance operations, including inferred ancestors.
+          // Their children are still checked independently.
           const instanceOperations = Object.values(resource.operations.lifecycle)
             .flatMap((operations) => operations ?? [])
             .filter(
