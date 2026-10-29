@@ -133,6 +133,66 @@ it("reports each missing nested resource independently on a shared interface", a
     ]);
 });
 
+it("does not report a synthesized intermediate resource without its own operations", async () => {
+  await tester
+    .expect(
+      `${service}
+      @parentResource(Part)
+      model Component is ProxyResource<{}> { ...ResourceNameParameter<Component>; }
+      @armResourceOperations interface Components {
+        get is ArmResourceRead<Component>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic("Component"));
+});
+
+it("does not let a list in another service satisfy a nested resource", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace("Microsoft.Contoso") @service namespace First {
+        model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+        @parentResource(Widget)
+        model Part is ProxyResource<{}> { ...ResourceNameParameter<Part>; }
+        @armResourceOperations interface Parts {
+          get is ArmResourceRead<Part>;
+        }
+      }
+      @armProviderNamespace("Microsoft.Contoso") @service namespace Second {
+        @armResourceOperations interface Parts {
+          list is ArmResourceListByParent<First.Part>;
+        }
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic());
+});
+
+it("checks REST-only instance routes even when the model also has resolved ARM operations", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface Parts {
+        get is ArmResourceRead<Part>;
+        list is ArmResourceListByParent<Part>;
+      }
+      interface OtherParts {
+        @get
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/alternateParts/{partName}")
+        @readsResource(Part)
+        get(
+          @path subscriptionId: string,
+          @path resourceGroupName: string,
+          @path widgetName: string,
+          @path partName: string
+        ): ArmResponse<Part>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic());
+});
+
 it("checks a read-only singleton child", async () => {
   await tester
     .expect(

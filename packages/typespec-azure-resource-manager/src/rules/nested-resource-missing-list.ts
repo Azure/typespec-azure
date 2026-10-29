@@ -4,6 +4,7 @@ import {
   isArrayModelType,
   paramMessage,
   type Model,
+  type Operation,
   type Program,
 } from "@typespec/compiler";
 import {
@@ -16,7 +17,7 @@ import {
 import { getActionDetails, getParentResource, getResourceOperation } from "@typespec/rest";
 import { getArmProviderNamespace } from "../namespace.js";
 import { getArmOperationList } from "../operations.js";
-import { getResourceBaseType, ResourceBaseType } from "../resource.js";
+import { getResourceBaseType, resolveArmResources, ResourceBaseType } from "../resource.js";
 import { walkJsonProperties } from "./model-utils.js";
 
 interface ArmServiceOperations {
@@ -35,6 +36,8 @@ export const nestedResourceMissingListRule = createRule({
   },
   create(context) {
     const metadata = createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read });
+    const checkedOperations = new Set<Operation>();
+    const reportedModels = new Set<Model>();
     const [services] = getAllHttpServices(context.program);
     const armServices = services
       // REST metadata also exists in non-ARM services. Do not apply ARM list requirements there.
@@ -49,24 +52,62 @@ export const nestedResourceMissingListRule = createRule({
             .map((op) => normalizeRoute(op.path)),
         ),
       }));
+    const serviceByOperation = new Map<Operation, ArmServiceOperations>();
+    for (const service of armServices) {
+      for (const { operation } of service.operations) {
+        serviceByOperation.set(operation, service);
+      }
+    }
 
     return {
-      model(model) {
-        if (!getParentResource(context.program, model)) return;
-        const baseType = getResourceBaseType(context.program, model);
-        if (
-          baseType !== ResourceBaseType.ResourceGroup &&
-          baseType !== ResourceBaseType.Subscription &&
-          baseType !== ResourceBaseType.Location
-        ) {
-          return;
+      root(program) {
+        const { resources = [] } = resolveArmResources(program);
+        for (const resource of resources) {
+          if (resource.parent === undefined || !isApplicableResource(program, resource.type)) {
+            continue;
+          }
+
+          // Synthetic parents have no lifecycle operations; do not report them as authored resources.
+          const instanceOperations = Object.values(resource.operations.lifecycle)
+            .flatMap((operations) => operations ?? [])
+            .filter(
+              (op) =>
+                serviceByOperation.has(op.operation) &&
+                getActionDetails(program, op.operation) === undefined,
+            );
+          const firstOperation = instanceOperations[0];
+          if (firstOperation === undefined) continue;
+          for (const { operation } of instanceOperations) checkedOperations.add(operation);
+
+          const collectionPath = getCollectionPath(resource.resourceInstancePath);
+          const matchingLists = resource.operations.lists.filter(
+            (list) =>
+              normalizeRoute(list.path) === collectionPath &&
+              isCollectionGet(list.httpOperation, metadata, program),
+          );
+          const hasAllCollectionGets = instanceOperations.every(({ operation }) => {
+            const service = serviceByOperation.get(operation);
+            if (service === undefined) return false;
+            if (matchingLists.some((list) => serviceByOperation.get(list.operation) === service)) {
+              return true;
+            }
+            // A collection GET authored as an action is not included in the resolver's lists.
+            return service.collectionPaths.has(collectionPath);
+          });
+          if (hasAllCollectionGets) continue;
+
+          reportMissingList(resource.type, firstOperation.operation);
         }
+      },
+      model(model) {
+        // Check operations omitted by the resolver, including on otherwise resolved models.
+        if (!isApplicableResource(context.program, model)) return;
 
         const instanceOperations = getResourceInstanceOperations(
           context.program,
           model,
           armServices,
-        );
+        ).filter(({ httpOperation }) => !checkedOperations.has(httpOperation.operation));
         if (instanceOperations.length === 0) return;
 
         // Check lists within the same service; another service's matching route cannot satisfy this one.
@@ -76,14 +117,30 @@ export const nestedResourceMissingListRule = createRule({
         );
         if (hasAllCollectionGets) return;
 
-        context.reportDiagnostic({
-          target: instanceOperations[0].httpOperation.operation.interface ?? model,
-          format: { name: model.name },
-        });
+        reportMissingList(model, instanceOperations[0].httpOperation.operation);
       },
     };
+
+    function reportMissingList(model: Model, operation: Operation) {
+      if (reportedModels.has(model)) return;
+      reportedModels.add(model);
+      context.reportDiagnostic({
+        target: operation.interface ?? model,
+        format: { name: model.name },
+      });
+    }
   },
 });
+
+function isApplicableResource(program: Program, model: Model): boolean {
+  if (!getParentResource(program, model)) return false;
+  const baseType = getResourceBaseType(program, model);
+  return (
+    baseType === ResourceBaseType.ResourceGroup ||
+    baseType === ResourceBaseType.Subscription ||
+    baseType === ResourceBaseType.Location
+  );
+}
 
 function getResourceInstanceOperations(
   program: Program,
