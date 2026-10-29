@@ -75,5 +75,4 @@ It preserves their case-insensitive full-path predicates: a canonical
 occurrence satisfies that member even if another occurrence of the same
 segment differs. This is not a complete ARM path validator.
 
-The native rule reports per concrete operation. Swagger selector multiplicity
-and real-spec diagnostic correspondence require separate migration evidence.
+The native rule reports per concrete operation.
