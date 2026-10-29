@@ -118,6 +118,13 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("keeps nested resource list guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/nested-resource-missing-list";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
+
   it("keeps redundant summary guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
