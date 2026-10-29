@@ -517,7 +517,10 @@ export interface SdkEnumValueType<
   name: string;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
+  /** Original enum member value, or its TypeSpec name when no value is specified. */
   value: string | number;
+  /** Protocol-specific encoded names. Unset protocols use `value`. */
+  serializationOptions?: SerializationOptions;
   enumType: SdkEnumType;
   valueType: TValueType;
   /** Unique ID for the current type. */
