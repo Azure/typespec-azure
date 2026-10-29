@@ -15,6 +15,7 @@ export { generateMetadataFile } from "./metadata.js";
 export { generateModels } from "./models.js";
 export { generateOperations } from "./operations.js";
 export { generateOptions } from "./options.js";
+export { generatePathExpansionHelpers } from "./path-expansion.js";
 export { generatePolymorphicHelpers } from "./polymorphics.js";
 export { generateResponses } from "./responses.js";
 export { generateUnions } from "./unions.js";

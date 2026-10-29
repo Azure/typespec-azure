@@ -65,3 +65,63 @@ enum IntEnum {
 @get
 @route("/int-enum-path/{value}")
 op intEnumPath(@path value: IntEnum): void;
+
+@route("/uri/simple/{value}")
+op simpleArray(value: string[]): void;
+@route("/uri/simple-map/{value}")
+op simpleMap(value: Record<int32>): void;
+@route("/uri/simple-explode/{value*}")
+op simpleExplodedMap(value: Record<int32>): void;
+@route("/uri/path{/value}")
+op pathArray(value: string[]): void;
+@route("/uri/path-explode{/value*}/end")
+op pathExplodedArray(value: string[]): void;
+@route("/uri/path-map{/value*}")
+op pathExplodedMap(value: Record<int32>): void;
+@route("/uri/label{.value}")
+op labelArray(value: string[]): void;
+@route("/uri/label-explode{.value*}")
+op labelExplodedArray(value: string[]): void;
+@route("/uri/label-map{.value*}")
+op labelExplodedMap(value: Record<int32>): void;
+@route("/uri/matrix{;value}")
+op matrixArray(value: string[]): void;
+@route("/uri/matrix-explode{;value*}")
+op matrixExplodedArray(value: string[]): void;
+@route("/uri/matrix-map{;value}")
+op matrixMap(value: Record<int32>): void;
+@route("/uri/matrix-map-explode{;value*}")
+op matrixExplodedMap(value: Record<int32>): void;
+@route("/uri/label-scalar{.value}")
+op labelScalar(value: string): void;
+@route("/uri/matrix-scalar{;value}")
+op matrixScalar(value: int32): void;
+@route("/uri/path-scalar{/value}")
+op pathScalar(value: string): void;
+@route("/uri/typed-array{/value*}")
+op typedArray(value: int32[]): void;
+@route("/uri/time-array{/value*}")
+op timeArray(value: utcDateTime[]): void;
+@route("/uri/enum-array{/value*}")
+op enumArray(value: IntEnum[]): void;
+@route("/uri/bool-map{;value*}")
+op boolMap(value: Record<boolean>): void;
+@route("/uri/query-map{?value}")
+op queryMap(value: Record<int32>): void;
+@route("/uri/query-map-explode?fixed=true{&value*}")
+op queryExplodedMap(value: Record<int32>): void;
+@route("/uri/optional-query-map{?value}")
+op optionalQueryMap(value?: Record<int32>): void;
+
+model QueryFields {
+  field: string;
+  count?: int32;
+  values?: string[];
+  enabled?: boolean;
+}
+@route("/uri/query-object{?value}")
+op queryObject(value: QueryFields): void;
+@route("/uri/query-object-explode{?value*}")
+op queryExplodedObject(value: QueryFields): void;
+@route("/uri/optional-query-object{?value}")
+op optionalQueryObject(value?: QueryFields): void;

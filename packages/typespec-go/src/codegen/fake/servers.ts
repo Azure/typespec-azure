@@ -8,7 +8,9 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "../core/errors.js";
 import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
+import { getPathExpansionStyle } from "../core/path-expansion.js";
 import { generateServerInternal, RequiredHelpers } from "./internal.js";
+import { parseURITemplateParameter } from "./uri-template.js";
 
 // contains the generated content for all servers and the required helpers
 export class ServerContent {
@@ -1139,7 +1141,7 @@ function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathP
   // "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}"
   // each path param will replaced with a regex capture.
   // note that some path params are optional.
-  let urlPath = method.httpPath;
+  let urlPath = method.httpPath.split("?")[0];
   // escape any characters in the path that could be interpreted as regex tokens
   // per RFC3986, these are the pchars that also double as regex tokens
   // . $ * + ()
@@ -1153,14 +1155,21 @@ function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathP
     // inserted unescaped and can span multiple path segments, so their
     // captures must also admit '/'.
     // NOTE: Use "$$" because "$&" and "$'" are special replacement patterns.
-    const pathDelimiter = param.isEncoded ? "" : "/";
+    const pathDelimiter = !param.isEncoded || param.pathStyle === "path" ? "/" : "";
     let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]+)`;
+    if (param.pathStyle === "path") {
+      replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>/${param.isEncoded && (param.kind === "pathScalarParam" || !param.explode) ? "[^/]*" : ".*?"})`;
+    } else if (param.pathStyle !== "simple") {
+      const { prefix } = getPathExpansionStyle(param);
+      const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>${escapedPrefix}[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]*)`;
+    }
     if (param.style === "optional" || param.style === "flag") {
       replaceWith += "?";
     }
     urlPath = urlPath.replace(toReplace, replaceWith);
   }
-  return urlPath;
+  return urlPath + (pathParams.some((param) => param.pathStyle === "path") ? "$" : "");
 }
 
 interface parseResult {
@@ -1217,6 +1226,30 @@ function parseHeaderPathQueryParams(
   // track the param groups that need to be instantiated/populated.
   // we track the params separately as it might be a subset of ParameterGroup.params
   const paramGroups = new Map<go.ParameterGroup, Array<go.MethodParameter>>();
+  const queryExpansions = new Map<go.QueryExpansion, string>();
+  for (const param of method.parameters) {
+    if (
+      go.isQueryParameter(param) &&
+      param.location === "method" &&
+      !go.isLiteralParameter(param.style) &&
+      param.queryExpansion &&
+      !param.queryExpansion.explode &&
+      !queryExpansions.has(param.queryExpansion)
+    ) {
+      requiredHelpers.uriTemplate = true;
+      const name = `queryExpansion${queryExpansions.size}`;
+      queryExpansions.set(param.queryExpansion, name);
+      const keys = method.parameters
+        .filter(
+          (member) => go.isQueryParameter(member) && member.queryExpansion === param.queryExpansion,
+        )
+        .map((member) =>
+          go.isQueryParameter(member) ? JSON.stringify(member.queryParameter) : "",
+        );
+      content += `${indent.get()}${name}, err := parseURIQueryObject(qp.Get(${JSON.stringify(param.queryExpansion.queryParameter)}), []string{${keys.join(", ")}})\n`;
+      content += `${indent.get()}if err != nil { return nil, err }\n`;
+    }
+  }
 
   for (const param of consolidateHostParams(method.parameters)) {
     if (param.location === "client" || go.isLiteralParameter(param.style)) {
@@ -1255,6 +1288,34 @@ function parseHeaderPathQueryParams(
     // of paramValue will be updated with the var name that
     // contains the unescaped value.
     let paramValue = getRawParamValue(param);
+    let querySource = "qp";
+    if (go.isQueryParameter(param) && param.queryExpansion && !param.queryExpansion.explode) {
+      const source = queryExpansions.get(param.queryExpansion);
+      if (!source) {
+        throw new CodegenError("InternalError", "missing URI query-object expansion");
+      }
+      querySource = source;
+      paramValue = `${querySource}.Get(${JSON.stringify(param.queryParameter)})`;
+    }
+    if (
+      param.kind === "pathCollectionParam" ||
+      param.kind === "pathMapParam" ||
+      param.kind === "queryMapParam" ||
+      (go.isQueryParameter(param) && param.queryExpansion)
+    ) {
+      requiredHelpers.uriTemplate = true;
+      content += parseURITemplateParameter(
+        param,
+        paramValue,
+        createLocalVariableName(param, "Param"),
+        querySource,
+        method,
+        pkg,
+        imports,
+        indent,
+      );
+      continue;
+    }
 
     // optional params are pointer-wrapped; dispatch on the unwrapped type.
     const paramType = go.unwrapPtr(param.type);
@@ -1263,6 +1324,11 @@ function parseHeaderPathQueryParams(
     // non-encoded path params are already in their final form (the client
     // skips url.PathEscape for them), so they're passed through verbatim.
     if (go.isPathParameter(param)) {
+      const { prefix } = getPathExpansionStyle(param);
+      if (prefix) {
+        imports.add("strings");
+        paramValue = `strings.TrimPrefix(${paramValue}, ${JSON.stringify(prefix)})`;
+      }
       let paramVar = createLocalVariableName(param, "Unescaped");
       if (go.isRequiredParameter(param.style) && go.isConstant(param.type, "string")) {
         // for string-based enums, we perform the conversion as part of unescaping
@@ -1304,11 +1370,7 @@ function parseHeaderPathQueryParams(
     }
 
     // parse params as required
-    if (
-      param.kind === "headerCollectionParam" ||
-      param.kind === "pathCollectionParam" ||
-      param.kind === "queryCollectionParam"
-    ) {
+    if (param.kind === "headerCollectionParam" || param.kind === "queryCollectionParam") {
       const elementType = go.unwrapPtr(param.type.itemType);
       // any element type other than string will require some form of conversion/parsing
       if (elementType.kind !== "string") {
@@ -1544,7 +1606,11 @@ function parseHeaderPathQueryParams(
         for (const param of params) {
           // check array before body in case the body is just an array
           if (param.type.kind === "slice") {
-            paramNilCheck.push(`len(${getFinalParamValue(pkg, param, paramValues)}) > 0`);
+            paramNilCheck.push(
+              go.isQueryParameter(param) && param.queryExpansion
+                ? `${getFinalParamValue(pkg, param, paramValues)} != nil`
+                : `len(${getFinalParamValue(pkg, param, paramValues)}) > 0`,
+            );
           } else if (param.kind === "bodyParam") {
             if (param.bodyFormat === "binary") {
               imports.add("io");
@@ -1669,10 +1735,12 @@ function getRawParamValue(param: go.MethodParameter): string {
     case "headerMapParam":
       return "req.Header";
     case "pathCollectionParam":
+    case "pathMapParam":
     case "pathScalarParam":
       // path params are in the matches slice
       return `matches[regex.SubexpIndex("${sanitizeRegexpCaptureGroupName(param.pathSegment)}")]`;
     case "queryCollectionParam":
+    case "queryMapParam":
     case "queryScalarParam":
       // use qp
       if (param.kind === "queryCollectionParam" && param.collectionFormat === "multi") {
@@ -1682,7 +1750,7 @@ function getRawParamValue(param: go.MethodParameter): string {
     case "uriParam":
       return "req.URL.Host";
     default:
-      throw new CodegenError("InternalError", `unhandled parameter ${param.name}`);
+      throw new CodegenError("InternalError", `unhandled parameter kind ${param.kind}`);
   }
 }
 
@@ -1720,11 +1788,7 @@ function getFinalParamValue(
     return `time.Time(${paramValue})`;
   } else if (go.isRequiredParameter(param.style)) {
     // optional params are always in their "final" form
-    if (
-      param.kind === "headerCollectionParam" ||
-      param.kind === "pathCollectionParam" ||
-      param.kind === "queryCollectionParam"
-    ) {
+    if (param.kind === "headerCollectionParam" || param.kind === "queryCollectionParam") {
       // for required params that are collections of strings, we split them inline.
       // not necessary for optional params as they're already in slice format.
       if (param.collectionFormat !== "multi" && param.type.itemType.kind === "string") {

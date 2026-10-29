@@ -31,6 +31,7 @@ specs:
   "payload/multipart": { options: { module: multipartgroup } }
   "payload/pageable": { options: { module: pageablegroup } }
   "payload/xml": { options: { module: xmlgroup, slice-elements-byval: true } }
+  "routes": { options: { module: routesgroup } }
   "serialization/encoded-name/json": { options: { module: jsongroup } }
   "server/endpoint/not-defined": { options: { module: noendpointgroup } }
   "server/path/multiple": { options: { module: multiplegroup } }
@@ -68,8 +69,6 @@ specs:
   # --- Not generated yet (tracked skips) ---
   # TODO: https://github.com/Azure/typespec-azure/issues/4946
   "response/status-code-range": false
-  # TODO: https://github.com/Azure/typespec-azure/issues/4928
-  routes: false
   # TODO: https://github.com/Azure/typespec-azure/issues/5226
   "server/versions/versioned": false
   # TODO: https://github.com/Azure/typespec-azure/issues/4957

@@ -157,15 +157,16 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   } else if (go.isMap(type, "time")) {
-    const timeType = type.itemType.ptrType;
+    const timeType = go.unwrapPtr(type.itemType);
+    const elementPtr = type.itemType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
+    unmarshallerText += `${indent.get()}aux := map[string]${elementPtr}datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
-    unmarshallerText += `${indent.get()}cp := map[string]*time.Time{}\n`;
+    unmarshallerText += `${indent.get()}cp := map[string]${elementPtr}time.Time{}\n`;
     unmarshallerText += `${indent.get()}for k, v := range aux {\n`;
-    unmarshallerText += `${indent.push().get()}cp[k] = (*time.Time)(v)\n`;
+    unmarshallerText += `${indent.push().get()}cp[k] = (${elementPtr}time.Time)(v)\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
