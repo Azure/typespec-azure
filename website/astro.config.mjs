@@ -63,6 +63,12 @@ export default defineConfig({
         { icon: "github", label: "GitHub", href: "https://github.com/Azure/typespec-azure" },
       ],
       customCss: ["./src/css/custom.css"],
+      pagefind: {
+        ranking: {
+          // Avoid favoring short generated API pages over guides and decorator references.
+          pageLength: 0,
+        },
+      },
       components: {
         Header: "./src/components/header/header.astro",
       },

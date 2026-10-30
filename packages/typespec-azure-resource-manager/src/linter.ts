@@ -31,6 +31,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
@@ -38,11 +39,14 @@ import { noQueryInPostRule } from "./rules/no-query-in-post.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
+import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
@@ -51,6 +55,10 @@ import { useInterfaceRule } from "./rules/use-interface.js";
 import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
+import { useScopeForExtensionRoutingRule } from "./rules/use-scope-for-extension-routing.js";
+import { useStandardErrorRule } from "./rules/use-standard-error.js";
+import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -59,12 +67,14 @@ const rules = [
   useRelationshipRequiredPropertiesRule,
   armNoRecordRule,
   armNoPathCasingConflictsRule,
+  scopePathSegmentCasingRule,
   noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,
+  useStandardErrorRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
@@ -99,16 +109,32 @@ const rules = [
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   resourceNameRule,
+  resourceMissingReadRule,
   retryAfterRule,
   unsupportedTypeRule,
   useModelRequestBodyRule,
+  useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
+  noEmptyPostResponseRule,
   noReservedResourcePropertyRule,
+  noTagsOnProxyResourceRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
+  useResourcePathForPutRule,
+  useScopeForExtensionRoutingRule,
 ];
 
 export const $linter = defineLinter({
   rules,
+  ruleSets: {
+    all: {
+      enable: Object.fromEntries(
+        rules.map((rule) => [
+          `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+          rule !== useScopeForExtensionRoutingRule,
+        ]),
+      ),
+    },
+  },
 });

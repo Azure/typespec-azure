@@ -71,6 +71,7 @@ export function createTCGCContext(
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
+    convertDiscriminatedUnionsToModels: true,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
     __referencedTypeCache: new Map<
@@ -173,6 +174,8 @@ export interface CreateSdkContextOptions {
   exportTCGCoutput?: boolean; // this flag is for emitter to export TCGC output as yaml file
   flattenUnionAsEnum?: boolean; // this flag is for emitter to decide whether tcgc should flatten union as enum
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
+  /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
+  convertDiscriminatedUnionsToModels?: boolean;
 }
 
 export async function createSdkContext<
@@ -238,6 +241,7 @@ export async function createSdkContext<
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
+    convertDiscriminatedUnionsToModels: options?.convertDiscriminatedUnionsToModels ?? true,
   };
 
   if (context.options["examples-dir"]) {
@@ -253,9 +257,7 @@ export async function createSdkContext<
     }
   }
   sdkContext.sdkPackage = diagnostics.pipe(await createSdkPackage(sdkContext));
-  for (const client of sdkContext.sdkPackage.clients) {
-    diagnostics.pipe(await handleClientExamples(sdkContext, client));
-  }
+  diagnostics.pipe(await handleClientExamples(sdkContext, sdkContext.sdkPackage.clients));
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   // Validate duplicate operation names in clients (e.g., from multi-service merge or sub-client merge).
@@ -383,6 +385,12 @@ async function exportTCGCOutput(context: SdkContext) {
           return undefined; // remove raw example
         }
         if (v instanceof Map) {
+          if (k === "variants") {
+            return [...v].map(([name, type]) => ({
+              name: typeof name === "string" ? name : undefined,
+              type,
+            }));
+          }
           return Object.fromEntries(v);
         }
         return v;

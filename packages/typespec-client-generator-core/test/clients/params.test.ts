@@ -202,6 +202,11 @@ it("initialization default endpoint with union auth", async () => {
   strictEqual(credentialParam.type.name, "ServiceCredentialUnion");
   strictEqual(credentialParam.type.isGeneratedName, true);
   strictEqual(credentialParam.type.variantTypes.length, 2);
+  deepStrictEqual([...credentialParam.type.variants.values()], credentialParam.type.variantTypes);
+  strictEqual(credentialParam.type.variants.size, 2);
+  for (const key of credentialParam.type.variants.keys()) {
+    strictEqual(typeof key, "symbol");
+  }
   const schemes = credentialParam.type.variantTypes
     .filter((v): v is SdkCredentialType => v.kind === "credential")
     .map((s) => s.scheme);
@@ -435,6 +440,11 @@ it("initialization multiple server parameters with apikey auth", async () => {
   const endpointParamType = endpointParam.type;
   strictEqual(endpointParamType.kind, "union");
   strictEqual(endpointParamType.variantTypes.length, 2);
+  deepStrictEqual([...endpointParamType.variants.values()], endpointParamType.variantTypes);
+  strictEqual(endpointParamType.variants.size, 2);
+  for (const key of endpointParamType.variants.keys()) {
+    strictEqual(typeof key, "symbol");
+  }
 
   const overridableEndpoint = endpointParamType.variantTypes.find(
     (x) => x.kind === "endpoint" && x.serverUrl === "{endpoint}",
@@ -800,6 +810,7 @@ it("endpoint template argument with default value of enum member", async () => {
     op myOp(): void;
 
     enum ClientType {
+      @encodedName("application/json", "wire-default")
       Default: "default",
       MultiClient: "multi-client",
       RenamedOperation: "renamed-operation",

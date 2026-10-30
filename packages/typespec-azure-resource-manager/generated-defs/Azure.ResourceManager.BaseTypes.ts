@@ -1,7 +1,18 @@
 import type { DecoratorContext, DecoratorValidatorCallbacks, Model } from "@typespec/compiler";
 
+/**
+ * An ARM-managed base type descriptor identifying the schema contract a resource conforms to.
+ * Used as a parameter to the `@azureBaseType` decorator to indicate which
+ * base types a resource conforms to.
+ */
 export interface BaseTypeInfo {
+  /**
+   * The base type identifier.
+   */
   readonly baseType: "Agent" | "Relationship" | string;
+  /**
+   * The schema version of the base type.
+   */
   readonly version: string;
 }
 
