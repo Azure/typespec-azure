@@ -1982,7 +1982,7 @@
           {
             "name": "Working",
             "value": "Working",
-            "description": "Working"
+            "description": "The resource provisioning operation is in progress."
           }
         ]
       },
