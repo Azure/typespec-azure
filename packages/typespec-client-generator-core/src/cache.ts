@@ -15,9 +15,7 @@ import {
   clientKey,
   clientLocationKey,
   findServiceForOperation,
-  getClientServiceConfigurations,
   getScopedDecoratorData,
-  isSameServiceConfigurations,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
@@ -158,26 +156,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     if (!keepClient && client.type) {
       context.__rawClientsCache.delete(client.type);
       context.__clientToOperationsCache.delete(client);
-    }
-  }
-
-  for (const [client, types] of mergedSubClientTypes) {
-    if (!client.parent?.subClients.includes(client)) continue;
-    const catalog = getClientServiceConfigurations(context, { ...client, type: types[0] });
-    const conflictingType = types
-      .slice(1)
-      .find(
-        (type) =>
-          !isSameServiceConfigurations(
-            catalog,
-            getClientServiceConfigurations(context, { ...client, type }),
-          ),
-      );
-    if (conflictingType) {
-      reportDiagnostic(context.program, {
-        code: "inconsistent-multiple-service",
-        target: conflictingType,
-      });
     }
   }
 }

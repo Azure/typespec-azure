@@ -3,6 +3,7 @@ import { getAuthentication, getHttpOperation } from "@typespec/http";
 import { ok } from "assert";
 import { expect, it } from "vitest";
 import { parse } from "yaml";
+import { createTCGCContext } from "../../src/context.js";
 import { type SdkClientType, UsageFlags } from "../../src/interfaces.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
@@ -401,7 +402,7 @@ it("does not overwrite explicit operation and interface authentication", async (
 it.each(["WithoutConfigurations, Configured", "Configured, WithoutConfigurations"])(
   "rejects a missing merged catalog with services ordered %s",
   async (services) => {
-    const diagnostics = await AzureCoreTester.diagnose(`
+    const { program } = await AzureCoreTester.compile(`
       ${definitions}
       model SingleConfiguration {
         public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
@@ -413,7 +414,9 @@ it.each(["WithoutConfigurations, Configured", "Configured, WithoutConfigurations
       @client({service: [${services}], autoMergeService: true})
       namespace Combined {}
     `);
-    expectDiagnostics(diagnostics, [
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
+    expectDiagnostics(program.diagnostics, [
       { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
     ]);
   },
@@ -454,7 +457,7 @@ it("merges equivalent catalogs independently of non-default declaration order", 
 });
 
 it("rejects merged catalogs with different password-flow token URLs", async () => {
-  const diagnostics = await AzureCoreTester.diagnose(`
+  const { program } = await AzureCoreTester.compile(`
     model FirstAuth is OAuth2Auth<[{
       type: OAuth2FlowType.password;
       tokenUrl: "https://first.example.com/token";
@@ -472,13 +475,15 @@ it("rejects merged catalogs with different password-flow token URLs", async () =
       public: { endpoint: "https://service.example.com"; authentication: SecondAuth };
     }
     @service @azureServiceConfigurations(FirstConfigurations)
-    namespace First { @get @route("/first") op read(): void; }
+    namespace First { @get @route("/first") op first(): void; }
     @service @azureServiceConfigurations(SecondConfigurations)
-    namespace Second { @get @route("/second") op read(): void; }
+    namespace Second { @get @route("/second") op second(): void; }
     @client({service: [First, Second], autoMergeService: true})
     namespace Combined {}
   `);
-  expectDiagnostics(diagnostics, [
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  expectDiagnostics(program.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
   ]);
 });
@@ -548,7 +553,7 @@ it.each(["scopes", "flows", "schemes", "options"])(
 it.each([false, true])(
   "compares OpenID Connect scopes in OAuth configurations: conflict=%s",
   async (conflict) => {
-    const diagnostics = await AzureCoreTester.diagnose(`
+    const { program } = await AzureCoreTester.compile(`
       ${definitions}
       model FirstIdentity is OpenIdConnectAuth<"https://login.example.com", ["read", "write"]>;
       model SecondIdentity is OpenIdConnectAuth<
@@ -568,14 +573,16 @@ it.each([false, true])(
         };
       }
       @service @azureServiceConfigurations(FirstConfigurations)
-      namespace First { @get @route("/first") op read(): void; }
+      namespace First { @get @route("/first") op first(): void; }
       @service @azureServiceConfigurations(SecondConfigurations)
-      namespace Second { @get @route("/second") op read(): void; }
+      namespace Second { @get @route("/second") op second(): void; }
       @client({service: [First, Second], autoMergeService: true})
       namespace Combined {}
     `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
     expectDiagnostics(
-      diagnostics,
+      program.diagnostics,
       conflict
         ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
         : [],
@@ -595,7 +602,7 @@ it.each([
     second: "[PublicAuth, Key, Key]",
   },
 ])("rejects merged authentication with different $name", async ({ first, second }) => {
-  const diagnostics = await AzureCoreTester.diagnose(`
+  const { program } = await AzureCoreTester.compile(`
     ${definitions}
     model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
     model FirstConfigurations {
@@ -605,13 +612,15 @@ it.each([
       public: { endpoint: "https://example.com"; authentication: ${second} };
     }
     @service @azureServiceConfigurations(FirstConfigurations)
-    namespace First { @get @route("/first") op read(): void; }
+    namespace First { @get @route("/first") op first(): void; }
     @service @azureServiceConfigurations(SecondConfigurations)
-    namespace Second { @get @route("/second") op read(): void; }
+    namespace Second { @get @route("/second") op second(): void; }
     @client({service: [First, Second], autoMergeService: true})
     namespace Combined {}
   `);
-  expectDiagnostics(diagnostics, [
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  expectDiagnostics(program.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
   ]);
 });
@@ -667,7 +676,7 @@ it("projects configuration-specific authentication and credential alternatives",
 });
 
 it("rejects incompatible pairings even when flat HTTP servers and auth alternatives agree", async () => {
-  const diagnostics = await AzureCoreTester.diagnose(`
+  const { program } = await AzureCoreTester.compile(`
         model AuthA is AadOauth2Auth<["a.read"]>;
         model AuthB is AadOauth2Auth<["b.read"]>;
         model AuthC is AadOauth2Auth<["c.read"]>;
@@ -682,13 +691,15 @@ it("rejects incompatible pairings even when flat HTTP servers and auth alternati
           china: { endpoint: "https://china.example.com"; authentication: AuthA | AuthC };
         }
         @service @azureServiceConfigurations(FirstConfigurations)
-        namespace First { @get @route("/first") op read(): void; }
+        namespace First { @get @route("/first") op first(): void; }
         @service @azureServiceConfigurations(SecondConfigurations)
-        namespace Second { @get @route("/second") op read(): void; }
+        namespace Second { @get @route("/second") op second(): void; }
         @client({service: [First, Second], autoMergeService: true})
         namespace Combined {}
       `);
-  expectDiagnostics(diagnostics, [
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  expectDiagnostics(program.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" },
   ]);
 });
@@ -696,7 +707,7 @@ it("rejects incompatible pairings even when flat HTTP servers and auth alternati
 it.each([false, true])(
   "compares merged server parameter defaults: conflict=%s",
   async (conflict) => {
-    const diagnostics = await AzureCoreTester.diagnose(`
+    const { program } = await AzureCoreTester.compile(`
         ${definitions}
         model FirstConfigurations {
           public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://first.example.com" }; authentication: PublicAuth };
@@ -705,18 +716,100 @@ it.each([false, true])(
           public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://${conflict ? "second" : "first"}.example.com" }; authentication: PublicAuth };
         }
         @service @azureServiceConfigurations(FirstConfigurations)
-        namespace First { @get @route("/first") op read(): void; }
+        namespace First { @get @route("/first") op first(): void; }
         @service @azureServiceConfigurations(SecondConfigurations)
-        namespace Second { @get @route("/second") op read(): void; }
+        namespace Second { @get @route("/second") op second(): void; }
         @client({service: [First, Second], autoMergeService: true})
         namespace Combined {}
       `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
     expectDiagnostics(
-      diagnostics,
+      program.diagnostics,
       conflict
         ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
         : [],
     );
+  },
+);
+
+it.each([
+  { version: "1", level: "root" },
+  { version: "2", level: "root" },
+  { version: "1", level: "child" },
+])(
+  "validates merged $level catalogs after API-version projection for version $version",
+  async ({ version, level }) => {
+    const { program } = await AzureCoreTester.compile(`
+      model PublicAuth is AadOauth2Auth<["public.read"]>;
+      model GovernmentAuth is AadOauth2Auth<["government.read"]>;
+
+      @versioned(AuthDefinitions.Versions)
+      namespace AuthDefinitions {
+        enum Versions { v1: "1", v2: "2" }
+        model Configurations {
+          public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
+          @added(Versions.v2)
+          government: { endpoint: "https://government.example.com"; authentication: GovernmentAuth };
+        }
+      }
+      model PublicConfigurations {
+        public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
+      }
+
+      @service @versioned(First.Versions)
+      @azureServiceConfigurations(${level === "child" ? "PublicConfigurations" : "AuthDefinitions.Configurations"})
+      namespace First {
+        enum Versions {
+          @useDependency(AuthDefinitions.Versions.v1) v1: "1",
+          @useDependency(AuthDefinitions.Versions.v2) v2: "2",
+        }
+        ${level === "child" ? "@azureServiceConfigurations(AuthDefinitions.Configurations) namespace Operations {" : ""}
+        @get @route("/first") op first(): void;
+        ${level === "child" ? "}" : ""}
+      }
+
+      @service @versioned(Second.Versions)
+      @azureServiceConfigurations(PublicConfigurations)
+      namespace Second {
+        enum Versions {
+          @useDependency(AuthDefinitions.Versions.v1) v1: "1",
+          @useDependency(AuthDefinitions.Versions.v2) v2: "2",
+        }
+        ${level === "child" ? "@azureServiceConfigurations(PublicConfigurations) namespace Operations {" : ""}
+        @get @route("/second") op second(): void;
+        ${level === "child" ? "}" : ""}
+      }
+
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    const rawContext = createTCGCContext(program, "@azure-tools/typespec-python", {
+      mutateNamespace: false,
+    });
+    rawContext.getRootClients();
+    expectDiagnostics(program.diagnostics, []);
+    const context = await createSdkContextForTester(program, {
+      "api-version": { First: version, Second: version },
+    });
+    expect(context.diagnostics).toEqual([]);
+    expectDiagnostics(
+      program.diagnostics,
+      version === "1"
+        ? []
+        : [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }],
+    );
+    if (version === "1") {
+      expect(context.sdkPackage.clients).toHaveLength(1);
+      const root = context.sdkPackage.clients[0];
+      const client = level === "child" ? root.children?.[0] : root;
+      ok(client);
+      expect(client.methods.map((method) => method.name)).toEqual(["first", "second"]);
+      expect(client.clientInitialization.serviceConfigurations).toMatchObject({
+        defaultConfiguration: "public",
+        configurations: [{ name: "public", endpoint: { serverUrl: "https://public.example.com" } }],
+      });
+    }
   },
 );
 

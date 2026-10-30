@@ -42,7 +42,7 @@ All services must have the same server and auth definitions.
 
 Make the merged services use matching server and auth definitions, or generate them as separate clients.
 
-For paired endpoint/OAuth configurations, matching default scopes is not sufficient. Catalogs must have matching names, endpoint templates/parameter defaults, and per-configuration authentication; every catalog uses the required `public` default. Configuration and authentication declaration order do not affect compatibility, including OAuth flow and scope ordering; AND/OR grouping and actual values must still match. The same requirements apply to same-named child clients merged across services. Identical flat HTTP servers and auth alternatives do not establish identical pairings. Separate auth models may be used when their settings are equivalent.
+For paired endpoint/OAuth configurations, matching default scopes is not sufficient. In the selected API versions, catalogs must have matching names, endpoint templates/parameter defaults, and per-configuration authentication; every catalog uses the required `public` default. Configuration and authentication declaration order do not affect compatibility, including OAuth flow and scope ordering; AND/OR grouping and actual values must still match. The same requirements apply to same-named child clients merged across services. Identical flat HTTP servers and auth alternatives do not establish identical pairings. Separate auth models may be used when their settings are equivalent.
 
 ```typespec
 @service

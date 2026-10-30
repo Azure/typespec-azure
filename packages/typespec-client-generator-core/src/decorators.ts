@@ -92,7 +92,6 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
-  isSameServiceConfigurations,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -294,14 +293,12 @@ export const $client: ClientDecorator = (
       return;
     }
     services = serviceConfig.values;
-    const catalog = services[0]
-      ? getAzureServiceConfigurations(context.program, services[0])
-      : undefined;
-    let isSame = services.every((svc) =>
-      isSameServiceConfigurations(catalog, getAzureServiceConfigurations(context.program, svc)),
+    const hasConfigurations = services.some(
+      (svc) => getAzureServiceConfigurations(context.program, svc) !== undefined,
     );
-    // Paired catalogs include servers and auth; flat HTTP declaration order is not significant.
-    if (isSame && !catalog) {
+    let isSame = true;
+    // Paired catalogs are compared after the SDK's API versions have been applied.
+    if (!hasConfigurations) {
       let servers = undefined;
       let auth: Authentication | undefined;
       for (const svc of services) {
