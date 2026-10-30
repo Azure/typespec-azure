@@ -1,4 +1,5 @@
 import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
 
 using TypeSpec.Http;
 
@@ -65,3 +66,121 @@ enum IntEnum {
 @get
 @route("/int-enum-path/{value}")
 op intEnumPath(@path value: IntEnum): void;
+
+@route("/uri/simple/{value}")
+op simpleArray(value: string[]): void;
+@route("/uri/simple-map/{value}")
+op simpleMap(value: Record<int32>): void;
+@route("/uri/simple-explode/{value*}")
+op simpleExplodedMap(value: Record<int32>): void;
+@route("/uri/path{/value}")
+op pathArray(value: string[]): void;
+@route("/uri/path-explode{/value*}/end")
+op pathExplodedArray(value: string[]): void;
+@route("/uri/path-map{/value*}")
+op pathExplodedMap(value: Record<int32>): void;
+@route("/uri/label{.value}")
+op labelArray(value: string[]): void;
+@route("/uri/label-explode{.value*}")
+op labelExplodedArray(value: string[]): void;
+@route("/uri/label-map{.value*}")
+op labelExplodedMap(value: Record<int32>): void;
+@route("/uri/matrix{;value}")
+op matrixArray(value: string[]): void;
+@route("/uri/matrix-explode{;value*}")
+op matrixExplodedArray(value: string[]): void;
+@route("/uri/matrix-map{;value}")
+op matrixMap(value: Record<int32>): void;
+@route("/uri/matrix-map-explode{;value*}")
+op matrixExplodedMap(value: Record<int32>): void;
+@route("/uri/label-scalar{.value}")
+op labelScalar(value: string): void;
+@route("/uri/matrix-scalar{;value}")
+op matrixScalar(value: int32): void;
+@route("/uri/path-scalar{/value}")
+op pathScalar(value: string): void;
+@route("/uri/typed-array{/value*}")
+op typedArray(value: int32[]): void;
+@route("/uri/time-array{/value*}")
+op timeArray(value: utcDateTime[]): void;
+@route("/uri/enum-array{/value*}")
+op enumArray(value: IntEnum[]): void;
+@route("/uri/bool-map{;value*}")
+op boolMap(value: Record<boolean>): void;
+@route("/uri/query-map{?value}")
+op queryMap(value: Record<int32>): void;
+@route("/uri/query-map-explode?fixed=true{&value*}")
+op queryExplodedMap(value: Record<int32>): void;
+@route("/uri/optional-query-map{?value}")
+op optionalQueryMap(value?: Record<int32>): void;
+
+model QueryFields {
+  field: string;
+  count?: int32;
+  enabled?: boolean;
+}
+@route("/uri/query-object{?value}")
+op queryObject(value: QueryFields): void;
+@route("/uri/query-object-explode{?value*}")
+op queryExplodedObject(value: QueryFields): void;
+@route("/uri/optional-query-object{?value}")
+op optionalQueryObject(value?: QueryFields): void;
+
+model RequiredQueryFields {
+  name: string;
+  parts: string;
+}
+@route("/uri/query-groups/{name}{?rawQP,second}")
+op queryGroups(
+  @path name: string,
+  rawQP: RequiredQueryFields,
+  second: RequiredQueryFields,
+  @query rawQueryValues: string,
+  @query uriQueryKey: string,
+): void;
+
+model OptionalQueryFields {
+  count?: int32;
+}
+@route("/uri/query-option-collisions{?first,second}")
+op queryOptionCollisions(
+  first: OptionalQueryFields,
+  second: OptionalQueryFields,
+  @query count?: int32,
+  @query firstCount?: int32,
+): void;
+
+model SpreadMapsBody {
+  values: Record<int32 | null>;
+  numbers: Record<int32>;
+  list: int32[];
+  nested: Record<Record<int32 | null>>;
+}
+@post
+@route("/spread-maps")
+op spreadMaps(...SpreadMapsBody): void;
+
+@encode(BytesKnownEncoding.base64url)
+scalar URLBytes extends bytes;
+model BytesQueryFields {
+  value: URLBytes;
+}
+@route("/uri/bytes-object{?value}")
+op bytesObject(value: BytesQueryFields): void;
+@route("/uri/bytes-map{?value}")
+op bytesMap(value: Record<URLBytes>): void;
+@route("/uri/bytes-array{/value*}")
+op bytesArray(value: URLBytes[]): void;
+@route("/uri/bytes-scalar/{value}")
+op bytesScalar(value: URLBytes): void;
+
+model QueryPageOptions {
+  @query includePending: boolean;
+}
+model QueryPage {
+  @pageItems items: string[];
+  @nextLink nextLink?: Azure.Core.Legacy.parameterizedNextLink<[QueryPageOptions.includePending]>;
+}
+@list
+@route("/uri/query-paged-map{?value}")
+op queryPagedMap(...QueryPageOptions, value: Record<int32>): QueryPage;

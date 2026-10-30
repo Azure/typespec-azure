@@ -365,6 +365,7 @@ function getExampleValue(
     case "any":
       return jsonToGo(example.value, indent);
     case "array": {
+      imports?.addForType(example.type);
       const isElementByValue = example.type.itemType.kind !== "ptr";
       // if polymorphic, need to add type name in array, so inArray will be set to false
       // if other case, no need to add type name in array, so inArray will be set to true
@@ -377,6 +378,7 @@ function getExampleValue(
       return exampleText;
     }
     case "dictionary": {
+      imports?.addForType(example.type);
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       const isValueByValue = example.type.itemType.kind !== "ptr";
       const isValuePolymorphic = example.type.itemType.kind === "interface";

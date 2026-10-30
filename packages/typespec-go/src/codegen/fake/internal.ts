@@ -16,6 +16,7 @@ export class RequiredHelpers {
   readRequestBody: boolean;
   splitHelper: boolean;
   tracker: boolean;
+  uriTemplate: boolean;
 
   constructor() {
     this.getHeaderValue = false;
@@ -26,6 +27,7 @@ export class RequiredHelpers {
     this.readRequestBody = false;
     this.splitHelper = false;
     this.tracker = false;
+    this.uriTemplate = false;
   }
 }
 
@@ -73,6 +75,9 @@ export function generateServerInternal(
   if (requiredHelpers.tracker) {
     body += emitTracker(imports);
   }
+  if (requiredHelpers.uriTemplate) {
+    body += emitURITemplate(imports);
+  }
 
   return text + imports.text() + body;
 }
@@ -100,9 +105,144 @@ func getOptional[T any](v T) *T {
 	if reflect.ValueOf(v).IsZero() {
 		return nil
 	}
+
 	return &v
 }
 `;
+}
+
+function emitURITemplate(imports: ImportManager): string {
+  imports.add("fmt");
+  imports.add("net/url");
+  imports.add("strings");
+  return `
+	func splitURIPath(value, prefix, separator string) ([]string, error) {
+		if value == "" {
+			return nil, nil
+		}
+		if !strings.HasPrefix(value, prefix) {
+			return nil, fmt.Errorf("invalid URI expansion %q: expected prefix %q", value, prefix)
+		}
+		return strings.Split(strings.TrimPrefix(value, prefix), separator), nil
+	}
+
+	func splitURIQuery(value string) []string {
+		if value == "" {
+			return []string{}
+		}
+		return strings.Split(value, ",")
+	}
+
+	func parseURIArray[T any](values []string, unescape bool, parse func(string) (T, error)) ([]T, error) {
+		if values == nil {
+			return nil, nil
+		}
+		result := make([]T, len(values))
+		for i, value := range values {
+			if unescape {
+				var err error
+				value, err = url.PathUnescape(value)
+				if err != nil {
+					return nil, err
+				}
+			}
+			parsed, err := parse(value)
+			if err != nil {
+				return nil, err
+			}
+			result[i] = parsed
+		}
+		return result, nil
+	}
+
+	func parseURIMap[T any](values []string, explode, unescape bool, parse func(string) (T, error)) (map[string]T, error) {
+		if values == nil {
+			return nil, nil
+		}
+		pairs := values
+		if explode {
+			pairs = make([]string, 0, len(values)*2)
+			for _, value := range values {
+				key, item, ok := strings.Cut(value, "=")
+				if !ok {
+					return nil, fmt.Errorf("invalid URI map entry %q: expected key=value", value)
+				}
+				pairs = append(pairs, key, item)
+			}
+		}
+		if len(pairs)%2 != 0 {
+			return nil, fmt.Errorf("invalid URI map expansion: expected key/value pairs")
+		}
+		result := make(map[string]T, len(pairs)/2)
+		for i := 0; i < len(pairs); i += 2 {
+			key, value := pairs[i], pairs[i+1]
+			if unescape {
+				var err error
+				key, err = url.PathUnescape(key)
+				if err != nil {
+					return nil, err
+				}
+				value, err = url.PathUnescape(value)
+				if err != nil {
+					return nil, err
+				}
+			}
+			parsed, err := parse(value)
+			if err != nil {
+				return nil, err
+			}
+			result[key] = parsed
+		}
+		return result, nil
+	}
+
+	func parseRawURIQuery(query string) (url.Values, error) {
+		result := url.Values{}
+		for _, part := range strings.Split(query, "&") {
+			if part == "" {
+				continue
+			}
+			key, value, _ := strings.Cut(part, "=")
+			key, err := url.QueryUnescape(key)
+			if err != nil {
+				return nil, err
+			}
+			result.Add(key, value)
+		}
+		return result, nil
+	}
+
+	func parseURIQueryMap[T any](value string, parse func(string) (T, error)) (map[string]T, error) {
+		parts := splitURIQuery(value)
+		for i, part := range parts {
+			decoded, err := url.QueryUnescape(part)
+			if err != nil {
+				return nil, err
+			}
+			parts[i] = decoded
+		}
+		return parseURIMap(parts, false, false, parse)
+	}
+
+	func parseURIQueryObject(value string, keys []string) (url.Values, error) {
+		fields := make(map[string]bool, len(keys))
+		for _, key := range keys {
+			fields[key] = true
+		}
+		values, err := parseURIQueryMap(value, func(v string) (string, error) { return v, nil })
+		if err != nil {
+			return nil, err
+		}
+		result := url.Values{}
+		for key, item := range values {
+			if !fields[key] {
+				return nil, fmt.Errorf("invalid URI query object entry %q", key)
+			}
+			result.Set(key, item)
+		}
+		return result, nil
+	}
+	`;
 }
 
 function emitGetHeaderValue(imports: ImportManager): string {

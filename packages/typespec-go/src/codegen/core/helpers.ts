@@ -371,7 +371,6 @@ export function formatParamValue(
   switch (param.kind) {
     case "formBodyCollectionParam":
     case "headerCollectionParam":
-    case "pathCollectionParam":
     case "queryCollectionParam": {
       if (param.collectionFormat === "multi") {
         throw new CodegenError(
@@ -383,7 +382,7 @@ export function formatParamValue(
       const separator = getDelimiterForCollectionFormat(param.collectionFormat);
 
       const emitConvertOver = function (paramName: string, format: string): string {
-        const encodedVar = `encoded${naming.capitalize(paramName)}`;
+        const encodedVar = `encoded${naming.capitalize(param.name)}`;
         let content = "strings.Join(func() []string {\n";
         content += `${indent.push().get()}${encodedVar} := make([]string, len(${paramName}))\n`;
         content += `${indent.get()}for i := 0; i < len(${paramName}); i++ {\n`;
@@ -400,8 +399,8 @@ export function formatParamValue(
           imports.add("encoding/base64");
           imports.add("strings");
           return emitConvertOver(
-            param.name,
-            `base64.${formatBytesEncoding(unwrappedElement.encoding)}Encoding.EncodeToString(${param.name}[i])`,
+            paramName,
+            `base64.${formatBytesEncoding(unwrappedElement.encoding)}Encoding.EncodeToString(${paramName}[i])`,
           );
         case "string":
           imports.add("strings");
@@ -409,9 +408,9 @@ export function formatParamValue(
         case "time": {
           imports.add("strings");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-          const elemVal = unwrappedElement.utc ? `${param.name}[i].UTC()` : `${param.name}[i]`;
+          const elemVal = unwrappedElement.utc ? `${paramName}[i].UTC()` : `${paramName}[i]`;
           return emitConvertOver(
-            param.name,
+            paramName,
             `datetime.${unwrappedElement.format}(${elemVal}).String()`,
           );
         }
@@ -1263,10 +1262,12 @@ export function getMethodParamGroups(method: go.MethodType | go.NextPageMethod):
         partialBodyParams.push(param);
         break;
       case "pathCollectionParam":
+      case "pathMapParam":
       case "pathScalarParam":
         pathParams.push(param);
         break;
       case "queryCollectionParam":
+      case "queryMapParam":
       case "queryScalarParam":
         if (param.isEncoded) {
           encodedQueryParams.push(param);
