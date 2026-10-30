@@ -21,7 +21,7 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName, type SdkName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js";
@@ -187,7 +187,7 @@ function importAllApis(clientFile: SourceFile, srcPath: string, subfolder: strin
 
 function generateMethod(
   context: SdkContext,
-  method: [string[], SdkServiceMethod<SdkServiceOperation>],
+  method: [SdkName[], SdkServiceMethod<SdkServiceOperation>],
 ): MethodDeclarationStructure[] {
   const res: MethodDeclarationStructure[] = [];
   const declaration = getOperationFunction(context, method, "Client");
@@ -266,21 +266,20 @@ function buildClientOperationGroups(
 ) {
   const [_hierarchy, client] = clientMap;
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
-  for (const [prefixKey, operations] of methodMap) {
-    const prefixes = prefixKey.split("/");
+  for (const [prefixes, operations] of methodMap) {
     const layer = 0;
-    if (prefixKey === "") {
+    if (prefixes.length === 0) {
       operations.forEach((op) => {
         const methods = generateMethod(dpgContext, [prefixes, op]);
         clientClass.addMethods(methods);
       });
     } else {
       // The `rawGroupName` is used to any places where we need normalized name twice so we need to keep the raw as PascalCase.
-      const rawGroupName = normalizeName(prefixes[0] ?? "", NameType.Interface);
+      const rawGroupName = normalizeSdkName(prefixes[0] ?? { name: "" }, NameType.Interface);
       const operationName = `_get${rawGroupName}Operations`;
       const propertyType = `${rawGroupName}Operations`;
       // The `groupName` is used to any places where we don't need normalized name again
-      const groupName = normalizeName(prefixes[0] ?? "", NameType.Property);
+      const groupName = normalizeSdkName(prefixes[0] ?? { name: "" }, NameType.Property);
       const existingProperty = clientClass.getProperty(groupName);
       if (!existingProperty) {
         clientClass.addProperty({

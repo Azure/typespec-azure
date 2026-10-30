@@ -56,7 +56,7 @@ interface EmitSampleOptions {
   generatedFiles: SourceFile[];
   classicalMethodPrefix?: string;
   subFolder?: string;
-  hierarchies?: string[]; // Add hierarchies to track operation path
+  hierarchies?: SdkName[];
 }
 /**
  * Helpers to emit samples
@@ -80,11 +80,10 @@ function emitClientSamples(
   options: EmitSampleOptions,
 ) {
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
-  for (const [prefixKey, operations] of methodMap) {
-    const hierarchies = prefixKey ? prefixKey.split("/") : [];
+  for (const [hierarchies, operations] of methodMap) {
     const prefix = hierarchies
       .map((name) => {
-        return normalizeName(name, NameType.Property);
+        return normalizeSdkName(name, NameType.Property);
       })
       .join(".");
     for (const op of operations) {
