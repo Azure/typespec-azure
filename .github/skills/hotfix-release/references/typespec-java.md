@@ -2,6 +2,8 @@
 
 **Three emitter PRs and one SDK sync pipeline run**, which creates a downstream SDK PR.
 
+Run commands from `packages/typespec-java` unless noted otherwise.
+
 ## 1. Core-sync PR
 
 Target the release branch. Keep the package version unchanged.
@@ -11,16 +13,19 @@ Target the release branch. Keep the package version unchanged.
   submodule gitlink.
 - Inspect upstream Java changes since the previous pin. Include intended fixes;
   investigate features before including them in a patch release.
-- From this package, run `pnpm sync-tests`. Let it finish: it replaces test inputs
+- Run `pnpm sync-tests`. Let it finish: it replaces test inputs
   before copying them. Inspect substantive changes separately from line-ending
   noise.
-- Check whether upstream changes also require local generation scripts, Spector
-  configuration, or emitter options to change.
+- Check whether upstream changes require local generation scripts or emitter
+  options to change.
 - Add Chronus `fix` descriptions based on the upstream user-facing changes, with
   source PR links. Do not edit `CHANGELOG.md` in this PR.
 - Validate the branded build and relevant generated Java regressions. Run
   `pnpm regenerate -- --parallelization 4` when generation changes.
 - Open a draft PR targeting the release branch.
+
+Optional Spector check: review `emitter-tests/spector.config.yaml` for new upstream
+cases, opt in relevant cases, regenerate, and run `pnpm test:java:e2e`.
 
 Optional SDK validation against this PR uses pipeline `8274` with
 `EmitterVersion=none`, `PRIdOrBranch=<PR number>`, and
