@@ -5,7 +5,6 @@ import { Tester, TesterWithSuppressions } from "./test-host.js";
 describe("orchestrator", () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.resetModules();
   });
 
   it("filters single-program analysis by service name", async () => {
@@ -428,34 +427,26 @@ describe("orchestrator", () => {
   });
 
   it("skips Phase A pairs when the matching base service is missing", async () => {
-    vi.doMock("../src/pipeline/versions.js", () => ({
-      enumerateVersions: vi.fn((program: object) =>
-        program === baseProgram
-          ? []
-          : [{ service: { name: "HeadService" }, versions: ["2025-01-01"] }],
-      ),
-      buildPhaseAPairs: vi.fn(() => [
-        {
-          baseVersion: "2025-01-01",
-          headVersion: "2025-01-01",
-          phase: "same-version",
-        },
-      ]),
-      buildPhaseBPairs: vi.fn(() => []),
-      createVersionedView: vi.fn(),
-      defaultVersionClassifier: (version: string) =>
-        version.endsWith("-preview") ? "preview" : "stable",
-    }));
-    vi.doMock("../src/suppression/suppression.js", () => ({
-      applySuppressions: vi.fn((findings: unknown[]) => findings),
-    }));
+    const { program: baseProgram } = await Tester.compile(`
+      model Placeholder {
+        name: string;
+      }
+    `);
+    const { program: headProgram } = await Tester.compile(`
+      @versioned(Versions)
+      @service
+      namespace HeadService;
 
-    const { analyzeBaseAndHead: mockedAnalyzeBaseAndHead } =
-      await import("../src/pipeline/orchestrator.js");
-    const baseProgram = {};
-    const headProgram = {};
+      enum Versions {
+        v1: "2025-01-01",
+      }
 
-    const result = mockedAnalyzeBaseAndHead(baseProgram as any, headProgram as any, {
+      @route("/widgets")
+      @get
+      op getWidget(): string;
+    `);
+
+    const result = analyzeBaseAndHead(baseProgram, headProgram, {
       phase: "same-version",
     });
 

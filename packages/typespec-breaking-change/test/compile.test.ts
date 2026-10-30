@@ -1,10 +1,32 @@
 import { getSuppressions, getUnversionedSuppressions } from "@azure-tools/typespec-azure-core";
 import { resolveVirtualPath } from "@typespec/compiler/testing";
-import { describe, expect, it } from "vitest";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
 import { compileService } from "../src/cli/compile.js";
 import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 describe("CLI compilation", () => {
+  const temporaryDirectories: string[] = [];
+
+  afterEach(async () => {
+    await Promise.all(
+      temporaryDirectories.splice(0).map((path) => rm(path, { recursive: true, force: true })),
+    );
+  });
+
+  it("compiles without injecting a nonexistent package library", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "typespec-breaking-change-compile-"));
+    temporaryDirectories.push(directory);
+    const main = join(directory, "main.tsp");
+    await writeFile(main, "model Widget { name: string; }\n");
+
+    const program = await compileService(main);
+
+    expect(program.diagnostics.filter((diagnostic) => diagnostic.severity === "error")).toEqual([]);
+  });
+
   it("compiles specs without importing the removed breaking-change library", async () => {
     const { fs } = await Tester.compile("");
     fs.add("main.tsp", "model Widget {}");
