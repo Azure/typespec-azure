@@ -299,32 +299,34 @@ it("checks children at location scope", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-// Deferred until resolver collection associations are available (#5080); no rule-local workaround.
-it.skip.each([
-  // Synthetic missing-operation regression: https://github.com/Azure/typespec-azure/issues/5886
-  { name: "without a parent read", parentRead: "" },
-  // Production authoring pattern; Automation also exposes a parent read:
-  // https://github.com/MaryGao/azure-rest-api-specs/blob/2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9/specification/automation/resource-manager/Microsoft.Automation/Automation/AutomationAccount.tsp#L137-L160
-  {
-    name: "with a parent read (Automation pattern)",
-    parentRead: "get is ArmResourceRead<Widget>;",
+// https://github.com/Azure/typespec-azure/issues/5886
+// Automation uses a separate collection-item model and also exposes a parent read:
+// https://github.com/MaryGao/azure-rest-api-specs/blob/2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9/specification/automation/resource-manager/Microsoft.Automation/Automation/AutomationAccount.tsp#L137-L160
+it.each([
+  { itemType: "Part", parentRead: false },
+  { itemType: "Part", parentRead: true },
+  { itemType: "PartItem", parentRead: false },
+  { itemType: "PartItem", parentRead: true },
+])(
+  "reports a missing list for a parent action returning $itemType[] (parent read: $parentRead)",
+  async ({ itemType, parentRead }) => {
+    await tester
+      .expect(
+        `${service}
+        model PartItem { id: string; }
+        /*target*/@armResourceOperations interface Parts {
+          get is ArmResourceRead<Part>;
+        }
+        @armResourceOperations interface Widgets {
+          ${parentRead ? "get is ArmResourceRead<Widget>;" : ""}
+          @get @action("parts")
+          listParts is ArmResourceActionSync<Widget, void, ArmResponse<{ value: ${itemType}[] }>>;
+        }
+      `,
+      )
+      .toEmitDiagnostics((x) => ({ ...diagnostic(), pos: x.pos.target.pos }));
   },
-])("accepts a collection GET implemented as a parent action $name", async ({ parentRead }) => {
-  await tester
-    .expect(
-      `${service}
-      @armResourceOperations interface Parts {
-        get is ArmResourceRead<Part>;
-      }
-      @armResourceOperations interface Widgets {
-        ${parentRead}
-        @get @action("parts")
-        listParts is ArmResourceActionSync<Widget, void, ArmResponse<{ value: Part[] }>>;
-      }
-    `,
-    )
-    .toBeValid();
-});
+);
 
 it("does not mistake a parent action returning a single item for a collection", async () => {
   await tester
