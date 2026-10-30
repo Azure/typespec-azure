@@ -30,6 +30,7 @@ import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
+import { nestedResourcesMustHaveListOperationRule } from "./rules/nested-resources-must-have-list-operation.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
@@ -103,6 +104,7 @@ const rules = [
   lroLocationHeaderRule,
   listOperationMissingPageableRule,
   missingXmsIdentifiersRule,
+  nestedResourcesMustHaveListOperationRule,
   noResponseBodyRule,
   noQueryInPostRule,
   operationsInterfaceMissingRule,
@@ -132,7 +134,8 @@ export const $linter = defineLinter({
       enable: Object.fromEntries(
         rules.map((rule) => [
           `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-          rule !== useScopeForExtensionRoutingRule,
+          rule !== useScopeForExtensionRoutingRule &&
+            rule !== nestedResourcesMustHaveListOperationRule,
         ]),
       ),
     },
