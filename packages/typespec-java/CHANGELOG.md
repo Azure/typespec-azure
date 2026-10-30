@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.48.5
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `cba4987c6` to prevent service-defined YAML map keys, such as discriminator value `responses`, from being interpreted as code-model properties ([microsoft/typespec#12434](https://github.com/microsoft/typespec/pull/12434)).
+- Update the Java generator to TypeSpec core commit `6ba281975` to preserve resource ID parameters for ARM models shared across multiple routes ([microsoft/typespec#12443](https://github.com/microsoft/typespec/pull/12443)).
+
+
 ## 0.48.4
 
 ### Bug Fixes
