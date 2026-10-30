@@ -169,6 +169,35 @@ it("does not let a list in another service satisfy a nested resource", async () 
     .toEmitDiagnostics(diagnostic());
 });
 
+// Deferred until equivalent-path resource identities share their list association:
+// https://github.com/Azure/typespec-azure/issues/5899
+// Real API Management pattern:
+// https://github.com/MaryGao/azure-rest-api-specs/blob/2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/TagDescriptionContract.tsp#L70-L175
+it.skip("accepts a registered list for equivalent read and legacy PUT resource paths", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface PartsLegacy
+        extends Azure.ResourceManager.Legacy.LegacyOperations<
+          {
+            ...ApiVersionParameter;
+            ...SubscriptionIdParameter;
+            ...ResourceGroupParameter;
+            ...Azure.ResourceManager.Legacy.Provider;
+            @path @segment("widgets") @key widgetName: string;
+          },
+          { @path @segment("parts") @key partName: string; }
+        > {}
+      @armResourceOperations interface Parts {
+        get is ArmResourceRead<Part>;
+        createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part>;
+        list is ArmResourceListByParent<Part>;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
 // Deferred until REST-only resource associations are exposed by the resolver: #5885.
 it.skip("checks REST-only instance routes even when the model also has resolved ARM operations", async () => {
   await tester

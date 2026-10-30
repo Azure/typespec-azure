@@ -39,6 +39,8 @@ This can produce a warning even when the HTTP collection GET exists. Collection 
 tracked in [typespec-azure#5080](https://github.com/Azure/typespec-azure/issues/5080), and a dropped
 parent-action operation is tracked in
 [typespec-azure#5886](https://github.com/Azure/typespec-azure/issues/5886).
+Equivalent-path read and create/update identities can also receive different list associations;
+see [typespec-azure#5899](https://github.com/Azure/typespec-azure/issues/5899).
 This rule does not work around those helper limitations.
 
 The rule evaluates source declarations, consistent with existing missing-operation rules.
