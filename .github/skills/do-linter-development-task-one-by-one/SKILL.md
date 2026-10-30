@@ -716,8 +716,11 @@ agent to repair the source in place.
 Keep development PRs on their existing
 `feature/lintdiff-migration-new` target. Promotion follows its skill's canonical
 `Azure/typespec-azure`/`main` base, recorded head-repository policy and agent-recommended
-destination, with new rules disabled by default. Do not wait for or perform a
-development merge before promotion, and never merge either PR automatically.
+destination, with new rules disabled in recommended/default policy presets,
+not automatically excluded from library `all`; follow the
+[shared ruleset policy](../shared/native-migration-contract.md#packaging-documentation-and-release-readiness).
+Do not wait for or perform a development merge before promotion, and never merge
+either PR automatically.
 
 ## Cycle handoff
 

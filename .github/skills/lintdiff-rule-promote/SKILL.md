@@ -156,8 +156,11 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   the handoff. Pin that exact commit as immutable source for this invocation;
   do not silently consume a newer branch tip or uncommitted source changes.
 - Use the existing destination analysis, canonical `origin/main` base,
-  disabled-by-default rulesets, and required validation. Do not wait for the
-  development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
+  disabled-by-default recommended policy presets, and required validation.
+  Preserve library `all` membership independently under the
+  [shared ruleset policy](../shared/native-migration-contract.md#packaging-documentation-and-release-readiness).
+  Do not wait for the development PR to merge.
+  Pass the queue's no-skill-edits/no-skill-update-PR
   constraint to all delegated agents and append milestones to the shared log.
 - On every queue cycle, including initial promotion, require the separate
   promotion worktree and readiness manifest already prepared by the queue.
