@@ -73,6 +73,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/no-query-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-query-explode)                                               | It is recommended to serialize query parameter without explode: true                                                                                 |
 | [`@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch)               | Ensure that operations with the same path use consistent path parameter names.                                                                       |
 | [`@azure-tools/typespec-azure-core/no-openapi-client-extensions`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi-client-extensions)                       | Azure specs should not use @typespec/openapi @extension to emit client-altering x-ms-* extensions                                                    |
+| [`@azure-tools/typespec-azure-core/pageable-requires-200-response`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/pageable-requires-200-response)                   | Next-link pageable operations must define a 200 response.                                                                                            |
 
 ## Decorators
 
