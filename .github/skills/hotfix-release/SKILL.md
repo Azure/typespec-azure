@@ -7,6 +7,9 @@ description: Publish a hotfix (patch) release for one or more packages from an e
 
 Instructions for publishing a hotfix (patch) release for one or more packages from an existing `release/*` branch.
 
+For `@azure-tools/typespec-java`, also follow the [Java hotfix runbook](references/typespec-java.md).
+It covers the preceding core-sync PR and the downstream SDK sync pipeline.
+
 > ⚠️ **Prerequisites:** A `release/<sprint-name>` branch must already exist with the fix commit(s) merged into it. If it does not exist, create one from the last release tag commit first.
 
 ## REQUIRED PARAMETERS
