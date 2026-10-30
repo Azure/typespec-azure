@@ -59,13 +59,9 @@ it("preserves scoped metadata on models and namespaces", async () => {
   ok(dynamic);
   ok(plain);
   ok(namespace);
-  deepStrictEqual(dynamic.decorators, [
-    { name: decoratorName, arguments: { scope: "csharp" } },
-  ]);
+  deepStrictEqual(dynamic.decorators, [{ name: decoratorName, arguments: { scope: "csharp" } }]);
   deepStrictEqual(plain.decorators, []);
-  deepStrictEqual(namespace.decorators, [
-    { name: decoratorName, arguments: { scope: "csharp" } },
-  ]);
+  deepStrictEqual(namespace.decorators, [{ name: decoratorName, arguments: { scope: "csharp" } }]);
   expectDiagnostics(context.diagnostics, []);
 });
 
