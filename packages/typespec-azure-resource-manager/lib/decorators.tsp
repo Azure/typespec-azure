@@ -3,6 +3,20 @@ using Reflection;
 namespace Azure.ResourceManager;
 
 /**
+ * Marks an operation as a provider operation rather than an operation on a resource.
+ * Standard provider action and operations list templates apply this decorator automatically.
+ * Use resource operation templates or decorators for operations on registered resource models.
+ *
+ * @example
+ * ```typespec
+ * @providerOperation
+ * @get
+ * op getProviderInformation(): string;
+ * ```
+ */
+extern dec providerOperation(target: Operation);
+
+/**
  * `@armProviderNamespace` sets the Azure Resource Manager provider name. It will default to use the
  * Namespace element value unless an override value is specified.
  *

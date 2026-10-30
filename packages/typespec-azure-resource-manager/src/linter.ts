@@ -43,6 +43,7 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { providerOrResourceOperationRule } from "./rules/provider-or-resource-operation.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -123,6 +124,7 @@ const rules = [
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
+  providerOrResourceOperationRule,
 ];
 
 export const $linter = defineLinter({
