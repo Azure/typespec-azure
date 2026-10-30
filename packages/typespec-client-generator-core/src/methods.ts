@@ -85,6 +85,7 @@ import {
   getRawLroMetadata,
   preservesLroPagingPath,
 } from "./lro-metadata.js";
+import { resolveLroStatusMetadata } from "./lro-status-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -98,6 +99,8 @@ import {
   getSdkModelPropertyType,
   getSdkModelPropertyTypeBase,
   getSdkModelWithDiagnostics,
+  isVisibleSdkProperty,
+  resolveEffectiveSdkModelProperties,
 } from "./types.js";
 
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
@@ -452,8 +455,36 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   const diagnostics = createDiagnosticCollector();
   const operation = rawMetadata.operation;
   const resultProperties = getClientLroResultProperties(context, operation);
+  const nativeMetadata = getRawLroMetadata(context.program, operation);
   const finalResponse = getFinalResponse();
   if (resultProperties !== undefined && !finalResponse) return diagnostics.wrap(undefined);
+  const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
+  const statusCustomization = diagnostics.pipe(
+    resolveLroStatusMetadata(context, operation, nativeMetadata, isVisibleSdkProperty),
+  );
+  const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
+  const effectiveStatusMetadata = resolveEffectiveSdkModelProperties(
+    pollingInfo.responseModel,
+    statusCustomization?.properties ?? [],
+    [],
+  );
+  for (const conflict of effectiveStatusMetadata.conflicts) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "lro-status-metadata-name-conflict",
+        format: { clientName: conflict.clientName },
+        target: conflict.rawProperty,
+      }),
+    );
+  }
+  const statusMetadata = effectiveStatusMetadata.selections.map(({ sdkProperty }) => ({
+    property: sdkProperty,
+  }));
+  const pollingResponseBody = rawMetadata.pollingInfo.responseModel
+    ? (diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
+      ) as SdkModelType)
+    : undefined;
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -461,23 +492,20 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     finalResponse,
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
-      responseBody: rawMetadata.pollingInfo.responseModel
-        ? (diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
-          ) as SdkModelType)
-        : undefined,
+      responseBody: pollingResponseBody,
     },
     operation: diagnostics.pipe(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
     logicalResult: diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
-    statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
-    pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
+    statusMonitorStep,
+    pollingInfo,
     envelopeResult: diagnostics.pipe(
       getSdkModelWithDiagnostics(context, rawMetadata.envelopeResult),
     ),
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
+    ...(statusMetadata.length > 0 ? { statusMetadata } : {}),
   });
 
   function getSdkLroServiceFinalStep(

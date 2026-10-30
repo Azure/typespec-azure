@@ -41,6 +41,8 @@ interface ClientLroResultSelection {
   result: Model | Scalar;
 }
 
+const rawLroMetadataCache = new WeakMap<Program, Map<Operation, LroMetadata | undefined>>();
+
 /**
  * Selects the client result without discovering or changing protocol facts.
  * Core keeps a separate compatibility policy for its combined metadata API.
@@ -85,9 +87,21 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
 
 /** Raw LRO metadata only; the legacy @markAsLro fallback is handled separately. */
 export function getRawLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
+  let programCache = rawLroMetadataCache.get(program);
+  if (!programCache) {
+    programCache = new Map();
+    rawLroMetadataCache.set(program, programCache);
+  }
+  if (programCache.has(operation)) {
+    return programCache.get(operation);
+  }
+
   const protocol = getLroProtocolMetadata(program, operation);
-  if (!protocol) return undefined;
-  return {
+  if (!protocol) {
+    programCache.set(operation, undefined);
+    return undefined;
+  }
+  const metadata = {
     operation: protocol.operation,
     finalStateVia: protocol.completion.finalStateVia,
     statusMonitorStep: protocol.polling.statusMonitorStep,
@@ -95,6 +109,8 @@ export function getRawLroMetadata(program: Program, operation: Operation): LroMe
     finalStep: protocol.completion.finalStep,
     ...resolveLroClientResult(protocol),
   };
+  programCache.set(operation, metadata);
+  return metadata;
 }
 
 /** Select once per SDK context so method construction and usage analysis agree. */
