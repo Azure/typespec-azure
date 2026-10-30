@@ -1,6 +1,6 @@
 # Java hotfix release
 
-Supplement the [hotfix-release skill](../../.github/skills/hotfix-release/SKILL.md)
+Supplement the [hotfix-release skill](../SKILL.md)
 with these Java-specific steps. The emitter release involves **three PRs and one
 SDK sync pipeline run**; the pipeline creates an additional downstream SDK PR.
 
