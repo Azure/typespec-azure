@@ -1,14 +1,14 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { nestedResourceMissingListRule } from "../../src/rules/nested-resource-missing-list.js";
+import { nestedResourcesMustHaveListOperationRule } from "../../src/rules/nested-resources-must-have-list-operation.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    nestedResourceMissingListRule,
+    nestedResourcesMustHaveListOperationRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });

@@ -13,9 +13,9 @@ import {
   getCollectionPath,
   isCollectionGet,
   normalizeRoute,
-} from "./nested-resource-missing-list-utils.js";
+} from "./nested-resources-must-have-list-operation-utils.js";
 
-export const nestedResourceMissingListRule = createRule({
+export const nestedResourcesMustHaveListOperationRule = createRule({
   name: "NestedResourcesMustHaveListOperation",
   description:
     "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), all the nested must have a list operation which returns the collection of the resource.",
