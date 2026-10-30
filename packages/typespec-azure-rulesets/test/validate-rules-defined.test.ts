@@ -125,9 +125,9 @@ describe("expect all rules to be defined", () => {
     }
   });
 
-  it("keeps nested system data guidance opt-in", () => {
+  it("disables nested system data guidance in recommended rulesets but not ARM all", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/no-nested-system-data";
-    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], false);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     for (const ruleset of Object.values($linter.ruleSets ?? {})) {
       ok(!ruleset.enable?.[ruleName]);
