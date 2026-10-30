@@ -103,7 +103,9 @@ import {
   createGeneratedName,
   filterPreviewVersion,
   getAvailableApiVersions,
+  getClientDefaultServiceConfiguration,
   getClientDoc,
+  getClientServiceConfigurations,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
@@ -1547,10 +1549,14 @@ function getSdkCredentialType(
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClientType<SdkHttpOperation>,
+  authentication?: Authentication,
 ): SdkCredentialParameter | undefined {
   // Multiple services only deal with the first server config
   const service = client.__raw.services[0];
-  const auth = getAuthentication(context.program, service);
+  const auth =
+    authentication ??
+    getClientDefaultServiceConfiguration(context, client.__raw)?.authentication ??
+    getAuthentication(context.program, service);
   if (!auth) return undefined;
   return {
     type: getSdkCredentialType(context, client, auth),
@@ -2890,12 +2896,18 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
     }
     // server parameters
-    // Multiple services only deal with the first server config
-    const servers = getServers(context.program, client.services[0]);
-    if (servers !== undefined && servers[0].parameters !== undefined) {
-      for (const param of servers[0].parameters.values()) {
-        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+    for (const current of [client, ...listSubClients(context, client, true)]) {
+      const catalog = getClientServiceConfigurations(context, current);
+      const servers = catalog
+        ? catalog.configurations.map((configuration) => configuration.server)
+        : current === client
+          ? getServers(context.program, current.services[0])?.slice(0, 1)
+          : undefined;
+      for (const server of servers ?? []) {
+        for (const param of server.parameters.values()) {
+          const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+        }
       }
     }
     client.services.map((s) => services.add(s));

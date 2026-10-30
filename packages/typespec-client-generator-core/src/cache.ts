@@ -38,6 +38,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
   // get root clients with full hierarchy (root clients + sub clients)
   const { clients, mergedSubClientTypes } = getRootClients(context);
+  context.__mergedSubClientTypes = mergedSubClientTypes;
 
   const servicesNs = new Set<Namespace>();
   clients.forEach((c) => c.services.forEach((s) => servicesNs.add(s)));

@@ -5,6 +5,7 @@ import type {
   EnumMember,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   Type,
   Union,
@@ -44,6 +45,56 @@ export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   options?: Type,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Pairs named HTTP server endpoints with OAuth authentication configurations.
+ *
+ * Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
+ *
+ * The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
+ *
+ * Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+ *
+ * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+ *
+ * @param target The namespace using these configurations.
+ * @param configurations The named endpoint and authentication records.
+ * @example
+ * ```typespec
+ * model PublicAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.io/.default"],
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+ * >;
+ * model GovernmentAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.us/.default"],
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+ * >;
+ *
+ * model Configurations {
+ *   public: {
+ *     endpoint: "https://api.loganalytics.io";
+ *     authentication: PublicAuth;
+ *   };
+ *   government: {
+ *     endpoint: "https://api.loganalytics.us";
+ *     authentication: GovernmentAuth;
+ *   };
+ * }
+ *
+ * @service
+ * @azureServiceConfigurations(Configurations)
+ * namespace Logs {
+ *   @get op query(): string;
+ * }
+ * ```
+ */
+export type AzureServiceConfigurationsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  configurations: Model,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -197,6 +248,7 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
+  azureServiceConfigurations: AzureServiceConfigurationsDecorator;
   previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;

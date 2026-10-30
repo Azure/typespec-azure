@@ -1,3 +1,4 @@
+import { getAzureServiceConfigurations } from "@azure-tools/typespec-azure-core";
 import {
   createDiagnosticCollector,
   type EmitContext,
@@ -43,12 +44,14 @@ import {
 } from "./interfaces.js";
 import {
   type BrandedSdkEmitterOptionsInterface,
+  getClientServiceConfigurations,
   handleVersioningMutationForGlobalNamespace,
+  isSameServiceConfigurations,
   parseEmitterName,
   type TCGCEmitterOptions,
   type TspLiteralType,
 } from "./internal-utils.js";
-import { createDiagnostic } from "./lib.js";
+import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
 import { createDuplicateClientNameDiagnostic } from "./validations/diagnostics.js";
 
@@ -256,6 +259,7 @@ export async function createSdkContext<
       sdkContext.examplesDir = normalizeExamplesDir;
     }
   }
+  validateServiceConfigurations(sdkContext);
   sdkContext.sdkPackage = diagnostics.pipe(await createSdkPackage(sdkContext));
   diagnostics.pipe(await handleClientExamples(sdkContext, sdkContext.sdkPackage.clients));
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
@@ -268,6 +272,49 @@ export async function createSdkContext<
     await exportTCGCOutput(sdkContext);
   }
   return sdkContext;
+}
+
+function validateServiceConfigurations(context: TCGCContext): void {
+  // Client discovery applies the SDK's API-version options; linter contexts can skip mutation.
+  for (const client of context.getRootClients()) {
+    if (client.services.length < 2) continue;
+    const catalog = getAzureServiceConfigurations(context.program, client.services[0]);
+    if (
+      client.services
+        .slice(1)
+        .some(
+          (service) =>
+            !isSameServiceConfigurations(
+              catalog,
+              getAzureServiceConfigurations(context.program, service),
+            ),
+        )
+    ) {
+      reportDiagnostic(context.program, {
+        code: "inconsistent-multiple-service",
+        target: client.type ?? client.services[0],
+      });
+    }
+  }
+  for (const [client, types] of context.__mergedSubClientTypes ?? []) {
+    if (!client.parent?.subClients.includes(client)) continue;
+    const catalog = getClientServiceConfigurations(context, { ...client, type: types[0] });
+    const conflictingType = types
+      .slice(1)
+      .find(
+        (type) =>
+          !isSameServiceConfigurations(
+            catalog,
+            getClientServiceConfigurations(context, { ...client, type }),
+          ),
+      );
+    if (conflictingType) {
+      reportDiagnostic(context.program, {
+        code: "inconsistent-multiple-service",
+        target: conflictingType,
+      });
+    }
+  }
 }
 
 function validateNamesUnderNamespaces(context: SdkContext) {

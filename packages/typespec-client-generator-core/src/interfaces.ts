@@ -22,13 +22,13 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  Visibility,
   type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
   type HttpStatusCodeRange,
   type HttpVerb,
-  Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";
 
@@ -79,6 +79,7 @@ export interface TCGCContext {
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
+  __mergedSubClientTypes?: Map<SdkClient, (Namespace | Interface)[]>;
   __clientToOperationsCache?: Map<SdkClient, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient>;
   __clientParametersCache: Map<SdkClient, SdkMethodParameter[]>;
@@ -620,8 +621,21 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+  /** Paired deployment configurations; existing initialization fields describe public. */
+  serviceConfigurations?: {
+    defaultConfiguration: string;
+    configurations: SdkServiceConfiguration[];
+  };
   /** How to initialize a client. */
   initializedBy: InitializedByFlags;
+}
+
+/** A deployment's endpoint and authentication, independent of native constructor shape. */
+export interface SdkServiceConfiguration {
+  name: string;
+  endpoint: SdkEndpointType;
+  authentication: Authentication;
+  credential?: SdkCredentialParameter;
 }
 
 /**
