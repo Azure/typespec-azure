@@ -4,8 +4,6 @@ This rule checks models with a JSON property named `properties`. It finds `syste
 
 Use the standard ARM resource templates, which already provide the envelope's `systemData` property. Do not redeclare it inside the resource's properties model.
 
-The rule is opt-in. Enable `@azure-tools/typespec-azure-resource-manager/no-nested-system-data` explicitly; neither the ARM `all` ruleset nor the general `resource-manager` ruleset enables it.
-
 ## ❌ Incorrect
 
 ```tsp
