@@ -12,18 +12,24 @@ Validate that ARM Resource operations use the correct decorator for the HTTP ver
 This rule only applies to custom operations. Operations using standard ARM resource templates (e.g. `ArmResourceRead`, `ArmResourceCreateOrReplaceAsync`) automatically satisfy this rule unless the http verb is overridden in the spec with additional http verb decorators.
 :::
 
-| HTTP Verb | Required decorator(s)                                                                           |
-| --------- | ----------------------------------------------------------------------------------------------- |
-| PUT       | `@armResourceCreateOrUpdate`                                                                    |
-| GET       | `@armResourceRead`, `@armResourceList`, `@armResourceAction`, or `@armResourceCollectionAction` |
-| PATCH     | `@armResourceUpdate`                                                                            |
-| DELETE    | `@armResourceDelete`                                                                            |
-| POST      | `@armResourceAction` or `@armResourceCollectionAction`                                          |
-| HEAD      | `@armResourceCheckExistence`                                                                    |
+| HTTP Verb | Required decorator(s)                                           |
+| --------- | --------------------------------------------------------------- |
+| PUT       | `@armResourceCreateOrUpdate`                                    |
+| GET       | `@armResourceRead`, `@armResourceList`, or `@armResourceAction` |
+| PATCH     | `@armResourceUpdate`                                            |
+| DELETE    | `@armResourceDelete`                                            |
+| POST      | `@armResourceAction`                                            |
+| HEAD      | `@armResourceCheckExistence`                                    |
 
-Provider operations may use GET or POST, including operations using the `ArmProviderActionSync` and `ArmProviderActionAsync` templates. Other verbs require the corresponding resource operation decorator; a provider-scoped path alone does not exempt an operation from this rule.
+Provider operations must use GET or POST and be decorated with `@providerOperation` or `@armResourceCollectionAction`. The `ArmProviderActionSync` and `ArmProviderActionAsync` templates already apply `@armResourceCollectionAction`. A provider-scoped path alone does not satisfy this rule. Provider operations have separate diagnostics for missing decorators and unsupported HTTP verbs.
+
+For library versions that do not yet expose `@providerOperation`, use `@armResourceCollectionAction` or a standard provider action template.
+
+Resource operations must use a resource operation decorator from the table above or a generic ARM resource operation decorator. Provider-only decorators do not satisfy this requirement, including when applied to an operation with resource key parameters.
 
 Private extension, legacy, and built-in resource operation decorators are also accepted when their `operationType` matches the HTTP verb: `createOrUpdate` for PUT, `read`, `list`, or `action` for GET, `update` for PATCH, `delete` for DELETE, `action` for POST, and `checkExistence` for HEAD.
+
+For HEAD, `@extensionResourceOperation`, `@legacyResourceOperation`, `@builtInResourceOperation`, and `@legacyExtensionResourceOperation` must each specify `operationType: "checkExistence"`. This is required even if `@armResourceCheckExistence` is also present. The missing-decorator diagnostic includes the required operation type, and an existing generic decorator with a different operation type produces an `invalidOperationType` diagnostic.
 
 ## Impact
 

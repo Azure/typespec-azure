@@ -3,6 +3,7 @@ import {
   type LinterRuleTester,
   type TesterInstance,
   createLinterRuleTester,
+  mockFile,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
@@ -12,7 +13,21 @@ let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await Tester.createInstance();
+  // The providerOperation API is tracked separately in #5816 and is not on main yet.
+  runner = await Tester.files({
+    "provider-operation.js": mockFile.js({
+      $decorators: {
+        "Azure.ResourceManager": { providerOperation: function $providerOperation() {} },
+      },
+    }),
+    "provider-operation.tsp": `
+      import "./provider-operation.js";
+      namespace Azure.ResourceManager;
+      extern dec providerOperation(target: TypeSpec.Reflection.Operation);
+    `,
+  })
+    .import("./provider-operation.tsp")
+    .createInstance();
   tester = createLinterRuleTester(
     runner,
     useOperationDecoratorRule,
@@ -47,32 +62,32 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource PUT operation must be decorated with @armResourceCreateOrUpdate or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          'Resource PUT operation must be decorated with @armResourceCreateOrUpdate or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation. Generic ARM resource operation decorators must use operationType "createOrUpdate".',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @armResourceAction or @armResourceCollectionAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          'Resource GET operation must be decorated with @armResourceRead or @armResourceList or @armResourceAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation. Generic ARM resource operation decorators must use operationType "read" or "list" or "action".',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource PATCH operation must be decorated with @armResourceUpdate or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          'Resource PATCH operation must be decorated with @armResourceUpdate or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation. Generic ARM resource operation decorators must use operationType "update".',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource DELETE operation must be decorated with @armResourceDelete or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          'Resource DELETE operation must be decorated with @armResourceDelete or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation. Generic ARM resource operation decorators must use operationType "delete".',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          'Resource POST operation must be decorated with @armResourceAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation. Generic ARM resource operation decorators must use operationType "action".',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource HEAD operation must be decorated with @armResourceCheckExistence or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          'Resource HEAD operation must be decorated with @armResourceCheckExistence or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation. Generic ARM resource operation decorators must use operationType "checkExistence".',
       },
     ]);
 });
@@ -133,20 +148,37 @@ describe("Resource operation verbs", () => {
       .toBeValid();
   });
 
-  it.each(["armResourceAction(FooResource)", "armResourceCollectionAction"])(
-    "accepts GET actions decorated with @%s",
-    async (decorator) => {
-      await tester
-        .expect(
-          resourceOperationSetup(`
-          @${decorator}
+  it("accepts GET resource actions", async () => {
+    await tester
+      .expect(
+        resourceOperationSetup(`
+          @armResourceAction(FooResource)
           @get
           action(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
         `),
-        )
-        .toBeValid();
-    },
-  );
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    ["providerOperation", "get"],
+    ["providerOperation", "post"],
+    ["armResourceCollectionAction", "get"],
+    ["armResourceCollectionAction", "post"],
+  ])("does not accept provider-only @%s on a resource %s operation", async (decorator, verb) => {
+    await tester
+      .expect(
+        resourceOperationSetup(`
+          @${decorator}
+          @${verb}
+          action(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource>;
+        `),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message: new RegExp(`Resource ${verb.toUpperCase()} operation must be decorated with`),
+      });
+  });
 
   it.each([
     ["armResourceRead(FooResource)", "head", "HEAD", "@armResourceCheckExistence"],
@@ -278,6 +310,29 @@ describe("Private ARM resource decorators", () => {
       });
   });
 
+  it.each(privateDecorators)(
+    "validates @%s operationType even with a public HEAD decorator",
+    async (decorator) => {
+      for (const decorators of [
+        `@${decorator} "read") @armResourceCheckExistence(FooResource)`,
+        `@armResourceCheckExistence(FooResource) @${decorator} "read")`,
+      ]) {
+        await tester
+          .expect(
+            buildPrivateDecoratorTestSpec(`
+            ${decorators}
+            @head
+            exists(...ResourceInstanceParameters<FooResource>): ArmResourceExistsResponse | ArmResourceNotFoundResponse;
+          `),
+          )
+          .toEmitDiagnostics({
+            code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+            message: `Resource HEAD operation decorator @${decorator.split("(")[0]} must use operationType "checkExistence".`,
+          });
+      }
+    },
+  );
+
   it.each(privateDecorators)("accepts GET with @%s action", async (decorator) => {
     await tester
       .expect(
@@ -397,13 +452,46 @@ describe("Provider operations", () => {
        
       ${content}
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
       interface VirtualMachinesOperations {
         ${operation}
       }
     `;
   }
+
+  it("requires a provider decorator on the standard provider operations list", async () => {
+    await tester
+      .expect(
+        providerOperationSetup(
+          ``,
+          `
+        interface Operations {
+          list is Azure.ResourceManager.Operations.list;
+        }
+      `,
+        ),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+        message:
+          "Provider operations must be decorated with @providerOperation or @armResourceCollectionAction.",
+      });
+  });
+
+  it("accepts a provider decorator on the standard provider operations list", async () => {
+    await tester
+      .expect(
+        providerOperationSetup(
+          ``,
+          `
+        interface Operations {
+          @armResourceCollectionAction
+          list is Azure.ResourceManager.Operations.list;
+        }
+      `,
+        ),
+      )
+      .toBeValid();
+  });
 
   it("doesn't emit a diagnostic for provider operations", async () => {
     const content = providerOperationSetup(
@@ -453,10 +541,37 @@ describe("Provider operations", () => {
     await tester.expect(content).toBeValid();
   });
 
-  it.each(["get", "post"])("accepts custom provider operations using %s", async (verb) => {
+  it.each(["get", "post"])(
+    "requires decorators on custom provider operations using %s",
+    async (verb) => {
+      await tester
+        .expect(
+          providerOperationSetup(`
+        @${verb}
+        operation(
+          ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>,
+          ...Azure.ResourceManager.Foundations.DefaultProviderNamespace
+        ): string;
+      `),
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+          message:
+            "Provider operations must be decorated with @providerOperation or @armResourceCollectionAction.",
+        });
+    },
+  );
+
+  it.each([
+    ["get", "providerOperation"],
+    ["post", "providerOperation"],
+    ["get", "armResourceCollectionAction"],
+    ["post", "armResourceCollectionAction"],
+  ])("accepts provider %s operations with @%s", async (verb, decorator) => {
     await tester
       .expect(
         providerOperationSetup(`
+        @${decorator}
         @${verb}
         operation(
           ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>,
@@ -466,6 +581,24 @@ describe("Provider operations", () => {
       )
       .toBeValid();
   });
+
+  it.each(["put", "patch", "delete", "head"])(
+    "rejects @providerOperation using %s",
+    async (verb) => {
+      await tester
+        .expect(
+          providerOperationSetup(`
+          @providerOperation
+          @${verb}
+          operation(): string;
+        `),
+        )
+        .toEmitDiagnostics({
+          code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+          message: `Provider ${verb.toUpperCase()} operation must use GET or POST.`,
+        });
+    },
+  );
 
   it("requires a resource decorator after a dynamic provider path segment", async () => {
     await tester
@@ -500,10 +633,17 @@ describe("Provider operations", () => {
           ): string;
         `),
         )
-        .toEmitDiagnostics({
-          code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
-          message: new RegExp(`Resource ${verb.toUpperCase()} operation must be decorated with`),
-        });
+        .toEmitDiagnostics([
+          {
+            code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+            message:
+              "Provider operations must be decorated with @providerOperation or @armResourceCollectionAction.",
+          },
+          {
+            code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
+            message: `Provider ${verb.toUpperCase()} operation must use GET or POST.`,
+          },
+        ]);
     },
   );
 
@@ -519,7 +659,7 @@ describe("Provider operations", () => {
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
-          message: new RegExp(`Resource ${verb.toUpperCase()} operation must be decorated with`),
+          message: `Provider ${verb.toUpperCase()} operation must use GET or POST.`,
         });
     },
   );
