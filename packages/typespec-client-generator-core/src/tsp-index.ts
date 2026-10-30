@@ -19,6 +19,7 @@ import {
   $convenientAPI,
   $deserializeEmptyStringAsNull,
   $disablePageable,
+  $dynamicModel,
   $flattenProperty,
   $legacyHierarchyBuilding,
   $markAsLro,
@@ -71,6 +72,7 @@ export const $decorators = {
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
     clientOption: $clientOption,
+    dynamicModel: $dynamicModel,
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {
