@@ -68,13 +68,13 @@ op createOrUpdate is ArmResourceCreateOrReplaceAsync<
 
 ## Update (PATCH)
 
-The `ArmResourcePatchAsync` and `ArmCustomPatchAsync` templates use `ArmLroLocationHeader` by
-default with the resource as the final result.
+The `ArmCustomPatchAsync` template uses `ArmLroLocationHeader` by default with the resource as the
+final result.
 
 ### Default
 
 ```typespec
-op update is ArmResourcePatchAsync<MyResource, MyResourceProperties>;
+op update is ArmCustomPatchAsync<MyResource, MyResourcePatch>;
 ```
 
 The default `LroHeaders` for PATCH is:
@@ -89,9 +89,9 @@ To use an `Azure-AsyncOperation` header instead of `Location`, override the `Lro
 Set `FinalResult` to the resource type:
 
 ```typespec
-op update is ArmResourcePatchAsync<
+op update is ArmCustomPatchAsync<
   MyResource,
-  MyResourceProperties,
+  MyResourcePatch,
   LroHeaders = ArmAsyncOperationHeader<FinalResult = MyResource> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
@@ -102,9 +102,9 @@ op update is ArmResourcePatchAsync<
 To return both headers, use `ArmCombinedLroHeaders`. Set `FinalResult` to the resource type:
 
 ```typespec
-op update is ArmResourcePatchAsync<
+op update is ArmCustomPatchAsync<
   MyResource,
-  MyResourceProperties,
+  MyResourcePatch,
   LroHeaders = ArmCombinedLroHeaders<FinalResult = MyResource> &
     Azure.Core.Foundations.RetryAfterHeader
 >;

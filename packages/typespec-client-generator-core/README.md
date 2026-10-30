@@ -120,7 +120,7 @@ Available ruleSets:
 
 | Name                                                                                                                                                                                                  | Description                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-client-generator-core/use-create-for-put`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-create-for-put)                     | ARM PUT SDK method names should use 'create' as the verb prefix.                                                                                                    |
+| [`@azure-tools/typespec-client-generator-core/use-correct-verb`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-correct-verb)                         | PUT, PATCH, and DELETE SDK method names should start with 'create', 'update', and 'delete', respectively.                                                           |
 | [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)               | Client names should end with 'Client'.                                                                                                                              |
 | [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)             | Avoid naming conflicts between a property and a model of the same name.                                                                                             |
 | [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.                                                                     |
@@ -146,6 +146,7 @@ Available ruleSets:
 - [`@clientOption`](#@clientoption)
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
+- [`@lroStatusMetadata`](#@lrostatusmetadata)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
@@ -999,6 +1000,39 @@ model MyModel {
   prop: stringlike;
 }
 ```
+
+#### `@lroStatusMetadata`
+
+Marks a status-monitor model property as transient polling data that the SDK should expose to
+callers while the long-running operation is in progress, for scenarios like reporting progress,
+usage, or job statistics. Emitters whose operations return only the final result, such as Python
+and JavaScript, would otherwise need handwritten code to surface these values; marked properties
+appear on the emitter's idiomatic poller or operation object instead. The property does not affect
+polling, status evaluation, errors, or final-result extraction.
+
+Values come from the most recent status-monitor response the SDK has received, including the
+initial response when it contains the status-monitor model. Any value may be absent until a
+response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+Emitters should keep these values current after each poll. Metadata is not part of the
+continuation token; after rehydration, the next poll populates it again.
+
+Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
+are diagnosed once at declaration time.
+
+```typespec
+@Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The status-monitor model property.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
 
 #### `@operationGroup`
 

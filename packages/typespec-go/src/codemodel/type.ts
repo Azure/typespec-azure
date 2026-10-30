@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging -- codemodel intentionally merges interface and class declarations of the same name to define its public API shape. */
 
-import * as path from "path";
+import { getBaseFileName } from "@typespec/compiler";
 import { Client, ClientOptions } from "./client.js";
 import { type PackageContent, type PackageType, getPackageName } from "./module.js";
 import { ParameterGroup } from "./param.js";
@@ -598,7 +598,7 @@ export function getTypeDeclaration(
     case "readSeekCloser":
     case "tokenCredential":
       // strip module to just the leaf package as required
-      return `${byRef}${path.basename(type.module)}.${type.name}`;
+      return `${byRef}${getBaseFileName(type.module)}.${type.name}`;
   }
 }
 

@@ -60,16 +60,33 @@ describe("expect all rules to be defined", () => {
       ruleset.enable?.["@azure-tools/typespec-client-generator-core/get-operation-name"],
       false,
     );
+    strictEqual(
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-correct-verb"],
+      false,
+    );
     ok(
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );
   });
 
-  it("keeps PUT SDK naming guidance opt-in", () => {
-    const ruleName = "@azure-tools/typespec-client-generator-core/use-create-for-put";
-    ok($linter.ruleSets?.["client-sdk"].disable?.[ruleName]);
-    for (const rulesetName of ["data-plane", "resource-manager", "client-sdk"]) {
-      ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
+  it("keeps combined SDK naming guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[rulesetName].disable?.[ruleName], undefined);
+    }
+    for (const oldName of ["use-create-for-put", "use-update-for-patch", "use-delete-for-delete"]) {
+      for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+        strictEqual(
+          ruleset.enable?.[`@azure-tools/typespec-client-generator-core/${oldName}`],
+          undefined,
+        );
+        strictEqual(
+          ruleset.disable?.[`@azure-tools/typespec-client-generator-core/${oldName}`],
+          undefined,
+        );
+      }
     }
   });
 
@@ -115,6 +132,15 @@ describe("expect all rules to be defined", () => {
       undefined,
     );
   });
+
+  it.each(["no-query-in-post", "use-model-request-body"])(
+    "enables rolled-out ARM rule %s by default",
+    (name) => {
+      const ruleName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+      strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
+      strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    },
+  );
 
   it("keeps redundant summary guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";

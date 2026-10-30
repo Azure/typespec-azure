@@ -171,6 +171,20 @@ function doc(code: string) {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "union-model-discriminator-conflict": {
+      ...doc("union-model-discriminator-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' cannot be converted to a polymorphic SDK model because model '${"modelName"}' in its hierarchy uses @discriminator. Use @discriminated on the union without @discriminator on its model hierarchy, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
+    "union-model-conversion-conflict": {
+      ...doc("union-model-conversion-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
     "union-null": {
       ...doc("union-null"),
       severity: "warning",
@@ -197,6 +211,27 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
+      },
+    },
+    "lro-status-metadata-duplicate": {
+      ...doc("lro-status-metadata-duplicate"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@lroStatusMetadata is applied more than once to property '${"propertyName"}' with overlapping scopes.`,
+      },
+    },
+    "lro-status-metadata-name-conflict": {
+      ...doc("lro-status-metadata-name-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`LRO status metadata has more than one entry with the projected client name '${"clientName"}'.`,
+      },
+    },
+    "lro-status-metadata-structural-property": {
+      ...doc("lro-status-metadata-structural-property"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@lroStatusMetadata cannot select the status monitor's ${"role"} property '${"propertyName"}'.`,
       },
     },
     "conflicting-multipart-model-usage": {

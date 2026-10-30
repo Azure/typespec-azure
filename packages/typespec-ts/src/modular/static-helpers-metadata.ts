@@ -244,6 +244,57 @@ export const XmlHelpers = {
   },
 } as const;
 
+export const StreamingHelpers = {
+  StreamResponse: {
+    kind: "typeAlias",
+    name: "StreamResponse",
+    location: "streamingHelpers.ts",
+  },
+  getStreamResponse: {
+    kind: "function",
+    name: "getStreamResponse",
+    location: "streamingHelpers.ts",
+  },
+  readJsonlStream: {
+    kind: "function",
+    name: "readJsonlStream",
+    location: "streamingHelpers.ts",
+  },
+} as const;
+
+export const SseStreamingHelpers = {
+  SseResponse: {
+    kind: "typeAlias",
+    name: "SseResponse",
+    location: "getSseResponse.ts",
+  },
+  getSseResponse: {
+    kind: "function",
+    name: "getSseResponse",
+    location: "getSseResponse.ts",
+  },
+  parseSseErrorResponse: {
+    kind: "function",
+    name: "parseSseErrorResponse",
+    location: "getSseResponse.ts",
+  },
+  cancelSseResponse: {
+    kind: "function",
+    name: "cancelSseResponse",
+    location: "getSseResponse.ts",
+  },
+  SseEventDescriptor: {
+    kind: "interface",
+    name: "SseEventDescriptor",
+    location: "sseStreamingHelpers.ts",
+  },
+  readSseStream: {
+    kind: "function",
+    name: "readSseStream",
+    location: "sseStreamingHelpers.ts",
+  },
+} as const;
+
 export const StorageCompatHelpers = {
   StorageCompatResponseInfo: {
     kind: "interface",
