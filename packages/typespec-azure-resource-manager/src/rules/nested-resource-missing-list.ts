@@ -22,7 +22,7 @@ export const nestedResourceMissingListRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/nested-resource-missing-list",
   messages: {
-    default: paramMessage`Nested resource '${"name"}' must have a list operation at its parent collection.`,
+    default: paramMessage`The nested resource "${"name"}" does not have list operation, please add it.`,
   },
   create(context) {
     const reportedModels = new Set<Model>();
@@ -53,14 +53,16 @@ export const nestedResourceMissingListRule = createRule({
             (list) =>
               normalizeRoute(list.path) === collectionPath && isCollectionGet(list.httpOperation),
           );
-          const hasAllCollectionGets = instanceOperations.every(({ operation }) => {
-            const service = serviceByOperation.get(operation);
-            return (
-              service !== undefined &&
-              matchingLists.some((list) => serviceByOperation.get(list.operation) === service)
-            );
-          });
-          if (hasAllCollectionGets) continue;
+          const hasCollectionGetInEveryInstanceService = instanceOperations.every(
+            ({ operation }) => {
+              const service = serviceByOperation.get(operation);
+              return (
+                service !== undefined &&
+                matchingLists.some((list) => serviceByOperation.get(list.operation) === service)
+              );
+            },
+          );
+          if (hasCollectionGetInEveryInstanceService) continue;
 
           reportMissingList(resource.type, firstOperation.operation);
         }

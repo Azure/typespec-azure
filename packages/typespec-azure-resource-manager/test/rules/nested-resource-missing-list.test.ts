@@ -23,7 +23,7 @@ const service = `
 
 const diagnostic = (name = "Part") => ({
   code: "@azure-tools/typespec-azure-resource-manager/nested-resource-missing-list",
-  message: `Nested resource '${name}' must have a list operation at its parent collection.`,
+  message: `The nested resource "${name}" does not have list operation, please add it.`,
 });
 
 it("reports an instance-only child on its authored interface", async () => {
@@ -226,31 +226,6 @@ it.skip("accepts a registered list for equivalent read and legacy PUT resource p
     .toBeValid();
 });
 
-// Deferred until REST-only resource associations are exposed by the resolver: #5885.
-it.skip("checks REST-only instance routes even when the model also has resolved ARM operations", async () => {
-  await tester
-    .expect(
-      `${service}
-      @armResourceOperations interface Parts {
-        get is ArmResourceRead<Part>;
-        list is ArmResourceListByParent<Part>;
-      }
-      interface OtherParts {
-        @get
-        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/alternateParts/{partName}")
-        @readsResource(Part)
-        get(
-          @path subscriptionId: string,
-          @path resourceGroupName: string,
-          @path widgetName: string,
-          @path partName: string
-        ): ArmResponse<Part>;
-      }
-    `,
-    )
-    .toEmitDiagnostics(diagnostic());
-});
-
 it("checks a read-only singleton child", async () => {
   await tester
     .expect(
@@ -327,9 +302,6 @@ it("checks children at location scope", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-// https://github.com/Azure/typespec-azure/issues/5886
-// Automation uses a separate collection-item model and also exposes a parent read:
-// https://github.com/MaryGao/azure-rest-api-specs/blob/2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9/specification/automation/resource-manager/Microsoft.Automation/Automation/AutomationAccount.tsp#L137-L160
 it.each([
   { itemType: "Part", parentRead: false },
   { itemType: "Part", parentRead: true },
@@ -401,32 +373,6 @@ it("still reports a missing list when a later action overrides Read metadata", a
     .toEmitDiagnostics(diagnostic());
 });
 
-// CustomAzureProxyResource<false> is intentionally not registered; see #4798.
-it.skip("checks registered lifecycle operations on a legacy custom child", async () => {
-  await tester
-    .expect(
-      `${service.replace("ProxyResource<WidgetProperties>", "Azure.ResourceManager.Legacy.CustomAzureProxyResource<false>")}
-      @armResourceOperations interface Parts {
-        get is ArmResourceRead<Part>;
-      }
-    `,
-    )
-    .toEmitDiagnostics(diagnostic());
-});
-
-it.skip("accepts a legacy custom child with a parent list", async () => {
-  await tester
-    .expect(
-      `${service.replace("ProxyResource<WidgetProperties>", "Azure.ResourceManager.Legacy.CustomAzureProxyResource<false>")}
-      @armResourceOperations interface Parts {
-        get is ArmResourceRead<Part>;
-        list is ArmResourceListByParent<Part>;
-      }
-    `,
-    )
-    .toBeValid();
-});
-
 const legacyOperations = `
   interface LegacyParts extends Azure.ResourceManager.Legacy.LegacyOperations<
     {
@@ -440,9 +386,7 @@ const legacyOperations = `
   > {}
 `;
 
-// Legacy coverage is deferred for this initial non-legacy implementation.
-// Ordinary LegacyOperations.Read is already supported by resolveArmResources.
-it.skip("checks legacy operations associated through REST resource metadata", async () => {
+it("checks legacy operations associated through REST resource metadata", async () => {
   await tester
     .expect(
       `${service}
@@ -455,7 +399,7 @@ it.skip("checks legacy operations associated through REST resource metadata", as
     .toEmitDiagnostics(diagnostic());
 });
 
-it.skip("accepts a child with legacy read and list operations", async () => {
+it("accepts a child with legacy read and list operations", async () => {
   await tester
     .expect(
       `${service}
