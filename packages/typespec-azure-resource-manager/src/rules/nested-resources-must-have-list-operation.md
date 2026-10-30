@@ -17,46 +17,20 @@ Listing application versions does not replace listing applications in a gallery.
 Add `ArmResourceListByParent<Part>` alongside the `Part` lifecycle operations to provide the
 required list.
 
-This initial implementation checks resource identities and instance operations returned by
-`resolveArmResources`. Unregistered custom resources and REST-only instance routes missing from
-that graph are not checked. The intentional exclusion of `CustomAzureProxyResource<false>` is discussed in
-[typespec-azure#4798](https://github.com/Azure/typespec-azure/issues/4798).
-Registered resources using legacy read and list operation templates are covered.
-
-This rule applies to nested resources with lifecycle operations at resource-group, subscription,
-or location scope, including read-only and singleton resources. It does not require lists for
-top-level resources, unused resource declarations, action-only resources, or tenant/extension scopes.
-Top-level list requirements are separate policies. Listing `Widget` instances, another resource type,
+This rule applies to nested resources at resource-group, subscription, or location scope,
+including read-only and singleton resources. Top-level list requirements are separate policies.
+Listing `Widget` instances, another resource type,
 or `Part` instances across a subscription does not replace listing `Part` instances within one `Widget`.
 
-The collection GET must appear in the resource's resolved `operations.lists`. Registered list
-operations can be authored on another interface in the same service. Each service containing
-instance operations must provide its own matching list. Lists must return a successful response with a
-2xx status code and use GET. The list item property can have any name, and the items may use a
-separate collection representation of the resource. This rule relies on the resolved list
-classification rather than validating the response body's shape.
-
-An action returning a collection does not replace a registered list, even when its HTTP route matches
-the parent collection. Collection associations are
-tracked in [typespec-azure#5080](https://github.com/Azure/typespec-azure/issues/5080), and a dropped
-parent-action operation is tracked in
-[typespec-azure#5886](https://github.com/Azure/typespec-azure/issues/5886).
-Equivalent-path read and create/update identities can also receive different list associations;
-see [typespec-azure#5899](https://github.com/Azure/typespec-azure/issues/5899).
-This rule does not work around those helper limitations.
-
-The rule evaluates source declarations, consistent with existing missing-operation rules.
-It does not check operation availability separately for each API version. General version-aware
-detection, reporting, and suppression are tracked in
-[typespec-azure#5875](https://github.com/Azure/typespec-azure/issues/5875).
+Define the list operation in the same service as the nested resource operations. It must use GET
+and return a successful 2xx response. Use `ArmResourceListByParent<Part>` rather than an action
+returning a collection.
 
 ## Impact
 
 - **Area:** API
 
 Clients cannot discover instances of the nested resource within a containing resource without this list operation.
-The rule reports one warning per resource on its lifecycle operation interface, or on its model
-when the lifecycle operation is not in an interface.
 
 The rule is disabled by default, including in the package's `all` ruleset. Enable
 `@azure-tools/typespec-azure-resource-manager/nested-resources-must-have-list-operation` explicitly to adopt it.
@@ -118,9 +92,3 @@ The examples assume the ARM library and its usual `Http`, `Rest`, `Versioning`, 
 
 This rule corresponds to
 [NestedResourcesMustHaveListOperation](https://github.com/Azure/azure-openapi-validator/blob/main/docs/nested-resources-must-have-list-operation.md).
-The native rule reports a warning per authored resource using ARM/REST resource-operation
-metadata and HTTP collection routes. The Swagger validator reports an error per discovered model name
-using subscription-prefixed routes and response-schema associations. The native rule requires a list
-of nested-resource instances within their directly containing resource; a collection at another scope
-does not satisfy this rule.
-These intentional metadata and diagnostic-unit differences do not imply exact Swagger-count parity.
