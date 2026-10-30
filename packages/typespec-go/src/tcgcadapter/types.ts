@@ -324,11 +324,13 @@ export class TypeAdapter {
   // returns the Go code model type for the specified SDK type.
   // the operation is idempotent, so getting the same type multiple times
   // returns the same instance of the converted type.
+  // mapElementsByValue is reserved for URI parameters, not spread bodies.
   getWireType(
     type: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
     xmlItemsName?: string,
+    mapElementsByValue = false,
   ): Exclude<go.WireType, go.Ptr> {
     switch (type.kind) {
       case "boolean":
@@ -369,7 +371,7 @@ export class TypeAdapter {
             : this.codeModel.options["slice-elements-byval"] === true;
 
         const keyName = recursiveKeyName(
-          `array-${myElementTypeByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
+          `array-${myElementTypeByValue}-${mapElementsByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
           valueType,
           substituteDiscriminator,
         );
@@ -383,6 +385,8 @@ export class TypeAdapter {
           valueType,
           elementTypeByValue,
           substituteDiscriminator,
+          undefined,
+          mapElementsByValue,
         );
         switch (elementType.kind) {
           case "constantDef":
@@ -439,9 +443,10 @@ export class TypeAdapter {
           type.valueType,
           elementTypeByValue,
           substituteDiscriminator,
+          mapElementsByValue,
         );
         const keyName = recursiveKeyName(
-          `dict-${elementTypeByValue}${valueType.kind === "ptr" ? "-ptr" : ""}`,
+          `dict-${elementTypeByValue}-${mapElementsByValue}${valueType.kind === "ptr" ? "-ptr" : ""}`,
           type.valueType,
           substituteDiscriminator,
         );
@@ -486,7 +491,13 @@ export class TypeAdapter {
         }
         return this.getModel(type);
       case "nullable":
-        return this.getWireType(type.type, elementTypeByValue, substituteDiscriminator);
+        return this.getWireType(
+          type.type,
+          elementTypeByValue,
+          substituteDiscriminator,
+          undefined,
+          mapElementsByValue,
+        );
       case "union":
         if (type.discriminatedOptions) {
           throw new AdapterError(
@@ -1328,8 +1339,15 @@ export class TypeAdapter {
     sdkType: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
+    mapElementsByValue = false,
   ): go.MapValueType {
-    const valueType = this.getWireType(sdkType, elementTypeByValue, substituteDiscriminator);
+    const valueType = this.getWireType(
+      sdkType,
+      elementTypeByValue,
+      substituteDiscriminator,
+      undefined,
+      mapElementsByValue,
+    );
     switch (valueType.kind) {
       case "constantDef":
       case "constantValue":
@@ -1343,7 +1361,7 @@ export class TypeAdapter {
           sdkType.__raw?.node,
         );
       default:
-        return !elementTypeByValue && helpers.isPtrType(valueType)
+        return !mapElementsByValue && helpers.isPtrType(valueType)
           ? this.getPtrType(valueType)
           : valueType;
     }

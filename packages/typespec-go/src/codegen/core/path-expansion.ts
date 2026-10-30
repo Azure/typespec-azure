@@ -75,6 +75,9 @@ export function generatePathExpansionHelpers(pkg: go.PackageContent): string {
 		part := format(value)
 		if escape {
 			part = url.PathEscape(part)
+			if separator == "." {
+				part = strings.ReplaceAll(part, ".", "%2E")
+			}
 		}
 		parts = append(parts, part)
 	}
@@ -99,6 +102,13 @@ export function generatePathExpansionHelpers(pkg: go.PackageContent): string {
 		if escape {
 			key = url.PathEscape(key)
 			value = url.PathEscape(value)
+			if explode {
+				key = strings.ReplaceAll(key, "=", "%3D")
+			}
+			if separator == "." {
+				key = strings.ReplaceAll(key, ".", "%2E")
+				value = strings.ReplaceAll(value, ".", "%2E")
+			}
 		}
 		if explode {
 			parts = append(parts, key + "=" + value)

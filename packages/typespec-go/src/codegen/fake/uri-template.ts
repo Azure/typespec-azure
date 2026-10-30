@@ -52,7 +52,7 @@ function valueParser(type: go.WireType, pkg: go.FakePackage, imports: ImportMana
     }
     case "encodedBytes":
       imports.add("encoding/base64");
-      body = `return base64.${wireType.encoding}Encoding.DecodeString(v)`;
+      body = `return base64.${helpers.formatBytesEncoding(wireType.encoding)}Encoding.DecodeString(v)`;
       break;
     case "time": {
       imports.add("time");
@@ -107,7 +107,7 @@ export function parseURITemplateParameter(
   } else if (param.kind === "queryMapParam") {
     const parser = valueParser(param.type.itemType, pkg, imports);
     if (!param.explode) {
-      const parse = `parseURIMap(splitURIQuery(${raw}), false, false, ${parser})`;
+      const parse = `parseURIQueryMap(${raw}, ${parser})`;
       if (go.isRequiredParameter(param.style)) {
         text += `${result}, err := ${parse}\n${fail}`;
       } else {

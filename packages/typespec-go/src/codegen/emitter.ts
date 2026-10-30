@@ -112,6 +112,11 @@ export class Emitter {
           await write("path_helpers.go", pathExpansionHelpers);
         }
 
+        const queryExpansionHelpers = core.generateQueryExpansionHelpers(pkg);
+        if (queryExpansionHelpers.length > 0) {
+          await write("query_helpers.go", queryExpansionHelpers);
+        }
+
         const models = core.generateModels(pkg, this.codeModel.options, emitter);
         if (models.models.length > 0) {
           await write("models.go", models.models);

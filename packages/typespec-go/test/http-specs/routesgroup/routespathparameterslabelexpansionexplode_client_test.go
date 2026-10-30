@@ -25,9 +25,9 @@ func TestRoutesLabelExplode(t *testing.T) {
 }
 
 func TestRoutesLabelArrayEscapesComponents(t *testing.T) {
-	root := newRoutesRequestClient(t, "/routes/path/label/explode/array.a%2Fb%2Cc%3Bd=e%20f+.z", url.Values{})
+	root := newRoutesRequestClient(t, "/routes/path/label/explode/array.a%2Fb%2Cc%3Bd=e%20f+%2Eg.z", url.Values{})
 	client := root.NewRoutesPathParametersClient().NewRoutesPathParametersLabelExpansionClient().NewRoutesPathParametersLabelExpansionExplodeClient()
-	_, err := client.Array(context.Background(), []string{"a/b,c;d=e f+", "z"}, nil)
+	_, err := client.Array(context.Background(), []string{"a/b,c;d=e f+.g", "z"}, nil)
 	require.NoError(t, err)
 }
 

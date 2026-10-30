@@ -196,25 +196,49 @@ function emitURITemplate(imports: ImportManager): string {
 		return result, nil
 	}
 
+	func parseRawURIQuery(query string) (url.Values, error) {
+		result := url.Values{}
+		for _, part := range strings.Split(query, "&") {
+			if part == "" {
+				continue
+			}
+			key, value, _ := strings.Cut(part, "=")
+			key, err := url.QueryUnescape(key)
+			if err != nil {
+				return nil, err
+			}
+			result.Add(key, value)
+		}
+		return result, nil
+	}
+
+	func parseURIQueryMap[T any](value string, parse func(string) (T, error)) (map[string]T, error) {
+		parts := splitURIQuery(value)
+		for i, part := range parts {
+			decoded, err := url.QueryUnescape(part)
+			if err != nil {
+				return nil, err
+			}
+			parts[i] = decoded
+		}
+		return parseURIMap(parts, false, false, parse)
+	}
+
 	func parseURIQueryObject(value string, keys []string) (url.Values, error) {
 		fields := make(map[string]bool, len(keys))
 		for _, key := range keys {
 			fields[key] = true
 		}
+		values, err := parseURIQueryMap(value, func(v string) (string, error) { return v, nil })
+		if err != nil {
+			return nil, err
+		}
 		result := url.Values{}
-		parts := splitURIQuery(value)
-		for i := 0; i < len(parts); {
-			key := parts[i]
-			if !fields[key] || i+1 == len(parts) {
+		for key, item := range values {
+			if !fields[key] {
 				return nil, fmt.Errorf("invalid URI query object entry %q", key)
 			}
-			i++
-			start := i
-			i++
-			for i < len(parts) && !fields[parts[i]] {
-				i++
-			}
-			result[key] = []string{strings.Join(parts[start:i], ",")}
+			result.Set(key, item)
 		}
 		return result, nil
 	}

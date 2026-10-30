@@ -17,6 +17,7 @@ export { generateOperations } from "./operations.js";
 export { generateOptions } from "./options.js";
 export { generatePathExpansionHelpers } from "./path-expansion.js";
 export { generatePolymorphicHelpers } from "./polymorphics.js";
+export { generateQueryExpansionHelpers } from "./query-expansion.js";
 export { generateResponses } from "./responses.js";
 export { generateUnions } from "./unions.js";
 export { generateVersionInfo } from "./version.js";

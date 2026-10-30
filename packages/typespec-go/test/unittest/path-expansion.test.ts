@@ -2,6 +2,27 @@ import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
 describe("path expansion helper emission", () => {
+  it.each([
+    { expansion: "filter", member: "values: string[]", parameter: "filter: Filter" },
+    { expansion: "filter*", member: "values?: string[]", parameter: "filter: Filter" },
+    { expansion: "filter", member: "values: string[] | null", parameter: "filter?: Filter" },
+    { expansion: "filter*", member: "values: string[]", parameter: "filter?: Filter" },
+  ])(
+    "rejects array-valued query object members: $expansion, $member",
+    async ({ expansion, member, parameter }) => {
+      await expect(
+        emitGoFor(`
+        @service
+        namespace Expansions;
+        model BaseFilter { ${member}; }
+        model Filter extends BaseFilter { count?: int32; }
+        @route("/query{?${expansion}}")
+        op read(${parameter}): void;
+      `),
+      ).rejects.toThrow("query objects cannot contain array-valued fields");
+    },
+  );
+
   it("does not emit payload models or serde for query parameter groups", async () => {
     const files = await emitGoFor(`
       @service
@@ -127,4 +148,31 @@ describe("path expansion helper emission", () => {
     );
     expect(files.has("child/generated_path_helpers.go")).toBe(true);
   });
+
+  it.each([
+    { parameter: "value: Record<int32>", expansion: "value", helpers: true, preserve: false },
+    { parameter: "value?: Record<int32>", expansion: "value", helpers: true, preserve: true },
+    { parameter: "value: Filter", expansion: "value", helpers: true, preserve: false },
+    { parameter: "value?: Filter", expansion: "value", helpers: true, preserve: true },
+    { parameter: "value: OptionalFilter", expansion: "value", helpers: true, preserve: true },
+    { parameter: "value: Filter", expansion: "value*", helpers: false, preserve: false },
+    { parameter: "value: string[]", expansion: "value", helpers: false, preserve: false },
+  ])(
+    "selects query helpers for $parameter {$expansion}",
+    async ({ parameter, expansion, helpers, preserve }) => {
+      const files = await emitGoFor(`
+      @service namespace Expansions;
+      model Filter { field: string; }
+      model OptionalFilter { field?: string; }
+      @route("/query{?${expansion}}")
+      op read(${parameter}): void;
+    `);
+      expect(files.has("zz_query_helpers.go")).toBe(helpers);
+      expect(
+        files.get("zz_query_helpers.go")?.includes("func preserveQueryExpansions") ?? false,
+      ).toBe(preserve);
+      const client = files.get("zz_expansions_client.go")!;
+      expect(client.includes("preserveQueryExpansions(")).toBe(preserve);
+    },
+  );
 });
