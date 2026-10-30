@@ -22,7 +22,7 @@ This initial implementation checks resource identities and instance operations r
 `resolveArmResources`. Unregistered custom resources and REST-only instance routes missing from
 that graph are not checked. The intentional exclusion of `CustomAzureProxyResource<false>` is discussed in
 [typespec-azure#4798](https://github.com/Azure/typespec-azure/issues/4798).
-Legacy-specific test coverage is temporarily deferred.
+Registered resources using legacy read and list operation templates are covered.
 
 This rule applies to nested resources with lifecycle operations at resource-group, subscription,
 or location scope, including read-only and singleton resources. It does not require lists for
@@ -31,13 +31,14 @@ Top-level list requirements are separate policies. Listing `Widget` instances, a
 or `Part` instances across a subscription does not replace listing `Part` instances within one `Widget`.
 
 The collection GET must appear in the resource's resolved `operations.lists`. Registered list
-operations can be authored on another interface. They must return a successful response with a
+operations can be authored on another interface in the same service. Each service containing
+instance operations must provide its own matching list. Lists must return a successful response with a
 2xx status code and use GET. The list item property can have any name, and the items may use a
 separate collection representation of the resource. This rule relies on the resolved list
 classification rather than validating the response body's shape.
 
-Collections authored only as actions are not recognized unless the resolver exposes them as lists.
-This can produce a warning even when the HTTP collection GET exists. Collection associations are
+An action returning a collection does not replace a registered list, even when its HTTP route matches
+the parent collection. Collection associations are
 tracked in [typespec-azure#5080](https://github.com/Azure/typespec-azure/issues/5080), and a dropped
 parent-action operation is tracked in
 [typespec-azure#5886](https://github.com/Azure/typespec-azure/issues/5886).
