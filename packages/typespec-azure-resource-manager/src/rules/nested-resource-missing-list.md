@@ -1,5 +1,4 @@
-Nested ARM resources must provide an operation that lists instances of that nested resource
-within a specific containing resource.
+Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), all the nested must have a list operation which returns the collection of the resource.
 
 For example, `Widget` is a top-level resource and `Part` is a nested resource declared with
 `@parentResource(Widget)`. The required operation lists `Part` instances belonging to one `Widget`:

@@ -17,7 +17,8 @@ import {
 
 export const nestedResourceMissingListRule = createRule({
   name: "nested-resource-missing-list",
-  description: "Nested ARM resources must provide a list operation at their parent collection.",
+  description:
+    "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), all the nested must have a list operation which returns the collection of the resource.",
   docs: fileRef.fromPackageRoot("src/rules/nested-resource-missing-list.md"),
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/nested-resource-missing-list",
