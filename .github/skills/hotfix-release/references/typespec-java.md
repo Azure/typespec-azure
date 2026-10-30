@@ -66,11 +66,8 @@ Run Azure DevOps pipeline **8274**, `typespec-java - sync sdk`, in
 `azure-sdk/internal`, against `Azure/azure-sdk-for-java:main` with
 `EmitterVersion=<version>` and `PRIdOrBranch=none`.
 
-Inspect the complete diff of its generated SDK PR. If anything besides
-`eng/emitter-package.json` and `eng/emitter-package-lock.json` changes, obtain
-explicit user review before approving or merging. Otherwise, follow repository
-approval and merge requirements; do not use auto-merge to wait for every requested
-owner.
+Inspect the complete diff of its generated SDK PR, including any generated changes
+beyond `eng/emitter-package.json` and `eng/emitter-package-lock.json`.
 
 The hotfix is complete only after publication, the backmerge actually lands on
 main, and the SDK sync succeeds with its generated PR merged.
