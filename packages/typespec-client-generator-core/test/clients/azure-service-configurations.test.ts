@@ -14,8 +14,8 @@ const definitions = `
     "https://login.microsoftonline.us/common/oauth2/v2.0/token"
   >;
   model Configurations {
-    Government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
-    Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+    government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
+    public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
   }
 `;
 
@@ -32,7 +32,7 @@ it.each(["python", "csharp", "java", "go", "ts"])(
   async (language) => {
     const { program } = await AzureCoreTester.compile(`
       ${definitions}
-      @service @azureServiceConfigurations(Configurations, "Public")
+      @service @azureServiceConfigurations(Configurations)
       namespace Service { @get op read(): void; }
     `);
     const context = await createSdkContextForTester(program, {
@@ -41,10 +41,10 @@ it.each(["python", "csharp", "java", "go", "ts"])(
     expect(context.diagnostics).toEqual([]);
     const client = context.sdkPackage.clients[0];
     const catalog = client.clientInitialization.serviceConfigurations;
-    expect(catalog?.defaultConfiguration).toBe("Public");
+    expect(catalog?.defaultConfiguration).toBe("public");
     expect(catalog?.configurations.map((configuration) => configuration.name)).toEqual([
-      "Public",
-      "Government",
+      "public",
+      "government",
     ]);
     const government = catalog?.configurations[1];
     expect(government?.endpoint).toMatchObject({
@@ -147,10 +147,10 @@ it("retains required instance endpoints and key/token alternatives in every conf
         ${definitions}
         model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
         model SearchConfigurations {
-          Public: { endpoint: "{endpoint}"; parameters: { endpoint: url }; authentication: PublicAuth | Key };
-          Government: { endpoint: "{endpoint}"; parameters: { endpoint: url }; authentication: GovernmentAuth | Key };
+          public: { endpoint: "{endpoint}"; parameters: { endpoint: url }; authentication: PublicAuth | Key };
+          government: { endpoint: "{endpoint}"; parameters: { endpoint: url }; authentication: GovernmentAuth | Key };
         }
-        @service @azureServiceConfigurations(SearchConfigurations, "Public")
+        @service @azureServiceConfigurations(SearchConfigurations)
         namespace Service { @get op read(): void; }
       `);
   const context = await createSdkContextForTester(program);
@@ -183,10 +183,10 @@ it("keeps OR-of-AND requirements local to each configuration", async () => {
         ${definitions}
         model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
         model CombinedConfigurations {
-          Public: { endpoint: "https://public.example.com"; authentication: [PublicAuth, Key] | NoAuth };
-          Government: { endpoint: "https://government.example.com"; authentication: [GovernmentAuth, Key] | NoAuth };
+          public: { endpoint: "https://public.example.com"; authentication: [PublicAuth, Key] | NoAuth };
+          government: { endpoint: "https://government.example.com"; authentication: [GovernmentAuth, Key] | NoAuth };
         }
-        @service @azureServiceConfigurations(CombinedConfigurations, "Public")
+        @service @azureServiceConfigurations(CombinedConfigurations)
         namespace Service { @get op read(): void; }
       `);
   const context = await createSdkContextForTester(program);
@@ -209,14 +209,14 @@ it.each(["virtual", "auto-merged"])(
   async (kind) => {
     const { program } = await AzureCoreTester.compile(`
           ${definitions}
-          @service @azureServiceConfigurations(Configurations, "Public")
+          @service @azureServiceConfigurations(Configurations)
           namespace Service {
             interface Operations { @get @route("/child") read(): void; }
           }
           model PrivateConfigurations {
-            Private: { endpoint: "https://private.example.com"; authentication: PublicAuth };
+            public: { endpoint: "https://private.example.com"; authentication: PublicAuth };
           }
-          @azureServiceConfigurations(PrivateConfigurations, "Private")
+          @azureServiceConfigurations(PrivateConfigurations)
           @client({name: "Customized", service: Service, autoMergeService: true})
           namespace Clients.Customized {}
           ${kind === "virtual" ? '@@clientLocation(Service.Operations.read, "Moved");' : ""}
@@ -229,7 +229,7 @@ it.each(["virtual", "auto-merged"])(
     );
     ok(child);
     expect(child.clientInitialization.serviceConfigurations).toMatchObject({
-      defaultConfiguration: "Private",
+      defaultConfiguration: "public",
       configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
     });
     expect(child.clientInitialization.serviceConfigurations).not.toBe(
@@ -242,17 +242,17 @@ it("prefers a child namespace's catalog over a customized SDK parent", async () 
   const { program } = await AzureCoreTester.compile(`
         ${definitions}
         model LocalConfigurations {
-          Local: { endpoint: "https://local.example.com"; authentication: GovernmentAuth };
+          public: { endpoint: "https://local.example.com"; authentication: GovernmentAuth };
         }
-        @service @azureServiceConfigurations(Configurations, "Public")
+        @service @azureServiceConfigurations(Configurations)
         namespace Service {
-          @azureServiceConfigurations(LocalConfigurations, "Local")
+          @azureServiceConfigurations(LocalConfigurations)
           namespace Operations { @get @route("/child") op read(): void; }
         }
         model PrivateConfigurations {
-          Private: { endpoint: "https://private.example.com"; authentication: PublicAuth };
+          public: { endpoint: "https://private.example.com"; authentication: PublicAuth };
         }
-        @azureServiceConfigurations(PrivateConfigurations, "Private")
+        @azureServiceConfigurations(PrivateConfigurations)
         @client({name: "Customized", service: Service, autoMergeService: true})
         namespace Clients.Customized {}
       `);
@@ -260,8 +260,14 @@ it("prefers a child namespace's catalog over a customized SDK parent", async () 
   expect(context.diagnostics).toEqual([]);
   const client = context.sdkPackage.clients[0];
   const child = client.children?.[0];
-  expect(client.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("Private");
-  expect(child?.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("Local");
+  expect(client.clientInitialization.serviceConfigurations).toMatchObject({
+    defaultConfiguration: "public",
+    configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
+  });
+  expect(child?.clientInitialization.serviceConfigurations).toMatchObject({
+    defaultConfiguration: "public",
+    configurations: [{ endpoint: { serverUrl: "https://local.example.com" } }],
+  });
   ok(child);
   expect(getCredential(child).type).toMatchObject({
     kind: "credential",
@@ -273,31 +279,31 @@ it("preserves matching catalogs on merged children and grandchildren", async () 
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
     model LocalConfigurations {
-      Local: { endpoint: "https://local.example.com"; authentication: GovernmentAuth };
+      public: { endpoint: "https://local.example.com"; authentication: GovernmentAuth };
     }
     model NestedConfigurations {
-      Nested: { endpoint: "https://nested.example.com"; authentication: GovernmentAuth };
+      public: { endpoint: "https://nested.example.com"; authentication: GovernmentAuth };
     }
     model PrivateConfigurations {
-      Private: { endpoint: "https://private.example.com"; authentication: PublicAuth };
+      public: { endpoint: "https://private.example.com"; authentication: PublicAuth };
     }
-    @service @azureServiceConfigurations(Configurations, "Public")
+    @service @azureServiceConfigurations(Configurations)
     namespace First {
-      @azureServiceConfigurations(LocalConfigurations, "Local")
+      @azureServiceConfigurations(LocalConfigurations)
       namespace Operations {
-        @azureServiceConfigurations(NestedConfigurations, "Nested")
+        @azureServiceConfigurations(NestedConfigurations)
         namespace Nested { @get @route("/first") op first(): void; }
       }
     }
-    @service @azureServiceConfigurations(Configurations, "Public")
+    @service @azureServiceConfigurations(Configurations)
     namespace Second {
-      @azureServiceConfigurations(LocalConfigurations, "Local")
+      @azureServiceConfigurations(LocalConfigurations)
       namespace Operations {
-        @azureServiceConfigurations(NestedConfigurations, "Nested")
+        @azureServiceConfigurations(NestedConfigurations)
         namespace Nested { @get @route("/second") op second(): void; }
       }
     }
-    @azureServiceConfigurations(PrivateConfigurations, "Private")
+    @azureServiceConfigurations(PrivateConfigurations)
     @client({service: [First, Second], autoMergeService: true})
     namespace Combined {}
   `);
@@ -306,13 +312,16 @@ it("preserves matching catalogs on merged children and grandchildren", async () 
   const root = context.sdkPackage.clients[0];
   const child = root.children?.[0];
   const grandchild = child?.children?.[0];
-  expect(root.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("Private");
+  expect(root.clientInitialization.serviceConfigurations).toMatchObject({
+    defaultConfiguration: "public",
+    configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
+  });
   expect(child?.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "Local",
+    defaultConfiguration: "public",
     configurations: [{ endpoint: { serverUrl: "https://local.example.com" } }],
   });
   expect(grandchild?.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "Nested",
+    defaultConfiguration: "public",
     configurations: [{ endpoint: { serverUrl: "https://nested.example.com" } }],
   });
   ok(child && grandchild);
@@ -331,24 +340,24 @@ it.each(["child", "grandchild"])(
     const { program } = await AzureCoreTester.compile(`
       ${definitions}
       model FirstLocal {
-        Local: { endpoint: "https://first.example.com"; authentication: GovernmentAuth };
+        public: { endpoint: "https://first.example.com"; authentication: GovernmentAuth };
       }
       model SecondLocal {
-        Local: { endpoint: "https://second.example.com"; authentication: GovernmentAuth };
+        public: { endpoint: "https://second.example.com"; authentication: GovernmentAuth };
       }
-      @service @azureServiceConfigurations(Configurations, "Public")
+      @service @azureServiceConfigurations(Configurations)
       namespace First {
-        @azureServiceConfigurations(FirstLocal, "Local")
+        @azureServiceConfigurations(FirstLocal)
         namespace Operations {
-          ${level === "grandchild" ? '@azureServiceConfigurations(FirstLocal, "Local")' : ""}
+          ${level === "grandchild" ? "@azureServiceConfigurations(FirstLocal)" : ""}
           namespace Nested { @get @route("/first") op first(): void; }
         }
       }
-      @service @azureServiceConfigurations(Configurations, "Public")
+      @service @azureServiceConfigurations(Configurations)
       namespace Second {
-        @azureServiceConfigurations(${level === "child" ? "SecondLocal" : "FirstLocal"}, "Local")
+        @azureServiceConfigurations(${level === "child" ? "SecondLocal" : "FirstLocal"})
         namespace Operations {
-          ${level === "grandchild" ? '@azureServiceConfigurations(SecondLocal, "Local")' : ""}
+          ${level === "grandchild" ? "@azureServiceConfigurations(SecondLocal)" : ""}
           namespace Nested { @get @route("/second") op second(): void; }
         }
       }
@@ -369,7 +378,7 @@ it.each(["child", "grandchild"])(
 it("does not overwrite explicit operation and interface authentication", async () => {
   const { program } = await AzureCoreTester.compile(`
         ${definitions}
-        @service @azureServiceConfigurations(Configurations, "Public")
+        @service @azureServiceConfigurations(Configurations)
         namespace Service {
           @useAuth(NoAuth) @get @route("/anonymous") op anonymous(): void;
           @useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
@@ -389,42 +398,17 @@ it("does not overwrite explicit operation and interface authentication", async (
   );
 });
 
-it.each([false, true])(
-  "validates named defaults across merged services: conflict=%s",
-  async (conflict) => {
-    const diagnostics = await AzureCoreTester.diagnose(`
-        ${definitions}
-        model EquivalentConfigurations {
-          Public: { endpoint: "https://same.example.com"; authentication: PublicAuth };
-          Government: { endpoint: "https://same.example.com"; authentication: PublicAuth };
-        }
-        @service @azureServiceConfigurations(EquivalentConfigurations, "Public")
-        namespace First { @get @route("/first") op read(): void; }
-        @service @azureServiceConfigurations(EquivalentConfigurations, "${conflict ? "Government" : "Public"}")
-        namespace Second { @get @route("/second") op read(): void; }
-        @client({service: [First, Second], autoMergeService: true})
-        namespace Combined {}
-      `);
-    expectDiagnostics(
-      diagnostics,
-      conflict
-        ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
-        : [],
-    );
-  },
-);
-
 it.each(["WithoutConfigurations, Configured", "Configured, WithoutConfigurations"])(
   "rejects a missing merged catalog with services ordered %s",
   async (services) => {
     const diagnostics = await AzureCoreTester.diagnose(`
       ${definitions}
       model SingleConfiguration {
-        Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+        public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
       }
       @service @server("https://api.loganalytics.io")
       namespace WithoutConfigurations { @get @route("/first") op first(): void; }
-      @service @azureServiceConfigurations(SingleConfiguration, "Public")
+      @service @azureServiceConfigurations(SingleConfiguration)
       namespace Configured { @get @route("/second") op second(): void; }
       @client({service: [${services}], autoMergeService: true})
       namespace Combined {}
@@ -440,18 +424,18 @@ it("merges equivalent catalogs independently of non-default declaration order", 
     ${definitions}
     model ChinaAuth is AadOauth2Auth<["china.read"]>;
     model FirstConfigurations {
-      Government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
-      Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
-      China: { endpoint: "https://china.example.com"; authentication: ChinaAuth };
+      government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
+      public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+      china: { endpoint: "https://china.example.com"; authentication: ChinaAuth };
     }
     model SecondConfigurations {
-      China: { endpoint: "https://china.example.com"; authentication: ChinaAuth };
-      Public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
-      Government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
+      china: { endpoint: "https://china.example.com"; authentication: ChinaAuth };
+      public: { endpoint: "https://api.loganalytics.io"; authentication: PublicAuth };
+      government: { endpoint: "https://api.loganalytics.us"; authentication: GovernmentAuth };
     }
-    @service @azureServiceConfigurations(FirstConfigurations, "Public")
+    @service @azureServiceConfigurations(FirstConfigurations)
     namespace First { @get @route("/first") op first(): void; }
-    @service @azureServiceConfigurations(SecondConfigurations, "Public")
+    @service @azureServiceConfigurations(SecondConfigurations)
     namespace Second { @get @route("/second") op second(): void; }
     @client({service: [First, Second], autoMergeService: true})
     namespace Combined {}
@@ -460,11 +444,11 @@ it("merges equivalent catalogs independently of non-default declaration order", 
   expect(context.diagnostics).toEqual([]);
   const client = context.sdkPackage.clients[0];
   const catalog = client.clientInitialization.serviceConfigurations;
-  expect(catalog?.defaultConfiguration).toBe("Public");
+  expect(catalog?.defaultConfiguration).toBe("public");
   expect(catalog?.configurations.map((configuration) => configuration.name)).toEqual([
-    "Public",
-    "Government",
-    "China",
+    "public",
+    "government",
+    "china",
   ]);
   expect(client.methods.map((method) => method.name)).toEqual(["first", "second"]);
 });
@@ -482,14 +466,14 @@ it("rejects merged catalogs with different password-flow token URLs", async () =
       scopes: ["read"];
     }]>;
     model FirstConfigurations {
-      Public: { endpoint: "https://service.example.com"; authentication: FirstAuth };
+      public: { endpoint: "https://service.example.com"; authentication: FirstAuth };
     }
     model SecondConfigurations {
-      Public: { endpoint: "https://service.example.com"; authentication: SecondAuth };
+      public: { endpoint: "https://service.example.com"; authentication: SecondAuth };
     }
-    @service @azureServiceConfigurations(FirstConfigurations, "Public")
+    @service @azureServiceConfigurations(FirstConfigurations)
     namespace First { @get @route("/first") op read(): void; }
-    @service @azureServiceConfigurations(SecondConfigurations, "Public")
+    @service @azureServiceConfigurations(SecondConfigurations)
     namespace Second { @get @route("/second") op read(): void; }
     @client({service: [First, Second], autoMergeService: true})
     namespace Combined {}
@@ -527,14 +511,14 @@ it.each(["scopes", "flows", "schemes", "options"])(
       model FirstAuth is OAuth2Auth<[${flows.join(",")}]>;
       model SecondAuth is OAuth2Auth<[${secondFlows.join(",")}]>;
       model FirstConfigurations {
-        Public: { endpoint: "https://example.com"; authentication: [FirstAuth, Key] | NoAuth };
+        public: { endpoint: "https://example.com"; authentication: [FirstAuth, Key] | NoAuth };
       }
       model SecondConfigurations {
-        Public: { endpoint: "https://example.com"; authentication: ${secondRequirements} };
+        public: { endpoint: "https://example.com"; authentication: ${secondRequirements} };
       }
-      @service @azureServiceConfigurations(FirstConfigurations, "Public")
+      @service @azureServiceConfigurations(FirstConfigurations)
       namespace First { @get @route("/first") op first(): void; }
-      @service @azureServiceConfigurations(SecondConfigurations, "Public")
+      @service @azureServiceConfigurations(SecondConfigurations)
       namespace Second { @get @route("/second") op second(): void; }
       @client({service: [First, Second], autoMergeService: true})
       namespace Combined {}
@@ -572,20 +556,20 @@ it.each([false, true])(
         ["${conflict ? "other" : "write"}", "read"]
       >;
       model FirstConfigurations {
-        Public: {
+        public: {
           endpoint: "https://example.com";
           authentication: PublicAuth | FirstIdentity;
         };
       }
       model SecondConfigurations {
-        Public: {
+        public: {
           endpoint: "https://example.com";
           authentication: PublicAuth | SecondIdentity;
         };
       }
-      @service @azureServiceConfigurations(FirstConfigurations, "Public")
+      @service @azureServiceConfigurations(FirstConfigurations)
       namespace First { @get @route("/first") op read(): void; }
-      @service @azureServiceConfigurations(SecondConfigurations, "Public")
+      @service @azureServiceConfigurations(SecondConfigurations)
       namespace Second { @get @route("/second") op read(): void; }
       @client({service: [First, Second], autoMergeService: true})
       namespace Combined {}
@@ -615,14 +599,14 @@ it.each([
     ${definitions}
     model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
     model FirstConfigurations {
-      Public: { endpoint: "https://example.com"; authentication: ${first} };
+      public: { endpoint: "https://example.com"; authentication: ${first} };
     }
     model SecondConfigurations {
-      Public: { endpoint: "https://example.com"; authentication: ${second} };
+      public: { endpoint: "https://example.com"; authentication: ${second} };
     }
-    @service @azureServiceConfigurations(FirstConfigurations, "Public")
+    @service @azureServiceConfigurations(FirstConfigurations)
     namespace First { @get @route("/first") op read(): void; }
-    @service @azureServiceConfigurations(SecondConfigurations, "Public")
+    @service @azureServiceConfigurations(SecondConfigurations)
     namespace Second { @get @route("/second") op read(): void; }
     @client({service: [First, Second], autoMergeService: true})
     namespace Combined {}
@@ -642,16 +626,16 @@ it("projects configuration-specific authentication and credential alternatives",
       scopes: ["government.read"];
     }]>;
     model MixedConfigurations {
-      Public: {
+      public: {
         endpoint: "https://public.example.com";
         authentication: [PublicAuth, Key] | NoAuth;
       };
-      Government: {
+      government: {
         endpoint: "https://government.example.com";
         authentication: GovernmentTokenAuth | Key;
       };
     }
-    @service @azureServiceConfigurations(MixedConfigurations, "Public")
+    @service @azureServiceConfigurations(MixedConfigurations)
     namespace Service { @get op read(): void; }
   `);
   const context = await createSdkContextForTester(program);
@@ -688,18 +672,18 @@ it("rejects incompatible pairings even when flat HTTP servers and auth alternati
         model AuthB is AadOauth2Auth<["b.read"]>;
         model AuthC is AadOauth2Auth<["c.read"]>;
         model FirstConfigurations {
-          Public: { endpoint: "https://public.example.com"; authentication: AuthA | AuthB };
-          Government: { endpoint: "https://government.example.com"; authentication: AuthA | AuthC };
-          China: { endpoint: "https://china.example.com"; authentication: AuthB | AuthC };
+          public: { endpoint: "https://public.example.com"; authentication: AuthA | AuthB };
+          government: { endpoint: "https://government.example.com"; authentication: AuthA | AuthC };
+          china: { endpoint: "https://china.example.com"; authentication: AuthB | AuthC };
         }
         model SecondConfigurations {
-          Public: { endpoint: "https://public.example.com"; authentication: AuthA | AuthB };
-          Government: { endpoint: "https://government.example.com"; authentication: AuthB | AuthC };
-          China: { endpoint: "https://china.example.com"; authentication: AuthA | AuthC };
+          public: { endpoint: "https://public.example.com"; authentication: AuthA | AuthB };
+          government: { endpoint: "https://government.example.com"; authentication: AuthB | AuthC };
+          china: { endpoint: "https://china.example.com"; authentication: AuthA | AuthC };
         }
-        @service @azureServiceConfigurations(FirstConfigurations, "Public")
+        @service @azureServiceConfigurations(FirstConfigurations)
         namespace First { @get @route("/first") op read(): void; }
-        @service @azureServiceConfigurations(SecondConfigurations, "Public")
+        @service @azureServiceConfigurations(SecondConfigurations)
         namespace Second { @get @route("/second") op read(): void; }
         @client({service: [First, Second], autoMergeService: true})
         namespace Combined {}
@@ -715,14 +699,14 @@ it.each([false, true])(
     const diagnostics = await AzureCoreTester.diagnose(`
         ${definitions}
         model FirstConfigurations {
-          Public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://first.example.com" }; authentication: PublicAuth };
+          public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://first.example.com" }; authentication: PublicAuth };
         }
         model SecondConfigurations {
-          Public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://${conflict ? "second" : "first"}.example.com" }; authentication: PublicAuth };
+          public: { endpoint: "{endpoint}"; parameters: { endpoint: url = "https://${conflict ? "second" : "first"}.example.com" }; authentication: PublicAuth };
         }
-        @service @azureServiceConfigurations(FirstConfigurations, "Public")
+        @service @azureServiceConfigurations(FirstConfigurations)
         namespace First { @get @route("/first") op read(): void; }
-        @service @azureServiceConfigurations(SecondConfigurations, "Public")
+        @service @azureServiceConfigurations(SecondConfigurations)
         namespace Second { @get @route("/second") op read(): void; }
         @client({service: [First, Second], autoMergeService: true})
         namespace Combined {}
@@ -746,13 +730,13 @@ it.each(["1", "2"])(
           model PublicAuth is AadOauth2Auth<["public.read"]>;
           model GovernmentAuth is AadOauth2Auth<["government.read"]>;
           model Configurations {
-            Public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
+            public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
             @added(Versions.v2)
-            Government: { endpoint: "https://government.example.com"; authentication: GovernmentAuth };
+            government: { endpoint: "https://government.example.com"; authentication: GovernmentAuth };
           }
         }
         @service @versioned(Service.Versions)
-        @azureServiceConfigurations(AuthDefinitions.Configurations, "Public")
+        @azureServiceConfigurations(AuthDefinitions.Configurations)
         namespace Service {
           enum Versions {
             @useDependency(AuthDefinitions.Versions.v1) v1: "1",
@@ -766,14 +750,14 @@ it.each(["1", "2"])(
     const configurations =
       context.sdkPackage.clients[0].clientInitialization.serviceConfigurations?.configurations;
     expect(configurations?.map((configuration) => configuration.name)).toEqual(
-      version === "1" ? ["Public"] : ["Public", "Government"],
+      version === "1" ? ["public"] : ["public", "government"],
     );
   },
 );
-it("uses the explicit default rather than declaration order", async () => {
+it("uses public authentication regardless of declaration order", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
-    @service @azureServiceConfigurations(Configurations, "Government")
+    @service @azureServiceConfigurations(Configurations)
     namespace Service { @get op read(): void; }
   `);
   const context = await createSdkContextForTester(program);
@@ -781,11 +765,9 @@ it("uses the explicit default rather than declaration order", async () => {
   const client = context.sdkPackage.clients[0];
   expect(getCredential(client).type).toMatchObject({
     kind: "credential",
-    scheme: { model: { name: "GovernmentAuth" } },
+    scheme: { model: { name: "PublicAuth" } },
   });
-  expect(client.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe(
-    "Government",
-  );
+  expect(client.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("public");
 });
 
 it("does not bind configurations by matching scopes", async () => {
@@ -793,10 +775,10 @@ it("does not bind configurations by matching scopes", async () => {
     model PublicAuth is AadOauth2Auth<["shared.read"], "https://public.example.com/authorize", "https://public.example.com/token">;
     model GovernmentAuth is AadOauth2Auth<["shared.read"], "https://government.example.com/authorize", "https://government.example.com/token">;
     model Configurations {
-      Public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
-      Government: { endpoint: "https://government.example.com"; authentication: GovernmentAuth };
+      public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
+      government: { endpoint: "https://government.example.com"; authentication: GovernmentAuth };
     }
-    @service @azureServiceConfigurations(Configurations, "Public")
+    @service @azureServiceConfigurations(Configurations)
     namespace Service { @get op read(): void; }
   `);
   const context = await createSdkContextForTester(program);
@@ -817,7 +799,7 @@ it("does not bind configurations by matching scopes", async () => {
 it("serializes every paired configuration without compiler model references", async () => {
   const { program, fs } = await AzureCoreTester.compile(`
     ${definitions}
-    @service @azureServiceConfigurations(Configurations, "Public")
+    @service @azureServiceConfigurations(Configurations)
     namespace Service { @get op read(): void; }
   `);
   const context = await createSdkContextForTester(program, {}, { exportTCGCoutput: true });
@@ -825,10 +807,10 @@ it("serializes every paired configuration without compiler model references", as
   const output = fs.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
   ok(output);
   const catalog = parse(output).clients[0].clientInitialization.serviceConfigurations;
-  expect(catalog.defaultConfiguration).toBe("Public");
+  expect(catalog.defaultConfiguration).toBe("public");
   expect(
     catalog.configurations.map((configuration: { name: string }) => configuration.name),
-  ).toEqual(["Public", "Government"]);
+  ).toEqual(["public", "government"]);
   const government = catalog.configurations[1];
   expect(government.endpoint.serverUrl).toBe("https://api.loganalytics.us");
   expect(government.authentication.options[0].schemes[0]).not.toHaveProperty("model");
@@ -844,14 +826,14 @@ it("includes endpoint parameter types reachable only from a non-default configur
     ${definitions}
     enum Region { East: "east", West: "west" }
     model RegionalConfigurations {
-      Public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
-      Government: {
+      public: { endpoint: "https://public.example.com"; authentication: PublicAuth };
+      government: {
         endpoint: "https://{region}.government.example.com";
         parameters: { region: Region };
         authentication: GovernmentAuth;
       };
     }
-    @service @azureServiceConfigurations(RegionalConfigurations, "Public")
+    @service @azureServiceConfigurations(RegionalConfigurations)
     namespace Service { @get op read(): void; }
   `);
   const context = await createSdkContextForTester(program);
@@ -871,18 +853,18 @@ it.each(["child", "grandchild"])(
       ${definitions}
       enum Region { East: "east", West: "west" }
       model LocalConfigurations {
-        Public: { endpoint: "https://local.example.com"; authentication: PublicAuth };
-        Government: {
+        public: { endpoint: "https://local.example.com"; authentication: PublicAuth };
+        government: {
           endpoint: "https://{region}.government.example.com";
           parameters: { region: Region };
           authentication: GovernmentAuth;
         };
       }
-      @service @azureServiceConfigurations(Configurations, "Public")
+      @service @azureServiceConfigurations(Configurations)
       namespace Service {
-        ${level === "child" ? '@azureServiceConfigurations(LocalConfigurations, "Public")' : ""}
+        ${level === "child" ? "@azureServiceConfigurations(LocalConfigurations)" : ""}
         namespace Operations {
-          ${level === "grandchild" ? '@azureServiceConfigurations(LocalConfigurations, "Public")' : ""}
+          ${level === "grandchild" ? "@azureServiceConfigurations(LocalConfigurations)" : ""}
           namespace Nested { @get op read(): void; }
         }
       }

@@ -2,25 +2,25 @@ This diagnostic is issued when `@azureServiceConfigurations` declares an invalid
 
 ## Impact
 
-- **Area:** Paired service configurations. Blocks invalid endpoints, authentication requirements, or named defaults.
+- **Area:** Paired service configurations. Blocks invalid endpoints, authentication requirements, or catalogs missing the required `public` default.
 - **Not affected:** Ordinary HTTP server and authentication declarations without this decorator.
 
 ## Incorrect Usage
 
-The selected default is not a declared configuration:
+The catalog does not declare the required `public` configuration:
 
 ```typespec
 model ServiceAuth is AadOauth2Auth<["https://api.loganalytics.io/.default"]>;
 
 model Configurations {
-  Public: {
+  other: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Missing")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
   @get op query(): string;
 }
@@ -31,31 +31,31 @@ namespace Logs {
 Azure Core reports the specific invalid setting. For this example:
 
 ```text
-The default configuration 'Missing' is not declared.
+Service configurations must declare a 'public' configuration.
 ```
 
 ## How to Fix
 
-Select an existing configuration by name:
+Declare a configuration named exactly `public`. It is always the default, regardless of declaration order:
 
 ```typespec
 model ServiceAuth is AadOauth2Auth<["https://api.loganalytics.io/.default"]>;
 
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
   @get op query(): string;
 }
 ```
 
-An empty catalog also fails the default check because it has no configuration to select.
+An empty catalog or a catalog declaring only PascalCase `Public` also fails this check.
 
 The remaining examples assume `using Azure.Core;`, `using TypeSpec.Http;`, and the `ServiceAuth` model shown above.
 
@@ -67,11 +67,11 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: string;
+  public: string;
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -83,14 +83,14 @@ Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -104,6 +104,10 @@ Incorrect:
 
 ```typespec
 model Configurations {
+  public: {
+    endpoint: "https://api.loganalytics.io";
+    authentication: ServiceAuth;
+  };
   ` `: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
@@ -111,7 +115,7 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, " ")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -123,14 +127,14 @@ Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -144,7 +148,7 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
     descripton: "Public cloud";
@@ -152,7 +156,7 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -164,7 +168,7 @@ Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
     description: "Public cloud";
@@ -172,7 +176,7 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -186,33 +190,33 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: string;
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
 ```
 
-Reported message: `Configuration 'Public' must declare a non-empty endpoint string literal.`
+Reported message: `Configuration 'public' must declare a non-empty endpoint string literal.`
 
 Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -226,32 +230,32 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
 ```
 
-Reported message: `Configuration 'Public' must declare authentication requirements.`
+Reported message: `Configuration 'public' must declare authentication requirements.`
 
 Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -265,14 +269,14 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: string;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -284,14 +288,14 @@ Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: [ServiceAuth, ApiKeyAuth<ApiKeyLocation.header, "api-key">] | NoAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -305,7 +309,7 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://{region}.example.com";
     parameters: string;
     authentication: ServiceAuth;
@@ -313,19 +317,19 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
 ```
 
-Reported message: `Configuration 'Public' parameters must be a model.`
+Reported message: `Configuration 'public' parameters must be a model.`
 
 Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://{region}.example.com";
     parameters: {
       region: string;
@@ -335,7 +339,7 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -349,7 +353,7 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
     description: string;
@@ -357,19 +361,19 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
 ```
 
-Reported message: `Configuration 'Public' description must be a string literal.`
+Reported message: `Configuration 'public' description must be a string literal.`
 
 Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
     description: "Public cloud";
@@ -377,7 +381,7 @@ model Configurations {
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -391,14 +395,14 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ApiKeyAuth<ApiKeyLocation.header, "api-key">;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -410,14 +414,14 @@ Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth | ApiKeyAuth<ApiKeyLocation.header, "api-key">;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -431,7 +435,7 @@ Incorrect:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
@@ -440,7 +444,7 @@ model Configurations {
 @service
 @server("https://api.loganalytics.io")
 @useAuth(ServiceAuth)
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }
@@ -452,14 +456,14 @@ Correct:
 
 ```typespec
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: ServiceAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
 
 }

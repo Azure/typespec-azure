@@ -98,16 +98,16 @@ Available ruleSets:
 
 Pairs named HTTP server endpoints with OAuth authentication configurations.
 
-Calls `@server` for each configuration, with the default first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
+Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
 
-The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and explicit default for SDK generation.
+The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
 
 Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
 
 OAuth URL metadata does not change a caller-owned credential's authority or tenant.
 
 ```typespec
-@Azure.Core.azureServiceConfigurations(configurations: Model, defaultConfiguration: valueof string)
+@Azure.Core.azureServiceConfigurations(configurations: Model)
 ```
 
 ##### Target
@@ -117,10 +117,9 @@ The namespace using these configurations.
 
 ##### Parameters
 
-| Name                 | Type             | Description                                    |
-| -------------------- | ---------------- | ---------------------------------------------- |
-| configurations       | `Model`          | The named endpoint and authentication records. |
-| defaultConfiguration | `valueof string` | The name of the default configuration.         |
+| Name           | Type    | Description                                    |
+| -------------- | ------- | ---------------------------------------------- |
+| configurations | `Model` | The named endpoint and authentication records. |
 
 ##### Examples
 
@@ -137,18 +136,18 @@ model GovernmentAuth is AadOauth2Auth<
 >;
 
 model Configurations {
-  Public: {
+  public: {
     endpoint: "https://api.loganalytics.io";
     authentication: PublicAuth;
   };
-  Government: {
+  government: {
     endpoint: "https://api.loganalytics.us";
     authentication: GovernmentAuth;
   };
 }
 
 @service
-@azureServiceConfigurations(Configurations, "Public")
+@azureServiceConfigurations(Configurations)
 namespace Logs {
   @get op query(): string;
 }

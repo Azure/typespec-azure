@@ -31,7 +31,7 @@ export interface AzureServiceConfiguration {
   authentication: Authentication;
 }
 
-/** Client-independent deployment facts; the named default is always the first entry. */
+/** Client-independent deployment facts; public is always the default and first entry. */
 export interface AzureServiceConfigurations {
   defaultConfiguration: string;
   configurations: AzureServiceConfiguration[];
@@ -65,7 +65,6 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
   context,
   target,
   configurations,
-  defaultConfiguration,
 ) => {
   if (!validateDecoratorUniqueOnNode(context, target, $azureServiceConfigurations)) return;
   const { program } = context;
@@ -88,9 +87,9 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
     return;
   }
   const entries = [...walkPropertiesInherited(configurations)];
-  const selected = entries.find((entry) => entry.name === defaultConfiguration);
+  const selected = entries.find((entry) => entry.name === "public");
   if (!selected) {
-    invalid(configurations, `The default configuration '${defaultConfiguration}' is not declared.`);
+    invalid(configurations, "Service configurations must declare a 'public' configuration.");
     return;
   }
   const ordered = [selected, ...entries.filter((entry) => entry !== selected)];
@@ -219,5 +218,5 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
     const server = getServers(program, target)![result.length];
     result.push({ name: record.name, server, authentication: auth });
   }
-  setConfigurations(program, target, { defaultConfiguration, configurations: result });
+  setConfigurations(program, target, { defaultConfiguration: "public", configurations: result });
 };

@@ -606,7 +606,7 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
-  /** Paired deployment defaults; existing initialization fields describe the named default. */
+  /** Paired deployment configurations; existing initialization fields describe public. */
   serviceConfigurations?: {
     defaultConfiguration: string;
     configurations: SdkServiceConfiguration[];
