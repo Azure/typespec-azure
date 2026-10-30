@@ -33,6 +33,7 @@ import {
   isNeverType,
   isNullType,
   isTemplateDeclaration,
+  resolveEncodedEnumMemberValue,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { isEvents } from "@typespec/events";
@@ -74,6 +75,7 @@ import {
   type SdkArrayType,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
+  type SdkClient,
   type SdkClientType,
   type SdkConstantType,
   type SdkCredentialParameter,
@@ -119,6 +121,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getRawLroMetadata } from "./lro-metadata.js";
+import { resolveLroStatusMetadata } from "./lro-status-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -1257,7 +1260,7 @@ function getSdkEnumValueWithDiagnostics(
   type: EnumMember,
 ): [SdkEnumValueType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
+  const sdkType: SdkEnumValueType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     isExactName: isExactClientName(context, type),
@@ -1265,7 +1268,9 @@ function getSdkEnumValueWithDiagnostics(
     enumType,
     valueType: enumType.valueType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
-  });
+  };
+  setSerializationOptions(context, sdkType, []);
+  return diagnostics.wrap(sdkType);
 }
 
 export function getSdkEnum(context: TCGCContext, type: Enum, operation?: Operation): SdkEnumType {
@@ -1321,7 +1326,7 @@ function getSdkUnionEnumValues(
   const values: SdkEnumValueType[] = [];
   for (const member of type.flattenedMembers.values()) {
     const name = getLibraryName(context, member.type);
-    values.push({
+    const sdkValue: SdkEnumValueType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
       isExactName: isExactClientName(context, member.type),
@@ -1329,7 +1334,9 @@ function getSdkUnionEnumValues(
       valueType: enumType.valueType,
       enumType,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, member.type),
-    });
+    };
+    setSerializationOptions(context, sdkValue, []);
+    values.push(sdkValue);
   }
   return diagnostics.wrap(values);
 }
@@ -1659,6 +1666,57 @@ export function getSdkModelPropertyType(
     context.__modelPropertyCache.set(type, property);
   }
   return diagnostics.wrap(property);
+}
+
+export function getEffectiveSdkModelProperty(
+  model: SdkModelType,
+  rawProperty: ModelProperty,
+): SdkModelPropertyType | undefined {
+  let current: SdkModelType | undefined = model;
+  while (current) {
+    // Raw selection already excludes overridden base properties. Legacy hierarchy rebasing can
+    // replace a selected property with a same-named property whose __raw has a different identity.
+    const property = current.properties.find(
+      (candidate) => candidate.__raw === rawProperty || candidate.__raw?.name === rawProperty.name,
+    );
+    if (property) return property;
+    current = current.baseModel;
+  }
+  return undefined;
+}
+
+export interface EffectiveSdkModelPropertySelection {
+  rawProperty: ModelProperty;
+  sdkProperty: SdkModelPropertyType;
+}
+
+export interface EffectiveSdkModelPropertyConflict {
+  rawProperty: ModelProperty;
+  clientName: string;
+}
+
+export function resolveEffectiveSdkModelProperties(
+  model: SdkModelType,
+  rawProperties: ModelProperty[],
+  reservedNames: string[] = [],
+): {
+  selections: EffectiveSdkModelPropertySelection[];
+  conflicts: EffectiveSdkModelPropertyConflict[];
+} {
+  const selections: EffectiveSdkModelPropertySelection[] = [];
+  const conflicts: EffectiveSdkModelPropertyConflict[] = [];
+  const seenNames = new Set(reservedNames);
+  for (const rawProperty of rawProperties) {
+    const sdkProperty = getEffectiveSdkModelProperty(model, rawProperty);
+    if (!sdkProperty) continue;
+    if (seenNames.has(sdkProperty.name)) {
+      conflicts.push({ rawProperty, clientName: sdkProperty.name });
+      continue;
+    }
+    seenNames.add(sdkProperty.name);
+    selections.push({ rawProperty, sdkProperty });
+  }
+  return { selections, conflicts };
 }
 
 function addPropertiesToModelType(
@@ -2486,6 +2544,61 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
   return diagnostics.wrap(undefined);
 }
 
+function updateLroStatusMetadataUsageAndAccess(
+  context: TCGCContext,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const processed = new Set<Operation>();
+
+  for (const client of listClients(context)) {
+    updateClientOperations(client);
+    for (const subClient of listSubClients(context, client, true)) {
+      updateClientOperations(subClient);
+    }
+  }
+  return diagnostics.wrap(undefined);
+
+  function updateClientOperations(client: SdkClient): void {
+    for (const operation of listOperationsInClient(context, client)) {
+      if (processed.has(operation)) continue;
+      processed.add(operation);
+
+      const lroMetadata = getRawLroMetadata(context.program, operation);
+      if (!lroMetadata) continue;
+      const statusMetadata = diagnostics.pipe(
+        resolveLroStatusMetadata(context, operation, lroMetadata, isVisibleSdkProperty),
+      );
+      if (!statusMetadata) continue;
+
+      const pollingModel = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, lroMetadata.pollingInfo.responseModel),
+      );
+      for (const rawProperty of statusMetadata.properties) {
+        const sdkProperty = getEffectiveSdkModelProperty(pollingModel, rawProperty);
+        if (!sdkProperty) continue;
+
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
+        const operationAccess = getAccessOverride(context, operation) ?? "public";
+        const propertyAccess = getAccessOverride(context, sdkProperty.__raw ?? rawProperty);
+        if (operationAccess === "public" && propertyAccess === "internal") {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-access-override",
+              target: sdkProperty.__raw ?? rawProperty,
+            }),
+          );
+        }
+        diagnostics.pipe(
+          updateUsageOrAccess(context, propertyAccess ?? operationAccess, sdkProperty.type),
+        );
+        // Match the existing LRO serialization path's JSON assumption, not arbitrary media types.
+        setSerializationOptions(context, sdkProperty, ["application/json"]);
+        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
+      }
+    }
+  }
+}
+
 /**
  * Propagate serialization options from a parent model to a newly added subtype.
  * This handles the case where updateSerializationOptions already ran on the parent
@@ -2633,14 +2746,19 @@ function reconcilePropertiesAfterRebase(
  * Apply the same predicates as `addPropertiesToModelType` so our view of the
  * SDK-observable property set stays aligned with the actual SDK shape.
  */
-function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
+export type SdkPropertyVisibilityPredicate = (
+  context: TCGCContext,
+  property: ModelProperty,
+) => boolean;
+
+export const isVisibleSdkProperty: SdkPropertyVisibilityPredicate = (context, property) => {
   return (
     !isStatusCode(context.program, property) &&
     !isNeverOrVoidType(property.type) &&
     !hasNoneVisibility(context, property) &&
     isInScope(context, property)
   );
-}
+};
 
 /**
  * Check if two property types are incompatible during `@hierarchyBuilding`
@@ -2806,8 +2924,6 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   }
   // update for orphan models/enums/unions
   diagnostics.pipe(handleServiceOrphanTypes(context));
-  // update access
-  diagnostics.pipe(updateAccessOverride(context));
   // update usage
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
@@ -2816,6 +2932,11 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
+  // Promote the final retained metadata property graphs after hierarchy reconciliation.
+  diagnostics.pipe(updateLroStatusMetadataUsageAndAccess(context));
+  // Apply access overrides after hierarchy reconciliation and metadata graph promotion can
+  // materialize otherwise-unreferenced types.
+  diagnostics.pipe(updateAccessOverride(context));
   // clean up discriminator info when only subtypes have usage
   cleanupDiscriminatorForUnusedBase(context);
   // update generated name
@@ -2840,6 +2961,17 @@ function updateSerializationOptions(
 
   if (options.seenTypes.has(type)) {
     return diagnostics.wrap(undefined); // avoid circular references
+  }
+
+  if (type.kind === "enum" || type.kind === "enumvalue") {
+    if (type.kind === "enum") {
+      for (const value of type.values) {
+        setSerializationOptions(context, value, contentTypes);
+      }
+    } else {
+      setSerializationOptions(context, type, contentTypes);
+    }
+    return diagnostics.wrap(undefined);
   }
 
   if (type.kind === "array" || type.kind === "dict") {
@@ -2940,7 +3072,7 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType | SdkEnumValueType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
@@ -2978,8 +3110,18 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType | SdkEnumValueType,
 ) {
+  if (type.kind === "enumvalue") {
+    const name =
+      type.__raw?.kind === "EnumMember"
+        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/json")
+        : type.value;
+    if (typeof name === "string") {
+      (type.serializationOptions ??= {}).json = { name };
+    }
+    return;
+  }
   const serializationOptions = (type.serializationOptions ??= {});
   serializationOptions.json = {
     name:
@@ -2993,8 +3135,18 @@ function updateJsonSerializationOptions(
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType | SdkEnumValueType,
 ) {
+  if (type.kind === "enumvalue") {
+    const name =
+      type.__raw?.kind === "EnumMember"
+        ? resolveEncodedEnumMemberValue(context.program, type.__raw, "application/xml")
+        : type.value;
+    if (typeof name === "string") {
+      (type.serializationOptions ??= {}).xml = { name };
+    }
+    return;
+  }
   const serializationOptions = (type.serializationOptions ??= {});
   serializationOptions.xml = {
     name:
@@ -3039,6 +3191,12 @@ function updateXmlSerializationOptions(
 }
 
 function hasExplicitlyDefinedXmlSerializationInfo(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "EnumMember") {
+    return (
+      resolveEncodedEnumMemberValue(context.program, type, "application/xml") !==
+      (type.value ?? type.name)
+    );
+  }
   if (type.kind === "Model" || type.kind === "ModelProperty" || type.kind === "Scalar") {
     if (type.decorators && type.decorators.some((d) => d.definition?.namespace.name === "Xml")) {
       return true;
@@ -3058,6 +3216,12 @@ function hasExplicitlyDefinedXmlSerializationInfo(context: TCGCContext, type: Ty
 }
 
 function hasExplicitlyDefinedJsonSerializationInfo(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "EnumMember") {
+    return (
+      resolveEncodedEnumMemberValue(context.program, type, "application/json") !==
+      (type.value ?? type.name)
+    );
+  }
   if (type.kind === "ModelProperty") {
     const jsonName = resolveEncodedName(context.program, type, "application/json");
     if (jsonName && jsonName !== type.name) {
