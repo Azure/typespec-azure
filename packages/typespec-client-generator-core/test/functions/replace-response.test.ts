@@ -38,13 +38,16 @@ it("replaces the generated method response with void without changing HTTP respo
   strictEqual(method.operation.exceptions.length, 1);
 });
 
-it("replaces a response with bytes", async () => {
+it.each(["Metadata", "bytes"])("replaces a %s response with raw bytes", async (responseType) => {
   const { program } = await SimpleTesterWithService.compile(`
     model Metadata {
       name: string;
     }
 
-    @get op download(): Metadata;
+    @get op download(): {
+      @header contentType: "application/json";
+      @body body: ${responseType};
+    };
 
     #suppress "experimental-feature" "testing replaceResponseWithBytes"
     #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
@@ -56,8 +59,17 @@ it("replaces a response with bytes", async () => {
 
   ok(method.response.type);
   strictEqual(method.response.type.kind, "bytes");
-  strictEqual(method.response.type.encode, "base64");
-  strictEqual(method.operation.responses[0].type?.kind, "model");
+  strictEqual(method.response.type.encode, "bytes");
+  const httpResponse = method.operation.responses[0];
+  strictEqual(httpResponse.defaultContentType, "application/json");
+  ok(httpResponse.type);
+  if (responseType === "bytes") {
+    strictEqual(httpResponse.type.kind, "bytes");
+    strictEqual(httpResponse.type.encode, "base64");
+  } else {
+    strictEqual(httpResponse.type.kind, "model");
+    strictEqual(httpResponse.type.name, "Metadata");
+  }
 });
 
 it("removes pageable behavior when overriding a list operation with bytes", async () => {
@@ -87,6 +99,7 @@ it("removes pageable behavior when overriding a list operation with bytes", asyn
   strictEqual(method.kind, "basic");
   ok(method.response.type);
   strictEqual(method.response.type.kind, "bytes");
+  strictEqual(method.response.type.encode, "bytes");
   strictEqual(method.operation.responses[0].type?.kind, "model");
 });
 
@@ -165,5 +178,31 @@ describe("scoped response replacement", () => {
     const method = getServiceMethodOfClient(context.sdkPackage);
 
     strictEqual(method.response.type?.name, "Widget");
+  });
+
+  it.each(["go", "python"])("respects the scope of raw bytes replacement for %s", async (scope) => {
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        mainCode,
+        `
+          #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
+          @@override(TestService.create, replaceResponseWithBytes(TestService.create), "go");
+        `,
+      ),
+    );
+    const context = await createSdkContextForTester(program, {
+      emitterName: `@azure-tools/typespec-${scope}`,
+    });
+    const method = getServiceMethodOfClient(context.sdkPackage);
+
+    ok(method.response.type);
+    if (scope === "go") {
+      strictEqual(method.response.type.kind, "bytes");
+      strictEqual(method.response.type.encode, "bytes");
+    } else {
+      strictEqual(method.response.type.kind, "model");
+      strictEqual(method.response.type.name, "Widget");
+    }
+    strictEqual(method.operation.responses[0].type?.kind, "model");
   });
 });
