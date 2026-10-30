@@ -534,7 +534,8 @@ export class ClientAdapter {
   ): void {
     const exportOperation =
       (sdkMethod.kind === "basic" || sdkMethod.kind === "paging") &&
-      sdkMethod.access !== "internal";
+      sdkMethod.access !== "internal" &&
+      !sdkMethod.response.sseMetadata;
     const naming = new go.MethodNaming(
       helpers.getEffectiveName(sdkMethod, !exportOperation),
       helpers.getEffectiveName(sdkMethod, true, "CreateRequest"),
@@ -609,14 +610,25 @@ export class ClientAdapter {
       | undefined;
     switch (sdkMethod.kind) {
       case "basic":
-        method = new go.SyncMethod(
-          methodName,
-          goClient,
-          sdkMethod.operation.path,
-          sdkMethod.operation.verb,
-          statusCodes,
-          naming,
-        );
+        if (sdkMethod.response.sseMetadata) {
+          method = new go.SseMethod(
+            methodName,
+            goClient,
+            sdkMethod.operation.path,
+            sdkMethod.operation.verb,
+            statusCodes,
+            naming,
+          );
+        } else {
+          method = new go.SyncMethod(
+            methodName,
+            goClient,
+            sdkMethod.operation.path,
+            sdkMethod.operation.verb,
+            statusCodes,
+            naming,
+          );
+        }
         break;
       case "paging":
         method = new go.PageableMethod(
@@ -915,6 +927,18 @@ export class ClientAdapter {
           }
         }
       }
+    }
+
+    if (method.kind === "sseMethod") {
+      let name = "LastEventID";
+      let suffix = 0;
+      while (method.optionalParamsGroup.params.some((param) => param.name === name)) {
+        name = `LastEventID${++suffix}`;
+      }
+      const lastEventID = new go.SseLastEventIDParameter(name);
+      lastEventID.group = method.optionalParamsGroup;
+      method.optionalParamsGroup.params.push(lastEventID);
+      method.parameters.push(lastEventID);
     }
 
     // we must do this after adapting method params as it can add optional params
@@ -1470,6 +1494,7 @@ export class ClientAdapter {
     const paramName = getEscapedReservedName(
       helpers.getEffectiveName(methodParam, paramStyle === "required"),
       "Param",
+      method.kind === "sseMethod" ? ["streaming"] : undefined,
     );
     // required and literal params are always passed by value
     const byVal = go.isRequiredParameter(paramStyle) || paramStyle === "literal";
@@ -1692,12 +1717,16 @@ export class ClientAdapter {
     const unexport = sdkMethod.access === "internal";
     switch (sdkMethod.kind) {
       case "basic":
-        methodName = helpers.getEffectiveName(sdkMethod, unexport);
-        if (unexport) {
-          // we add internal to the extra list so we don't end up with a method named "internal"
-          // which will collide with an unexported field with the same name. we don't need to
-          // do this for pagers/pollers as those methods get extra naming.
-          methodName = getEscapedReservedName(methodName, "Method", ["internal"]);
+        if (sdkMethod.response.sseMetadata) {
+          methodName = `${unexport ? "open" : "Open"}${helpers.getEffectiveName(sdkMethod, false)}`;
+        } else {
+          methodName = helpers.getEffectiveName(sdkMethod, unexport);
+          if (unexport) {
+            // we add internal to the extra list so we don't end up with a method named "internal"
+            // which will collide with an unexported field with the same name. we don't need to
+            // do this for pagers/pollers/sse as those methods get extra naming.
+            methodName = getEscapedReservedName(methodName, "Method", ["internal"]);
+          }
         }
         break;
       case "lro":
@@ -1818,6 +1847,35 @@ export class ClientAdapter {
     }
 
     let sdkResponseType = sdkMethod.response.type;
+    if (sdkMethod.response.sseMetadata) {
+      const streamType = sdkMethod.response.streamMetadata?.streamType;
+      if (!streamType) {
+        throw new AdapterError(
+          "InternalError",
+          `missing SSE stream type for method ${method.name}`,
+          sdkMethod.__raw?.node,
+        );
+      }
+      const unionType = this.ta.getSseUnionType(streamType);
+      respEnv.result = new go.SseResult("Stream", this.ta.getSSEReader(unionType));
+      respEnv.result.docs.summary = streamType.summary;
+      respEnv.result.docs.description = streamType.doc;
+
+      const fieldNames = new Set(["Stream"]);
+      for (const header of respEnv.headers) {
+        const baseName = header.fieldName === "Stream" ? "StreamHeader" : header.fieldName;
+        let fieldName = baseName;
+        for (let suffix = 1; fieldNames.has(fieldName); suffix++) {
+          fieldName = `${baseName}${suffix}`;
+        }
+        header.fieldName = fieldName;
+        fieldNames.add(fieldName);
+      }
+      return {
+        respEnv: respEnv,
+        respHeaders: pageableRespHeadersMap,
+      };
+    }
 
     // since HEAD requests don't return a type, we must check this before checking sdkResponseType
     if (

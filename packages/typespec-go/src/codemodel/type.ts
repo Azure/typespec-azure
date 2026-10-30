@@ -45,6 +45,7 @@ export type WireType =
   | Scalar
   | Slice
   | SliceArray
+  | SSEReader
   | String
   | Time
   | UnionStruct;
@@ -397,6 +398,39 @@ export type SliceArrayElementType = SliceArrayElementWireType | Ptr<SliceArrayEl
 /** the set of slice array wire types */
 export type SliceArrayElementWireType = Constant | String;
 
+/** describes the server-sent event (SSE) modeled by a union variant */
+export interface SseEvent {
+  /**
+   * the value of the SSE event field used to identify this event.
+   * undefined for unnamed variants which are message events.
+   */
+  name?: string;
+
+  /** indicates that receiving this event terminates the stream */
+  terminal: boolean;
+
+  /** the format of the event's data field */
+  format: SseEventFormat;
+
+  /**
+   * set when the variant type is an event envelope. the data field contains only
+   * the event payload which is deserialized into this field of the envelope.
+   * when unset, the data field contains the complete variant type.
+   */
+  envelopeField?: ModelField;
+}
+
+/** the set of formats for an SSE event's data field */
+export type SseEventFormat = "JSON" | "Text";
+
+/** the streaming.SSEReader type in azcore */
+export interface SSEReader extends QualifiedType {
+  kind: "sseReader";
+
+  /** the union of possible events */
+  eventType: UnionStruct;
+}
+
 /** a Go string */
 export interface String {
   kind: "string";
@@ -450,6 +484,9 @@ export interface TokenCredential extends QualifiedType {
 export interface UnionField extends StructField {
   /** the variant's underlying type */
   type: UnionVariantType;
+
+  /** contains SSE specific info for this variant */
+  sse?: SseEvent;
 }
 
 /** a Go struct modeling a non-discriminated union where exactly one field is set */
@@ -458,6 +495,18 @@ export interface UnionStruct extends StructBase {
 
   /** the variant fields of the union. exactly one is populated at runtime */
   fields: Array<UnionField>;
+
+  /** usage flags for this type */
+  usage: UnionStructFlags;
+}
+
+/** bit flags indicating how a union type is used */
+export enum UnionStructFlags {
+  /** used as a sum type */
+  SumType = 1,
+
+  /** used in SSE */
+  SseType = 2,
 }
 
 /**
@@ -597,9 +646,21 @@ export function getTypeDeclaration(
     case "readCloser":
     case "readSeekCloser":
     case "tokenCredential":
-      // strip module to just the leaf package as required
-      return `${byRef}${getBaseFileName(type.module)}.${type.name}`;
+      return `${byRef}${getQualifiedTypeDecl(type)}`;
+    case "sseReader":
+      return `*${getQualifiedTypeDecl(type)}[${getTypeDeclaration(type.eventType, scope)}]`;
   }
+}
+
+/**
+ * returns a type name qualified by the leaf package name of its module
+ *
+ * @param qualifiedType the type to render
+ * @returns the package-qualified type declaration
+ */
+function getQualifiedTypeDecl(qualifiedType: QualifiedType): string {
+  // strip module to just the leaf package as required
+  return `${getBaseFileName(qualifiedType.module)}.${qualifiedType.name}`;
 }
 
 /**
@@ -1024,6 +1085,21 @@ export class SliceArray implements SliceArray {
   }
 }
 
+export class SseEvent implements SseEvent {
+  constructor(format: SseEventFormat, terminal: boolean) {
+    this.format = format;
+    this.terminal = terminal;
+  }
+}
+
+export class SSEReader extends QualifiedType implements SSEReader {
+  constructor(eventType: UnionStruct) {
+    super("SSEReader", "github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
+    this.kind = "sseReader";
+    this.eventType = eventType;
+  }
+}
+
 export class String implements String {
   constructor() {
     this.kind = "string";
@@ -1044,9 +1120,10 @@ export class UnionField extends StructField implements UnionField {
 }
 
 export class UnionStruct extends StructBase implements UnionStruct {
-  constructor(pkg: PackageContent, name: string) {
+  constructor(pkg: PackageContent, name: string, usage: UnionStructFlags) {
     super(pkg, name);
     this.kind = "unionStruct";
+    this.usage = usage;
     this.fields = new Array<UnionField>();
   }
 }
