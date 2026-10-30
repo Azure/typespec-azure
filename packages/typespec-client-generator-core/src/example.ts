@@ -588,7 +588,10 @@ function getSdkTypeExample(
           return diagnostics.wrap(undefined);
         }
       case "enum":
-        if (type.values.some((v) => v.value === example) || !type.isFixed) {
+        if (
+          type.values.some((v) => (v.serializationOptions?.json?.name ?? v.value) === example) ||
+          !type.isFixed
+        ) {
           return getSdkBaseTypeExample(
             typeof example as "string" | "number",
             type,
@@ -600,7 +603,7 @@ function getSdkTypeExample(
           return diagnostics.wrap(undefined);
         }
       case "enumvalue":
-        if (type.value === example) {
+        if ((type.serializationOptions?.json?.name ?? type.value) === example) {
           return getSdkBaseTypeExample(
             typeof example as "string" | "number",
             type,

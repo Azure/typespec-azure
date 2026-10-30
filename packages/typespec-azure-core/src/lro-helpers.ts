@@ -42,6 +42,7 @@ import {
 
 import { getFinalLocationValue, isFinalLocation } from "./decorators/final-location.js";
 import { FinalOperationKey } from "./decorators/final-operation.js";
+import { getLroErrorResult } from "./decorators/lro-error-result.js";
 import { getLroResult } from "./decorators/lro-result.js";
 import {
   extractLroStates,
@@ -914,12 +915,15 @@ function getStatusMonitorInfo(
   const statusProperty = findLroStatusProperty(program, modelOrLink);
   if (statusProperty === undefined) return undefined;
   const successInfo = getTargetModelInformation(program, modelOrLink);
+  const errorProperty = ignoreDiagnostics(getLroErrorResult(program, modelOrLink, true));
   const lroStates = ignoreDiagnostics(extractLroStates(program, statusProperty));
   if (lroStates === undefined) return undefined;
   return {
     monitorType: modelOrLink,
     successType: successInfo !== undefined ? successInfo[0] : undefined,
     successProperty: successInfo !== undefined ? successInfo[1] : undefined,
+    errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
+    errorProperty,
     statusProperty: statusProperty,
     lroStates: lroStates,
   };

@@ -126,6 +126,15 @@ describe("expect all rules to be defined", () => {
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
   });
 
+  it.each(["no-query-in-post", "use-model-request-body"])(
+    "enables rolled-out ARM rule %s by default",
+    (name) => {
+      const ruleName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+      strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
+      strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    },
+  );
+
   it("keeps redundant summary guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
