@@ -21,7 +21,7 @@ func (transport routeTransport) Do(req *http.Request) (*http.Response, error) {
 	return transport(req)
 }
 
-func newRoutesRequestClient(t *testing.T, path string, query url.Values) *routesgroup.RoutesClient {
+func newRoutesRequestClient(t *testing.T, path string, query url.Values, rawQuery ...string) *routesgroup.RoutesClient {
 	t.Helper()
 	called := false
 	options := &routesgroup.RoutesClientOptions{}
@@ -29,6 +29,9 @@ func newRoutesRequestClient(t *testing.T, path string, query url.Values) *routes
 		called = true
 		require.Equal(t, path, req.URL.EscapedPath())
 		require.Equal(t, query, req.URL.Query())
+		if len(rawQuery) > 0 {
+			require.Equal(t, rawQuery[0], req.URL.RawQuery)
+		}
 		return &http.Response{
 			StatusCode: http.StatusNoContent,
 			Header:     http.Header{},

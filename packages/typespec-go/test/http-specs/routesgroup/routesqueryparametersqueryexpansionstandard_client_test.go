@@ -30,10 +30,19 @@ func TestRoutesQueryStandard(t *testing.T) {
 
 func TestRoutesQueryModelEscapesValues(t *testing.T) {
 	root := newRoutesRequestClient(t, "/routes/query/query-expansion/standard/model", url.Values{
-		"param": {"field,a & b,value,x+y=z"},
-	})
+		"param": {"field,a,value,b & c,value,x+y=z"},
+	}, "param=field,a%2Cvalue%2Cb%20%26%20c,value,x%2By%3Dz")
 	client := root.NewRoutesQueryParametersClient().NewRoutesQueryParametersQueryExpansionClient().NewRoutesQueryParametersQueryExpansionStandardClient()
-	_, err := client.Model(context.Background(), routesgroup.ExpandParameters{Field: "a & b", Value: "x+y=z"}, nil)
+	_, err := client.Model(context.Background(), routesgroup.ExpandParameters{Field: "a,value,b & c", Value: "x+y=z"}, nil)
+	require.NoError(t, err)
+}
+
+func TestRoutesQueryRecordPreservesComponentBoundaries(t *testing.T) {
+	root := newRoutesRequestClient(t, "/routes/query/query-expansion/standard/record", url.Values{
+		"param": {"%2C,2,a,b + c,1"},
+	}, "param=%252C,2,a%2Cb%20%2B%20c,1")
+	client := root.NewRoutesQueryParametersClient().NewRoutesQueryParametersQueryExpansionClient().NewRoutesQueryParametersQueryExpansionStandardClient()
+	_, err := client.Record(context.Background(), map[string]int32{"a,b + c": 1, "%2C": 2}, nil)
 	require.NoError(t, err)
 }
 

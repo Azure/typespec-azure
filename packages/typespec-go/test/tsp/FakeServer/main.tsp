@@ -1,4 +1,5 @@
 import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
 
 using TypeSpec.Http;
 
@@ -116,7 +117,6 @@ op optionalQueryMap(value?: Record<int32>): void;
 model QueryFields {
   field: string;
   count?: int32;
-  values?: string[];
   enabled?: boolean;
 }
 @route("/uri/query-object{?value}")
@@ -125,3 +125,62 @@ op queryObject(value: QueryFields): void;
 op queryExplodedObject(value: QueryFields): void;
 @route("/uri/optional-query-object{?value}")
 op optionalQueryObject(value?: QueryFields): void;
+
+model RequiredQueryFields {
+  name: string;
+  parts: string;
+}
+@route("/uri/query-groups/{name}{?rawQP,second}")
+op queryGroups(
+  @path name: string,
+  rawQP: RequiredQueryFields,
+  second: RequiredQueryFields,
+  @query rawQueryValues: string,
+  @query uriQueryKey: string,
+): void;
+
+model OptionalQueryFields {
+  count?: int32;
+}
+@route("/uri/query-option-collisions{?first,second}")
+op queryOptionCollisions(
+  first: OptionalQueryFields,
+  second: OptionalQueryFields,
+  @query count?: int32,
+  @query firstCount?: int32,
+): void;
+
+model SpreadMapsBody {
+  values: Record<int32 | null>;
+  numbers: Record<int32>;
+  list: int32[];
+  nested: Record<Record<int32 | null>>;
+}
+@post
+@route("/spread-maps")
+op spreadMaps(...SpreadMapsBody): void;
+
+@encode(BytesKnownEncoding.base64url)
+scalar URLBytes extends bytes;
+model BytesQueryFields {
+  value: URLBytes;
+}
+@route("/uri/bytes-object{?value}")
+op bytesObject(value: BytesQueryFields): void;
+@route("/uri/bytes-map{?value}")
+op bytesMap(value: Record<URLBytes>): void;
+@route("/uri/bytes-array{/value*}")
+op bytesArray(value: URLBytes[]): void;
+@route("/uri/bytes-scalar/{value}")
+op bytesScalar(value: URLBytes): void;
+
+model QueryPageOptions {
+  @query includePending: boolean;
+}
+model QueryPage {
+  @pageItems items: string[];
+  @nextLink nextLink?: Azure.Core.Legacy.parameterizedNextLink<[QueryPageOptions.includePending]>;
+}
+@list
+@route("/uri/query-paged-map{?value}")
+op queryPagedMap(...QueryPageOptions, value: Record<int32>): QueryPage;

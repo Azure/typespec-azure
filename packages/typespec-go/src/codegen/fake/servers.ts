@@ -625,7 +625,11 @@ function dispatchForOperationBody(
   );
   if (
     allQueryParams.find(
-      (each: go.QueryParameter) => each.location === "method" && !go.isLiteralParameter(each.style),
+      (each: go.QueryParameter) =>
+        each.location === "method" &&
+        !go.isLiteralParameter(each.style) &&
+        each.queryExpansion?.explode !== false &&
+        (each.kind !== "queryMapParam" || each.explode),
     )
   ) {
     content += `${indent.get()}qp := req.URL.Query()\n`;
@@ -924,7 +928,7 @@ function dispatchForOperationBody(
   // translate each partial body param to its field within the unmarshalled body
   for (const partialBodyParam of partialBodyParams) {
     result.params.set(
-      partialBodyParam.name,
+      partialBodyParam,
       `${helpers.deref(partialBodyParam.type)}body.${naming.capitalize(partialBodyParam.name)}`,
     );
   }
@@ -1178,7 +1182,7 @@ interface parseResult {
 
   // maps a param name to the var containing the "final" value.
   // only params that required parsing/casting will have an entry.
-  params: Map<string, string>;
+  params: Map<go.MethodParameter, string>;
 }
 
 /**
@@ -1197,11 +1201,20 @@ function parseHeaderPathQueryParams(
   indent: helpers.Indentation,
 ): parseResult {
   let content = "";
-  const paramValues = new Map<string, string>();
+  const paramValues = new Map<go.MethodParameter, string>();
+  const localNames = method.parameters.flatMap((param) =>
+    param.group ? [{ name: naming.uncapitalize(param.group.name) }] : [],
+  );
+
+  const allocateLocalName = function (candidate: string): string {
+    const name = helpers.getUniqueVarName(localNames, [candidate]);
+    localNames.push({ name });
+    return name;
+  };
 
   const createLocalVariableName = function (param: go.MethodParameter, suffix: string): string {
-    const paramName = `${naming.uncapitalize(param.name)}${suffix}`;
-    paramValues.set(param.name, paramName);
+    const paramName = allocateLocalName(`${naming.uncapitalize(param.name)}${suffix}`);
+    paramValues.set(param, paramName);
     return paramName;
   };
 
@@ -1227,6 +1240,19 @@ function parseHeaderPathQueryParams(
   // we track the params separately as it might be a subset of ParameterGroup.params
   const paramGroups = new Map<go.ParameterGroup, Array<go.MethodParameter>>();
   const queryExpansions = new Map<go.QueryExpansion, string>();
+  const rawQuery = method.parameters.some(
+    (param) =>
+      param.location === "method" &&
+      !go.isLiteralParameter(param.style) &&
+      ((param.kind === "queryMapParam" && !param.explode) ||
+        (go.isQueryParameter(param) && param.queryExpansion?.explode === false)),
+  );
+  const rawQueryVariable = rawQuery ? allocateLocalName("rawQP") : "";
+  if (rawQuery) {
+    requiredHelpers.uriTemplate = true;
+    content += `${indent.get()}${rawQueryVariable}, err := parseRawURIQuery(req.URL.RawQuery)\n`;
+    content += `${indent.get()}if err != nil { return nil, err }\n`;
+  }
   for (const param of method.parameters) {
     if (
       go.isQueryParameter(param) &&
@@ -1237,7 +1263,7 @@ function parseHeaderPathQueryParams(
       !queryExpansions.has(param.queryExpansion)
     ) {
       requiredHelpers.uriTemplate = true;
-      const name = `queryExpansion${queryExpansions.size}`;
+      const name = allocateLocalName(`queryExpansion${queryExpansions.size}`);
       queryExpansions.set(param.queryExpansion, name);
       const keys = method.parameters
         .filter(
@@ -1246,7 +1272,7 @@ function parseHeaderPathQueryParams(
         .map((member) =>
           go.isQueryParameter(member) ? JSON.stringify(member.queryParameter) : "",
         );
-      content += `${indent.get()}${name}, err := parseURIQueryObject(qp.Get(${JSON.stringify(param.queryExpansion.queryParameter)}), []string{${keys.join(", ")}})\n`;
+      content += `${indent.get()}${name}, err := parseURIQueryObject(${rawQueryVariable}.Get(${JSON.stringify(param.queryExpansion.queryParameter)}), []string{${keys.join(", ")}})\n`;
       content += `${indent.get()}if err != nil { return nil, err }\n`;
     }
   }
@@ -1289,6 +1315,10 @@ function parseHeaderPathQueryParams(
     // contains the unescaped value.
     let paramValue = getRawParamValue(param);
     let querySource = "qp";
+    if (param.kind === "queryMapParam" && !param.explode) {
+      querySource = rawQueryVariable;
+      paramValue = `${rawQueryVariable}.Get(${JSON.stringify(param.queryParameter)})`;
+    }
     if (go.isQueryParameter(param) && param.queryExpansion && !param.queryExpansion.explode) {
       const source = queryExpansions.get(param.queryExpansion);
       if (!source) {
@@ -1426,7 +1456,7 @@ function parseHeaderPathQueryParams(
         } else if (elementFormat === "Std" || elementFormat === "URL") {
           imports.add("encoding/base64");
           fromVar = `parsed${naming.capitalize(elementFormat)}`;
-          content += `${indent.get()}${fromVar}, parseErr := base64.${elementFormat}Encoding.DecodeString(${paramValue}[i])\n`;
+          content += `${indent.get()}${fromVar}, parseErr := base64.${helpers.formatBytesEncoding(elementFormat)}Encoding.DecodeString(${paramValue}[i])\n`;
           content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return nil, parseErr\n${indent.pop().get()}}\n`;
         } else if (
           elementFormat === "RFC1123" ||
@@ -1473,7 +1503,7 @@ function parseHeaderPathQueryParams(
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     } else if (paramType.kind === "encodedBytes") {
       imports.add("encoding/base64");
-      content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := base64.${paramType.encoding}Encoding.DecodeString(${paramValue})\n`;
+      content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := base64.${helpers.formatBytesEncoding(paramType.encoding)}Encoding.DecodeString(${paramValue})\n`;
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     } else if (paramType.kind === "time") {
       const formatMap: Record<string, string> = {
@@ -1664,14 +1694,14 @@ function parseHeaderPathQueryParams(
  *
  * @param pkg contains the package contents
  * @param method the method to be called with the parsed parameters
- * @param paramValues maps a parameter name to the value to be passed to the fake
+ * @param paramValues maps a parameter to the value to be passed to the fake
  * @param imports the import manager currently in scope
  * @returns the text for the parameters to be passed to the fake
  */
 function populateApiParams(
   pkg: go.FakePackage,
   method: go.MethodType,
-  paramValues: Map<string, string>,
+  paramValues: Map<go.MethodParameter, string>,
   imports: ImportManager,
 ): string {
   // FooOperation(req.Context(), matches[regex.SubexpIndex("resourceGroupName")], qp.Get("api-version"), nil)
@@ -1761,15 +1791,15 @@ function getRawParamValue(param: go.MethodParameter): string {
  *
  * @param pkg the contents of the package
  * @param param the parameter being evaluated
- * @param paramValues maps a parameter name to the value to be passed to the fake
+ * @param paramValues maps a parameter to the value to be passed to the fake
  * @returns the value to pass for the provided parameter
  */
 function getFinalParamValue(
   pkg: go.FakePackage,
   param: go.MethodParameter,
-  paramValues: Map<string, string>,
+  paramValues: Map<go.MethodParameter, string>,
 ): string {
-  let paramValue = paramValues.get(param.name);
+  let paramValue = paramValues.get(param);
   if (!paramValue) {
     // the param didn't require parsing so the "raw" value can be used
     paramValue = getRawParamValue(param);
@@ -1788,7 +1818,10 @@ function getFinalParamValue(
     return `time.Time(${paramValue})`;
   } else if (go.isRequiredParameter(param.style)) {
     // optional params are always in their "final" form
-    if (param.kind === "headerCollectionParam" || param.kind === "queryCollectionParam") {
+    if (
+      param.kind === "headerCollectionParam" ||
+      (param.kind === "queryCollectionParam" && !param.queryExpansion)
+    ) {
       // for required params that are collections of strings, we split them inline.
       // not necessary for optional params as they're already in slice format.
       if (param.collectionFormat !== "multi" && param.type.itemType.kind === "string") {

@@ -9,6 +9,7 @@ import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 import { getPathExpansionStyle } from "./path-expansion.js";
+import { isRawQueryExpansion, preservedQueryExpansions } from "./query-expansion.js";
 
 /**
  * emits the request handler for the specified method.
@@ -231,6 +232,20 @@ export function createRequestHandler(
   // BEGIN add query parameters
   const encodedParams = uniqueQueryExpansions(methodParamGroups.encodedQueryParams);
   const unencodedParams = uniqueQueryExpansions(methodParamGroups.unencodedQueryParams);
+  const rawQueryParams = encodedParams.filter(isRawQueryExpansion);
+  const preservedParams = preservedQueryExpansions(method, rawQueryParams);
+  const rawQueryValues = helpers.getUniqueVarName(
+    method.parameters.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["rawQueryValues", "uriQueryValues"],
+  );
+  const queryErr = helpers.getUniqueVarName(
+    method.parameters.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["queryErr", "uriQueryErr"],
+  );
+  const queryURL = helpers.getUniqueVarName(
+    method.parameters.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["queryURL", "uriQueryURL"],
+  );
 
   // check for any params that require reinjection
   const reinjectedParams = new Array<go.QueryParameter>();
@@ -267,6 +282,30 @@ export function createRequestHandler(
     }
 
     text += `${indent.get()}reqQP := req.Raw().URL.Query()\n`;
+    if (rawQueryParams.length > 0) {
+      imports.add("net/url");
+      text += `${indent.get()}${rawQueryValues} := url.Values{}\n`;
+      if (preservedParams.length > 0) {
+        const keys = preservedParams.map((param) =>
+          JSON.stringify(param.queryExpansion?.queryParameter ?? param.queryParameter),
+        );
+        let source = "req.Raw().URL.RawQuery";
+        if (forNextLinkPager && forReinjection !== "none") {
+          text += `${indent.get()}${queryURL} := req.Raw().URL\n`;
+          text += `${indent.get()}if !firstPage {\n`;
+          text += `${indent.push().get()}var ${queryErr} error\n`;
+          text += `${indent.get()}${queryURL}, ${queryErr} = url.Parse(nextLink)\n`;
+          text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+          text += `${indent.pop().get()}}\n`;
+          source = `${queryURL}.RawQuery`;
+        }
+        text += `${indent.get()}if ${source} != "" {\n`;
+        text += `${indent.push().get()}var ${queryErr} error\n`;
+        text += `${indent.get()}${rawQueryValues}, ${queryErr} = preserveQueryExpansions(${source}, ${keys.join(", ")})\n`;
+        text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+        text += `${indent.pop().get()}}\n`;
+      }
+    }
 
     // this will accumulate any non-reinjected params code
     let nonReinjectedParamsText = "";
@@ -280,6 +319,8 @@ export function createRequestHandler(
           queryExpansionMembers(qp, methodParamGroups.encodedQueryParams),
           imports,
           indent,
+          false,
+          rawQueryValues,
         );
       } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
         setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
@@ -292,7 +333,14 @@ export function createRequestHandler(
         setter += `${indent.get()}reqQP.Add("${qp.queryParameter}", ${helpers.formatValue("qv", qp.type.itemType, imports)})\n`;
         setter += `${indent.pop().get()}}`;
       } else if (qp.kind === "queryMapParam") {
-        setter = emitQueryObject(qp, imports, indent);
+        setter = emitQueryObject(
+          method.receiver.type.pkg,
+          qp,
+          imports,
+          indent,
+          false,
+          rawQueryValues,
+        );
       } else {
         // cannot initialize setter to this value as helpers.formatParamValue() can change imports
         setter = `reqQP.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
@@ -326,8 +374,12 @@ export function createRequestHandler(
     // thus not applicable for URIs. the correct URI encoding for SP is %20. note that literal '+'
     // characters are encoded by reqQP.Encode() as %2B so there's no risk of replacing them.
     // see https://www.rfc-editor.org/rfc/rfc3986 sections 2.1, 2.2, and 3.4
-    imports.add("strings");
-    text += `${indent.get()}req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")\n`;
+    if (rawQueryParams.length > 0) {
+      text += `${indent.get()}req.Raw().URL.RawQuery = encodeQuery(reqQP, ${rawQueryValues})\n`;
+    } else {
+      imports.add("strings");
+      text += `${indent.get()}req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")\n`;
+    }
 
     // don't close it yet if there are header/body params as those don't get reinjected
     const bodyParam = methodParamGroups.bodyParam;
@@ -370,7 +422,7 @@ export function createRequestHandler(
         setter += `${indent.push().get()}unencodedParams = append(unencodedParams, "${qp.queryParameter}="+qv)\n`;
         setter += `${indent.pop().get()}}`;
       } else if (qp.kind === "queryMapParam") {
-        setter = emitQueryObject(qp, imports, indent, true);
+        setter = emitQueryObject(method.receiver.type.pkg, qp, imports, indent, true);
       } else {
         setter = `unencodedParams = append(unencodedParams, "${qp.queryParameter}="+${helpers.formatParamValue(qp, imports, indent)})`;
       }
@@ -889,11 +941,21 @@ function emitSortedMapKeys(
 }
 
 function emitQueryObject(
+  pkg: go.PackageContent,
   param: go.QueryMapParameter,
   imports: ImportManager,
   indent: helpers.Indentation,
   unencoded = false,
+  rawQueryValues = "rawQueryValues",
 ): string {
+  if (!unencoded && !param.explode && param.type.itemType.kind !== "ptr") {
+    const itemType = param.type.itemType;
+    imports.addForType(itemType);
+    let text = `${rawQueryValues}.Set(${JSON.stringify(param.queryParameter)}, expandQueryMap(${helpers.getParamName(param)}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
+    text += `${indent.push().get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
+    text += `${indent.pop().get()}}))`;
+    return text;
+  }
   const set = (key: string, value: string): string =>
     unencoded
       ? `unencodedParams = append(unencodedParams, ${key} + "=" + ${value})`
@@ -907,7 +969,9 @@ function emitQueryObject(
     imports.add("strings");
   }
   const append = (key: string, value: string): string =>
-    param.explode ? set(key, value) : `parts = append(parts, ${key}, ${value})`;
+    param.explode
+      ? set(key, value)
+      : `parts = append(parts, ${unencoded ? key : `escapeQueryComponent(${key})`}, ${unencoded ? value : `escapeQueryComponent(${value})`})`;
   text += emitSortedMapKeys(paramName, imports, indent);
   text += `${indent.get()}for _, key := range keys {\n`;
   text += `${indent.push().get()}value := ${paramName}[key]\n`;
@@ -919,7 +983,11 @@ function emitQueryObject(
   text += `${indent.get()}${append("key", helpers.formatValue("value", param.type.itemType, imports))}\n`;
   text += `${indent.pop().get()}}\n`;
   if (!param.explode) {
-    text += `${indent.get()}${set(JSON.stringify(param.queryParameter), 'strings.Join(parts, ",")')}\n`;
+    text += `${indent.get()}${
+      unencoded
+        ? set(JSON.stringify(param.queryParameter), 'strings.Join(parts, ",")')
+        : `${rawQueryValues}.Set(${JSON.stringify(param.queryParameter)}, strings.Join(parts, ","))`
+    }\n`;
   }
   text += `${indent.pop().get()}}`;
   return text;
@@ -1164,8 +1232,23 @@ function emitQueryExpansion(
   imports: ImportManager,
   indent: helpers.Indentation,
   unencoded = false,
+  rawQueryValues = "rawQueryValues",
 ): string {
-  imports.add("strings");
+  if (
+    !unencoded &&
+    params.every(
+      (param) => go.isRequiredParameter(param.style) || go.isLiteralParameter(param.style),
+    )
+  ) {
+    const args = params.flatMap((param) => [
+      JSON.stringify(param.queryParameter),
+      helpers.formatParamValue(param, imports, indent),
+    ]);
+    return `${indent.get()}setQueryExpansion(${rawQueryValues}, ${JSON.stringify(expansion.queryParameter)}${args.length > 0 ? `, ${args.join(", ")}` : ""})\n`;
+  }
+  if (unencoded) {
+    imports.add("strings");
+  }
   const parts = helpers.getUniqueVarName(
     params.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
     ["parts", "queryParts"],
@@ -1192,13 +1275,13 @@ function emitQueryExpansion(
       );
     }
   }
-  text += `${indent.get()}if len(${parts}) > 0 {\n`;
-  indent.push();
-  const value = `strings.Join(${parts}, ",")`;
-  text += unencoded
-    ? `${indent.get()}unencodedParams = append(unencodedParams, ${JSON.stringify(expansion.queryParameter)}+"="+${value})\n`
-    : `${indent.get()}reqQP.Set(${JSON.stringify(expansion.queryParameter)}, ${value})\n`;
-  text += `${indent.pop().get()}}\n`;
+  if (unencoded) {
+    text += `${indent.get()}if len(${parts}) > 0 {\n`;
+    text += `${indent.push().get()}unencodedParams = append(unencodedParams, ${JSON.stringify(expansion.queryParameter)}+"="+strings.Join(${parts}, ","))\n`;
+    text += `${indent.pop().get()}}\n`;
+  } else {
+    text += `${indent.get()}setQueryExpansion(${rawQueryValues}, ${JSON.stringify(expansion.queryParameter)}, ${parts}...)\n`;
+  }
   text += `${indent.pop().get()}}\n`;
   return text;
 }

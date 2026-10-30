@@ -1335,6 +1335,26 @@ export class ClientAdapter {
       }
     }
 
+    if (optionalGroup) {
+      const counts = new Map<string, number>();
+      const names = new Set(optionalGroup.params.map((param) => param.name));
+      for (const param of optionalGroup.params) {
+        counts.set(param.name, (counts.get(param.name) ?? 0) + 1);
+      }
+      for (const param of optionalGroup.params) {
+        if (go.isQueryParameter(param) && param.queryExpansion && counts.get(param.name)! > 1) {
+          let name = helpers.getEffectiveName({
+            name: `${param.queryExpansion.queryParameter}_${param.name}`,
+          });
+          while (names.has(name)) {
+            name += "Param";
+          }
+          names.add(name);
+          param.name = name;
+        }
+      }
+    }
+
     return {
       exampleParams: paramMapping,
       paramsMap: pageableParamsMap,
@@ -2226,13 +2246,13 @@ export class ClientAdapter {
     optionalGroup: go.ParameterGroup | undefined,
     queryParameter: string,
     explode: boolean,
-  ): Array<go.QueryScalarParameter | go.QueryCollectionParameter> {
+  ): Array<go.QueryScalarParameter> {
     const groupName = helpers.getEffectiveName(model);
     const group = new go.ParameterGroup(this.ta.getPkg(), name, groupName, true, "method");
     group.docs.summary = model.summary;
     group.docs.description = model.doc;
     const expansion: go.QueryExpansion = { queryParameter, explode };
-    const params = new Array<go.QueryScalarParameter | go.QueryCollectionParameter>();
+    const params = new Array<go.QueryScalarParameter>();
     const { props, addlProps } = aggregateProperties(this.ta.ctx, model);
     if (addlProps || helpers.isPolymorphicRoot(model) || model.discriminatorValue) {
       throw new AdapterError(
@@ -2242,23 +2262,21 @@ export class ClientAdapter {
       );
     }
     for (const prop of props) {
+      const propType = prop.type.kind === "nullable" ? prop.type.type : prop.type;
+      if (propType.kind === "array") {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          "query objects cannot contain array-valued fields",
+          prop.__raw?.node,
+        );
+      }
       const type = this.adaptPathQueryType(prop.type);
       const style = this.adaptParameterStyle(required ? prop : { ...prop, optional: true });
       const byVal = go.isRequiredParameter(style) || go.isLiteralParameter(style);
       const fieldName = helpers.getEffectiveName(prop);
       const serializedName = prop.serializationOptions.json?.name ?? prop.serializedName;
-      let param: go.QueryScalarParameter | go.QueryCollectionParameter;
-      if (type.kind === "slice") {
-        param = new go.QueryCollectionParameter(
-          fieldName,
-          serializedName,
-          true,
-          type,
-          "csv",
-          style,
-          "method",
-        );
-      } else if (
+      let param: go.QueryScalarParameter;
+      if (
         type.kind === "constant" ||
         type.kind === "encodedBytes" ||
         type.kind === "literal" ||
@@ -2336,7 +2354,7 @@ export class ClientAdapter {
         sdkType.__raw?.node,
       );
     }
-    return this.ta.getWireType(sdkType, true, false);
+    return this.ta.getWireType(sdkType, true, false, undefined, true);
   }
 
   private adaptParameterStyle(param: ParameterStyleInfo): go.ParameterStyle {
