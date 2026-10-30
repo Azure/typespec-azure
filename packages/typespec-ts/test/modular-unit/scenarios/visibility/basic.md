@@ -499,6 +499,15 @@ export async function _updateWidgetDeserialize(result: PathUncheckedResponse): P
   return widgetDeserializer(result.body);
 }
 
+/**
+ * **Important:** If you set conditional headers (e.g., `If-Unmodified-Since`, `If-Match`),
+ * the service may return:
+ * - `412 Precondition Failed` if the resource changed since the specified condition.
+ * - `304 Not Modified` for GET requests if the resource has not changed.
+ *
+ * The SDK does not automatically retry or resolve conflicts.
+ * You should handle these status codes in your application logic.
+ */
 export async function updateWidget(
   context: Client,
   widgetName: string,
@@ -624,11 +633,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for TestingClient. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -669,6 +680,15 @@ export class TestingClient {
     return getWidget(this._client, widgetName, options);
   }
 
+  /**
+   * **Important:** If you set conditional headers (e.g., `If-Unmodified-Since`, `If-Match`),
+   * the service may return:
+   * - `412 Precondition Failed` if the resource changed since the specified condition.
+   * - `304 Not Modified` for GET requests if the resource has not changed.
+   *
+   * The SDK does not automatically retry or resolve conflicts.
+   * You should handle these status codes in your application logic.
+   */
   updateWidget(
     widgetName: string,
     body: WidgetUpdate,
@@ -916,11 +936,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for TestingClient. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -1127,11 +1149,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for TestingClient. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;

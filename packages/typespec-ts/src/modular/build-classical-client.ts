@@ -65,6 +65,7 @@ export function buildClassicalClient(
   const clientClass = clientFile.addClass({
     isExported: true,
     name: `${classicalClientName}`,
+    docs: getDocsFromDescription(client.doc?.trim() || `Client for ${classicalClientName}.`),
   });
 
   // Add the private client member. This will be the client context from /api
@@ -110,7 +111,9 @@ export function buildClassicalClient(
     constructor = generateConstructorWithOverloads(clientClass, classicalParams, client);
   } else {
     constructor = clientClass.addConstructor({
-      docs: getDocsFromDescription(client.doc),
+      docs: getDocsFromDescription(
+        client.doc?.trim() || `Creates an instance of ${classicalClientName}.`,
+      ),
       parameters: classicalParams,
     });
   }
@@ -363,9 +366,12 @@ function generateConstructorWithOverloads(
   const filteredParams = classicalParams.filter(
     (p) => p.name.toLowerCase() !== "subscriptionid" && p.name.toLowerCase() !== "options",
   );
+  const docs = getDocsFromDescription(
+    client.doc?.trim() || `Creates an instance of ${getClassicalClientName(client)}.`,
+  );
 
   const clientConstructor = clientClass.addConstructor({
-    docs: getDocsFromDescription(client.doc),
+    docs,
     parameters: [
       ...filteredParams,
       {
@@ -382,6 +388,7 @@ function generateConstructorWithOverloads(
   });
 
   clientConstructor.addOverload({
+    docs,
     parameters: [
       ...filteredParams,
       {
@@ -393,6 +400,7 @@ function generateConstructorWithOverloads(
   });
 
   clientConstructor.addOverload({
+    docs,
     parameters: [
       ...filteredParams,
       ...classicalParams.filter((p) => p.name.toLowerCase() === "subscriptionid"),
