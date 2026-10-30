@@ -114,6 +114,11 @@ validator or migration history:
 
 - Explain the native requirement, applicability, rationale, and corrective
   TypeSpec pattern. Describe accepted and rejected authoring constructs directly.
+- Omit routine "this rule is opt-in", enable-this-rule, and ruleset-membership
+  boilerplate from individual rule pages. Keep activation bookkeeping in central
+  linter/ruleset references and migration NOTES. Include rule-specific configuration
+  only when needed to explain applicability or the corrective authoring pattern;
+  this does not change actual defaults or their required validation.
 - Do not explain the rule by contrasting TypeSpec models with emitted OpenAPI
   references, Swagger reference overrides, or legacy validator mechanics, even
   when that comparison is technically accurate. Do not recommend an output
