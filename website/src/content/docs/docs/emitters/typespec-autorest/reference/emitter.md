@@ -89,7 +89,7 @@ Example: Versioning with version-status
 
 **Type:** `string`
 
-Directory where the examples are located. Default: `{project-root}/examples`.
+Directory containing legacy JSON examples. Unified YAML is discovered at the project root. Default: `{project-root}/examples`.
 
 ### `examples-directory`
 
@@ -192,7 +192,7 @@ Determines whether output should be split into multiple files. The only supporte
 
 **Default:** `false`
 
-When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.
+For legacy JSON examples, reference the source files instead of copying them to the output directory. Unified YAML examples are still materialized as JSON.
 
 ### `type-name-strategy`
 
@@ -217,3 +217,5 @@ Controls emission of a `service.yaml` manifest at the project root. "auto" (defa
 **Default:** `"auto"`
 
 Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.
+
+See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/). **Caution:** check SDK emitter support before replacing legacy JSON sources.
