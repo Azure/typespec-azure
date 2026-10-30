@@ -25,7 +25,7 @@ func TestRoutesMatrixExplode(t *testing.T) {
 }
 
 func TestRoutesMatrixRecordEscapesKeys(t *testing.T) {
-	root := newRoutesRequestClient(t, "/routes/path/matrix/explode/record;a=b%3Bc%2Fd=1;z=0", url.Values{})
+	root := newRoutesRequestClient(t, "/routes/path/matrix/explode/record;a%3Db%3Bc%2Fd=1;z=0", url.Values{})
 	client := root.NewRoutesPathParametersClient().NewRoutesPathParametersMatrixExpansionClient().NewRoutesPathParametersMatrixExpansionExplodeClient()
 	_, err := client.Record(context.Background(), map[string]int32{
 		"z": 0, "a=b;c/d": 1,
