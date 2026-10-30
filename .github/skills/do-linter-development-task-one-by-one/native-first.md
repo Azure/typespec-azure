@@ -152,6 +152,15 @@ authorize refresh, or waive any required gate.
    native behavior or separate comparison evidence; retain noise attribution,
    emitted snapshots and supported-shape research where their claims need them.
    Framework-only cases have a justified disposition, not mandatory duplication.
+   After focused checks pass, obtain an early independent local semantic review
+   of the complete native source diff before packing an immutable candidate or
+   starting expensive full coverage. Use the retained development local reviewer
+   and existing ownership, capability and correction-budget gates; keep the worker
+   idle during an outer-owned review. Address valid findings before artifact
+   preparation. This source-only pass is not final acceptance: retain the same
+   reviewer to inspect later changes and artifact/coverage evidence before
+   publication. Source changes still invalidate affected checks and full-population
+   evidence; an earlier clean review cannot certify changed source.
 3. **Validate actual artifacts.** Build/pack a clean immutable candidate input,
    retain source-to-artifact identity and verify loaded compiler/lint packages.
    Run real injected-package positive/compliant controls before expensive

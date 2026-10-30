@@ -54,7 +54,14 @@ equivalent because its activation profile was never enabled.
 
 Read the destination's instructions and existing rules before edits. Preserve
 diagnostic naming/messages, library wiring, exports and package architecture.
-New rules are disabled by default unless explicit policy authorizes enablement.
+Unless explicitly authorized, keep new rules disabled in recommended/default
+policy presets, such as `@azure-tools/typespec-azure-rulesets/resource-manager`.
+Library `all` rulesets are independent: preserve their existing automatic
+membership convention rather than adding a per-rule exclusion merely because
+a rule is new or disabled in a recommended preset. Preserve existing
+audience-specific exceptions; a new exception needs its own policy justification.
+Verify library `all` activation and recommended-preset nonactivation separately
+through existing package/registration tests, not duplicate rule-unit suites.
 Update every impacted ruleset's exhaustive enable/disable mapping and tests;
 do not assume adding a library rule automatically updates resource-manager
 rulesets. Add Chronus metadata for changed packages.

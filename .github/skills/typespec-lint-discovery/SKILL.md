@@ -67,6 +67,14 @@ Record these decisions in the brief before implementation:
   uses it. Apply the
   [simplification review guidance](../typespec-lint-implement/SKILL.md#simplification-and-review)
   when feedback challenges that architecture. Mark unresolved API questions explicitly.
+  Prove that the proposed predicate distinguishes the closest compliant shape,
+  not just that a helper returns metadata for a violating-looking example.
+  Read the helper's contract and downstream guard rationale. Protocol or
+  continuation metadata, for example, need not prove that an operation starts
+  work. If compliant and violating shapes expose the same proposed predicate,
+  identify a supported distinguishing fact before implementation. Otherwise
+  record the observability gap; do not infer intent from names, paths or prose,
+  or silently narrow the guideline.
 - **Diagnostic contract:** specify the unit (property, operation, model, etc.),
   authored target, expected multiplicity, exemptions, and concise corrective
   message. Extra diagnostics and suppressed duplicates are behavior decisions.
