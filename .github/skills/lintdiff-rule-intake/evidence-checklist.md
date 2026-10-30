@@ -9,6 +9,11 @@ A high-quality intake should account for all of these when they are available:
 - implementation logic and notable edge cases
 - upstream tests or examples
 - registration metadata such as severity, selectors, and `disableForTypeSpec*` hints
+- registered `openapiType`/category and caller-selected subtype, compared with
+  the catalog label; identify importer loss of RPaaS audience information
+- the [validator audience contract](SKILL.md#validator-audience-contract):
+  native selection or documented external opt-in, enablement/default policy,
+  supported ordinary ARM counterexamples, and actual comparison profiles
 
 ## Local migration evidence
 
@@ -19,6 +24,10 @@ A high-quality intake should account for all of these when they are available:
 - stored TypeSpec diagnostics
 - catalog or inventory classification
 - validation report evidence
+- existing native-rule implementations, registration/enablement, and authored
+  documentation; per-check coverage, remaining gaps, and candidate extensions
+- required existing-rule provenance mappings when a duplicate is omitted,
+  following the [coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract)
 
 ## Prerequisite and blocking evidence
 

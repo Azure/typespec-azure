@@ -1,20 +1,19 @@
 import {
+  getArmResources,
+  type ArmResourceDetails,
+  type ArmResourceOperation,
+} from "@azure-tools/typespec-azure-resource-manager";
+import {
   createRule,
   getDiscriminator,
   paramMessage,
   type Interface,
   type Model,
 } from "@typespec/compiler";
-import {
-  getArmResources,
-  type ArmResourceDetails,
-  type ArmResourceOperation,
-} from "@azure-tools/typespec-azure-resource-manager";
 
 export const allResourcesMustHaveGetOperationRule = createRule({
   name: "all-resources-must-have-get-operation",
-  description:
-    "ARM resources with PUT or PATCH operations must define a GET/read operation.",
+  description: "ARM resources with PUT or PATCH operations must define a GET/read operation.",
   severity: "warning",
   messages: {
     default: paramMessage`Resource '${"name"}' must have a get/read operation.`,
@@ -50,7 +49,10 @@ function requiresGetOperation(resource: ArmResourceDetails): boolean {
   );
 }
 
-function hasDiscriminatorAncestor(program: Parameters<typeof getArmResources>[0], model: Model): boolean {
+function hasDiscriminatorAncestor(
+  program: Parameters<typeof getArmResources>[0],
+  model: Model,
+): boolean {
   for (let current = model.baseModel; current !== undefined; current = current.baseModel) {
     if (getDiscriminator(program, current) !== undefined) {
       return true;
@@ -62,6 +64,8 @@ function hasDiscriminatorAncestor(program: Parameters<typeof getArmResources>[0]
 
 function getDiagnosticTarget(resource: ArmResourceDetails): Interface | Model {
   return (
+    resource.operations.lifecycle.createOrUpdate?.operation.interface ??
+    resource.operations.lifecycle.update?.operation.interface ??
     getOperationInterface(Object.values(resource.operations.lifecycle)) ??
     getOperationInterface(Object.values(resource.operations.lists)) ??
     getOperationInterface(Object.values(resource.operations.actions)) ??
@@ -72,6 +76,6 @@ function getDiagnosticTarget(resource: ArmResourceDetails): Interface | Model {
 function getOperationInterface(
   operations: Array<ArmResourceOperation | undefined>,
 ): Interface | undefined {
-  return operations.find((operation) => operation?.operation.interface !== undefined)
-    ?.operation.interface;
+  return operations.find((operation) => operation?.operation.interface !== undefined)?.operation
+    .interface;
 }

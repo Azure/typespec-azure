@@ -70,11 +70,6 @@
     "message": "The body of 202 response should be empty."
   },
   {
-    "code": "tsp-lintdiff-local-linter/lro-extension",
-    "severity": "warning",
-    "message": "ARM PUT operations with a 202 response must set `x-ms-long-running-operation` to `true`."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."

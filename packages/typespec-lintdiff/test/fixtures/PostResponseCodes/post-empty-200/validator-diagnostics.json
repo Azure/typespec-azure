@@ -1,0 +1,12 @@
+[
+  {
+    "code": "PostResponseCodes",
+    "message": "200 return code does not have a schema specified. LRO POST must have a 200 return code if only if the final response is intended to have a schema, if not the 200 return code must not be specified.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/reset",
+      "post"
+    ],
+    "severity": 0
+  }
+]

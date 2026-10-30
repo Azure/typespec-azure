@@ -1,5 +1,39 @@
 # Publication execution backends
 
+## Native-first publication
+
+For recorded `flowVersion: native-first`, one native implementation publisher
+owns both development and release-readiness checkpoints on one canonical head,
+with base `Azure/typespec-azure:main`. Apply publication preflight, lifecycle,
+operation-specific backend controls, exact head verification, bounded recovery,
+completion delivery and quiescence below. Do not run this file's legacy
+development-to-distinct-promotion-owner dispatch or legacy phase prompts.
+
+In an explicit-target backend, use one fresh top-level general-purpose worker
+per task/semantic-repair cycle with the
+[native-first procedure](native-first.md), not the legacy worker command.
+In a session-bound backend, retain the one verified native owner across both
+checkpoints/cycles and create new phase dispatch IDs. A directory change does not
+create a publisher. A/B each get a new persistent collector/fixer pair and their
+independent local review. Outer-owned review keeps the phase owner idle and
+resumes that same native owner, never a promotion owner. Apply the existing
+capability preflight before work; no concurrent writers or replacement owners.
+
+Bind evidence to the signed-in user's verified personal fork and dedicated
+branch using [the evidence contract](evidence.md). This is a separate role and
+narrow fork exception, not permission to publish native/skill PR heads there.
+Do not route fork evidence through a session-bound native PR creation tool.
+If the required backend cannot address both roles safely, stop before setup.
+Specs preservation refs are auxiliary evidence writes to a separately verified
+personal specs fork, not native/skill PR heads. Verify explicit repository/ref
+capability under [source retention](evidence.md#specs-source-retention); a session
+binding to TypeSpec Azure does not authorize writing to the specs repository.
+
+Native-first does not change existing legacy PR bases/heads, app comparison
+bindings or post-merge authorizations. Record `flowVersion` in every dispatch,
+result and recovery context. A task created under the legacy flow keeps its
+separate owners, strict worker command and source provenance.
+
 Use this shared contract for development preparation and standalone workers,
 standalone and queued promotion, authorized follow-up repair, publication-only
 recovery, and post-run skill PRs. It changes execution and publication ownership,
@@ -35,7 +69,14 @@ publication binding in durable session artifacts:
   completion channel; for reviews, selected owner and persistent capabilities
 
 Resolve repository identity from actual remote fetch/push URLs and GitHub
-metadata, never a remote's name. New development, migration and promotion heads,
+metadata, never a remote's name. Compare the resolved owner/repository, not a
+guessed exact URL spelling: `https://github.com/Azure/typespec-azure` and
+`https://github.com/Azure/typespec-azure.git` identify the same repository. The
+optional `.git` suffix is not a publication or permission gate. Still record the
+actual effective push URL/refspec and verify GitHub repository identity and push
+permission; URL equivalence alone does not establish the publication binding.
+
+New development, migration and promotion heads,
 and all skill-update PR heads, must live in canonical
 `Azure/typespec-azure`, not a personal fork. An Azure base repository alone does
 not satisfy this requirement. Verify push permission for the authorized head
@@ -46,8 +87,8 @@ may retain its head only with the exact
 [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
 Otherwise stop for explicit migration authorization; do not silently
 move, replace, or close it. New PRs and skill-only PRs retain the canonical-head
-policy. Promotion targets canonical `main`; migration and skill PRs
-target the explicitly selected migration branch. Examples using `origin` mean
+policy. Promotion and native-first rule PRs target canonical `main`; legacy
+migration and skill PRs target the explicitly selected branch. Examples using `origin` mean
 the verified canonical fetch remote; substitute its actual name when different.
 
 Git upstream controls tracking, push settings control push routing, and
@@ -585,7 +626,35 @@ review owners after a failure or reuse a review pair/budget across invocations.
 Keep no-skill-edits/no-skill-update-PR constraints in both prompts and all
 subagent handoffs. Each review loop may use its two required nested agents.
 
+## Publication command safety
+
+Apply this guidance to both execution backends and to creation and existing-PR
+updates. Keep read-only identity verification separate from short staging,
+commit, push and publication steps. Every shell call still selects and verifies
+its recorded root; splitting commands does not waive any ownership, approved
+content, staged-blob or destination check.
+
+On Windows, prefer short rooted PowerShell calls over one large mutation
+wrapper. Before executing a multi-line publication script, validate its syntax
+read-only with the installed PowerShell parser. Syntax validation must not
+execute the script or change its approved inputs. Reuse the verified content
+manifest, then verify staged paths and blobs before committing.
+
+Check a native Git command's `$LASTEXITCODE` immediately, rather than treating
+its output as a Boolean result. Commands such as `git diff --quiet` can succeed
+without output; do not call string methods on an assumed non-null response.
+
+A parser-rejected script has zero native staging, commit or push attempts, but
+remains a command failure governed by the existing finite correction policy.
+Publication approval does not renew that allowance. Do not split or replace a
+failed wrapper to bypass an exhausted budget or retry an external operation.
+
 ## Publication checks
+
+For rule PR creation and description updates in either flow, require the shared
+[two-section PR body](../shared/migration-pr-description.md). Keep mappings,
+provenance, validation and other detailed evidence in the linked `migration.md`
+or its appendix. This restriction does not apply to skill-update PRs.
 
 First reverify the selected worktree's physical containment under the inherited
 queue folder. For `update-existing`, follow
@@ -618,17 +687,18 @@ Before creating a rule PR or making an authorized title correction, apply the
 phase-specific title contract in
 [development](../develop-lintdiff-rule/SKILL.md#9-commit-push-and-create-the-draft-pr)
 or [promotion](../lintdiff-rule-promote/SKILL.md#10-review-commit-push-and-create-a-draft-pr).
-New source-development PRs use
+New legacy source-development PRs use
 `[WIP][Swagger Linter Development] <ValidatorRuleId>`, with no summary,
 `->` mapping, or `(origin)` suffix; record the validator-to-local-TypeSpec mapping
-in the PR body instead. Promotion PRs retain
+in `migration.md` instead. Promotion and native-first rule implementation PRs use
 `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`.
 For mappings, use the actual unqualified `createRule({ name })` from that phase's
-implementation: the local lintdiff name for development and the official
-destination name for promotion. Do not use the validator slug as a substitute
+implementation: the local lintdiff name for legacy development and the official
+destination name for promotion or native-first implementation. Do not use the validator slug as a substitute
 for a differently named rule. Separately authorized or opted-in queue post-merge source repair
 retains the development skill's `[Swagger Linter Repair]` title pattern.
-Read back the published title to confirm it matches the intended title before
+Read back the published title and complete body to confirm they match the title
+and two-section description contracts before
 handoff. Preserve existing task PR titles unless correction was requested; do
 not rename them merely to apply the new convention during recovery or resumption.
 

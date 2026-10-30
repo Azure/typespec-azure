@@ -6,6 +6,13 @@ global preference. The outer queue owns it; standalone callers own their context
 Every dispatch carries the artifact path/content identity and acknowledges the
 applicable settings before side effects.
 
+Readiness is a preparation snapshot, not the authority for a later coordinator
+grant. Carry the exact later decision, scope and updated counters in the durable
+recovery context and continuation handoff; verify that evidence directly rather
+than requiring an older readiness mirror to already contain the grant. A stale
+mirror grants nothing by itself, and this does not waive acknowledgement,
+instruction/configuration fingerprints, ownership, or budget checks.
+
 ## Explicit authorization, recorded once
 
 Record the exact user authorization, task/rule scope, publication binding and
@@ -23,6 +30,30 @@ Do not ask the user to repeat an authorization that still matches. Reverify
 current identities and content instead. Changed scope, an unexplained head, or
 missing evidence is still a blocker. Permission to edit these skills is not
 permission to restart a blocked rule task.
+
+### Native-first task scope
+
+Persist `flowVersion`, task ID, frozen validator membership/revision, native
+target, upstream/native profiles, baseline ID, candidate snapshot/artifacts,
+native/evidence owners and A/B review receipts in the same durable context.
+An old legacy context remains legacy; no resumption selector changes its PR
+bases, owners or repair history.
+
+Native-first maps the existing development/promotion preparation budgets to
+development/release-readiness. All eligibility and finite limits below still
+apply: task-wide orchestration/semantic-repair/reserve/timeout/comparison/hook
+allowances are shared by the whole group, never multiplied per member.
+Checkpoint B production-semantic defects return to A then B under the existing
+three-repair-cycle cap; documentation-only corrections reuse A only when its
+applicable content/inputs are unchanged. Keep all earlier failures and counters.
+Do not use semantic repair to retry operational errors.
+
+The one native PR is the active source PR for lifecycle purposes. Existing
+post-merge opt-in and exact legacy-fork permissions do not authorize an
+unrelated replacement PR. Evidence-fork publication is a separate recorded
+role under the native evidence contract, not `legacy_fork_update` and not a
+fork fallback for native or skill code. Preserve publication uncertainty,
+same-owner continuation and quiescence gates.
 
 ### Existing fork updates
 
@@ -143,10 +174,64 @@ green, increase timeouts, skip tests, or fix unrelated code. A failed required
 check cannot be demoted after the fact, and missing prior classification must
 not be filled in opportunistically.
 
+## Validation receipt parsing
+
+Use these rules for development, promotion and review handoffs; do not build a
+new success/failure detector around an assumed human-readable output layout:
+
+- Capture command, working directory, input identity, exit status and raw
+  stdout/stderr independently of receipt parsing. Prefer the installed runner's
+  documented structured report when it includes the required counts and outcomes;
+  preserve raw output as well. Do not invent flags or change the selected tests.
+- Derive metadata locations, configuration filenames and supported invocation
+  syntax from the actual checkout/installed runner before composing capture or
+  fingerprint commands; do not make guessed paths into new readiness gates.
+- Create raw capture artifacts independently of stdout events. A successful
+  quiet lint/format command can have empty output, and `Tee-Object` may create no
+  file when nothing is emitted. Preserve a verified empty capture and the actual
+  exit status; do not invent a passing summary or rerun the command merely to
+  obtain text. Missing required test selection/count evidence still fails.
+- When a structured report is unavailable, normalize CRLF to LF and remove ANSI
+  presentation escapes only in a derived parsing copy. Never overwrite raw
+  receipts, globally strip content, or convert GitHub's raw UTC timestamps.
+  Verify counts, failures/skips and nonempty selection; an exit code alone does
+  not prove the intended test population ran.
+- Before relying on a new parser, exercise it offline against representative
+  plain and ANSI-colored summaries, CRLF/LF text, a failure, and a missing or
+  malformed summary. Missing evidence must fail explicitly, not default to zero
+  failures or a passing count. Prefer an existing tested parser over inline code.
+- Hash receipt files only after their producing commands have completed and
+  closed the captures. Exclude the inventory command's own live stdout/stderr
+  captures from its input set; hash those separately after completion if needed.
+  A quiescent audit must not compare finalized bytes with a digest of an earlier
+  partial capture.
+- For PR-body drafting from API JSON, normalize decoded body line endings before
+  matching headings, verify each required section exists, and preserve the
+  original body. A failed heading match must not publish a truncated replacement.
+- Distinguish a command failure from an artifact-parser failure. Preserve both
+  statuses, establish side effects and identity, and apply the existing bounded
+  correction policy. An understood parser correction may reuse unchanged passing
+  command receipts; it must rerun the failed evidence-processing scope. It grants
+  no new allowance, blind rerun, gate waiver, or publication approval.
+
+This guidance does not replace the bundled review collector or its stricter
+raw-UTC, complete-pagination and parent-authorized recovery contract.
+
 ## Read-only blocker reconciliation
 
 Before declaring a terminal stop or requesting renewed permission, the
 coordinator checks the original operation, evidence and applicable contract.
+This checkpoint is mandatory, including when a worker reports exhausted
+correction allowances. Record the following before escalating:
+
+1. The exact failed component, command/exit, affected paths, and original gate
+   authority; separate components of combined commands without erasing their exit.
+2. Current content identity and side effects, including whether commands and
+   agents have stopped and earlier passing evidence still matches the draft.
+3. Remaining ordinary/shared/explicit allowances, retaining every failed attempt.
+4. Whether the next unfinished action is already permitted, needs a bounded
+   correction, or genuinely requires new permission/capability.
+
 Do not require the user to debug policy selection. Separate these cases:
 
 - **Actual permission/capability missing:** name the repository, operation and
@@ -169,6 +254,12 @@ the same idle phase owner only if the next action was already authorized and
 no failed required gate, task defect or side-effect uncertainty remains. This
 does not launch a fresh worker, reset counters, renew deadlines or retry an
 external operation. Otherwise retain the normal stop and recovery policy.
+
+If new permission is genuinely needed, explain the named failure and exact finite
+action in plain language. Accept an unambiguous affirmative response to that
+specific request; do not require the user to repeat a prescribed authorization
+sentence. Record the request and response together. Generic access approval or
+"continue" outside that specific bounded request still does not renew a budget.
 
 Use these decision cases when reviewing changes to the contracts:
 
@@ -332,6 +423,19 @@ The coordinator records eligibility, profile, isolation/restoration plan and
 allowance debit before the same owner executes. No publication is allowed until
 the full required scope passes. A confirmed source defect still follows the
 source-repair protocol, never a promotion-only semantic fix.
+
+For index-preserving isolation, archive both the exact index bytes and its staged
+mode/blob/path entries. Verify exact index restoration before subsequent Git
+inspection, and use `git --no-optional-locks` for read-only `status`, `diff` and
+`ls-files` checks: ordinary `git status` can refresh cached stat metadata even
+when no staged content changes. Do not assume that a later index-byte hash
+difference means restoration failed. Preserve the original guard failure and
+compare every staged entry, task-owned file and loaded compiled-output hash
+against the archived manifest under read-only blocker reconciliation. Continue
+only when the original exact restoration is established and the current
+semantic index, draft and runtime remain unchanged; missing restoration evidence
+or any content difference still blocks. This grants no mutation, failed-command
+rerun, new allowance or test retry.
 
 ### Local recovery decision cases
 

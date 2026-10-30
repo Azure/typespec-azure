@@ -1,12 +1,75 @@
 import { resolveArmResources } from "@azure-tools/typespec-azure-resource-manager";
 import { resolveVirtualPath } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { parse } from "yaml";
-import { createSdkContext } from "../src/context.js";
-import { listClients } from "../src/decorators.js";
+import { createSdkContext, createTCGCContext } from "../src/context.js";
+import {
+  getClientLocation,
+  listClients,
+  listOperationsInClient,
+  listSubClients,
+} from "../src/decorators.js";
+import { AllScopes } from "../src/internal-utils.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 import { ArmTester, createSdkContextForTester, SimpleTester } from "./tester.js";
+
+it("selects common client metadata independently of emitter-specific groups", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service namespace Example;
+    @clientName("Common")
+    @clientName("Language", "csharp")
+    interface Source {
+      @clientLocation("Moved")
+      @clientLocation("LanguageMoved", "csharp")
+      @get @route("/one") op one(): string;
+      @get @route("/two") op two(): string;
+    }
+  `);
+  const common = createTCGCContext(program, "@azure-tools/typespec-csharp", {
+    mutateNamespace: false,
+    scope: AllScopes,
+  });
+  const language = createTCGCContext(program, "@azure-tools/typespec-csharp", {
+    mutateNamespace: false,
+  });
+  const commonGroups = listSubClients(common, listClients(common)[0]);
+  deepStrictEqual(
+    commonGroups.map((x) => x.name),
+    ["Common", "Moved"],
+  );
+  const moved = listOperationsInClient(common, commonGroups[1]);
+  deepStrictEqual(
+    moved.map((x) => x.name),
+    ["one"],
+  );
+  strictEqual(getClientLocation(common, moved[0]), "Moved");
+  deepStrictEqual(
+    listSubClients(language, listClients(language)[0]).map((x) => x.name),
+    ["Language", "LanguageMoved"],
+  );
+});
+
+it("supports an explicit language scope without changing the emitter identity", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service namespace Example;
+    @clientName("CSharp", "csharp") interface Group {
+      @scope("csharp") @get @route("/one") op one(): string;
+      @scope("!csharp") @get @route("/two") op two(): string;
+    }
+  `);
+  const context = createTCGCContext(program, "@azure-tools/typespec-python", {
+    mutateNamespace: false,
+    scope: "csharp",
+  });
+  strictEqual(context.emitterName, "python");
+  const group = listSubClients(context, listClients(context)[0])[0];
+  strictEqual(group.name, "CSharp");
+  deepStrictEqual(
+    listOperationsInClient(context, group).map((x) => x.name),
+    ["one"],
+  );
+});
 
 it("multiple call with versioning", async () => {
   const tsp = `

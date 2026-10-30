@@ -1,12 +1,10 @@
 import "@typespec/http";
 import "@typespec/rest";
-import "@typespec/openapi";
 import "@typespec/versioning";
 import "@azure-tools/typespec-autorest";
 
 using TypeSpec.Http;
 using TypeSpec.Versioning;
-using TypeSpec.OpenAPI;
 
 @useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
 @service(#{ title: "Test Service" })
@@ -23,10 +21,15 @@ model Widget {
   name: string;
 }
 
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
-#suppress "@azure-tools/typespec-azure-core/no-openapi" "test"
-@route("/widgets/{name}")
-@doc("Get a widget")
-@get
-@operationId("Widget_Get")
-op getWidget(@path @doc("Widget name") name: string, @query("api-version") @doc("API version") apiVersion: string): Widget;
+namespace Operations {
+  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
+  interface Widget {
+    @route("/widgets/{name}")
+    @doc("Get a widget")
+    @get
+    get(
+      @path @doc("Widget name") name: string,
+      @query("api-version") @doc("API version") apiVersion: string,
+    ): TestService.Widget;
+  }
+}

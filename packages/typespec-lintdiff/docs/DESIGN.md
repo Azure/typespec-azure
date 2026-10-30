@@ -120,15 +120,19 @@ npm run validate -- --report-md
 
 The current top-line breakdown from `validate-report.md` is:
 
-- 223 total test cases
-- 33 covered by direct native TypeSpec lints
-- 5 covered only by template-related diagnostics
-- 1 intentionally partial mapping
-- 89 confirmed gaps with no TypeSpec diagnostics
-- 32 possible gaps with unmapped TypeSpec diagnostics
-- 10 expected-violation tests where the validator stayed silent
-- 52 compliance tests with unmapped TypeSpec diagnostics
-- 1 compliance test with an unexpected validator violation
+- 596 total test cases
+- 218 covered by direct native TypeSpec lints (217 direct-only and 1 with both direct and
+  template-related diagnostics)
+- 12 settled template-enforced cases
+- 45 intentionally partial cases
+- 14 settled prerequisite-blocked cases
+- 20 unresolved gaps (2 with no TypeSpec diagnostics and 18 masked by suppressed diagnostics)
+- 8 expected-violation tests where the validator stayed silent
+- 258 validator-clean compliance tests, including 24 provably clean, 166 with reviewed ambient
+  diagnostics, 56 awaiting ambient review, 3 with reviewed-expectation mismatches, and 9 with
+  mapped diagnostics
+- 21 compliance tests with reviewed validator discrepancies
+- 72 snapshot mismatches requiring follow-up
 
 Additional audit commands are available:
 

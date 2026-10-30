@@ -11,13 +11,13 @@ migration decisions auditable.
 
 ## What's here
 
-| Path | Contents |
-|------|----------|
-| `src/` | The linter: `index.ts`, `lib.ts`, `linter.ts`, and **67 rule files** under `src/rules/`. |
-| `test/fixtures/` | **212** rule test-case directories (`<RuleName>/rule.md` + per-case `main.tsp`, emitted `output.json`, `expect.json`, `tsp-diagnostics.json`, `validator-diagnostics.json`). |
-| `test/harness/` | The validation/comparison harness (`validate.ts`, `cross-repo-*.ts`, `audit-*.ts`, `catalog.ts`, `generate/sync-rule-metadata.ts`, `analyze-noise.ts`, `compile-worker.ts`, `lib/`) and Python coverage helpers. |
-| `catalog/` | Coverage catalog: `CATALOG.md`, `catalog.json` (209 validator rules), `validator-rule-metadata.json`, `rule-metadata-audit.json`. |
-| `docs/` | `DESIGN.md`, `ONBOARDING.md`, `SUMMARY.md`, `SKILLS.md` (migration skills map), `validate-report.md`. |
+| Path             | Contents                                                                                                                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`           | The linter: `index.ts`, `lib.ts`, `linter.ts`, and **67 rule files** under `src/rules/`.                                                                                                                         |
+| `test/fixtures/` | **212** rule test-case directories (`<RuleName>/rule.md` + per-case `main.tsp`, emitted `output.json`, `expect.json`, `tsp-diagnostics.json`, `validator-diagnostics.json`).                                     |
+| `test/harness/`  | The validation/comparison harness (`validate.ts`, `cross-repo-*.ts`, `audit-*.ts`, `catalog.ts`, `generate/sync-rule-metadata.ts`, `analyze-noise.ts`, `compile-worker.ts`, `lib/`) and Python coverage helpers. |
+| `catalog/`       | Coverage catalog: `CATALOG.md`, `catalog.json` (209 validator rules), `validator-rule-metadata.json`, `rule-metadata-audit.json`.                                                                                |
+| `docs/`          | `DESIGN.md`, `ONBOARDING.md`, `SUMMARY.md`, `SKILLS.md` (migration skills map), `validate-report.md`.                                                                                                            |
 
 > The deeper analysis notes (phase reports, equivalence analysis, non-migrated / non-template /
 > broader-coverage rationale, future work) live in the source repo
@@ -32,8 +32,9 @@ migration workflow.
 
 ## Migration status (from `docs/validate-report.md`)
 
-- 223 total test cases · 33 direct native lints · 5 template-only · 1 partial · 89 confirmed gaps ·
-  32 possible gaps · plus test-quality buckets.
+- 596 total test cases · 218 covered by direct native lints · 12 settled template-enforced ·
+  45 partial · 14 settled prerequisite-blocked · 20 unresolved gaps · plus test-quality and
+  compliance-proof buckets. The report also records 72 snapshot mismatches for follow-up.
 - Covered-rule confidence and per-rule rationale, plus rules intentionally **not** migrated
   (template-enforced / infallible / concept-not-applicable), are documented in the source repo's
   `notes/` (`phase1-assessment-report.md`, `phase2b-equivalence-analysis.md`,
@@ -73,6 +74,15 @@ or point the harness at existing checkouts via environment variables:
 
 - `LINTDIFF_VALIDATOR_ROOT` → an `azure-openapi-validator` checkout (validator rule source/docs).
 - `LINTDIFF_COMMON_TYPES` → ARM `common-types` TypeSpec sources used when compiling fixtures.
+
+### Official-library coverage
+
+Use [`coverage:native`](./docs/native-coverage.md) and the
+[`analyze-native-lint-coverage`](../../.github/skills/analyze-native-lint-coverage/SKILL.md)
+skill to compare a built official-library rule against fresh real specs without
+copying it into the temporary linter. Inputs are resolved at run start and
+recorded for replay; observed diagnostic overlap is not an automatic equivalence
+decision.
 
 ## Open items for the next developer
 

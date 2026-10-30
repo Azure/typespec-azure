@@ -10,6 +10,16 @@ user-invocable: true
 Use this skill to implement or correct migrated Swagger validator rules in
 `packages/typespec-lintdiff`.
 
+This remains the legacy temporary-library workflow. For direct official-package
+development use
+[/do-linter-development-task-one-by-one](../do-linter-development-task-one-by-one/native-first.md),
+which defaults new rule-ID and task-file queues to native-first.
+Do not rewrite prepared worker commands, retarget an existing development PR,
+or invoke this worker from a native-first task. The native boundary/completeness
+sections below remain reusable requirements through the
+[official migration contract](../shared/native-migration-contract.md), not a
+requirement to create a temporary implementation first.
+
 For dispatcher and standalone/queued worker invocations, perform the read-only
 ARM eligibility gate before creating anything, then apply the shared
 [publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
@@ -111,6 +121,12 @@ nor completion. Inspect all of the following:
 
 Assess material validator behavior against valid supported TypeSpec inputs and
 the native implementation boundary below, not exact executable Swagger behavior.
+First establish the
+[validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract):
+catalog eligibility does not establish upstream RPaaS versus ordinary ARM
+selection. Consider an evidenced, default-disabled external opt-in contract
+before declaring the absence of an automatic native audience selector a blocker.
+Retain genuine guideline/applicability uncertainty and the native boundary.
 Record Swagger-only or already-invalid shapes as intentional parity gaps, not
 missing native checks. Classify each requested rule as:
 
@@ -126,10 +142,18 @@ missing native checks. Classify each requested rule as:
 
 For `already covered` or `template-enforced`, stop before preparing the
 comparison harness or changing the temporary lintdiff implementation. Report
-the official rule or template and the code-backed equivalence evidence. For
-`partial`, only continue when the proposed work is explicitly limited to the
+the official rule or template and the code-backed equivalence evidence. This
+stops duplicate implementation work, not the
+[existing-rule coverage documentation obligation](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract):
+update the owning official rule's authored provenance docs through the
+authorized worktree/publication path, or return an explicit documentation
+handoff if that scope is unavailable. For template-only enforcement, record
+the actual control in its guidance or coverage inventory, not an unrelated lint.
+For `partial`, only continue when the proposed work is explicitly limited to the
 uncovered behavior; reuse or extend the official rule when that is the correct
-ownership instead of creating an overlapping temporary rule. For `uncertain`,
+ownership instead of creating an overlapping temporary rule. Record why an
+extension fits the existing contract or why a distinct rule is necessary, and
+preserve existing behavior with focused regression coverage. For `uncertain`,
 stop and surface the missing evidence rather than assuming a gap. Only `gap`
 and well-scoped `partial` rules proceed to development.
 
@@ -264,7 +288,10 @@ unchanged.
      are verified and the resulting snapshots remain repository-relative.
      `compare:setup` does not populate these sources. Do not assume a fresh rule
      worktree already contains `test/azure-openapi-validator` or
-     `test/common-types`
+     `test/common-types`. Reuse the verified absolute fixture-source paths in
+     the readiness manifest; standalone workers verify and record them before
+     creating links. The specs common-types source is
+     `specification\common-types`, not a root-level `common-types` directory.
 5. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
@@ -301,6 +328,11 @@ direct linter-package link within the specs checkout.
 
 The top-level worker works only in the supplied typespec-azure worktree.
 
+Follow the shared [analysis-first edit loop](../shared/analysis-first-lint-migration.md):
+use source semantics, saved diagnostics and focused regressions to decide fixes.
+Full corpus execution is an expensive checkpoint, not the default way to decide
+what code to change. Required final validation and review remain unchanged.
+
 ### 1. Establish evidence
 
 - Read the fixture `rule.md`, production TypeSpec rule, fixtures, snapshots,
@@ -331,11 +363,26 @@ from unresolved gaps.
 Apply the [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
 to native unit tests. Keep framework-only migration evidence in the fixture or
 comparison harness rather than duplicating it in each rule suite.
+Record required acceptance claims, including those promised in the PR, through
+the shared [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix).
+Follow its setup, typed-extraction, exact-target, and public-API fixture guidance.
+Apply [canonical suite ownership and grouping](../typespec-lint-validate/SKILL.md#canonical-suite-ownership-and-grouping)
+to native tests: retain meaningful rule-owned interactions and regressions in
+the established rule suite, not additional integration/isolation files.
+Preserve independent utility and genuine package/registration evidence in
+existing infrastructure. Delete generic suppression/enablement and unchanged
+sibling coexistence proof without replacement and reconcile stale PR promises.
+For published examples, follow the shared
+[documentation validation guidance](../typespec-lint-validate/SKILL.md#documentation-example-validation):
+remove bespoke per-rule parsers rather than relocating them, and distinguish
+existing shared continuous coverage from recorded one-time execution.
+This mapping supplements, not replaces, required focused fixture, build, and
+corpus evidence.
 
 Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
 to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
 comparisons and legacy validator mechanics in a dedicated migration section,
-`migration.md`, and the PR description, rather than teaching them as native usage.
+`migration.md`, or its linked appendix, rather than teaching them as native usage.
 
 #### Native TypeSpec implementation boundary
 
@@ -511,6 +558,11 @@ same external files, document that limit instead of adding a broader heuristic.
 
 When evidence requires a rule update:
 
+- first reproduce the alleged defect with an offending case and a nearby valid
+  control under the shared
+  [discriminating coverage gate](../typespec-lint-validate/SKILL.md#contract-driven-coverage);
+  if existing logic already passes, add useful regression evidence without
+  inventing a production rewrite
 - change the production TypeSpec rule
 - add directly related violating, compliant, and regression fixtures
 - for an emission-dependent rule, cover each distinct supported native matrix
@@ -531,10 +583,21 @@ the final complete-diff review.
 
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
 
+For endpoint listeners that resolve HTTP metadata or implement template guards,
+run focused diagnostic-unit regressions before the expensive corpus: generic
+operation declarations and template companions, generic-interface declarations,
+and authored concrete/inherited instantiated endpoints. Assert exact counts and
+targets, excluding non-endpoint companions without excluding real endpoints.
+Use installed compiler/destination helpers and guard before HTTP resolution when
+required by their contract. These cases must exercise the rule's own traversal
+decision or count regression, not duplicate framework-only filtering tests.
+
 #### ARM applicability without redundant namespace guards
 
-ARM-only catalog eligibility selects the rule's audience; it does not imply that
-every visited operation must carry provider namespace metadata. Before adding an
+ARM-only catalog eligibility admits a migration candidate; the
+[audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+establishes its actual audience. Neither implies that every visited operation
+must carry provider namespace metadata. Before adding an
 ARM applicability check, inspect the actual ruleset/runner selection and
 neighboring rules in the intended official destination.
 
@@ -579,6 +642,11 @@ use the existing synchronization/recovery contract; fetching alone is not mergin
 
 ### 4. Run the existing corpus analysis
 
+Enter this checkpoint after coherent source edits and focused checks stabilize.
+Record the question or required gate, estimated cost and runtime budget before
+execution. If findings require changes, analyze the saved evidence and batch
+justified fixes with focused regressions before another required full run.
+
 Use the existing full runner; do not add a per-rule runner:
 
 ```powershell
@@ -598,6 +666,16 @@ The command runs all local rules and rewrites canonical TypeSpec results and
 coverage files in this development worktree. Use the refreshed rule row and
 rule shard to verify project overlap, validator-only projects, TypeSpec-only
 projects, and compile failures.
+
+Record the validator audience/subtype and the runner's actual rule enablement
+before interpreting that row. Follow the
+[audience evidence contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+for RPaaS/opt-in rules: a general `all` run with the target disabled is regression
+and default-inactivity evidence, not enabled-target parity. Retain required
+representative/full runs, but supplement them with explicitly enabled focused
+evidence using supported existing harness controls. Do not invent runner flags
+or a per-rule runner to manufacture RPaaS corpus coverage; disclose when the
+available corpus cannot assess the target audience.
 
 The retained Swagger corpus represents the dataset-selected latest API version,
 while ordinary TypeSpec lint output may contain diagnostics from every declared
@@ -620,9 +698,10 @@ perform and document this attribution during the migration investigation rather
 than assuming every raw TypeSpec-only diagnostic applies to the retained
 Swagger version.
 
-If a quick iteration is needed first, use the existing `--filter`, `--limit`,
-and `--concurrency` options. The final behavioral check should use the full
-corpus when practical.
+When analysis and focused fixtures leave a specific real-spec question, use the
+existing `--filter`, `--limit`, and `--concurrency` options for a targeted
+reproduction. This supplements, not replaces, the required representative
+preflight and full corpus validation.
 
 `--filter` is one **case-sensitive literal substring** of a dataset project's
 `sourcePath`, not a regex or rule ID. For example, use
@@ -664,42 +743,27 @@ the newly generated results. This step is required for every rule that proceeds
 through the Development workflow, including runs that started with an empty
 diff or required no production rule change.
 
-#### Lead with the result and gap explanation
+#### Use the shared four-section report plus NOTES
 
-Immediately after the document title, start with `## Result and gap summary`.
-This is the migration note's primary reader-facing information, not an audit-log
-introduction. In roughly 150 words or fewer, answer:
+Follow the [migration report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note):
+conclusion and scope; actual coverage; function-level coverage; count differences;
+then NOTES. Name and hyperlink the original Swagger linter, state the
+evidence-backed conclusion briefly, and distinguish diagnostic totals from
+project counts. Keep only differing projects/diagnostic groups in the difference
+section. Put technical context in NOTES and code-backed examples under directly
+linked appendix groups; do not add a standalone fifth examples/actions section.
+Separate representation corner cases from missing core behavior; a targeted
+stress-test percentage is not production coverage.
 
-- **Results:** What are the latest validator versus migrated TypeSpec diagnostic
-  counts and affected-project counts? Name the compared scope, including staging
-  versus production or selected API version when material. Label partial or
-  non-comparable results explicitly.
-- **Why they differ:** Explain the concrete cause of each material discrepancy
-  in plain language and quantify its contribution when established. Distinguish
-  a real missed check from validator false positives, emitted duplicates,
-  version/population differences, or exclusions. Say what each engine checks
-  differently; labels such as "different methodologies" are not an explanation.
-- **Decision:** State whether a TypeSpec rule update is required, was completed,
-  or is unnecessary for the explained gap, and why. State the functional
-  equivalence conclusion separately from raw-count equality.
-- **Uncertainty:** Surface any unexplained remainder or material evidence
-  limitation here, not only deep in the document. Do not present an unresolved
-  gap as intentional or call findings false positives without supporting evidence.
+If comparison is blocked, state the blocker instead of implying parity. If
+counts match, do not treat equality as proof of equivalence. Do not lead with
+hashes, commands, reconciliation history or repair chronology.
 
-Use a short paragraph or compact bullets; when several causes contribute, a
-small cause/count/disposition table can follow. Link to the detailed evidence
-sections below rather than repeating their full tables. If counts match, say
-there is no observed count gap without treating equality as proof of equivalence.
-If comparison is blocked, lead with that blocker instead of implying parity.
+#### Preserve supporting evidence in a linked appendix
 
-A reader should understand the mismatch and its migration impact from this
-opening alone. Do not lead with commit hashes, tool versions, commands, report
-reconciliation history, or repair chronology.
-
-#### Keep the supporting evidence below the summary
-
-Retain the complete evidence required by `/analyze-swagger-typespec-lint-gap`;
-the concise opening supplements it, not replaces it. Record:
+Retain the complete evidence required by `/analyze-swagger-typespec-lint-gap`.
+Keep `migration.md` concise and put long details in a linked `evidence-details.md`
+or existing appendix, without removing any required investigation. Record:
 
 - the specs commit and whether the run was full or partial
 - latest validator and TypeSpec project and diagnostic counts
@@ -751,15 +815,21 @@ After restoring generated corpus data and removing temporary fixture links:
 
 1. Build a flat list of manually maintained files changed by the rule:
    production `.ts` files, fixture `main.tsp` and `expect.json` files,
-   `rule.md`, `migration.md`, and any directly changed tests. On PowerShell,
-   append each command result to the same array; do not create a nested array
+   `rule.md`, `migration.md`, its authored evidence appendix, and any directly
+   changed tests. On PowerShell, append each command result to the same array;
+   do not create a nested array
    whose entries become space-joined formatter arguments.
    Derive this list from the actual reviewed diff, deduplicate it and verify
    membership, existence and supported extensions. Record the count for evidence,
    not as a guessed fixed-number assertion that can prevent formatting.
 2. Run Prettier with those explicit paths only. Do not include harness-owned
    `output.json`, `tsp-diagnostics.json`, or `validator-diagnostics.json`
-   snapshots, and never use `prettier --write .`.
+   snapshots or generator-owned catalog outputs such as `catalog/CATALOG.md`,
+   and never use `prettier --write .`. Validate generated catalog consistency
+   through its generator/invariants, not an extra whole-file formatting gate.
+   Format eligible files with `--write` before running `--check`.
+   For an isolated entry in a maintained file with pre-existing formatting
+   drift, use the fragment procedure below instead of whole-file/range formatting.
 3. Run the package build and invoke `oxlint` only on the changed TypeScript
    source and test files. Do not use package- or repository-wide lint as a
    proxy when it has unrelated baseline warnings.
@@ -774,6 +844,33 @@ After restoring generated corpus data and removing temporary fixture links:
 This procedure satisfies the repository formatting and linting requirement for
 lintdiff worker PRs while preserving generated snapshot fidelity and keeping
 validation scoped to the change.
+
+#### Isolated-entry formatting
+
+Use this only when the reviewed change is an independently identifiable entry
+and formatting the surrounding maintained file would introduce unrelated churn:
+
+1. Preserve the current file bytes, the exact entry boundary, and any existing
+   task/user edits. Do not reconstruct the entire file from HEAD over those edits.
+2. Copy the entry into a session artifact outside the repository with the minimal
+   syntactic context needed by its parser, such as an object around a TS property.
+   Use the repository's `.prettierrc.json` explicitly via `--config`; a fragment
+   outside the worktree does not reliably discover repository settings/plugins.
+   Run from the dependency-ready repository root so configured plugin packages
+   resolve, passing the artifact's absolute path rather than changing into its
+   directory. Do not initialize/build missing tools solely for fragment formatting.
+3. Run the installed Prettier with `--write`, then `--check`, on that artifact
+   using the same config and parser. Preserve both command receipts.
+4. Apply only the formatted entry back to the maintained file, excluding any
+   temporary wrapper. Verify bytes outside the entry equal the preserved file
+   and inspect the complete diff, including pre-existing edits.
+5. Run the remaining required scoped checks. Fragment formatting does not replace
+   build, changed-file lint, catalog consistency, fixture checks, or diff hygiene.
+
+An unexpected broader rewrite is a draft/invocation failure under the existing
+correction budget, not permission to accept unrelated formatting. This lintdiff
+procedure does not override promotion's explicitly required regeneration and
+empty-ignore formatting of official-library generated documentation.
 
 ### 8. Run an independent code review
 
@@ -795,11 +892,12 @@ The reviewer must:
 
 - compare the rule branch against the freshly fetched
   `refs/remotes/origin/<target-branch>`, not a same-named local branch
-- inspect the production rule, fixtures, snapshots, `rule.md`, and
-  `migration.md`
-- verify that `migration.md` opens with an accurate result and gap summary:
-  counts, concrete causes, rule-change decision, and material uncertainty must
-  agree with the detailed evidence without requiring readers to reconstruct them
+- inspect the production rule, fixtures, snapshots, `rule.md`, `migration.md`
+  and its linked supporting evidence
+- verify the shared four-section migration report plus NOTES: evidenced positives,
+  actual counts, core/corner-case context, concrete causes, rule-change decision
+  and material uncertainty must agree with the linked evidence; examples must
+  be easy to reach, and stress-test percentages must not imply production coverage
 - check for semantic misses, false positives, incorrect TypeSpec compiler API
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
@@ -810,6 +908,18 @@ The reviewer must:
   independently of Swagger parity
 - reject framework-only native unit tests; require a distinct rule-owned
   predicate, target, or regression for each retained case
+- verify the acceptance-claim mapping, shared setup, typed extraction, and exact
+  targets; preserve required non-unit evidence in its proper layer and reject
+  vacuous regressions that never reach the relevant rule decision
+- enforce the shared canonical-suite, meaningful-grouping, and public-fixture
+  guidance for native tests; reject duplicate rule suites and bespoke Markdown
+  parsers even when moved outside `test/rules`, without removing independent
+  utility/package tests or actual published-example evidence
+- apply the shared
+  [final contract consistency sweep](../typespec-lint-implement/SKILL.md#final-contract-consistency),
+  including stale helpers/scaffolding, actual published snippets, suppression,
+  applicable manual guidance and SDK impact, and task-owned unreleased entries;
+  verify direct wiring and cheap guards where the implementation warrants them
 - for custom model traversal implemented by the rule, cover relevant cycles,
   shared siblings, shared models across operations, and diagnostic targets;
   assert the intended diagnostic
@@ -904,26 +1014,25 @@ creating a draft PR.
    promotion-style `->` mapping, or append the old `(origin)` suffix.
    The `[WIP]` prefix does not replace the
    requirement to create the PR as a draft.
-   Record the validator-to-local-TypeSpec mapping in the PR body, using the
+   Record the validator-to-local-TypeSpec mapping in `migration.md`, using the
    source lintdiff rule's actual unqualified `createRule({ name })` value.
    Do not substitute a proposed official name that will only be chosen during
    promotion, and confirm the mapping matches the final implementation.
    Do not append environment or execution labels such as `devbox` or `heavy`.
    Record actual base/head identities separately.
    For separately authorized or opted-in queue post-merge source repair, use
-   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and link
-   the original merged migration plus the new defect scope. Preserve an existing
+   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and record
+   the original merged PR link plus the new defect scope in `migration.md`.
+   Preserve an existing
    OPEN task PR's recorded title unless a correction is part of the request;
    this convention alone does not authorize renaming existing PRs.
-7. Write the PR description as an engineering explanation, not only a change
-   list. It must include:
-   - **Original Swagger linter:** include both of these direct GitHub hyperlinks
-     before listing a checklist of every specific check the original rule
-     performs:
-     - `linter code: [<ValidatorRuleId>](<validator source URL>)`
-     - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
-       Use the rule name and links from the fixture `rule.md` or validator
-       repository. Do not omit either link or replace them with unlinked paths.
+7. Use the shared [two-section PR body](../shared/migration-pr-description.md):
+   original Swagger documentation/logic links, then the published `migration.md`
+   link. Add no other body content.
+   Keep the following required explanation in `migration.md` or its linked
+   appendix, within the shared four-section report plus NOTES contract:
+   - **Original Swagger linter:** link the original documentation and
+     implementation and list every specific check the original rule performs.
    - **How the Swagger linter works:** explain the Swagger objects it inspects,
      traversal or lookup strategy, conditions and exemptions, diagnostic
      locations, and any known validator defects, stale maps, emitted-occurrence
@@ -932,12 +1041,12 @@ creating a draft PR.
      targets inspected, important compiler or library APIs used,
      version/projection handling, diagnostic targeting and deduplication
      decisions, and how these choices match the intended Swagger behavior.
-   - **Migration evidence:** link directly to the rule's `migration.md` for the
-     declared focused tests, real-service project comparison, latest full-corpus
+   - **Migration evidence:** retain the declared focused tests, real-service
+     project comparison, latest full-corpus
      counts, one-sided project explanations, compile failures, and remaining
-     uncertainty. Do not duplicate the detailed migration table or corpus
-     declaration in the PR description when `migration.md` already contains it.
-8. Prefer concrete examples, project names, and before/after evidence. Avoid a
+     uncertainty.
+8. In the migration report, prefer concrete examples, project names, and
+   before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
 9. Return the PR URL as the rule's final workflow result.

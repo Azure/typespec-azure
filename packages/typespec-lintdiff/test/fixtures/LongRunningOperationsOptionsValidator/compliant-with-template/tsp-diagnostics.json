@@ -10,6 +10,11 @@
     "message": "Top-level resource 'Widget' should define a list by resource group operation."
   },
   {
+    "code": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+    "severity": "warning",
+    "message": "ARM operations with Location or Azure-AsyncOperation response headers must have native polling metadata. Use an asynchronous ARM template or supported semantic LRO headers."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
     "severity": "warning",
     "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"

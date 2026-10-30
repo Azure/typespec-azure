@@ -36,6 +36,7 @@ const rulesetExtends = enableLocalLinter ? ["tsp-lintdiff-local-linter/all"] : [
 
 if (ruleset === "resource-manager") {
   compileOptions.linterRuleSet = {
+    ...resolvedOptions.linterRuleSet,
     extends: [
       "@azure-tools/typespec-azure-rulesets/resource-manager",
       ...rulesetExtends,
@@ -43,6 +44,7 @@ if (ruleset === "resource-manager") {
   };
 } else if (ruleset === "data-plane") {
   compileOptions.linterRuleSet = {
+    ...resolvedOptions.linterRuleSet,
     extends: [
       "@azure-tools/typespec-azure-rulesets/data-plane",
       ...rulesetExtends,
@@ -50,6 +52,7 @@ if (ruleset === "resource-manager") {
   };
 } else if (rulesetExtends.length > 0) {
   compileOptions.linterRuleSet = {
+    ...resolvedOptions.linterRuleSet,
     extends: rulesetExtends,
   };
 }

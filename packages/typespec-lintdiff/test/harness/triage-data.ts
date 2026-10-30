@@ -38,7 +38,11 @@ export const spectralTriage: Record<string, { tier: string; rationale: string }>
   "OperationId": { tier: "Template-enforced", rationale: "ARM templates generate operationIds with required verb patterns; custom operations can use any format." },
   "PatchInOperationName": { tier: "Template-enforced", rationale: "ARM templates generate 'Update' verb for PATCH; custom operations can override." },
   "PatchResponseCodes": { tier: "Template-enforced", rationale: "ARM templates enforce specific PATCH response codes; custom operations can override." },
-  "PostResponseCodes": { tier: "Template-enforced", rationale: "ARM templates enforce specific POST response codes; custom operations can override." },
+  PostResponseCodes: {
+    tier: "Unconstrained",
+    rationale:
+      "Partial native coverage: official rules check status sets and async/202/204 bodies, but synchronous resource POST 200 without a body is authorable through ArmResourceActionSync Response customization. The opt-in local no-empty-post-response rule covers only that gap.",
+  },
   "ProvisioningStateMustBeReadOnly": { tier: "Template-enforced", rationale: "ARM templates set provisioningState as readOnly; custom models can allow mutation." },
   "ProvisioningStateValidation": { tier: "Template-enforced", rationale: "ARM templates enforce provisioning state enum values; custom enums can differ." },
   "ProvisioningStateSpecifiedForLROPatch": { tier: "Template-enforced", rationale: "ARM PATCH template enforces provisioningState in response; custom operations can omit." },
@@ -182,9 +186,9 @@ export const spectralTriage: Record<string, { tier: string; rationale: string }>
   "InvalidVerbUsed": { tier: "Infallible", rationale: "TypeSpec HTTP decorators only generate valid HTTP methods." },
   "LongRunningOperationsOptionsValidator": { tier: "Template-enforced", rationale: "ARM LRO templates set valid x-ms-long-running-operation-options; custom ops can set invalid values." },
   "LroExtension": {
-    tier: "Prerequisite-blocked",
+    tier: "Unconstrained",
     rationale:
-      "The ARM violating repro needs arm-post-operation-response-codes suppression, and explicit x-ms-long-running-operation authoring is blocked by no-openapi unless suppressed.",
+      "Official response-code rules cover registered resource POST/PUT/DELETE; supported custom PATCH and provider POST templates can return 202 with plain Location headers but no native LRO metadata.",
   },
   "LroLocationHeader": { tier: "Template-enforced", rationale: "ARM LRO templates include Location header; custom LROs can omit it." },
   "MutabilityWithReadOnly": {

@@ -1,0 +1,249 @@
+# Shared Swagger baseline consumer and producer
+
+Native-first migration consumes a shared sealed Swagger baseline by default.
+Native-first is the default for new rule-ID and task-file queues. Legacy
+migration remains available through `--flow legacy` and compatibility/resumption
+routing; its execution contract is unchanged.
+Do not regenerate Swagger for each rule or candidate.
+
+## Monthly evaluation snapshot
+
+Use one frozen specs commit across migrations in a TypeSpec dependency-upgrade
+cycle, normally about one month. Select that commit after the specs repository's
+dependency upgrade and generate one shared baseline for the cycle. This is an
+upgrade-cycle policy, not automatic expiration on a calendar date.
+
+Keep three identities separate:
+
+- Develop each new native rule on a branch based on current canonical
+  `Azure/typespec-azure:main`; do not move development onto the baseline producer.
+- Evaluate coverage against the selected baseline's exact specs `source.commit`,
+  population and recorded dependency/runtime context. Do not fetch a newer specs
+  tip for each PR. Scope conclusions to this frozen corpus, not latest specs.
+- Record the actual injected candidate artifacts and compiler/library closure.
+  The baseline producer's runtime is provenance, not permission to relabel the
+  candidate or silently replace its dependencies with older packages.
+
+Reuse is the default within the cycle. Assume the compiler and libraries built
+from current canonical `Azure/typespec-azure:main` remain backward-compatible
+with the frozen specs source. Use the supported
+`--baseline-policy frozen-reference` together with `--baseline-run`: reuse saved
+Swagger diagnostics and run fresh native diagnostics across the full frozen
+corpus. A newer core/compiler/library/emitter version or commit alone is not a
+blocker and does not require a lint-only receipt or baseline refresh.
+
+This is an explicit backward-compatibility assumption, not proof of unchanged
+emission, dependencies or rule inputs. Preserve the baseline producer's identities
+and record the candidate's actual identities separately. Successful compilation
+establishes authorability, not identical emitted paths or schemas. Investigate
+actual failures and diagnostic-count gaps; never infer equivalence from this
+assumption alone.
+
+Before deciding on refresh, inspect actual source/artifact changes from the
+producer to the candidate. Distinguish unrelated changes and lint-only changes
+from compiler, emitter, decorators, libraries, dependencies and settings that
+can affect emission. Retain the change inventory, rationale, focused relevant
+controls and selected baseline-policy result. Check the mapped validator's relevant
+wire behavior; do not infer whole-corpus equivalence from a few passing controls.
+Required final native execution, activation/suppression controls, population and
+count investigations, integration checks and independent reviews remain intact.
+
+The analyzer defaults to `strict`, which rejects core changes and packed changes
+outside its lint-only allowlist. Select `frozen-reference` explicitly for this
+consumer workflow; a strict-policy closure mismatch alone does not establish a
+migration blocker. Keep `strict` for an explicitly requested identical-runtime
+or reviewed lint-only comparison. Verify that pinned tooling supports the chosen
+policy before execution; missing support is a tooling prerequisite, not permission
+to invent flags, edit sealed identities or fabricate compatibility receipts.
+
+Refresh normally follows the next specs dependency upgrade. An exceptional
+refresh needs evidence of material incompatibility or unresolved validity after
+the compatibility assessment, plus separate authorization. Disclose whether the
+reason is a real behavior change, unavailable proof or a tooling limitation.
+Keep old baselines immutable and finish an active run on its selected snapshot.
+
+## Discover before setup
+
+1. Discover the published baseline in the verified specs fork. The initial
+   publication contract is `msyyc/azure-rest-api-specs`,
+   branch `evidence/shared-swagger-baseline`. Fetch this branch through the
+   caller's verified remote, using `git fetch`, and record its exact commit.
+   Read `.lintdiff-baselines\current.json` at that commit, not the worktree's
+   moving branch tip. Read and retain the immutable version descriptor at
+   `.lintdiff-baselines\swagger-arm-20261026-2cd3c5dd\baseline.json` at the same
+   commit. The discovery and version descriptors must agree on baseline identity.
+   Treat `current.json` as discovery only; never reread it midway through a task.
+2. Save the selected schema-1 descriptor to an absolute local JSON path.
+   Record metadata repository/ref/commit, version path and descriptor SHA-256.
+   The metadata commit adds discovery files: it is **not** the tested specs SHA.
+   The frozen source is `source.commit`, initially
+   `2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9`.
+   Recover it from `source.repository` or the recorded preservation repository/ref.
+   Verify the source SHA before preparing a clean isolated runtime.
+3. Check the combined coverage/evidence worktree's local area for the selected
+   baseline before downloading. Reuse a complete matching local run read-only
+   only after verifying its descriptor/source identity, completion, inventory,
+   file hashes and required compatibility. Prior success or directory existence
+   alone is insufficient. Retain the verification receipt; partial replay
+   extractions and failed runs are not sealed baselines.
+
+   If a complete verified local run is unavailable, recover it with the stdlib
+   helper below. Prefer a retained archive through `--archive` after checking
+   its descriptor-bound size/hash; download only when the archive is missing.
+
+   ```powershell
+   mise exec -- python -X utf8 -B C:\dev\worktrees\tooling\.github\skills\analyze-native-lint-coverage\shared_baseline.py fetch `
+     --descriptor C:\dev\baseline-inputs\selected-descriptor.json `
+     --output C:\dev\baseline-inputs\swagger-arm-20261026-2cd3c5dd
+   ```
+
+   Use actual paths. Helper output must not exist; do not overwrite a retained
+   run or invoke `fetch` on its populated directory. To use a local archive, add
+   `--archive C:\dev\baseline-inputs\swagger-arm-20261026-2cd3c5dd.tar.gz`.
+   Otherwise the helper invokes `gh release download` once with the descriptor's
+   explicit repository/release/name. Use the caller's authorized GitHub CLI
+   authentication; the helper does not guess an owner or change authentication.
+   Private download staging is a unique sibling of output, not system temp.
+   Failed downloads/extractions remain available for diagnosis; do not reuse
+   their output directories. After verified success, the caller can remove the
+   download staging if it is no longer needed.
+
+4. Retain the returned `baselineRun`, `baselineId`, `sourceCommit`,
+   `baselineIdentity` and `swaggerGeneration: not-run`. Keep this verified
+   shared input read-only. Give every parallel candidate a separate writable
+   specs runtime at the frozen source commit and a separate analyzer output.
+   Never inject packages into the shared baseline or a concurrent runtime.
+
+Missing publication, access, descriptor fields, checksums, source, inventory,
+schemas or supported compatibility is an exact prerequisite blocker. Apply the
+monthly compatibility assessment before proposing a refresh. The helper does not
+fetch latest refs, install packages, compile, emit, run validators, refresh data
+or retry downloads. Preserve failed evidence and report the required immutable
+asset/descriptor/source or explicitly requested producer refresh.
+
+## Descriptor and integrity contract
+
+The schema-1 descriptor contains exactly:
+
+- `schemaVersion`, `baselineId`, `assessmentMode: swagger-baseline`.
+- `source`: `repository`, `commit`, `preservationRepository`, `preservationRef`.
+- `producer`: `candidateRepository`, `candidateCommit`, `coreCommit`,
+  `toolingRepository`, `toolingCommit`, `nodeVersion`, `scope`, `selection`
+  (`serviceType: resource-manager`, `filter: null`, `limit: null`), `observedAt`.
+- `dataset`: `projects`, `swaggerFiles`, `compileFailures`, `validationFailures`,
+  `observations`, `rulesWithFindings`.
+- `baselineIdentity`.
+- `archive`: `repository`, `release`, `name`, `sha256`, `bytes`.
+
+The archive repository must be the source preservation repository. The initial
+release is `swagger-lint-baseline-20261026-2cd3c5dd`, asset
+`swagger-arm-20261026-2cd3c5dd.tar.gz`. Large data are checksummed release assets,
+not hundreds of megabytes committed to Git. Archive root contains only
+`manifest.json`, `baseline.json`, and `dataset\**`, retaining everything the
+existing baseline loader needs.
+
+The helper verifies compressed bytes/size before extraction. It rejects escaping
+paths, links, special members, duplicate/case-colliding names and unexpected
+members. One bounded dataset inventory pass verifies all file SHA-256 hashes,
+including retained TypeSpec source. It preserves original Windows inventory
+strings when checking Node compact JSON content identity; normalization is only
+for filesystem comparisons. The baseline schema uses safe integer numbers.
+The helper also verifies sealed schema-2 Swagger-only completion, schema-1
+baseline identity/source/producer, schema-4 completed metadata, successful full
+project population, file references, summary, index, shard counts and totals.
+This integrity check does not replace the analyzer's compatibility checks.
+
+Publication may replace machine-specific absolute path prefixes in copied raw
+logs/messages with `$BASELINE_DATASET`, `$SPECS_ROOT`, `$CANDIDATE_ROOT`,
+`$TOOLING_ROOT` and `$USER_PROFILE`. Keep source data unchanged and retain
+source-to-published file hashes in the sealing evidence. Preserve counts, rule
+IDs, relative targets and the compatibility context. Recompute published file
+inventory and baseline identity; consumers always use the descriptor's published
+identity, never a hardcoded original run identity. Manifest
+`sourceBaselineIdentity` and `publicationSanitization` retain this provenance
+without relaxing Swagger-only completion or claiming native execution.
+
+The initial dataset completed compilation and Swagger validation for 487 projects
+and 649 Swagger files: 222905 observations, 121 rules **with findings**,
+zero compile/validation failures. These are historical Swagger results, not
+native completion. The producer candidate is
+`726862b537be9fdb24d7e6a4ca868eb9104025dd`, core
+`88e5bd18b07d0cbd3bbe92946aff36beaf707b54`, Node `v26.5.0`, with full ARM
+`scope: source`. Descriptor checksum/size and publication success must come from
+the actual sealed upload, not these documented counts.
+
+## Consume selected observations, then run native
+
+Read the saved full population, `_meta.json`, `validator-results.json`, and the
+selected rule's shard when present. The baseline retains all production ARM
+observations; selecting a different validator ID alone does not invalidate it.
+An index of 121 rules with findings is **not** a registry of all evaluated rules.
+If a shard is absent, verify the frozen producer's real production registration,
+audience, selector/options and successful execution. Report zero observed
+findings only for a proven evaluated rule. Unknown, disabled, staging-only,
+data-plane or RPaaS-only rules remain not-evaluated or unsupported, not compliant.
+ARM evidence is not proof of all data-plane/RPaaS behavior.
+
+Prepare/build the candidate through the existing skill. Use lightweight injected
+positive/compliant controls before the full run; skipped controls do not pass.
+Then invoke the existing native analyzer with all normal candidate/specs/tarball,
+mapping and policy options, adding:
+
+```powershell
+--scope source `
+--baseline-run C:\dev\baseline-inputs\swagger-arm-20261026-2cd3c5dd `
+--baseline-policy frozen-reference `
+--output C:\dev\coverage-runs\unique-candidate-run
+```
+
+Do not add `--filter`/`--limit` to a full-population baseline invocation.
+Current reuse does not support filtered replay of a full baseline; a different
+scope also changes context. For a justified pilot, request a separate explicit
+pilot producer with its own compatible population/context. Never silently
+generate filtered Swagger as migration preflight.
+
+Do not combine `--baseline-policy frozen-reference` with
+`--baseline-compatibility-receipt`. It retains the historical
+Swagger runtime while evaluating the current candidate under the explicit
+backward-compatibility assumption. Exact specs source, package manager, selection,
+sealed completion, population and inventory/hash checks remain mandatory.
+Record the policy and both runtime contexts; the tool leaves equivalence
+`not-determined`, so semantic controls and gap investigations must establish the
+supported migration conclusion separately.
+
+Only an explicitly selected `strict` comparison requires identical artifacts or
+the existing reviewed, content-bound lint-only compatibility receipt. A changed
+compiler/emitter/library/dependency closure cannot be certified by that receipt.
+Retain failed attempts and use a new analyzer output for an authorized corrected
+invocation; policy selection does not grant retries or waive required checks.
+
+`--baseline-run` skips Swagger generation and validator execution, not candidate
+injection or native execution. Run native across the full required compatible
+population, retain all failures as unassessed, investigate one-sided projects
+and both count directions, and preserve semantic controls, independent local
+reviews and separate A/B GitHub review checkpoints. Shared data does not prove
+equivalence or replace a fresh native run after a relevant rule change.
+
+## Explicit producer refresh
+
+Use the monthly upgrade-cycle policy above; neither a new PR nor a Git SHA
+difference alone authorizes or establishes the need for production.
+Only a separately requested producer/refresh resolves fresh candidate/specs refs
+once, freezes source/runtime/compiler/emission/validator/tooling identities, and
+runs the Swagger suite. The existing analyzer without `--baseline-run` remains
+available for this producer path. Its native completion must be reported
+separately; a sealed Swagger-only artifact cannot claim native success.
+
+Verify the complete required population, schema/index/shards, source hashes,
+failure inventory and all retained dataset file hashes. Seal a separate
+schema-2 manifest only after dataset completion, with `status: complete`,
+`finishedAt` at completion, `assessmentMode: swagger-baseline`,
+`completionScope: swagger-only`, `nativeAssessment: not-run` and the exact
+baseline identity. Never edit a still-running full analyzer manifest to imply
+native completion.
+
+Preserve the source at its exact SHA. Publish a new immutable version descriptor
+and checksummed archive/release in the verified specs fork; retain older assets.
+Download and verify the published asset before advancing mutable discovery.
+Freshness is this shared producer's responsibility, not each rule worker's.
+Record native work, if any, independently from Swagger dataset completion.

@@ -1,11 +1,11 @@
+import type { Model, Operation } from "@typespec/compiler";
 import {
   createRule,
   isTemplateDeclaration,
-  isTemplateInstance,
+  isTemplateDeclarationOrInstance,
   paramMessage,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import type { Model, Operation } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { getHttpOperation } from "@typespec/http";
 
@@ -15,13 +15,15 @@ export const repeatedPathInfoRule = createRule({
     "ARM PUT request bodies must not repeat path or query parameters in the resource properties bag.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`Request body property '${"name"}' repeats information already carried in the path or query.`,
+    default: paramMessage`Request body property '${"name"}' repeats information already carried in the path or query.`,
   },
   create(context) {
     return {
       operation: (operation) => {
-        if (isTemplateInstance(operation) || isTemplatedInterfaceOperation(operation)) {
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          isTemplatedInterfaceOperation(operation)
+        ) {
           return;
         }
 

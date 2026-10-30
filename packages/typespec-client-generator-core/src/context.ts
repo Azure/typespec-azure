@@ -41,6 +41,7 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  AllScopes,
   BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
@@ -52,6 +53,12 @@ import { createSdkPackage } from "./package.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
+  /**
+   * Default scope for metadata lookup, including client hierarchy and operation relocation.
+   * Omit to use the emitter's scope. AllScopes selects common metadata, not all languages.
+   * A scope passed directly to a metadata helper takes precedence over this option.
+   */
+  scope?: string | typeof AllScopes;
 }
 
 export function createTCGCContext(
@@ -66,6 +73,7 @@ export function createTCGCContext(
     emitterName: diagnostics.pipe(
       parseEmitterName(program, emitterName ?? program.emitters[0]?.metadata?.name),
     ),
+    scope: options?.scope,
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,

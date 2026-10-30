@@ -135,7 +135,7 @@ export function listScopedDecoratorData(
   key: symbol,
   languageScope?: string | typeof AllScopes,
 ): Map<Type, any> {
-  const scope = languageScope ?? context.emitterName;
+  const scope = languageScope ?? context.scope ?? context.emitterName;
   const retval: Map<Type, any> = new Map();
   for (const [type, data] of context.program.stateMap(key).entries()) {
     if (data[scope]) {
@@ -166,6 +166,7 @@ export function getScopedDecoratorData(
 ): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
+  languageScope ??= context.scope;
   if (languageScope === AllScopes) {
     return retval[languageScope];
   }

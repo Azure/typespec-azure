@@ -5,9 +5,9 @@
     "message": "Security definition should have a description."
   },
   {
-    "code": "tsp-lintdiff-local-linter/operation-id-noun-conflicting-model-names",
+    "code": "tsp-lintdiff-local-linter/no-operation-group-name-conflict",
     "severity": "warning",
-    "message": "OperationId has a noun 'Widget' that conflicts with a model name. The model will be disambiguated to 'WidgetModel' in generated SDKs. Consider using the plural form to avoid this."
+    "message": "Operation group 'Widget' conflicts with type 'Widget'. Rename the group, for example by using a plural name."
   },
   {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",

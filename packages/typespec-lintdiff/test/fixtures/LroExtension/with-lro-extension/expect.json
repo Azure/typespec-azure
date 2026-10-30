@@ -16,6 +16,10 @@
     {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
       "count": 7
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-long-running-operation-property",
+      "count": 1
     }
   ]
 }

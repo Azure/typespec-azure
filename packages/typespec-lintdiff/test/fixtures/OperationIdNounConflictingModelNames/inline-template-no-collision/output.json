@@ -1,0 +1,141 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/gizmos": {
+      "get": {
+        "operationId": "Gizmo_Get",
+        "description": "Get a gizmo",
+        "produces": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Possible gizmo values",
+            "schema": {
+              "type": "string",
+              "description": "Possible gizmo values",
+              "enum": [
+                "one",
+                "empty"
+              ],
+              "x-ms-enum": {
+                "name": "Gizmo",
+                "modelAsString": true,
+                "values": [
+                  {
+                    "name": "item",
+                    "value": "one",
+                    "description": "The selected value"
+                  },
+                  {
+                    "name": "empty",
+                    "value": "empty",
+                    "description": "The empty value"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "Widget_Get",
+        "description": "Get a widget",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Widget name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "API version",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "object",
+              "description": "A widget wrapper",
+              "properties": {
+                "value": {
+                  "$ref": "#/definitions/Item",
+                  "description": "The wrapped item"
+                }
+              },
+              "required": [
+                "value"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Item": {
+      "type": "object",
+      "description": "An item",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The item ID"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -54,16 +54,15 @@ interface Widgets {
   listBySubscription is ArmListBySubscription<Widget>;
 
   /** Restart the widget synchronously. */
-  @armResourceAction(Widget)
   @action("restart")
-  @post
-  restartWidget(...ResourceInstanceParameters<Widget>): RestartWidgetResponse | ErrorResponse;
+  restartWidget is ArmResourceActionSync<Widget, Request = void, Response = RestartWidgetResponse>;
 }
 
 /** Response for the restart widget operation. */
 model RestartWidgetResponse {
   /** The status code. */
   @statusCode statusCode: 200;
+
   /** The updated widget. */
   @body body: Widget;
 }

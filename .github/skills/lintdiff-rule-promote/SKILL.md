@@ -10,6 +10,14 @@ user-invocable: true
 Use this skill when a migrated rule in `packages/typespec-lintdiff` is ready to be
 promoted into an official TypeSpec Azure library.
 
+This remains available for standalone and legacy queue promotion. A
+[native-first task](../do-linter-development-task-one-by-one/native-first.md)
+already develops in the official package and must not invoke this workflow or
+create a second rule PR. Its release-readiness checkpoint retains this skill's
+applicable native packaging, test, documentation, ruleset and example requirements
+through the [official migration contract](../shared/native-migration-contract.md),
+without inventing an immutable temporary source commit.
+
 Promotion is a handoff workflow, not a rule-design workflow. The rule's source
 PR in `packages/typespec-lintdiff` remains the source of truth while the
 official-library PR is prepared in a clean worktree.
@@ -60,7 +68,9 @@ behavior-preserving destination adaptation can be made only in the promotion
 worktree with supporting evidence and documentation. A source-semantic defect
 blocks promotion and returns to the authorized repair workflow; this boundary
 does not authorize modifying the immutable source or silently changing semantics
-only in the official copy. Architectural coupling alone is not proof of an
+only in the official copy. The explicitly authorized common SDK naming
+adaptation below is a separate, documented promotion contract, not source repair.
+Architectural coupling alone is not proof of an
 affected service or a source-semantic defect; report uncertain findings as such.
 See the
 [review on PR #5271](https://github.com/Azure/typespec-azure/pull/5271#issuecomment-5661318416).
@@ -146,8 +156,11 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   the handoff. Pin that exact commit as immutable source for this invocation;
   do not silently consume a newer branch tip or uncommitted source changes.
 - Use the existing destination analysis, canonical `origin/main` base,
-  disabled-by-default rulesets, and required validation. Do not wait for the
-  development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
+  disabled-by-default recommended policy presets, and required validation.
+  Preserve library `all` membership independently under the
+  [shared ruleset policy](../shared/native-migration-contract.md#packaging-documentation-and-release-readiness).
+  Do not wait for the development PR to merge.
+  Pass the queue's no-skill-edits/no-skill-update-PR
   constraint to all delegated agents and append milestones to the shared log.
 - On every queue cycle, including initial promotion, require the separate
   promotion worktree and readiness manifest already prepared by the queue.
@@ -220,8 +233,12 @@ needs special investigation:
    files that can be read with `git show <ref>:<path>`.
 3. Complete the prepared-environment gate in process step 3 below.
 4. Do not run the lintdiff harness during promotion. The source rule's
-   `migration.md` is the source of migration evidence; use source package build
-   plus native target tests for promotion validation.
+   `migration.md` and its linked appendix are the source of migration evidence;
+   read both rather than treating a concise note as missing investigation.
+   The [shared report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note)
+   governs new or refreshed notes, not permission to rewrite immutable source
+   evidence during promotion. Use source package build plus native target tests
+   for promotion validation.
 5. Convert fixture coverage with the standard mapping in step 5 instead of
    copying snapshots or recreating the full harness layout.
 6. In a fresh worktree, build the target package dependency closure once before
@@ -276,7 +293,7 @@ validation commands below and only use bounded `validate:pr` with
    checkout as part of promotion; a separately requested source workspace follows
    the shared development preparation contract.
 5. If there are uncommitted source-rule changes, treat the current working tree
-   as the source only after making that explicit in the PR description.
+   as the source only after making that explicit in `migration.md`.
 
 ### 2. Recommend and select the destination library
 
@@ -302,10 +319,13 @@ Use these signals:
   Azure REST or data-plane authoring: it depends only on compiler/http/core
   APIs, checks common Azure style, versioning, auth, LRO, response, parameter,
   or model patterns, and does not need ARM helpers.
-- Treat validator metadata such as `applicability: Both`, `sources: ["common"]`,
-  or fixture text that says "Both ARM and DataPlane" as strong evidence for
-  `@azure-tools/typespec-azure-core`, unless the native contract governs SDK APIs
-  or needs ARM-only helpers or ARM-specific semantics.
+- Verify the
+  [validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+  before interpreting catalog `applicability: Both`, `sources: ["common"]`, or
+  fixture text that says "Both ARM and DataPlane". Importer fallback can hide
+  RPaaS-only registration. These labels support Core ownership only when the
+  actual audience and native guideline support shared Azure REST semantics;
+  SDK ownership or ARM/RPaaS-specific policy takes precedence over the label.
 - `@azure-tools/typespec-azure-core` must not take a dependency on
   `@azure-tools/typespec-azure-resource-manager`. If a candidate core rule
   currently imports ARM helpers, either recommend ARM or explain the rewrite
@@ -313,8 +333,17 @@ Use these signals:
 - Use fixture front matter and validation-report ruleset inference as evidence,
   not as the sole authority.
 - Check for existing official rules with equivalent coverage before promoting.
-  If the official rule already exists, recommend updating that rule instead of
-  adding a duplicate.
+  Apply the
+  [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract):
+  for full coverage, update the existing rule's authored provenance documentation
+  rather than adding a duplicate; this can be a documentation-only promotion.
+  For partial coverage, evaluate a coherent extension before a separate rule
+  and record the exact gap and compatibility/enablement effects. Source-semantic
+  changes still require the authorized repair workflow; this check does not
+  permit divergent destination-only semantics or editing the immutable source.
+  For a documentation-only outcome, skip new-rule implementation, registration,
+  and ruleset additions, while retaining applicable documentation generation,
+  validation, change metadata, review, and publication requirements.
 - Identify applicability guards that exist only because the lintdiff package
   enables ARM and data-plane rules together. Record whether the destination
   package and official ruleset already provide the same applicability boundary,
@@ -338,6 +367,58 @@ Proceed with the evidence-backed destination by default. If the user requested
 confirmation, wait for their selection before continuing. If the evidence cannot
 support a safe recommendation, stop and report the blocker under the confirmation
 policy.
+
+#### Common SDK operation naming family
+
+For operation-name policies such as `DeleteInOperationName`,
+`ListInOperationName`, and `PatchInOperationName`, follow the TCGC pattern
+established by [PUT promotion #5457](https://github.com/Azure/typespec-azure/pull/5457)
+and [PATCH promotion #5665](https://github.com/Azure/typespec-azure/pull/5665).
+This family-specific instruction authorizes adapting an authored-name lintdiff
+source to the **common SDK method name** during promotion, without reopening
+source repair or asking for routine approval. It does not authorize changing
+the immutable source, unrelated predicates, or enabling new diagnostics.
+
+- Select TCGC when the intended rule checks SDK operation names, even for an
+  ARM-origin validator. Do not route it to ARM merely because its fixtures use
+  ARM templates. Check existing TCGC rules first; for LIST, compare
+  `get-operation-name` but do not assume that allowing both `get` and `list`
+  satisfies a list-only policy.
+- Create the native TCGC context with `createTCGCContext(...,
+{ mutateNamespace: false })` and resolve names using
+  `getLibraryName(tcgcContext, operation, AllScopes)`. Honor unscoped
+  `@clientName`, exact names, and the supported friendly-name fallback; ignore
+  emitter-scoped overrides and explicit OpenAPI operation IDs for this common
+  naming contract. Do not hand-roll name resolution.
+- Preserve the source's operation selection, verb/paging conditions, prefix
+  policy, severity, and operation diagnostic targets apart from this approved
+  name-domain adaptation and justified lintdiff-only isolation removal. In
+  particular, do not turn a collection/LIST rule into a rule for every GET
+  operation. Use concrete HTTP service endpoints when that matches the source
+  contract, following `use-create-for-put` and `use-update-for-patch`; do not
+  copy another rule's traversal or predicates mechanically.
+- An opt-in ARM SDK naming rule need not require provider metadata when
+  selecting the rule supplies its intended audience. Verify this against the
+  source and neighboring rule contract, and test a minimal service without
+  provider metadata. Package ownership alone never filters services.
+- Register a new rule under `client-sdk` with plain `enable: false`, not in
+  ARM/data-plane rulesets solely because of its Swagger origin. Include native
+  docs, generated TCGC references, appropriate ARM guidance links, and separate
+  destination-feature and disabled-registration internal Chronus entries.
+- Prove override behavior in both directions: a valid common override fixes an
+  invalid authored name, and an invalid common override warns on the original
+  operation even when its authored name passes. Cover emitter-scoped overrides
+  in both directions, mixed common/scoped names, exact names, friendly-name
+  fallback, and rule-specific compliant/violating endpoint selection.
+- Record this authorized adaptation, the immutable source SHA and original
+  authored-name contract in the PR and review handoffs. Source corpus counts
+  remain evidence for that source, not fresh counts or exact equivalence for
+  the SDK-name adaptation. Do not rerun the lintdiff corpus during promotion.
+
+This authorization is limited to the naming family and supported name
+resolution above. A different or uncertain semantic change still follows the
+source-repair stop policy. An explicit user-selected different name domain takes
+precedence; document it rather than silently applying the family default.
 
 ### 3. Verify the prepared environment
 
@@ -375,8 +456,9 @@ Place the rule in the selected package:
 Check the source contract against the
 [implementation checkpoints](../typespec-lint-implement/SKILL.md#implementation-checkpoints).
 Classify any proposed semantic change under the existing source-repair policy
-before editing; selecting a better destination does not authorize divergence
-from the immutable source.
+before editing. The [common SDK naming family](#common-sdk-operation-naming-family)
+has its explicit, limited adaptation authorization; selecting a better
+destination alone does not authorize other divergence from the immutable source.
 
 Then adapt it to the destination package:
 
@@ -434,16 +516,32 @@ existing tester helper:
 Apply the [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
 checklist and [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
 before fixture conversion. Do not port framework-only cases merely because they
-exist in the source suite or migration harness. Apply the
+exist in the source suite or migration harness. Do not add raw-source import
+inspection tests or port emitted-reference-only matrices when the native rule
+does not inspect those references. Preserve the underlying native compliant or
+violating case without legacy emitter metadata; check dependency constraints in
+review and existing repository tooling. Apply the
 [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring)
 to representative ARM resource scenarios without rewriting focused handwritten
 semantic tests or introducing ARM coupling into shared Core test setup. For SDK
 naming, prove common versus language-scoped override behavior and the intended
 name domain.
 
-Create:
-
-- `packages/<target>/test/rules/<rule-name>.test.ts`
+Classify every required acceptance claim with the shared
+[test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix), including
+promises in the development and promotion PR descriptions. Follow its setup,
+typed-extraction, exact-target, and public-API fixture guidance. Apply
+[canonical suite ownership and grouping](../typespec-lint-validate/SKILL.md#canonical-suite-ownership-and-grouping):
+locate and extend the existing suite by its imported rule object, retaining
+historical filenames when behavior is folded into an existing rule. Create
+`packages/<target>/test/rules/<rule-name>.test.ts` only for a new rule.
+Keep meaningful rule-owned interaction/deduplication cases there, not in extra
+integration or import-guard suites. Preserve independent utility, genuine
+package/registration, and actual published-example evidence through existing
+infrastructure or the documented one-time example workflow. Delete generic
+suppression/enablement and unchanged-sibling coexistence proof without
+replacement; reconcile stale PR promises rather than treating them as
+independent requirements.
 
 Use `createLinterRuleTester` and cover:
 
@@ -466,14 +564,16 @@ to prove standard framework behavior. Test custom declaration filtering only
 when it implements a rule-specific policy, with included and excluded cases.
 Any discovered source defect returns to the queue.
 
-For metadata-resolution or reference-based logic, explicitly cover relevant
+For native metadata-resolution logic, explicitly cover rule-owned
 version-selection/fallback behavior, returned resolution diagnostics, and
-diagnostic targets. Prove that checking a resolved record does not depend on
-its generated reference matching the old path or regex layout. Use supported
-native inputs or existing test infrastructure, not production adapters or
-unsupported authoring shapes added solely for testing. Fixture conversion alone
-does not close a missing regression case; classify any newly exposed source
-defect before making changes.
+diagnostic targets. Establish reference-format independence by reviewing the
+rule and its reachable helpers for structured metadata use, with behavioral
+tests for the record fields the rule actually checks. Do not require a matrix
+of generated reference strings or a raw-source assertion to prove that
+independence. Use supported native inputs or existing test infrastructure, not
+production adapters or unsupported authoring shapes added solely for testing.
+Fixture conversion alone does not close a missing regression case; classify any
+newly exposed source defect before making changes.
 
 Use this standard fixture-to-native-test mapping:
 
@@ -497,10 +597,15 @@ Use this standard fixture-to-native-test mapping:
   native `it("...")` test title or titles that replace it, or an explicit
   `Not ported (framework-only)` disposition and reason; do not paraphrase test
   titles in mapping tables or PR notes
+- include each fixture's acceptance claim and destination layer in that mapping.
+  For relocated integration, package, or documentation evidence, name the exact
+  test title/evidence location instead of marking the claim framework-only.
+  Record justified removal only when the proof is genuinely redundant.
 
-Prefer direct TypeSpec snippets and expected diagnostics over OpenAPI output
+For behavior tests, prefer direct TypeSpec snippets and expected diagnostics over OpenAPI output
 snapshots. If a lintdiff fixture depends on unrelated diagnostics or
-suppressions, adapt the snippet so the promoted rule is tested directly.
+suppressions, adapt the behavior snippet so the promoted rule is tested directly,
+without erasing required interaction or suppression evidence in other layers.
 
 ### 6. Move rule documentation
 
@@ -521,12 +626,20 @@ library documentation following the
   mechanics merely to explain the migration
 - include realistic TypeSpec incorrect and correct examples
 - apply the shared [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring):
-  choose the example audience independently of the destination package, use
-  standard templates with named customizations for ARM resource scenarios, and
-  justify any handwritten ARM exception
+  use supported standard templates for the incorrect/correct pair whenever they
+  can preserve the diagnostic contrast, rather than raw routes; choose the
+  audience independently of the destination package, but do not use generic HTTP
+  labeling to omit a supported ARM template pair for an ARM-applicable rule;
+  justify handwritten exceptions with the inspected template limitation
 - pass the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
   gate for the actual incorrect/correct snippets; preserve the diagnostic
   contrast rather than substituting an exempt default template response
+- do not add, retain or relocate bespoke per-rule Markdown parsers. Keep literal
+  semantic tests and validate actual published snippets through existing shared
+  infrastructure or recorded one-time execution. State whether the evidence is
+  continuous or one-time; do not claim copied fixtures validate the published
+  document. When existing shared tooling extracts snippets, handle CRLF and LF
+  and require an unambiguous match
 - follow the destination's authored-document conventions, including `## Impact`
   with the affected areas and `## Suppression` guidance when used by neighboring
   rules; explain when suppression is appropriate rather than only how to fix
@@ -541,6 +654,13 @@ library documentation following the
   TypeSpec type and supported authoring forms instead
 - check the generated docs page path and title match the official TypeSpec rule
   name, not the source validator slug, when the names differ
+
+Bind the authored Markdown through the installed compiler's supported rule
+`docs` metadata, following destination rules and scaffolding (for example,
+`fileRef.fromPackageRoot(...)`). A public documentation URL alone is not an
+authored-file binding. After regeneration, verify that the new page contains
+the authored rationale/examples and has no new-rule missing-documentation
+warning; an exit-zero command or generated index entry alone does not prove this.
 
 Regenerate docs for the affected library after the rule docs are in place. Let
 the command complete; `tspd doc` can be quiet for several minutes after printing
@@ -565,6 +685,17 @@ it in the explicit formatting and diff review scope.
 
 Update `packages/typespec-azure-rulesets` so all official rules remain
 explicitly listed.
+
+Preserve the source's audience/activation contract, not just its predicate.
+For externally selected RPaaS rules, check library default/recommended/`all`
+enablement as well as official rulesets, including framework-generated `all`
+behavior. Keep the target inactive wherever enablement would imply ordinary
+ARM applicability; use supported registration controls and preserve every
+existing rule's enablement. Keep explicit opt-in instructions and ordinary ARM
+counterexamples in native docs and fixture-to-native evidence. Destination
+ownership does not supply an automatic RPaaS selector or turn disabled corpus
+counts into parity. A required change to the source contract follows source
+repair, not a promotion-only semantic rewrite.
 
 - Newly promoted rules must be registered with a plain `false` value by default.
   Promotion adds official rule availability without enabling new diagnostics for
@@ -592,9 +723,12 @@ description or remediation.
 
 Run or plan to run the rulesets build and test after updating the lists.
 
-### 8. Add a Chronus change
+### 8. Ensure Chronus change coverage
 
-Add a change entry for every touched official package:
+Inspect existing task-owned unreleased entries first, following the shared
+[unreleased change-entry policy](../typespec-lint-implement/SKILL.md#unreleased-change-entries).
+Update or reuse valid coverage; add an entry only when coverage is missing for
+a touched official package:
 
 - the destination: `@azure-tools/typespec-azure-core`,
   `@azure-tools/typespec-azure-resource-manager`, or
@@ -615,6 +749,25 @@ Choose the change kind separately for each package:
   If the user explicitly approved immediate enablement, classify and describe
   that user-facing ruleset change accordingly instead of using this
   internal-only guidance.
+
+When a new entry is needed, use `pnpm change add` and verify that the expected
+change files were created.
+Before any package changes are committed, Chronus can report
+`No package changed. Exiting.` even with explicit package, kind and message
+arguments. A zero exit status in that case does not satisfy the change-entry
+requirement. Do not create an early commit to make package detection work.
+Instead, inspect existing `.chronus/changes/` entries and `.chronus/config.yaml`,
+then create only the required task-owned entries using their front-matter
+format, package names and change kinds.
+
+Validate with plain `pnpm chronus status`; do not assume `status` accepts
+`--since`. Check the installed command's help before adding options.
+If supported `--only` selectors are needed for multiple touched packages, repeat
+the option for each package, for example
+`--only "<destination-package>" --only "@azure-tools/typespec-azure-rulesets"`.
+Do not pass the second package as a bare positional argument: the installed
+array-option parser may disable greedy arrays. Include every touched package
+whose change coverage is required.
 
 Chronus change files must use LF line endings. Do not run Prettier directly on a
 new change file when the Windows checkout would rewrite it with CRLF. Normalize
@@ -641,6 +794,9 @@ assuming every front-matter failure is a line-ending issue.
 Use the repo's mise-managed toolchain when available. Before the first command,
 record the shared
 [validation gate plan](../shared/recovery-context.md#validation-gates-and-supplemental-checks).
+Use the shared [validation receipt parsing](../shared/recovery-context.md#validation-receipt-parsing)
+procedure for command evidence and PR-body drafting, preserving raw receipts
+separately from normalized parsing copies.
 The applicable checks in steps 0-8, Chronus status and diff hygiene are required.
 Step 9 is supplemental unless the user or repository explicitly requires it.
 No phase handoff or generic failure rule changes that classification.
@@ -864,14 +1020,30 @@ promotion diff. The review should inspect:
   independence and preserved version-selection, fallback, and diagnostic targets
 - test conversion fidelity from lintdiff fixtures
 - adherence to the rule-test responsibility boundary: remove framework-only
-  cases, preserve distinct rule coverage, and explain fixtures not ported
+  cases, raw-source architecture assertions, and emitted-reference-only matrices;
+  preserve distinct native rule coverage and explain fixtures not ported
+- acceptance-claim mapping and preservation of promised non-unit evidence in its
+  proper layer; shared setup, typed extraction, exact targets, and discriminating
+  offending/valid controls must preserve relevant identity, visibility, and LRO
+  preconditions rather than merely compile
+- canonical suite ownership, meaningful test groups, and public fixture APIs
+  under the shared validation guidance; reject duplicate rule suites even when
+  relocated to integration/package folders, and enforce the existing prohibition
+  on bespoke Markdown parsers while preserving actual example evidence
+- the shared
+  [final contract consistency sweep](../typespec-lint-implement/SKILL.md#final-contract-consistency),
+  including obsolete helpers/scaffolding, manual guidance, exact suppression
+  examples, SDK impact, legacy mappings, and stale unreleased descriptions;
+  assess fixed-validator wiring and metadata costs without removing necessary
+  helpers, deduplication, or exemptions
 - docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
   section
 - example audience and template selection under the shared authoring policy,
-  justified handwritten ARM exceptions, and diagnostic evidence for the final
-  incorrect/correct snippets with the target rule enabled; compilation or a
-  passing exempt default-template example alone does not satisfy this gate
+  template-based incorrect/correct examples whenever supported, justified
+  handwritten exceptions, and diagnostic evidence for the final snippets with
+  the target rule enabled; generic HTTP labeling, compilation, or a passing
+  exempt default-template example alone does not satisfy this gate
 - generated docs and formatting drift, especially after rule renames:
   `packages/<target>/README.md`,
   `website/src/content/docs/docs/libraries/<library>/reference/linter.md`, and
@@ -881,7 +1053,9 @@ promotion diff. The review should inspect:
   unless the user explicitly approved immediate enablement
 - changelog classification and wording match the actual ruleset enablement:
   disabled-only registration has a separate `internal` rulesets entry, uses the
-  official TypeSpec rule name, and says "Register ... as disabled," not "Enable"
+  official TypeSpec rule name, and says "Register ... as disabled," not "Enable";
+  apply the shared unreleased change-entry policy rather than adding redundant
+  destination-package internal entries for review iterations
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
@@ -909,7 +1083,7 @@ Replace `<ValidatorRuleId>` with the original Swagger validator rule ID and
 `createRule({ name })` value, not the canonical validator slug or the source
 lintdiff rule name. For example:
 `[Swagger Linter Migration] XmsResourceInPutResponse -> use-resource-model-for-put`.
-Keep both names in the title even when the PR body already explains the mapping;
+Keep both names in the title and record the mapping details in `migration.md`;
 this preserves migration traceability in future Git history. See the
 [review suggestion on PR #5503](https://github.com/Azure/typespec-azure/pull/5503#discussion_r4046613960).
 Do not append environment or execution labels such as `devbox` or `heavy`.
@@ -918,17 +1092,15 @@ implementation, including any rename made during promotion or review. Preserve
 an existing OPEN task PR's recorded title unless a correction is part of the
 request; this convention alone does not authorize renaming existing PRs.
 
-Write the PR description as an engineering explanation, not only a change list.
-It must include:
+Use the shared [two-section PR body](../shared/migration-pr-description.md):
+original Swagger documentation/logic links, then the published `migration.md`
+link. Add no other body content.
 
-- **Original Swagger linter:** include both of these direct GitHub hyperlinks
-  before listing a checklist of every specific check the original rule performs:
-  - `linter code: [<ValidatorRuleId>](<validator source URL>)`
-  - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
+Keep all of the following required analysis in `migration.md` or its linked
+appendix, within the shared four-section report plus NOTES contract:
 
-  Use the rule name and links from the fixture `rule.md` or validator repository.
-  Do not omit either link or replace them with unlinked paths.
-
+- **Original Swagger linter:** link the original documentation and implementation
+  and list every specific check the original rule performs.
 - **How the Swagger linter works:** explain the Swagger objects it inspects,
   traversal or lookup strategy, conditions and exemptions, diagnostic locations,
   and any known validator defects, stale maps, emitted-occurrence duplication, or
@@ -967,14 +1139,14 @@ It must include:
   snapshots were not copied. For framework-only fixtures, write
   `Not ported (framework-only)` in the native-case column and explain which
   framework guarantee they exercise; do not create a rule test to fill the row.
-- **Migration evidence:** link directly to the rule's `migration.md` for the
-  declared focused tests, real-service project comparison, latest full-corpus
+- **Migration evidence:** retain the declared focused tests, real-service
+  project comparison, latest full-corpus
   counts, one-sided project explanations, compile failures, and remaining
-  uncertainty. Do not duplicate the detailed migration table or corpus
-  declaration in the PR description when `migration.md` already contains it.
+  uncertainty.
 - **Validation:** state the required checks and their outcomes. Failed or
   incomplete required checks block new publication; on an existing PR report
-  them as **Validation blocker** and stop the affected workflow.
+  them as **Validation blocker** in the migration report and workflow result,
+  and stop the affected workflow.
 - **Validation limitations:** disclose any failed, skipped or deadline-limited
   supplemental run with its command, scope, evidence, unresolved cause and
   disposition. Distinguish it from a required blocker; never claim the full
@@ -986,7 +1158,8 @@ It must include:
   bounded return-to-development flow and refresh this PR only after clean source
   review. Never describe source-rule edits as part of promotion itself.
 
-Prefer concrete examples, project names, and before/after evidence. Avoid a
+In the migration report, prefer concrete examples, project names, and
+before/after evidence. Avoid a
 generic bullet such as "promote lint rule" without explaining the actual rule
 behavior and why the destination package is correct.
 

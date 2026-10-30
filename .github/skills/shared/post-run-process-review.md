@@ -4,6 +4,12 @@ Read and follow this policy when a skill reaches its post-run process review.
 Use the invoking skill's review topics to identify concrete improvements, but
 do not ask the user whether to adopt them.
 
+This policy governs automatic improvements discovered while completing another
+workflow. A direct user request to redesign skills or update an explicitly named
+existing PR is a separate task with that requested scope; it is not permission
+for workers to change orchestration during an active rule/review run. Do not
+create a duplicate automatic skill-only PR for that same authorized update.
+
 ## Ownership and timing
 
 - Finish or stop the primary workflow before making post-run skill changes.

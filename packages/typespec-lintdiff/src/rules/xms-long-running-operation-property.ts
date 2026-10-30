@@ -1,8 +1,7 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
-import { createRule, type ModelProperty, type Operation, type Program } from "@typespec/compiler";
-import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
-import { getExtensions } from "@typespec/openapi";
+import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import { createRule, listServices, type ModelProperty, type Operation } from "@typespec/compiler";
+import { getHttpService, type HttpOperationResponse } from "@typespec/http";
 
 const qualifyingStatusCodes = [200, 201, 202, 204];
 const qualifyingHeaders = new Set(["location", "azure-asyncoperation"]);
@@ -15,44 +14,34 @@ export const xmsLongRunningOperationPropertyRule = createRule({
   severity: "warning",
   messages: {
     default:
-      "If an operation's (PUT/POST/PATCH/DELETE) responses have `Location` or `Azure-AsyncOperation` headers then it MUST have the property `x-ms-long-running-operation` set to `true`.",
+      "ARM operations with Location or Azure-AsyncOperation response headers must have native polling metadata. Use an asynchronous ARM template or supported semantic LRO headers.",
   },
   create(context) {
     return {
-      operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
-          return;
+      root() {
+        const visitedOperations = new Set<Operation>();
+        for (const service of listServices(context.program)) {
+          // Lintdiff enables mixed ARM/data-plane rules; remove this isolation on ARM promotion.
+          if (!getArmProviderNamespace(context.program, service.type)) {
+            continue;
+          }
+          const [httpService] = getHttpService(context.program, service.type);
+          for (const httpOperation of httpService.operations) {
+            const operation = httpOperation.operation;
+            if (!qualifyingVerbs.has(httpOperation.verb) || visitedOperations.has(operation)) {
+              continue;
+            }
+            visitedOperations.add(operation);
+            const target = getFirstQualifyingHeaderTarget(httpOperation.responses);
+            if (target && getLroMetadata(context.program, operation) === undefined) {
+              context.reportDiagnostic({ target });
+            }
+          }
         }
-
-        const [httpOperation] = getHttpOperation(context.program, operation);
-        if (!qualifyingVerbs.has(httpOperation.verb)) {
-          return;
-        }
-
-        if (isMarkedLongRunning(context.program, operation)) {
-          return;
-        }
-
-        const target = getFirstQualifyingHeaderTarget(httpOperation.responses);
-        if (target === undefined) {
-          return;
-        }
-
-        context.reportDiagnostic({
-          target,
-        });
       },
     };
   },
 });
-
-function isMarkedLongRunning(program: Program, operation: Operation): boolean {
-  return (
-    getLroMetadata(program, operation) !== undefined ||
-    getExtensions(program, operation).get("x-ms-long-running-operation") === true
-  );
-}
 
 function getFirstQualifyingHeaderTarget(
   responses: HttpOperationResponse[],

@@ -29,8 +29,18 @@ If the task is specifically about a named LintDiff or `azure-openapi-validator` 
    - severity expectations
    - likely false-positive / false-negative risks
    - validation and testability constraints
-5. Decide whether existing coverage already exists or whether a new lint still appears justified.
-6. End with a rule brief that is ready for `/typespec-lint-implement` or, if the repository already has the rule, `/typespec-lint-validate`.
+5. Decide whether to reuse an existing rule, extend it for evidenced missing
+   behavior, or add a distinct new rule. Compare intent, ownership, applicability,
+   enablement, exemptions, and diagnostics rather than names alone. Prefer an
+   extension when those contracts remain coherent; otherwise explain why a
+   separate rule is needed and how duplicate findings will be avoided.
+   For Swagger/LintDiff migrations, apply the
+   [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract),
+   including the existing rule's documentation update when a duplicate is omitted.
+6. End with a rule brief that is ready for `/typespec-lint-implement` or, if the
+   repository already has the rule, the required documentation update and any
+   focused `/typespec-lint-validate` follow-up. Full coverage is not a reason to
+   invent implementation changes.
 
 ## Native rule contract
 
@@ -52,12 +62,30 @@ Record these decisions in the brief before implementation:
   prove that requirement. Separate rule-owned decisions from guarantees supplied
   by those APIs or the linter framework; apply the
   [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
-  when planning coverage. Mark unresolved API questions explicitly.
+  when planning coverage. Establish why the native guideline requires custom
+  traversal, SDK setup or a public API, not merely why the proposed architecture
+  uses it. Apply the
+  [simplification review guidance](../typespec-lint-implement/SKILL.md#simplification-and-review)
+  when feedback challenges that architecture. Mark unresolved API questions explicitly.
+  Prove that the proposed predicate distinguishes the closest compliant shape,
+  not just that a helper returns metadata for a violating-looking example.
+  Read the helper's contract and downstream guard rationale. Protocol or
+  continuation metadata, for example, need not prove that an operation starts
+  work. If compliant and violating shapes expose the same proposed predicate,
+  identify a supported distinguishing fact before implementation. Otherwise
+  record the observability gap; do not infer intent from names, paths or prose,
+  or silently narrow the guideline.
 - **Diagnostic contract:** specify the unit (property, operation, model, etc.),
   authored target, expected multiplicity, exemptions, and concise corrective
   message. Extra diagnostics and suppressed duplicates are behavior decisions.
 - **Public naming:** use a short native name consistent with sibling rules.
   Define domain terms in user documentation and non-obvious helper contracts.
+- **Acceptance evidence:** record required standalone-example, registered
+  execution/suppression, interaction, registration, and dependency-isolation
+  claims when applicable, including promises in an existing PR description.
+  Map them to the [test-claim matrix](../typespec-lint-validate/SKILL.md#test-claim-matrix)
+  without requiring every layer for every rule; reconcile the mapping at the
+  final head.
 
 For naming rules, explicitly distinguish source names, common SDK names,
 language-specific overrides, and serialized operation IDs. Select the name
@@ -71,7 +99,8 @@ Produce a compact brief with these sections:
 
 - Problem statement
 - Native rule contract and intentional migration differences, when applicable
-- Existing coverage or prior art
+- Existing coverage or prior art, reuse/extension/new-rule decision, and any
+  required coverage documentation update
 - Candidate implementation surface
 - Candidate diagnostics/messages
 - Validation strategy

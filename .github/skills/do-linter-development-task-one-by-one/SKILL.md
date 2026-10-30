@@ -1,11 +1,97 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Develop lintdiff rules end-to-end from any coordinator session, creating or reusing worktrees only under --worktrees-folder (default C:\dev\worktrees), with worktree-bound publication owners and sequential development, review, promotion, and promotion review.
-argument-hint: "[--worktrees-folder <absolute-path>] <rule ID ...> or <prepared worker commands>"
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
+argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
 user-invocable: true
 ---
 
 # Develop lintdiff rules one by one
+
+## Select the flow before parsing or preparing tasks
+
+This skill has two versioned execution contracts:
+
+| Flow           | Implementation and publication                                                                                                                               | Procedure                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| `legacy`       | Temporary lintdiff implementation and development PR against `feature/lintdiff-migration-new`, then a separate official-library promotion PR against `main`  | The legacy contract below                |
+| `native-first` | One official-library implementation on a task branch based on canonical `main`, one native PR, and separate development/release-readiness reviews of that PR | [Native-first contract](native-first.md) |
+
+Accept exactly one optional queue-level `--flow legacy|native-first`. Parse and
+remove it before applying the selected input grammar; reject duplicate, unknown
+or missing values before setup. New rule-ID and task-file queues default to
+`native-first`; `--flow native-first` remains valid but is not required.
+Use `--flow legacy` for new rule-ID queues that need temporary-library development
+and separate promotion. Never edit or push directly to `main`.
+
+Read the recorded `flowVersion` first on resumption, before applying any default.
+Resume that flow when the selector is omitted; reject a conflicting selector.
+A default change cannot retarget an existing task, change its ownership, or reset
+its budgets. Put queue options
+on separate lines outside prepared worker commands; never extract `--flow` or
+`--worktrees-folder` from inside their strict command grammar. Old prepared
+`/develop-lintdiff-rule --worker` commands remain legacy; reject them with
+`--flow native-first`, rather than rewriting their branch or arguments.
+For compatibility, a new queue containing prepared worker commands and no
+selector uses `legacy` for the whole queue, including any mixed rule-ID entries.
+This exception does not apply to ordinary rule-ID or task-file queues.
+
+In native-first mode, rule-ID tokens create singleton tasks. Alternatively,
+accept exactly one `--task-file <absolute-json-path>` for an ordered list of
+explicit singleton/group tasks; do not mix it with bare IDs or prepared worker
+commands. Validate it with [native_tasks.py](native_tasks.py) and the canonical
+tooling catalog before setup. The helper performs read-only schema/catalog/
+collision validation, not semantic group admission or publication preflight.
+Queue options belong outside the JSON. In legacy mode reject `--task-file`;
+the legacy worker grammar is unchanged.
+
+```text
+/do-linter-development-task-one-by-one EnumInsteadOfBoolean
+/do-linter-development-task-one-by-one --task-file C:\dev\migration-tasks.json
+```
+
+These are alternative invocations, not instructions to remigrate the merged
+example. Native-first runs must read [native-first.md](native-first.md), the
+[native preparation override](preparation.md#native-first-preparation), and
+[native publication routing](app-session-execution.md#native-first-publication)
+and **must not fall through to the legacy phases below**. Keep one active task
+at a time. Both flows preserve required validation, independent local review,
+bounded GitHub review/fix, publication approval, and quiescence.
+Native-first coverage discovers and pins the
+[shared Swagger baseline](../analyze-native-lint-coverage/shared-baseline.md)
+before specs setup. It reruns native diagnostics, not the Swagger suite.
+Only an explicitly requested separate producer creates or refreshes shared data.
+
+Native-first tasks use three persistent worktrees: native development, specs
+runtime, and combined coverage/evidence. Prefer verified compatible local
+worktrees before creating missing roles; follow the
+[reuse and isolation checks](preparation.md#native-first-worktree-reuse).
+Fresh-checkout recovery verification remains required, but uses temporary
+isolation rather than a fourth persistent replay worktree.
+
+Both flows follow the shared
+[analysis-first edit loop](../shared/analysis-first-lint-migration.md).
+Decide source changes through semantic analysis and focused regressions.
+Treat full coverage as an expensive, justified checkpoint after coherent edits
+stabilize, not a per-edit debugger. Preserve all final verification/review gates.
+
+Both flows must create or refresh `migration.md` under the shared
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Review the concise report and its linked evidence together: preserve evidenced
+positives, actual counts, core/corner-case context and quickly accessible examples
+without weakening any required investigation or acceptance gate.
+
+All rule PR descriptions follow the shared
+[two-section PR body](../shared/migration-pr-description.md): original Swagger
+documentation/logic links, then the published `migration.md` link. Keep detailed
+analysis and required evidence in that report, not additional PR sections.
+
+## Legacy contract
+
+Everything below this heading describes `flowVersion: legacy`. Its references to
+one rule per task, three worktrees, two PR owners, fixed migration-branch input,
+promotion source immutability and promotion-specific results are not native-first
+requirements. Common folder safety, explicit identity checks and recovery bounds
+remain applicable through the native-first contract.
 
 Run a queue of rule IDs or prepared lintdiff worker commands sequentially. Each
 rule is an independent task. The queue owns
@@ -102,8 +188,8 @@ that line retains its strict grammar below. For prepared-command input, place
 resolved folder to subskills as handoff metadata, not as a new worker flag.
 
 ```text
-/do-linter-development-task-one-by-one TagsAreNotAllowedForProxyResources
-/do-linter-development-task-one-by-one --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --flow legacy TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --flow legacy --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
 ```
 
 These are alternative invocations, not a two-entry queue.
@@ -126,7 +212,7 @@ Every prepared worker command must:
 - include exactly one `--target-branch feature/lintdiff-migration-new`
 - contain no other flags or positional arguments
 
-For example, `/do-linter-development-task-one-by-one ParametersInPointGet PatchBodyParametersSchema`
+For example, `/do-linter-development-task-one-by-one --flow legacy ParametersInPointGet PatchBodyParametersSchema`
 prepares and completes the first rule before preparing the second.
 
 Determine the form for each line before parsing: a line beginning with
@@ -181,12 +267,20 @@ are eligible for `/develop-lintdiff-rule`. Record the observed applicability as
 the blocker. This is a read-only eligibility check, not target synchronization
 or worktree verification.
 
+Catalog eligibility is deliberately coarse. The worker must establish the
+[validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+before semantic classification; `ARM`/`Both` does not erase upstream RPaaS
+registration or require automatic native RPaaS detection. Preserve that contract
+through development, promotion, and both reviews.
+
 ## Queue state
 
 Keep an ordered ledger with one entry per parsed queue entry:
 
 - 1-based task number
 - rule ID
+- upstream/native audience contract and evidence once intake establishes it,
+  including external selection, enablement policy, and comparison limitations
 - original input, input form and effective worker command (once prepared)
 - resolved `worktrees_folder`, target repository root/project, authoritative
   instruction source and canonical/physical containment evidence for every path
@@ -531,6 +625,14 @@ deterministic draft/command failure with a finite additional correction allowanc
 A generic queue invocation, "continue", or pasted failure history is not such
 authorization. This is not an automatic retry or a new source-repair cycle.
 
+Before requesting this authorization, complete the shared
+[read-only blocker reconciliation](../shared/recovery-context.md#read-only-blocker-reconciliation).
+Ask once for the named correction and finite allowance in plain language.
+An unambiguous acceptance of that specific request is sufficient; preserve both
+messages rather than requiring a verbatim sentence. Access approval alone,
+ambiguous assent, or a generic continuation without the named bounded request
+does not grant additional attempts.
+
 1. Record the authorization text, failed command/evidence, task/cycle/phase,
    preserved state manifest, and exact additional allowance before doing work.
    Keep the original exhausted counter unchanged; track supplemental attempts
@@ -614,8 +716,11 @@ agent to repair the source in place.
 Keep development PRs on their existing
 `feature/lintdiff-migration-new` target. Promotion follows its skill's canonical
 `Azure/typespec-azure`/`main` base, recorded head-repository policy and agent-recommended
-destination, with new rules disabled by default. Do not wait for or perform a
-development merge before promotion, and never merge either PR automatically.
+destination, with new rules disabled in recommended/default policy presets,
+not automatically excluded from library `all`; follow the
+[shared ruleset policy](../shared/native-migration-contract.md#packaging-documentation-and-release-readiness).
+Do not wait for or perform a development merge before promotion, and never merge
+either PR automatically.
 
 ## Cycle handoff
 
@@ -639,6 +744,11 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   pinned source SHA for that promotion attempt
 - selected destination package, official rule name, ruleset enablement decision,
   and existing promotion adaptations that must be preserved on refresh
+- upstream registration/audience selection, native applicability and diagnostic
+  unit, default/opt-in enablement, ordinary ARM counterexamples, and validator/
+  native comparison profiles with their limitations; mark pending intake on the
+  initial dispatch, then supply the established contract before classification
+  and every subsequent phase/review
 - all completed phase outcomes, review-round counts, reviewed SHAs, and previous
   repair reasons; do not overwrite earlier results when a later cycle fails
 - task-wide native-test timeout-diagnosis allowance and usage, including failed
@@ -745,6 +855,14 @@ one session to execute both publication phases.
 > active command, elapsed time, and last completed milestone. During an operation
 > expected to exceed 10 minutes, run it in a form that permits monitoring and
 > append another heartbeat at least every 10 minutes until it ends.
+> Guard optional progress directories with `Test-Path -LiteralPath` before
+> enumerating them. Corpus capture/plan inventory can run before an `objects`
+> archive directory exists; its absence alone is not a stalled or failed
+> operation. Use the exact tracked process status, CPU-time changes and available
+> artifact timestamps for read-only progress evidence. Do not stop a healthy
+> operation merely because it has not reached the archive stage. Actual monitor
+> errors still follow the existing finite correction and reconciliation policy;
+> monitoring grants no new retry or cleanup allowance.
 >
 > For agent-introduced draft or validation-command errors, apply the local
 > draft-correction policy above. Record the causal evidence and attempt count, correct eligible failures
@@ -772,6 +890,10 @@ one session to execute both publication phases.
 > Acknowledge the task-scoped recovery context before commands. Reuse exact
 > applicable fork-update permissions and validation profiles; do not infer new
 > authorization, reset counters, or independently roll over a merged source PR.
+> Establish and preserve the validator audience contract above. An evidenced
+> external RPaaS opt-in is a valid native boundary, not permission for blanket
+> ARM enforcement. Carry actual activation/comparison profiles into both reviews
+> and promotion; a disabled target's corpus `0/0` is not equivalence evidence.
 > Do not recreate worktrees, rerun dispatcher mode or repeat passing dependency
 > setup. The development skill revalidates the prepared state and may repair only
 > invalidated layers under the shared preparation contract. Never pull, reset,
@@ -790,6 +912,10 @@ one session to execute both publication phases.
 > development PR URL and pushed head. Pass the shared post-run policy's queue ownership
 > constraint to that skill: do not modify skills or create a skill-update PR;
 > return only evidence-backed, high-confidence suggestions to the outer agent.
+> Carry the shared [analysis-first policy](../shared/analysis-first-lint-migration.md)
+> into development and review handoffs: analyze findings and run focused
+> regressions before expensive corpus execution. Record its purpose and cost;
+> batch justified fixes without skipping required fresh final coverage.
 > Maintain the cycle handoff after every phase, preserving prior heads in history
 > and recording newly verified pushed heads before calling the next skill.
 >
@@ -827,6 +953,14 @@ one session to execute both publication phases.
 > promotion. Do not ask for destination confirmation; keep existing destination
 > and ruleset enablement unless the evidence requires reporting a blocker.
 > Pass the same no-skill-edits/no-skill-update-PR ownership constraint.
+>
+> Enforce the shared
+> [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring)
+> in promotion documentation: use supported standard templates instead of raw
+> routes whenever they can demonstrate both incorrect and correct behavior.
+> Require a documented template limitation for handwritten exceptions; a generic
+> HTTP audience does not waive an available ARM template pair. Verify diagnostic
+> evidence for the actual final snippets before publication and review handoff.
 >
 > Follow promotion through draft PR creation or update. Record the absolute
 > promotion worktree and canonical promotion PR URL. A confirmed source defect

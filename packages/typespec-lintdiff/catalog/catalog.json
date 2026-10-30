@@ -1407,8 +1407,8 @@
     "sources": [
       "arm"
     ],
-    "tier": "Template-enforced",
-    "tierRationale": "ARM templates enforce specific POST response codes; custom operations can override."
+    "tier": "Unconstrained",
+    "tierRationale": "Partial native coverage: official rules check status sets and async/202/204 bodies, but synchronous resource POST 200 without a body is authorable through ArmResourceActionSync Response customization. The opt-in local no-empty-post-response rule covers only that gap."
   },
   {
     "id": "PreviewVersionOverOneYear",
@@ -2495,8 +2495,8 @@
     "sources": [
       "common"
     ],
-    "tier": "Prerequisite-blocked",
-    "tierRationale": "The ARM violating repro needs arm-post-operation-response-codes suppression, and explicit x-ms-long-running-operation authoring is blocked by no-openapi unless suppressed."
+    "tier": "Unconstrained",
+    "tierRationale": "Official response-code rules cover registered resource POST/PUT/DELETE; supported custom PATCH and provider POST templates can return 202 with plain Location headers but no native LRO metadata."
   },
   {
     "id": "LroStatusCodesReturnTypeSchema",
