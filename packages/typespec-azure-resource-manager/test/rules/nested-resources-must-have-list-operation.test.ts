@@ -199,8 +199,6 @@ it.each([false, true])(
 
 // Deferred until equivalent-path resource identities share their list association:
 // https://github.com/Azure/typespec-azure/issues/5899
-// Real API Management pattern:
-// https://github.com/MaryGao/azure-rest-api-specs/blob/2cd3c5dd6d00a5f53214fe594afd2aef3f44d3f9/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/TagDescriptionContract.tsp#L70-L175
 it.skip("accepts a registered list for equivalent read and legacy PUT resource paths", async () => {
   await tester
     .expect(
