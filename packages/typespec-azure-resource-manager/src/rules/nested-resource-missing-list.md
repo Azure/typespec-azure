@@ -32,7 +32,9 @@ or `Part` instances across a subscription does not replace listing `Part` instan
 
 The collection GET must appear in the resource's resolved `operations.lists`. Registered list
 operations can be authored on another interface. They must return a successful response with a
-`value` array; the items may use a separate collection representation of the resource.
+2xx status code and use GET. The list item property can have any name, and the items may use a
+separate collection representation of the resource. This rule relies on the resolved list
+classification rather than validating the response body's shape.
 
 Collections authored only as actions are not recognized unless the resolver exposes them as lists.
 This can produce a warning even when the HTTP collection GET exists. Collection associations are

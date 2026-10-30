@@ -6,7 +6,6 @@ import {
   type Operation,
   type Program,
 } from "@typespec/compiler";
-import { createMetadataInfo, Visibility } from "@typespec/http";
 import { getActionDetails, getParentResource } from "@typespec/rest";
 import { getResourceBaseType, resolveArmResources, ResourceBaseType } from "../resource.js";
 import {
@@ -26,7 +25,6 @@ export const nestedResourceMissingListRule = createRule({
     default: paramMessage`Nested resource '${"name"}' must have a list operation at its parent collection.`,
   },
   create(context) {
-    const metadata = createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read });
     const reportedModels = new Set<Model>();
     const serviceByOperation = createArmServiceIndex(context.program);
 
@@ -53,8 +51,7 @@ export const nestedResourceMissingListRule = createRule({
           const collectionPath = getCollectionPath(resource.resourceInstancePath);
           const matchingLists = resource.operations.lists.filter(
             (list) =>
-              normalizeRoute(list.path) === collectionPath &&
-              isCollectionGet(list.httpOperation, metadata, program),
+              normalizeRoute(list.path) === collectionPath && isCollectionGet(list.httpOperation),
           );
           const hasAllCollectionGets = instanceOperations.every(({ operation }) => {
             const service = serviceByOperation.get(operation);

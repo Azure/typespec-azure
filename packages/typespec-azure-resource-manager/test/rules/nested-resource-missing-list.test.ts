@@ -169,6 +169,34 @@ it("does not let a list in another service satisfy a nested resource", async () 
     .toEmitDiagnostics(diagnostic());
 });
 
+it.each([false, true])(
+  "checks list coverage for each service (second service list: %s)",
+  async (secondServiceList) => {
+    const result = tester.expect(`
+      @armProviderNamespace("Microsoft.Contoso") @service namespace First {
+        model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+        @parentResource(Widget)
+        model Part is ProxyResource<{}> { ...ResourceNameParameter<Part>; }
+        @armResourceOperations interface Parts {
+          get is ArmResourceRead<Part>;
+          list is ArmResourceListByParent<Part>;
+        }
+      }
+      @armProviderNamespace("Microsoft.Contoso") @service namespace Second {
+        @armResourceOperations interface OtherParts {
+          getOther is ArmResourceRead<First.Part>;
+          ${secondServiceList ? "listOther is ArmResourceListByParent<First.Part>;" : ""}
+        }
+      }
+    `);
+    if (secondServiceList) {
+      await result.toBeValid();
+    } else {
+      await result.toEmitDiagnostics(diagnostic());
+    }
+  },
+);
+
 // Deferred until equivalent-path resource identities share their list association:
 // https://github.com/Azure/typespec-azure/issues/5899
 // Real API Management pattern:
@@ -476,12 +504,16 @@ it("does not check resource declarations in non-ARM services", async () => {
 });
 
 it.each([
+  "@pageItems items: Part[];",
+  "@pageItems results: Part[];",
   "@pageItems items: Part[]; @visibility(Lifecycle.Create) value: Part[];",
   '@pageItems @encodedName("application/json", "items") value: Part[];',
-])("does not count a non-payload value array: %s", async (property) => {
-  await tester
-    .expect(
-      `${service}
+])(
+  "accepts a registered list without requiring a response property named value: %s",
+  async (property) => {
+    await tester
+      .expect(
+        `${service}
       @armResourceOperations interface Parts {
         get is ArmResourceRead<Part>;
       }
@@ -489,9 +521,33 @@ it.each([
         listParts is ArmResourceListByParent<Part, Response = ArmResponse<{ ${property} }>>;
       }
     `,
-    )
-    .toEmitDiagnostics(diagnostic());
-});
+      )
+      .toBeValid();
+  },
+);
+
+it.each([
+  { method: "post", response: "ArmResponse<ResourceListResult<Part>>" },
+  {
+    method: "get",
+    response: "{ @statusCode statusCode: 400; @body body: { @pageItems items: Part[]; }; }",
+  },
+])(
+  "does not count a registered $method list with response $response",
+  async ({ method, response }) => {
+    await tester
+      .expect(
+        `${service}
+      @armResourceOperations interface Parts {
+        get is ArmResourceRead<Part>;
+        @${method}
+        list is ArmResourceListByParent<Part, Response = ${response}>;
+      }
+    `,
+      )
+      .toEmitDiagnostics(diagnostic());
+  },
+);
 
 it("accepts an array serialized as value with a different source property name", async () => {
   await tester
