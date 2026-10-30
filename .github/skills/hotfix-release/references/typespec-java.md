@@ -1,8 +1,6 @@
 # Java hotfix release
 
-Supplement the [hotfix-release skill](../SKILL.md)
-with these Java-specific steps. The emitter release involves **three PRs and one
-SDK sync pipeline run**; the pipeline creates an additional downstream SDK PR.
+**Three emitter PRs and one SDK sync pipeline run**, which creates a downstream SDK PR.
 
 ## 1. Core-sync PR
 
