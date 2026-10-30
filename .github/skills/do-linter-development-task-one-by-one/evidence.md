@@ -84,6 +84,24 @@ raw receipts locally; sanitization must not alter diagnostic counts or targets.
 Never publish credentials, environment dumps, user mail, `node_modules`, raw
 `log.txt` or unrelated/private inputs.
 
+When validating evidence with tools installed in a prepared native/tooling
+checkout, explicitly select that checkout's configuration. The command's cwd
+alone does not prevent configuration discovery beside the target files.
+Verify configuration equivalence and retain applicable rules and overrides.
+Disable nested discovery only when no distinct required configuration is
+omitted. Do not install or build the evidence checkout merely to load an
+identical configuration from the prepared checkout.
+
+Write generated publication text, including JSON and task-scoped
+`.gitattributes`, as UTF-8 with LF endings before freezing published hashes.
+Preserve original raw receipts separately. A `-text` attribute preserves CRLF
+too; it does not normalize generated files or make them pass Git's whitespace
+check. Validate the actual staged text with `git diff --cached --check` before
+commit/publication, and verify staged blob hashes after any intentional
+normalization. Do not disable whitespace checks or rewrite immutable raw
+receipts to fix publication formatting. A failed check still follows the
+existing bounded correction policy.
+
 Before committing, compare the complete publication inventory with Git's staged
 paths. Directory staging can omit ignored manifests and `.log` receipts. When
 necessary, force-add only explicitly inventoried sanitized receipts; never
@@ -95,6 +113,13 @@ change line endings. Preserve exact evidence bytes with task-scoped
 `.gitattributes`, or explicitly record intentional normalization, retain original
 hashes and recompute published hashes. Verify the declared hashes again from a
 fresh checkout. Do not waive mismatches as harmless formatting differences.
+
+Read Git blobs as bytes. For subprocess capture, use an explicit bounded buffer
+that covers the measured largest blob, or stream the bytes. Node's default
+stdout limit can be smaller than full-population JSON. A capture overflow is
+not a blob mismatch: preserve the failed attempt and correct the reader under
+the existing recovery limits. Never truncate or decode/re-encode blob bytes
+before hashing.
 
 Measure dataset size before choosing Git versus artifact storage. Retain large
 Swagger/packages/build logs as durable downloadable fork release assets or
