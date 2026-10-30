@@ -6,6 +6,7 @@ import {
 } from "@typespec/compiler";
 import {
   getArmResourceOperationData,
+  isArmCollectionAction,
   isProviderOperation,
   isResourceOperation,
 } from "../operations.js";
@@ -21,6 +22,7 @@ export const providerOrResourceOperationRule = createRule({
     default:
       "ARM operations must be registered as provider or resource operations. Use standard templates such as ArmProviderActionSync, ArmResourceRead, or Extension.Read, or apply @providerOperation to a custom provider operation.",
     unregisteredResource: paramMessage`The resource "${"resourceName"}" for this operation is not a registered ARM resource. Use standard resource templates to create resources.`,
+    missingInterface: "Resource operations must be defined inside an interface",
   },
   create(context) {
     return {
@@ -33,7 +35,12 @@ export const providerOrResourceOperationRule = createRule({
           !isResourceOperation(context.program, operation)
         ) {
           const resourceOperation = getArmResourceOperationData(context.program, operation);
-          if (resourceOperation) {
+          if (
+            operation.interface === undefined &&
+            !isArmCollectionAction(context.program, operation)
+          ) {
+            context.reportDiagnostic({ target: operation, messageId: "missingInterface" });
+          } else if (resourceOperation) {
             context.reportDiagnostic({
               target: operation,
               messageId: "unregisteredResource",

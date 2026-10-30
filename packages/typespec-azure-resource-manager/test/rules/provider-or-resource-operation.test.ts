@@ -134,11 +134,10 @@ describe("provider-or-resource-operation", () => {
   });
 
   for (const declaration of [
-    "@get op custom(): string;",
     "interface Custom { @get custom(): string; }",
-    "op Custom<T>(): T; op custom is Custom<string>;",
     "interface Custom<T> { @get custom(): T; } interface Concrete extends Custom<string> {}",
     "interface Custom { @post @armResourceCollectionAction custom(): void; }",
+    "@post @armResourceCollectionAction op custom(): void;",
   ]) {
     it(`warns on unregistered concrete operations: ${declaration}`, async () => {
       await tester.expect(`${service}${declaration}`).toEmitDiagnostics([
@@ -150,6 +149,61 @@ describe("provider-or-resource-operation", () => {
       ]);
     });
   }
+
+  it.each([
+    "@get op custom(): string;",
+    "op Custom<T>(): T; op custom is Custom<string>;",
+    "@get @armResourceRead(Widget) op custom(): Widget;",
+    "op custom is ArmResourceRead<Widget>;",
+    '@action("custom") op custom is ArmResourceActionSync<Widget, void, Widget>;',
+    '@action("custom") op custom is ArmResourceActionAsync<Widget, void, Widget>;',
+  ])("requires an enclosing interface for %s", async (declaration) => {
+    await tester.expect(`${service}${resource}${declaration}`).toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
+        severity: "warning",
+        message: "Resource operations must be defined inside an interface",
+      },
+    ]);
+  });
+
+  it.each(["ArmResourceActionSync", "ArmResourceActionAsync"])(
+    "accepts %s after enclosing it in an interface",
+    async (template) => {
+      await tester
+        .expect(
+          `${service}${resource}
+          @armResourceOperations
+          interface Widgets {
+            custom is ${template}<Widget, void, Widget>;
+          }
+        `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it("accepts a namespace-scoped standard provider action", async () => {
+    await tester.expect(`${service} op refresh is ArmProviderActionSync;`).toBeValid();
+  });
+
+  it("supports suppression of the interface diagnostic", async () => {
+    await Tester.compile(
+      `${service}${resource}
+      #suppress "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation" "Approved exception."
+      op custom is ArmResourceRead<Widget>;
+    `,
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: {
+              "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation": true,
+            },
+          },
+        },
+      },
+    );
+  });
 
   it("does not infer resource registration from an operation return type", async () => {
     await tester
