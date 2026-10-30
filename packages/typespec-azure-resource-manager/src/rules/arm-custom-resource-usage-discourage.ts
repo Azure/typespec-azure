@@ -5,8 +5,8 @@ import {
   type Model,
   type Program,
 } from "@typespec/compiler";
-import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { isCustomAzureResource } from "../resource.js";
+import { hasSuppression } from "./utils.js";
 
 const armCustomResourceUsageDiscourageCode =
   "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage";
@@ -51,7 +51,10 @@ function hasSuppressedCustomResourceTemplate(
   }
   visited.add(model);
 
-  if (isTemplateInstance(model) && hasSuppression(model.node)) {
+  if (
+    isTemplateInstance(model) &&
+    hasSuppression(model.node, armCustomResourceUsageDiscourageCode)
+  ) {
     return true;
   }
 
@@ -65,26 +68,5 @@ function hasSuppressedCustomResourceTemplate(
     }
   }
 
-  return false;
-}
-
-function hasSuppression(node: Node | undefined): boolean {
-  let current = node;
-  while (current) {
-    for (const directive of current.directives ?? []) {
-      const firstArgument = directive.arguments[0];
-      if (
-        directive.target.sv === "suppress" &&
-        firstArgument &&
-        ((firstArgument.kind === SyntaxKind.StringLiteral &&
-          firstArgument.value === armCustomResourceUsageDiscourageCode) ||
-          (firstArgument.kind === SyntaxKind.Identifier &&
-            firstArgument.sv === armCustomResourceUsageDiscourageCode))
-      ) {
-        return true;
-      }
-    }
-    current = current.parent;
-  }
   return false;
 }
