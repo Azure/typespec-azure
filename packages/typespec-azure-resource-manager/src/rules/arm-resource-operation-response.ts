@@ -6,9 +6,13 @@ import {
   createRule,
   fileRef,
   getEffectiveModelType,
+  getTypeName,
   isErrorType,
   isType,
+  isVoidType,
+  paramMessage,
 } from "@typespec/compiler";
+import { createMetadataInfo, resolveRequestVisibility } from "@typespec/http";
 
 import { type ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
 import { getArmResource } from "../resource.js";
@@ -18,18 +22,45 @@ export const armResourceOperationsRule = createRule({
   name: "arm-resource-operation-response",
   docs: fileRef.fromPackageRoot("src/rules/arm-resource-operation-response.md"),
   severity: "warning",
-  description: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+  description:
+    "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema, and PUT input must match the resource.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-response",
   messages: {
     default: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    missingRequest: "ARM PUT operations must have a request body.",
+    requestMismatch: paramMessage`PUT request body must use resource model ${"resource"}. Found ${"request"}.`,
   },
   create(context) {
+    const metadata = createMetadataInfo(context.program);
     return {
       model: (model: Model) => {
         if (!isInternalTypeSpec(context.program, model)) {
           const armResource = getArmResource(context.program, model);
           if (armResource) {
             const resourceOperations = resolveResourceOperations(context.program, model);
+            const createOperation = resourceOperations.lifecycle.createOrUpdate;
+            if (
+              createOperation?.httpOperation.verb === "put" &&
+              !isInternalTypeSpec(context.program, createOperation.operation)
+            ) {
+              const { httpOperation, operation } = createOperation;
+              const body = httpOperation.parameters.body;
+              if (body === undefined || isVoidType(body.type)) {
+                context.reportDiagnostic({ target: operation, messageId: "missingRequest" });
+              } else if (body.bodyKind === "single") {
+                const request = metadata.getEffectivePayloadType(
+                  body.type,
+                  resolveRequestVisibility(context.program, operation, httpOperation.verb),
+                );
+                if (request !== model) {
+                  context.reportDiagnostic({
+                    target: operation,
+                    messageId: "requestMismatch",
+                    format: { resource: getTypeName(model), request: getTypeName(request) },
+                  });
+                }
+              }
+            }
             const kinds: ArmLifecycleOperationKind[] = ["read", "createOrUpdate", "update"];
             kinds
               .map((k) => resourceOperations.lifecycle[k])
