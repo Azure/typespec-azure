@@ -7,11 +7,8 @@ import type {
 import { createRule, isTemplateInstance, paramMessage } from "@typespec/compiler";
 import type { HttpVerb } from "@typespec/http";
 import { getOperationVerb } from "@typespec/http";
-import { getSegment } from "@typespec/rest";
-import {
-  isSourceOperationResourceManagerInternal,
-  isTemplatedInterfaceOperation,
-} from "./utils.js";
+import { getResourceTypeForKeyParam, getSegment } from "@typespec/rest";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const useOperationDecoratorRule = createRule({
   name: "use-operation-decorator",
@@ -19,33 +16,58 @@ export const useOperationDecoratorRule = createRule({
   description: "Validate ARM Resource operations use the correct decorator for the HTTP verb.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-operation-decorator",
   messages: {
-    default: paramMessage`Resource ${"verb"} operation must be decorated with ${"decorator"}.`,
+    default: paramMessage`Resource ${"verb"} operation must be decorated with ${"decorator"}. Generic ARM resource operation decorators must use operationType ${"operationType"}.`,
+    providerDecorator:
+      "Provider operations must be decorated with @providerOperation or @armResourceCollectionAction.",
+    providerVerb: paramMessage`Provider ${"verb"} operation must use GET or POST.`,
     invalidOperationType: paramMessage`Resource ${"verb"} operation decorator ${"decorator"} must use operationType ${"operationType"}.`,
   },
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (
-          !isSourceOperationResourceManagerInternal(operation) &&
-          !isTemplateInstance(operation)
-        ) {
+        if (!isTemplateInstance(operation)) {
           const verb = getOperationVerb(context.program, operation);
           if (verb && isTemplatedInterfaceOperation(operation) === false) {
+            if (isArmProviderOperation(context.program, operation)) {
+              if (
+                !operation.decorators.some((d) =>
+                  providerOperationDecorators.includes(d.decorator.name),
+                )
+              ) {
+                context.reportDiagnostic({
+                  messageId: "providerDecorator",
+                  target: operation,
+                });
+              }
+              if (verb !== "get" && verb !== "post") {
+                context.reportDiagnostic({
+                  messageId: "providerVerb",
+                  target: operation,
+                  format: { verb: verb.toUpperCase() },
+                });
+              }
+              return;
+            }
+
             const requiredDecorators = resourceOperationDecorators[verb];
             if (requiredDecorators?.length > 0) {
               const decorator = operation.decorators.find(
                 (d) => requiredDecorators.indexOf(d.decorator.name) >= 0,
               );
-              if (!decorator && !isArmProviderOperation(context.program, operation)) {
+              if (!decorator) {
                 context.reportDiagnostic({
                   messageId: "default",
                   target: operation,
                   format: {
                     verb: verb.toUpperCase(),
                     decorator: requiredDecorators.map((d) => `@${d.substring(1)}`).join(" or "),
+                    operationType: operationTypesByVerb[verb].map((x) => `"${x}"`).join(" or "),
                   },
                 });
-              } else if (decorator) {
+              }
+              for (const decorator of operation.decorators.filter((d) =>
+                isGenericArmResourceDecorator(d.decorator.name),
+              )) {
                 const allowedOperationTypes = operationTypesByVerb[verb];
                 const operationType = getGenericDecoratorOperationType(decorator);
 
@@ -98,26 +120,36 @@ const operationTypeArgIndexByDecorator: Record<GenericArmResourceDecorator, numb
 
 const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
   put: ["$armResourceCreateOrUpdate", ...genericArmResourceDecorators],
-  get: ["$armResourceRead", "$armResourceList", ...genericArmResourceDecorators],
+  get: [
+    "$armResourceRead",
+    "$armResourceList",
+    "$armResourceAction",
+    ...genericArmResourceDecorators,
+  ],
   patch: ["$armResourceUpdate", ...genericArmResourceDecorators],
   delete: ["$armResourceDelete", ...genericArmResourceDecorators],
-  post: ["$armResourceAction", "$armResourceCollectionAction", ...genericArmResourceDecorators],
-  head: [],
+  post: ["$armResourceAction", ...genericArmResourceDecorators],
+  head: ["$armResourceCheckExistence", ...genericArmResourceDecorators],
 };
+
+const resourceOperationDecoratorNames = new Set(Object.values(resourceOperationDecorators).flat());
+const providerOperationDecorators = ["$providerOperation", "$armResourceCollectionAction"];
 
 // ARM operationType conventions:
 // - PUT => createOrUpdate
-// - GET => read or list
+// - GET => read, list, or action
 // - PATCH => update
 // - DELETE => delete
 // - POST => action
+// - HEAD => checkExistence
 // This map is used only for generic private decorators that encode operation type as an argument.
-const operationTypesByVerb: Partial<Record<HttpVerb, readonly string[]>> = {
+const operationTypesByVerb: Record<HttpVerb, readonly string[]> = {
   put: ["createOrUpdate"],
-  get: ["read", "list"],
+  get: ["read", "list", "action"],
   patch: ["update"],
   delete: ["delete"],
   post: ["action"],
+  head: ["checkExistence"],
 };
 
 function isGenericArmResourceDecorator(name: string): name is GenericArmResourceDecorator {
@@ -143,9 +175,25 @@ function isStaticSegment(segment: string | undefined): boolean {
 }
 
 function isArmProviderOperation(program: Program, operation: Operation): boolean {
+  if (operation.decorators.some((d) => resourceOperationDecoratorNames.has(d.decorator.name))) {
+    return false;
+  }
+
+  if (
+    [...operation.parameters.properties.values()].some(
+      (p) => getResourceTypeForKeyParam(program, p) !== undefined,
+    )
+  ) {
+    return false;
+  }
+
+  if (operation.decorators.some((d) => providerOperationDecorators.includes(d.decorator.name))) {
+    return true;
+  }
+
   let isProviderAction = false;
 
-  for (const [index, [, property]] of [...operation.parameters.properties].entries()) {
+  for (const property of operation.parameters.properties.values()) {
     const segment = getSegment(program, property);
 
     if (segment === "providers") {
@@ -153,12 +201,7 @@ function isArmProviderOperation(program: Program, operation: Operation): boolean
     } else if (isProviderAction && !isStaticSegment(segment)) {
       return false;
     }
-
-    const isLastSegment = index === operation.parameters.properties.size - 1;
-    if (isLastSegment && !segment) {
-      return true;
-    }
   }
 
-  return false;
+  return isProviderAction;
 }
