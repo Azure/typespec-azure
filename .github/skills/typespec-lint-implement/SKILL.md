@@ -76,6 +76,10 @@ discovery rather than silently choosing different semantics.
 - When renaming or changing semantics, update implementation, tests,
   registration, rulesets, docs/links, and change metadata together. Describe
   registered-but-inactive behavior accurately; availability is not activation.
+- Keep recommended/default preset enablement separate from library `all`
+  membership. Do not add a per-rule `all` exclusion solely to keep a new rule
+  disabled in a recommended preset. Follow existing package conventions and
+  preserve independently justified audience-specific exceptions.
 - Apply the [native rule documentation contract](#native-rule-documentation)
   when writing or updating user-facing rule documentation.
 
