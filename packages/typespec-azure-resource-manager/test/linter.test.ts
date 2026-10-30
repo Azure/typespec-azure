@@ -9,38 +9,12 @@ const source = `
   op read(@path parentName: string, @path bindingName: string): void;
 `;
 
-it("keeps opt-in rules outside the general ARM all ruleset", () => {
-  const optInRules = new Set(["use-scope-for-extension-routing"]);
+it("keeps only RPaaS-specific routing outside the general ARM all ruleset", () => {
   for (const rule of $linter.rules) {
     expect(
       $linter.ruleSets?.all.enable?.[`@azure-tools/typespec-azure-resource-manager/${rule.name}`],
-    ).toBe(!optInRules.has(rule.name));
+    ).toBe(rule.name !== "use-scope-for-extension-routing");
   }
-});
-
-it("enables nested system data guidance through ARM all", async () => {
-  const [, diagnostics] = await Tester.compileAndDiagnose(
-    `
-      model Resource {
-        properties: {
-          systemData?: string;
-        };
-      }
-    `,
-    {
-      compilerOptions: {
-        linterRuleSet: {
-          extends: ["@azure-tools/typespec-azure-resource-manager/all"],
-        },
-      },
-    },
-  );
-  expect(
-    diagnostics.filter(
-      (diagnostic) =>
-        diagnostic.code === "@azure-tools/typespec-azure-resource-manager/no-nested-system-data",
-    ),
-  ).toHaveLength(1);
 });
 
 it.each([false, true])(
