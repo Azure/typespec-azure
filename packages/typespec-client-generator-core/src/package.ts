@@ -1,8 +1,8 @@
 import {
   createDiagnosticCollector,
-  type Diagnostic,
   getNamespaceFullName,
   ignoreDiagnostics,
+  type Diagnostic,
 } from "@typespec/compiler";
 
 import { prepareClientAndOperationCache } from "./cache.js";

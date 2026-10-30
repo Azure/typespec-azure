@@ -619,6 +619,35 @@ extern dec override(
 extern dec useSystemTextJsonConverter(target: Model, scope?: valueof DecoratorOptions | string);
 
 /**
+ * Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+ * A dynamic model represents updates as JSON Patch operations rather than a replacement of the full model.
+ * In C# generation, a marked model exposes patch-aware properties and a `JsonPatch`-backed `Patch` API.
+ * This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
+ *
+ * @param target The model or namespace to mark as dynamic.
+ * @param scope Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning.
+ *
+ * @example Mark a model as dynamic
+ * ```typespec
+ * @dynamicModel("csharp")
+ * model Pet {
+ *   name: string;
+ * }
+ * ```
+ *
+ * @example Mark a namespace for C# dynamic-model metadata
+ * ```typespec
+ * @dynamicModel("csharp")
+ * namespace PetStore {
+ *   model Pet {
+ *     name: string;
+ *   }
+ * }
+ * ```
+ */
+extern dec dynamicModel(target: Model | Namespace, scope?: valueof DecoratorOptions | string);
+
+/**
  * InitializedBy value.
  */
 enum InitializedBy {
