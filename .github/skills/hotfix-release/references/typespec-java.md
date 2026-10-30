@@ -28,14 +28,14 @@ Optional Spector check: review `emitter-tests/spector.config.yaml` for new upstr
 cases, opt in relevant cases, regenerate, and run `pnpm test:java:e2e`.
 
 Optional SDK validation against this PR uses pipeline `8274` with
-`EmitterVersion=none`, `PRIdOrBranch=<PR number>`, and
-`UpgradeDesignatedLibraries=false`. This is separate from the published-version
-run below.
+`EmitterVersion=none` and `PRIdOrBranch=<PR number>`. This is separate from the
+published-version run below.
 
 ## 2. Publish PR
 
 After the core-sync PR merges, follow the skill's publish procedure on a new
-branch from the updated release branch. Bump only Java:
+branch from the updated release branch. From the **repository root**, bump only Java
+and generate its changelog:
 
 ```powershell
 pnpm chronus version --ignore-policies --only @azure-tools/typespec-java
