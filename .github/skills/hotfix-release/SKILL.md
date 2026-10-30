@@ -7,6 +7,9 @@ description: Publish a hotfix (patch) release for one or more packages from an e
 
 Instructions for publishing a hotfix (patch) release for one or more packages from an existing `release/*` branch.
 
+For `@azure-tools/typespec-java`, also follow the [Java hotfix runbook](../../../packages/typespec-java/HOTFIX.md).
+It covers the preceding core-sync PR and the downstream SDK sync pipeline.
+
 > ⚠️ **Prerequisites:** A `release/<sprint-name>` branch must already exist with the fix commit(s) merged into it. If it does not exist, create one from the last release tag commit first.
 
 ## REQUIRED PARAMETERS
@@ -112,7 +115,7 @@ After the hotfix PR is merged:
 1. A workflow should automatically create a backmerge branch named `backmerge/release/<sprint-name>-YYYY-MM-DD`
 2. Find the backmerge branch at https://github.com/Azure/typespec-azure/branches
 3. Open a PR from the backmerge branch targeting `main`
-4. **Rebase merge** the backmerge PR into `main`
+4. Use **Create a merge commit** through the merge queue for the backmerge PR into `main`
 
 > ⚠️ The backmerge ensures the hotfix and version bump are reflected in `main`. Do NOT skip this step.
 
