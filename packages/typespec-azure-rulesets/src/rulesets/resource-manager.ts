@@ -86,6 +86,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
+    "@azure-tools/typespec-azure-resource-manager/no-nested-system-data": false,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
     "@azure-tools/typespec-azure-resource-manager/list-response-envelope": false,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-collection": false,
