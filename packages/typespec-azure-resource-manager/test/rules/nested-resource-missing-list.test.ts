@@ -22,7 +22,7 @@ const service = `
 `;
 
 const diagnostic = (name = "Part") => ({
-  code: "@azure-tools/typespec-azure-resource-manager/nested-resource-missing-list",
+  code: "@azure-tools/typespec-azure-resource-manager/NestedResourcesMustHaveListOperation",
   message: `The nested resource "${name}" does not have list operation, please add it.`,
 });
 

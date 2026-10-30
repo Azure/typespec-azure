@@ -119,7 +119,8 @@ describe("expect all rules to be defined", () => {
   });
 
   it("keeps nested resource list guidance opt-in", () => {
-    const ruleName = "@azure-tools/typespec-azure-resource-manager/nested-resource-missing-list";
+    const ruleName =
+      "@azure-tools/typespec-azure-resource-manager/NestedResourcesMustHaveListOperation";
     strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], false);
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
