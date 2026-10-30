@@ -15,7 +15,7 @@ it("keeps opt-in guidance outside the general ARM all ruleset", () => {
       $linter.ruleSets?.all.enable?.[`@azure-tools/typespec-azure-resource-manager/${rule.name}`],
     ).toBe(
       rule.name !== "use-scope-for-extension-routing" &&
-        rule.name !== "NestedResourcesMustHaveListOperation",
+        rule.name !== "nested-resources-must-have-list-operation",
     );
   }
 });

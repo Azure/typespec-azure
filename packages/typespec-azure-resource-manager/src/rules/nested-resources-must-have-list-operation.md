@@ -59,7 +59,7 @@ The rule reports one warning per resource on its lifecycle operation interface, 
 when the lifecycle operation is not in an interface.
 
 The rule is disabled by default, including in the package's `all` ruleset. Enable
-`@azure-tools/typespec-azure-resource-manager/NestedResourcesMustHaveListOperation` explicitly to adopt it.
+`@azure-tools/typespec-azure-resource-manager/nested-resources-must-have-list-operation` explicitly to adopt it.
 
 ## ❌ Incorrect
 

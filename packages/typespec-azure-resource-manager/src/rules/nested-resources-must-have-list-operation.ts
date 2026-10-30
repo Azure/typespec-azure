@@ -16,12 +16,12 @@ import {
 } from "./nested-resources-must-have-list-operation-utils.js";
 
 export const nestedResourcesMustHaveListOperationRule = createRule({
-  name: "NestedResourcesMustHaveListOperation",
+  name: "nested-resources-must-have-list-operation",
   description:
     "Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), all the nested must have a list operation which returns the collection of the resource.",
-  docs: fileRef.fromPackageRoot("src/rules/NestedResourcesMustHaveListOperation.md"),
+  docs: fileRef.fromPackageRoot("src/rules/nested-resources-must-have-list-operation.md"),
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/NestedResourcesMustHaveListOperation",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/nested-resources-must-have-list-operation",
   messages: {
     default: paramMessage`The nested resource "${"name"}" does not have list operation, please add it.`,
   },
