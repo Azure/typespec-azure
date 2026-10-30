@@ -355,8 +355,14 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    implementation. State clearly whether the migration is functionally
    equivalent for the assessed policy, is not equivalent, or remains
    undetermined. Keep any material gap, failed required gate or scope restriction
-   visible here; never manufacture equivalence to fit the format. Omit redundant
-   no-change statements, hashes, commands and repair history.
+   visible here; never manufacture equivalence to fit the format. Keep this
+   section limited to the conclusion and policy boundaries, not work performed:
+   omit successful test/coverage/recovery milestones, review status, implementation
+   PR links, candidate/commit hashes, commands, repair history and redundant
+   no-change statements. Put that context in NOTES or linked evidence instead.
+   If a confirmed Swagger linter bug affects the conclusion, name the bug and its
+   impact concisely, and state whether the TypeSpec linter intentionally avoids
+   it. Distinguish intended-policy coverage from bug-for-bug equivalence.
 2. **Actual coverage.** Briefly state the assessed project population and
    failures/unassessed projects, if any. Explain that reported diagnostics are
    total individual findings across that population, not project counts.
@@ -380,11 +386,17 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    to its grouped appendix entry. Exclude matching projects and routine examples.
    If there are no differences, say so briefly. Keep unresolved differences
    visible; do not let opposing project gaps cancel.
+   When an upstream defect causes a difference, call it a bug, explain its
+   mechanism and false-positive/false-negative effect, and link the pinned
+   implementation. Distinguish confirmed defects from suspected causes and code
+   inspection from captured execution traces; do not imply that a newer upstream
+   version or an uncaptured execution path was tested.
 
 **NOTES** holds technical context: frozen inputs, audience/API-version and
 source/projection policies, severity/default activation, counting method,
 directional gaps, test totals and limitations, runtime, provenance and recovery
-links. An unsupported comparison, required-check failure or semantic gap still
+links, validation/publication status and implementation PR links. An unsupported
+comparison, required-check failure or semantic gap still
 belongs in the conclusion and relevant behavior/difference entry, not only NOTES.
 
 Do not add a fifth numbered section or a standalone examples/actions section.
@@ -401,7 +413,7 @@ Use this outline, replacing placeholders with verified observations:
 
 The TypeSpec rule `<TypeSpec rule ID>` migrates Swagger linter rule
 [`<Swagger rule ID>`](<verified original rule documentation or implementation URL>).
-**<Evidence-backed equivalence conclusion and assessed scope.>**
+**<Evidence-backed equivalence conclusion and assessed scope; name any material confirmed upstream bug concisely.>**
 
 ## 2. Actual coverage
 
