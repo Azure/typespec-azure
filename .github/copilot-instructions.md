@@ -53,7 +53,7 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 - Before adding a helper, cache, traversal, diagnostic or piece of state, search the package for how existing features already do it and follow that pattern. Extend existing code rather than writing a parallel implementation.
 - Keep diffs minimal: no unrelated edits, renames or refactors in files you only need to touch lightly.
 - Don't export internal helpers that are only used in one file, wrap a single call in a new helper, or pass helper functions in as parameters when the function can be imported directly.
-- Follow the format of neighbouring files (for example other diagnostic docs), and don't hard-wrap lines in Markdown docs.
+- Follow the format of neighboring files (for example other diagnostic docs), and don't hard-wrap lines in Markdown docs.
 - See [TCGC instructions](./instructions/tcgc.instructions.md) for TCGC-specific conventions.
 
 ## Available Task Instructions
