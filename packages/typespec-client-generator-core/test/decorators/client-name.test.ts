@@ -475,6 +475,9 @@ it("duplicate model property with all language scopes", async () => {
       prop1: string;
       prop2: string;
     }
+
+    model B extends A {}
+    model C extends B {}
     `,
   );
 
@@ -489,6 +492,58 @@ it("duplicate model property with all language scopes", async () => {
         'Client name: "prop2" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
+});
+
+it.each([
+  {
+    base: '@clientName("progress", "python") value: string;',
+    derived: "progress: string;",
+    message:
+      'Client name: "progress" is defined somewhere causing naming conflicts in language scope: "python"',
+  },
+  {
+    base: "progress: string;",
+    derived: '@clientName("progress", "python") value: string;',
+    message: 'Client name: "progress" is duplicated in language scope: "python"',
+  },
+])("reports inherited property client-name conflicts: $derived", async (testCase) => {
+  const diagnostics = await SimpleTester.diagnose(`
+    @service
+    namespace Contoso.WidgetManager;
+
+    model Base {
+      ${testCase.base}
+    }
+
+    model Derived extends Base {
+      ${testCase.derived}
+    }
+
+    model Leaf extends Derived {}
+  `);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: testCase.message,
+    },
+  ]);
+});
+
+it("ignores overridden base properties when validating client names", async () => {
+  await SimpleTester.compile(`
+    @service
+    namespace Contoso.WidgetManager;
+
+    model Base {
+      @clientName("progress")
+      value: string;
+    }
+
+    model Derived extends Base {
+      value: string;
+      progress: string;
+    }
+  `);
 });
 
 it("duplicate enum member with all language scopes", async () => {

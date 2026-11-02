@@ -1,5 +1,7 @@
 This diagnostic is issued when two generated SDK declarations have the same client name in the same language scope and the duplicate is an error for that scope.
 
+For model properties, this includes inherited properties unless the derived model overrides them. A collision introduced by a derived property is reported on that property, not repeatedly on its descendants.
+
 ## Impact
 
 - **Area:** SDK symbol naming. Blocks generation of two declarations with the same client name in one language scope because they would collide in the emitted API.
