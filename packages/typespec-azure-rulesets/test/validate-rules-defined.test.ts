@@ -142,6 +142,14 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps SDK GET LRO guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/no-get-lro";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
+    for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+      ok(!ruleset.enable?.[ruleName]);
+    }
+  });
+
   it("keeps ARM resource-group path guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-path-standard-name";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);

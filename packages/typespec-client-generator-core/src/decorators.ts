@@ -1,4 +1,4 @@
-import { getLroProtocolMetadata, setLroDeclaration } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -98,7 +98,6 @@ import {
   normalizeScope,
   omitOperation,
   overrideKey,
-  parseEmitterName,
   parseScopes,
   responseOverrideKey,
   scopeKey,
@@ -1975,7 +1974,7 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
 
-const markAsLroKey = createStateSymbol("markAsLro");
+export const markAsLroKey = createStateSymbol("markAsLro");
 
 export const $markAsLro: MarkAsLroDecorator = (
   context: DecoratorContext,
@@ -2008,16 +2007,14 @@ export const $markAsLro: MarkAsLroDecorator = (
     return;
   }
   setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
-  setLroDeclaration(context.program, target, (program, operation, emitterName) => {
-    const [scope] = parseEmitterName(program, emitterName);
-    return (
-      getScopedDecoratorData({ program, emitterName: scope }, markAsLroKey, operation) === true
-    );
-  });
 };
 
-export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
-  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+export function getMarkAsLro(
+  context: TCGCContext,
+  entity: Operation,
+  languageScope?: string | typeof AllScopes,
+): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity, languageScope) ?? false;
 }
 
 const markAsPageableKey = createStateSymbol("markAsPageable");

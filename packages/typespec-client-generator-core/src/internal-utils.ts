@@ -165,7 +165,7 @@ export function listScopedDecoratorData(
 }
 
 export function getScopedDecoratorData(
-  context: Pick<TCGCContext, "program" | "emitterName">,
+  context: TCGCContext,
   key: symbol,
   target: Type,
   languageScope?: string | typeof AllScopes,

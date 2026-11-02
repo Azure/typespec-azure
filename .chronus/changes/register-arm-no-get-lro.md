@@ -4,4 +4,5 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Register `@azure-tools/typespec-azure-resource-manager/no-get-lro` as disabled in the resource-manager ruleset.
+Register the ARM `no-get-lro` rule as disabled in the resource-manager ruleset
+and the TCGC `no-get-lro` rule as disabled in the client-sdk ruleset.
