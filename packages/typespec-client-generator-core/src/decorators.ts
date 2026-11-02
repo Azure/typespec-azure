@@ -1305,24 +1305,6 @@ export const $dynamicModel: DynamicModelDecorator = (
   }
 };
 
-export const $dynamicModel: DynamicModelDecorator = (
-  context: DecoratorContext,
-  target: Model | Namespace,
-  scope?: LanguageScopes | DecoratorOptions,
-) => {
-  const [, positiveScopes] = parseScopes(normalizeScope(scope));
-  if (!positiveScopes?.includes("csharp")) {
-    reportDiagnostic(context.program, {
-      code: "decorator-requires-scope",
-      format: {
-        decoratorName: "dynamicModel",
-        allowedScopes: '"csharp"',
-      },
-      target,
-    });
-  }
-};
-
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
 /**
