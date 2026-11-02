@@ -1,12 +1,12 @@
 Per [ARM guidelines](https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/resource-api-reference.md), all the nested must have a list operation which returns the collection of the resource.
 
 For example, `Widget` is a top-level resource and `Part` is a nested resource declared with
-`@parentResource(Widget)`. The required operation lists `Part` instances belonging to one `Widget`:
+`@parentResource(Widget)`. An operation can list `Part` instances belonging to one `Widget`:
 
 | Request                                         | Purpose                                  |
 | ----------------------------------------------- | ---------------------------------------- |
 | `GET .../widgets`                               | List top-level `Widget` instances.       |
-| `GET .../widgets/{widgetName}/parts`            | List nested `Part` instances: required.  |
+| `GET .../widgets/{widgetName}/parts`            | List nested `Part` instances by parent.  |
 | `GET .../widgets/{widgetName}/parts/{partName}` | Get one `Part`; does not replace a list. |
 
 Here, "parent" means the containing resource: `Widget` is the parent of `Part`.
@@ -14,17 +14,25 @@ It is not another name for "top-level resource". A nested resource can also cont
 another nested resource, such as `Gallery` > `GalleryApplication` > `GalleryApplicationVersion`.
 Listing application versions does not replace listing applications in a gallery.
 
-Add `ArmResourceListByParent<Part>` alongside the `Part` lifecycle operations to provide the
-required list.
+Add `ArmResourceListByParent<Part>` alongside the `Part` lifecycle operations, or provide
+`ArmListBySubscriptionScope<Part>` to list the same resource across the subscription.
 
 This rule applies to nested resources at resource-group, subscription, or location scope,
 including read-only and singleton resources. Top-level list requirements are separate policies.
-Listing `Widget` instances, another resource type,
-or `Part` instances across a subscription does not replace listing `Part` instances within one `Widget`.
+Listing `Widget` instances or another resource type does not satisfy the requirement for `Part`.
+A subscription-wide collection for the same resource is sufficient; a parent-specific list
+at a different scope is not.
 
 Define the list operation in the same service as the nested resource operations. It must use GET
-and return a successful 2xx response. Use `ArmResourceListByParent<Part>` rather than an action
-returning a collection.
+and return a successful 2xx response. Parent-specific action collections do not replace
+registered resource LISTs.
+
+Subscription-wide LISTs use `GET /subscriptions/{subscriptionId}/providers/{namespace}/{collection}`.
+The operation must be marked `@list` and identify the resource through REST list metadata or
+explicit `@pageItems` metadata whose array items are the resource model. This also covers
+provider-level actions such as the deleted-services LIST for `DeletedServiceContract`, whose
+individual reads are under `locations/{location}`. The provider namespace, collection and
+service must match; an unrelated collection or a LIST in another service is not sufficient.
 
 An operation that borrows a resource model to address a descendant endpoint does not introduce
 another resource-level list requirement. For example, a read of
@@ -37,14 +45,14 @@ response body's shape. Separately declared child resources remain subject to the
 
 - **Area:** API
 
-Clients cannot discover instances of the nested resource within a containing resource without this list operation.
+Clients cannot discover instances of the nested resource without a parent-specific or subscription-wide list operation.
 
 The rule is disabled by default, including in the package's `all` ruleset. Enable
 `@azure-tools/typespec-azure-resource-manager/nested-resources-must-have-list-operation` explicitly to adopt it.
 
 ## ❌ Incorrect
 
-`Part` has individual-resource operations but no operation to list `Part` instances within one `Widget`:
+`Part` has individual-resource operations but no parent-specific or subscription-wide LIST:
 
 ```typespec
 @armProviderNamespace

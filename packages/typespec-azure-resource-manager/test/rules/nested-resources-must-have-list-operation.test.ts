@@ -174,7 +174,7 @@ it("does not let a parent or unrelated list satisfy the child", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-it("does not let a subscription-wide list replace the parent collection", async () => {
+it("does not let a parent list at a different scope replace the parent collection", async () => {
   await tester
     .expect(
       `${service}
@@ -186,6 +186,158 @@ it("does not let a subscription-wide list replace the parent collection", async 
     )
     .toEmitDiagnostics(diagnostic());
 });
+
+it("accepts a subscription-wide list for a nested resource", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface Parts {
+        get is ArmResourceRead<Part>;
+        listBySubscription is ArmListBySubscriptionScope<Part>;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
+it("accepts a subscription-wide registered list with a separate item representation", async () => {
+  await tester
+    .expect(
+      `${service}
+      model PartSummary { id: string; }
+      @armResourceOperations interface Parts {
+        get is ArmResourceRead<Part>;
+        listBySubscription is ArmListBySubscriptionScope<
+          Part, Response = ArmResponse<{ @pageItems items: PartSummary[] }>
+        >;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
+const deletedService = `
+  @armProviderNamespace @service namespace Microsoft.ApiManagement;
+  @subscriptionResource
+  @parentResource(SubscriptionLocationResource)
+  model DeletedServiceContract is ProxyResource<{}> {
+    ...ResourceNameParameter<
+      DeletedServiceContract, KeyName = "serviceName", SegmentName = "deletedservices"
+    >;
+  }
+  @armResourceOperations interface DeletedServiceContracts {
+    getByName is ArmResourceRead<
+      DeletedServiceContract,
+      BaseParameters = Azure.ResourceManager.Foundations.SubscriptionBaseParameters
+    >;
+  }
+`;
+
+it("accepts the DeletedServiceContract subscription-wide provider-action list", async () => {
+  await tester
+    .expect(
+      `${deletedService}
+      model DeletedServicesCollection {
+        @pageItems value?: DeletedServiceContract[];
+        @nextLink nextLink?: string;
+      }
+      interface DeletedServicesOperationGroup {
+        @autoRoute @get @list @action("deletedservices")
+        listBySubscription is ArmProviderActionSync<
+          Response = DeletedServicesCollection, Scope = SubscriptionActionScope
+        >;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
+it.each([
+  {
+    method: "post",
+    list: "@list",
+    collection: "deletedservices",
+    item: "DeletedServiceContract",
+    status: 200,
+  },
+  {
+    method: "get",
+    list: "@list",
+    collection: "deletedservices",
+    item: "DeletedServiceContract",
+    status: 400,
+  },
+  {
+    method: "get",
+    list: "",
+    collection: "deletedservices",
+    item: "DeletedServiceContract",
+    status: 200,
+  },
+  {
+    method: "get",
+    list: "@list",
+    collection: "otherServices",
+    item: "DeletedServiceContract",
+    status: 200,
+  },
+  {
+    method: "get",
+    list: "@list",
+    collection: "deletedservices",
+    item: "OtherService",
+    status: 200,
+  },
+])(
+  "rejects an unrelated or invalid subscription-wide collection: $method $collection $item $status $list",
+  async ({ method, list, collection, item, status }) => {
+    await tester
+      .expect(
+        `${deletedService}
+        model OtherService { id: string; }
+        interface DeletedServicesOperationGroup {
+          @autoRoute @${method} ${list} @action("${collection}")
+          listBySubscription is ArmProviderActionSync<
+            Response = {
+              @statusCode statusCode: ${status};
+              @body body: { @pageItems items: ${item}[]; };
+            },
+            Scope = SubscriptionActionScope
+          >;
+        }
+      `,
+      )
+      .toEmitDiagnostics(diagnostic("DeletedServiceContract"));
+  },
+);
+
+it.each([false, true])(
+  "checks subscription-wide list coverage in each instance service (second list: %s)",
+  async (secondList) => {
+    const result = tester.expect(`
+      @armProviderNamespace("Microsoft.Contoso") @service namespace First {
+        model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+        @parentResource(Widget)
+        model Part is ProxyResource<{}> { ...ResourceNameParameter<Part>; }
+        @armResourceOperations interface Parts {
+          get is ArmResourceRead<Part>;
+          list is ArmListBySubscriptionScope<Part>;
+        }
+      }
+      @armProviderNamespace("Microsoft.Contoso") @service namespace Second {
+        @armResourceOperations interface Parts {
+          getOther is ArmResourceRead<First.Part>;
+          ${secondList ? "listOther is ArmListBySubscriptionScope<First.Part>;" : ""}
+        }
+      }
+    `);
+    if (secondList) {
+      await result.toBeValid();
+    } else {
+      await result.toEmitDiagnostics(diagnostic());
+    }
+  },
+);
 
 it("checks a child of a subscription-scoped resource", async () => {
   await tester

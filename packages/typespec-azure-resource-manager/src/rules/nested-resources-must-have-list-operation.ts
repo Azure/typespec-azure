@@ -15,6 +15,7 @@ import {
 } from "../resource.js";
 import {
   createArmServiceIndex,
+  createSubscriptionListIndex,
   getCollectionPath,
   isCollectionGet,
   normalizeRoute,
@@ -33,6 +34,7 @@ export const nestedResourcesMustHaveListOperationRule = createRule({
   create(context) {
     const reportedModels = new Set<Model>();
     const serviceByOperation = createArmServiceIndex(context.program);
+    const subscriptionLists = createSubscriptionListIndex(context.program, serviceByOperation);
 
     return {
       root(program) {
@@ -73,16 +75,15 @@ export const nestedResourcesMustHaveListOperationRule = createRule({
             (list) =>
               normalizeRoute(list.path) === collectionPath && isCollectionGet(list.httpOperation),
           );
-          const hasCollectionGetInEveryInstanceService = instanceOperations.every(
-            ({ operation }) => {
-              const service = serviceByOperation.get(operation);
-              return (
-                service !== undefined &&
-                matchingLists.some((list) => serviceByOperation.get(list.operation) === service)
-              );
-            },
-          );
-          if (hasCollectionGetInEveryInstanceService) continue;
+          const hasListInEveryInstanceService = instanceOperations.every(({ operation }) => {
+            const service = serviceByOperation.get(operation);
+            return (
+              service !== undefined &&
+              (matchingLists.some((list) => serviceByOperation.get(list.operation) === service) ||
+                subscriptionLists.get(resource.type)?.has(service) === true)
+            );
+          });
+          if (hasListInEveryInstanceService) continue;
 
           reportMissingList(resource.type, firstOperation.operation);
         }
