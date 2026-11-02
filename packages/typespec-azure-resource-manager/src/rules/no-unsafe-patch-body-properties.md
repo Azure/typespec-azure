@@ -24,8 +24,11 @@ HTTP metadata inside an explicit `@body` remains JSON input even when an HTTP
 annotation is ignored; `@bodyRoot` transport properties stay outside the document.
 Resource comparison excludes transport-only properties and retains explicit
 response-body and collection-item metadata context. Response-derived resource
-members may be readable or writable for the PATCH operation; write-only members
-are not rejected merely because they are absent from Read output.
+members are compared as a partial native resource model rather than only its
+Read output. Write-only members are not rejected merely because they are absent
+from Read output. If multiple effective resource properties have the same encoded
+JSON name, their descendant layout is ambiguous and is not compared; input
+safety checks and unrelated resource-property checks still apply.
 
 The case-insensitive, encoded top-level `identity` property and its descendants
 are exempt from optionality, default, and lifecycle-visibility checks.
@@ -52,18 +55,17 @@ asynchronous PATCH operations. Otherwise comparison uses, in order:
 3. Same-service, same-path GET 200 response body.
 4. Same-service, same-path GET 201 response body.
 
-Without service metadata, GET fallback stays within the PATCH operation's
-namespace. A GET from an unrelated namespace or service is not a comparison
-resource.
+GET fallback requires service metadata. A GET from an unrelated service is not
+a comparison resource.
 
 Exact status codes take precedence over ranges containing the same code.
 Singleton ranges are exact status codes. Content variants with different body
 types, body kinds, or explicit-body metadata are ambiguous and are not used as
 comparison resources; identical body variants may be used.
-Across equally preferred status entries or shared-route GET operations, layout
-errors must hold for every comparison candidate. A property absent from every
-candidate is still reported; declaration order does not select an arbitrary
-resource. Partial-update safety checks remain independent of these alternatives.
+The same ambiguity check applies across equally preferred status entries and
+shared-route GET operations. Ambiguous preferred bodies are not replaced with
+lower-priority responses, and declaration order does not select an arbitrary
+resource. Partial-update safety checks remain independent of resource selection.
 Without a comparison resource, only layout validation is skipped; immutable and
 partial-update safety checks still run.
 
@@ -76,9 +78,8 @@ unsupported union, only descendant layout comparison is skipped; required,
 default, visibility, and immutable checks still run. Genuinely absent properties
 and supported single-model or nullable counterparts retain layout comparison.
 Multipart transport wrappers, native File models and primitive binary bodies
-are not PATCH document-property models. Inherited native File members are also
-excluded in derived files, but authored JSON property overrides retain their
-partial-update checks.
+are not PATCH document-property models. Models derived from native File are
+also excluded as whole file payloads.
 An array-versus-scalar mismatch alone is not a type-equality diagnostic.
 
 Recursive active-context tracking terminates cycles without suppressing sibling

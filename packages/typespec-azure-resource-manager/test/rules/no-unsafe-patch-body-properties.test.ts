@@ -295,14 +295,40 @@ describe("partial resource layout", () => {
   it.each(["Read", "Update", "Query"])(
     "compares response members with %s visibility without rejecting write-only input",
     async (lifecycle) => {
-      const expectation = tester.expect(`${service}
+      await tester
+        .expect(
+          `${service}
         model Resource { details: { @visibility(Lifecycle.${lifecycle}) value?: string; }; }
         @patch op update(@body body: { details?: { value?: string } }): Resource;
-      `);
-      if (lifecycle === "Query") await expectation.toEmitDiagnostics(missing("details.value"));
-      else await expectation.toBeValid();
+      `,
+        )
+        .toBeValid();
     },
   );
+
+  it("does not select a conflicting encoded resource member by declaration order", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Base {
+          @encodedName("application/json", "wire")
+          @visibility(Lifecycle.Read) readable?: { good?: string };
+        }
+        model Resource extends Base {
+          @encodedName("application/json", "wire")
+          @visibility(Lifecycle.Query) queryOnly?: { other?: string };
+        }
+        @patch op update(@body body: {
+          wire?: { /*good*/good: string };
+          /*extra*/extra?: string;
+        }): Resource;
+      `,
+      )
+      .toEmitDiagnostics((x) => [
+        { ...required("wire.good"), pos: x.pos.good.pos },
+        { ...missing("extra"), pos: x.pos.extra.pos },
+      ]);
+  });
 
   it("accepts named PATCH keys permitted by a resource record", async () => {
     await tester
@@ -828,7 +854,7 @@ describe("native discriminators", () => {
 
 describe("resource selection", () => {
   it.each([false, true])(
-    "retains definite layout errors across shared GET routes in either order (%s)",
+    "skips ambiguous shared GET layouts but retains safety in either order (%s)",
     async (reverse) => {
       const first = '@sharedRoute @route("/widgets") @get op first(): First;';
       const second = '@sharedRoute @route("/widgets") @get op second(): Second;';
@@ -843,10 +869,7 @@ describe("resource selection", () => {
           ${reverse ? second + first : first + second}
         `,
         )
-        .toEmitDiagnostics((x) => [
-          { ...missing("extra"), pos: x.pos.extra.pos },
-          { ...defaultValue("enabled"), pos: x.pos.enabled.pos },
-        ]);
+        .toEmitDiagnostics((x) => [{ ...defaultValue("enabled"), pos: x.pos.enabled.pos }]);
     },
   );
 
@@ -876,7 +899,7 @@ describe("resource selection", () => {
   });
 
   it.each([false, true])(
-    "retains definite layout errors across equivalent exact status entries (%s)",
+    "skips ambiguous equivalent exact status entries in either order (%s)",
     async (reverse) => {
       await tester
         .expect(
@@ -892,9 +915,37 @@ describe("resource selection", () => {
             ${reverse ? "Singleton | Literal" : "Literal | Singleton"};
         `,
         )
-        .toEmitDiagnostics((x) => ({ ...missing("extra"), pos: x.pos.extra.pos }));
+        .toBeValid();
     },
   );
+
+  it("does not substitute a 201 body for ambiguous PATCH 200 bodies", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Json {
+          @header contentType: "application/json";
+          @body body: { value?: string };
+        }
+        model Xml {
+          @header contentType: "application/xml";
+          @body body: { other?: string };
+        }
+        model Created {
+          @statusCode status: 201;
+          @body body: { enabled?: boolean };
+        }
+        @patch op update(@body body: {
+          extra?: string;
+          /*enabled*/enabled?: boolean = false;
+        }): Json | Xml | Created;
+      `,
+      )
+      .toEmitDiagnostics((x) => ({
+        ...defaultValue("enabled"),
+        pos: x.pos.enabled.pos,
+      }));
+  });
 
   it.each([200, 201])("uses PATCH %s", async (status) => {
     await tester
@@ -1033,17 +1084,6 @@ describe("scope and registration", () => {
       .toBeValid();
   });
 
-  it("retains safety checks on authored JSON overrides in a derived file", async () => {
-    await tester
-      .expect(
-        `${service}
-        model CustomFile extends File<Contents = string> { contents: string = "fixed"; }
-        @patch op update(@body body: { attachment?: CustomFile }): void;
-      `,
-      )
-      .toEmitDiagnostics([required("attachment.contents"), defaultValue("attachment.contents")]);
-  });
-
   it("checks each concrete endpoint without also checking its local template instance", async () => {
     await tester
       .expect(
@@ -1070,31 +1110,6 @@ describe("scope and registration", () => {
   });
 
   describe("applicability", () => {
-    it("uses a namespaced GET without service metadata", async () => {
-      await tester
-        .expect(
-          `
-          namespace Microsoft.TestService;
-          @route("/widgets") @patch op update(@body body: { extra?: string }): AcceptedResponse;
-          @route("/widgets") @get op read(): { value: string };
-        `,
-        )
-        .toEmitDiagnostics(missing("extra"));
-    });
-
-    it("does not borrow a same-path GET from another non-service namespace", async () => {
-      await tester
-        .expect(
-          `
-          namespace First {
-            @route("/widgets") @patch op update(@body body: { value: string }): AcceptedResponse;
-          }
-          namespace Second { @route("/widgets") @get op read(): { other: string }; }
-        `,
-        )
-        .toEmitDiagnostics(required("value"));
-    });
-
     it("does not borrow a same-path GET from another service", async () => {
       await tester
         .expect(
