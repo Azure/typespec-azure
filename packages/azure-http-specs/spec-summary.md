@@ -1316,6 +1316,20 @@ Expected calls:
 - GET the status-monitor URI returns a running status with nested `usage`
 - GET the status-monitor URI returns a succeeded status with nested `usage` and the result
 
+### Azure_ClientGenerator_Core_Lro_Result_createCompatibility
+
+- Endpoint: `put /azure/client-generator-core/lro/result/compatibility/jobs/{id}`
+
+Verifies that `@clientLroResult` can preserve an existing SDK contract that returns the
+established result property of a resource LRO.
+
+### Azure_ClientGenerator_Core_Lro_Result_createDefault
+
+- Endpoint: `put /azure/client-generator-core/lro/result/default/jobs/{id}`
+
+Verifies that a resource create-or-replace LRO returns the complete resource even when its
+polling model defines an `@lroResult` property.
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`

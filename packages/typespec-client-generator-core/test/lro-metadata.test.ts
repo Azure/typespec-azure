@@ -14,6 +14,12 @@ const prefix = `
 
 it.each([
   ["resource PUT", "op start is Operations.LongRunningResourceCreateOrReplace<Widget>;"],
+  [
+    "resource PUT with polling result",
+    `op poll is Operations.GetResourceOperationStatus<Widget>;
+     @pollingOperation(poll)
+     op start is Operations.LongRunningResourceCreateOrReplace<Widget>;`,
+  ],
   ["resource DELETE", "op start is Operations.LongRunningResourceDelete<Widget>;"],
   ["resource action", "op start is Operations.LongRunningResourceAction<Widget, {}, Widget>;"],
   [

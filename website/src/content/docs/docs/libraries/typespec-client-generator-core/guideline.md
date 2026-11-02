@@ -372,7 +372,7 @@ Azure.Core remains responsible for polling links, parameter bindings, terminal s
 
 `lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
 
-Core's combined `getLroMetadata` API and TCGC both omit the extraction path when the selected final result is the complete resource. TCGC assembles `lroMetadata.__raw` and the method's `__raw_lro_metadata` from the protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than treat the raw compatibility fields as a separate client contract.
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` retain their existing shapes. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result-type defaults are preserved, but inconsistent resource PUT result/envelope/path combinations are corrected.
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
