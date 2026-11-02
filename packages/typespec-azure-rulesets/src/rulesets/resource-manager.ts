@@ -99,6 +99,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
     "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/top-level-resources-list-by-subscription": false,
     "@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis": false,
     "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable": false,
     "@azure-tools/typespec-azure-resource-manager/lro-location-header": true,

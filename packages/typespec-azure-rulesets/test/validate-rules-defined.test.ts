@@ -139,4 +139,13 @@ describe("expect all rules to be defined", () => {
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
   });
+
+  it("keeps top-level subscription list guidance opt-in", () => {
+    const ruleName =
+      "@azure-tools/typespec-azure-resource-manager/top-level-resources-list-by-subscription";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+      ok(!ruleset.enable?.[ruleName]);
+    }
+  });
 });

@@ -48,6 +48,7 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
 import { secretProprule } from "./rules/secret-prop.js";
+import { topLevelResourcesListBySubscriptionRule } from "./rules/top-level-resources-list-by-subscription.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
@@ -125,6 +126,7 @@ const rules = [
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
   useScopePathStandardNameRule,
+  topLevelResourcesListBySubscriptionRule,
 ];
 
 export const $linter = defineLinter({
@@ -134,7 +136,8 @@ export const $linter = defineLinter({
       enable: Object.fromEntries(
         rules.map((rule) => [
           `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-          rule !== useScopeForExtensionRoutingRule,
+          rule !== useScopeForExtensionRoutingRule &&
+            rule !== topLevelResourcesListBySubscriptionRule,
         ]),
       ),
     },
