@@ -682,3 +682,263 @@ export enum KnownVersions {
   V20240801Preview = "2024-08-01-preview",
 }
 ```
+
+# Should dispatch inline union variants through ordinary intermediate models
+
+```tsp
+model PetBase {
+  kind: string;
+  name: string;
+}
+
+model Mammal extends PetBase {}
+model Feline extends Mammal {}
+
+model Cat extends Feline {
+  kind: "cat";
+  meow: boolean;
+}
+
+model Dog extends Mammal {
+  kind: "dog";
+  bark: boolean;
+}
+
+@discriminated(#{ envelope: "none" })
+union Pet extends PetBase {
+  cat: Cat,
+  dog: Dog,
+}
+
+@post op echo(@body pet: Pet): Pet;
+```
+
+```ts models alias PetBaseUnion
+/** Alias for PetBaseUnion */
+export type PetBaseUnion = Cat | Dog | PetBase;
+```
+
+```ts models function petBaseUnionSerializer
+export function petBaseUnionSerializer(item: PetBaseUnion): any {
+  switch (item.kind) {
+    case "cat":
+      return catSerializer(item as Cat);
+
+    case "dog":
+      return dogSerializer(item as Dog);
+
+    default:
+      return petBaseSerializer(item);
+  }
+}
+```
+
+```ts models function petBaseUnionDeserializer
+export function petBaseUnionDeserializer(item: any): PetBaseUnion {
+  switch (item["kind"]) {
+    case "cat":
+      return catDeserializer(item as Cat);
+
+    case "dog":
+      return dogDeserializer(item as Dog);
+
+    default:
+      return petBaseDeserializer(item);
+  }
+}
+```
+
+```ts models function catSerializer
+export function catSerializer(item: Cat): any {
+  return { kind: item["kind"], name: item["name"], meow: item["meow"] };
+}
+```
+
+```ts models function catDeserializer
+export function catDeserializer(item: any): Cat {
+  return {
+    kind: item["kind"],
+    name: item["name"],
+    meow: item["meow"],
+  };
+}
+```
+
+# Should preserve nested discriminator dispatch boundaries
+
+```tsp
+@discriminator("kind")
+model PetBase {
+  kind: string;
+  name: string;
+}
+
+@discriminator("breed")
+model Dog extends PetBase {
+  kind: "dog";
+  breed: string;
+}
+
+model Golden extends Dog {
+  breed: "golden";
+  trained: boolean;
+}
+
+@post op echo(@body pet: PetBase): PetBase;
+```
+
+```ts models alias PetBaseUnion
+/** Alias for PetBaseUnion */
+export type PetBaseUnion = DogUnion | PetBase;
+```
+
+```ts models alias DogUnion
+/** Alias for DogUnion */
+export type DogUnion = Golden | Dog;
+```
+
+```ts models function petBaseUnionSerializer
+export function petBaseUnionSerializer(item: PetBaseUnion): any {
+  switch (item.kind) {
+    case "dog":
+      return dogUnionSerializer(item as DogUnion);
+
+    default:
+      return petBaseSerializer(item);
+  }
+}
+```
+
+```ts models function petBaseUnionDeserializer
+export function petBaseUnionDeserializer(item: any): PetBaseUnion {
+  switch (item["kind"]) {
+    case "dog":
+      return dogUnionDeserializer(item as DogUnion);
+
+    default:
+      return petBaseDeserializer(item);
+  }
+}
+```
+
+```ts models function dogUnionSerializer
+export function dogUnionSerializer(item: DogUnion): any {
+  switch (item.breed) {
+    case "golden":
+      return goldenSerializer(item as Golden);
+
+    default:
+      return dogSerializer(item);
+  }
+}
+```
+
+```ts models function dogUnionDeserializer
+export function dogUnionDeserializer(item: any): DogUnion {
+  switch (item["breed"]) {
+    case "golden":
+      return goldenDeserializer(item as Golden);
+
+    default:
+      return dogDeserializer(item);
+  }
+}
+```
+
+# Should collect descendant discriminator values through ordinary intermediate models
+
+```tsp
+@discriminator("kind")
+model PetBase {
+  kind: string;
+  name: string;
+}
+
+model Cat extends PetBase {
+  kind: "cat";
+  meow: boolean;
+}
+
+model Feline extends Cat {}
+
+@global.Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Feline)
+model Kitten extends PetBase {
+  kind: "kitten";
+  meow: boolean;
+  playful: boolean;
+}
+
+@post op echo(@body pet: PetBase): PetBase;
+```
+
+```yaml
+needTCGC: true
+```
+
+```ts models alias PetBaseUnion
+/** Alias for PetBaseUnion */
+export type PetBaseUnion = CatUnion | PetBase;
+```
+
+```ts models alias CatUnion
+/** Alias for CatUnion */
+export type CatUnion = Kitten | Cat;
+```
+
+```ts models interface Cat
+/** model interface Cat */
+export interface Cat extends PetBase {
+  kind: "cat" | "kitten";
+  meow: boolean;
+}
+```
+
+```ts models function petBaseUnionSerializer
+export function petBaseUnionSerializer(item: PetBaseUnion): any {
+  switch (item.kind) {
+    case "cat":
+    case "kitten":
+      return catUnionSerializer(item as CatUnion);
+
+    default:
+      return petBaseSerializer(item);
+  }
+}
+```
+
+```ts models function petBaseUnionDeserializer
+export function petBaseUnionDeserializer(item: any): PetBaseUnion {
+  switch (item["kind"]) {
+    case "cat":
+    case "kitten":
+      return catUnionDeserializer(item as CatUnion);
+
+    default:
+      return petBaseDeserializer(item);
+  }
+}
+```
+
+```ts models function catUnionSerializer
+export function catUnionSerializer(item: CatUnion): any {
+  switch (item.kind) {
+    case "kitten":
+      return kittenSerializer(item as Kitten);
+
+    default:
+      return catSerializer(item);
+  }
+}
+```
+
+```ts models function catUnionDeserializer
+export function catUnionDeserializer(item: any): CatUnion {
+  switch (item["kind"]) {
+    case "kitten":
+      return kittenDeserializer(item as Kitten);
+
+    default:
+      return catDeserializer(item);
+  }
+}
+```
