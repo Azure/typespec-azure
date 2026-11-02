@@ -31,11 +31,12 @@ options:
 The Java emitter supports these `@clientOption` values from
 `@azure-tools/typespec-client-generator-core`:
 
-| Option                   | Target                                           | Value    | Behavior                                                                                                          |
-| ------------------------ | ------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `clientRequired`         | Operation parameter or model property            | `true`   | Treats an optional TypeSpec property as required in the generated client API.                                     |
-| `responseHeadersAsModel` | Operation with response headers and no body      | `true`   | Returns the response headers as a strongly typed model from the convenience method.                               |
-| `collectionHeaderPrefix` | Dictionary-valued response header model property | `string` | Deserializes response headers with the configured prefix into the dictionary while removing the prefix from keys. |
+| Option                              | Target                                           | Value    | Behavior                                                                                                          |
+| ----------------------------------- | ------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `clientRequired`                    | Operation parameter or model property            | `true`   | Treats an optional TypeSpec property as required in the generated client API.                                     |
+| `responseHeadersAsModel`            | Operation with response headers and no body      | `true`   | Returns the response headers as a strongly typed model from the convenience method.                               |
+| `collectionHeaderPrefix`            | Dictionary-valued response header model property | `string` | Deserializes response headers with the configured prefix into the dictionary while removing the prefix from keys. |
+| `includeContinuationTokenParameter` | Request parameter with `@continuationToken`      | `true`   | Includes the continuation-token parameter in pageable convenience methods and supports starting from that cursor. |
 
 Specify `"java"` as the language scope:
 
@@ -43,4 +44,5 @@ Specify `"java"` as the language scope:
 @@clientOption(ReadOptions.filter, "clientRequired", true, "java");
 @@clientOption(ResponseHeaderOp.getResourceMetadata, "responseHeadersAsModel", true, "java");
 @@clientOption(MetadataHeaders.metadata, "collectionHeaderPrefix", "x-ms-meta-", "java");
+@@clientOption(PageAfterQueryParameter.after, "includeContinuationTokenParameter", true, "java");
 ```

@@ -810,6 +810,7 @@ it("endpoint template argument with default value of enum member", async () => {
     op myOp(): void;
 
     enum ClientType {
+      @encodedName("application/json", "wire-default")
       Default: "default",
       MultiClient: "multi-client",
       RenamedOperation: "renamed-operation",
