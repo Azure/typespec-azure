@@ -158,6 +158,24 @@ Concrete ARM resource identities are seeded only by registered read or createOrU
 
 Identity paths are matched case-insensitively for literal segments and by position for variable segments. A createOrUpdate operation can establish a resource without a read operation; list-only and action-only operation sets cannot.
 
+## Public ARM Resource Resolution
+
+- `resolveArmResources(program)` returns a provider-wide declaration view. A resource model can produce multiple `ResolvedResource` occurrences when it is used at different scopes, parents, or extension targets.
+- Use `{ version: "..." }` for a single service version or `{ serviceVersions: [{ namespace, version }] }` to combine independently versioned ARM service namespaces. The options are mutually exclusive, and an invalid selection returns an empty provider result with a diagnostic.
+- Version-selected results use projected TypeSpec models, operations, properties, and HTTP metadata. Resolution caches keep the default view and each projected view isolated.
+- `nameResolver` customizes logical resource, operation, and operation-group names without changing ARM identity, HTTP paths, serialized names, parent/scope relationships, or singleton keys. Return `undefined` to retain the default.
+- Use `resourceType` and `resourceInstancePath` as stable ARM identity fields. `resourceName` is consumer-facing logical metadata and can be customized.
+
+## Migrated Swagger Linter Coverage
+
+- `list-response-envelope` covers both ARM-provider collection GETs and authored paged `@list` operations, including POST list actions. The response envelope must contain exactly array-valued `value` and `nextLink`; inherited properties count.
+- `scope-path-segment-casing` requires exact complete path segments `subscriptions` and `resourceGroups`.
+- `resource-missing-read` requires a registered read operation for any resource with a create or update lifecycle operation. A list operation does not satisfy it.
+- `use-resource-path-for-put` requires PUT paths to end in resource type/name pairs after the provider namespace. Standard ARM templates generate valid paths.
+- `use-standard-response-codes` permits only `200`, `201`, `202`, `204`, and default generally. GET operations inside services must include `200` and may additionally use only `202` or default.
+- `use-scope-for-extension-routing` is an opt-in RPaaS policy that rejects paths with multiple case-sensitive `/providers/` segments. It is not a restriction on ordinary ARM extension-resource routes.
+- `no-tags-on-proxy-resource` rejects JSON envelope property `tags` on every non-tracked resource, including extension resources. A `tags` field inside the resource properties bag is not an ARM envelope tag.
+
 ## ARM Request and Response Rules
 
 - `no-query-in-collection` allows only `api-version` and case-sensitive `$filter` on collection GET operations.
