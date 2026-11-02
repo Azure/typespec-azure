@@ -407,7 +407,7 @@ Values come from the most recent status-monitor response the SDK has received, i
 
 TCGC describes the selected properties, not runtime response values. Language emitters must implement this lifecycle and their public accessor shape; Spector HTTP scenarios alone do not demonstrate generated poller access or removal of SDK customizations. An emitter that already exposes a typed status-monitor response may satisfy this contract through its existing operation or poller API, provided it reflects the latest received response and remains accessible after failure or cancellation.
 
-Separate `@lroStatusMetadata` declarations on one property may use disjoint emitter scopes. Overlapping scopes, including an unscoped declaration combined with any other declaration, are diagnosed once at declaration time.
+Separate `@lroStatusMetadata` declarations on one property use the standard TCGC scope rules, including overlapping scopes. Each selected property appears only once in the metadata collection. Projected client-name conflicts are handled by the existing `duplicate-client-name` validation, not a separate LRO metadata diagnostic.
 
 Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
 

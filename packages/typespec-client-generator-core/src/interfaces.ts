@@ -76,6 +76,10 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
+  __lroStatusMetadataCache: Map<
+    Operation,
+    { responseModel: SdkModelType; properties: SdkLroStatusMetadata[] }
+  >;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;

@@ -317,6 +317,33 @@ op start(): Foundations.AcceptedResponse & {
     ]);
   });
 
+  it("retains selected output graphs when convenience generation is disabled", async () => {
+    const { program } = await Tester.compile(
+      operation
+        .replace("op getJobStatus", '@scope("!java")\nop getJobStatus')
+        .replace("op start is", '@convenientAPI(false, "java")\nop start is'),
+    );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    expect(context.diagnostics).toHaveLength(0);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    expect(method.lroMetadata.statusMetadata?.map((x) => x.property.name)).toEqual([
+      "percentComplete",
+      "details",
+      "requestToken",
+    ]);
+    const details = context.sdkPackage.models.find((x) => x.name === "Details");
+    const detailMode = context.sdkPackage.enums.find((x) => x.name === "DetailMode");
+    ok(details);
+    ok(detailMode);
+    expect(details.usage & UsageFlags.Output).toBe(UsageFlags.Output);
+    expect(detailMode.usage & UsageFlags.Output).toBe(UsageFlags.Output);
+    expect(context.sdkPackage.models.map((x) => x.name)).not.toContain("Sibling");
+  });
+
   it("excludes scoped-out polling properties and their type graphs", async () => {
     const { program } = await Tester.compile(
       operation.replace(
@@ -432,12 +459,15 @@ model JobState extends PollingMetadataBase {`,
       (x) => x.property.name === "rebasedDetails",
     );
     ok(metadata);
+    expect(
+      metadata.property ===
+        method.lroMetadata.pollingInfo.responseModel.baseModel?.properties.find(
+          (x) => x.name === "rebasedDetails",
+        ),
+    ).toBe(true);
     strictEqual(metadata.property.type, rebasedDetails);
     strictEqual(metadata.property.serializationOptions.json?.name, "rebased_details");
     expect(rebasedDetails.usage & UsageFlags.Output).toBe(UsageFlags.Output);
-    expect(context.diagnostics.map((x) => x.code)).not.toContain(
-      "@azure-tools/typespec-client-generator-core/lro-status-metadata-name-conflict",
-    );
   });
 
   it("promotes a selected graph lifted from a removed base", async () => {
@@ -555,21 +585,14 @@ op start(): {
     expect(csharpDetails.usage & UsageFlags.Input).toBe(0);
   });
 
-  it("reports duplicates, conflicts, and explicit internal exposure", async () => {
+  it("uses standard client-name and access diagnostics", async () => {
     const invalidCases = [
       {
         code: operation.replace(
-          "@lroStatusMetadata\n  request_token",
-          "@lroStatusMetadata\n  @lroStatusMetadata\n  request_token",
-        ),
-        diagnostic: "lro-status-metadata-duplicate",
-      },
-      {
-        code: operation.replace(
           "percentComplete?: int32;",
-          '@clientName("requestToken")\n  percentComplete?: int32;',
+          '@clientName("details")\n  percentComplete?: int32;',
         ),
-        diagnostic: "lro-status-metadata-name-conflict",
+        diagnostic: "duplicate-client-name",
       },
       {
         code: operation.replace("model Details {", "@access(Access.internal)\nmodel Details {"),
@@ -610,9 +633,13 @@ op start(): {
     for (const code of invalidCases) {
       const { program } = await Tester.compile(code);
       const context = await createSdkContextForTester(program);
-      expect(context.diagnostics.map((x) => x.code)).toContain(
-        "@azure-tools/typespec-client-generator-core/lro-status-metadata-structural-property",
-      );
+      expect(
+        context.diagnostics.filter(
+          (x) =>
+            x.code ===
+            "@azure-tools/typespec-client-generator-core/lro-status-metadata-structural-property",
+        ),
+      ).toHaveLength(1);
     }
   });
 
@@ -721,12 +748,9 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
       "percentComplete",
       "details",
     ]);
-    expect(context.diagnostics.map((x) => x.code)).not.toContain(
-      "@azure-tools/typespec-client-generator-core/lro-status-metadata-name-conflict",
-    );
   });
 
-  it("reports duplicate scoped property decorators when declared", async () => {
+  it("selects repeated scoped property decorators only once", async () => {
     const [{ program }, compileDiagnostics] = await Tester.compileAndDiagnose(
       operation.replace(
         "@lroStatusMetadata\n  request_token",
@@ -739,103 +763,98 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
     const csharpContext = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-csharp",
     });
-    expect(compileDiagnostics.map((x) => x.code)).toContain(
-      "@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate",
-    );
-    expect(
-      [...pythonContext.diagnostics, ...csharpContext.diagnostics].map((x) => x.code),
-    ).not.toContain("@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate");
+    expect(compileDiagnostics).toHaveLength(0);
+    for (const context of [pythonContext, csharpContext]) {
+      expect(context.diagnostics).toHaveLength(0);
+      const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+      ok(method);
+      strictEqual(method.kind, "lro");
+      expect(method.lroMetadata.statusMetadata?.map((x) => x.property.name)).toEqual([
+        "percentComplete",
+        "details",
+        "requestToken",
+      ]);
+    }
   });
 
   it.each([
-    { left: "python", right: "javascript", duplicate: false, selected: ["python", "javascript"] },
-    { left: "javascript", right: "python", duplicate: false, selected: ["python", "javascript"] },
+    { left: "python", right: "javascript", selected: ["python", "javascript"] },
+    { left: "javascript", right: "python", selected: ["python", "javascript"] },
     {
       left: undefined,
       right: "python",
-      duplicate: true,
       selected: ["python", "javascript", "java", "csharp"],
     },
-    { left: "python", right: undefined, duplicate: true, selected: ["python"] },
-    { left: "!python", right: "java", duplicate: true, selected: ["javascript", "java", "csharp"] },
-    { left: "java", right: "!python", duplicate: true, selected: ["java"] },
+    {
+      left: "python",
+      right: undefined,
+      selected: ["python", "javascript", "java", "csharp"],
+    },
+    { left: "!python", right: "java", selected: ["javascript", "java", "csharp"] },
+    { left: "java", right: "!python", selected: ["javascript", "java", "csharp"] },
     {
       left: "!python",
       right: "python",
-      duplicate: false,
       selected: ["python", "javascript", "java", "csharp"],
     },
     {
       left: "python",
       right: "!python",
-      duplicate: false,
       selected: ["python", "javascript", "java", "csharp"],
     },
-    { left: "python", right: "python", duplicate: true, selected: ["python"] },
+    { left: "python", right: "python", selected: ["python"] },
     {
       left: "python, javascript",
       right: "javascript, java",
-      duplicate: true,
-      selected: ["python", "javascript"],
+      selected: ["python", "javascript", "java"],
     },
     {
       left: "python, javascript",
       right: "java, csharp",
-      duplicate: false,
       selected: ["python", "javascript", "java", "csharp"],
     },
     {
       left: "!(python, javascript)",
       right: "python,javascript",
-      duplicate: false,
       selected: ["python", "javascript", "java", "csharp"],
     },
     {
       left: "!python",
       right: "!java",
-      duplicate: true,
-      selected: ["javascript", "java", "csharp"],
+      selected: ["python", "javascript", "csharp"],
     },
     {
       left: "!python,python",
       right: "python",
-      duplicate: true,
       selected: ["python", "javascript", "java", "csharp"],
     },
-  ])(
-    "checks declaration overlap for $left + $right",
-    async ({ left, right, duplicate, selected }) => {
-      const augment = (scope: string | undefined) =>
-        `@@lroStatusMetadata(PollingMetadataBase.request_token${scope === undefined ? "" : `, ${JSON.stringify(scope)}`});`;
-      const [{ program }, compileDiagnostics] = await Tester.compileAndDiagnose(
-        operation.replace("@lroStatusMetadata\n  request_token", "request_token") +
-          augment(left) +
-          augment(right),
-      );
-      expect(compileDiagnostics.map((x) => x.code)).toEqual(
-        duplicate
-          ? ["@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate"]
-          : [],
-      );
-      for (const emitter of ["python", "javascript", "java", "csharp"]) {
-        const context = await createSdkContextForTester(program, {
-          emitterName: `@azure-tools/typespec-${emitter}`,
-        });
-        expect(context.diagnostics).toHaveLength(0);
-        const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
-        ok(method);
-        strictEqual(method.kind, "lro");
-        const properties = method.lroMetadata.statusMetadata?.map((x) => x.property.name);
-        expect(properties).toEqual([
-          "percentComplete",
-          "details",
-          ...(selected.includes(emitter) ? ["requestToken"] : []),
-        ]);
-      }
-    },
-  );
+  ])("uses standard scope precedence for $left + $right", async ({ left, right, selected }) => {
+    const augment = (scope: string | undefined) =>
+      `@@lroStatusMetadata(PollingMetadataBase.request_token${scope === undefined ? "" : `, ${JSON.stringify(scope)}`});`;
+    const [{ program }, compileDiagnostics] = await Tester.compileAndDiagnose(
+      operation.replace("@lroStatusMetadata\n  request_token", "request_token") +
+        augment(left) +
+        augment(right),
+    );
+    expect(compileDiagnostics).toHaveLength(0);
+    for (const emitter of ["python", "javascript", "java", "csharp"]) {
+      const context = await createSdkContextForTester(program, {
+        emitterName: `@azure-tools/typespec-${emitter}`,
+      });
+      expect(context.diagnostics).toHaveLength(0);
+      const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+      ok(method);
+      strictEqual(method.kind, "lro");
+      const properties = method.lroMetadata.statusMetadata?.map((x) => x.property.name);
+      expect(properties).toEqual([
+        "percentComplete",
+        "details",
+        ...(selected.includes(emitter) ? ["requestToken"] : []),
+      ]);
+    }
+  });
 
-  it("checks later augments against every accepted declaration, including options bags", async () => {
+  it("merges scoped augments with options bags and overlapping declarations", async () => {
     const [{ program }, diagnostics] = await Tester.compileAndDiagnose(
       operation.replace("@lroStatusMetadata\n  request_token", "request_token") +
         `
@@ -845,9 +864,7 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
 @@lroStatusMetadata(PollingMetadataBase.request_token, "java");
 `,
     );
-    expect(diagnostics.map((x) => x.code)).toEqual([
-      "@azure-tools/typespec-client-generator-core/lro-status-metadata-duplicate",
-    ]);
+    expect(diagnostics).toHaveLength(0);
     for (const emitter of ["python", "javascript", "java"]) {
       const context = await createSdkContextForTester(program, {
         emitterName: `@azure-tools/typespec-${emitter}`,

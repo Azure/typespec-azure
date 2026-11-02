@@ -3,17 +3,12 @@ import {
   createDiagnosticCollector,
   type Diagnostic,
   type ModelProperty,
-  type Operation,
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import { getLroStatusMetadataDecorator } from "./decorators.js";
-import type { TCGCContext } from "./interfaces.js";
+import type { SdkLroStatusMetadata, TCGCContext } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
-import type { SdkPropertyVisibilityPredicate } from "./types.js";
-
-export interface ResolvedLroStatusMetadata {
-  properties: ModelProperty[];
-}
+import { getSdkModelPropertyType, isVisibleSdkProperty } from "./types.js";
 
 type StatusMonitorLinkStep<TLink> =
   | { kind: "nextOperationLink"; target: TLink }
@@ -27,48 +22,15 @@ function getStatusMonitorLink<TLink>(
     : statusMonitorStep?.target.link;
 }
 
-const resolutionCache = new WeakMap<
-  TCGCContext,
-  Map<Operation, ResolvedLroStatusMetadata | undefined>
->();
-
 export function resolveLroStatusMetadata(
   context: TCGCContext,
-  operation: Operation,
-  raw: LroMetadata | undefined,
-  isPropertyVisible: SdkPropertyVisibilityPredicate,
-): [ResolvedLroStatusMetadata | undefined, readonly Diagnostic[]] {
-  let contextCache = resolutionCache.get(context);
-  if (!contextCache) {
-    contextCache = new Map();
-    resolutionCache.set(context, contextCache);
-  }
-  const cached = contextCache.get(operation);
-  if (contextCache.has(operation)) {
-    return [cached, []];
-  }
-
-  const [value, diagnostics] = resolve(context, operation, raw, isPropertyVisible);
-  contextCache.set(operation, value);
-  return [value, diagnostics];
-}
-
-function resolve(
-  context: TCGCContext,
-  operation: Operation,
-  raw: LroMetadata | undefined,
-  isPropertyVisible: SdkPropertyVisibilityPredicate,
-): [ResolvedLroStatusMetadata | undefined, readonly Diagnostic[]] {
+  raw: LroMetadata,
+): [SdkLroStatusMetadata[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-
-  if (!raw) {
-    return diagnostics.wrap(undefined);
-  }
-
-  const properties: ModelProperty[] = [];
+  const properties: SdkLroStatusMetadata[] = [];
 
   for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
-    if (!isPropertyVisible(context, property)) continue;
+    if (!isVisibleSdkProperty(context, property)) continue;
     const metadataDecorator = getLroStatusMetadataDecorator(context, property);
     if (!metadataDecorator) continue;
 
@@ -84,13 +46,10 @@ function resolve(
       continue;
     }
 
-    properties.push(property);
+    properties.push({ property: diagnostics.pipe(getSdkModelPropertyType(context, property)) });
   }
 
-  if (properties.length === 0 && diagnostics.diagnostics.length === 0) {
-    return diagnostics.wrap(undefined);
-  }
-  return diagnostics.wrap({ properties });
+  return diagnostics.wrap(properties);
 }
 
 function getStructuralRole(
