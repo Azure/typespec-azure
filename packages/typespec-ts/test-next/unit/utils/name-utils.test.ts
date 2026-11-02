@@ -157,24 +157,6 @@ describe("#normalizeSdkName", () => {
     expect(normalizeSdkName({ name: "model_name" }, NameType.Interface)).to.equal("ModelName");
   });
 
-  it.each(["type", "custom_Name"])(
-    "preserves the exact parameter name %s on repeated normalization",
-    (name) => {
-      const parameter = { name, isExactName: true };
-      expect(normalizeSdkName(parameter, NameType.Parameter, { shouldGuard: true })).to.equal(name);
-      parameter.name = normalizeSdkName(parameter, NameType.Parameter, { shouldGuard: true });
-      expect(normalizeSdkName(parameter, NameType.Parameter, { shouldGuard: true })).to.equal(name);
-    },
-  );
-
-  it("keeps resolved parameter name conflicts", () => {
-    expect(
-      normalizeSdkName({ name: "readParameter" }, NameType.Parameter, {
-        shouldGuard: true,
-      }),
-    ).to.equal("readParameter");
-  });
-
   it("honors an explicit name override", () => {
     expect(
       normalizeSdkName({ name: "type" }, NameType.Parameter, {

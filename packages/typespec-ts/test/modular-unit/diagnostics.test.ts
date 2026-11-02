@@ -254,4 +254,38 @@ describe("Diagnostic reporting tests", () => {
     expect(warnings).toHaveLength(5);
     expect(warnings.every((diagnostic) => diagnostic.severity === "warning")).toBe(true);
   });
+
+  it("preserves exact parameter names on repeated method hierarchy visits", async () => {
+    const [{ getClientHierarchyMap }, { getMethodHierarchiesMap }] = await Promise.all([
+      import("../../src/utils/client-utils.js"),
+      import("../../src/utils/operation-util.js"),
+    ]);
+    const { program } = await compileTypeSpecFor(`
+      #suppress "experimental-feature" "exact name test"
+      @route("/test")
+      @get
+      op read(
+        #suppress "experimental-feature" "exact name test"
+        @clientName(exact("read"))
+        @query param: string,
+      ): void;
+    `);
+    const context = await createDpgContextTestHelper(program);
+    const [, client] = getClientHierarchyMap(context)[0]!;
+
+    const firstResult = getMethodHierarchiesMap(context, client);
+    const firstOperation = [...firstResult.values()]
+      .flat()
+      .find((operation) => operation.name === "read");
+    expect(firstOperation).toBeDefined();
+    expect(firstOperation!.parameters[0]!.isExactName).toBe(true);
+    expect(firstOperation!.parameters[0]!.name).toBe("read");
+
+    const secondResult = getMethodHierarchiesMap(context, client);
+    const secondOperation = [...secondResult.values()]
+      .flat()
+      .find((operation) => operation.name === "read");
+    expect(secondOperation).toBe(firstOperation);
+    expect(secondOperation!.parameters[0]!.name).toBe("read");
+  });
 });
