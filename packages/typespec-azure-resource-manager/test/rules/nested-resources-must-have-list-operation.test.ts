@@ -50,6 +50,92 @@ it("accepts a child with the standard parent list", async () => {
     .toBeValid();
 });
 
+const dscNodeService = `
+  @armProviderNamespace @service namespace Microsoft.Automation;
+  model AutomationAccount is TrackedResource<{}> {
+    ...ResourceNameParameter<AutomationAccount>;
+  }
+  @parentResource(AutomationAccount)
+  model DscNode is ProxyResource<{}> {
+    ...ResourceNameParameter<DscNode, KeyName = "nodeId", SegmentName = "nodes">;
+  }
+  model DscNodeReport { id: string; }
+`;
+
+const nodeReportOperations = `
+  nodeReportsGet is ArmResourceRead<
+    DscNode,
+    Response = ArmResponse<DscNodeReport>,
+    Parameters = { @path @segment("reports") reportId: string; }
+  >;
+  @list @get @action("reports")
+  listByNode is ArmResourceActionSync<
+    DscNode, void, ArmResponse<{ @pageItems value: DscNodeReport[]; }>
+  >;
+`;
+
+it.each([false, true])(
+  "does not require a resource LIST for plain DscNode reports (node read: %s)",
+  async (nodeRead) => {
+    await tester
+      .expect(
+        `${dscNodeService}
+        @armResourceOperations interface DscNodes {
+          ${nodeRead ? "get is ArmResourceRead<DscNode>;" : ""}
+          listByAutomationAccount is ArmResourceListByParent<DscNode>;
+          ${nodeReportOperations}
+        }
+      `,
+      )
+      .toBeValid();
+  },
+);
+
+it("still requires the actual DscNode LIST when plain report operations exist", async () => {
+  await tester
+    .expect(
+      `${dscNodeService}
+      @armResourceOperations interface DscNodes {
+        get is ArmResourceRead<DscNode>;
+        ${nodeReportOperations}
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic("DscNode"));
+});
+
+it("still checks a registered report resource nested beneath DscNode", async () => {
+  await tester
+    .expect(
+      `${dscNodeService}
+      @parentResource(DscNode)
+      model Report is ProxyResource<{}> {
+        ...ResourceNameParameter<Report, SegmentName = "reports">;
+      }
+      @armResourceOperations interface DscNodes {
+        get is ArmResourceRead<DscNode>;
+        listByAutomationAccount is ArmResourceListByParent<DscNode>;
+      }
+      @armResourceOperations interface Reports {
+        get is ArmResourceRead<Report>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic("Report"));
+});
+
+it("does not bypass an actual resource read with a plain response representation", async () => {
+  await tester
+    .expect(
+      `${dscNodeService}
+      @armResourceOperations interface DscNodes {
+        get is ArmResourceRead<DscNode, Response = ArmResponse<DscNodeReport>>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic("DscNode"));
+});
+
 it.each(["resource-group", "subscription"])(
   "does not report nested-resource diagnostics for a top-level %s resource without lists",
   async (scope) => {
@@ -389,6 +475,19 @@ it("checks legacy operations associated through REST resource metadata", async (
     .expect(
       `${service}
       ${legacyOperations}
+      @armResourceOperations interface Parts {
+        get is LegacyParts.Read<Part>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic());
+});
+
+it("still checks a legacy alias whose collection differs from the declared model segment", async () => {
+  await tester
+    .expect(
+      `${service}
+      ${legacyOperations.replace('@segment("parts")', '@segment("partAliases")')}
       @armResourceOperations interface Parts {
         get is LegacyParts.Read<Part>;
       }

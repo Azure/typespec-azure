@@ -26,6 +26,13 @@ Define the list operation in the same service as the nested resource operations.
 and return a successful 2xx response. Use `ArmResourceListByParent<Part>` rather than an action
 returning a collection.
 
+An operation that borrows a resource model to address a descendant endpoint does not introduce
+another resource-level list requirement. For example, a read of
+`.../nodes/{nodeId}/reports/{reportId}` authored with `ArmResourceRead<DscNode>` does not make
+the report a `DscNode` resource. The actual `DscNode` collection still requires its own list.
+This distinction uses the registered resource collection and resolved resource types, not the
+response body's shape. Separately declared child resources remain subject to the rule.
+
 ## Impact
 
 - **Area:** API

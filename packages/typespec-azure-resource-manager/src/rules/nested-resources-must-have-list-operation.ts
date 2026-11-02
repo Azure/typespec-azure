@@ -7,7 +7,12 @@ import {
   type Program,
 } from "@typespec/compiler";
 import { getActionDetails, getParentResource } from "@typespec/rest";
-import { getResourceBaseType, resolveArmResources, ResourceBaseType } from "../resource.js";
+import {
+  getArmResource,
+  getResourceBaseType,
+  resolveArmResources,
+  ResourceBaseType,
+} from "../resource.js";
 import {
   createArmServiceIndex,
   getCollectionPath,
@@ -34,6 +39,20 @@ export const nestedResourcesMustHaveListOperationRule = createRule({
         const { resources = [] } = resolveArmResources(program);
         for (const resource of resources) {
           if (resource.parent === undefined || !isApplicableResource(program, resource.type)) {
+            continue;
+          }
+
+          // A lifecycle template can borrow an ancestor model for a non-resource endpoint.
+          const collectionName = getArmResource(
+            program,
+            resource.type,
+          )?.collectionName?.toLowerCase();
+          const resourceTypes = resource.resourceType.types.map((type) => type.toLowerCase());
+          if (
+            collectionName !== undefined &&
+            resourceTypes.at(-1) !== collectionName &&
+            resourceTypes.includes(collectionName)
+          ) {
             continue;
           }
 
