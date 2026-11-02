@@ -615,18 +615,22 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
     ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
-    // find the property inside the envelope result using the final result path
+    // A direct result property can be inherited, so also search the envelope's base models.
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
     if (envelopeResult.kind === "model") {
       const resultPath = rawMetadata.finalResultPath;
-      for (const property of envelopeResult.properties) {
-        if (property.__raw === undefined || property.kind !== "property") {
-          continue;
+      let current: SdkModelType | undefined = envelopeResult;
+      while (current && !sdkProperty) {
+        for (const property of current.properties) {
+          if (property.__raw === undefined || property.kind !== "property") {
+            continue;
+          }
+          if (property.__raw?.name === resultPath) {
+            sdkProperty = property;
+            break;
+          }
         }
-        if (property.__raw?.name === resultPath) {
-          sdkProperty = property;
-          break;
-        }
+        current = current.baseModel;
       }
     }
 

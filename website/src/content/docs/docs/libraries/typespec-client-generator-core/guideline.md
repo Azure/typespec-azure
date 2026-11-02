@@ -376,7 +376,7 @@ The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
-### Customizing LRO Results
+#### Customizing LRO Results
 
 TCGC applies `@clientLroResult` when calculating the SDK-facing result without changing polling, parameter binding, or required final requests. A model selection must be a polling, final-operation, final-location, or applicable resource response body already identified by the LRO protocol. A property selection must be the direct established status-monitor result property; unrelated and nested selections report `invalid-client-lro-result`. The decorator supports the existing language scopes and overrides.
 
@@ -384,7 +384,7 @@ TCGC derives the default result from the discovered protocol. When the result is
 
 `finalResponse.result` is the selected SDK type, `envelopeResult` is the response body containing it, and `resultSegments` identifies the selected direct property when one exists. The raw result paths likewise contain a name only for a direct property selection. Emitters must process `finalStep` independently because a required final request can return a different body from the selected result envelope.
 
-### LRO status metadata
+#### LRO status metadata
 
 The TCGC-only `@lroStatusMetadata` decorator lets an SDK expose auxiliary status-monitor metadata without changing Azure.Core polling protocol semantics or the normal method response:
 

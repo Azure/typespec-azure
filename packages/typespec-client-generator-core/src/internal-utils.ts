@@ -1326,7 +1326,7 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
  *
  * @param context - The TypeSpec client generator context
  * @param operation - The TypeSpec operation to check for LRO metadata
- * @returns The resolved LRO metadata for the operation, if available
+ * @returns The LRO metadata for the operation if available, otherwise undefined
  */
 export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,

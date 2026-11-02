@@ -2341,6 +2341,15 @@ function updateTypesFromOperation(
         "FinalEnvelopeResult",
       );
 
+      // A required final operation can return a different body from the selected client result.
+      if (lroMetaData.finalStep?.kind === "finalOperationReference") {
+        updateUsageOrAccessForLroComponent(
+          lroMetaData.finalStep.responseModel,
+          UsageFlags.LroFinalEnvelope,
+          "FinalEnvelopeResult",
+        );
+      }
+
       // the polling model will have LroPolling.
       updateUsageOrAccessForLroComponent(
         lroMetaData.pollingInfo.responseModel,

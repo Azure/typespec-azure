@@ -198,7 +198,7 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("rejects a monitor selection that would bypass the required final GET", async () => {
+  it("rejects selecting a separate status-monitor body for a resource PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${resourceService}
       @@clientLroResult(start, Status);
@@ -284,6 +284,36 @@ describe("@clientLroResult", () => {
     strictEqual(method.lroMetadata.__raw.finalResultPath, "result");
   });
 
+  it("selects an inherited protocol result property for a resource PUT", async () => {
+    const { program } = await AzureCoreTester.compile(`
+      @service namespace TestService;
+      model Payload { value: string; }
+      model ResultProperties { @lroResult result: Payload; }
+      @resource("jobs") model Job extends ResultProperties {
+        @key id: string;
+        @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+      }
+      @get @route("/jobs/{id}") op read(@path id: string): Job;
+      @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
+      @pollingOperation(poll)
+      @createsOrReplacesResource(Job)
+      @put @route("/jobs/{id}") op start(@path id: string): Job;
+      @@clientLroResult(start, Job.result);
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnosticEmpty(context.diagnostics);
+    const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.response.type?.kind, "model");
+    strictEqual(method.response.type.name, "Payload");
+    strictEqual(method.lroMetadata.__raw.finalResultPath, "result");
+    deepStrictEqual(
+      method.response.resultSegments?.map((property) => property.name),
+      ["result"],
+    );
+  });
+
   it("selects a status-monitor result property for a custom PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
@@ -359,6 +389,49 @@ describe("@clientLroResult", () => {
       strictEqual(method.response.resultSegments, undefined);
     },
   );
+
+  it("preserves a required final-operation response model outside the client scope", async () => {
+    const { program } = await AzureCoreTester.compile(`
+      @service namespace TestService;
+      model Artifact { value: string; }
+      model Payload { value: string; }
+      model Status {
+        @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+        @lroResult result: Payload;
+      }
+      @scope("java")
+      @get @route("/artifacts/{id}") op read(@path id: string): Artifact;
+      @get @route("/operations/{operationId}") op poll(@path operationId: string): Status;
+      @finalOperation(read, { id: RequestParameter<"id"> })
+      @pollingOperation(poll, { operationId: ResponseProperty<"operationId"> })
+      @post @route("/artifacts/{id}:start") op start(@path id: string): {
+        @statusCode statusCode: 202;
+        @header operationId: string;
+      };
+      @@clientLroResult(start, Status.result);
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    expectDiagnosticEmpty(context.diagnostics);
+    const methods = context.sdkPackage.clients[0].methods;
+    strictEqual(
+      methods.some((method) => method.name === "read"),
+      false,
+    );
+    const method = methods.find((method) => method.name === "start");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.response.type?.kind, "model");
+    strictEqual(method.response.type.name, "Payload");
+    const finalStep = method.lroMetadata.finalStep;
+    strictEqual(finalStep?.kind, "finalOperationReference");
+    const finalBody = finalStep.target.operation.responses[0].type;
+    ok(finalBody?.kind === "model");
+    strictEqual(finalBody.name, "Artifact");
+    ok(context.sdkPackage.models.includes(finalBody));
+    ok(finalBody.usage & UsageFlags.LroFinalEnvelope);
+  });
 
   it("selects a declared final-location response", async () => {
     const { program } = await AzureCoreTester.compile(`
