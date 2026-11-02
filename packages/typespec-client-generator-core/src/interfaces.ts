@@ -517,7 +517,10 @@ export interface SdkEnumValueType<
   name: string;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
+  /** Original enum member value, or its TypeSpec name when no value is specified. */
   value: string | number;
+  /** Protocol-specific encoded names. Unset protocols use `value`. */
+  serializationOptions?: SerializationOptions;
   enumType: SdkEnumType;
   valueType: TValueType;
   /** Unique ID for the current type. */
@@ -1214,6 +1217,22 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * Auxiliary status-monitor properties marked with `@lroStatusMetadata`, in deterministic
+   * direct-then-inherited model/property order. Emitters expose values from the latest received
+   * status-monitor response (including initial, failed, and canceled responses) on the poller or
+   * operation. Values may be absent until received and are refreshed after each poll, not persisted
+   * in continuation tokens; the next poll repopulates them after rehydration.
+   */
+  statusMetadata?: SdkLroStatusMetadata[];
+}
+
+export interface SdkLroStatusMetadata {
+  /**
+   * Exact effective property from `pollingInfo.responseModel`. The value is auxiliary operation
+   * state, not the LRO status, error, logical result, or a polling/final location.
+   */
+  property: SdkModelPropertyType;
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {

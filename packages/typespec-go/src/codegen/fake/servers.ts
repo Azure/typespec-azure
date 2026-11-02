@@ -287,7 +287,7 @@ function generateServerTransportDo(
   content += `${indent.get()}rawMethod := req.Context().Value(runtime.CtxAPINameKey{})\n`;
   content += `${indent.get()}method, ok := rawMethod.(string)\n`;
   content += `${indent.get()}if !ok {\n`;
-  content += `${indent.push().get()}return nil, nonRetriableError{errors.New("unable to dispatch request, missing value for CtxAPINameKey")}\n`;
+  content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("unable to dispatch request, missing value for CtxAPINameKey")}\n`;
   content += `${indent.pop().get()}}\n\n`;
 
   if (finalSubClients.length > 0 && finalMethods.length > 0) {

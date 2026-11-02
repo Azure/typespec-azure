@@ -2,28 +2,10 @@ GET operations read a resource or report the status of existing work. Do not
 explicitly declare a GET long-running. A GET can return an accepted response,
 polling headers or an operation status without being declared an LRO.
 
-This opt-in rule reports once per concrete GET in an HTTP service when it has an
-effective explicit long-running operation (LRO) declaration for AutoRest:
-
-- An accepted `Azure.ClientGenerator.Core.Legacy.markAsLro` declaration whose
-  scope includes `@azure-tools/typespec-autorest`.
-- A semantic `x-ms-long-running-operation` extension set to exactly `true`.
-- A truthy `x-ms-long-running-operation-options` extension.
-
-An explicit flag value overrides a compatibility declaration. Options remain
-independently forbidden. Protocol and polling metadata alone never cause a
-warning. Standard read and polling templates remain valid. Non-service helpers,
-non-GET operations and uninstantiated templates are not checked. If no service is
-declared, the HTTP library's global service fallback applies.
-
-The ARM library `all` ruleset and the Azure resource-manager ruleset leave this
-rule disabled. Enable it explicitly:
-
-```yaml
-linter:
-  enable:
-    "@azure-tools/typespec-azure-resource-manager/no-get-lro": true
-```
+This rule reports once per concrete GET in an HTTP service when it has an
+effective explicit long-running operation (LRO) declaration. Standard read and
+polling templates remain valid. Non-service helpers, non-GET operations and
+uninstantiated templates are not checked.
 
 ## Impact
 
@@ -117,9 +99,12 @@ operations whose `x-ms-long-running-operation` is exactly `true` or whose
 can produce separate diagnostics; `false` and absent LRO flags are valid.
 
 The native rule reports one operation even when both extension branches apply.
-It reads semantic declarations, not emitted Swagger. AutoRest already omits
-ordinary Core-derived LRO flag/options on GET; that prevention does not cover
-accepted SDK compatibility declarations or explicit extensions.
+It reads semantic declarations, not emitted Swagger. Compatibility declarations
+from `Azure.ClientGenerator.Core.Legacy.markAsLro` are evaluated for
+`@azure-tools/typespec-autorest`; declarations scoped only to other emitters do
+not trigger this rule. An explicit LRO flag overrides a compatibility declaration;
+only exact `true` violates. Truthy options independently violate. Protocol and
+polling metadata alone never cause a warning.
 
 The ARM audience also enables Core's broader `no-legacy-usage` and
 `no-openapi-client-extensions` policies. Those warn on Legacy and raw-extension
