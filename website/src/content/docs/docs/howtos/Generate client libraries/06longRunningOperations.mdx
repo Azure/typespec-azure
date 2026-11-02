@@ -272,6 +272,16 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 
 </ClientTabs>
 
+## Exposing status-monitor metadata
+
+Use [`@lroStatusMetadata`](../../libraries/typespec-client-generator-core/reference/decorators.md#@Azure.ClientGenerator.Core.lroStatusMetadata) on an auxiliary property of a native Azure.Core LRO status-monitor model when generated SDKs should expose that value while polling. Typical values include progress, usage, job statistics, timestamps, and item-level diagnostics.
+
+The generated poller or operation object exposes the latest value received from the status monitor, including values returned in the initial response and values available after a failed or canceled terminal response. A value can be absent until a response containing it arrives. Status metadata is refreshed after each poll and is not persisted in continuation tokens.
+
+Apply the decorator only to auxiliary properties. The LRO status, logical result, structural error, polling location, and final location already control the LRO protocol and cannot also be status metadata. The decorator can be scoped to emitters, and multiple declarations on one property are allowed only when their scopes do not overlap.
+
+This decorator describes metadata for language emitters; it does not change polling, terminal-state evaluation, error handling, or final-result extraction. It applies only to native Azure.Core LROs, not operations treated as long-running solely through the legacy `@markAsLro` decorator.
+
 ## Legacy LRO Decorators
 
 :::caution

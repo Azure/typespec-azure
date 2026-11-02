@@ -242,6 +242,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Union Types:**
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- `SdkUnionType.variants` maps each declared variant key to its SDK type in TypeSpec source order. Named variants retain their original, untransformed string names; unnamed and default variants use unique symbol keys. Explicit `null` variants are excluded because nullability is represented by an `SdkNullableType` wrapper. Distinct keys can map to the same SDK type, which is important for tagged unions. `variantTypes` remains the ordered array of the same map values for compatibility. TCGC-created unions use unique symbol keys for every synthesized alternative. In `tcgc-output.yaml`, variants are serialized as an ordered array of `{ name?, type }` objects so symbol-keyed alternatives are not lost.
 - When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
 
 #### Inline-discriminated union conversion
@@ -298,6 +299,12 @@ Do not combine `@discriminated` unions with `@discriminator` on their variant mo
 Example types help model the examples that TypeSpec authors define to help users understand how to use the API. TCGC currently only supports examples based on HTTP payload, so the examples are available in `SdkHttpOperation.examples`.
 
 [`SdkHttpOperationExample`](../reference/js-api/interfaces/sdkhttpoperationexample/) represents an example. [`SdkHttpParameterExampleValue`](../reference/js-api/interfaces/sdkhttpparameterexamplevalue/), [`SdkHttpResponseExampleValue`](../reference/js-api/interfaces/sdkhttpresponseexamplevalue/), and [`SdkHttpResponseHeaderExampleValue`](../reference/js-api/interfaces/sdkhttpresponseheaderexamplevalue/) represent HTTP parameter, response body, and response header examples. Each type contains the example value and its corresponding definition type.
+
+When `examples-dir` is unset, TCGC first discovers unified examples from `examples.yaml` and `examples/*.yaml`. For a package containing multiple services, it discovers those files below each service's project folder and resolves each service against its selected API version. If a service has no unified files, TCGC falls back to its legacy JSON examples. Setting `examples-dir` explicitly disables unified discovery and preserves the legacy JSON-only contract.
+
+Unified files are validated before resolution, including YAML structure, placement, version lineage, `$namespace`, and `{api-version}` usage. Invalid unified input produces `example-loading` diagnostics and skips that service's examples instead of falling back to legacy JSON. Operation keys are matched case-insensitively against both customized and original operation IDs in the language-independent `autorest` scope. This keeps examples attached across emitter-specific `@clientName` and `@clientLocation` customizations.
+
+`SdkHttpOperationExample.name` is unique within its operation. When unified examples normalize to the same title, TCGC preserves every lineage by adding `_2`, `_3`, and so on. `filePath` is relative to the project root and identifies the source JSON or YAML file; when a unified example has an explicit `id`, the path is suffixed with `#<id>`. Emitters should treat this suffix as an example identifier, not as part of the physical filename.
 
 [`SdkExampleValue`](../reference/js-api/type-aliases/sdkexamplevalue/) represents an example value of different types. All related types are used to represent the example value of a definition type. One definition type may have different example value types.
 
@@ -358,7 +365,7 @@ Parameters used in client (either API version parameter or client parameter defi
 The method's return type is determined by the underlying operation's normal responses:
 
 - If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
-- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. Either replacement disables pageable-method classification and reports `override-response-replacement`. For any other override operation, TCGC ignores its declared return type, preserves the response calculated from the original operation, and does not perform response compatibility validation.
+- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. The replacement bytes type has `encode: "bytes"`, indicating raw response bytes rather than the normal base64 encoding of a TypeSpec `bytes` payload. Either replacement disables pageable-method classification and reports `override-response-replacement`. For any other override operation, TCGC ignores its declared return type, preserves the response calculated from the original operation, and does not perform response compatibility validation.
 - If the responses contain multiple return types, the return type is a union of all the types.
 - If the responses contain empty return type, the return type is wrapped with a nullable type.
 

@@ -381,3 +381,45 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - The value is `undefined` when there is no associated service or no service authentication. Multi-service clients use the first service, matching existing endpoint and credential metadata behavior.
 - `tcgc-output.yaml` preserves authentication option/scheme grouping but strips each `HttpAuth.model` compiler reference. An operation-level `@useAuth` does not replace the client-level service authentication metadata.
 - This is emitter-consumed type-graph metadata with no new generated SDK or wire behavior. Document it in `guideline.md`; do not add a Spector carrier scenario.
+
+## Unified YAML examples (November 2026)
+
+- When `examples-dir` is unset, TCGC discovers `examples.yaml` and `examples/*.yaml`, validates them with `@azure-tools/typespec-azure-examples`, and resolves version lineages per service. Multi-service packages discover examples below each service folder.
+- Services without unified files fall back independently to legacy JSON examples. An explicit `examples-dir` disables unified discovery. Invalid unified input skips that service without falling back.
+- Unified operation keys match case-insensitively against customized and original operation IDs in the `autorest` scope. Explicit example IDs are appended to `SdkHttpOperationExample.filePath` as `path#id`.
+- This is example-loading and emitter metadata behavior. Unit tests are the correct coverage; do not add a Spector carrier scenario.
+
+## Ordered union variants (November 2026)
+
+- `SdkUnionType.variants` is an ordered `Map<string | symbol, SdkType>`. Named keys retain their TypeSpec spelling; unnamed/default and synthesized variants use unique symbols. Explicit null is omitted and represented by `SdkNullableType`.
+- `variantTypes` remains the ordered list of the map values. Different keys may intentionally reference the same SDK type.
+- `tcgc-output.yaml` serializes variants as `{ name?, type }[]` so symbol-keyed entries and duplicate SDK types are preserved.
+- This is emitter-consumed type-graph metadata with no distinct wire behavior; no Spector scenario is needed.
+
+## Inline discriminated union conversion (November 2026)
+
+- By default, eligible `@discriminated(#{ envelope: "none" })` unions with an explicit model constraint are projected to the existing base `SdkModelType`. Every named variant must nominally inherit from the base, and the union cannot have a default or contain the base itself.
+- TCGC synthesizes or reuses discriminator properties and populates the base subtype map. Compatible unions sharing a base combine their subtype mappings.
+- Existing `@discriminator` metadata, duplicate payload mappings, encoded discriminator names, and conflicting tags produce conversion diagnostics. Emitters needing native union behavior can set `convertDiscriminatedUnionsToModels: false`.
+- The feature changes client type shape but reuses ordinary polymorphic wire behavior. Keep detailed assertions in unit tests rather than adding a duplicate Spector carrier.
+
+## LRO status metadata (November 2026)
+
+- `@lroStatusMetadata` selects auxiliary direct or inherited status-monitor properties for `SdkLroServiceMetadata.statusMetadata`. It preserves the exact cached SDK properties in direct-then-inherited order.
+- Selected values represent the latest received response, including initial, failed, and canceled responses. They are refreshed after polling and are not stored in continuation tokens.
+- Structural status, result, error, polling-location, and final-location properties are rejected. Disjoint scopes can coexist; overlapping declarations are diagnosed once.
+- The existing `azure/client-generator-core/lro/metadata` Spector scenarios provide shared runtime coverage. Language emitters still need tests for their poller/operation accessor shape.
+
+## Dynamic models (November 2026)
+
+- `@dynamicModel` targets a model or namespace and requires a scope that explicitly includes `csharp`. TCGC records generic decorator metadata; it does not itself synthesize JSON Patch fields.
+- This is emitter-specific metadata pending adoption. Do not add a carrier-only Spector scenario without distinct shared wire behavior.
+
+## Raw-byte response replacement (November 2026)
+
+- `replaceResponseWithBytes` gives the client method an `SdkBuiltInType` with `kind: "bytes"` and `encode: "bytes"` so emitters treat the response as raw bytes, not a base64 payload.
+- The underlying HTTP response type, content type, and other metadata remain unchanged. The existing response-replacement Spector scenario covers this wire-preserving behavior.
+
+## Feedback lesson (PR #5772)
+
+- Applying legacy `@markAsLro` to an operation that already has native Azure.Core LRO metadata reports `mark-as-lro-ineffective` as an **error**, not a warning. Keep both the how-to wording and knowledge severity accurate.
