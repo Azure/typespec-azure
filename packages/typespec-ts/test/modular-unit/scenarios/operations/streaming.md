@@ -52,6 +52,7 @@ export async function _receiveDeserialize(result: StreamResponse): Promise<Async
   return readJsonlStream(result.body, (e) => infoDeserializer(e));
 }
 
+/** Performs the receive operation. */
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
@@ -274,6 +275,7 @@ export async function _receiveDeserialize(
   return readSseStream(events, descriptors);
 }
 
+/** Performs the receive operation. */
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
@@ -399,6 +401,7 @@ export async function _receiveDeserialize(
   return readSseStream(events, descriptors);
 }
 
+/** Performs the receive operation. */
 export async function receive(
   context: Client,
   id: string,
@@ -531,6 +534,7 @@ export async function _receiveDeserialize(
   return readSseStream(events, descriptors);
 }
 
+/** Performs the receive operation. */
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
@@ -665,6 +669,7 @@ export async function _receiveDeserialize(
   return readSseStream(events, descriptors);
 }
 
+/** Performs the receive operation. */
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },

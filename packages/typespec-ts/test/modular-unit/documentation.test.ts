@@ -14,6 +14,81 @@ import { clearCompileCache, createDpgContextTestHelper, rlcEmitterFor } from "..
 describe("Generated documentation", () => {
   afterAll(clearCompileCache);
 
+  for (const description of [undefined, "Reads the stored item."]) {
+    it(`documents operation functions, methods, and groups with ${description ? "explicit" : "fallback"} docs`, async () => {
+      const clients = await emitModularClientFromTypeSpec(`
+        ${description ? `@doc("${description}")` : ""}
+        @get op read(): string;
+        @route("/items") interface Items {
+          ${description ? `@doc("${description}")` : ""}
+          @get read(): string;
+        }
+      `);
+      const client = clients[0]!.getClasses()[0]!;
+      const files = clients[0]!.getProject().getSourceFiles();
+      const declarations = [
+        client.getMethodOrThrow("read"),
+        ...files.flatMap((file) => file.getFunctions()).filter((fn) => fn.getName() === "read"),
+        files
+          .flatMap((file) => file.getInterfaces())
+          .find((iface) => iface.getName() === "ItemsOperations")!
+          .getPropertyOrThrow("read"),
+      ];
+      assert.lengthOf(declarations, 4);
+      for (const declaration of declarations) {
+        assert.include(
+          declaration.getJsDocs()[0]!.getText(),
+          description ?? "Performs the read operation.",
+        );
+      }
+
+      const project = clients[0]!.getProject();
+      project.compilerOptions.set({ declaration: true, emitDeclarationOnly: true });
+      const declarationOutput = clients[0]!
+        .getEmitOutput()
+        .getOutputFiles()
+        .find((file) => file.getFilePath().endsWith(".d.ts"))!;
+      assert.include(declarationOutput.getText(), description ?? "Performs the read operation.");
+    });
+  }
+
+  it("documents child client getters without replacing explicit docs", async () => {
+    for (const description of [undefined, "Manages stored items."]) {
+      const clients = await emitModularClientFromTypeSpec(
+        `
+        ${description ? `@doc("${description}")` : ""}
+        @clientInitialization({ initializedBy: InitializedBy.parent })
+        interface Items { @get read(): void; }
+      `,
+        { needTCGC: true },
+      );
+      const getter = clients[0]!
+        .getClasses()[0]!
+        .getMethods()
+        .find((method) => method.getName().startsWith("get"))!;
+      assert.include(
+        getter.getJsDocs()[0]!.getText(),
+        description ?? `Gets a ${getter.getReturnTypeNodeOrThrow().getText()} client.`,
+      );
+    }
+  });
+
+  for (const type of ["string", "bytes"]) {
+    it(`documents the generated ${type} response wrapper`, async () => {
+      const models = await emitModularModelsFromTypeSpec(`@get op read(): ${type};`, {
+        "wrap-non-model-return": true,
+      });
+      const response = models!.getTypeAliasOrThrow("ReadResponse");
+      assert.include(response.getJsDocs()[0]!.getText(), "The response for the read operation.");
+      if (type === "string") {
+        assert.include(response.getFullText(), "The response body.");
+      } else {
+        assert.include(response.getFullText(), "BROWSER ONLY");
+        assert.include(response.getFullText(), "NODEJS ONLY");
+      }
+    });
+  }
+
   for (const type of [
     "decimal",
     "decimal128",

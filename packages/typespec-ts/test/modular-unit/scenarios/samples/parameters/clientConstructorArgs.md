@@ -87,6 +87,7 @@ export class MachineLearningServicesClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the createOrUpdate operation. */
   createOrUpdate(
     name: string,
     version: string,

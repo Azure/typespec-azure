@@ -191,6 +191,7 @@ export async function _backupDeserialize(result: PathUncheckedResponse): Promise
   return backupResultDeserializer(result.body);
 }
 
+/** Performs the backup operation. */
 export function backup(
   context: Client,
   resourceGroupName: string,

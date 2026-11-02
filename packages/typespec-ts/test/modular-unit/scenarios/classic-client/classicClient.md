@@ -56,6 +56,7 @@ export class TestServiceClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the foo operation. */
   foo(options: FooOptionalParams = { requestOptions: {} }): Promise<void> {
     return foo(this._client, options);
   }

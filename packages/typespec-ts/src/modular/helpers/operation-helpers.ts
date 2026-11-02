@@ -3573,12 +3573,16 @@ export function buildNonModelResponseTypeDeclaration(
   }`;
   } else {
     const returnType = getTypeExpression(context, operation.response.type!);
-    typeBody = `{ body: ${returnType} }`;
+    typeBody = `{
+      /** The response body. */
+      body: ${returnType};
+    }`;
   }
 
   return {
     kind: StructureKind.TypeAlias,
     name: typeName,
+    docs: [`The response for the ${operation.name} operation.`],
     type: typeBody,
     isExported: true,
     leadingTrivia: "\n",

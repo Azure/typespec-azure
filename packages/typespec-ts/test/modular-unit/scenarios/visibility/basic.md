@@ -315,6 +315,7 @@ export async function _createMetadataWidgetDeserialize(
   return metadataWidgetDeserializer(result.body);
 }
 
+/** Performs the createMetadataWidget operation. */
 export async function createMetadataWidget(
   context: Client,
   body: MetadataWidgetCreate,
@@ -348,6 +349,7 @@ export async function _createWriteOnlyWidgetDeserialize(
   return writeOnlyWidgetDeserializer(result.body);
 }
 
+/** Performs the createWriteOnlyWidget operation. */
 export async function createWriteOnlyWidget(
   context: Client,
   body: WriteOnlyWidgetCreate,
@@ -379,6 +381,7 @@ export async function _createGadgetDeserialize(result: PathUncheckedResponse): P
   return gadgetDeserializer(result.body);
 }
 
+/** Performs the createGadget operation. */
 export async function createGadget(
   context: Client,
   body: Gadget,
@@ -414,6 +417,7 @@ export async function _deleteWidgetDeserialize(result: PathUncheckedResponse): P
   return;
 }
 
+/** Performs the deleteWidget operation. */
 export async function deleteWidget(
   context: Client,
   widgetName: string,
@@ -453,6 +457,7 @@ export async function _getWidgetDeserialize(result: PathUncheckedResponse): Prom
   return widgetDeserializer(result.body);
 }
 
+/** Performs the getWidget operation. */
 export async function getWidget(
   context: Client,
   widgetName: string,
@@ -500,6 +505,8 @@ export async function _updateWidgetDeserialize(result: PathUncheckedResponse): P
 }
 
 /**
+ * Performs the updateWidget operation.
+ *
  * **Important:** If you set conditional headers (e.g., `If-Unmodified-Since`, `If-Match`),
  * the service may return:
  * - `412 Precondition Failed` if the resource changed since the specified condition.
@@ -553,6 +560,7 @@ export async function _createOrUpdateWidgetDeserialize(
   return widgetDeserializer(result.body);
 }
 
+/** Performs the createOrUpdateWidget operation. */
 export async function createOrUpdateWidget(
   context: Client,
   widgetName: string,
@@ -585,6 +593,7 @@ export async function _createWidgetDeserialize(result: PathUncheckedResponse): P
   return widgetDeserializer(result.body);
 }
 
+/** Performs the createWidget operation. */
 export async function createWidget(
   context: Client,
   body: WidgetCreate,
@@ -645,6 +654,7 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the createMetadataWidget operation. */
   createMetadataWidget(
     body: MetadataWidgetCreate,
     options: CreateMetadataWidgetOptionalParams = { requestOptions: {} },
@@ -652,6 +662,7 @@ export class TestingClient {
     return createMetadataWidget(this._client, body, options);
   }
 
+  /** Performs the createWriteOnlyWidget operation. */
   createWriteOnlyWidget(
     body: WriteOnlyWidgetCreate,
     options: CreateWriteOnlyWidgetOptionalParams = { requestOptions: {} },
@@ -659,6 +670,7 @@ export class TestingClient {
     return createWriteOnlyWidget(this._client, body, options);
   }
 
+  /** Performs the createGadget operation. */
   createGadget(
     body: Gadget,
     options: CreateGadgetOptionalParams = { requestOptions: {} },
@@ -666,6 +678,7 @@ export class TestingClient {
     return createGadget(this._client, body, options);
   }
 
+  /** Performs the deleteWidget operation. */
   deleteWidget(
     widgetName: string,
     options: DeleteWidgetOptionalParams = { requestOptions: {} },
@@ -673,6 +686,7 @@ export class TestingClient {
     return deleteWidget(this._client, widgetName, options);
   }
 
+  /** Performs the getWidget operation. */
   getWidget(
     widgetName: string,
     options: GetWidgetOptionalParams = { requestOptions: {} },
@@ -681,6 +695,8 @@ export class TestingClient {
   }
 
   /**
+   * Performs the updateWidget operation.
+   *
    * **Important:** If you set conditional headers (e.g., `If-Unmodified-Since`, `If-Match`),
    * the service may return:
    * - `412 Precondition Failed` if the resource changed since the specified condition.
@@ -697,6 +713,7 @@ export class TestingClient {
     return updateWidget(this._client, widgetName, body, options);
   }
 
+  /** Performs the createOrUpdateWidget operation. */
   createOrUpdateWidget(
     widgetName: string,
     body: WidgetCreateOrUpdate,
@@ -705,6 +722,7 @@ export class TestingClient {
     return createOrUpdateWidget(this._client, widgetName, body, options);
   }
 
+  /** Performs the createWidget operation. */
   createWidget(
     body: WidgetCreate,
     options: CreateWidgetOptionalParams = { requestOptions: {} },
@@ -884,6 +902,7 @@ export async function _replaceParentDeserialize(result: PathUncheckedResponse): 
   return parentDeserializer(result.body);
 }
 
+/** Performs the replaceParent operation. */
 export async function replaceParent(
   context: Client,
   parentName: string,
@@ -916,6 +935,7 @@ export async function _createParentDeserialize(result: PathUncheckedResponse): P
   return parentDeserializer(result.body);
 }
 
+/** Performs the createParent operation. */
 export async function createParent(
   context: Client,
   body: ParentCreate,
@@ -948,6 +968,7 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the replaceParent operation. */
   replaceParent(
     parentName: string,
     body: ParentCreateOrUpdate,
@@ -956,6 +977,7 @@ export class TestingClient {
     return replaceParent(this._client, parentName, body, options);
   }
 
+  /** Performs the createParent operation. */
   createParent(
     body: ParentCreate,
     options: CreateParentOptionalParams = { requestOptions: {} },
@@ -1098,6 +1120,7 @@ export async function _createOtherDeserialize(
   return widgetCreateDeserializer(result.body);
 }
 
+/** Performs the createOther operation. */
 export async function createOther(
   context: Client,
   body: WidgetCreate,
@@ -1129,6 +1152,7 @@ export async function _createWidgetDeserialize(result: PathUncheckedResponse): P
   return widgetDeserializer(result.body);
 }
 
+/** Performs the createWidget operation. */
 export async function createWidget(
   context: Client,
   body: WidgetCreate_1,
@@ -1161,6 +1185,7 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the createOther operation. */
   createOther(
     body: WidgetCreate,
     options: CreateOtherOptionalParams = { requestOptions: {} },
@@ -1168,6 +1193,7 @@ export class TestingClient {
     return createOther(this._client, body, options);
   }
 
+  /** Performs the createWidget operation. */
   createWidget(
     body: WidgetCreate_1,
     options: CreateWidgetOptionalParams = { requestOptions: {} },

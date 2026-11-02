@@ -54,6 +54,8 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: string,
@@ -70,6 +72,7 @@ export async function uploadFile(
 ```ts models
 import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
+/** The response for the uploadFile operation. */
 export type UploadFileResponse = {
   /**
    * BROWSER ONLY
@@ -146,6 +149,8 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -162,6 +167,7 @@ export async function uploadFile(
 ```ts models
 import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
+/** The response for the uploadFile operation. */
 export type UploadFileResponse = {
   /**
    * BROWSER ONLY
@@ -239,6 +245,8 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -255,6 +263,7 @@ export async function uploadFile(
 ```ts models
 import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
+/** The response for the uploadFile operation. */
 export type UploadFileResponse = {
   /**
    * BROWSER ONLY
@@ -332,6 +341,8 @@ export async function _uploadFileDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -348,6 +359,7 @@ export async function uploadFile(
 ```ts models
 import { NodeReadableStream } from "@azure/core-rest-pipeline";
 
+/** The response for the uploadFile operation. */
 export type UploadFileResponse = {
   /**
    * BROWSER ONLY
@@ -423,6 +435,8 @@ export async function _uploadFileDeserialize(
     body: typeof result.body === "string" ? stringToUint8Array(result.body, "base64") : result.body,
   };
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -436,7 +450,11 @@ export async function uploadFile(
 ## Models
 
 ```ts models
-export type UploadFileResponse = { body: Uint8Array };
+/** The response for the uploadFile operation. */
+export type UploadFileResponse = {
+  /** The response body. */
+  body: Uint8Array;
+};
 ```
 
 # bytes request body with @encode("bytes") and application/json content type should be treated as binary
@@ -488,6 +506,8 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -548,6 +568,8 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,
@@ -602,6 +624,8 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
+
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: Uint8Array,

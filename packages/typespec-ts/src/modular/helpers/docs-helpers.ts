@@ -51,7 +51,9 @@ export function getInputDocs(type: SdkType, description?: string): string[] {
 }
 
 export function getOperationDocs(operation: ServiceOperation, parameterNames: string[]): string[] {
-  const docs = getDocsFromDescription(operation.doc);
+  const docs = getDocsFromDescription(
+    operation.doc?.trim() || `Performs the ${operation.name} operation.`,
+  );
   if (
     operation.operation.parameters.some(
       (parameter) =>

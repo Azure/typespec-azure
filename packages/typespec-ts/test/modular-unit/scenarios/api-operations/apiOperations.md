@@ -43,6 +43,7 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
   return;
 }
 
+/** Performs the uploadFileViaBody operation. */
 export async function uploadFileViaBody(
   context: Client,
   body: Uint8Array,
@@ -102,6 +103,7 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
   return;
 }
 
+/** Performs the uploadFileViaBody operation. */
 export async function uploadFileViaBody(
   context: Client,
   body: Uint8Array,
@@ -187,6 +189,7 @@ export async function _uploadFileDeserialize(result: PathUncheckedResponse): Pro
   return;
 }
 
+/** Performs the uploadFile operation. */
 export async function uploadFile(
   context: Client,
   body: {
@@ -281,6 +284,7 @@ export async function _uploadFilesDeserialize(result: PathUncheckedResponse): Pr
   return;
 }
 
+/** Performs the uploadFiles operation. */
 export async function uploadFiles(
   context: Client,
   body: {
@@ -340,6 +344,7 @@ export async function _downloadFileDeserialize(result: PathUncheckedResponse): P
   return result.body;
 }
 
+/** Performs the downloadFile operation. */
 export async function downloadFile(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
@@ -398,6 +403,7 @@ export async function _downloadFileDeserialize(result: PathUncheckedResponse): P
   return result.body;
 }
 
+/** Performs the downloadFile operation. */
 export async function downloadFile(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
@@ -457,6 +463,7 @@ export async function _uploadFileViaBodyDeserialize(result: PathUncheckedRespons
   return;
 }
 
+/** Performs the uploadFileViaBody operation. */
 export async function uploadFileViaBody(
   context: Client,
   contentType: string,
@@ -522,6 +529,7 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
   return result.body;
 }
 
+/** Performs the test operation. */
 export async function test(
   context: Client,
   apiVersion: string,
@@ -589,6 +597,7 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the test operation. */
   test(apiVersion: string, options: TestOptionalParams = { requestOptions: {} }): Promise<string> {
     return test(this._client, apiVersion, options);
   }
@@ -658,6 +667,7 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
   return result.body;
 }
 
+/** Performs the test operation. */
 export async function test(
   context: Client,
   apiVersion: string,
@@ -725,6 +735,7 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the test operation. */
   test(apiVersion: string, options: TestOptionalParams = { requestOptions: {} }): Promise<string> {
     return test(this._client, apiVersion, options);
   }
@@ -778,6 +789,7 @@ export async function _test1Deserialize(result: PathUncheckedResponse): Promise<
   return result.body;
 }
 
+/** Performs the test1 operation. */
 export async function test1(
   context: Client,
   options: Test1OptionalParams = { requestOptions: {} },
@@ -815,6 +827,7 @@ export async function _testDeserialize(result: PathUncheckedResponse): Promise<s
   return result.body;
 }
 
+/** Performs the test operation. */
 export async function test(
   context: Client,
   apiVersion: string,
@@ -882,10 +895,12 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the test1 operation. */
   test1(options: Test1OptionalParams = { requestOptions: {} }): Promise<string> {
     return test1(this._client, options);
   }
 
+  /** Performs the test operation. */
   test(apiVersion: string, options: TestOptionalParams = { requestOptions: {} }): Promise<string> {
     return test(this._client, apiVersion, options);
   }

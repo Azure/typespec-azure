@@ -115,6 +115,8 @@ export async function _fooDeserialize(result: PathUncheckedResponse): Promise<Li
 
   return listTestResultDeserializer(result.body);
 }
+
+/** Performs the foo operation. */
 export async function foo(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
@@ -141,6 +143,8 @@ export async function _barDeserialize(result: PathUncheckedResponse): Promise<Li
 
   return listTestResultDeserializer(result.body);
 }
+
+/** Performs the bar operation. */
 export async function bar(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },

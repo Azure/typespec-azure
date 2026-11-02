@@ -75,6 +75,7 @@ export class ServiceAClient {
     this.operations = _getOperationsOperations(this._client);
   }
 
+  /** Performs the rootA operation. */
   rootA(options: RootAOptionalParams = { requestOptions: {} }): Promise<void> {
     return rootA(this._client, options);
   }
@@ -107,6 +108,7 @@ export class ServiceBClient {
     this.operations = _getOperationsOperations(this._client);
   }
 
+  /** Performs the rootB operation. */
   rootB(options: RootBOptionalParams = { requestOptions: {} }): Promise<void> {
     return rootB(this._client, options);
   }

@@ -27,6 +27,7 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the continue operation. */
   /**
    *  @fixme continue is a reserved word that cannot be used as an operation name.
    *         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript")

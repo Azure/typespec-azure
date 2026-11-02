@@ -320,7 +320,7 @@ function addChildClient(
   });
   const name = getClassicalClientName(client);
   const getChildClientFunction = clientClass.addMethod({
-    docs: getDocsFromDescription(client.doc),
+    docs: getDocsFromDescription(client.doc?.trim() || `Gets a ${name} client.`),
     name: `get${name}`,
     returnType: `${getClassicalClientName(client)}`,
     parameters: diffParams,

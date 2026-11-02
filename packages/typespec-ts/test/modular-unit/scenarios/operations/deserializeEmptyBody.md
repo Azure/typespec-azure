@@ -71,6 +71,8 @@ export async function _deleteKeyValueDeserialize(
   }
   return keyValueDeserializer(result.body);
 }
+
+/** Performs the deleteKeyValue operation. */
 export async function deleteKeyValue(
   context: Client,
   key: string,
@@ -153,6 +155,8 @@ export async function _getResourceDeserialize(result: PathUncheckedResponse): Pr
 
   return resourceDeserializer(result.body);
 }
+
+/** Performs the getResource operation. */
 export async function getResource(
   context: Client,
   id: string,
@@ -248,6 +252,8 @@ export async function _deleteKeyValueDeserialize(
   }
   return keyValueDeserializer(result.body);
 }
+
+/** Performs the deleteKeyValue operation. */
 export async function deleteKeyValue(
   context: Client,
   key: string,

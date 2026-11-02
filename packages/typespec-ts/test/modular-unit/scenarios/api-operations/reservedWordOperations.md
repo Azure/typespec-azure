@@ -40,6 +40,8 @@ export async function _$continueDeserialize(result: PathUncheckedResponse): Prom
 
   return testDeserializer(result.body);
 }
+
+/** Performs the continue operation. */
 /**
  *  @fixme continue is a reserved word that cannot be used as an operation name.
  *         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript")
@@ -96,6 +98,8 @@ export async function _$returnDeserialize(result: PathUncheckedResponse): Promis
 
   return testDeserializer(result.body);
 }
+
+/** Performs the return operation. */
 /**
  *  @fixme return is a reserved word that cannot be used as an operation name.
  *         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript")
@@ -152,6 +156,8 @@ export async function _globalDeserialize(result: PathUncheckedResponse): Promise
 
   return testDeserializer(result.body);
 }
+
+/** Performs the global operation. */
 export async function global(
   context: Client,
   options: GlobalOptionalParams = { requestOptions: {} },
@@ -215,6 +221,8 @@ export async function _deleteConversationDeserialize(result: PathUncheckedRespon
 
   return;
 }
+
+/** Performs the delete operation. */
 export async function deleteConversation(
   context: Client,
   conversationName: string,
@@ -287,6 +295,8 @@ export async function _$deleteDeserialize(result: PathUncheckedResponse): Promis
 
   return;
 }
+
+/** Performs the delete operation. */
 export async function $delete(
   context: Client,
   conversationName: string,

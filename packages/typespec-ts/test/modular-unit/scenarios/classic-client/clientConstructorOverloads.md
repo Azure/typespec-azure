@@ -187,6 +187,7 @@ export class StandardServiceClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the checkNameAvailability operation. */
   checkNameAvailability(
     body: CheckNameAvailabilityInput,
     options: CheckNameAvailabilityOptionalParams = { requestOptions: {} },
@@ -335,6 +336,7 @@ export class MixedServiceClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the listSkus operation. */
   listSkus(options: ListSkusOptionalParams = { requestOptions: {} }): Promise<SkuListResult> {
     return listSkus(this._client, options);
   }

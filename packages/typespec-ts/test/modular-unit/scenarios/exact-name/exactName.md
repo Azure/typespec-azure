@@ -231,10 +231,12 @@ export class TestingClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the useDate operation. */
   useDate(body: Date, options: UseDateOptionalParams = { requestOptions: {} }): Promise<Date> {
     return useDate(this._client, body, options);
   }
 
+  /** Performs the nestedOperation operation. */
   nestedOperation(
     body: {
       "stop-parameters": StopParameters;
@@ -244,6 +246,7 @@ export class TestingClient {
     return nestedOperation(this._client, body, options);
   }
 
+  /** Performs the my_operation operation. */
   my_operation(
     my_parameter: string,
     endpoint: string,
@@ -315,6 +318,7 @@ export async function _$classDeserialize(result: PathUncheckedResponse): Promise
   return;
 }
 
+/** Performs the class operation. */
 export async function $class(
   context: Client,
   options: classOptionalParams = { requestOptions: {} },
@@ -339,6 +343,7 @@ export async function _my_operationDeserialize(result: PathUncheckedResponse): P
   return;
 }
 
+/** Performs the my_operation operation. */
 export async function my_operation(
   context: Client,
   options: my_operationOptionalParams = { requestOptions: {} },
@@ -377,7 +382,9 @@ export class TestingClient {
 ```ts classicOperations interface my_groupOperations
 /** Interface representing a my_group operations. */
 export interface my_groupOperations {
+  /** Performs the class operation. */
   class: (options?: my_groupclassOptionalParams) => Promise<void>;
+  /** Performs the my_operation operation. */
   my_operation: (options?: my_operationOptionalParams) => Promise<void>;
 }
 ```
@@ -482,6 +489,7 @@ export class my_client {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the test operation. */
   test(options: TestOptionalParams = { requestOptions: {} }): Promise<void> {
     return test(this._client, options);
   }
