@@ -27,7 +27,7 @@ import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
-import { getDocsFromDescription } from "./helpers/docs-helpers.js";
+import { getDocsFromDescription, getInputDocs } from "./helpers/docs-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import { CloudSettingHelpers } from "./static-helpers-metadata.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
@@ -302,7 +302,7 @@ function getDocsWithKnownVersion(
   dpgContext: SdkContext,
   param: SdkMethodParameter | SdkEndpointParameter | SdkCredentialParameter | SdkHttpParameter,
 ) {
-  const docs = getDocsFromDescription(param.doc);
+  const docs = getInputDocs(param.type, param.doc);
   if (param.name.toLowerCase() !== "apiversion") {
     return docs;
   }

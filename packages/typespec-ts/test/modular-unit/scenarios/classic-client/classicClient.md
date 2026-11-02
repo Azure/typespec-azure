@@ -44,7 +44,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestServiceClientOptionalParams } from "./api/testServiceContext.js";
 
-/** Client for TestServiceClient. */
+/** Client for TestService. */
 export class TestServiceClient {
   private _client: TestServiceContext;
   /** The pipeline used by this client to make requests */

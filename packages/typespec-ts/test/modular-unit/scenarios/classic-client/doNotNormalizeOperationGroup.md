@@ -39,7 +39,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { RelayClientOptionalParams } from "./api/relayContext.js";
 
-/** Client for RelayClient. */
+/** Client for Relay. */
 export class RelayClient {
   private _client: RelayContext;
   /** The pipeline used by this client to make requests */

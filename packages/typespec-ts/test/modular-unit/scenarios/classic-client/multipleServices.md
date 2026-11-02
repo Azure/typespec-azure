@@ -62,7 +62,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { ServiceAClientOptionalParams } from "./api/serviceAContext.js";
 
-/** Client for ServiceAClient. */
+/** Client for ServiceA. */
 export class ServiceAClient {
   private _client: ServiceAContext;
   /** The pipeline used by this client to make requests */
@@ -95,7 +95,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { ServiceBClientOptionalParams } from "./api/serviceBContext.js";
 
-/** Client for ServiceBClient. */
+/** Client for ServiceB. */
 export class ServiceBClient {
   private _client: ServiceBContext;
   /** The pipeline used by this client to make requests */

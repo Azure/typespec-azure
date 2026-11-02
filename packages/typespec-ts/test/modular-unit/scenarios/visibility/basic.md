@@ -642,7 +642,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
-/** Client for TestingClient. */
+/** Client for Testing. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
@@ -956,7 +956,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
-/** Client for TestingClient. */
+/** Client for Testing. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
@@ -1173,7 +1173,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
-/** Client for TestingClient. */
+/** Client for Testing. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */

@@ -31,7 +31,7 @@ function isDecimalInput(type: SdkType, visited = new Set<SdkType>()): boolean {
   switch (type.kind) {
     case "decimal":
     case "decimal128":
-      return type.encode !== "string";
+      return true;
     case "nullable":
       return isDecimalInput(type.type, visited);
     case "array":
@@ -64,12 +64,7 @@ export function getOperationDocs(operation: ServiceOperation, parameterNames: st
     docs.push(conditionalHeaderGuidance);
   }
   for (const parameter of operation.parameters) {
-    if (
-      !parameter.optional &&
-      parameter.onClient === false &&
-      parameterNames.includes(parameter.name) &&
-      isDecimalInput(parameter.type)
-    ) {
+    if (parameterNames.includes(parameter.name) && isDecimalInput(parameter.type)) {
       docs.push(
         `@param ${parameter.name} - ${parameter.doc?.trim() || "A decimal number."}\n${decimalGuidance}`,
       );

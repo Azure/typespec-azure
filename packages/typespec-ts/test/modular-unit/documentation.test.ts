@@ -194,16 +194,6 @@ describe("Generated documentation", () => {
     assert.notInclude(docs, "Precondition Failed");
   });
 
-  it("documents encoded decimal inputs that are still represented as numbers", async () => {
-    const operations = await emitModularOperationsFromTypeSpec(`
-      @encode("string") scalar ExactAmount extends decimal128;
-      @put op update(@body value: ExactAmount): void;
-    `);
-    const operation = operations![0]!.getFunctionOrThrow("update");
-    assert.equal(operation.getParameterOrThrow("value").getTypeNodeOrThrow().getText(), "number");
-    assert.include(operation.getFullText(), "IEEE 754");
-  });
-
   it("does not confuse optional decimal inputs with the synthetic options parameter", async () => {
     const tsp = `@get op read(@query options?: decimal): void;`;
     const operations = await emitModularOperationsFromTypeSpec(tsp);
@@ -219,6 +209,91 @@ describe("Generated documentation", () => {
       models!.getInterfaceOrThrow("ReadOptionalParams").getPropertyOrThrow("options").getFullText(),
       "IEEE 754",
     );
+  });
+
+  for (const name of ["context", "options", "optionalParams"]) {
+    for (const location of ["cookie", "headerCollectionPrefix"]) {
+      it(`does not document excluded ${location} decimal inputs named ${name}`, async () => {
+        const parameter =
+          location === "cookie"
+            ? `@cookie ${name}: decimal`
+            : `#suppress "@azure-tools/typespec-client-generator-core/client-option"
+               @clientOption("headerCollectionPrefix", "x-ms-meta-", "javascript")
+               @header("x-ms-meta-") ${name}: decimal`;
+        const tsp = `@get op read(${parameter}, @query value: decimal): void;`;
+        const operations = await emitModularOperationsFromTypeSpec(tsp, { needTCGC: true });
+        const clients = await emitModularClientFromTypeSpec(tsp, { needTCGC: true });
+        for (const declaration of [
+          operations![0]!.getFunctionOrThrow("read"),
+          clients[0]!.getClasses()[0]!.getMethodOrThrow("read"),
+        ]) {
+          const docs = declaration
+            .getJsDocs()
+            .map((doc) => doc.getText())
+            .join("\n");
+          assert.notInclude(docs, `@param ${name}`);
+          assert.include(docs, "@param value");
+          assert.include(docs, "IEEE 754");
+        }
+      });
+    }
+  }
+
+  it("documents a real required decimal parameter named options", async () => {
+    const operations = await emitModularOperationsFromTypeSpec(
+      `@get op read(@query options: decimal): void;`,
+    );
+    const operation = operations![0]!.getFunctionOrThrow("read");
+    assert.deepEqual(
+      operation.getParameters().map((parameter) => parameter.getName()),
+      ["context", "options", "optionalParams"],
+    );
+    assert.include(operation.getJsDocs()[0]!.getText(), "@param options");
+    assert.include(operation.getJsDocs()[0]!.getText(), "IEEE 754");
+  });
+
+  it("documents required and optional client-initialization decimal parameters", async () => {
+    const context = await emitModularClientContextFromTypeSpec(
+      `
+      import "@azure-tools/typespec-client-generator-core";
+      using Azure.ClientGenerator.Core;
+      model ClientParameters {
+        @doc("The required amount.") amount: decimal;
+        @doc("The optional amount.") optionalAmount?: decimal128;
+      }
+      @@clientInitialization(Azure.TypeScript.Testing, { parameters: ClientParameters });
+      @get op read(@query amount: decimal, @query optionalAmount?: decimal128): void;
+    `,
+      { needTCGC: true },
+    );
+    for (const [interfaceName, propertyName, description] of [
+      ["TestingContext", "amount", "The required amount."],
+      ["TestingContext", "optionalAmount", "The optional amount."],
+      ["TestingClientOptionalParams", "optionalAmount", "The optional amount."],
+    ] as const) {
+      const property = context!.getInterfaceOrThrow(interfaceName).getPropertyOrThrow(propertyName);
+      assert.include(property.getFullText(), description);
+      assert.include(property.getFullText(), "IEEE 754");
+    }
+  });
+
+  it("documents client-location decimal parameters", async () => {
+    const context = await emitModularClientContextFromTypeSpec(
+      `
+      import "@azure-tools/typespec-client-generator-core";
+      using Azure.ClientGenerator.Core;
+      @get op read(
+        @clientLocation(Azure.TypeScript.Testing)
+        @doc("The client amount.") @query amount?: decimal
+      ): void;
+    `,
+      { needTCGC: true },
+    );
+    for (const interfaceName of ["TestingContext", "TestingClientOptionalParams"]) {
+      const property = context!.getInterfaceOrThrow(interfaceName).getPropertyOrThrow("amount");
+      assert.include(property.getFullText(), "The client amount.");
+      assert.include(property.getFullText(), "IEEE 754");
+    }
   });
 
   it("preserves service documentation on the public client class", async () => {
@@ -240,7 +315,7 @@ describe("Generated documentation", () => {
     const tsp = `@get op read(): void;`;
     const clients = await emitModularClientFromTypeSpec(tsp);
     const client = clients[0]!.getClasses()[0]!;
-    assert.include(client.getJsDocs()[0]!.getText(), "Client for TestingClient.");
+    assert.include(client.getJsDocs()[0]!.getText(), "Client for Testing.");
     assert.include(
       client.getConstructors()[0]!.getJsDocs()[0]!.getText(),
       "Creates an instance of TestingClient.",

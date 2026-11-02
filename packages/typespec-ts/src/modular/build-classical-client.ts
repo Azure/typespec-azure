@@ -65,7 +65,7 @@ export function buildClassicalClient(
   const clientClass = clientFile.addClass({
     isExported: true,
     name: `${classicalClientName}`,
-    docs: getDocsFromDescription(client.doc?.trim() || `Client for ${classicalClientName}.`),
+    docs: getDocsFromDescription(client.doc?.trim() || `Client for ${modularClientName}.`),
   });
 
   // Add the private client member. This will be the client context from /api

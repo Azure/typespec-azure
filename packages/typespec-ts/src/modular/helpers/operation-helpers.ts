@@ -1034,7 +1034,7 @@ export function getOperationFunction(
     docs: [
       ...getOperationDocs(
         operation,
-        parameters.map((p) => p.name),
+        parameters.slice(1, -1).map((p) => p.name),
       ),
       ...getFixmeForMultilineDocs(fixme),
     ],
@@ -1477,7 +1477,7 @@ function getStructuredStreamOperationFunction(
     docs: [
       ...getOperationDocs(
         operation,
-        parameters.map((p) => p.name),
+        parameters.slice(1, -1).map((p) => p.name),
       ),
       ...getFixmeForMultilineDocs(fixme),
     ],
@@ -1665,7 +1665,7 @@ function getLroOnlyOperationFunction(
     docs: [
       ...getOperationDocs(
         operation,
-        parameters.map((p) => p.name),
+        parameters.slice(1, -1).map((p) => p.name),
       ),
       ...getFixmeForMultilineDocs(fixme),
     ],
@@ -1776,7 +1776,7 @@ function getLroAndPagingOperationFunction(
     docs: [
       ...getOperationDocs(
         operation,
-        parameters.map((p) => p.name),
+        parameters.slice(1, -1).map((p) => p.name),
       ),
       ...getFixmeForMultilineDocs(fixme),
     ],
@@ -1872,7 +1872,7 @@ function getPagingOnlyOperationFunction(
     docs: [
       ...getOperationDocs(
         operation,
-        parameters.map((p) => p.name),
+        parameters.slice(1, -1).map((p) => p.name),
       ),
       ...getFixmeForMultilineDocs(fixme),
     ],
