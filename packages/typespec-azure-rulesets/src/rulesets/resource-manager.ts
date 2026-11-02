@@ -114,6 +114,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
     "@azure-tools/typespec-azure-resource-manager/no-tags-on-proxy-resource": false,
+    "@azure-tools/typespec-azure-resource-manager/top-level-resources-list-by-resource-group": false,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
     "@azure-tools/typespec-azure-resource-manager/use-model-request-body": true,
     "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": false,
