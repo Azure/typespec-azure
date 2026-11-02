@@ -171,6 +171,55 @@ model Invalid {
     }
   });
 
+  it("uses common scope precedence for repeated declarations on one source", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation.replace(
+        "@lroOperationId\n",
+        '@lroOperationId(#{ scope: "python" })\n  @lroOperationId\n',
+      ),
+    );
+    for (const emitterName of ["@azure-tools/typespec-python", "@azure-tools/typespec-csharp"]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      expectDiagnostics(context.diagnostics, []);
+      const method = context.sdkPackage.clients[0].methods.find(
+        (x) => x.name === "startPropertyJob",
+      );
+      ok(method);
+      strictEqual(method.kind, "lro");
+      strictEqual(method.lroMetadata.operationId?.length, 1);
+      strictEqual(method.lroMetadata.operationId[0].kind, "property");
+    }
+  });
+
+  it("selects different response properties for positive and negated scopes", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation
+        .replace("@lroOperationId\n", '@lroOperationId(#{ scope: "!python" })\n')
+        .replace(
+          "status: LroStatus;",
+          `@lroOperationId("python")
+  pythonId: string;
+  status: LroStatus;`,
+        ),
+    );
+    for (const [emitterName, propertyName] of [
+      ["@azure-tools/typespec-python", "pythonId"],
+      ["@azure-tools/typespec-csharp", "operationId"],
+    ]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      expectDiagnostics(context.diagnostics, []);
+      const method = context.sdkPackage.clients[0].methods.find(
+        (x) => x.name === "startPropertyJob",
+      );
+      ok(method);
+      strictEqual(method.kind, "lro");
+      strictEqual(method.lroMetadata.operationId?.length, 1);
+      const operationId = method.lroMetadata.operationId[0];
+      strictEqual(operationId.kind, "property");
+      strictEqual(operationId.property.name, propertyName);
+    }
+  });
+
   it("exposes an inherited status-monitor response property", async () => {
     const { program } = await Tester.compile(`
 model PropertyJobStateBase {
@@ -499,6 +548,7 @@ op createWidget(): {
   @lroStatus status: LroStatus;
 }
 `);
+    ok("kind" in Monitor && Monitor.kind === "Model");
     const context = await createSdkContextForTester(program);
     const property = Monitor.properties.get("status");
     ok(property);

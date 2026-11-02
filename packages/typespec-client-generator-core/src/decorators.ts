@@ -1,4 +1,4 @@
-import { getLroProtocolMetadata, getOperationLinks } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -50,6 +50,7 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  DynamicModelDecorator,
   LroOperationIdDecorator,
   LroStatusMetadataDecorator,
   OperationGroupDecorator,
@@ -94,6 +95,7 @@ import {
   isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
+  lroOperationIdKey,
   negationScopesKey,
   normalizeScope,
   omitOperation,
@@ -149,75 +151,26 @@ export function getLroStatusMetadataDecorator(
   );
 }
 
-const lroOperationIdKey = createStateSymbol("lroOperationId");
-const [getLroOperationIdEntries, setLroOperationIdEntries, getLroOperationIdMap] = useStateMap<
-  ModelProperty,
-  ScopedLroDecorator[]
->(lroOperationIdKey);
-
 export const $lroOperationId: LroOperationIdDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  const entries = getLroOperationIdEntries(context.program, target) ?? [];
-  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
-  setLroOperationIdEntries(context.program, target, entries);
+  setScopedDecoratorData(
+    context,
+    $lroOperationId,
+    lroOperationIdKey,
+    target,
+    { target: context.decoratorTarget },
+    scope,
+  );
 };
 
-export function validateLroDecoratorTargets(context: TCGCContext): void {
-  const validTargets: ModelProperty[] = [];
-  const operations = new Set<Operation>();
-  for (const namespace of listAllUserDefinedNamespaces(context)) {
-    for (const operation of namespace.operations.values()) operations.add(operation);
-    for (const iface of namespace.interfaces.values()) {
-      for (const operation of iface.operations.values()) operations.add(operation);
-    }
-  }
-
-  for (const operation of operations) {
-    const pollingLink = getOperationLinks(context.program, operation)?.get("polling");
-    if (!pollingLink) continue;
-    const httpOperation = ignoreDiagnostics(
-      getHttpOperation(context.program, pollingLink.linkedOperation),
-    );
-    for (const parameter of httpOperation.parameters.parameters) {
-      if (parameter.type === "path") validTargets.push(parameter.param);
-    }
-    for (
-      let model = pollingLink.result?.statusMonitor?.monitorType;
-      model;
-      model = model.baseModel
-    ) {
-      for (const property of model.properties.values()) {
-        validTargets.push(property);
-      }
-    }
-  }
-
-  for (const [target, entries] of getLroOperationIdMap(context.program)) {
-    if (isPathParam(context.program, target)) continue;
-    if (
-      !validTargets.some(
-        (validTarget) => findRootSourceProperty(validTarget) === findRootSourceProperty(target),
-      ) ||
-      !$(context.program).scalar.extendsString(target.type)
-    ) {
-      reportDiagnostic(context.program, {
-        code: "lro-operation-id-invalid-target",
-        target: entries[0].target,
-      });
-    }
-  }
-}
-
-export function getLroOperationIdDecorators(
+export function getLroOperationIdDecorator(
   context: TCGCContext,
   target: ModelProperty,
-): ScopedLroDecorator[] {
-  return (getLroOperationIdEntries(context.program, target) ?? []).filter(
-    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
-  );
+): { target: DiagnosticTarget } | undefined {
+  return getScopedDecoratorData(context, lroOperationIdKey, target);
 }
 
 /**
@@ -1357,6 +1310,24 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   entity: Model,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {};
+
+export const $dynamicModel: DynamicModelDecorator = (
+  context: DecoratorContext,
+  target: Model | Namespace,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const [, positiveScopes] = parseScopes(normalizeScope(scope));
+  if (!positiveScopes?.includes("csharp")) {
+    reportDiagnostic(context.program, {
+      code: "decorator-requires-scope",
+      format: {
+        decoratorName: "dynamicModel",
+        allowedScopes: '"csharp"',
+      },
+      target,
+    });
+  }
+};
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 

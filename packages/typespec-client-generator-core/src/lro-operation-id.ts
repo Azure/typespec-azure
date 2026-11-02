@@ -9,7 +9,7 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getHttpOperation, isVisible, Visibility } from "@typespec/http";
-import { getLroOperationIdDecorators, isInScope } from "./decorators.js";
+import { getLroOperationIdDecorator, isInScope } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
 import { hasNoneVisibility } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -102,10 +102,8 @@ function getPathSelections(context: TCGCContext, raw: LroMetadata) {
   );
   return httpOperation.parameters.parameters.flatMap((parameter) => {
     if (parameter.type !== "path") return [];
-    return getLroOperationIdDecorators(context, parameter.param).map((decorator) => ({
-      property: parameter.param,
-      target: decorator.target,
-    }));
+    const decorator = getLroOperationIdDecorator(context, parameter.param);
+    return decorator ? [{ property: parameter.param, target: decorator.target }] : [];
   });
 }
 
@@ -120,12 +118,10 @@ function getPropertySelections(context: TCGCContext, responseModel: Model) {
       ) {
         continue;
       }
-      selections.push(
-        ...getLroOperationIdDecorators(context, property).map((decorator) => ({
-          property,
-          target: decorator.target,
-        })),
-      );
+      const decorator = getLroOperationIdDecorator(context, property);
+      if (decorator) {
+        selections.push({ property, target: decorator.target });
+      }
     }
   }
   return selections;
