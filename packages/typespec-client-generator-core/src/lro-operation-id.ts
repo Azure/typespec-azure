@@ -3,29 +3,18 @@ import {
   createDiagnosticCollector,
   type Diagnostic,
   type DiagnosticTarget,
-  ignoreDiagnostics,
   type Model,
   type ModelProperty,
+  walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getHttpOperation, isVisible, Visibility } from "@typespec/http";
-import { getLroOperationIdDecorator, isInScope } from "./decorators.js";
+import { isVisible, Visibility } from "@typespec/http";
+import { getLroOperationIdDecorator } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
-import { hasNoneVisibility } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-
-type StatusMonitorLinkStep<TLink> =
-  | { kind: "nextOperationLink"; target: TLink }
-  | { kind: "nextOperationReference"; target: { link?: TLink } };
-
-/** @internal */
-export function getStatusMonitorLink<TLink>(
-  statusMonitorStep: StatusMonitorLinkStep<TLink> | undefined,
-): TLink | undefined {
-  return statusMonitorStep?.kind === "nextOperationLink"
-    ? statusMonitorStep.target
-    : statusMonitorStep?.target.link;
-}
+import { getStatusMonitorLink } from "./lro-status-metadata.js";
+import { getHttpOperationWithCache } from "./public-utils.js";
+import { isVisibleSdkProperty } from "./types.js";
 
 /** @internal */
 export function getLroOperationIdLink(
@@ -97,9 +86,7 @@ function getPathSelections(context: TCGCContext, raw: LroMetadata) {
       : raw.statusMonitorStep?.operation;
   if (!statusMonitorOperation) return [];
 
-  const httpOperation = ignoreDiagnostics(
-    getHttpOperation(context.program, statusMonitorOperation),
-  );
+  const httpOperation = getHttpOperationWithCache(context, statusMonitorOperation);
   return httpOperation.parameters.parameters.flatMap((parameter) => {
     if (parameter.type !== "path") return [];
     const decorator = getLroOperationIdDecorator(context, parameter.param);
@@ -109,19 +96,16 @@ function getPathSelections(context: TCGCContext, raw: LroMetadata) {
 
 function getPropertySelections(context: TCGCContext, responseModel: Model) {
   const selections: { property: ModelProperty; target: DiagnosticTarget }[] = [];
-  for (let model: Model | undefined = responseModel; model; model = model.baseModel) {
-    for (const property of model.properties.values()) {
-      if (
-        !isInScope(context, property) ||
-        hasNoneVisibility(context, property) ||
-        !isVisible(context.program, property, Visibility.Read)
-      ) {
-        continue;
-      }
-      const decorator = getLroOperationIdDecorator(context, property);
-      if (decorator) {
-        selections.push({ property, target: decorator.target });
-      }
+  for (const property of walkPropertiesInherited(responseModel)) {
+    if (
+      !isVisibleSdkProperty(context, property) ||
+      !isVisible(context.program, property, Visibility.Read)
+    ) {
+      continue;
+    }
+    const decorator = getLroOperationIdDecorator(context, property);
+    if (decorator) {
+      selections.push({ property, target: decorator.target });
     }
   }
   return selections;

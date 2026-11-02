@@ -442,6 +442,10 @@ op begin is MyLongRunningOperation;
 response and must remain derivable after poller rehydration from the stored polling URL. The
 property form becomes available only after a status-monitor response is received.
 
+Property selection follows the effective inherited model shape: an overridden base property is
+not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names
+and serialization metadata.
+
 This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API
 parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET
 `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller

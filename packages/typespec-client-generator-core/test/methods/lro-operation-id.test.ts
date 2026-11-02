@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { getLroOperationIdLink, getStatusMonitorLink } from "../../src/lro-operation-id.js";
+import { getLroOperationIdLink } from "../../src/lro-operation-id.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const Tester = AzureCoreTester.wrap(
@@ -64,24 +64,6 @@ op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
 `;
 
 describe("LRO operation ID", () => {
-  it("accepts a next-operation reference with a status-monitor link", () => {
-    const link = {
-      kind: "link",
-      location: "ResponseHeader",
-      property: {} as any,
-    } as const;
-    const step = {
-      kind: "nextOperationReference",
-      responseModel: {} as any,
-      target: {
-        kind: "reference",
-        operation: {} as any,
-        link,
-      },
-    } as const;
-    strictEqual(getStatusMonitorLink(step), link);
-  });
-
   it("requires the operation ID target to belong to a linked status monitor", async () => {
     const diagnostics = await Tester.diagnose(`
 model Invalid {
@@ -258,6 +240,76 @@ op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
     });
+  });
+
+  it("selects only the effective operation ID when a derived monitor overrides it", async () => {
+    const { program } = await Tester.compile(`
+model BaseJobState {
+  @lroOperationId operationId: string;
+  status: LroStatus;
+}
+model DerivedJobState extends BaseJobState {
+  @lroOperationId operationId: string;
+}
+@route("/base-jobs/status") @get
+op getBaseJobStatus(): BaseJobState;
+@route("/base-jobs") @pollingOperation(getBaseJobStatus)
+op startBaseJob is Azure.Core.Foundations.LongRunningOperation<
+  {}, AcceptedResponse, {}, {}
+>;
+@route("/derived-jobs/status") @get
+op getDerivedJobStatus(): DerivedJobState;
+@route("/derived-jobs") @pollingOperation(getDerivedJobStatus)
+op startDerivedJob is Azure.Core.Foundations.LongRunningOperation<
+  {}, AcceptedResponse, {}, {}
+>;
+`);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    for (const name of ["startBaseJob", "startDerivedJob"]) {
+      const method = context.sdkPackage.clients[0].methods.find((x) => x.name === name);
+      ok(method);
+      strictEqual(method.kind, "lro");
+      strictEqual(method.lroMetadata.operationId?.length, 1);
+      const operationId = method.lroMetadata.operationId[0];
+      strictEqual(operationId.kind, "property");
+      strictEqual(
+        operationId.property,
+        method.lroMetadata.pollingInfo.responseModel.properties.find(
+          (x) => x.name === "operationId",
+        ),
+      );
+    }
+  });
+
+  it("uses the retained operation ID property after hierarchy rebasing", async () => {
+    const { program } = await Tester.compile(
+      propertyOperation.replace(
+        "model PropertyJobState {",
+        `model NewJobState {
+  @clientName("rebasedId")
+  @encodedName("application/json", "rebased_id")
+  operationId: string;
+}
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(NewJobState)
+model PropertyJobState {`,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId?.length, 1);
+    const operationId = method.lroMetadata.operationId[0];
+    strictEqual(operationId.kind, "property");
+    strictEqual(
+      operationId.property,
+      method.lroMetadata.pollingInfo.responseModel.baseModel?.properties.find(
+        (x) => x.name === "rebasedId",
+      ),
+    );
+    strictEqual(operationId.property.serializationOptions.json?.name, "rebased_id");
   });
 
   it("rejects a property outside the linked status-monitor response model", async () => {

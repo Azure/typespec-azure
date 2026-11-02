@@ -81,8 +81,8 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getRawLroMetadata } from "./lro-metadata.js";
-import { getStatusMonitorLink, resolveLroOperationId } from "./lro-operation-id.js";
-import { resolveLroStatusMetadata } from "./lro-status-metadata.js";
+import { resolveLroOperationId } from "./lro-operation-id.js";
+import { getStatusMonitorLink, resolveLroStatusMetadata } from "./lro-status-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -91,6 +91,7 @@ import {
 } from "./public-utils.js";
 import {
   getClientTypeWithDiagnostics,
+  getEffectiveSdkModelProperty,
   getSdkBuiltInType,
   getSdkModel,
   getSdkModelPropertyType,
@@ -460,14 +461,8 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
 
     if (!pollingResponseBody) continue;
-    const property = getPropertySegmentsFromModelOrParameters(
-      pollingResponseBody,
-      (candidate) =>
-        candidate.kind === "property" &&
-        candidate.__raw?.kind === "ModelProperty" &&
-        findRootSourceProperty(candidate.__raw) === findRootSourceProperty(selection.property),
-    )?.at(-1);
-    if (property?.kind === "property") {
+    const property = getEffectiveSdkModelProperty(pollingResponseBody, selection.property);
+    if (property) {
       operationId.push({ kind: "property", property });
     }
   }
