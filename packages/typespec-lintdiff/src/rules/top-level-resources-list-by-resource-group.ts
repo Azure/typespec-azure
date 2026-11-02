@@ -1,10 +1,10 @@
-import { createRule, paramMessage } from "@typespec/compiler";
 import {
+  getArmResourceOperationList,
   getArmResources,
-  getResourceBaseType,
-  ResourceBaseType,
-  type ArmResourceDetails,
+  getResourceOperation,
 } from "@azure-tools/typespec-azure-resource-manager";
+import { createRule, paramMessage } from "@typespec/compiler";
+import { getParentResource } from "@typespec/rest";
 
 export const topLevelResourcesListByResourceGroupRule = createRule({
   name: "top-level-resources-list-by-resource-group",
@@ -12,25 +12,46 @@ export const topLevelResourcesListByResourceGroupRule = createRule({
     "Top-level resource-group ARM resources must define a list by resource group operation.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`Top-level resource '${"name"}' should define a list by resource group operation.`,
+    default: paramMessage`Top-level resource '${"name"}' should define a list by resource group operation.`,
   },
   create(context) {
     return {
       root: (program) => {
-        for (const armResource of getArmResources(program)) {
-          if (!requiresListByResourceGroup(program, armResource)) {
+        for (const resource of getArmResources(program)) {
+          if (getParentResource(program, resource.typespecType) !== undefined) {
             continue;
           }
 
-          if (hasListByResourceGroupOperation(armResource)) {
+          const operations = [...getArmResourceOperationList(program, resource.typespecType)].map(
+            (operation) => ({
+              kind: operation.kind,
+              path: getResourceOperation(program, operation.operation)?.path ?? "",
+            }),
+          );
+          const hasResourceGroupInstance = operations.some(
+            (operation) =>
+              operation.kind !== "list" &&
+              operation.kind !== "action" &&
+              operation.kind !== "other" &&
+              /^\/subscriptions\/\{[^}]+\}\/resourcegroups\/\{[^}]+\}\/providers\/[^/]+\/[^/]+\/[^/]+\/?$/i.test(
+                operation.path,
+              ),
+          );
+          const hasResourceGroupList = operations.some(
+            (operation) =>
+              operation.kind === "list" &&
+              /^\/subscriptions\/\{[^}]+\}\/resourcegroups\/\{[^}]+\}\/providers\/[^/]+\/[^/]+\/?$/i.test(
+                operation.path,
+              ),
+          );
+          if (!hasResourceGroupInstance || hasResourceGroupList) {
             continue;
           }
 
           context.reportDiagnostic({
-            target: armResource.typespecType,
+            target: resource.typespecType,
             format: {
-              name: armResource.name,
+              name: resource.name,
             },
           });
         }
@@ -38,35 +59,3 @@ export const topLevelResourcesListByResourceGroupRule = createRule({
     };
   },
 });
-
-function requiresListByResourceGroup(program: Parameters<typeof getArmResources>[0], armResource: ArmResourceDetails): boolean {
-  return (
-    getResourceBaseType(program, armResource.typespecType) === ResourceBaseType.ResourceGroup &&
-    isTopLevelResource(armResource)
-  );
-}
-
-function isTopLevelResource(armResource: ArmResourceDetails): boolean {
-  if (!armResource.resourceTypePath) {
-    return false;
-  }
-
-  const providerMarker = "/providers/";
-  const providerIndex = armResource.resourceTypePath.indexOf(providerMarker);
-  if (providerIndex === -1) {
-    return false;
-  }
-
-  const providerAndTypes = armResource.resourceTypePath
-    .slice(providerIndex + providerMarker.length)
-    .split("/")
-    .filter((segment) => segment.length > 0 && !segment.startsWith("{"));
-
-  return providerAndTypes.length === 2;
-}
-
-function hasListByResourceGroupOperation(armResource: ArmResourceDetails): boolean {
-  return Object.values(armResource.operations.lists).some((operation) =>
-    operation.path.includes("/resourceGroups/{resourceGroupName}/"),
-  );
-}
