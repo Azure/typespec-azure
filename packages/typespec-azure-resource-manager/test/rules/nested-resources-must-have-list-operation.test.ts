@@ -435,9 +435,7 @@ it.each([false, true])(
   },
 );
 
-// Deferred until equivalent-path resource identities share their list association:
-// https://github.com/Azure/typespec-azure/issues/5899
-it.skip("accepts a registered list for equivalent read and legacy PUT resource paths", async () => {
+it("accepts a registered list for equivalent read and legacy PUT resource paths", async () => {
   await tester
     .expect(
       `${service}
@@ -691,6 +689,47 @@ it("still checks a legacy alias whose collection differs from the declared model
     `,
     )
     .toEmitDiagnostics(diagnostic());
+});
+
+it.each([false, true])(
+  "checks every registered read path when an alias has no list (alias first: %s)",
+  async (aliasFirst) => {
+    const reads = ["get is ArmResourceRead<Part>;", "getAlias is LegacyParts.Read<Part>;"];
+    await tester
+      .expect(
+        `${service}
+        ${legacyOperations.replace('@segment("parts")', '@segment("partAliases")')}
+        @armResourceOperations interface Parts {
+          ${(aliasFirst ? reads.toReversed() : reads).join("\n")}
+          list is ArmResourceListByParent<Part>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(diagnostic());
+  },
+);
+
+it("keeps registered lists with the same name in different services", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace("Microsoft.Contoso") @service namespace First {
+        model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+        @parentResource(Widget)
+        model Part is ProxyResource<{}> { ...ResourceNameParameter<Part>; }
+        @armResourceOperations interface Parts {
+          get is ArmResourceRead<Part>;
+          list is ArmResourceListByParent<Part>;
+        }
+      }
+      @armProviderNamespace("Microsoft.Contoso") @service namespace Second {
+        @armResourceOperations interface Parts {
+          list is ArmResourceListByParent<First.Part>;
+        }
+      }
+    `,
+    )
+    .toBeValid();
 });
 
 it("accepts a child with legacy read and list operations", async () => {

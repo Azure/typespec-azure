@@ -39,8 +39,12 @@ An operation that borrows a resource model to address a descendant endpoint does
 another resource-level list requirement. For example, a read of
 `.../nodes/{nodeId}/reports/{reportId}` authored with `ArmResourceRead<DscNode>` does not make
 the report a `DscNode` resource. The actual `DscNode` collection still requires its own list.
-This distinction uses the registered resource collection and resolved resource types, not the
+This distinction uses the registered resource collection and parsed ARM instance path, not the
 response body's shape. Separately declared child resources remain subject to the rule.
+
+Resource discovery uses `getArmResources`. LIST coverage is checked against all registered
+operations for each authored model, so equivalent standard and legacy instance paths can
+share a matching LIST without depending on inferred resource-name grouping.
 
 ## Impact
 

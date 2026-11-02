@@ -1,16 +1,12 @@
-import {
-  createRule,
-  fileRef,
-  paramMessage,
-  type Model,
-  type Operation,
-  type Program,
-} from "@typespec/compiler";
+import { createRule, fileRef, paramMessage, type Model, type Program } from "@typespec/compiler";
+import { getHttpOperation } from "@typespec/http";
 import { getActionDetails, getParentResource } from "@typespec/rest";
+import { getArmResourceOperationList } from "../operations.js";
 import {
-  getArmResource,
+  getArmResources,
   getResourceBaseType,
-  resolveArmResources,
+  isSingletonResource,
+  parseArmResourceInstancePath,
   ResourceBaseType,
 } from "../resource.js";
 import {
@@ -32,76 +28,76 @@ export const nestedResourcesMustHaveListOperationRule = createRule({
     default: paramMessage`The nested resource "${"name"}" does not have list operation, please add it.`,
   },
   create(context) {
-    const reportedModels = new Set<Model>();
     const serviceByOperation = createArmServiceIndex(context.program);
     const subscriptionLists = createSubscriptionListIndex(context.program, serviceByOperation);
 
     return {
       root(program) {
-        const { resources = [] } = resolveArmResources(program);
-        for (const resource of resources) {
-          if (
-            resource.parent === undefined ||
-            resource.singleton !== undefined ||
-            !isApplicableResource(program, resource.type)
-          ) {
+        for (const resource of getArmResources(program)) {
+          const model = resource.typespecType;
+          if (isSingletonResource(program, model) || !isApplicableResource(program, model)) {
             continue;
           }
 
-          // A lifecycle template can borrow an ancestor model for a non-resource endpoint.
-          const collectionName = getArmResource(
-            program,
-            resource.type,
-          )?.collectionName?.toLowerCase();
-          const resourceTypes = resource.resourceType.types.map((type) => type.toLowerCase());
-          if (
-            collectionName !== undefined &&
-            resourceTypes.at(-1) !== collectionName &&
-            resourceTypes.includes(collectionName)
-          ) {
-            continue;
-          }
+          // The lifecycle dictionary retains only the last operation of each kind.
+          const operations = [...getArmResourceOperationList(program, model)].map(
+            ({ kind, operation }) => {
+              const [httpOperation] = getHttpOperation(program, operation);
+              return { kind, operation, httpOperation };
+            },
+          );
+          const collectionName = resource.collectionName?.toLowerCase();
+          const instanceOperations = operations.filter(({ kind, operation, httpOperation }) => {
+            if (
+              kind === "list" ||
+              kind === "action" ||
+              kind === "other" ||
+              !serviceByOperation.has(operation) ||
+              getActionDetails(program, operation) !== undefined
+            ) {
+              return false;
+            }
+            const path = parseArmResourceInstancePath(httpOperation.path);
+            if (path === undefined || path.resourceType.types.length < 2) return false;
 
-          // Skip resources with no eligible instance operations, including inferred ancestors.
-          // Their children are still checked independently.
-          const instanceOperations = Object.values(resource.operations.lifecycle)
-            .flatMap((operations) => operations ?? [])
-            .filter(
-              (op) =>
-                serviceByOperation.has(op.operation) &&
-                getActionDetails(program, op.operation) === undefined,
+            // A lifecycle template can borrow an ancestor model for a non-resource endpoint.
+            const resourceTypes = path.resourceType.types.map((type) => type.toLowerCase());
+            return (
+              collectionName === undefined ||
+              resourceTypes.at(-1) === collectionName ||
+              !resourceTypes.includes(collectionName)
             );
+          });
           const firstOperation = instanceOperations[0];
           if (firstOperation === undefined) continue;
 
-          const collectionPath = getCollectionPath(resource.resourceInstancePath);
-          const matchingLists = resource.operations.lists.filter(
-            (list) =>
-              normalizeRoute(list.path) === collectionPath && isCollectionGet(list.httpOperation),
+          const lists = operations.filter(
+            ({ kind, httpOperation }) => kind === "list" && isCollectionGet(httpOperation),
           );
-          const hasListInEveryInstanceService = instanceOperations.every(({ operation }) => {
-            const service = serviceByOperation.get(operation);
-            return (
-              service !== undefined &&
-              (matchingLists.some((list) => serviceByOperation.get(list.operation) === service) ||
-                subscriptionLists.get(resource.type)?.has(service) === true)
-            );
-          });
+          const hasListInEveryInstanceService = instanceOperations.every(
+            ({ operation, httpOperation }) => {
+              const service = serviceByOperation.get(operation);
+              const collectionPath = getCollectionPath(httpOperation.path);
+              return (
+                service !== undefined &&
+                (lists.some(
+                  (list) =>
+                    normalizeRoute(list.httpOperation.path) === collectionPath &&
+                    serviceByOperation.get(list.operation) === service,
+                ) ||
+                  subscriptionLists.get(model)?.has(service) === true)
+              );
+            },
+          );
           if (hasListInEveryInstanceService) continue;
 
-          reportMissingList(resource.type, firstOperation.operation);
+          context.reportDiagnostic({
+            target: firstOperation.operation.interface ?? model,
+            format: { name: model.name },
+          });
         }
       },
     };
-
-    function reportMissingList(model: Model, operation: Operation) {
-      if (reportedModels.has(model)) return;
-      reportedModels.add(model);
-      context.reportDiagnostic({
-        target: operation.interface ?? model,
-        format: { name: model.name },
-      });
-    }
   },
 });
 
