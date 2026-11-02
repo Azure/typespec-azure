@@ -55,7 +55,7 @@ export function getCachedLroProtocolMetadata(
 
 /**
  * Selects the client result without discovering or changing protocol facts.
- * Core keeps a separate result policy for its combined metadata API.
+ * Core keeps a separate compatibility policy for its combined metadata API.
  */
 export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClientResult {
   const { finalStep, originalUriHasGetOperation } = protocol.completion;
