@@ -29,6 +29,12 @@ The Python CI setup action uses the Python and uv versions declared in
 action. `pnpm deps check` reports version drift as part of the CI consistency
 checks.
 
+Java builds in GitHub Actions use the shared `.github/actions/setup-java` action
+to select the JDK and Maven versions from mise without changing the job's Node.js
+version. Maven dependencies are cached by OS, architecture, tool configuration,
+the pinned Java generator sources and patch, and package POMs. CI also runs on
+`main` pushes to populate caches that pull requests can restore.
+
 Workspace builds use native TypeScript 7 through the root `typescript-native`
 dependency, which provides `tsc` to package scripts. The `typescript` catalog entry
 aliases `@typescript/typescript6` for tools that require the JavaScript compiler

@@ -55,6 +55,7 @@
     "!dist/test/**"
   ],
   "dependencies": {
+    "@azure-tools/typespec-azure-examples": "workspace:^",
     "change-case": "catalog:",
     "pluralize": "catalog:",
     "yaml": "catalog:"

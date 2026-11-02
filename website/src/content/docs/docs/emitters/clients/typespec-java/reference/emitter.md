@@ -52,7 +52,7 @@ Specify the human readable name of the service. The name will be used for classe
 
 **Type:** `string`
 
-Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
+Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
 
 ### `generate-samples`
 

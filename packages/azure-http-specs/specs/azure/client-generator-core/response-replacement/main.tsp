@@ -7,6 +7,10 @@ using Spector;
 
 @doc("Test scenarios for client response replacement.")
 @scenarioService("/azure/client-generator-core/response-replacement")
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "azure.clientgenerator.core.responsereplacement",
+  "java"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ResponseReplacement;
 
 model Widget {

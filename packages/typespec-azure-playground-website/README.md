@@ -18,3 +18,18 @@ The following environment variables are available:
 # Bundle and use local version of typespec libraries
 VITE_USE_LOCAL_LIBRARIES=true
 ```
+
+## Go client generation
+
+Select `@azure-tools/typespec-go` and set a module identity in the playground's `tspconfig.yaml`:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-go"
+options:
+  "@azure-tools/typespec-go":
+    module: example.com/playground
+```
+
+The browser generates Go source without running `gofmt`, `go mod tidy`, or `go generate`.
+These steps still run when using the emitter from the command line.

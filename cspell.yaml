@@ -120,6 +120,7 @@ words:
   - stac
   - strconv
   - stretchr
+  - subscriptionid
   - tcgc
   - tsmv
   - userrp

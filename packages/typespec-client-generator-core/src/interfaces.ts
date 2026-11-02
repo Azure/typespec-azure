@@ -66,7 +66,9 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
+  convertDiscriminatedUnionsToModels?: boolean;
 
+  __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
@@ -515,7 +517,10 @@ export interface SdkEnumValueType<
   name: string;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
+  /** Original enum member value, or its TypeSpec name when no value is specified. */
   value: string | number;
+  /** Protocol-specific encoded names. Unset protocols use `value`. */
+  serializationOptions?: SerializationOptions;
   enumType: SdkEnumType;
   valueType: TValueType;
   /** Unique ID for the current type. */
@@ -542,7 +547,22 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   /** Full qualified namespace. */
   namespace: string;
   kind: "union";
+  /** SDK types of the alternatives, in the same order as `variants.values()`. */
   variantTypes: TValueType[];
+  /**
+   * Maps variant keys to SDK types, in the same iteration order as `variantTypes`.
+   * Declared alternatives retain TypeSpec source order and their original string or symbol keys.
+   * String keys are declared names without casing transformations; symbols identify unnamed/default variants.
+   * Synthesized alternatives use new, unique symbol keys.
+   * Explicit null alternatives are excluded and represented by an `SdkNullableType` wrapper.
+   * Distinct keys may reference the same SDK type.
+   */
+  variants: Map<string | symbol, TValueType>;
+  /**
+   * Type declared by the union's `extends` clause. This constrains the variants but does not imply inheritance.
+   * Usage, access, and serialization information propagate to this referenced type.
+   */
+  baseType?: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** Whether the type has public or private accessibility. */
@@ -1176,7 +1196,7 @@ interface SdkLroServiceMethodOptions {
  * Long running operation metadata.
  */
 export interface SdkLroServiceMetadata {
-  /** LRO metadata from TypeSpec core library */
+  /** Core-compatible raw metadata with TCGC-selected client result fields. */
   __raw: LroMetadata;
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
@@ -1197,6 +1217,22 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * Auxiliary status-monitor properties marked with `@lroStatusMetadata`, in deterministic
+   * direct-then-inherited model/property order. Emitters expose values from the latest received
+   * status-monitor response (including initial, failed, and canceled responses) on the poller or
+   * operation. Values may be absent until received and are refreshed after each poll, not persisted
+   * in continuation tokens; the next poll repopulates them after rehydration.
+   */
+  statusMetadata?: SdkLroStatusMetadata[];
+}
+
+export interface SdkLroStatusMetadata {
+  /**
+   * Exact effective property from `pollingInfo.responseModel`. The value is auxiliary operation
+   * state, not the LRO status, error, logical result, or a polling/final location.
+   */
+  property: SdkModelPropertyType;
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
@@ -1440,8 +1476,10 @@ export interface DecoratorOptions {
 
 interface SdkExampleBase {
   kind: string;
+  /** Unique example name within the operation. */
   name: string;
   doc: string;
+  /** Path to the source JSON or YAML file, with `#id` appended for YAML examples with an explicit ID. */
   filePath: string;
   rawExample: any;
 }

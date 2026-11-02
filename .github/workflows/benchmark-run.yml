@@ -137,7 +137,7 @@ jobs:
 
       - name: Upload backfill results and logs
         if: ${{ always() && inputs.backfill_from != '' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backfill-results
           path: /tmp/bench-backfill-results-*/
@@ -170,7 +170,7 @@ jobs:
 
       - name: Upload prepared build
         if: ${{ inputs.backfill_from == '' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: benchmark-build
           path: |
@@ -208,7 +208,7 @@ jobs:
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: benchmark-build
           path: /tmp/benchmark-build
@@ -221,7 +221,7 @@ jobs:
           node packages/benchmark/dist/src/cli.js run-workload \
             --plan /tmp/benchmark-build/benchmark-plan.json \
             --workload "$WORKLOAD" --output "/tmp/benchmark-shard-${WORKLOAD}.json"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: benchmark-result-${{ matrix.id }}
           path: /tmp/benchmark-shard-*.json
@@ -240,13 +240,13 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           node-version: 24.15.0
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: benchmark-build
           path: /tmp/benchmark-build
       - name: Restore prepared build
         run: tar -xzf /tmp/benchmark-build/benchmark-build.tar.gz
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: benchmark-result-*
           path: /tmp/benchmark-shards
@@ -256,7 +256,7 @@ jobs:
           node packages/benchmark/dist/src/cli.js merge \
             --plan /tmp/benchmark-build/benchmark-plan.json \
             --shards-dir /tmp/benchmark-shards --output /tmp/benchmark-results.json
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: benchmark-results
           path: /tmp/benchmark-results.json

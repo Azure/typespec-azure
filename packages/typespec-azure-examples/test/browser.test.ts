@@ -54,6 +54,7 @@ Widgets.get:
     },
   });
   expect(context.examples).not.toHaveProperty("discoverExampleFiles");
+  expect(context.examples).not.toHaveProperty("add");
   expect(context.examples).not.toHaveProperty("migrate");
   expect(context.examples).not.toHaveProperty("resolveExamplesDir");
 });

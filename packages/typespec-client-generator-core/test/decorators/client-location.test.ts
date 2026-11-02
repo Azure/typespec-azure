@@ -291,6 +291,61 @@ describe("Operation", () => {
     );
   });
 
+  it("preserves the source service api version when moving an operation across services", async () => {
+    const { program } = await SimpleTester.compile(
+      `
+    @service
+    @versioned(Versions)
+    namespace Network {
+      enum Versions {
+        v2026: "2026-01-01",
+      }
+
+      interface PublicIPAddresses {
+        @get
+        @route("/network/publicIPs")
+        op list(@query("api-version") apiVersion: string): string;
+      }
+    }
+
+    @service
+    @versioned(Versions)
+    namespace Compute {
+      enum Versions {
+        v2018: "2018-10-01",
+      }
+
+      interface PublicIPAddresses {
+        @get
+        @route("/compute/vmss/publicIPs")
+        op listVmss(@query("api-version") apiVersion: string): string;
+      }
+    }
+
+    @client({ service: [Network, Compute], autoMergeService: true })
+    namespace Combined {}
+
+    @@clientName(Network.PublicIPAddresses, "PublicIpAddresses", "java");
+    @@clientLocation(Compute.PublicIPAddresses.listVmss, Network.PublicIPAddresses, "java");
+  `,
+    );
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    const client = context.sdkPackage.clients[0].children?.find(
+      (c) => c.name === "PublicIpAddresses",
+    );
+    ok(client);
+    const method = client.methods.find(
+      (m) => m.name === "listVmss",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(method);
+    const apiVersionParam = method.operation.parameters.find((p) => p.isApiVersionParam);
+    ok(apiVersionParam);
+    strictEqual(apiVersionParam.clientDefaultValue, "2018-10-01");
+  });
+
   it("move an operation to a new opeartion group with api version", async () => {
     const { program } = await SimpleTester.compile(
       `

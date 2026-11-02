@@ -739,7 +739,9 @@ function generateOperation(
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
-  const methodName = go.isLROMethod(method) ? method.naming.operationMethod : method.name;
+  const methodName = go.isLROMethod(method)
+    ? naming.getEscapedReservedName(method.naming.operationMethod, "Operation")
+    : method.name;
   let text = "";
   const respErrDoc = genRespErrorDoc(method);
   if (method.docs.summary || method.docs.description) {
@@ -792,13 +794,26 @@ function generateOperation(
   // that case the response handler is invoked by the fetcher.
   if (needsResponseHandler(method) && !go.isLROMethod(method)) {
     // methods that return a modeled type, headers, or both call the method's response handler
-    text += `${indent.get()}return client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
+    const responseCall = `client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`;
+    if (options["inject-spans"]) {
+      const responseVar = helpers.getUniqueVarName(helpers.getMethodParameters(method), [
+        "resp",
+        "response",
+      ]);
+      text += `${indent.get()}${responseVar}, err := ${responseCall}\n`;
+      text += `${indent.get()}return ${responseVar}, err\n`;
+    } else {
+      text += `${indent.get()}return ${responseCall}\n`;
+    }
   } else {
     // no response handler so we emit the status code check here
     const zeroResp = getZeroReturnValue(method, false);
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: `!runtime.HasStatusCode(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`,
-      body: (indent) => `${indent.get()}return ${zeroResp}, runtime.NewResponseError(httpResp)\n`,
+      body: (indent) =>
+        options["inject-spans"]
+          ? `${indent.get()}err = runtime.NewResponseError(httpResp)\n${indent.get()}return ${zeroResp}, err\n`
+          : `${indent.get()}return ${zeroResp}, runtime.NewResponseError(httpResp)\n`,
     })}\n`;
 
     if (go.isLROMethod(method)) {
@@ -946,7 +961,7 @@ function generateLROBeginMethod(
 
   // creating the poller from response branch
 
-  const opName = method.naming.operationMethod;
+  const opName = naming.getEscapedReservedName(method.naming.operationMethod, "Operation");
   text += `${indent.get()}resp, err := client.${opName}(${helpers.getCreateRequestParameters(method)})\n`;
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return ${zeroResp}, err\n`;

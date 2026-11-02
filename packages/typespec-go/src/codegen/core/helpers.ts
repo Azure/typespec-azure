@@ -313,6 +313,30 @@ export function getMethodParameters(
   return combined;
 }
 
+/**
+ * Returns the first candidate not used by a parameter, or the last candidate
+ * with a numeric suffix if all candidates collide.
+ */
+export function getUniqueVarName(
+  params: ReadonlyArray<{ name: string }>,
+  candidates: readonly [string, ...string[]],
+): string {
+  const names = new Set(params.map((param) => param.name));
+  for (const candidate of candidates) {
+    if (!names.has(candidate)) {
+      return candidate;
+    }
+  }
+  const lastCandidate = candidates[candidates.length - 1];
+  for (let suffix = 0; suffix < 100; ++suffix) {
+    const candidate = `${lastCandidate}${suffix}`;
+    if (!names.has(candidate)) {
+      return candidate;
+    }
+  }
+  throw new CodegenError("InternalError", "failed to create unique variable name");
+}
+
 // returns the fully-qualified parameter name.  this is usually just the name
 // but will include the client or optional param group name prefix as required.
 export function getParamName(param: go.MethodParameter): string {
