@@ -1,7 +1,7 @@
 ---
-changeKind: feature
+changeKind: breaking
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add scoped @clientLroResult selections of protocol-backed completion bodies and nested properties, with coherent result types and ordered extraction paths, paging validation, and diagnostics for invalid or protocol-changing selections. Language emitter support for consuming nested result paths is separate from TCGC metadata support.
+Return the resource or completion response body by default for resource lifecycle LROs, add scoped `@clientLroResult` selections for protocol response bodies and established status-monitor result properties, and warn on resource-operation compatibility overrides with `use-valid-client-lro-result`.

@@ -64,6 +64,10 @@ describe("expect all rules to be defined", () => {
       ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-correct-verb"],
       false,
     );
+    strictEqual(
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-valid-client-lro-result"],
+      true,
+    );
     ok(
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );

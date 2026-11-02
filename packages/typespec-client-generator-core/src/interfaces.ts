@@ -67,14 +67,7 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
   convertDiscriminatedUnionsToModels?: boolean;
-  __clientLroMetadataCache?: Map<
-    Operation,
-    {
-      metadata: LroMetadata | undefined;
-      resultProperties?: ModelProperty[];
-      diagnostics: readonly Diagnostic[];
-    }
-  >;
+
   __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;

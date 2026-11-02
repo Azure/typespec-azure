@@ -14,25 +14,6 @@ const prefix = `
 
 it.each([
   ["resource PUT", "op start is Operations.LongRunningResourceCreateOrReplace<Widget>;"],
-  [
-    "resource PUT with polling result",
-    `op poll is Operations.GetResourceOperationStatus<Widget>;
-     @pollingOperation(poll)
-     op start is Operations.LongRunningResourceCreateOrReplace<Widget>;`,
-  ],
-  [
-    "resource PUT with a different polling result",
-    `@resource("jobs") model Job {
-       @key id: string;
-       @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
-       @lroResult result: Widget;
-     }
-     @route("/jobs/{id}") @get op read(@path id: string): Job;
-     @route("/jobs/{id}/status") @get op poll(@path id: string): Job;
-     @pollingOperation(poll)
-     @createsOrReplacesResource(Job)
-     @route("/jobs/{id}") @put op start(@path id: string): Job;`,
-  ],
   ["resource DELETE", "op start is Operations.LongRunningResourceDelete<Widget>;"],
   ["resource action", "op start is Operations.LongRunningResourceAction<Widget, {}, Widget>;"],
   [
@@ -84,15 +65,6 @@ it.each([
   Object.freeze(protocol.completion);
   if (protocol.completion.finalStep) Object.freeze(protocol.completion.finalStep);
   const selected = resolveLroClientResult(protocol);
-  if (protocol.completion.finalStep?.kind === "pollingSuccessProperty") {
-    strictEqual(
-      selected.finalResult === "void" ? "void" : selected.finalResult?.name,
-      protocol.completion.finalStep.responseModel.name,
-    );
-    strictEqual(selected.finalResult, protocol.completion.finalStep.target.type);
-    strictEqual(selected.finalEnvelopeResult, protocol.polling.pollingInfo.responseModel);
-    strictEqual(selected.finalResultPath, protocol.completion.finalStep.target.name);
-  }
   const native = getRawLroMetadata(program, operation);
   const legacy = getLroMetadata(program, operation);
   ok(native);
@@ -109,6 +81,37 @@ it.each([
     strictEqual(selected[key], legacy[key], key);
   }
   deepStrictEqual(protocol, before);
+  expectDiagnosticEmpty(program.diagnostics);
+});
+
+it("keeps the complete resource as the TCGC default for a resource PUT", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service namespace TestService;
+    model Payload { value: string; }
+    @resource("jobs") model Job {
+      @key id: string;
+      @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+      @lroResult result: Payload;
+    }
+    @get @route("/jobs/{id}") op read(@path id: string): Job;
+    @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
+    @pollingOperation(poll)
+    @createsOrReplacesResource(Job)
+    @put @route("/jobs/{id}") op start(@path id: string): Job;
+  `);
+  const [services] = getAllHttpServices(program);
+  const operation = services[0].operations.find((o) => o.operation.name === "start")!.operation;
+  const native = getRawLroMetadata(program, operation);
+  const legacy = getLroMetadata(program, operation);
+  ok(native);
+  ok(legacy);
+  strictEqual(native.finalResult, native.finalEnvelopeResult);
+  strictEqual(native.finalResultPath, undefined);
+  strictEqual(native.logicalPath, undefined);
+  strictEqual(legacy.finalResult, native.finalResult);
+  strictEqual(legacy.finalEnvelopeResult, native.finalEnvelopeResult);
+  strictEqual(legacy.finalResultPath, undefined);
+  strictEqual(legacy.logicalPath, undefined);
   expectDiagnosticEmpty(program.diagnostics);
 });
 

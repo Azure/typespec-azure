@@ -85,7 +85,6 @@ import {
   clientKey,
   clientLocationKey,
   clientLroResultKey,
-  type ClientLroResultReference,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
@@ -1828,61 +1827,15 @@ export const $clientLroResult: ClientLroResultDecorator = (
   result: Model | ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  if (
-    result.kind === "ModelProperty" &&
-    result.type.kind !== "Model" &&
-    result.type.kind !== "Scalar"
-  ) {
-    reportDiagnostic(context.program, {
-      code: "invalid-client-lro-result",
-      target: context.getArgumentTarget(0) ?? context.decoratorTarget,
-      format: {
-        reason:
-          "@clientLroResult requires a model, scalar, or array result without null or union traversal.",
-      },
-    });
-    return;
-  }
-  const reference = createClientLroResultReference(context, result);
-  setScopedDecoratorData(context, $clientLroResult, clientLroResultKey, target, reference, scope);
+  setScopedDecoratorData(context, $clientLroResult, clientLroResultKey, target, result, scope);
 };
 
-/** Gets the stored LRO result reference for the current language scope. @internal */
-export function getClientLroResultReference(
+/** Gets the LRO result selected for the current language scope. @internal */
+export function getClientLroResult(
   context: TCGCContext,
   target: Operation,
-): ClientLroResultReference | undefined {
+): Model | ModelProperty | undefined {
   return getScopedDecoratorData(context, clientLroResultKey, target);
-}
-
-/** Creates the stored decorator state while preserving the explicit nested property path. */
-function createClientLroResultReference(
-  context: DecoratorContext,
-  result: Model | ModelProperty,
-): ClientLroResultReference {
-  const resultArgumentTarget = context.getArgumentTarget(0);
-  const reference: ClientLroResultReference = {
-    result,
-    diagnosticTarget: resultArgumentTarget ?? context.decoratorTarget,
-  };
-  if (result.kind === "Model") return reference;
-  if (!resultArgumentTarget) return reference;
-  if (!("kind" in resultArgumentTarget)) return reference;
-
-  // Only type references expose the explicit nested property path written by the user.
-  if (resultArgumentTarget.kind !== SyntaxKind.TypeReference) return reference;
-
-  const properties: ModelProperty[] = [result];
-  let node = resultArgumentTarget.target;
-  while (node.kind === SyntaxKind.MemberExpression) {
-    node = node.base;
-    const type = context.program.checker.getTypeForNode({
-      ...resultArgumentTarget,
-      target: node,
-    });
-    if (type.kind === "ModelProperty") properties.unshift(type);
-  }
-  return { ...reference, propertyPath: properties };
 }
 
 const clientDocKey = createStateSymbol("clientDoc");

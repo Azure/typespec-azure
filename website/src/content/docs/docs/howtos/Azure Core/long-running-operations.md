@@ -31,17 +31,17 @@ The operation remains at `operation`; protocol facts are grouped by lifecycle. T
 
 Core owns `completion.finalStateVia` and `completion.finalStep`. In particular, a final operation link or reference describes an additional HTTP request needed to obtain the result; choosing a client result must not remove that request. The existing `finalStep` union also represents a declared polling success property or the absence of a polling result. It is not exclusively an HTTP-request field.
 
-`polling.statusMonitorResult` records success information when completion falls back to a status monitor. An absent value means no usable fallback monitor information was found, while a void type means that monitor has no success value. `completion.originalUriHasGetOperation` remains an optional boolean recording GET availability only when `original-uri` was explicitly requested. Core continues to report the existing diagnostic when that GET is missing.
+`polling.statusMonitorResult` records success information when completion falls back to a status monitor. An absent value means that fallback result information was unavailable or not applicable, while a void type means that monitor has no success value. `completion.originalUriHasGetOperation` remains an optional boolean recording GET availability only when `original-uri` was explicitly requested. Core continues to report the existing diagnostic when that GET is missing.
 
-TCGC consumes these protocol facts and owns selection of the client result and envelope, SDK type translation, and the method's result segments. Client emitters should use TCGC's `lroMetadata.finalResponse` and method response rather than independently reconstructing the client result.
+TCGC consumes these protocol facts and owns selection of the client result and envelope, SDK type translation, and the method's result segments. Client emitters should use the method response and, when present, TCGC's `lroMetadata.finalResponse` rather than independently reconstructing the client result.
 
 ### Combined metadata compatibility
 
 `getLroMetadata(program, operation)` remains available with its existing flat `LroMetadata` shape. The lifecycle grouping applies only to `LroProtocolMetadata`. The combined helper uses the same protocol analysis and a separate result resolver for existing emitters and libraries.
 
-When the completion step is `pollingSuccessProperty`, both the combined Core helper and native TCGC metadata select that property's type as the final result, including for resource PUT operations. For example, if the resource and monitor use a `Job` model with `@lroResult result: Result`, the final result is `Result`, the final envelope remains `Job`, and the extraction path is `result`. Previously, resource PUT metadata could select `Job` while retaining a path to `Result`.
+When a resource create-or-replace operation selects the complete resource, both the combined Core helper and native TCGC metadata use that resource as the final result without retaining a polling-property extraction path. For example, if a `Job` model is both the resource and monitor and has `@lroResult result: Result`, `finalResult` and `finalEnvelopeResult` are `Job`, `finalResultPath` is undefined, and the protocol `finalStep` remains `pollingSuccessProperty`.
 
-This correction preserves protocol facts, raw TypeSpec object identities, polling behavior, and required final requests. It can change generated return types or final-state schemas for affected operations; consumers that relied on the previous resource-type default must review their generated contracts before upgrading.
+This correction preserves the resource result type, protocol facts, raw TypeSpec object identities, polling behavior, and required final requests while keeping the result, envelope, and extraction path coherent.
 
 The Azure.Core library provides a helper that emitters can use to determine if an operation being processed is an LRO, and to provide details about how the LRO should be processed by clients, or about how operations are linked.
 

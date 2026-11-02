@@ -422,13 +422,6 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`${"reason"}`,
       },
     },
-    "unsupported-client-lro-result": {
-      ...doc("unsupported-client-lro-result"),
-      severity: "error",
-      messages: {
-        default: paramMessage`${"reason"}`,
-      },
-    },
     "non-head-bool-response-decorator": {
       ...doc("non-head-bool-response-decorator"),
       severity: "warning",

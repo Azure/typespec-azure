@@ -905,48 +905,11 @@ describe("LongRunningOperation", () => {
     deepStrictEqual(metadata.finalStateVia, "original-uri");
     deepStrictEqual(metadata.logicalResult.name, "TestModel");
     deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-    deepStrictEqual(metadata.logicalPath, "result");
+    deepStrictEqual(metadata.logicalPath, undefined);
 
     deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
-    deepStrictEqual(metadata.finalResultPath, "result");
-  });
-
-  it("selects the polling success property for a resource PUT", async () => {
-    const [_, metadata] = await compileLroOperation(
-      `
-      model Result { value: string; }
-      @resource("jobs")
-      model Job {
-        @key id: string;
-        @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
-        @lroResult result: Result;
-      }
-      @route("/jobs/{id}") @get op read(@path id: string): Job;
-      @route("/jobs/{id}/status") @get op poll(@path id: string): Job;
-      @pollingOperation(poll)
-      @createsOrReplacesResource(Job)
-      @route("/jobs/{id}") @put op start(@path id: string): Job;
-      `,
-      "start",
-    );
-    ok(metadata);
-    const monitor = metadata.pollingInfo.responseModel;
-    const result = monitor.properties.get("result");
-    ok(result);
-    strictEqual(result.type.kind, "Model");
-    strictEqual(result.type.name, "Result");
-    strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
-    strictEqual(metadata.finalStep.target, result);
-    ok(metadata.finalResult && metadata.finalResult !== "void");
-    strictEqual(metadata.finalResult.name, "Result");
-    strictEqual(metadata.finalResult, result.type);
-    strictEqual(metadata.logicalResult, result.type);
-    strictEqual(metadata.finalEnvelopeResult, monitor);
-    strictEqual(metadata.envelopeResult, monitor);
-    strictEqual(metadata.finalResultPath, "result");
-    strictEqual(metadata.logicalPath, "result");
-    strictEqual(metadata.finalStateVia, "original-uri");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "TestModel");
+    strictEqual(metadata.finalResultPath, undefined);
   });
 
   it("Gets Lro for non-resource PUT with polling reference", async () => {
