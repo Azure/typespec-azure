@@ -315,7 +315,7 @@ func (client *ExpansionsClient) Collision(ctx context.Context, parts map[string]
 
 // collisionCreateRequest creates the Collision request.
 func (client *ExpansionsClient) collisionCreateRequest(ctx context.Context, parts map[string]int32, _ *ExpansionsClientCollisionOptions) (*policy.Request, error) {
-	urlPath := "/collision{parts}"
+	urlPath := runtime.JoinPaths(client.endpoint, "/collision{parts}")
 	partsParam := expandPathMap(parts, ";", ";", true, true, func(value int32) string {
 		return strconv.FormatInt(int64(value), 10)
 	})
@@ -323,7 +323,7 @@ func (client *ExpansionsClient) collisionCreateRequest(ctx context.Context, part
 		return nil, errors.New("parameter parts cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{parts}", partsParam)
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.endpoint, urlPath))
+	req, err := runtime.NewRequest(ctx, http.MethodGet, urlPath)
 	if err != nil {
 		return nil, err
 	}
@@ -351,13 +351,13 @@ func (client *ExpansionsClient) Label(ctx context.Context, options *ExpansionsCl
 
 // labelCreateRequest creates the Label request.
 func (client *ExpansionsClient) labelCreateRequest(ctx context.Context, options *ExpansionsClientLabelOptions) (*policy.Request, error) {
-	urlPath := "/label{value}"
+	urlPath := runtime.JoinPaths(client.endpoint, "/label{value}")
 	optionalValue := ""
 	if options != nil && options.Value != nil {
 		optionalValue = "." + url.PathEscape(*options.Value)
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{value}", optionalValue)
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.endpoint, urlPath))
+	req, err := runtime.NewRequest(ctx, http.MethodGet, urlPath)
 	if err != nil {
 		return nil, err
 	}
@@ -385,7 +385,7 @@ func (client *ExpansionsClient) Matrix(ctx context.Context, options *ExpansionsC
 
 // matrixCreateRequest creates the Matrix request.
 func (client *ExpansionsClient) matrixCreateRequest(ctx context.Context, options *ExpansionsClientMatrixOptions) (*policy.Request, error) {
-	urlPath := "/matrix{values}"
+	urlPath := runtime.JoinPaths(client.endpoint, "/matrix{values}")
 	optionalValues := ""
 	if options != nil && options.Values != nil {
 		optionalValues = expandPathArray(options.Values, ";values=", ";values=", true, func(value string) string {
@@ -393,7 +393,7 @@ func (client *ExpansionsClient) matrixCreateRequest(ctx context.Context, options
 		})
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{values}", optionalValues)
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.endpoint, urlPath))
+	req, err := runtime.NewRequest(ctx, http.MethodGet, urlPath)
 	if err != nil {
 		return nil, err
 	}

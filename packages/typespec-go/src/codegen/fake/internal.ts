@@ -212,7 +212,7 @@ function emitURITemplate(imports: ImportManager): string {
 		return result, nil
 	}
 
-	func parseURIQueryMap[T any](value string, parse func(string) (T, error)) (map[string]T, error) {
+	func parseURIQueryArray[T any](value string, parse func(string) (T, error)) ([]T, error) {
 		parts := splitURIQuery(value)
 		for i, part := range parts {
 			decoded, err := url.QueryUnescape(part)
@@ -220,6 +220,14 @@ function emitURITemplate(imports: ImportManager): string {
 				return nil, err
 			}
 			parts[i] = decoded
+		}
+		return parseURIArray(parts, false, parse)
+	}
+
+	func parseURIQueryMap[T any](value string, parse func(string) (T, error)) (map[string]T, error) {
+		parts, err := parseURIQueryArray(value, func(v string) (string, error) { return v, nil })
+		if err != nil {
+			return nil, err
 		}
 		return parseURIMap(parts, false, false, parse)
 	}

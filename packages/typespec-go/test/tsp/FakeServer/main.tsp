@@ -184,3 +184,34 @@ model QueryPage {
 @list
 @route("/uri/query-paged-map{?value}")
 op queryPagedMap(...QueryPageOptions, value: Record<int32>): QueryPage;
+
+model PlainQueryPage {
+  @pageItems items: string[];
+  @nextLink nextLink?: url;
+}
+@list
+@route("/uri/query-paged-plain{?value,filter,values}")
+op queryPagedPlain(value: Record<int32>, filter: QueryFields, values: string[]): PlainQueryPage;
+
+model LiteralQueryFields {
+  kind: "fixed";
+}
+@route("/uri/query-literal{?filter}")
+op queryLiteral(filter: LiteralQueryFields): void;
+
+model MixedLiteralQueryFields {
+  kind: "fixed";
+  field: string;
+  count?: int32;
+}
+@route("/uri/query-mixed-literal{?filter}")
+op queryMixedLiteral(filter: MixedLiteralQueryFields): void;
+
+@route("/uri/query-array{?value}")
+op queryArray(value: string[]): void;
+@route("/uri/optional-query-array{?value}")
+op optionalQueryArray(value?: string[]): void;
+@route("/uri/query-uint-array{?value*}")
+op queryUintArray(value: uint32[]): void;
+@route("/uri/query-max-uint-array{?value*}")
+op queryMaxUintArray(value: uint64[]): void;

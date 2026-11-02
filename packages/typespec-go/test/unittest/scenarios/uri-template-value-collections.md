@@ -148,7 +148,7 @@ func (client *ValueCollectionsClient) PathItems(ctx context.Context, items []int
 
 // pathItemsCreateRequest creates the PathItems request.
 func (client *ValueCollectionsClient) pathItemsCreateRequest(ctx context.Context, items []int32, _ *ValueCollectionsClientPathItemsOptions) (*policy.Request, error) {
-	urlPath := "/path/items{items}"
+	urlPath := runtime.JoinPaths(client.endpoint, "/path/items{items}")
 	itemsParam := expandPathArray(items, "/", "/", true, func(value int32) string {
 		return strconv.FormatInt(int64(value), 10)
 	})
@@ -156,7 +156,7 @@ func (client *ValueCollectionsClient) pathItemsCreateRequest(ctx context.Context
 		return nil, errors.New("parameter items cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{items}", itemsParam)
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.endpoint, urlPath))
+	req, err := runtime.NewRequest(ctx, http.MethodGet, urlPath)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (client *ValueCollectionsClient) PathValues(ctx context.Context, values map
 
 // pathValuesCreateRequest creates the PathValues request.
 func (client *ValueCollectionsClient) pathValuesCreateRequest(ctx context.Context, values map[string]int32, _ *ValueCollectionsClientPathValuesOptions) (*policy.Request, error) {
-	urlPath := "/path/values{values}"
+	urlPath := runtime.JoinPaths(client.endpoint, "/path/values{values}")
 	valuesParam := expandPathMap(values, "/", "/", true, true, func(value int32) string {
 		return strconv.FormatInt(int64(value), 10)
 	})
@@ -193,7 +193,7 @@ func (client *ValueCollectionsClient) pathValuesCreateRequest(ctx context.Contex
 		return nil, errors.New("parameter values cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{values}", valuesParam)
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.endpoint, urlPath))
+	req, err := runtime.NewRequest(ctx, http.MethodGet, urlPath)
 	if err != nil {
 		return nil, err
 	}

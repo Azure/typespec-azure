@@ -606,14 +606,29 @@ export function formatValue(paramName: string, type: go.WireType, imports: Impor
         case "float64":
           imports.add("strconv");
           return `strconv.FormatFloat(${star}${paramName}, 'f', -1, 64)`;
+        case "int8":
+        case "int16":
         case "int32":
+        case "rune":
           imports.add("strconv");
           return `strconv.FormatInt(int64(${star}${paramName}), 10)`;
         case "int64":
           imports.add("strconv");
           return `strconv.FormatInt(${star}${paramName}, 10)`;
+        case "byte":
+        case "uint8":
+        case "uint16":
+        case "uint32":
+          imports.add("strconv");
+          return `strconv.FormatUint(uint64(${star}${paramName}), 10)`;
+        case "uint64":
+          imports.add("strconv");
+          return `strconv.FormatUint(${star}${paramName}, 10)`;
         default:
-          throw new CodegenError("InternalError", `unhandled scalar type ${unwrappedType.type}`);
+          throw new CodegenError(
+            "InternalError",
+            `unhandled scalar type ${JSON.stringify(unwrappedType)}`,
+          );
       }
     case "time": {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");

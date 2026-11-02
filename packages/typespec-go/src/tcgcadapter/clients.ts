@@ -2360,6 +2360,10 @@ export class ClientAdapter {
       param.queryExpansion = expansion;
       param.docs.summary = prop.summary;
       param.docs.description = prop.doc;
+      params.push(param);
+      if (go.isLiteralParameter(style)) {
+        continue;
+      }
       if (byVal) {
         param.group = group;
         group.params.push(param);
@@ -2374,7 +2378,6 @@ export class ClientAdapter {
         param.group = optionalGroup;
         optionalGroup.params.push(param);
       }
-      params.push(param);
     }
     if (group.params.length > 0 && !this.parameterGroups.has(groupName)) {
       this.parameterGroups.set(groupName, group);
@@ -2488,6 +2491,9 @@ export class ClientAdapter {
             ) {
               // spread case
               for (const goParam of goParams) {
+                if (go.isLiteralParameter(goParam.style)) {
+                  continue;
+                }
                 const isQueryMember = go.isQueryParameter(goParam) && goParam.queryExpansion;
                 if (isQueryMember && param.value.kind === "null") {
                   continue;
@@ -2501,7 +2507,7 @@ export class ClientAdapter {
                 }
                 const paramExample = new go.ParameterExample(
                   goParam,
-                  this.adaptExampleType(propertyValue, goParam?.type),
+                  this.adaptExampleType(propertyValue, goParam.type),
                 );
                 if (goParam.group && goParam.group === method.optionalParamsGroup) {
                   goExample.optionalParamsGroup.push(paramExample);

@@ -156,7 +156,9 @@ describe("path expansion helper emission", () => {
     { parameter: "value?: Filter", expansion: "value", helpers: true, preserve: true },
     { parameter: "value: OptionalFilter", expansion: "value", helpers: true, preserve: true },
     { parameter: "value: Filter", expansion: "value*", helpers: false, preserve: false },
-    { parameter: "value: string[]", expansion: "value", helpers: false, preserve: false },
+    { parameter: "value: string[]", expansion: "value", helpers: true, preserve: false },
+    { parameter: "value?: string[]", expansion: "value", helpers: true, preserve: true },
+    { parameter: "value: string[]", expansion: "value*", helpers: false, preserve: false },
   ])(
     "selects query helpers for $parameter {$expansion}",
     async ({ parameter, expansion, helpers, preserve }) => {
