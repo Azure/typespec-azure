@@ -40,7 +40,11 @@ export const nestedResourcesMustHaveListOperationRule = createRule({
       root(program) {
         const { resources = [] } = resolveArmResources(program);
         for (const resource of resources) {
-          if (resource.parent === undefined || !isApplicableResource(program, resource.type)) {
+          if (
+            resource.parent === undefined ||
+            resource.singleton !== undefined ||
+            !isApplicableResource(program, resource.type)
+          ) {
             continue;
           }
 

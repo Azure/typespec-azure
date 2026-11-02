@@ -18,7 +18,8 @@ Add `ArmResourceListByParent<Part>` alongside the `Part` lifecycle operations, o
 `ArmListBySubscriptionScope<Part>` to list the same resource across the subscription.
 
 This rule applies to nested resources at resource-group, subscription, or location scope,
-including read-only and singleton resources. Top-level list requirements are separate policies.
+including read-only resources. Singleton resources are exempt, but their non-singleton children
+are still checked independently. Top-level list requirements are separate policies.
 Listing `Widget` instances or another resource type does not satisfy the requirement for `Part`.
 A subscription-wide collection for the same resource is sufficient; a parent-specific list
 at a different scope is not.

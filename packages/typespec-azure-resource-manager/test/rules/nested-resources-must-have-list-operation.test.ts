@@ -462,15 +462,60 @@ it.skip("accepts a registered list for equivalent read and legacy PUT resource p
     .toBeValid();
 });
 
-it("checks a read-only singleton child", async () => {
+it.each(["default", "latest"])("bypasses a read-only singleton child named %s", async (name) => {
+  await tester
+    .expect(
+      `${service}
+      @@singleton(Part, "${name}");
+      @armResourceOperations interface Parts { get is ArmResourceRead<Part>; }
+    `,
+    )
+    .toBeValid();
+});
+
+it("bypasses a singleton with mutable lifecycle operations", async () => {
   await tester
     .expect(
       `${service}
       @@singleton(Part);
+      @armResourceOperations interface Parts
+        extends ResourceInstanceOperations<Part, WidgetProperties> {}
+    `,
+    )
+    .toBeValid();
+});
+
+it("bypasses singleton metadata with multiple literal names", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace @service namespace Microsoft.Contoso;
+      model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+      @parentResource(Widget)
+      @singleton("primary")
+      model Part is ProxyResource<{}> {
+        ...ResourceNameParameter<Part, Type = "primary" | "secondary" | string>;
+      }
       @armResourceOperations interface Parts { get is ArmResourceRead<Part>; }
     `,
     )
-    .toEmitDiagnostics(diagnostic());
+    .toBeValid();
+});
+
+it("still requires a list for a non-singleton child of a singleton", async () => {
+  await tester
+    .expect(
+      `${service}
+      @@singleton(Part);
+      @parentResource(Part)
+      model Component is ProxyResource<WidgetProperties> {
+        ...ResourceNameParameter<Component>;
+      }
+      @armResourceOperations interface Parts { get is ArmResourceRead<Part>; }
+      @armResourceOperations interface Components { get is ArmResourceRead<Component>; }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic("Component"));
 });
 
 it("accepts a singleton with a parent list", async () => {
