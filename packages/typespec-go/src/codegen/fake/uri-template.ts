@@ -148,7 +148,9 @@ export function parseURITemplateParameter(
   } else {
     const parse =
       param.kind === "queryCollectionParam"
-        ? `parseURIArray(splitURIQuery(${raw}), false, ${valueParser(param.type.itemType, pkg, imports)})`
+        ? param.collectionFormat === "multi"
+          ? `parseURIArray(${raw}, false, ${valueParser(param.type.itemType, pkg, imports)})`
+          : `parseURIQueryArray(${raw}, ${valueParser(param.type.itemType, pkg, imports)})`
         : `(${valueParser(go.unwrapPtr(param.type), pkg, imports)})(${raw})`;
     if (go.isRequiredParameter(param.style)) {
       text += `${result}, err := ${parse}\n${fail}`;

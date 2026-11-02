@@ -9,7 +9,9 @@ import { ImportManager } from "./imports.js";
 
 export function isRawQueryExpansion(param: go.QueryParameter): boolean {
   return (
-    (param.kind === "queryMapParam" && !param.explode) || param.queryExpansion?.explode === false
+    (param.kind === "queryMapParam" && !param.explode) ||
+    (param.kind === "queryCollectionParam" && param.collectionFormat === "csv") ||
+    param.queryExpansion?.explode === false
   );
 }
 
@@ -46,16 +48,26 @@ export function generateQueryExpansionHelpers(pkg: go.PackageContent): string {
   let preserve = false;
   let map = false;
   let object = false;
+  let array = false;
   const track = (method: go.MethodType | go.NextPageMethod): void => {
-    const params = helpers
-      .getMethodParamGroups(method)
-      .encodedQueryParams.filter(isRawQueryExpansion);
+    const encoded = helpers.getMethodParamGroups(method).encodedQueryParams;
+    const params = encoded.filter(isRawQueryExpansion);
     required ||= params.length > 0;
     preserve ||= preservedQueryExpansions(method, params).length > 0;
+    preserve ||=
+      params.length > 0 &&
+      method.kind !== "nextPageMethod" &&
+      go.isPageableMethod(method) &&
+      method.strategy?.kind === "nextLink" &&
+      !encoded.some(
+        (param) =>
+          method.strategy?.kind === "nextLink" && method.strategy.reinjectedParams.includes(param),
+      );
     map ||= params.some(
       (param) => param.kind === "queryMapParam" && param.type.itemType.kind !== "ptr",
     );
     object ||= params.some((param) => param.queryExpansion?.explode === false);
+    array ||= params.some((param) => param.kind === "queryCollectionParam");
   };
   for (const client of pkg.clients) {
     for (const method of client.methods) {
@@ -108,6 +120,17 @@ func setQueryExpansion(expansions url.Values, name string, parts ...string) {
 		escaped[i] = escapeQueryComponent(part)
 	}
 	expansions.Set(name, strings.Join(escaped, ","))
+}
+`;
+  }
+  if (array) {
+    text += `
+func expandQueryArray[T any](values []T, format func(T) string) string {
+	parts := make([]string, len(values))
+	for i, value := range values {
+		parts[i] = escapeQueryComponent(format(value))
+	}
+	return strings.Join(parts, ",")
 }
 `;
   }

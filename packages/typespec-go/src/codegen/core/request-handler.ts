@@ -100,11 +100,18 @@ export function createRequestHandler(
   // so, if a path contains tokens but there are no path params, skip emitting the path.
   const pathStr = method.httpPath;
   const pathContainsParms = pathStr.includes("{");
+  // Collection and styled expansions must retain empty and dot segments.
+  // Ordinary scalar paths still need normalization after inserting ARM scopes.
+  const joinBeforeExpansion = methodParamGroups.pathParams.some(
+    (param) => param.kind !== "pathScalarParam" || param.pathStyle !== "simple",
+  );
   let opEndpoint = hostParam;
   if (hasPathParams || (!pathContainsParms && pathStr.length > 1)) {
     // there are path params, or the path doesn't contain tokens and is not "/" so emit it
-    text += `${indent.get()}urlPath := "${method.httpPath}"\n`;
-    opEndpoint = `runtime.JoinPaths(${hostParam}, urlPath)`;
+    text += joinBeforeExpansion
+      ? `${indent.get()}urlPath := runtime.JoinPaths(${hostParam}, "${method.httpPath}")\n`
+      : `${indent.get()}urlPath := "${method.httpPath}"\n`;
+    opEndpoint = joinBeforeExpansion ? "urlPath" : `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
   if (hasPathParams) {
@@ -257,6 +264,21 @@ export function createRequestHandler(
       reinjectedParams.includes(member),
     ),
   );
+  if (forNextLinkPager && rawQueryParams.length > 0 && reinjectedExpansions.length === 0) {
+    imports.add("net/url");
+    const keys = rawQueryParams.map((param) =>
+      JSON.stringify(param.queryExpansion?.queryParameter ?? param.queryParameter),
+    );
+    text += `${indent.get()}if !firstPage {\n`;
+    text += `${indent.push().get()}${queryURL}, ${queryErr} := url.Parse(nextLink)\n`;
+    text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+    text += `${indent.get()}if ${queryURL}.RawQuery != "" {\n`;
+    text += `${indent.push().get()}var ${rawQueryValues} url.Values\n`;
+    text += `${indent.get()}${rawQueryValues}, ${queryErr} = preserveQueryExpansions(${queryURL}.RawQuery, ${keys.join(", ")})\n`;
+    text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+    text += `${indent.get()}req.Raw().URL.RawQuery = encodeQuery(req.Raw().URL.Query(), ${rawQueryValues})\n`;
+    text += `${indent.pop().get()}}\n${indent.pop().get()}}\n`;
+  }
 
   // tracks if we're inside an "if firstPage {}" block so we can close it at the end
   let inIfFirstPage = false;
@@ -322,6 +344,12 @@ export function createRequestHandler(
           false,
           rawQueryValues,
         );
+      } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "csv") {
+        const itemType = qp.type.itemType;
+        imports.addForType(itemType);
+        setter = `${rawQueryValues}.Set(${JSON.stringify(qp.queryParameter)}, expandQueryArray(${helpers.getParamName(qp)}, func(value ${go.getTypeDeclaration(itemType, method.receiver.type.pkg)}) string {\n`;
+        setter += `${indent.push().get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
+        setter += `${indent.pop().get()}}))`;
       } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
         setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
         indent.push();
@@ -433,7 +461,10 @@ export function createRequestHandler(
   }
   // END add query parameters
 
-  if (method.kind === "sseMethod" || (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult")) {
+  if (
+    method.kind === "sseMethod" ||
+    (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult")
+  ) {
     // skip auto-body downloading for streaming responses
     text += `${indent.get()}runtime.SkipBodyDownload(req)\n`;
   }
