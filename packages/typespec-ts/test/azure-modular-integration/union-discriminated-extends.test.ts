@@ -5,6 +5,7 @@ import {
   CustomDiscriminatorDog,
   EnumDiscriminatorCat,
   EnumDiscriminatorDog,
+  ExplicitDiscriminatorCat,
   ExplicitDiscriminatorDog,
   ExtendsClient,
   InjectedDiscriminatorCat,
@@ -24,7 +25,12 @@ describe("Discriminated union extends", () => {
   });
 
   describe("ExplicitDiscriminator", () => {
+    const cat: ExplicitDiscriminatorCat = { kind: "cat", name: "Whiskers", meow: true };
     const dog: ExplicitDiscriminatorDog = { kind: "dog", name: "Rex", bark: false };
+
+    it("getCat", async () => {
+      assert.deepEqual(await client.explicitDiscriminator.operations.getCat(), cat);
+    });
 
     it("getDog", async () => {
       assert.deepEqual(await client.explicitDiscriminator.operations.getDog(), dog);
@@ -32,6 +38,10 @@ describe("Discriminated union extends", () => {
 
     it("putDog", async () => {
       assert.isUndefined(await client.explicitDiscriminator.operations.putDog(dog));
+    });
+
+    it("putCat", async () => {
+      assert.isUndefined(await client.explicitDiscriminator.operations.putCat(cat));
     });
   });
 

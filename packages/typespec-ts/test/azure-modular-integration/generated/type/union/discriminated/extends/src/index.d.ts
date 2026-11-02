@@ -127,7 +127,7 @@ export declare interface ExplicitDiscriminatorPetBase {
     name: string;
 }
 
-export declare type ExplicitDiscriminatorPetBaseUnion = ExplicitDiscriminatorDog | ExplicitDiscriminatorPetBase;
+export declare type ExplicitDiscriminatorPetBaseUnion = ExplicitDiscriminatorCat | ExplicitDiscriminatorDog | ExplicitDiscriminatorPetBase;
 
 export declare class ExtendsClient {
     private _client;
