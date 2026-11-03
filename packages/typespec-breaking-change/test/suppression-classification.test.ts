@@ -1,18 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildSuppressionInventory,
-  suppressionIdentityKey,
-} from "../src/suppression/inventory.js";
-import {
-  compareInventories,
-  type SuppressionComparisonResult,
-} from "../src/suppression/classification.js";
-import { detectAmbiguousSuppressions } from "../src/suppression/ambiguity.js";
-import {
-  analyzeBaseAndHead,
-  analyzeProgram,
-  type Finding,
-} from "../src/index.js";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/index.js";
+import { compareInventories } from "../src/suppression/classification.js";
+import { buildSuppressionInventory, suppressionIdentityKey } from "../src/suppression/inventory.js";
 import { TesterWithSuppressions } from "./test-host.js";
 
 // Helper to compile a program with suppressions library loaded
@@ -369,7 +358,9 @@ describe("suppression classification (A1)", () => {
     );
 
     const typeChanged = result.classifications.find(
-      (c) => c.head?.kind === "ResponsePropertyTypeChanged" || c.base?.kind === "ResponsePropertyTypeChanged",
+      (c) =>
+        c.head?.kind === "ResponsePropertyTypeChanged" ||
+        c.base?.kind === "ResponsePropertyTypeChanged",
     );
     const madeOptional = result.classifications.find(
       (c) => c.head?.kind === "ResponsePropertyMadeOptional",
@@ -465,6 +456,72 @@ describe("suppression classification (A1)", () => {
 });
 
 describe("version scoping (A2)", () => {
+  it.each([
+    { name: "no approval", approvals: "", suppressed: [false, false], ambiguous: false },
+    {
+      name: "first transition approved",
+      approvals:
+        '@approvedBreakingChange("first", #{ kind: "ResponsePropertyTypeChanged", since: "2024-01-01" })',
+      suppressed: [true, false],
+      ambiguous: false,
+    },
+    {
+      name: "both transitions approved separately",
+      approvals: `
+        @approvedBreakingChange("first", #{ kind: "ResponsePropertyTypeChanged", since: "2024-01-01" })
+        @approvedBreakingChange("second", #{ kind: "ResponsePropertyTypeChanged", since: "2025-01-01" })
+      `,
+      suppressed: [true, true],
+      ambiguous: false,
+    },
+    {
+      name: "unscoped approval is ambiguous",
+      approvals: '@approvedBreakingChange("too broad", #{ kind: "ResponsePropertyTypeChanged" })',
+      suppressed: [true, false],
+      ambiguous: true,
+    },
+  ])("detects string -> int32 -> float64: $name", async ({ approvals, suppressed, ambiguous }) => {
+    const program = await compileWithSuppressions(`
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2023-01-01", v2: "2024-01-01", v3: "2025-01-01" }
+      model Widget {
+        ${approvals}
+        @typeChangedFrom(Versions.v2, string)
+        @typeChangedFrom(Versions.v3, int32)
+        value: float64;
+      }
+      @route("/widgets") @get op read(): Widget;
+    `);
+    const result = analyzeProgram(program, { phase: "cross-version" });
+    expect(
+      result.findings.map((finding) => ({
+        kind: finding.diff.kind,
+        element: finding.diff.identity.element,
+        phase: finding.phase,
+        pair: [finding.versionPair.baseVersion, finding.versionPair.headVersion],
+        suppressed: finding.suppressed,
+        ambiguous: finding.ambiguousSuppressionDetected ?? false,
+      })),
+    ).toEqual([
+      {
+        kind: "ResponsePropertyTypeChanged",
+        element: "body.properties.value",
+        phase: "cross-version",
+        pair: ["2023-01-01", "2024-01-01"],
+        suppressed: suppressed[0],
+        ambiguous: false,
+      },
+      {
+        kind: "ResponsePropertyTypeChanged",
+        element: "body.properties.value",
+        phase: "cross-version",
+        pair: ["2024-01-01", "2025-01-01"],
+        suppressed: suppressed[1],
+        ambiguous,
+      },
+    ]);
+  });
+
   it("since-scoped suppression matches only the correct version pair", async () => {
     const program = await compileWithSuppressions(`
       @versioned(Versions)
@@ -487,16 +544,22 @@ describe("version scoping (A2)", () => {
 
     // The v1->v2 finding should be suppressed (since matches "2024-01-01")
     const v1v2 = result.findings.filter(
-      (f) => f.versionPair.baseVersion === "2023-01-01" && f.versionPair.headVersion === "2024-01-01",
+      (f) =>
+        f.versionPair.baseVersion === "2023-01-01" && f.versionPair.headVersion === "2024-01-01",
     );
-    const suppressedV1V2 = v1v2.filter((f) => f.suppressed && f.diff.kind.includes("PropertyRemoved"));
+    const suppressedV1V2 = v1v2.filter(
+      (f) => f.suppressed && f.diff.kind.includes("PropertyRemoved"),
+    );
     expect(suppressedV1V2.length).toBeGreaterThan(0);
 
     // Any findings for v2->v3 should NOT be suppressed by this scoped approval
     const v2v3 = result.findings.filter(
-      (f) => f.versionPair.baseVersion === "2024-01-01" && f.versionPair.headVersion === "2025-01-01",
+      (f) =>
+        f.versionPair.baseVersion === "2024-01-01" && f.versionPair.headVersion === "2025-01-01",
     );
-    const suppressedV2V3 = v2v3.filter((f) => f.suppressed && f.diff.kind.includes("PropertyRemoved"));
+    const suppressedV2V3 = v2v3.filter(
+      (f) => f.suppressed && f.diff.kind.includes("PropertyRemoved"),
+    );
     // There shouldn't be a removal finding for v2->v3 because the property was already removed in v2
     // So this is testing that the since-scoped approval doesn't leak to other pairs
     // The key test: the approval with since: "2024-01-01" only matches headVersion "2024-01-01"
@@ -635,7 +698,9 @@ describe("pipeline integration (A1 + A2)", () => {
     // Should have suppression comparison
     expect(result.suppressionComparison).toBeDefined();
     expect(result.suppressionComparison!.classifications.length).toBeGreaterThan(0);
-    expect(result.suppressionComparison!.recommendedLabels).toContain("BreakingChangeReviewRequired");
+    expect(result.suppressionComparison!.recommendedLabels).toContain(
+      "BreakingChangeReviewRequired",
+    );
 
     // Suppressed findings should carry classification
     const suppressed = result.findings.filter((f) => f.suppressed);
