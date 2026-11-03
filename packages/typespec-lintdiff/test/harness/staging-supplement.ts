@@ -202,8 +202,6 @@ export async function produceStagingSupplement(
   const rules = Object.keys(selected);
   const ruleset = { rules: copyRules(selected) };
   deleteRulesPropertiesInPayloadNotValidForSpectralRules(ruleset);
-  const spectral = new Spectral();
-  spectral.setRuleset(ruleset);
   const data = path.join(output, "data");
   fs.mkdirSync(data, { recursive: true });
   const results = new Map(rules.map((rule) => [rule, [] as StagingObservation[]]));
@@ -249,6 +247,9 @@ export async function produceStagingSupplement(
       try {
         const file = fileWithin(datasetDir, swaggerFile);
         checkReferences(datasetDir, file);
+        // Resolver caches can retain recursive schema graphs from an earlier input.
+        const spectral = new Spectral();
+        spectral.setRuleset(ruleset);
         const diagnostics = await spectral.run({
           parsed: {
             data: JSON.parse(fs.readFileSync(file, "utf8")),
@@ -299,6 +300,7 @@ export async function produceStagingSupplement(
           write(path.join(data, rawFile), { error: receipt.error });
       }
       manifest.inputs.push(receipt);
+      write(path.join(output, "manifest.json"), manifest);
     }
   }
   for (const [rule, observations] of results) {
