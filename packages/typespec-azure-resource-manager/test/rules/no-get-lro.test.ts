@@ -1,6 +1,7 @@
 import { Tester } from "#test/tester.js";
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { createLinterRuleTester, t, type LinterRuleTester } from "@typespec/compiler/testing";
+import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "node:assert";
 import { beforeEach, it } from "vitest";
 import { noGetLroRule } from "../../src/rules/no-get-lro.js";
@@ -32,6 +33,7 @@ it("recognizes a customized GET LRO using the existing Core helper", async () =>
       ${t.op("read")} is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
     }
   `);
+  strictEqual(getHttpOperation(program, read)[0].verb, "get");
   strictEqual(getLroMetadata(program, read)?.operation, read);
 });
 
@@ -107,49 +109,4 @@ it.each(["post", "put", "patch", "delete"])("allows a long-running %s", async (v
   `,
     )
     .toBeValid();
-});
-
-it("does not let a false extension suppress a recognized GET LRO", async () => {
-  await tester
-    .expect(
-      `
-    ${resource}
-    @armResourceOperations interface Widgets {
-      @OpenAPI.extension("x-ms-long-running-operation", false)
-      read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
-    }
-  `,
-    )
-    .toEmitDiagnostics(diagnostic);
-});
-
-it.each([
-  ['"x-ms-long-running-operation", true', true],
-  ['"x-ms-long-running-operation", false', false],
-  ['"x-ms-long-running-operation", "true"', false],
-  ['"x-ms-long-running-operation-options", #{}', true],
-  ['"x-ms-long-running-operation-options", #[]', true],
-  ['"x-ms-long-running-operation-options", null', false],
-] as const)("checks raw semantic extension %s", async (extension, violates) => {
-  const result = tester.expect(`
-    ${resource}
-    @OpenAPI.extension(${extension}) @get @route("/read") op read(): { value: string; };
-  `);
-  if (violates) await result.toEmitDiagnostics(diagnostic);
-  else await result.toBeValid();
-});
-
-it("reports one operation when protocol metadata and both extensions apply", async () => {
-  await tester
-    .expect(
-      `
-    ${resource}
-    @armResourceOperations interface Widgets {
-      @OpenAPI.extension("x-ms-long-running-operation", true)
-      @OpenAPI.extension("x-ms-long-running-operation-options", #{})
-      read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
-    }
-  `,
-    )
-    .toEmitDiagnostics(diagnostic);
 });

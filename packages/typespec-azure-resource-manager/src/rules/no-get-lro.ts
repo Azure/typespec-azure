@@ -1,7 +1,6 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { createRule, fileRef, isTemplateDeclaration } from "@typespec/compiler";
 import { getAllHttpServices, type HttpOperation } from "@typespec/http";
-import { getExtensions } from "@typespec/openapi";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noGetLroRule = createRule({
@@ -28,12 +27,7 @@ export const noGetLroRule = createRule({
         if (operations.get(op)?.verb !== "get") {
           return;
         }
-        const extensions = getExtensions(context.program, op);
-        if (
-          getLroMetadata(context.program, op) !== undefined ||
-          extensions.get("x-ms-long-running-operation") === true ||
-          extensions.get("x-ms-long-running-operation-options")
-        ) {
+        if (getLroMetadata(context.program, op) !== undefined) {
           context.reportDiagnostic({ target: op });
         }
       },

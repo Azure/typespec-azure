@@ -64,9 +64,7 @@ on the operation before its decorators.
 
 This rule supplies SDK declaration coverage for
 [GetOperationMustNotBeLongRunning](https://github.com/Azure/azure-openapi-validator/blob/e1b8b207a196cf2fc288593efec22e6e38ab98d5/docs/get-operation-must-not-be-long-running.md).
-The ARM rule supplies native protocol and explicit extension coverage.
+The ARM rule supplies native protocol coverage.
 
 This SDK check applies to any accepted language scope, not only one emitter's
-output. A false raw LRO flag does not change the accepted SDK designation.
-Rules can overlap when an operation has both a Legacy SDK declaration and a raw
-LRO extension; compare per-rule diagnostics separately from unique operations.
+output. Raw LRO extensions alone are not checked by either rule.

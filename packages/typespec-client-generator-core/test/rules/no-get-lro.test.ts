@@ -113,7 +113,7 @@ it("does not replace the invalid-marker diagnostic", async () => {
     .toBeValid();
 });
 
-it("reports a Legacy-marked ARM read without relying on an emitted extension", async () => {
+it("reports a Legacy-marked ARM read", async () => {
   const armTester = createLinterRuleTester(
     await ArmTester.createInstance(),
     noGetLroRule,
@@ -126,7 +126,6 @@ it("reports a Legacy-marked ARM read without relying on an emitted extension", a
     model Widget is ProxyResource<{}> { ...ResourceNameParameter<Widget>; }
     @armResourceOperations interface Widgets {
       @Azure.ClientGenerator.Core.Legacy.markAsLro("csharp")
-      @OpenAPI.extension("x-ms-long-running-operation", false)
       read is ArmResourceRead<Widget>;
     }
   `,
