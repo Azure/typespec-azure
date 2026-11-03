@@ -12,9 +12,18 @@ import {
   getProperty,
   isArrayModelType,
   isList,
+  paramMessage,
+  resolveEncodedName,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { type HttpOperationResponse, getHttpOperation } from "@typespec/http";
+import {
+  type HttpOperationBody,
+  type HttpOperationResponse,
+  type MetadataInfo,
+  Visibility,
+  createMetadataInfo,
+  getHttpOperation,
+} from "@typespec/http";
 import { getArmProviderNamespace } from "../namespace.js";
 
 export const listResponseEnvelopeRule = createRule({
@@ -27,8 +36,10 @@ export const listResponseEnvelopeRule = createRule({
     default:
       "Collection GET response models must declare exactly the `value` and `nextLink` properties.",
     valueArray: "Paged ARM list responses must declare a 'value' property of array type.",
+    nextLink: paramMessage`Paged ARM list responses must include the '${"name"}' next-link property in the response body.`,
   },
   create(context) {
+    const metadataInfo = createMetadataInfo(context.program);
     return {
       operation: (operation) => {
         const [httpOperation] = getHttpOperation(context.program, operation);
@@ -40,19 +51,56 @@ export const listResponseEnvelopeRule = createRule({
         const [paging] = isList(context.program, operation)
           ? getPagingOperation(context.program, operation)
           : [];
+        const nextLinkName = paging?.output.nextLink?.property.name;
         const paged =
           getLocationContext(context.program, operation).type === "project" &&
-          paging?.output.nextLink !== undefined;
+          nextLinkName !== undefined;
         if (!collection && !paged) {
           return;
         }
 
         if (paged) {
+          const response = getPagingResponse(httpOperation.responses);
+          for (const { body } of response?.responses ?? []) {
+            if (body === undefined) continue;
+            const properties =
+              body.type.kind === "Model" ? [...walkPropertiesInherited(body.type)] : [];
+            for (const contentType of body.contentTypes) {
+              const nextLink = properties.find(
+                (property) =>
+                  resolveEncodedName(context.program, property, contentType) === nextLinkName &&
+                  metadataInfo.isPayloadProperty(
+                    property,
+                    Visibility.All,
+                    body.bodyKind === "single" && body.isExplicit,
+                  ),
+              );
+              if (nextLink === undefined) {
+                const target =
+                  body.type.kind === "Model"
+                    ? (getProperty(body.type, nextLinkName) ?? body.type)
+                    : operation;
+                context.reportDiagnostic({
+                  target: getDiagnosticTarget(context.program, operation, target),
+                  messageId: "nextLink",
+                  format: { name: nextLinkName },
+                });
+                return;
+              }
+            }
+          }
+
           for (const response of httpOperation.responses) {
             if (response.statusCodes !== 200) continue;
             for (const { body } of response.responses) {
               if (body === undefined) continue;
-              const invalidValue = getInvalidValueTarget(operation, body.type);
+              const inExplicitBody = body.bodyKind === "single" && body.isExplicit;
+              const invalidValue = getInvalidValueTarget(
+                operation,
+                body.type,
+                metadataInfo,
+                inExplicitBody,
+              );
               if (invalidValue !== undefined) {
                 context.reportDiagnostic({
                   target: getDiagnosticTarget(context.program, operation, invalidValue),
@@ -61,7 +109,7 @@ export const listResponseEnvelopeRule = createRule({
                 return;
               }
               if (body.type.kind === "Model") {
-                const invalidTargets = getInvalidTargets(body.type);
+                const invalidTargets = getInvalidTargets(body.type, metadataInfo, inExplicitBody);
                 for (const invalidTarget of invalidTargets) {
                   context.reportDiagnostic({
                     target: getDiagnosticTarget(context.program, operation, invalidTarget),
@@ -74,12 +122,17 @@ export const listResponseEnvelopeRule = createRule({
           return;
         }
 
-        const responseModel = get200ResponseModel(httpOperation.responses);
-        if (responseModel === undefined) {
+        const body = get200ResponseBody(httpOperation.responses);
+        if (body?.type.kind !== "Model") {
           return;
         }
+        const responseModel = body.type;
         const value = getProperty(responseModel, "value");
-        if (value !== undefined && (value.type.kind !== "Model" || !isArrayModelType(value.type))) {
+        if (
+          value !== undefined &&
+          metadataInfo.isPayloadProperty(value, Visibility.All, body.isExplicit) &&
+          (value.type.kind !== "Model" || !isArrayModelType(value.type))
+        ) {
           context.reportDiagnostic({
             target: getDiagnosticTarget(context.program, operation, value),
             messageId: "valueArray",
@@ -87,7 +140,11 @@ export const listResponseEnvelopeRule = createRule({
           return;
         }
 
-        for (const invalidTarget of getInvalidTargets(responseModel)) {
+        for (const invalidTarget of getInvalidTargets(
+          responseModel,
+          metadataInfo,
+          body.isExplicit,
+        )) {
           context.reportDiagnostic({
             target: getDiagnosticTarget(context.program, operation, invalidTarget),
           });
@@ -111,7 +168,26 @@ function isCollectionGetPath(path: string): boolean {
   );
 }
 
-function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefined {
+function getPagingResponse(responses: HttpOperationResponse[]): HttpOperationResponse | undefined {
+  const ok = responses.find((response) => response.statusCodes === 200);
+  if (ok !== undefined) return ok;
+
+  let success: HttpOperationResponse | undefined;
+  let successCode = 300;
+  let successRange: HttpOperationResponse | undefined;
+  for (const response of responses) {
+    const status = response.statusCodes;
+    if (typeof status === "number" && status >= 200 && status < successCode) {
+      success = response;
+      successCode = status;
+    } else if (typeof status === "object" && status.start < 300 && status.end >= 200) {
+      successRange ??= response;
+    }
+  }
+  return success ?? successRange ?? responses.find((response) => response.statusCodes === "*");
+}
+
+function get200ResponseBody(responses: HttpOperationResponse[]): HttpOperationBody | undefined {
   for (const response of responses) {
     if (response.statusCodes !== 200) {
       continue;
@@ -128,19 +204,25 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
         continue;
       }
 
-      return bodyModel;
+      return body;
     }
   }
 
   return undefined;
 }
 
-function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
+function getInvalidTargets(
+  responseModel: Model,
+  metadataInfo: MetadataInfo,
+  inExplicitBody: boolean,
+): (Model | ModelProperty)[] {
   const invalidTargets: ModelProperty[] = [];
   let hasValue = false;
   let hasNextLink = false;
 
   for (const property of walkPropertiesInherited(responseModel)) {
+    // Keep the existing lifecycle policy; only distinguish body properties from HTTP metadata.
+    if (!metadataInfo.isPayloadProperty(property, Visibility.All, inExplicitBody)) continue;
     if (property.name === "value") {
       hasValue = true;
     } else if (property.name === "nextLink") {
@@ -174,9 +256,16 @@ function getDiagnosticTarget(
 function getInvalidValueTarget(
   operation: Operation,
   type: Type,
+  metadataInfo: MetadataInfo,
+  inExplicitBody: boolean,
 ): Model | ModelProperty | Operation | undefined {
   if (type.kind !== "Model") return operation;
   const value = getProperty(type, "value");
-  if (value === undefined) return type;
+  if (
+    value === undefined ||
+    !metadataInfo.isPayloadProperty(value, Visibility.All, inExplicitBody)
+  ) {
+    return type;
+  }
   return value.type.kind === "Model" && isArrayModelType(value.type) ? undefined : value;
 }
