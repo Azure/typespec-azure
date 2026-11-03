@@ -1,6 +1,6 @@
 import type { DecoratorContext, Program, Type } from "@typespec/compiler";
-import { isDiffKind, type DiffKind } from "../diff-kind.js";
-import { BreakingChangeStateKeys, reportDiagnostic } from "../lib.js";
+import { isDiffKind, type DiffKind } from "../breaking-change-kinds.js";
+import { AzureCoreStateKeys as BreakingChangeStateKeys, reportDiagnostic } from "../lib.js";
 
 /**
  * Metadata stored by suppression decorators.
@@ -28,9 +28,15 @@ export function $approvedBreakingChange(
   options?: { kind?: string; since?: string; path?: string },
 ): void {
   const normalizedReason = getDecoratorStringValue(reason) ?? String(reason);
-  const normalizedKind = options?.kind ? getDecoratorStringValue(options.kind) ?? options.kind : undefined;
-  const normalizedSince = options?.since ? getDecoratorStringValue(options.since) ?? options.since : undefined;
-  const normalizedPath = options?.path ? getDecoratorStringValue(options.path) ?? options.path : undefined;
+  const normalizedKind = options?.kind
+    ? (getDecoratorStringValue(options.kind) ?? options.kind)
+    : undefined;
+  const normalizedSince = options?.since
+    ? (getDecoratorStringValue(options.since) ?? options.since)
+    : undefined;
+  const normalizedPath = options?.path
+    ? (getDecoratorStringValue(options.path) ?? options.path)
+    : undefined;
   const resolvedKind = validateDiffKind(context, target, normalizedKind);
   if (normalizedKind !== undefined && resolvedKind === undefined) {
     return;
@@ -54,8 +60,12 @@ export function $approvedUnversionedChange(
   options?: { kind?: string; path?: string },
 ): void {
   const normalizedReason = getDecoratorStringValue(reason) ?? String(reason);
-  const normalizedKind = options?.kind ? getDecoratorStringValue(options.kind) ?? options.kind : undefined;
-  const normalizedPath = options?.path ? getDecoratorStringValue(options.path) ?? options.path : undefined;
+  const normalizedKind = options?.kind
+    ? (getDecoratorStringValue(options.kind) ?? options.kind)
+    : undefined;
+  const normalizedPath = options?.path
+    ? (getDecoratorStringValue(options.path) ?? options.path)
+    : undefined;
   const resolvedKind = validateDiffKind(context, target, normalizedKind);
   if (normalizedKind !== undefined && resolvedKind === undefined) {
     return;
@@ -120,6 +130,7 @@ function validateDiffKind(
   reportDiagnostic(context.program, {
     code: "invalid-suppression-kind",
     target,
+    format: { kind },
   });
   return undefined;
 }

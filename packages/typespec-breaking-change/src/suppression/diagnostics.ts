@@ -1,7 +1,7 @@
+import { $lib } from "@azure-tools/typespec-azure-core";
 import type { Diagnostic, DiagnosticTarget, Program } from "@typespec/compiler";
-import { createApproveBreakingChangeCodeFix } from "./codefixes.js";
-import { $lib } from "../lib.js";
 import type { AnalysisResult, Finding } from "../types.js";
+import { createApproveBreakingChangeCodeFix } from "./codefixes.js";
 
 /**
  * Emit breaking change findings as TypeSpec diagnostics on the program.

@@ -167,7 +167,7 @@ describe("diagnostics", () => {
     const diagnostics = emitFindingDiagnostics(program, result);
 
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(diagnostics[0].code).toBe("@azure-tools/typespec-breaking-change/breaking-change");
+    expect(diagnostics[0].code).toBe("@azure-tools/typespec-azure-core/breaking-change");
     expect(diagnostics[0].severity).toBe("error");
     expect(diagnostics[0].message).toContain("Breaking change detected");
   });

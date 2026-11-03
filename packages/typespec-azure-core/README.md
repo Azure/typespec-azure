@@ -77,6 +77,8 @@ Available ruleSets:
 
 ### Azure.Core
 
+- [`@approvedBreakingChange`](#@approvedbreakingchange)
+- [`@approvedUnversionedChange`](#@approvedunversionedchange)
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
 - [`@lroCanceled`](#@lrocanceled)
@@ -92,6 +94,51 @@ Available ruleSets:
 - [`@previewVersion`](#@previewversion)
 - [`@uniqueItems`](#@uniqueitems)
 - [`@useFinalStateVia`](#@usefinalstatevia)
+
+#### `@approvedBreakingChange`
+
+Marks a breaking change as intentionally approved for cross-version comparison.
+
+When placed on a type, property, operation, or namespace, it suppresses
+the matching breaking-change finding in the tool output.
+
+```typespec
+@Azure.Core.approvedBreakingChange(reason: valueof string, options?: valueof Azure.Core.ApprovedBreakingChangeOptions)
+```
+
+##### Target
+
+`Model | ModelProperty | Operation | Enum | EnumMember | Union | UnionVariant | Scalar | Interface | Namespace`
+
+##### Parameters
+
+| Name    | Type                                    | Description                                                    |
+| ------- | --------------------------------------- | -------------------------------------------------------------- |
+| reason  | `valueof string`                        | A required explanation of why the breaking change is approved. |
+| options | `valueof ApprovedBreakingChangeOptions` | Optional suppression options: kind, since, and path filters.   |
+
+#### `@approvedUnversionedChange`
+
+Marks a same-version structural difference as intentionally approved.
+
+A same-version comparison uses two compilations of the same API version. Any difference
+indicates a version projection inconsistency. Use this decorator only when the inconsistency
+is known and accepted (e.g., during a refactoring migration).
+
+```typespec
+@Azure.Core.approvedUnversionedChange(reason: valueof string, options?: valueof Azure.Core.ApprovedUnversionedChangeOptions)
+```
+
+##### Target
+
+`Model | ModelProperty | Operation | Enum | EnumMember | Union | UnionVariant | Scalar | Interface | Namespace`
+
+##### Parameters
+
+| Name    | Type                                       | Description                                                       |
+| ------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| reason  | `valueof string`                           | A required explanation of why the unversioned change is approved. |
+| options | `valueof ApprovedUnversionedChangeOptions` | Optional suppression options: kind and path filters.              |
 
 #### `@finalLocation`
 

@@ -8,6 +8,7 @@ import "./models.tsp";
 import "./operations.tsp";
 import "./obsolete.tsp";
 import "./decorators.tsp";
+import "./breaking-change.tsp";
 import "./legacy.tsp";
 import "../dist/src/tsp-index.js";
 

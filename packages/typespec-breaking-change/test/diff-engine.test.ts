@@ -1,3 +1,5 @@
+import { unsafe_Realm as Realm } from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
 import { describe, expect, it } from "vitest";
 import { computeDiffs } from "../src/diff/diff-engine.js";
 import { diffOperations } from "../src/diff/diff-operations.js";
@@ -8,6 +10,40 @@ import { Tester } from "./test-host.js";
 
 describe("computeDiffs", () => {
   describe("operation diffs", () => {
+    it("ignores a default TypeKit realm created by another compiler installation", async () => {
+      const { baseView, headView } = await compileViews(`
+        using TypeSpec.Http;
+        using TypeSpec.Versioning;
+
+        @versioned(Versions)
+        @service
+        namespace TestService;
+
+        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+
+        @added(Versions.v2)
+        @route("/widgets")
+        @get
+        op listWidgets(): void;
+      `);
+
+      const defaultRealm = Symbol.for("TypeSpec.Typekit.DEFAULT_TYPEKIT_REALM");
+      const foreignTypekit = Object.create(
+        $(new Realm(baseView.program, "foreign compiler installation")),
+      );
+      Object.defineProperty(foreignTypekit, "httpOperation", { value: undefined });
+      const programState = baseView.program as unknown as Record<symbol, unknown>;
+      programState[defaultRealm] = { typekit: foreignTypekit };
+
+      expect(computeDiffs(baseView, headView).diffs).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: "OperationAdded",
+          }),
+        ]),
+      );
+    });
+
     it("detects operation added", async () => {
       const { baseView, headView } = await compileViews(`
         using TypeSpec.Http;

@@ -1,4 +1,4 @@
-import type { DiffKind } from "../diff-kind.js";
+import type { DiffKind } from "@azure-tools/typespec-azure-core";
 import type { ApiDiff, OperationDiffIdentity, OperationIdentity, VersionedView } from "../types.js";
 import { canonicalizeOperations, type CanonicalizationResult } from "./canonicalize.js";
 import { diffOperations } from "./diff-operations.js";

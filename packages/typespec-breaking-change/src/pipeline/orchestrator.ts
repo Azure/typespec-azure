@@ -70,16 +70,17 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
       const baseView = timeVersionedView(program, service.service, pair.baseVersion, timing);
       const headView = timeVersionedView(program, service.service, pair.headVersion, timing);
       const findings = analyzePair(baseView, headView, pair, timing);
+      const counts = summarizeComparisonFindings(findings);
       allFindings.push(...findings);
       versionComparisons.push({
         serviceName: service.service.name,
         baseVersion: pair.baseVersion,
         headVersion: pair.headVersion,
         phase: pair.phase,
-        findingCount: findings.length,
+        ...counts,
       });
       options?.log?.(
-        `  Phase B: ${pair.baseVersion} \u2192 ${pair.headVersion} \u2014 ${formatComparisonResult(findings.length)}`,
+        `  Phase B: ${pair.baseVersion} \u2192 ${pair.headVersion} \u2014 ${formatComparisonResult(counts.findingCount, counts.rawFindingCount)}`,
       );
     }
   }
@@ -172,15 +173,16 @@ export function analyzeBaseAndHead(
           timing,
         );
         const findings = analyzePair(baseView, headView, pair, timing);
+        const counts = summarizeComparisonFindings(findings);
         versionComparisons.push({
           serviceName: headService.service.name,
           baseVersion: pair.baseVersion,
           headVersion: pair.headVersion,
           phase: pair.phase,
-          findingCount: findings.length,
+          ...counts,
         });
         options?.log?.(
-          `  Phase A: ${pair.headVersion} (base \u2192 head) \u2014 ${formatComparisonResult(findings.length)}`,
+          `  Phase A: ${pair.headVersion} (base \u2192 head) \u2014 ${formatComparisonResult(counts.findingCount, counts.rawFindingCount)}`,
         );
 
         if (findings.length > 0) {
@@ -216,16 +218,17 @@ export function analyzeBaseAndHead(
             timing,
           );
           const findings = analyzePair(baseView, headView, pair, timing);
+          const counts = summarizeComparisonFindings(findings);
           allFindings.push(...findings);
           versionComparisons.push({
             serviceName: headService.service.name,
             baseVersion: pair.baseVersion,
             headVersion: pair.headVersion,
             phase: pair.phase,
-            findingCount: findings.length,
+            ...counts,
           });
           options?.log?.(
-            `  Phase B: ${pair.baseVersion} \u2192 ${pair.headVersion} \u2014 ${formatComparisonResult(findings.length)}`,
+            `  Phase B: ${pair.baseVersion} \u2192 ${pair.headVersion} \u2014 ${formatComparisonResult(counts.findingCount, counts.rawFindingCount)}`,
           );
         }
       }
@@ -410,10 +413,24 @@ function buildSummary(
   return summary;
 }
 
-function formatComparisonResult(findingCount: number): string {
-  return findingCount === 0
-    ? "no changes"
-    : `${findingCount} finding${findingCount === 1 ? "" : "s"}`;
+function summarizeComparisonFindings(
+  findings: Finding[],
+): Pick<VersionComparisonSummary, "findingCount" | "rawFindingCount"> {
+  const findingCount = collapsePhaseADuplicates(
+    mergeRequestResponseToResource(deduplicateBySourceType(findings)),
+  ).length;
+  return {
+    findingCount,
+    rawFindingCount: findingCount === findings.length ? undefined : findings.length,
+  };
+}
+
+function formatComparisonResult(findingCount: number, rawFindingCount?: number): string {
+  const result =
+    findingCount === 0 ? "no changes" : `${findingCount} finding${findingCount === 1 ? "" : "s"}`;
+  return rawFindingCount === undefined
+    ? result
+    : `${result} (${rawFindingCount} raw occurrence${rawFindingCount === 1 ? "" : "s"})`;
 }
 
 /**

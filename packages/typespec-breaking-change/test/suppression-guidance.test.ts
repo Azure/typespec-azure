@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import { formatConsoleReport } from "../src/reporting/reporter-console.js";
+import { formatJsonReport } from "../src/reporting/reporter-json.js";
+import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
 import {
   formatSuppressionDiff,
   formatSuppressionGuidance,
   formatSuppressionHint,
 } from "../src/suppression/suppression-guidance.js";
-import { formatJsonReport } from "../src/reporting/reporter-json.js";
-import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
-import { formatConsoleReport } from "../src/reporting/reporter-console.js";
-import type { Finding, AnalysisResult } from "../src/types.js";
+import type { AnalysisResult, Finding } from "../src/types.js";
 
 function makeFinding(overrides: Partial<Finding> = {}): Finding {
   return {
@@ -52,6 +52,25 @@ describe("suppression guidance", () => {
       );
     });
 
+    it("omits a path for a direct same-version declaration target", () => {
+      const finding = makeFinding({
+        phase: "same-version",
+        diff: {
+          ...makeFinding().diff,
+          headType: { kind: "ModelProperty" } as any,
+          headSourceTraceLevel: "direct",
+          origin: {
+            declarationPath: "Microsoft.Widget.Models.WidgetProperties.legacyStatus",
+            type: {} as any,
+          },
+        },
+      });
+
+      expect(formatSuppressionHint(finding)).toBe(
+        '@approvedUnversionedChange("your reason here", #{ kind: "ResponsePropertyRemoved" })',
+      );
+    });
+
     it("includes the correct diff kind in the hint", () => {
       const finding = makeFinding({
         diff: {
@@ -61,6 +80,22 @@ describe("suppression guidance", () => {
       });
       const hint = formatSuppressionHint(finding);
       expect(hint).toContain('"OperationRemoved"');
+    });
+
+    it("uses the full operation-relative path when no declaration origin exists", () => {
+      const operation = { kind: "Operation" } as any;
+      const property = { kind: "ModelProperty" } as any;
+      const finding = makeFinding({
+        diff: {
+          ...makeFinding().diff,
+          headType: property,
+          operationType: operation,
+        },
+      });
+
+      expect(formatSuppressionHint(finding)).toBe(
+        '@approvedBreakingChange("your reason here", #{ kind: "ResponsePropertyRemoved", path: "responses.200.body.properties.legacyStatus" })',
+      );
     });
   });
 
@@ -93,10 +128,33 @@ describe("suppression guidance", () => {
     });
 
     it("returns operation-level guidance when no origin", () => {
-      const finding = makeFinding();
+      const finding = makeFinding({
+        diff: {
+          ...makeFinding().diff,
+          headType: { kind: "ModelProperty" } as any,
+          operationType: { kind: "Operation" } as any,
+        },
+      });
       const guidance = formatSuppressionGuidance(finding);
       expect(guidance.placement).toContain("GET /widgets/{}");
       expect(guidance.example).toContain("op ");
+      expect(guidance.decorator).toContain('path: "responses.200.body.properties.legacyStatus"');
+    });
+
+    it("omits the path when the operation itself is the suppression target", () => {
+      const operation = { kind: "Operation" } as any;
+      const finding = makeFinding({
+        diff: {
+          ...makeFinding().diff,
+          kind: "OperationRouteChanged",
+          headType: operation,
+          operationType: operation,
+        },
+      });
+
+      expect(formatSuppressionGuidance(finding).decorator).toBe(
+        '@approvedBreakingChange("your reason here", #{ kind: "OperationRouteChanged" })',
+      );
     });
 
     it("returns service-level guidance for service identity", () => {
@@ -212,14 +270,20 @@ describe("suppression guidance", () => {
 });
 
 describe("suppression guidance in reporters", () => {
-
   function makeResult(): AnalysisResult {
     return {
       findings: [makeFinding()],
       timing: {
-        compileBaseMs: 0, compileHeadMs: 0, versionMutatorsMs: 0,
-        canonicalizeMs: 0, identityMatchingMs: 0, diffEngineMs: 0,
-        classifyMs: 0, suppressMs: 0, reportMs: 0, totalMs: 100,
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 100,
       },
       summary: { servicesAnalyzed: 1, comparisonsPerformed: 1, versionComparisons: [] },
     };
@@ -278,7 +342,11 @@ describe("suppression guidance in reporters", () => {
 
   it("Console report shows reason instead of hint for suppressed findings", () => {
     const result = makeResult();
-    result.findings[0] = { ...result.findings[0], suppressed: true, suppressionReason: "Approved by team" };
+    result.findings[0] = {
+      ...result.findings[0],
+      suppressed: true,
+      suppressionReason: "Approved by team",
+    };
     const output = formatConsoleReport(result, { showSuppressed: true });
     expect(output).toContain("Reason: Approved by team");
     expect(output).not.toContain("Suppress:");

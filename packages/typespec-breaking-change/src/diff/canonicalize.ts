@@ -1,12 +1,10 @@
 import type { Namespace, Program } from "@typespec/compiler";
+import { unsafe_Realm as Realm } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
-import {
-  HttpCanonicalizer,
-  OperationHttpCanonicalization,
-} from "@typespec/http-canonicalization";
 import { listHttpOperationsIn, type HttpOperation } from "@typespec/http";
-import { getOperationIdentity, identityKey } from "./operation-identity.js";
+import { HttpCanonicalizer, OperationHttpCanonicalization } from "@typespec/http-canonicalization";
 import type { OperationIdentity } from "../types.js";
+import { getOperationIdentity, identityKey } from "./operation-identity.js";
 
 /**
  * A canonicalized operation with its wire identity.
@@ -40,7 +38,7 @@ export function canonicalizeOperations(
   program: Program,
   namespace: Namespace,
 ): CanonicalizationResult {
-  const tk = $(program);
+  const tk = $(new Realm(program, "breaking change HTTP canonicalization"));
   const canonicalizer = new HttpCanonicalizer(tk);
 
   const [httpOps, _diagnostics] = listHttpOperationsIn(program, namespace);
@@ -49,9 +47,7 @@ export function canonicalizeOperations(
   for (const httpOp of httpOps) {
     const identity = getOperationIdentity(httpOp);
     const key = identityKey(identity);
-    const canonical = canonicalizer.canonicalize(
-      httpOp.operation,
-    ) as OperationHttpCanonicalization;
+    const canonical = canonicalizer.canonicalize(httpOp.operation) as OperationHttpCanonicalization;
 
     operations.set(key, { identity, canonical, httpOperation: httpOp });
   }

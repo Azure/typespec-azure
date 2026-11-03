@@ -1,6 +1,6 @@
 using TypeSpec.Reflection;
 
-namespace Azure.BreakingChange;
+namespace Azure.Core;
 
 /**
  * Options for the approvedBreakingChange decorator.
@@ -8,8 +8,10 @@ namespace Azure.BreakingChange;
 model ApprovedBreakingChangeOptions {
   /** Optional DiffKind filter (e.g., "ResponsePropertyRemoved"). */
   kind?: string;
+
   /** Optional version lower bound — suppression applies when head version >= since. */
   since?: string;
+
   /**
    * Identity path from the suppression site to the violation target.
    * Required when the suppression is not on the target node itself.
@@ -20,7 +22,7 @@ model ApprovedBreakingChangeOptions {
 }
 
 /**
- * Marks a breaking change as intentionally approved for cross-version (Phase B) comparison.
+ * Marks a breaking change as intentionally approved for cross-version comparison.
  *
  * When placed on a type, property, operation, or namespace, it suppresses
  * the matching breaking-change finding in the tool output.
@@ -41,7 +43,7 @@ extern dec approvedBreakingChange(
     | Interface
     | Namespace,
   reason: valueof string,
-  options?: valueof ApprovedBreakingChangeOptions,
+  options?: valueof ApprovedBreakingChangeOptions
 );
 
 /**
@@ -50,6 +52,7 @@ extern dec approvedBreakingChange(
 model ApprovedUnversionedChangeOptions {
   /** Optional DiffKind filter (e.g., "ResponsePropertyRemoved"). */
   kind?: string;
+
   /**
    * Identity path from the suppression site to the violation target.
    * Required when the suppression is not on the target node itself.
@@ -60,10 +63,10 @@ model ApprovedUnversionedChangeOptions {
 }
 
 /**
- * Marks a same-version (Phase A) structural difference as intentionally approved.
+ * Marks a same-version structural difference as intentionally approved.
  *
- * Phase A compares two compilations of the same version. Any diff indicates a
- * version projection inconsistency. Use this decorator only when the inconsistency
+ * A same-version comparison uses two compilations of the same API version. Any difference
+ * indicates a version projection inconsistency. Use this decorator only when the inconsistency
  * is known and accepted (e.g., during a refactoring migration).
  *
  * @param reason A required explanation of why the unversioned change is approved.
@@ -82,5 +85,5 @@ extern dec approvedUnversionedChange(
     | Interface
     | Namespace,
   reason: valueof string,
-  options?: valueof ApprovedUnversionedChangeOptions,
+  options?: valueof ApprovedUnversionedChangeOptions
 );

@@ -3,6 +3,18 @@ import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
   diagnostics: {
+    "breaking-change": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Breaking change detected: ${"message"}`,
+      },
+    },
+    "invalid-suppression-kind": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Invalid DiffKind '${"kind"}' specified in suppression decorator.`,
+      },
+    },
     "lro-status-union-non-string": {
       severity: "error",
       messages: {
@@ -273,6 +285,8 @@ export const $lib = createTypeSpecLibrary({
   },
 
   state: {
+    approvedBreakingChange: { description: "Approved breaking change suppressions" },
+    approvedUnversionedChange: { description: "Approved unversioned change suppressions" },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },

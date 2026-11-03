@@ -1,8 +1,9 @@
 import type { SourceLocation } from "@typespec/compiler";
+import { getFindingIdentity } from "../finding-identity.js";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
+import { formatSuppressionHint } from "../suppression/suppression-guidance.js";
 import type { AnalysisResult, Finding } from "../types.js";
 import { isOperationIdentity } from "../types.js";
-import { formatSuppressionHint } from "../suppression/suppression-guidance.js";
-import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 
 const SUMMARY_SEPARATOR = "─────────────────────────────";
 
@@ -19,7 +20,9 @@ export function formatConsoleReport(
   result: AnalysisResult,
   options: ConsoleReporterOptions = {},
 ): string {
-  const visibleFindings = result.findings.filter((finding) => shouldIncludeFinding(finding, options));
+  const visibleFindings = result.findings.filter((finding) =>
+    shouldIncludeFinding(finding, options),
+  );
   const summaryLines = [SUMMARY_SEPARATOR, formatSummary(result)];
 
   if (result.summary.noComparisonReason) {
@@ -59,7 +62,11 @@ function formatFinding(finding: Finding): string {
     );
   }
 
-  lines.push(`  Element: ${finding.diff.identity.element}`);
+  const identity = getFindingIdentity(finding);
+  lines.push(`  Element: ${identity.primary}`);
+  if (identity.source && identity.source !== identity.wire) {
+    lines.push(`  Wire element: ${identity.wire}`);
+  }
   lines.push(`  Phase: ${formatVersionPair(finding)}`);
   lines.push(`  Location: ${formatLocation(resolvedLocation?.location)}`);
 

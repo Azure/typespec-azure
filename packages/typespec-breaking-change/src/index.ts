@@ -1,6 +1,19 @@
+export {
+  $approvedBreakingChange,
+  $approvedUnversionedChange,
+  BreakingChangeStateKeys,
+  diffKinds,
+  findSuppressions,
+  findUnversionedSuppressions,
+  getSuppressions,
+  getUnversionedSuppressions,
+  isDiffKind,
+  type DiffKind,
+  type ResolvedSuppression,
+  type SuppressionMetadata,
+} from "@azure-tools/typespec-azure-core";
 export { formatResult, main, parseArgs, type CliOptions, type CliOutput } from "./cli/cli.js";
 export { compileService, type CompileOptions } from "./cli/compile.js";
-export { diffKinds, isDiffKind, type DiffKind } from "./diff-kind.js";
 export {
   canonicalizeOperations,
   type CanonicalizationResult,
@@ -18,7 +31,6 @@ export {
   type ResolvedOperation,
 } from "./diff/operation-identity.js";
 export { resolveOrigin } from "./diff/origin.js";
-export { $lib, BreakingChangeStateKeys } from "./lib.js";
 export * from "./pipeline/orchestrator.js";
 export * from "./pipeline/policy.js";
 export { resolveFindingLocation } from "./pipeline/resolve-location.js";
@@ -51,16 +63,6 @@ export {
   type SuppressionComparisonResult,
 } from "./suppression/classification.js";
 export { createApproveBreakingChangeCodeFix } from "./suppression/codefixes.js";
-export {
-  $approvedBreakingChange,
-  $approvedUnversionedChange,
-  findSuppressions,
-  findUnversionedSuppressions,
-  getSuppressions,
-  getUnversionedSuppressions,
-  type ResolvedSuppression,
-  type SuppressionMetadata,
-} from "./suppression/decorators.js";
 export { emitFindingDiagnostics } from "./suppression/diagnostics.js";
 export {
   buildSuppressionInventory,

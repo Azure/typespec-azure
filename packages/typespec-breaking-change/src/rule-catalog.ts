@@ -1,4 +1,4 @@
-import { diffKinds, type DiffKind } from "./diff-kind.js";
+import { diffKinds, type DiffKind } from "@azure-tools/typespec-azure-core";
 import { phaseBRuleCatalog } from "./pipeline/policy.js";
 
 export type DiffKindSupportStatus = "emitted" | "derived" | "declared-only";

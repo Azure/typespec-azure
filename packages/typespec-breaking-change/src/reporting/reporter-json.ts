@@ -1,4 +1,7 @@
 import type { SourceLocation } from "@typespec/compiler";
+import { getSourceElementPath } from "../finding-identity.js";
+import { resolveFindingLocation } from "../pipeline/resolve-location.js";
+import { formatSuppressionGuidance } from "../suppression/suppression-guidance.js";
 import type {
   AnalysisResult,
   AnalysisSummary,
@@ -7,8 +10,6 @@ import type {
   TimingInfo,
 } from "../types.js";
 import { isOperationIdentity } from "../types.js";
-import { formatSuppressionGuidance } from "../suppression/suppression-guidance.js";
-import { resolveFindingLocation } from "../pipeline/resolve-location.js";
 
 /**
  * Full structured JSON report — aligned with typespec-suppressions report pattern.
@@ -128,7 +129,7 @@ function mapFinding(finding: Finding): JsonFinding {
         }
       : undefined,
     sourceTraceLevel: resolvedLocation?.sourceTraceLevel,
-    sourceElementPath: resolvedLocation?.elementPath,
+    sourceElementPath: getSourceElementPath(finding),
   };
 
   if (isOperationIdentity(finding.diff.identity)) {
