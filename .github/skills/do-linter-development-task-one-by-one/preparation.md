@@ -92,6 +92,9 @@ are never adopted/retargeted as native-first.
 
 ### Native-first dependency profile
 
+Apply the [read-only probe precautions](#read-only-dependency-probes) below to
+native, nested `core`, and specs commands, including child processes.
+
 Before installation, read each checkout's `packageManager` and verify the actual
 launcher with `--version` in that checkout. A working global launcher does not
 prove that mise, a shim or the child install selects the same version. Use the
@@ -365,6 +368,27 @@ readiness evidence for every layer.
 - Verify full Git status after setup. Do not stage generated files, `core`,
   `pnpm-lock.yaml` or logs as incidental setup changes. Unexpected tracked changes
   require an explicit dependency-defect diagnosis, not silent cleanup.
+
+### Read-only dependency probes
+
+Do not assume `pnpm exec`, including a CLI `--help` request, is read-only.
+Dependency verification can automatically install packages before the requested
+command runs. For supported pnpm versions, set
+`PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false` process-locally before probes and
+validation commands, and inherit it in child processes. Preserve the verified
+registry and launcher selection. Prefer the already-installed Node executable
+and CLI entrypoint when inspecting help or implementation. Do not change global
+configuration or treat disabled automatic installation as dependency readiness.
+An actual missing prerequisite still needs the declared readiness check and
+bounded repair; do not silently install through a probe.
+
+Filtered workspace installation does not expose every package dependency at the
+repository root. Run smoke checks and evidence scripts in the declaring package's
+resolution context, or explicitly resolve from its `package.json`. For example,
+a root-level bare `yaml` import can fail while TCGC's declared dependency is
+installed and usable. Check the installed link and declaring manifest before
+classifying this as a missing dependency. Do not reinstall the workspace or add
+a root dependency to correct a verifier's resolution context.
 
 ### Development and specs
 

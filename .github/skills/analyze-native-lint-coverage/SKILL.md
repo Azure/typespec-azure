@@ -235,12 +235,26 @@ Use the existing external-integration architecture:
 - Build the candidate package, Azure AutoRest emitter, rulesets, required
   dependency closures, and `@typespec/integration-tester`.
 - Pack the built Azure and core package closures into a dedicated artifact
-  directory. Inspect installed `chronus pack --help`; its `--only` selectors
-  must include all required published dependencies, not just the changed rule.
+  directory. Inspect the installed Chronus CLI's help or implementation using
+  the [read-only probe precautions](../do-linter-development-task-one-by-one/preparation.md#read-only-dependency-probes).
+  Its selectors must include all required published dependencies, not just the
+  changed rule. Verify the installed parser: when `--only` arrays are nongreedy,
+  repeat `--only=<package>` for each name instead of supplying trailing names.
 - Keep unrelated unbuilt packages out of the artifact set. Verify full Git
   status after building and packing. Preserve unexpected changes for diagnosis.
 - Use a clean isolated specs checkout with its declared Node/package manager.
   Do not pre-link the temporary lintdiff linter.
+
+Derive the exact expected package set and its workspace groups before packing.
+The Azure root Chronus configuration ignores `@typespec/*`; pack those core
+packages separately using the existing `core` workspace configuration. Verify
+the selected cwd/configuration for each invocation, and preserve the prepared
+launcher and no-auto-install setting in Chronus's child `pnpm pack` processes.
+A successful root pack alone does not establish a complete Azure/core closure.
+Verify the combined inventory and source-to-payload identity. If a stage fails,
+retain verified tarballs and prepare only missing packages under the existing
+bounded correction policy; do not overwrite passing artifacts or weaken the
+original complete-set guard.
 
 Run the analyzer's Node entrypoint with the **specs** package-manager version on
 `PATH`. Running it through the tooling checkout's pnpm script can select the
