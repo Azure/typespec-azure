@@ -9,7 +9,7 @@ const source = `
   op read(@path parentName: string, @path bindingName: string): void;
 `;
 
-it("includes ARM rules in all except RPaaS routing", () => {
+it("keeps only RPaaS-specific routing outside the general ARM all ruleset", () => {
   for (const rule of $linter.rules) {
     expect(
       $linter.ruleSets?.all.enable?.[`@azure-tools/typespec-azure-resource-manager/${rule.name}`],
