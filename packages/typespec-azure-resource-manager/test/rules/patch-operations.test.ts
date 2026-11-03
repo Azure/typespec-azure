@@ -354,7 +354,7 @@ interface Widgets {
       }));
   });
 
-  it("retains inherited-only nested wrappers as leaves", async () => {
+  it("compares inherited leaves rather than their nested wrapper names", async () => {
     await tester
       .expect(
         bodyPair(`
@@ -365,7 +365,40 @@ interface Widgets {
         model PatchBody { patchWrapper?: PatchWrapper; }
       `),
       )
-      .toEmitDiagnostics(missingProperty("patchWrapper"));
+      .toBeValid();
+  });
+
+  it("finds inherited writable PUT leaves behind read-only direct members", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model Key { identityType?: string; }
+        model Encryption { key?: Key; }
+        model UpdateProperties { encryption?: Encryption; }
+        model PutProperties extends UpdateProperties {
+          @visibility(Lifecycle.Read) state?: string;
+        }
+        model PutBody { properties?: PutProperties; }
+        model PatchBody { properties?: UpdateProperties; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("reports genuinely missing inherited nested PATCH leaves", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutProperties { common?: string; }
+        model PatchBase { common?: string; extra?: string; }
+        model PatchProperties extends PatchBase {
+          @visibility(Lifecycle.Read) state?: string;
+        }
+        model PutBody { properties?: PutProperties; }
+        model PatchBody { properties?: PatchProperties; }
+      `),
+      )
+      .toEmitDiagnostics(missingProperty("extra"));
   });
 
   it("requires a PATCH request body", async () => {
@@ -406,7 +439,7 @@ interface Widgets {
   });
 
   it.each(["", "@body body: void"])(
-    "leaves missing PUT body validation to the PUT rule (%s)",
+    "reports PATCH properties when the PUT body is missing (%s)",
     async (parameter) => {
       await tester
         .expect(
@@ -416,7 +449,7 @@ interface Widgets {
         @route("/widgets") @patch op patch(@body body: { common?: string; }): void;
       `,
         )
-        .toBeValid();
+        .toEmitDiagnostics(missingProperty("common"));
     },
   );
 
@@ -1034,7 +1067,7 @@ interface Widgets {
       `,
     );
     if (verb === "put") {
-      await expectation.toBeValid();
+      await expectation.toEmitDiagnostics(missingProperty("common"));
     } else {
       await expectation.toEmitDiagnostics({
         code,

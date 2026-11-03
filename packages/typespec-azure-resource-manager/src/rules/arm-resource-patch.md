@@ -1,6 +1,8 @@
 The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource.
 
-When a PUT shares the PATCH endpoint, the PATCH must have a nonempty object body whose effective input properties correspond to PUT input properties. This includes recursive models, inherited properties, encoded JSON names, native operation visibility, and every declared service/dependency version. Unsupported or ambiguous body types are not treated as empty objects.
+When a PUT shares the PATCH endpoint, the PATCH must have a nonempty object body whose effective input properties correspond to PUT input properties. A nonempty PATCH body cannot correspond to an absent or void PUT body. This includes recursive models, inherited properties, encoded JSON names, native operation visibility, and declared service/dependency version availability. Unsupported or ambiguous body types are not treated as empty objects.
+
+Historical property names and types are not reconstructed when checking older versions; this can produce false positives. Shared version-aware lint evaluation is tracked in [#5875](https://github.com/Azure/typespec-azure/issues/5875).
 
 `arm-resource-operation-response` checks PUT request/resource and response consistency; `use-operation-decorator` checks resource operation registration. Resource subset and model identity alone are insufficient: the same resource model can expose a property to PATCH but hide it from PUT through `@parameterVisibility(Lifecycle.Create)`. Therefore `arm-resource-patch` also checks effective writable input at paired endpoints, including custom HTTP operations.
 

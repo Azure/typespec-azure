@@ -105,18 +105,21 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
               continue;
             }
             const putBody = getBodyAtVersion(program, put, version);
-            if (
-              putBody === undefined ||
-              put.parameters.body?.bodyKind !== "single" ||
-              !isObjectBody(putBody)
-            ) {
-              continue;
+            const putPropertyNames = new Set<string>();
+            if (putBody !== undefined && !isVoidType(putBody)) {
+              if (put.parameters.body?.bodyKind !== "single" || !isObjectBody(putBody)) {
+                continue;
+              }
+              for (const property of collectLeafProperties(
+                program,
+                putBody,
+                put,
+                metadataInfo,
+                version,
+              )) {
+                putPropertyNames.add(property.jsonName);
+              }
             }
-            const putPropertyNames = new Set(
-              collectLeafProperties(program, putBody, put, metadataInfo, version).map(
-                (property) => property.jsonName,
-              ),
-            );
             for (const patchProperty of patchProperties) {
               if (putPropertyNames.has(patchProperty.jsonName)) {
                 continue;
@@ -229,7 +232,7 @@ function collectTypeLeaves(
   for (const [jsonName, property] of properties) {
     const target =
       getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
-    const nested = hasDirectPayloadProperties(
+    const nested = hasPayloadProperties(
       program,
       property.type,
       metadataInfo,
@@ -258,7 +261,7 @@ function collectTypeLeaves(
   return leaves;
 }
 
-function hasDirectPayloadProperties(
+function hasPayloadProperties(
   program: Program,
   type: Type,
   metadataInfo: MetadataInfo,
@@ -270,15 +273,15 @@ function hasDirectPayloadProperties(
     const member = getSingleNonNullMember(type);
     return (
       member !== undefined &&
-      hasDirectPayloadProperties(program, member, metadataInfo, visibility, inExplicitBody, version)
+      hasPayloadProperties(program, member, metadataInfo, visibility, inExplicitBody, version)
     );
   }
   if (type.kind !== "Model") {
     return false;
   }
 
-  return [...type.properties.values()].some(
-    (property) =>
+  return [...walkJsonProperties(program, type)].some(
+    ([, property]) =>
       isAvailableAtVersion(program, property, version) &&
       metadataInfo.isPayloadProperty(property, visibility, inExplicitBody) &&
       !isNeverType(property.type),
