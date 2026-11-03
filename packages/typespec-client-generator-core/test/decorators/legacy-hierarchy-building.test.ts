@@ -8,6 +8,68 @@ import {
   SimpleTesterWithService,
 } from "../tester.js";
 
+it.each(["python", "java"])(
+  "preserves scoped access on a non-LRO rebased hierarchy for %s",
+  async (emitter) => {
+    const { program } = await SimpleTesterWithService.compile(`
+      @access(Access.internal)
+      @access(Access.public, "python")
+      model Root { id: string; }
+
+      @access(Access.internal)
+      @access(Access.public, "python")
+      model Middle extends Root { mode: Mode; }
+
+      @access(Access.internal)
+      @access(Access.public, "python")
+      enum Mode { fast, slow }
+
+      @access(Access.internal)
+      @access(Access.public, "python")
+      @Legacy.hierarchyBuilding(Middle)
+      model Leaf extends Root {
+        mode: Mode;
+        value: string;
+      }
+
+      @access(Access.internal)
+      @get
+      @route("/middle")
+      op getMiddle(): Middle;
+
+      @access(Access.internal)
+      @get
+      @route("/leaf")
+      op getLeaf(): Leaf;
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: `@azure-tools/typespec-${emitter}`,
+    });
+    strictEqual(context.diagnostics.length, 0);
+    const models = context.sdkPackage.models;
+    const root = models.find((x) => x.name === "Root");
+    const middle = models.find((x) => x.name === "Middle");
+    const leaf = models.find((x) => x.name === "Leaf");
+    const mode = context.sdkPackage.enums.find((x) => x.name === "Mode");
+    ok(root);
+    ok(middle);
+    ok(leaf);
+    ok(mode);
+    strictEqual(leaf.baseModel, middle);
+    strictEqual(middle.baseModel, root);
+    strictEqual(leaf.properties.length, 1);
+    strictEqual(leaf.properties[0].name, "value");
+    for (const type of [root, middle, leaf, mode]) {
+      strictEqual(type.access, emitter === "python" ? "public" : "internal");
+    }
+    strictEqual(context.sdkPackage.clients[0].methods.length, 2);
+    for (const method of context.sdkPackage.clients[0].methods) {
+      strictEqual(method.kind, "basic");
+      strictEqual(method.access, "internal");
+    }
+  },
+);
+
 it("three-level inheritance chain", async () => {
   // Expected after rebase:
   //   C extends B extends A

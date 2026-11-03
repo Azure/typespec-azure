@@ -31,6 +31,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
@@ -57,6 +58,8 @@ import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
 import { useScopeForExtensionRoutingRule } from "./rules/use-scope-for-extension-routing.js";
+import { useScopePathStandardNameRule } from "./rules/use-scope-path-standard-name.js";
+import { useStandardErrorRule } from "./rules/use-standard-error.js";
 import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
@@ -73,6 +76,7 @@ const rules = [
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,
+  useStandardErrorRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
@@ -115,12 +119,14 @@ const rules = [
   useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
+  noEmptyPostResponseRule,
   noReservedResourcePropertyRule,
   noTagsOnProxyResourceRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
+  useScopePathStandardNameRule,
 ];
 
 export const $linter = defineLinter({

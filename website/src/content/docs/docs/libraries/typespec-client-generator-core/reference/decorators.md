@@ -853,6 +853,83 @@ model MyModel {
 }
 ```
 
+### `@dynamicModel` {#@Azure.ClientGenerator.Core.dynamicModel}
+
+Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+A dynamic model represents updates as JSON Patch operations rather than a replacement of the full model.
+In C# generation, a marked model exposes patch-aware properties and a `JsonPatch`-backed `Patch` API.
+This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
+
+```typespec
+@Azure.ClientGenerator.Core.dynamicModel(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The model or namespace to mark as dynamic.
+`Model | Namespace`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                                                                                                                        |
+| ----- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning. |
+
+#### Examples
+
+##### Mark a model as dynamic
+
+```typespec
+@dynamicModel("csharp")
+model Pet {
+  name: string;
+}
+```
+
+##### Mark a namespace for C# dynamic-model metadata
+
+```typespec
+@dynamicModel("csharp")
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+}
+```
+
+### `@lroStatusMetadata` {#@Azure.ClientGenerator.Core.lroStatusMetadata}
+
+Marks a status-monitor model property as transient polling data that the SDK should expose to
+callers while the long-running operation is in progress, for scenarios like reporting progress,
+usage, or job statistics. Emitters whose operations return only the final result, such as Python
+and JavaScript, would otherwise need handwritten code to surface these values; marked properties
+appear on the emitter's idiomatic poller or operation object instead. The property does not affect
+polling, status evaluation, errors, or final-result extraction.
+
+Values come from the most recent status-monitor response the SDK has received, including the
+initial response when it contains the status-monitor model. Any value may be absent until a
+response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+Emitters should keep these values current after each poll. Metadata is not part of the
+continuation token; after rehydration, the next poll populates it again.
+
+Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
+are diagnosed once at declaration time.
+
+```typespec
+@Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The status-monitor model property.
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Define the sub client generated in the client SDK.
