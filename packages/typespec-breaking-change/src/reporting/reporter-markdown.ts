@@ -306,7 +306,7 @@ function fmtMs(ms: number): string {
 }
 
 function esc(value: string): string {
-  return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 }
 
 /** Group findings by version pair, returning label → findings entries. */
