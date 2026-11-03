@@ -218,6 +218,9 @@ cost/budget before execution; retain unsuccessful attempts, never overwrite
 them or silently retry with failing projects excluded.
 
 The producer checks the sealed parent inventory before and after execution.
+Reference existence/type checks reuse each just-verified file inventory rather
+than repeating filesystem traversal for every reference; no file hashes or
+population checks are skipped.
 It reads retained Swagger/reference files only, rejects nonlocal/escaping or
 symlinked references, and records each input's execution status plus raw
 diagnostics. Resolver, format, parsing and thrown-rule failures prevent complete

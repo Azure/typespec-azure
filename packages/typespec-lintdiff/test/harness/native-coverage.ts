@@ -685,10 +685,16 @@ interface CoverageDataset {
   projects: DatasetProject[];
 }
 
+function datasetFileKey(file: string): string {
+  const normalized = file.replace(/[\\/]/g, path.sep);
+  return process.platform === "win32" ? normalized.toLowerCase() : normalized;
+}
+
 export function readCoverageDataset(
   datasetDir: string,
   context: BaselineContext,
   requireSuccessful = false,
+  verifiedFiles?: Set<string>,
 ) {
   const dataset: CoverageDataset = JSON.parse(
     fs.readFileSync(containedFile(datasetDir, "_meta.json"), "utf8"),
@@ -742,7 +748,12 @@ export function readCoverageDataset(
   for (const files of references) {
     if (!Array.isArray(files)) throw new Error("Missing dataset file inventory.");
     for (const file of files) {
-      if (typeof file !== "string" || !fs.statSync(containedFile(datasetDir, file)).isFile()) {
+      if (
+        typeof file !== "string" ||
+        (verifiedFiles
+          ? !verifiedFiles.has(datasetFileKey(file))
+          : !fs.statSync(containedFile(datasetDir, file)).isFile())
+      ) {
         throw new Error("Missing referenced dataset file.");
       }
     }
@@ -963,10 +974,16 @@ export function verifyBaselineRun(run: string) {
     throw new Error("Only a completed, sealed schema-2 baseline run can be reused.");
   }
   const datasetDir = containedFile(run, "dataset");
-  if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
+  const files = inventoryDataset(datasetDir);
+  if (contentIdentity(files) !== contentIdentity(evidence.files)) {
     throw new Error("Baseline dataset inventory or file hashes are corrupt.");
   }
-  const result = readCoverageDataset(datasetDir, evidence.context, true);
+  const result = readCoverageDataset(
+    datasetDir,
+    evidence.context,
+    true,
+    new Set(files.map((item) => datasetFileKey(item.file))),
+  );
   if (contentIdentity(result.dataset.projects) !== contentIdentity(evidence.projects)) {
     throw new Error("Baseline project population changed.");
   }

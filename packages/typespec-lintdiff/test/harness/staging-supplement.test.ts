@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   inventoryDataset,
   loadCoverageValidatorMembers,
+  verifyBaselineRun,
   type BaselineEvidence,
 } from "./native-coverage.js";
 import {
@@ -222,5 +223,23 @@ describe("immutable ARM staging supplements", () => {
       produceStagingSupplement(test.baseline, path.join(alias, "new-supplement"), [rule]),
     ).rejects.toThrow(/outside/);
     expect(fs.existsSync(path.join(test.baseline, "new-supplement"))).toBe(false);
+  });
+
+  it("rejects escaping references even when the changed metadata inventory is resealed", () => {
+    const test = fixture();
+    const metaFile = path.join(test.dataset, "_meta.json");
+    const meta = JSON.parse(fs.readFileSync(metaFile, "utf8"));
+    meta.commonTypesFiles = ["../outside.json"];
+    write(path.join(test.baseline, "outside.json"), {});
+    write(metaFile, meta);
+    test.evidence.files = inventoryDataset(test.dataset);
+    write(path.join(test.baseline, "baseline.json"), test.evidence);
+    write(path.join(test.baseline, "manifest.json"), {
+      schemaVersion: 2,
+      status: "complete",
+      finishedAt: new Date().toISOString(),
+      baselineIdentity: identity(test.evidence),
+    });
+    expect(() => verifyBaselineRun(test.baseline)).toThrow(/Missing referenced dataset file/);
   });
 });
