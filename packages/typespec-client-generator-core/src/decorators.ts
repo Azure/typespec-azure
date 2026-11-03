@@ -1,4 +1,4 @@
-import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata, getOperationLinks } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -14,6 +14,7 @@ import {
   isErrorModel,
   isList,
   isNumeric,
+  listOperationsIn,
   type Model,
   type ModelProperty,
   type Namespace,
@@ -95,7 +96,6 @@ import {
   isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
-  lroOperationIdKey,
   negationScopesKey,
   normalizeScope,
   omitOperation,
@@ -151,6 +151,8 @@ export function getLroStatusMetadataDecorator(
   );
 }
 
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+
 export const $lroOperationId: LroOperationIdDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
@@ -164,6 +166,46 @@ export const $lroOperationId: LroOperationIdDecorator = (
     { target: context.decoratorTarget },
     scope,
   );
+  return {
+    onGraphFinish: () => {
+      if (isPathParam(context.program, target)) return [];
+      if ($(context.program).scalar.extendsString(target.type)) {
+        const source = findRootSourceProperty(target);
+        for (const operation of listOperationsIn(context.program.getGlobalNamespaceType())) {
+          if (!$(context.program).type.isUserDefined(operation)) continue;
+          const pollingLink = getOperationLinks(context.program, operation)?.get("polling");
+          if (!pollingLink) continue;
+          const httpOperation = ignoreDiagnostics(
+            getHttpOperation(context.program, pollingLink.linkedOperation),
+          );
+          if (
+            httpOperation.parameters.parameters.some(
+              (parameter) =>
+                parameter.type === "path" && findRootSourceProperty(parameter.param) === source,
+            )
+          ) {
+            return [];
+          }
+          // Base declarations remain valid even when a derived monitor overrides them.
+          for (
+            let model = pollingLink.result?.statusMonitor?.monitorType;
+            model;
+            model = model.baseModel
+          ) {
+            for (const property of model.properties.values()) {
+              if (findRootSourceProperty(property) === source) return [];
+            }
+          }
+        }
+      }
+      return [
+        createDiagnostic({
+          code: "lro-operation-id-invalid-target",
+          target: context.decoratorTarget,
+        }),
+      ];
+    },
+  };
 };
 
 export function getLroOperationIdDecorator(

@@ -1256,9 +1256,13 @@ export interface SdkLroOperationIdPropertyMetadata {
   kind: "property";
   /** Exact property selected from the status-monitor response model. */
   property: SdkModelPropertyType;
+  /**
+   * Segments from `pollingInfo.responseModel` to the operation ID, using the same property
+   * objects as the response model. Currently `[property]`: only direct or inherited properties
+   * are selectable, and inheritance does not add a response-body segment.
+   */
+  propertySegments: SdkModelPropertyType[];
 }
-
-// A response-header variant can be added when a service needs a server-issued operation ID there.
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
   kind: "nextOperationReference";

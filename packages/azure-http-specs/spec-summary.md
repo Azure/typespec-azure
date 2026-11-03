@@ -1339,7 +1339,7 @@ Expected calls:
 
 - Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start`
 
-Declares a status-body operation ID flow where the polling URI does not contain the identifier.
+Declares a status-body operation ID flow where the polling URI does not contain the identifier. After a poll response, emitters use the operation ID property's segments to read `id` from `TranslationStatus` and expose `translation-123` on the SDK operation or poller. Before that response the ID is unavailable. It is not a request parameter and must not be used to construct the polling URL; polling continues with the complete `Operation-Location` URI. The scenario supplies the HTTP flow; emitter tests must verify their public operation-ID accessor.
 
 Expected calls:
 
@@ -1352,8 +1352,7 @@ Expected calls:
 
 - Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start-with-path`
 
-Declares a Translation-shaped fallback flow with operation identity in both the
-Operation-Location path and the status-monitor body.
+Declares a Translation-shaped fallback flow with operation identity in both the Operation-Location path and the status-monitor body. Emitters can expose `translation-456` from the polling URI before the first poll, then use the body's `id` once a status response is available. The ID is SDK operation or poller state, not a replacement for the complete polling URI.
 
 Expected calls:
 

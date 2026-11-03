@@ -6,4 +6,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, including inherited properties and `@hierarchyBuilding` replacements. Includes emitter scopes and representative Spector scenarios.
+Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Includes emitter scopes and representative Spector scenarios.

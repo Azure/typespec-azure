@@ -134,7 +134,12 @@ model Invalid {
   });
 
   it("exposes a status-monitor response property", async () => {
-    const { program } = await Tester.compile(propertyOperation);
+    const { program } = await Tester.compile(
+      propertyOperation.replace(
+        "@lroOperationId\n",
+        '@lroOperationId\n  @clientName("jobId")\n  @encodedName("application/json", "job_id")\n',
+      ),
+    );
     const context = await createSdkContextForTester(program);
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
     ok(method);
@@ -142,13 +147,20 @@ model Invalid {
     strictEqual(method.lroMetadata.operationId?.length, 1);
     strictEqual(method.lroMetadata.operationId?.[0].kind, "property");
     if (method.lroMetadata.operationId?.[0].kind === "property") {
-      strictEqual(method.lroMetadata.operationId[0].property.name, "operationId");
+      strictEqual(method.lroMetadata.operationId[0].property.name, "jobId");
       strictEqual(method.lroMetadata.operationId[0].property.__raw?.name, "operationId");
       strictEqual(
         method.lroMetadata.operationId[0].property,
-        method.lroMetadata.pollingInfo.responseModel.properties.find(
-          (x) => x.name === "operationId",
-        ),
+        method.lroMetadata.pollingInfo.responseModel.properties.find((x) => x.name === "jobId"),
+      );
+      strictEqual(method.lroMetadata.operationId[0].propertySegments.length, 1);
+      strictEqual(
+        method.lroMetadata.operationId[0].propertySegments[0],
+        method.lroMetadata.operationId[0].property,
+      );
+      strictEqual(
+        method.lroMetadata.operationId[0].propertySegments[0].serializationOptions.json?.name,
+        "job_id",
       );
     }
   });
@@ -224,6 +236,11 @@ op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
     strictEqual(method.kind, "lro");
     strictEqual(method.lroMetadata.operationId?.[0].kind, "property");
     if (method.lroMetadata.operationId?.[0].kind === "property") {
+      strictEqual(method.lroMetadata.operationId[0].propertySegments.length, 1);
+      strictEqual(
+        method.lroMetadata.operationId[0].propertySegments[0],
+        method.lroMetadata.operationId[0].property,
+      );
       strictEqual(
         method.lroMetadata.operationId[0].property,
         method.lroMetadata.pollingInfo.responseModel.baseModel?.properties.find(
@@ -241,6 +258,21 @@ op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
       code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
     });
   });
+
+  it.each(["@lroOperationId @path", "@path @lroOperationId"])(
+    "accepts a numeric path ID with decorator order %s",
+    async (decorators) => {
+      const { program } = await Tester.compile(
+        operation.replace("@lroOperationId\n  @path jobId: string", `${decorators} jobId: int32`),
+      );
+      const context = await createSdkContextForTester(program);
+      expectDiagnostics(context.diagnostics, []);
+      const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+      ok(method);
+      strictEqual(method.kind, "lro");
+      strictEqual(method.lroMetadata.operationId?.[0].kind, "path");
+    },
+  );
 
   it("selects only the effective operation ID when a derived monitor overrides it", async () => {
     const { program } = await Tester.compile(`
@@ -310,6 +342,8 @@ model PropertyJobState {`,
       ),
     );
     strictEqual(operationId.property.serializationOptions.json?.name, "rebased_id");
+    strictEqual(operationId.propertySegments.length, 1);
+    strictEqual(operationId.propertySegments[0], operationId.property);
   });
 
   it("rejects a property outside the linked status-monitor response model", async () => {

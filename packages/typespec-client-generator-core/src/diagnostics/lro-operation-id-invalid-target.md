@@ -1,8 +1,6 @@
-This diagnostic is issued when `@lroOperationId` targets a property that is not a supported
-operation ID source.
+This diagnostic is issued when `@lroOperationId` targets a property that is not a supported operation ID source.
 
-`@lroOperationId` identifies either a path parameter of the linked LRO status-monitor operation or
-a string-like property of its response model.
+`@lroOperationId` identifies either a path parameter of the linked LRO status-monitor operation or a string-like property of its response model.
 
 ## Impact
 
@@ -32,9 +30,7 @@ TCGC reports:
 
 ## ✅ How to Fix
 
-Move the decorator to the corresponding `@path` parameter of the operation referenced by
-`@pollingOperation`, or to the string-like operation ID property on that operation's response model.
-The source must match the service contract; remove the decorator if there is no supported source.
+Move the decorator to the corresponding `@path` parameter of the operation referenced by `@pollingOperation`, or to the string-like operation ID property on that operation's response model. The source must match the service contract; remove the decorator if there is no supported source.
 
 For a service whose status monitor returns a string ID:
 

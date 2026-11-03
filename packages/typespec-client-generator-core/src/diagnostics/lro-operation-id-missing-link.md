@@ -1,7 +1,4 @@
-This diagnostic is issued when an `@lroOperationId` path parameter belongs to the linked
-status-monitor operation, but the initiating LRO does not receive the status-monitor URI in a
-response header or URL-valued body property. A response-model property selection does not require a
-URI link.
+This diagnostic is issued when an `@lroOperationId` path parameter belongs to the linked status-monitor operation, but the initiating LRO does not receive the status-monitor URI in a response header or URL-valued body property. A response-model property selection does not require a URI link.
 
 ## Impact
 
@@ -18,12 +15,8 @@ TCGC reports:
 
 ## ✅ How to Fix
 
-Model the linked polling operation with an `Operation-Location`-style response link, move
-`@lroOperationId` to the status-monitor response model's operation ID property, or remove it.
-Only model a response link if the service actually returns it; explicit polling-parameter mappings
-alone do not provide a URI to parse.
+Model the linked polling operation with an `Operation-Location`-style response link, move `@lroOperationId` to the status-monitor response model's operation ID property, or remove it. Only model a response link if the service actually returns it; explicit polling-parameter mappings alone do not provide a URI to parse.
 
 ## Suppression
 
-This diagnostic should not be suppressed. Model the service's response link or select a supported
-response-model property instead.
+This diagnostic should not be suppressed. Model the service's response link or select a supported response-model property instead.

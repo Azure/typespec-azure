@@ -463,7 +463,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     if (!pollingResponseBody) continue;
     const property = getEffectiveSdkModelProperty(pollingResponseBody, selection.property);
     if (property) {
-      operationId.push({ kind: "property", property });
+      operationId.push({ kind: "property", property, propertySegments: [property] });
     }
   }
 

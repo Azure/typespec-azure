@@ -413,8 +413,7 @@ Status metadata requires native Azure.Core LRO discovery. An operation detected 
 
 #### Legacy LRO operation identity
 
-TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service
-that returns a server-issued identifier in its status-monitor URI, response body, or both:
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service that returns a server-issued identifier in its status-monitor URI, response body, or both:
 
 ```typespec
 model OperationStatus {
@@ -436,27 +435,15 @@ op getOperationStatus(
 op begin is MyLongRunningOperation;
 ```
 
-`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact
-`SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact
-`SdkModelPropertyType` for the status-monitor body. The path form is available from the initial
-response and must remain derivable after poller rehydration from the stored polling URL. The
-property form becomes available only after a status-monitor response is received.
+`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact `SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact `SdkModelPropertyType` for the status-monitor body. The path form is available from the initial response and must remain derivable after poller rehydration from the stored polling URL. The property form becomes available only after a status-monitor response is received.
 
-Property selection follows the effective inherited model shape: an overridden base property is
-not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names
-and serialization metadata.
+For `kind: "property"`, `propertySegments` gives the access path from `pollingInfo.responseModel` to the ID, following the segment representation used by paging metadata. Currently only direct or inherited properties are selectable, so the path is `[property]`; inheritance does not add a JSON nesting level. Each segment is the exact effective SDK property, carrying its client name and `serializationOptions.json.name` for emitters reading a typed model or raw JSON. An overridden base property is not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names and serialization metadata.
 
-This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API
-parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET
-`Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller
-state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no
-modeled polling operation cannot expose operation-ID metadata.
+For example, after the body-only Translation scenario returns `{ id: "translation-123", status: "Running" }`, an emitter reads the selected `id` using `propertySegments` and exposes `"translation-123"` through its operation or poller accessor. No ID is available before that response in the body-only case. When both sources are selected, the URI-derived value is available first and the body value becomes available after polling. These scenarios supply HTTP fixtures; each emitter must implement and test the public accessor.
 
-Conforming Azure services expose operation identity through their request and response API,
-including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator.
-`@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is
-not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret
-URI or a delete-until-gone resource name, is not an operation identifier.
+This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no modeled polling operation cannot expose operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API, including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator. `@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret URI or a delete-until-gone resource name, is not an operation identifier.
 
 ### HTTP Operation Parameters Handling
 
