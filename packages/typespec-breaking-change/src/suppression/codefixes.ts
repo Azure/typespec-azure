@@ -1,54 +1,54 @@
-import {
-  createAddDecoratorCodeFix,
-  type CodeFix,
-  type DiagnosticTarget,
-  type Type,
-} from "@typespec/compiler";
-import type { Finding } from "../types.js";
-import { resolveSuppressionTarget } from "./target.js";
+import { defineCodeFix, getSourceLocation, type CodeFix } from "@typespec/compiler";
+import { isOperationIdentity, type Finding } from "../types.js";
+import { composeFullIdentityPath, resolveSuppressionTarget } from "./target.js";
 
 /**
- * Create a codefix that adds @approvedBreakingChange decorator to suppress a finding.
- *
- * Targets the origin declaration type when available (suppresses all uses of that declaration),
- * falling back to the head type (wire type where the change was detected).
+ * Create a phase-appropriate approval on a surviving source declaration.
  *
  * @param finding - The finding to create a codefix for
  * @returns A CodeFix, or undefined if no suitable target exists
  */
 export function createApproveBreakingChangeCodeFix(finding: Finding): CodeFix | undefined {
-  const suppressionTarget = resolveSuppressionTarget(finding);
-  const target = suppressionTarget.target ?? getCodefixTarget(finding);
+  if (finding.phase === "same-version" && finding.diff.kind === "OperationRemoved") {
+    return undefined;
+  }
+  // A same-version removal's origin belongs to the baseline, not the file being edited.
+  const suppressionTarget =
+    finding.phase === "same-version" && !finding.diff.headType
+      ? {
+          target: finding.diff.operationType,
+          path: isOperationIdentity(finding.diff.identity)
+            ? composeFullIdentityPath(finding.diff.identity)
+            : undefined,
+        }
+      : resolveSuppressionTarget(finding);
+  const target = suppressionTarget.target;
   if (!target) return undefined;
   const pathOption = suppressionTarget.path
-    ? `, path: "${escapeString(suppressionTarget.path)}"`
+    ? `, path: ${JSON.stringify(suppressionTarget.path)}`
     : "";
+  const crossVersion = finding.phase === "cross-version";
+  const decorator = crossVersion ? "approvedBreakingChange" : "approvedUnversionedChange";
+  const sinceOption = crossVersion
+    ? `, since: ${JSON.stringify(finding.versionPair.headVersion)}`
+    : "";
+  const args = [
+    JSON.stringify(`Approved: ${finding.diff.message}`),
+    `#{ kind: ${JSON.stringify(finding.diff.kind)}${pathOption}${sinceOption} }`,
+  ];
 
-  return createAddDecoratorCodeFix(target as DiagnosticTarget, "approvedBreakingChange", [
-    `"Approved: ${escapeString(finding.diff.message)}"`,
-    `#{ kind: "${escapeString(finding.diff.kind)}"${pathOption} }`,
-  ]);
-}
-
-/**
- * Get the best target node for the codefix decorator insertion.
- * Prefers origin type (named declaration) over wire type.
- */
-function getCodefixTarget(finding: Finding): Type | undefined {
-  // Prefer origin — it's the named declaration that "owns" the change
-  if (finding.diff.origin?.type) {
-    return finding.diff.origin.type;
-  }
-
-  // Fallback to head type (where the change is visible in the current spec)
-  if (finding.diff.headType) {
-    return finding.diff.headType;
-  }
-
-  // For removals, the base type might be all we have
-  return finding.diff.baseType;
-}
-
-function escapeString(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return defineCodeFix({
+    id: `add-decorator-${decorator}`,
+    label: `Approve this change with @Azure.Core.${decorator}`,
+    fix: (context) => {
+      const location = getSourceLocation(target);
+      const lineStart = location.file.text.lastIndexOf("\n", location.pos - 1) + 1;
+      const indent = location.file.text.slice(lineStart, location.pos).match(/^[ \t]*/)?.[0] ?? "";
+      // Insert at the declaration, not the line start: properties may share a line with their model.
+      return context.prependText(
+        location,
+        `@Azure.Core.${decorator}(${args.join(", ")})\n${indent}`,
+      );
+    },
+  });
 }
