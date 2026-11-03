@@ -236,6 +236,15 @@ parent identity, supplement manifest content identity, exact rule set, immutable
 repository/commit/path or archive size/hash, producer source commit and runtime.
 Use a separate discovery descriptor/path; do not add fields to the strict
 schema-1 production descriptor or reinterpret its production summary totals.
+Publish optional staging discovery at
+`.lintdiff-baselines\<baseline-id>\staging\current.json` on the same metadata
+branch. A consumer reads it at the **already pinned metadata commit**, checks
+the parent identity, profile and selected rules, and records the referenced
+immutable supplement repository/commit/path and manifest identity before setup.
+An older pinned metadata commit may legitimately have no supplement. That is
+missing evaluated staging data, not a zero-finding result or permission to
+silently fetch a newer discovery tip. Explicitly select a newer metadata commit
+for a new comparison while retaining the unchanged production descriptor.
 Verify recovered Git blob bytes or downloaded archive hashes before consumption.
 An archive must be safely extracted without escaping paths, links or special
 files; the production `shared_baseline.py fetch` command does not download or
