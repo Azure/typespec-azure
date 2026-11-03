@@ -6,6 +6,7 @@ import type {
   SdkModelType,
   SdkServiceMethod,
 } from "../../src/interfaces.js";
+import { UsageFlags } from "../../src/interfaces.js";
 import {
   createSdkContextForTester,
   SimpleTesterWithService,
@@ -60,6 +61,34 @@ it("json serialization with @encodedName", async () => {
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
   strictEqual(models[0].properties[0].kind, "property");
   strictEqual(models[0].properties[0].serializationOptions.json?.name, "newId");
+});
+
+it.each(["filter", "filter*"])("query object {%s} serialization options", async (expansion) => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseFilter {
+      @encodedName("application/json", "display-name") name: string;
+    }
+    model Filter extends BaseFilter {
+      @clientName("total") count: int32;
+      enabled: boolean;
+    }
+    @route("/items{?${expansion}}")
+    op test(filter?: Filter): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const model = method.parameters[0].type;
+  strictEqual(model.kind, "model");
+  strictEqual(model.usage, UsageFlags.Input);
+  strictEqual(model.serializationOptions.json?.name, "Filter");
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].name, "total");
+  strictEqual(model.properties[0].serializationOptions.json?.name, "count");
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.json?.name, "enabled");
+  ok(model.baseModel);
+  strictEqual(model.baseModel.properties[0].kind, "property");
+  strictEqual(model.baseModel.properties[0].serializationOptions.json?.name, "display-name");
 });
 
 it("@attribute", async function () {

@@ -2083,6 +2083,10 @@ function updateTypesFromOperation(
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+      if (param.type === "query") {
+        // Query objects use JSON wire names without being JSON request bodies.
+        diagnostics.pipe(updateSerializationOptions(context, sdkType, ["application/json"]));
+      }
     }
     const httpBody = httpOperation.parameters.body;
     if (httpBody && !isNeverOrVoidType(httpBody.type)) {

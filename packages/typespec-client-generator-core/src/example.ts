@@ -11,7 +11,6 @@ import {
   getRelativePathFromDirectory,
   joinPaths,
   normalizePath,
-  resolveEncodedName,
   resolvePath,
 } from "@typespec/compiler";
 import {
@@ -338,7 +337,7 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
   const diagnostics = createDiagnosticCollector();
 
   if (method.operation.kind === "http") {
-    diagnostics.pipe(handleHttpOperationExamples(method.operation, examples, context.program));
+    diagnostics.pipe(handleHttpOperationExamples(method.operation, examples));
     if (method.operation.examples) {
       context.__httpOperationExamples.set(method.operation.__raw, method.operation.examples);
     }
@@ -350,7 +349,6 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
 function handleHttpOperationExamples(
   operation: SdkHttpOperation,
   examples: Record<string, LoadedExample>,
-  program: Program,
 ) {
   const diagnostics = createDiagnosticCollector();
   operation.examples = [];
@@ -369,7 +367,6 @@ function handleHttpOperationExamples(
             : operation.parameters,
           example.data,
           example.relativePath,
-          program,
         ),
       ),
       responses: diagnostics.pipe(
@@ -393,7 +390,6 @@ function handleHttpParameters(
   parameters: SdkHttpParameter[],
   example: any,
   relativePath: string,
-  program: Program,
 ): [SdkHttpParameterExampleValue[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const parameterExamples: SdkHttpParameterExampleValue[] = [];
@@ -414,12 +410,7 @@ function handleHttpParameters(
       }
       if (parameter) {
         const value = diagnostics.pipe(
-          getSdkTypeExample(
-            parameter.type,
-            example.parameters[name],
-            relativePath,
-            parameter.kind === "query" ? program : undefined,
-          ),
+          getSdkTypeExample(parameter.type, example.parameters[name], relativePath),
         );
         if (value) {
           parameterExamples.push({
@@ -548,7 +539,6 @@ function getSdkTypeExample(
   type: SdkType,
   example: any,
   relativePath: string,
-  queryProgram?: Program,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
@@ -577,7 +567,7 @@ function getSdkTypeExample(
             value: null,
           });
         } else {
-          return getSdkTypeExample(type.type, example, relativePath, queryProgram);
+          return getSdkTypeExample(type.type, example, relativePath);
         }
       case "unknown":
         return diagnostics.wrap({
@@ -643,7 +633,7 @@ function getSdkTypeExample(
       case "dict":
         return getSdkDictionaryExample(type, example, relativePath);
       case "model":
-        return getSdkModelExample(type, example, relativePath, queryProgram);
+        return getSdkModelExample(type, example, relativePath);
     }
   }
   return diagnostics.wrap(undefined);
@@ -786,7 +776,6 @@ function getSdkModelExample(
   type: SdkModelType,
   example: any,
   relativePath: string,
-  queryProgram?: Program,
 ): [SdkModelExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
@@ -803,7 +792,6 @@ function getSdkModelExample(
             type.discriminatedSubtypes![example[type.discriminatorProperty.name]],
             example,
             relativePath,
-            queryProgram,
           );
         }
       } else {
@@ -824,19 +812,13 @@ function getSdkModelExample(
     while (modelQueue.length > 0) {
       const model = modelQueue.pop()!;
       for (const property of model.properties) {
-        if (property.kind !== "property") {
-          continue;
-        }
-        // Query-only properties can lack JSON serialization metadata.
-        const name =
-          property.serializationOptions.json?.name ??
-          (queryProgram
-            ? property.__raw
-              ? resolveEncodedName(queryProgram, property.__raw, "application/json")
-              : property.name
-            : undefined);
-        if (name && !properties.has(name)) {
-          properties.set(name, property);
+        // for query/path/cookie/header parameters, they should have been handled in parameters.
+        if (
+          property.kind === "property" &&
+          property.serializationOptions.json?.name &&
+          !properties.has(property.serializationOptions.json.name)
+        ) {
+          properties.set(property.serializationOptions.json.name, property);
         }
       }
       if (model.additionalProperties && additionalPropertiesType === undefined) {
