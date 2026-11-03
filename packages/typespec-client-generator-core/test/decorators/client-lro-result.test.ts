@@ -1,8 +1,8 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
+import { ArmTester, AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const monitorService = `
   @service namespace TestService;
@@ -88,6 +88,104 @@ describe("@clientLroResult", () => {
     strictEqual(response.resultSegments?.[0].type, response.result);
     strictEqual(method.lroMetadata.__raw.finalResultPath, "result");
   });
+
+  it.each([
+    {
+      name: "Azure.Core resource PUT",
+      tester: AzureCoreTester,
+      finalStateVia: "original-uri",
+      finalStep: "pollingSuccessProperty",
+      code: `
+        @service namespace TestService;
+        alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
+        @resource("widgets") model Widget { @key name: string; value: string; }
+        alias StandardStatus = ResourceOperationStatus<Widget>;
+        model WidgetStatus is StandardStatus;
+
+        @get @route("/widgets/{name}/status")
+        op poll(@path name: string): WidgetStatus;
+        @pollingOperation(poll)
+        op start is Operations.LongRunningResourceCreateOrReplace<Widget>;
+      `,
+    },
+    {
+      name: "ARM resource PUT with combined LRO headers",
+      tester: ArmTester,
+      finalStateVia: "location",
+      finalStep: "finalOperationLink",
+      code: `
+        @armProviderNamespace
+        @service
+        @versioned(Versions)
+        @armCommonTypesVersion(CommonTypes.Versions.v5)
+        namespace TestService;
+        enum Versions { v1: "2024-01-01" }
+
+        model Widget is TrackedResource<WidgetProperties> {
+          ...ResourceNameParameter<Widget>;
+        }
+        model WidgetProperties {
+          provisioningState?: ResourceProvisioningState;
+        }
+        alias StandardStatus = ResourceOperationStatus<Widget>;
+        model WidgetStatus is StandardStatus;
+
+        op start is ArmResourceCreateOrReplaceAsync<
+          Widget,
+          LroHeaders = ArmCombinedLroHeaders<WidgetStatus, Widget>
+        >;
+      `,
+    },
+  ])(
+    "selects a templated result through a cloned polling model for $name",
+    async ({ tester, code, finalStateVia, finalStep }) => {
+      const { program } = await tester.compile(`
+        ${code}
+        @@clientLroResult(start, StandardStatus.result, "python");
+      `);
+      const [selection, diagnostics] = program.resolveTypeReference(
+        "TestService.StandardStatus.result",
+      );
+      expectDiagnosticEmpty(diagnostics);
+      ok(selection?.kind === "ModelProperty");
+
+      for (const language of ["python", "java"]) {
+        const context = await createSdkContextForTester(program, {
+          emitterName: `@azure-tools/typespec-${language}`,
+        });
+        expectDiagnosticEmpty(context.diagnostics);
+        const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+        ok(method);
+        strictEqual(method.kind, "lro");
+        const response = method.lroMetadata.finalResponse;
+        ok(response);
+        strictEqual(response.result.kind, "model");
+        strictEqual(response.result.name, "Widget");
+        strictEqual(response.envelopeResult.kind, "model");
+        strictEqual(
+          response.envelopeResult.name,
+          language === "python" ? "WidgetStatus" : "Widget",
+        );
+        strictEqual(method.response.type, response.result);
+        deepStrictEqual(
+          response.resultSegments?.map((property) => property.name),
+          language === "python" ? ["result"] : undefined,
+        );
+        strictEqual(
+          response.resultSegments?.[0].type,
+          language === "python" ? response.result : undefined,
+        );
+        deepStrictEqual(method.response.resultSegments, response.resultSegments);
+        const raw = method.lroMetadata.__raw;
+        strictEqual(raw.finalResultPath, language === "python" ? "result" : undefined);
+        strictEqual(method.lroMetadata.finalStateVia, finalStateVia);
+        strictEqual(raw.finalStep?.kind, finalStep);
+        const resultProperty = raw.pollingInfo.resultProperty;
+        ok(resultProperty);
+        notStrictEqual(resultProperty.model, selection.model);
+      }
+    },
+  );
 
   it("applies existing string, options-bag, exclusion, and override scopes", async () => {
     const { program } = await AzureCoreTester.compile(`
