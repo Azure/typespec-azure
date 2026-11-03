@@ -114,6 +114,8 @@ describe("native coverage arguments", () => {
         "C:\\baseline",
         "--baseline-policy",
         "frozen-reference",
+        "--staging-supplement",
+        "C:\\staging",
         "--candidate-working-tree",
         "true",
         "--native-budget-seconds",
@@ -123,6 +125,7 @@ describe("native coverage arguments", () => {
       ]),
     ).toMatchObject({
       baselinePolicy: "frozen-reference",
+      stagingSupplement: "C:\\staging",
       candidateWorkingTree: true,
       nativeBudgetSeconds: 3600,
       nativeMode: "target-only",
@@ -132,6 +135,7 @@ describe("native coverage arguments", () => {
   it.each([
     ["--baseline-policy", "frozen-reference"],
     ["--baseline-policy", "force"],
+    ["--staging-supplement", "C:\\staging"],
     ["--native-budget-seconds", "0"],
     ["--candidate-working-tree", "guess"],
     ["--native-mode", "unknown"],

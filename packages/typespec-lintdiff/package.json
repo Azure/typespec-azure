@@ -45,6 +45,7 @@
     "compare:setup": "node --import tsx/esm test/harness/cross-repo-setup.ts",
     "specs:generate": "node --import tsx/esm test/harness/spec-dataset.ts",
     "specs:staging": "node --import tsx/esm test/harness/staging-validator-results.ts",
+    "specs:staging-supplement": "node --import tsx/esm test/harness/staging-supplement.ts",
     "specs:typespec": "node --import tsx/esm test/harness/typespec-results.ts",
     "coverage:native": "node --import tsx/esm test/harness/native-coverage.ts",
     "specs:coverage": "node --import tsx/esm test/harness/refresh-coverage.ts",

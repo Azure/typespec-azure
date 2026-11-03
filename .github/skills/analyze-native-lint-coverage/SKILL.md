@@ -36,8 +36,11 @@ Treat equivalence as a hypothesis to test, not an expected result to manufacture
 
 Apply the [validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract).
 The current generator evaluates production ARM Swagger validation. Data-plane,
-RPaaS, staging-only, and SDK-name policies need separately established comparison
-profiles; do not present an ARM run as proof for those audiences.
+RPaaS and SDK-name policies need separately established comparison profiles;
+do not present an ARM run as proof for those audiences. ARM/common staging-only
+Spectral rules can use the explicit immutable
+[staging supplement profile](shared-baseline.md#staging-only-diagnostic-supplements).
+It is not the AutoRest production configuration or a native-engine staging run.
 
 ## Mapping scope
 
@@ -155,6 +158,13 @@ schema-4 dataset files. Its `assessmentMode: swagger-baseline`,
 `completionScope: swagger-only` and `nativeAssessment: not-run` seal only Swagger
 completion. They do not claim a native pass. The old schema-1 pilot manifests
 are evidence, not reusable schema-2 baselines.
+
+For ARM/common staging-only Spectral validators, also pin and verify an immutable
+[staging supplement](shared-baseline.md#staging-only-diagnostic-supplements) for
+that exact parent, then pass `--staging-supplement <absolute-directory>`.
+Ordinary consumers never produce missing observations automatically. The CLI
+rejects selected staging-only rules without evaluated supplemental data instead
+of interpreting their absent production shard as zero.
 
 Without `--baseline-run`, the existing analyzer generates Swagger and executes
 validators. That path is **producer-only**, for a separately requested shared
