@@ -12,7 +12,6 @@ import type {
   Union,
   UnionVariant,
 } from "@typespec/compiler";
-import { walkPropertiesInherited } from "@typespec/compiler";
 import type {
   AugmentDecoratorStatementNode,
   DecoratorExpressionNode,
@@ -284,7 +283,7 @@ function validateClientNamesPerNamespace(
 
   // Check for duplicate client names for model properties
   for (const model of namespace.models.values()) {
-    validateClientNamesCore(tcgcContext, scope, walkPropertiesInherited(model), model);
+    validateClientNamesCore(tcgcContext, scope, model.properties.values());
   }
 
   // Check for duplicate client names for enum members
@@ -318,7 +317,6 @@ function validateClientNamesCore(
     | EnumMember
     | UnionVariant
   >,
-  model?: Model,
 ) {
   const duplicateTracker = new DuplicateTracker<
     string,
@@ -339,7 +337,7 @@ function validateClientNamesCore(
     }
   }
 
-  reportDuplicateClientNames(tcgcContext.program, duplicateTracker, scope, model);
+  reportDuplicateClientNames(tcgcContext.program, duplicateTracker, scope);
 }
 
 function reportDuplicateClientNames(
@@ -349,15 +347,12 @@ function reportDuplicateClientNames(
     Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
   >,
   scope: string | typeof AllScopes,
-  model?: Model,
 ) {
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {
       const [type, target, messageId] = Array.isArray(item)
         ? [item[0], item[1], "default" as const]
         : [item, item, "nonDecorator" as const];
-      // Inherited conflicts are reported where introduced, not again on every descendant.
-      if (model && type.kind === "ModelProperty" && type.model !== model) continue;
       program.reportDiagnostic(
         createDuplicateClientNameDiagnostic(
           name,

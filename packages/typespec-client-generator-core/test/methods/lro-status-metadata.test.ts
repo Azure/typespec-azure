@@ -590,13 +590,6 @@ op start(): {
       {
         code: operation.replace(
           "percentComplete?: int32;",
-          '@clientName("requestToken")\n  percentComplete?: int32;',
-        ),
-        diagnostic: "duplicate-client-name",
-      },
-      {
-        code: operation.replace(
-          "percentComplete?: int32;",
           '@clientName("details")\n  percentComplete?: int32;',
         ),
         diagnostic: "duplicate-client-name",

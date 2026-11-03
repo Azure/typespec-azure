@@ -31,8 +31,7 @@ export function resolveLroStatusMetadata(
 
   for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
     if (!isVisibleSdkProperty(context, property)) continue;
-    const metadataDecorator = getLroStatusMetadataDecorator(context, property);
-    if (!metadataDecorator) continue;
+    if (!getLroStatusMetadataDecorator(context, property)) continue;
 
     const structuralRole = getStructuralRole(raw, property);
     if (structuralRole) {
@@ -40,7 +39,7 @@ export function resolveLroStatusMetadata(
         createDiagnostic({
           code: "lro-status-metadata-structural-property",
           format: { propertyName: property.name, role: structuralRole },
-          target: metadataDecorator.target,
+          target: property,
         }),
       );
       continue;

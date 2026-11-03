@@ -106,10 +106,6 @@ import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
-interface ScopedLroDecorator {
-  target: DiagnosticTarget;
-}
-
 const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
 
 export const $lroStatusMetadata: LroStatusMetadataDecorator = (
@@ -117,20 +113,13 @@ export const $lroStatusMetadata: LroStatusMetadataDecorator = (
   target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  setScopedDecoratorData(
-    context,
-    $lroStatusMetadata,
-    lroStatusMetadataKey,
-    target,
-    { target: context.decoratorTarget },
-    scope,
-  );
+  setScopedDecoratorData(context, $lroStatusMetadata, lroStatusMetadataKey, target, true, scope);
 };
 
 export function getLroStatusMetadataDecorator(
   context: TCGCContext,
   target: ModelProperty,
-): ScopedLroDecorator | undefined {
+): boolean | undefined {
   return getScopedDecoratorData(context, lroStatusMetadataKey, target);
 }
 

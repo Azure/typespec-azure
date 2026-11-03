@@ -1,9 +1,7 @@
 ---
-changeKind: fix
+changeKind: internal
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Align `@lroStatusMetadata` with standard TCGC scoped decorator handling. Repeated and overlapping declarations now use shared scope precedence instead of a separate duplicate diagnostic, and client-name conflicts use existing validation. Resolve selections during LRO response processing and cache them on the TCGC context while preserving effective properties and selected graph usage after legacy hierarchy reconciliation.
-
-Extend shared `duplicate-client-name` validation to detect model-property collisions with inherited properties, including LRO status metadata. Overridden base properties are excluded, and inherited conflicts are not reported again on every descendant.
+Align `@lroStatusMetadata` with standard TCGC scoped decorator handling. Repeated and overlapping declarations use shared scope precedence, and client-name validation retains its existing behavior. Preserve selected metadata properties, output usage, access, and serialization after legacy hierarchy reconciliation.
