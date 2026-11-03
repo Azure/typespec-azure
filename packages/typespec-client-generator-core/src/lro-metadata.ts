@@ -116,10 +116,7 @@ export function isLroProtocolResultProperty(
   if (resultProperty === undefined) return false;
   return (
     resultProperty === property ||
-    findRootSourceProperty(resultProperty) === findRootSourceProperty(property) ||
-    (resultProperty.name === property.name &&
-      resultProperty.model !== undefined &&
-      resultProperty.model === property.model)
+    findRootSourceProperty(resultProperty) === findRootSourceProperty(property)
   );
 }
 
