@@ -184,6 +184,102 @@ findings only for a proven evaluated rule. Unknown, disabled, staging-only,
 data-plane or RPaaS-only rules remain not-evaluated or unsupported, not compliant.
 ARM evidence is not proof of all data-plane/RPaaS behavior.
 
+### Staging-only diagnostic supplements
+
+The production baseline stays immutable. Missing staging-only observations are
+not evaluated, not zero. A separately authorized producer can evaluate saved
+Swagger **without recompiling TypeSpec or regenerating Swagger**, publishing a
+new immutable supplement bound to the exact parent `baselineIdentity`.
+An authorized supplement does not authorize a new specs snapshot or a
+production-baseline refresh.
+
+The supported profile is `arm-staging-spectral`: explicitly enabled
+`stagingOnly: true` rules from the installed validator's ARM/common Spectral
+registrations. Preserve original selectors, functions, options, resolution and
+severity; do not broaden to data-plane, RPaaS or native-engine rules. This is
+direct Spectral evaluation, not a claim that AutoRest's staging configuration
+was run. Pin and record the actual rulesets/Spectral runtime, producer revision
+and lockfile. Compare them with the parent producer's validator before reusing
+historical semantic conclusions.
+
+From `packages\typespec-lintdiff`, after verifying the selected baseline:
+
+```powershell
+mise exec -- node --import tsx/esm test\harness\staging-supplement.ts `
+  --baseline-run C:\dev\baseline-inputs\verified-baseline `
+  --output C:\dev\baseline-inputs\new-staging-supplement
+```
+
+Omitting `--validator-rule` explicitly selects **all currently registered
+ARM/common staging-only Spectral rules**, recorded in the manifest. For an
+authorized selected-rule supplement, repeat `--validator-rule <ID>` instead.
+Neither path supports a project filter/limit. Estimate and record validator-only
+cost/budget before execution; retain unsuccessful attempts, never overwrite
+them or silently retry with failing projects excluded.
+
+The producer checks the sealed parent inventory before and after execution.
+Reference existence/type checks reuse each just-verified file inventory rather
+than repeating filesystem traversal for every reference; no file hashes or
+population checks are skipped.
+It reads retained Swagger/reference files only, rejects nonlocal/escaping or
+symlinked references, and records each input's execution status plus raw
+diagnostics. Resolver, format, parsing and thrown-rule failures prevent complete
+status and consumption. Every selected rule has a shard, including a successfully
+evaluated zero-finding rule; severity totals are computed from observations.
+Keep invocation input and reported source document identities separate.
+
+Publish `manifest.json` and `data\**` together as a new immutable supplement,
+never inside or appended to the parent dataset. Small sanitized supplements can
+be committed on a dedicated specs-fork evidence branch; large supplements use a
+new checksummed release asset under the existing evidence contract. Record the
+parent identity, supplement manifest content identity, exact rule set, immutable
+repository/commit/path or archive size/hash, producer source commit and runtime.
+Use a separate discovery descriptor/path; do not add fields to the strict
+schema-1 production descriptor or reinterpret its production summary totals.
+Publish optional staging discovery at
+`.lintdiff-baselines\<baseline-id>\staging\current.json` on the same metadata
+branch. A consumer reads it at the **already pinned metadata commit**, checks
+the parent identity, profile and selected rules, and records the referenced
+immutable supplement repository/commit/path and manifest identity before setup.
+An older pinned metadata commit may legitimately have no supplement. That is
+missing evaluated staging data, not a zero-finding result or permission to
+silently fetch a newer discovery tip. Explicitly select a newer metadata commit
+for a new comparison while retaining the unchanged production descriptor.
+Verify recovered Git blob bytes or downloaded archive hashes before consumption.
+An archive must be safely extracted without escaping paths, links or special
+files; the production `shared_baseline.py fetch` command does not download or
+extract supplement archives.
+
+Verify a recovered supplement against its verified parent without compiling:
+
+```powershell
+mise exec -- node --import tsx/esm test\harness\staging-supplement.ts `
+  --baseline-run C:\dev\baseline-inputs\verified-baseline `
+  --verify-supplement C:\dev\baseline-inputs\recovered-staging-supplement `
+  --validator-rule PatchPropertiesCorrespondToPutProperties
+```
+
+Record the returned `supplementIdentity` and compare it with the pinned
+publication. The consumer verifies profile/completion, parent/source binding,
+full input population, file inventory/hashes, rule shards and severity counts.
+Missing required rules, corruption or failed inputs block comparison; they are
+not a reason to run the producer automatically.
+
+Pass `--staging-supplement <absolute-supplement-directory>` alongside the usual
+`--baseline-run` and explicit `--baseline-policy frozen-reference`. Native
+coverage retains production/staging provenance separately, copies and verifies
+the supplement separately from the parent, and checks both after execution.
+Conflicting production/staging rule observations fail rather than overwrite.
+The parent `baseline.json` and production counts are unchanged.
+
+The legacy `specs:staging` script/schema-6 index is local historical evidence,
+not a sealed supplement accepted by this path. Do not copy it into a sealed
+baseline. A new validator-only evaluation may be combined with unchanged,
+content-verified saved native receipts for **saved-observation reanalysis**;
+label that separately from a fresh native run. Native changes still require
+the full fresh native gate. Retain one-sided sets and both count-gap directions;
+neither enabling staging nor equal totals proves semantic equivalence.
+
 Prepare/build the candidate through the existing skill. Use lightweight injected
 positive/compliant controls before the full run; skipped controls do not pass.
 Then invoke the existing native analyzer with all normal candidate/specs/tarball,

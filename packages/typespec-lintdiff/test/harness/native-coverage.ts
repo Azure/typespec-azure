@@ -6,6 +6,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { gunzipSync } from "node:zlib";
+import { readStagingSupplement, stagingRules } from "./staging-supplement.js";
 
 export interface NativeDiagnostic {
   rule: string;
@@ -79,6 +80,7 @@ export interface Config {
   baselineRun?: string;
   baselineCompatibilityReceipt?: string;
   baselinePolicy?: "strict" | "frozen-reference";
+  stagingSupplement?: string;
   candidateWorkingTree?: boolean;
   nativeBudgetSeconds?: number;
   nativeMode?: "configured" | "target-only";
@@ -103,6 +105,7 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     "--baseline-run",
     "--baseline-compatibility-receipt",
     "--baseline-policy",
+    "--staging-supplement",
     "--candidate-working-tree",
     "--native-budget-seconds",
     "--native-mode",
@@ -167,6 +170,9 @@ export function parseNativeCoverageArgs(args: string[]): Config {
   if (values.has("--baseline-compatibility-receipt") && !values.has("--baseline-run")) {
     throw new Error("--baseline-compatibility-receipt requires --baseline-run.");
   }
+  if (values.has("--staging-supplement") && !values.has("--baseline-run")) {
+    throw new Error("--staging-supplement requires --baseline-run.");
+  }
   const baselinePolicy = values.get("--baseline-policy") ?? "strict";
   if (baselinePolicy !== "strict" && baselinePolicy !== "frozen-reference") {
     throw new Error(`Unsupported baseline policy: ${baselinePolicy}`);
@@ -211,6 +217,7 @@ export function parseNativeCoverageArgs(args: string[]): Config {
     baselineRun: values.get("--baseline-run"),
     baselineCompatibilityReceipt: values.get("--baseline-compatibility-receipt"),
     baselinePolicy,
+    stagingSupplement: values.get("--staging-supplement"),
     candidateWorkingTree: candidateWorkingTree === "true",
     nativeBudgetSeconds,
     nativeMode,
@@ -678,10 +685,16 @@ interface CoverageDataset {
   projects: DatasetProject[];
 }
 
+function datasetFileKey(file: string): string {
+  const normalized = file.replace(/[\\/]/g, path.sep);
+  return process.platform === "win32" ? normalized.toLowerCase() : normalized;
+}
+
 export function readCoverageDataset(
   datasetDir: string,
   context: BaselineContext,
   requireSuccessful = false,
+  verifiedFiles?: Set<string>,
 ) {
   const dataset: CoverageDataset = JSON.parse(
     fs.readFileSync(containedFile(datasetDir, "_meta.json"), "utf8"),
@@ -735,7 +748,12 @@ export function readCoverageDataset(
   for (const files of references) {
     if (!Array.isArray(files)) throw new Error("Missing dataset file inventory.");
     for (const file of files) {
-      if (typeof file !== "string" || !fs.statSync(containedFile(datasetDir, file)).isFile()) {
+      if (
+        typeof file !== "string" ||
+        (verifiedFiles
+          ? !verifiedFiles.has(datasetFileKey(file))
+          : !fs.statSync(containedFile(datasetDir, file)).isFile())
+      ) {
         throw new Error("Missing referenced dataset file.");
       }
     }
@@ -911,13 +929,35 @@ export function validateBaselineCompatibility(
   }
 }
 
-export function reuseBaseline(
-  run: string,
-  destination: string,
+export function loadCoverageValidatorMembers(
+  datasetDir: string,
   context: BaselineContext,
-  receipt?: unknown,
-  policy: Config["baselinePolicy"] = "strict",
+  evidence: BaselineEvidence,
+  selected: string[],
+  stagingDirectory?: string,
 ) {
+  const { dataset, members } = readCoverageDataset(datasetDir, context);
+  const supplement = stagingDirectory
+    ? readStagingSupplement(stagingDirectory, evidence, [])
+    : undefined;
+  for (const [rule, observations] of supplement?.members ?? []) {
+    if (members.has(rule)) {
+      throw new Error(`Staging supplement conflicts with production observations: ${rule}`);
+    }
+    members.set(rule, observations);
+  }
+  const staging = stagingRules();
+  for (const rule of selected) {
+    if (Object.hasOwn(staging, rule) && !supplement?.members.has(rule)) {
+      throw new Error(
+        `Staging-only rule was not evaluated: ${rule}; select a verified --staging-supplement.`,
+      );
+    }
+  }
+  return { dataset, members, supplement };
+}
+
+export function verifyBaselineRun(run: string) {
   const manifestFile = containedFile(run, "manifest.json");
   const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
   const baselineFile = containedFile(run, "baseline.json");
@@ -933,15 +973,32 @@ export function reuseBaseline(
   ) {
     throw new Error("Only a completed, sealed schema-2 baseline run can be reused.");
   }
-  validateBaselineCompatibility(evidence, context, receipt, policy);
   const datasetDir = containedFile(run, "dataset");
-  if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
+  const files = inventoryDataset(datasetDir);
+  if (contentIdentity(files) !== contentIdentity(evidence.files)) {
     throw new Error("Baseline dataset inventory or file hashes are corrupt.");
   }
-  const result = readCoverageDataset(datasetDir, context, true);
+  const result = readCoverageDataset(
+    datasetDir,
+    evidence.context,
+    true,
+    new Set(files.map((item) => datasetFileKey(item.file))),
+  );
   if (contentIdentity(result.dataset.projects) !== contentIdentity(evidence.projects)) {
     throw new Error("Baseline project population changed.");
   }
+  return { evidence, datasetDir, manifestFile };
+}
+
+export function reuseBaseline(
+  run: string,
+  destination: string,
+  context: BaselineContext,
+  receipt?: unknown,
+  policy: Config["baselinePolicy"] = "strict",
+) {
+  const { evidence, datasetDir, manifestFile } = verifyBaselineRun(run);
+  validateBaselineCompatibility(evidence, context, receipt, policy);
   if (fs.existsSync(destination)) throw new Error("Baseline copy destination already exists.");
   fs.cpSync(datasetDir, destination, { recursive: true, errorOnExist: true, force: false });
   if (contentIdentity(inventoryDataset(destination)) !== contentIdentity(evidence.files)) {
@@ -1116,6 +1173,7 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     candidateRepo,
     specsRepo,
     ...(config.baselineRun ? [path.resolve(config.baselineRun)] : []),
+    ...(config.stagingSupplement ? [path.resolve(config.stagingSupplement)] : []),
   ]) {
     const relative = path.relative(root, output);
     if (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative)) {
@@ -1185,6 +1243,9 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     baselineIdentity: undefined as string | undefined,
     baselineReuse: undefined as ReturnType<typeof reuseBaseline>["provenance"] | undefined,
     baselineContext: undefined as BaselineContext | undefined,
+    stagingSupplement: undefined as
+      | { identity: string; manifest: ReturnType<typeof readStagingSupplement>["manifest"] }
+      | undefined,
     nativeExecution: undefined as
       | { startedAt: string; budgetSeconds?: number; finishedAt?: string; budgetExceeded?: boolean }
       | undefined,
@@ -1292,7 +1353,25 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     writeJson(path.join(output, "baseline.json"), evidence);
     manifest.baselineIdentity = contentIdentity(evidence);
     writeJson(path.join(output, "manifest.json"), manifest);
-    const { dataset, members } = readCoverageDataset(datasetDir, context);
+    const { dataset, members, supplement } = loadCoverageValidatorMembers(
+      datasetDir,
+      context,
+      evidence,
+      config.validatorRules,
+      config.stagingSupplement,
+    );
+    if (supplement && config.stagingSupplement) {
+      manifest.stagingSupplement = { identity: supplement.identity, manifest: supplement.manifest };
+      manifest.policies.swagger +=
+        "; explicitly selected immutable ARM staging Spectral supplement";
+      fs.cpSync(path.resolve(config.stagingSupplement), path.join(output, "staging-supplement"), {
+        recursive: true,
+        errorOnExist: true,
+        force: false,
+      });
+      readStagingSupplement(path.join(output, "staging-supplement"), evidence, []);
+      writeJson(path.join(output, "manifest.json"), manifest);
+    }
     const validator = config.validatorRules.flatMap((rule) => members.get(rule) ?? []);
     const native: NativeProjectResult[] = [];
     const nativeStarted = Date.now();
@@ -1372,11 +1451,19 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     writeJson(path.join(output, "coverage.json"), {
       ...report,
       baselineComparison: manifest.baselineReuse ?? { policy: "fresh" },
+      validatorProfiles: config.validatorRules.map((rule) => ({
+        rule,
+        profile: supplement?.members.has(rule) ? "arm-staging-spectral" : "production-arm",
+      })),
+      ...(supplement ? { stagingSupplementIdentity: supplement.identity } : {}),
       nativeExecution: manifest.nativeExecution,
     });
     fs.writeFileSync(
       path.join(output, "coverage.md"),
-      "assessmentMode" in report ? packageEvidenceMarkdown(report) : markdown(report, config),
+      (supplement
+        ? `Swagger staging supplement: \`${supplement.identity}\` (explicit ARM/common Spectral staging; production observations remain separate).\n\n`
+        : "") +
+        ("assessmentMode" in report ? packageEvidenceMarkdown(report) : markdown(report, config)),
     );
     if (
       contentIdentity(snapshot(candidateRepo, config.candidateWorkingTree)) !==
@@ -1397,6 +1484,16 @@ export async function runNativeCoverage(config: Config): Promise<void> {
     }
     if (contentIdentity(inventoryDataset(datasetDir)) !== contentIdentity(evidence.files)) {
       throw new Error("Dataset changed during the comparison.");
+    }
+    if (supplement) {
+      for (const directory of [
+        config.stagingSupplement!,
+        path.join(output, "staging-supplement"),
+      ]) {
+        if (readStagingSupplement(directory, evidence, []).identity !== supplement.identity) {
+          throw new Error("Staging supplement changed during the comparison.");
+        }
+      }
     }
     manifest.status = report.unassessedProjects.length > 0 ? "incomplete" : "complete";
     writeJson(path.join(output, "manifest.json"), {

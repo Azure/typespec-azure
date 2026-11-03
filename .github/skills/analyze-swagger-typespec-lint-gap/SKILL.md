@@ -105,7 +105,12 @@ this order:
    blocked/infallible behavior, or a mapped rule that never fired; lint-diff
    requires observed diagnostics in the same project.
 3. **Different validator execution mode:** a `stagingOnly` rule is zero in a
-   production run but can fire in a separately labeled staging run.
+   production report only numerically: it was **not evaluated**, not compliant.
+   Establish actual execution before using a zero count. ARM/common Spectral
+   staging-only rules can use a parent-bound
+   [immutable supplement](../analyze-native-lint-coverage/shared-baseline.md#staging-only-diagnostic-supplements)
+   over the retained Swagger, with no emission/regeneration. Keep its explicit
+   staging profile, runtime and failures separate from production observations.
 4. **Different API-version scope:** all emitted Swagger versions or an
    unprojected TypeSpec program can disagree with newest-version Swagger and a
    TypeSpec program projected to that version.

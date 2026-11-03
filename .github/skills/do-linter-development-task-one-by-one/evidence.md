@@ -32,6 +32,14 @@ exact prerequisite; only an explicitly requested producer runs the Swagger
 suite. Refresh appends new immutable assets and advances discovery only after
 verification, retaining prior versions. Legacy flow stays unchanged.
 
+Staging-only ARM/common Spectral data can be published as a separately authorized
+[immutable supplement](../analyze-native-lint-coverage/shared-baseline.md#staging-only-diagnostic-supplements).
+Bind it to the exact production baseline identity, retain all input execution
+receipts including zero findings and failures, and pin the supplement's manifest
+identity and publication commit. Never modify the sealed parent or its
+production totals. Recovered supplements require their own integrity/population
+verification; production-baseline recovery alone does not recover staging data.
+
 ## Publication binding and layout
 
 Before setup, resolve the signed-in user's actual personal fork of

@@ -101,6 +101,7 @@ Optional options:
 | `--filter TEXT`                         | Case-sensitive literal project-path substring, not a regex.                                                                                     |
 | `--limit N`                             | Positive integer; omit with the filter for the full discovered population.                                                                      |
 | `--baseline-run PATH`                   | Completed retained schema-2 run; bypass Swagger generation and validation.                                                                      |
+| `--staging-supplement PATH`             | Immutable ARM/common staging-only Spectral observations bound to that exact baseline; requires `--baseline-run`.                                |
 | `--baseline-compatibility-receipt PATH` | Reviewed JSON receipt for a changed candidate/runtime installation; requires `--baseline-run`.                                                  |
 | `--baseline-policy strict`              | Default. Require identical or reviewed lint-only compatible runtimes.                                                                           |
 | `--baseline-policy frozen-reference`    | Compare against historical Swagger under an explicit backward-compatibility assumption; requires `--baseline-run`, without a lint-only receipt. |
@@ -141,6 +142,58 @@ At expiry, the tool stops its own active worker processes and does not launch
 queued projects. It retains completed results and writes failed/unassessed
 receipts for interrupted and queued projects. An incomplete report exits nonzero.
 The final integrity checks and report writing can finish after the native limit.
+
+## Staging-only Swagger observations
+
+A production baseline does not evaluate staging-only rules. Native coverage
+rejects selected ARM/common staging-only Spectral validators without an explicit
+verified supplement; an absent production shard is not an evaluated zero.
+
+Produce the separately authorized supplement over the saved full Swagger
+population, without TypeSpec compilation, emission or AutoRest execution:
+
+```powershell
+node --import tsx/esm test\harness\staging-supplement.ts `
+  --baseline-run C:\dev\baselines\verified-parent `
+  --output C:\dev\baselines\new-staging-supplement
+```
+
+By default this selects all ARM/common `stagingOnly: true` Spectral registrations
+in the actual installed rulesets package. Repeat `--validator-rule <ID>` for an
+explicit subset. Data-plane, RPaaS and native-engine staging are not supported
+profiles. There is no project filter/limit. Original rule severity/options and
+functions are retained; this is explicitly enabled direct Spectral evaluation,
+not the production or staging AutoRest pipeline.
+
+The schema-1 supplement manifest records its parent baseline content identity,
+source SHA, selected rules, runtime package/content and producer/lockfile hashes,
+and per-input execution receipts. Its separate `data` inventory contains raw
+diagnostics and per-rule shards, including evaluated zero-finding rules. Saved
+relative-reference closure is used with the input document's real source URI;
+network/escaping references, parsing/resolver/format diagnostics and thrown-rule
+errors are failures, never compliance. A failed supplement cannot be consumed.
+Supplement locations use document paths, not source-line ranges.
+
+Recover the immutable `manifest.json` plus `data` directory and verify:
+
+```powershell
+node --import tsx/esm test\harness\staging-supplement.ts `
+  --baseline-run C:\dev\baselines\verified-parent `
+  --verify-supplement C:\dev\baselines\recovered-staging-supplement
+```
+
+Pin the returned supplement identity to the published checksum/commit, then add
+`--staging-supplement C:\dev\baselines\recovered-staging-supplement` to the normal
+native invocation. Production data remains unchanged; conflicting rule shards
+fail rather than overwrite. The comparison manifest retains supplement identity
+and provenance, and a separately copied supplement is reverified after native
+execution. The old schema-6 `specs:staging` files are not sealed supplements.
+
+See the skill's
+[publication/recovery contract](../../../.github/skills/analyze-native-lint-coverage/shared-baseline.md#staging-only-diagnostic-supplements).
+Saved native receipts may be reanalyzed alongside newly evaluated Swagger only
+when their candidate/source/artifact identities still match; label this as
+saved-observation reanalysis, not fresh native execution or semantic equivalence.
 
 ## Baseline retention and compatibility
 
