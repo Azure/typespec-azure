@@ -360,6 +360,8 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    omit successful test/coverage/recovery milestones, review status, implementation
    PR links, candidate/commit hashes, commands, repair history and redundant
    no-change statements. Put that context in NOTES or linked evidence instead.
+   Summarize material non-equivalence or restrictions here; put per-group
+   diagnostic counts and their explanations in section 4, not the conclusion.
    If a confirmed Swagger linter bug affects the conclusion, name the bug and its
    impact concisely, and state whether the TypeSpec linter intentionally avoids
    it. Distinguish intended-policy coverage from bug-for-bug equivalence.
@@ -367,12 +369,23 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    failures/unassessed projects, if any. Explain that reported diagnostics are
    total individual findings across that population, not project counts.
    Use a three-column table: count, Swagger linter, TypeSpec linter. Show raw
-   reported totals. When they differ, add an after-analysis row only for an
-   explicitly justified common unit, such as affected HTTP operations. Do not
-   relabel adjusted values as raw findings or imply correspondence from equal
-   totals. Mark unsupported comparison/attribution unassessed, and non-lint
+   reported totals. When they differ, add a second row only for an explicitly
+   justified common unit. Name what it counts and the grouping identity, such
+   as "Affected HTTP operations (grouped by project/route)", rather than
+   "After analysis". Grouping changes the counting unit; it does not normalize
+   findings into equivalent defects or require the remaining counts to match.
+   Do not relabel adjusted values as raw findings or imply correspondence from
+   equal totals. Mark unsupported comparison/attribution unassessed, and non-lint
    outcomes not applicable, rather than inventing zero or matching counts.
    Keep project overlap and detailed location summaries out of the scorecard.
+   Immediately after the table, briefly summarize the evidenced causes of any
+   remaining gap and link first to
+   `[Why diagnostic counts differ](#4-why-diagnostic-counts-differ)`, where the
+   reader can follow links to detailed evidence. Identify unresolved causes as
+   unresolved, not accepted differences. Do not repeat member-total arithmetic,
+   callback-family accounting, exact-reproduction receipts or tracing provenance
+   here; put the breakdown in section 4 and technical context in NOTES or the
+   linked evidence. Retain any qualification needed to interpret the table.
 3. **Function-level coverage.** Use a compact behavior/result table covering
    material checks and compliant controls. Distinguish covered, missing,
    compiler-prevented, approved retirement and unassessed behavior honestly.
@@ -420,10 +433,13 @@ The TypeSpec rule `<TypeSpec rule ID>` migrates Swagger linter rule
 <Assessed projects and failures/unassessed projects.>
 Reported diagnostics means individual findings, not projects.
 
-| Count                                   | Swagger linter        | TypeSpec linter       |
-| --------------------------------------- | --------------------- | --------------------- |
-| Reported diagnostics                    | <raw total>           | <raw total>           |
-| After analysis: <justified common unit> | <count or unassessed> | <count or unassessed> |
+| Count                                         | Swagger linter        | TypeSpec linter       |
+| --------------------------------------------- | --------------------- | --------------------- |
+| Reported diagnostics                          | <raw total>           | <raw total>           |
+| <Justified common unit and grouping identity> | <count or unassessed> | <count or unassessed> |
+
+<Brief explanation of the evidenced causes of the remaining gap, with any unresolved causes stated explicitly.>
+See [Why diagnostic counts differ](#4-why-diagnostic-counts-differ) for the breakdown and remaining limitations.
 
 ## 3. Function-level coverage
 
@@ -441,9 +457,15 @@ and direct grouped-evidence links; or a brief statement of no differences.>
 <Technical context, validation limits and links to supporting evidence/recovery.>
 ```
 
-Omit the after-analysis row when raw counts agree. When counts differ but no
+Omit the common-unit row when raw counts agree. When counts differ but no
 supported common unit exists, retain the raw counts and mark comparison
 unassessed; do not invent normalization.
+
+Before publishing or refreshing the report, read sections 1 and 2 as a summary:
+the migration conclusion, what the numbers count, why they differ and where to
+read the explanation must be clear without tracing implementation history.
+Remove repeated accounting and provenance without hiding material gaps or
+discarding linked evidence.
 
 For many-to-one tasks, name and link every original Swagger linter in the short
 conclusion. Put the member status matrix in NOTES or directly linked member
