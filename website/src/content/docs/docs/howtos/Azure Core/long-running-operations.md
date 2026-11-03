@@ -37,9 +37,9 @@ TCGC consumes these protocol facts and owns selection of the client result and e
 
 ### Combined metadata compatibility
 
-`getLroMetadata(program, operation)` remains available with its existing flat `LroMetadata` contract. The lifecycle grouping applies only to `LroProtocolMetadata`; leaf names, types, optionality, and semantics are unchanged. The combined helper uses the same protocol analysis and a compatibility result resolver for existing emitters and libraries. No migration is required for existing callers.
+`getLroMetadata(program, operation)` remains available with the same function signature and flat `LroMetadata` structure. The lifecycle grouping applies only to `LroProtocolMetadata`. Polling links, required completion requests, `finalStateVia`, and raw TypeSpec object identities are unchanged.
 
-The separation preserves current result defaults, raw TypeSpec object identities, and protocol facts. It corrects inconsistent result/envelope/path combinations without introducing new result-selection decorators. In particular, resource PUT result selection and a declared polling result property can describe different types; this refactor does not change that behavior.
+When `getLroMetadata` selects the complete resource as `finalResult`, `finalEnvelopeResult` is that resource, and `logicalPath` and `finalResultPath` are `undefined`. The polling response and declared result property remain available in the protocol metadata.
 
 The Azure.Core library provides a helper that emitters can use to determine if an operation being processed is an LRO, and to provide details about how the LRO should be processed by clients, or about how operations are linked.
 
