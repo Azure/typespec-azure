@@ -1,6 +1,6 @@
+import { compile, formatDiagnostic, NodeHost } from "@typespec/compiler";
 import fs from "node:fs";
 import path from "node:path";
-import { compile, NodeHost } from "@typespec/compiler";
 import { computeDiffs } from "../dist/src/diff/diff-engine.js";
 import { analyzeBaseAndHead, analyzeProgram } from "../dist/src/pipeline/orchestrator.js";
 import { classifyDiffs } from "../dist/src/pipeline/policy.js";
@@ -14,22 +14,11 @@ import {
   enumerateVersions,
 } from "../dist/src/pipeline/versions.js";
 import { applySuppressions } from "../dist/src/suppression/suppression.js";
-
-const SPEC_ROOTS = [
-  {
-    name: "Network",
-    root: "C:\\Users\\markcowl\\session2\\azure-rest-api-specs\\specification\\network\\resource-manager\\Microsoft.Network\\Network\\Network",
-  },
-  {
-    name: "AppConfiguration",
-    root: "C:\\Users\\markcowl\\session2\\azure-rest-api-specs\\specification\\appconfiguration\\resource-manager\\Microsoft.AppConfiguration\\AppConfiguration",
-  },
-  {
-    name: "ContainerService/fleet",
-    root: "C:\\Users\\markcowl\\session2\\azure-rest-api-specs\\specification\\containerservice\\resource-manager\\Microsoft.ContainerService\\fleet",
-    note: "The task text listed Contoso.Management, but the stated 13-version / 8-pair profile matches fleet.",
-  },
-];
+import {
+  evaluationManifest,
+  parseEvaluationArgs,
+  resolveEvaluationInputs,
+} from "./evaluation-inputs.mjs";
 
 const TRACE_LEVELS = [
   "direct",
@@ -56,16 +45,33 @@ const mergeIdentityIds = new WeakMap();
 let nextMergeIdentityId = 0;
 
 async function main() {
-  const outIndex = process.argv.indexOf("--out");
-  const outPath = outIndex >= 0 ? process.argv[outIndex + 1] : undefined;
+  const options = parseEvaluationArgs(process.argv.slice(2));
+  if (options.help) {
+    process.stdout
+      .write(`Usage: node scripts/evaluate-source-tracing.mjs --repo <checkout> [--out <file>]
+
+Uses AZURE_REST_API_SPECS when --repo is omitted. No implicit downloads or installs.
+Explicit setup:
+  git clone ${evaluationManifest.repository} <checkout>
+  git -C <checkout> checkout --detach ${evaluationManifest.revision}
+  Install dependencies in that checkout using its documented setup instructions.
+Build this package before evaluation. The report records the specs revision; dependencies
+are those installed in the supplied checkout, not a hermetic historical toolchain.
+The same-program comparison is a zero-diff control, not changed-source detection coverage.
+`);
+    return;
+  }
+  const inputs = resolveEvaluationInputs(options.repository);
+  const outPath = options.out;
 
   const specs = [];
-  for (const spec of SPEC_ROOTS) {
+  for (const spec of inputs.specs) {
     specs.push(await evaluateSpec(spec));
   }
 
   const result = {
     generatedAt: new Date().toISOString(),
+    inputs: { repository: inputs.repository, revision: inputs.revision },
     specs,
   };
 
@@ -81,6 +87,12 @@ async function main() {
 async function evaluateSpec(spec) {
   const entrypoint = path.join(spec.root, "main.tsp");
   const program = await compile(NodeHost, entrypoint, { noEmit: true });
+  const errors = program.diagnostics.filter((diagnostic) => diagnostic.severity === "error");
+  if (errors.length > 0) {
+    throw new Error(
+      `${spec.name} failed compilation:\n${errors.map((error) => formatDiagnostic(error)).join("\n")}`,
+    );
+  }
   const diagnostics = {
     errors: program.diagnostics.filter((d) => d.severity === "error").length,
     warnings: program.diagnostics.filter((d) => d.severity === "warning").length,
@@ -121,10 +133,10 @@ async function evaluateSpec(spec) {
   return {
     name: spec.name,
     root: spec.root,
-    note: spec.note,
     diagnostics,
     services,
     phaseA: {
+      purpose: "same-program zero-diff control; not changed-source detection coverage",
       comparisons: phaseA.summary.comparisonsPerformed,
       findings: phaseA.findings.length,
       totalMs: phaseA.timing.totalMs,
@@ -360,7 +372,11 @@ function inferFallbackReason(finding, sourceTraceLevel) {
       };
     }
 
-    if (finding.diff.identity.element.startsWith("query.") || finding.diff.identity.element.startsWith("path.") || finding.diff.identity.element.startsWith("headers.")) {
+    if (
+      finding.diff.identity.element.startsWith("query.") ||
+      finding.diff.identity.element.startsWith("path.") ||
+      finding.diff.identity.element.startsWith("headers.")
+    ) {
       return {
         category: "parameter-without-declaration-anchor",
         why: "The diff is attached to a wire-level parameter rather than a ModelProperty with a declaration/sourceProperty chain.",
