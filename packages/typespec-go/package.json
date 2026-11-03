@@ -26,6 +26,9 @@
       "default": "./dist/src/index.js"
     }
   },
+  "browser": {
+    "./src/node-runner.js": "./src/node-runner.browser.js"
+  },
   "tspMain": "dist/src/index.js",
   "engines": {
     "node": ">=22.0.0"
