@@ -649,7 +649,7 @@ The long-running operation to customize.
 
 ```typespec
 @@clientLroResult(start, ActionStatus, "javascript");
-@@clientLroResult(start, ActionStatus.result, #{ scope: "python" });
+@@clientLroResult(start, ActionStatus.result, "python");
 ```
 
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}

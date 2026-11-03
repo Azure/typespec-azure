@@ -1342,7 +1342,7 @@ extern dec clientOption(
  * @example Return an action's whole status monitor in JavaScript and its payload in Python.
  * ```typespec
  * @@clientLroResult(start, ActionStatus, "javascript");
- * @@clientLroResult(start, ActionStatus.result, #{ scope: "python" });
+ * @@clientLroResult(start, ActionStatus.result, "python");
  * ```
  */
 extern dec clientLroResult(
