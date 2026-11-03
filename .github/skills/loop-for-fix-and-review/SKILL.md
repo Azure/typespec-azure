@@ -779,6 +779,11 @@ automatic full corpus run per comment. Batch the current round's justified
 fixes before expensive verification; preserve the required scope below and
 all inherited review/recovery limits.
 
+When creating or refreshing `migration.md` during review fixes, follow the shared
+[four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
+Keep review history and validation provenance in NOTES or linked evidence,
+not repeated in the conclusion or coverage summary or added as a fifth section.
+
 In native migration PR mode, follow the
 [official migration contract](../shared/native-migration-contract.md) and the
 task's predeclared required scope. Do not invoke temporary-rule development,
