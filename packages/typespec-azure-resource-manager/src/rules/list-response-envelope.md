@@ -1,26 +1,29 @@
-ARM HTTP 200 list responses must use a predictable envelope containing exactly an array-valued `value` and
-`nextLink`. Additional top-level properties or a missing envelope property make generated clients
-and pagination tooling handle list operations inconsistently.
+When an ARM list operation returns an HTTP 200 response body, that body must use a predictable
+envelope containing exactly an array-valued `value` and `nextLink`. Additional top-level
+properties or a missing envelope property make generated clients and pagination tooling handle
+list operations inconsistently. This rule does not require an HTTP 200 response.
 
 ## Impact
 
 - **Area:** API
 
-Collection response envelopes with other shapes violate the ARM RPC contract and can produce
+HTTP 200 collection response envelopes with other shapes violate the ARM RPC contract and can produce
 inconsistent generated client pagination behavior.
 
 The rule combines collection-path and paging-metadata checks under the existing
 `list-response-envelope` rule name. ARM-provider collection GET paths retain their
 envelope validation. Authored `@list` operations with a paging `@nextLink` are also
 checked, including POST list actions and operations without provider metadata.
-Inherited envelope properties are included. The `value` property must be an array,
-and the next-link property must be named `nextLink`, not a custom envelope name.
+For HTTP 200 response bodies, inherited envelope properties are included. The `value`
+property must be an array, and the next-link property must be named `nextLink`, not a custom envelope name.
 Prefer standard ARM list operation templates, which provide this envelope.
 
-For paged operations, the selected response body must also contain the named next-link
-property. Headers and properties excluded by `@bodyIgnore` do not count unless preserved
-inside an explicit `@body`. Correspondence uses serialized names in each declared body
-media type. Without `@nextLink`, this additional check is skipped.
+For paged operations, if the selected response has a body, that body must contain the named
+next-link property. A non-200 fallback response is checked only for this correspondence;
+custom envelope names and additional properties are allowed. A selected response without
+a body is skipped. Headers and properties excluded by `@bodyIgnore` do not count unless
+preserved inside an explicit `@body`. Correspondence uses serialized names in each declared
+body media type. Without `@nextLink`, this additional check is skipped.
 
 ## ❌ Incorrect
 
@@ -69,5 +72,5 @@ The combined native contract intentionally rejects a custom next-link property n
 
 ## Suppression
 
-Suppress this rule only when compatibility requirements prevent the response envelope from
+Suppress this rule only when compatibility requirements prevent the HTTP 200 response envelope from
 containing exactly `value` and `nextLink`, or require a next link outside the selected response body.
