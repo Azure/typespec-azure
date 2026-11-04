@@ -90,6 +90,14 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps redundant operation-group naming guidance opt-in", () => {
+    const ruleName =
+      "@azure-tools/typespec-client-generator-core/no-redundant-operation-group-name";
+    for (const rulesetName of ["client-sdk", "data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
   it("keeps RPaaS extension-routing guidance opt-in in the general Azure rulesets", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
