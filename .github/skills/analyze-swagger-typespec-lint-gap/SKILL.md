@@ -442,8 +442,12 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    callback-family accounting, exact-reproduction receipts or tracing provenance
    here; put the breakdown in section 4 and technical context in NOTES or the
    linked evidence. Retain any qualification needed to interpret the table.
-3. **Function-level coverage.** Use a compact behavior/result table covering
-   material checks and compliant controls. Distinguish covered, missing,
+3. **Function-level coverage.** Use a compact three-column table:
+   **Behavior**, **Result**, and **Rationale**, covering material checks and
+   compliant controls. Keep the result to the coverage status; explain why that
+   status applies in the rationale, with a direct link to supporting evidence
+   and any material scope limitation. Do not merely repeat the result.
+   Distinguish covered, missing,
    compiler-prevented, approved retirement and unassessed behavior honestly.
    Keep test inventories and fixture counts in NOTES or linked evidence.
    Test-case percentages do not establish production prevalence or exhaustive
@@ -461,6 +465,25 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    implementation. Distinguish confirmed defects from suspected causes and code
    inspection from captured execution traces; do not imply that a newer upstream
    version or an uncaptured execution path was tested.
+
+   For a difference table, use explicit column names:
+   **Difference (with evidence)**, **Swagger diagnostics (raw / grouped)**,
+   **TypeSpec diagnostics for the same check**, and
+   **Recommended action and rationale**.
+   Preserve the compact cell format, such as `53 / 25` and `0`; do not split
+   counts into extra columns or repeat labels inside each cell.
+   Explain before the table that `raw / grouped` means reported diagnostics /
+   justified grouped check instances, and define the grouping identity.
+   Grouping must retain distinct checks and meet the correspondence requirements
+   above; grouped checks are not necessarily proven service defects.
+   Define the TypeSpec column's assessed rule/message scope: it counts observed
+   diagnostics attributed to the same check and target/context, not unrelated
+   warnings on the same operation or results before suppression.
+   Use **unassessed** when attribution is unsupported, not zero. Keep other
+   rules' evidence and predicted post-fix gains explicitly separate.
+   The action column must distinguish recommendations from approved decisions
+   and retain coverage status, unresolved policy and required approval where
+   relevant; a vague **Decision** heading must not imply approval.
 
 **NOTES** holds technical context: frozen inputs, audience/API-version and
 source/projection policies, severity/default activation, counting method,
@@ -500,14 +523,23 @@ See [Why diagnostic counts differ](#4-why-diagnostic-counts-differ) for the brea
 
 ## 3. Function-level coverage
 
-| Behavior                               | Result            |
-| -------------------------------------- | ----------------- |
-| <Material check and compliant control> | <Verified status> |
+| Behavior                               | Result            | Rationale                                                              |
+| -------------------------------------- | ----------------- | ---------------------------------------------------------------------- |
+| <Material check and compliant control> | <Verified status> | <Why this status applies, with evidence link and any scope limitation> |
 
 ## 4. Why diagnostic counts differ
 
-<Differing projects/diagnostic groups only, with counts, cause, coverage/action decision
-and direct grouped-evidence links; or a brief statement of no differences.>
+<Define any grouping identity and the assessed TypeSpec rule/message scope.
+Include differing projects/diagnostic groups only; if none, say so instead of
+adding a table.>
+
+| Difference (with evidence)        | Swagger diagnostics (raw / grouped)         | TypeSpec diagnostics for the same check | Recommended action and rationale                                      |
+| --------------------------------- | ------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------- |
+| <Cause and grouped-evidence link> | <Raw count> / <Grouped count or unassessed> | <Observed count or unassessed>          | <Coverage status; recommendation, rationale and any pending approval> |
+
+<Keep compact numeric cells. If grouping is not needed, use "Swagger diagnostics"
+and a single raw count. Keep other rules' evidence and predicted post-fix gains
+separate from observed attributed diagnostics.>
 
 ## NOTES
 
