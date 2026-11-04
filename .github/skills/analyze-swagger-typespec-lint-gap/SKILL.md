@@ -7,8 +7,9 @@ description: Investigate coverage or diagnostic-count gaps between a Swagger val
 
 Investigate differences between a Swagger validator rule and its migrated
 TypeSpec lint rule without assuming that raw diagnostic counts must be equal.
-Produce reproducible evidence, decide whether the migrated TypeSpec rule needs
-to change, and give a rule-focused implementation plan when it does.
+Produce reproducible evidence, assess coverage, then recommend the smallest
+justified action through **Gap analysis and decision**. Analysis does not
+authorize production edits; keep report-only tasks report-only.
 
 Follow the shared [analysis-first policy](../shared/analysis-first-lint-migration.md).
 Investigate upstream/native code and saved project diagnostics before requesting
@@ -28,9 +29,9 @@ differences. Equal corpus totals must not cancel opposite project gaps.
 Investigate every residual; "close" is not permission to ignore a missing member.
 Never deduplicate distinct violations merely because paths/locations match.
 
-Require deterministic attribution only for claims that use it, such as per-member
-native counts or exact correspondence. Without it, report group observations
-and independent member conclusions, marking member native counts unassessed.
+Investigate [correspondence](#8-establish-correspondence-and-justify-normalization)
+from saved evidence before marking attribution unassessed. Deterministic, tested
+attribution is required for claims that use it, not every group observation.
 Do not add artificial Swagger identities to production messages. Missing
 attribution alone is a reporting limit; unresolved required semantic/count
 questions or execution failures still block the relevant conclusion.
@@ -257,7 +258,22 @@ For each outlier:
 Do not normalize solely by property name. Common names such as `enabled` can
 collide across unrelated models and operations.
 
-### 8. Decide whether stronger normalization is valid
+### 8. Establish correspondence and justify normalization
+
+First reconcile the selected Swagger members and each TypeSpec rule's actual
+checks/predicates. A shared TypeSpec rule can have multiple diagnostic/message
+families: use the family to select the relevant check, then investigate exact
+project, API version, operation, model/schema, emitted path and source declaration
+identities available in saved diagnostics, receipts and pinned sources. Trace
+source-to-emission relationships and predicate behavior, including exceptions.
+The same operation, message text, property name or count alone proves neither
+the same check nor the same violation.
+
+Attempt deterministic attribution using that existing evidence for singletons,
+one-to-many and admitted many-to-one mappings. Account for corresponding findings,
+unmatched findings on both sides and unrelated TypeSpec checks. Count shared
+warnings once in group totals; do not collapse distinct violations at one location.
+General many-to-many remains deferred, not a cross-product of inferred matches.
 
 Add a rule-specific canonical identity only when it is:
 
@@ -267,43 +283,50 @@ Add a rule-specific canonical identity only when it is:
 - Collision-resistant.
 - Independently testable with fixtures and sampled real projects.
 
-If no reliable semantic identity exists across the two outputs, preserve the
-two cardinalities and judge equivalence behaviorally.
+If evidence cannot establish identity, retain both cardinalities, group
+observations and independent member conclusions. Mark only unsupported
+attribution/comparison unassessed and name the missing evidence and limits;
+never fabricate zero, a match or per-member native counts. Behavioral evidence
+can support a scoped semantic conclusion, not an exact-correspondence claim.
+Any further compile needs a concrete question and the existing cost/budget gate;
+missing attribution is not permission for unlimited runs.
 
-### 9. Decide whether the TypeSpec rule must change
+### 9. Gap analysis and decision
 
-This is the primary decision produced by the investigation.
+Analyze the exact semantic, emission or policy cause before recommending action.
+For each investigated gap, record separately in its grouped supporting evidence:
 
-Update the migrated TypeSpec rule when aligned evidence shows that it:
+- **Coverage status:** what behavior is covered, missing, compiler-prevented,
+  approved for retirement or still unassessed, and for which policy/population.
+- **Cause and evidence:** distinguish confirmed Swagger bugs/false positives,
+  comparison/population artifacts, existing responsible TypeSpec policies with
+  authored suppressions, genuinely missing behavior, modeling/spec issues and
+  unresolved/deferred policy. Check existing owning rules before proposing a
+  duplicate check.
+- **Recommended action and rationale:** weigh coverage benefit against
+  implementation complexity, diagnostic noise and maintenance. Recommend the
+  smallest justified owning-rule fix, spec/model correction, comparison repair,
+  further investigation, non-porting or explicit defer decision. State the
+  decision owner/approval still needed; a proposed exclusion is not an approved
+  policy retirement.
 
-- Misses an authorable API shape diagnosed by Swagger.
-- Reports an authorable compliant shape rejected by neither Swagger nor the
-  rule specification.
-- Checks a broader or narrower semantic target than Swagger.
-- Uses the wrong path, operation, version, visibility, or reachability
-  classification.
-- Cannot observe a Swagger-enforced concept that is represented in the
-  TypeSpec semantic program.
+For a recommended TypeSpec rule change, identify the production source file,
+exact missing/extra predicate or target classification, violating fixture and
+compliant control. Include relevant version, visibility, reachability and
+authorable-shape requirements. Keep those changes separate from emitter,
+Swagger linter, report-generator, normalization, dataset or harness work.
 
-Do not request a TypeSpec rule change when the gap is fully caused by report
-population, API-version projection, compile failures, duplicated emitted
-occurrences, stale validator data, or another non-rule comparison artifact.
+Distinguish observed configured warnings from diagnostic/predicate evidence
+before suppression and from predicted post-fix gains. An authored suppression
+can explain an absent warning without showing a missing owning check; source
+inspection alone is not an observed unsuppressed run.
 
-For every investigated gap, record exactly one disposition in its grouped
-supporting evidence:
-
-- **TypeSpec rule update required:** identify the missing or extra semantic
-  behavior, the production rule file to change, and the violating and compliant
-  fixtures to add.
-- **No TypeSpec rule update required:** identify the evidence proving the
-  migrated rule already has matching behavior.
-
-Keep required production TypeSpec rule and directly related fixture/test changes
-separate from emitter, Swagger linter, report-generator, normalization, dataset
-or harness work. The latter can explain a count difference but are not
-migration-rule action items. Do not add a standalone required-action section to
-the reader-facing report or repeat "No TypeSpec rule change is required" when
-the equivalence conclusion already communicates that result.
+**No immediate code change recommended** does not mean matching semantics.
+A deferred genuine gap stays missing and blocks equivalence/success for required
+functionality. Do not automatically fix production code to equalize Swagger
+totals or port confirmed upstream defects. Do not add a standalone action section
+to the reader-facing report; link its evidence-backed decision from the relevant
+behavior/difference entry.
 
 ### 10. Reach the migration conclusion
 
@@ -311,7 +334,8 @@ Accept the migrated TypeSpec rule as functionally equivalent when:
 
 - Violating and compliant fixtures establish matching semantics.
 - The compared populations and API-version scopes are aligned.
-- Validator projects are covered by TypeSpec diagnostics.
+- Validator projects' required behavior is covered by the responsible TypeSpec
+  checks; total/project overlap alone is not member coverage.
 - TypeSpec-only projects are explained or eliminated by correct projection.
 - Residual cardinality differences are explained by source-to-emission
   multiplicity, references, generated structures, or identity collisions.
@@ -320,7 +344,9 @@ Accept the migrated TypeSpec rule as functionally equivalent when:
 Raw diagnostic equality is not required when one rule reports emitted
 occurrences and the other reports semantic source targets.
 
-Do not claim equivalence when one-sided projects or outliers remain unexplained.
+Do not claim equivalence when one-sided projects or outliers remain unexplained,
+or required functionality is missing/deferred. An approved narrower policy
+requires an explicitly scoped conclusion, not full Swagger parity.
 
 ## Correctness Requirements
 
@@ -346,12 +372,37 @@ This is the shared report contract for migration development, native coverage
 analysis and gap investigation. It changes presentation, not the investigation,
 validation, review or acceptance requirements.
 
+### Assessment and publication gate
+
+Before publication, reconcile the mapping's membership with the actual owning
+rule's source checks at the assessed revision, every member conclusion and all
+raw, semantic-check and corresponding-warning count scopes.
+Keep each counting unit and attributed subset explicit and traceable; do not
+infer missing-member coverage from total agreement or project overlap.
+
+Verify which assessed source revision, helper/compiler/emitter closure and
+artifacts support each current-source claim. Comparison-affecting changes to
+that source or closure require fresh relevant final coverage under the existing
+full-population and budget gates. Report-only changes reuse verified observations.
+If a later head contains unrelated changes, retain the frozen assessed identity
+and justify applicability; never silently relabel old data as a new-head run.
+This publication check does not fetch moving refs mid-run, rerun on every SHA,
+refresh the immutable Swagger baseline or waive review/checkpoint/replay gates.
+
 ### Reader-facing report
 
 Keep `migration.md` concise and focused on the migration decision. Use
 **Swagger linter** and **TypeSpec linter** in reader-facing prose, not
 "validator" and "native". Preserve actual package names, source identifiers,
 receipt fields, filenames and quoted diagnostics unchanged.
+
+On refresh, first reconcile one underlying assessment, then rewrite the complete
+main and member narratives together. Replace superseded tables, classifications
+and summaries instead of appending corrections that leave competing conclusions.
+Reader-appropriate aggregations may differ while remaining traceable to that
+assessment; do not impose one rule's grouping or data constants on other rules.
+Preserve all audit, recovery and semantic evidence through direct links, without
+repeating provenance/accounting or introducing competing taxonomies.
 
 Use exactly four numbered sections followed by an unnumbered `NOTES` section:
 
@@ -400,8 +451,9 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
 4. **Why diagnostic counts differ.** Explain only differing projects or
    diagnostic groups: Swagger-linter-only, TypeSpec-linter-only, count-only,
    or semantic/identity differences even when totals match. State each cause,
-   both observed counts and the evidence-backed disposition, with a direct link
-   to its grouped appendix entry. Exclude matching projects and routine examples.
+   both observed counts, coverage status and recommended action/rationale from
+   **Gap analysis and decision**, with a direct link to its grouped appendix
+   entry. Exclude matching projects and routine examples.
    If there are no differences, say so briefly. Keep unresolved differences
    visible; do not let opposing project gaps cancel.
    When an upstream defect causes a difference, call it a bug, explain its
@@ -418,7 +470,7 @@ comparison, required-check failure or semantic gap still
 belongs in the conclusion and relevant behavior/difference entry, not only NOTES.
 
 Do not add a fifth numbered section or a standalone examples/actions section.
-Keep code-backed examples, complete investigations, rule-change dispositions,
+Keep code-backed examples, complete investigations, coverage/action decisions,
 fixture mappings and reproduction commands in the directly linked appendix.
 Removing the standalone example section does not remove any required evidence.
 
@@ -454,7 +506,7 @@ See [Why diagnostic counts differ](#4-why-diagnostic-counts-differ) for the brea
 
 ## 4. Why diagnostic counts differ
 
-<Differing projects/diagnostic groups only, with counts, cause, disposition
+<Differing projects/diagnostic groups only, with counts, cause, coverage/action decision
 and direct grouped-evidence links; or a brief statement of no differences.>
 
 ## NOTES
@@ -466,11 +518,15 @@ Omit the common-unit row when raw counts agree. When counts differ but no
 supported common unit exists, retain the raw counts and mark comparison
 unassessed; do not invent normalization.
 
-Before publishing or refreshing the report, read sections 1 and 2 as a summary:
-the migration conclusion, what the numbers count, why they differ and where to
-read the explanation must be clear without tracing implementation history.
-Remove repeated accounting and provenance without hiding material gaps or
-discarding linked evidence.
+Before publishing or refreshing, read the entire main report, all member notes
+and linked grouped conclusions together, not just sections 1 and 2. Can the
+reader readily decide: Is migration complete, and for which policy? What do the
+numbers count? Why do they differ? What should change, and why is it worth the
+complexity? What remains uncertain? Check that scorecards, behavior tables,
+decisions and limitations answer consistently, with matching controls separate
+from differences and technical proofs directly linked. Quality is the reader's
+decision, not word count or outline compliance. Remove stale summaries and
+repeated accounting/provenance without discarding evidence or hiding gaps.
 
 For many-to-one tasks, name and link every original Swagger linter in the short
 conclusion. Put the member status matrix in NOTES or directly linked member
@@ -483,9 +539,9 @@ notes without duplicating shared baseline data.
 
 Start the appendix's difference analysis with a linked summary of only projects
 or diagnostic groups that differ. For each, show reported Swagger/TypeSpec
-counts, justified after-analysis counts or unassessed status, cause and
-disposition. Group details by project, then exact diagnostic target such as
-path/method, schema or source declaration. Show both linters' counts per group
+counts, justified after-analysis counts or unassessed status, cause, coverage
+status and recommended action/rationale. Group details by project, then exact
+diagnostic target such as path/method, schema or source declaration. Show both linters' counts per group
 so reviewers can account for the entire project difference without reading raw
 JSON. Reconstructable shared prefixes can shorten long paths without losing
 case, parameter names or identity.
@@ -507,9 +563,10 @@ evidence. Moving details must not discard evidence, weaken a gate or turn an
 unresolved investigation into an accepted difference:
 
 1. Final migration conclusion.
-2. A direct answer to whether the migrated TypeSpec rule must change.
-3. Required TypeSpec rule and fixture/test changes, or an explicit statement
-   that none are required.
+2. Separate coverage status, exact cause and recommended action/rationale under
+   **Gap analysis and decision**, including deferred gaps and pending approvals.
+3. Concrete TypeSpec source/fixture/compliance-control requirements for recommended
+   changes, or the justified non-code decision and any further investigation.
 4. Links or paths to both required reports and their observed source revisions.
 5. A row-level reconciliation of both reports.
 6. Specific causes for every reported number gap.
@@ -532,7 +589,7 @@ reconstructing the investigation:
 ### Gap example: <short cause>
 
 - **Classification:** <Swagger-linter-only | TypeSpec-linter-only | count-only>
-- **Status:** <fixed | intentional | population mismatch | unresolved>
+- **Status:** <fixed | approved policy difference | population mismatch | deferred | unresolved>
 - **Project/API version:** `<project>` / `<version>`
 - **Source:** `<path or symbol>`
 
@@ -556,8 +613,10 @@ reconstructing the investigation:
 **Explanation:** <the exact semantic, emission, projection, or Swagger linter
 implementation difference that causes the gap>.
 
-**Disposition:** <rule fix, comparison projection, intentional extra coverage,
-or remaining investigation>.
+**Coverage status:** <evidenced behavior and policy boundary>.
+
+**Recommended action and rationale:** <smallest justified fix or explicit
+non-porting/defer/investigation decision; benefit versus complexity/noise/maintenance>.
 ```
 
 Use excerpts verified against the pinned source and generated output; do not
@@ -573,6 +632,5 @@ same cause. Separate examples are required for different causes. Resolved gaps
 must retain an example when it explains why production or comparison behavior
 changed; mark the status and disposition accordingly.
 
-The final statement should say whether the migrated TypeSpec rule is
-functionally equal to the related Swagger rule and clearly identify any
-remaining uncertainty.
+The final statement should state functional equivalence for the assessed policy,
+any approved scope restriction and remaining uncertainty.

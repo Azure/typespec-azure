@@ -74,11 +74,16 @@ For many-to-one comparisons, a shared native rule can report checks unrelated
 to the selected Swagger rule. Matching project sets can therefore hide a missing
 check. Verify each validator's material checks with discriminating violating and
 compliant fixtures, inspect the relevant native findings, and explain broader
-native behavior. Do not attribute findings by message text or property names.
-When reliable attribution is unavailable, report group counts, observed project
-sets and independent member conclusions. Per-member native counts remain
-unassessed, not zero. Attribution limits alone are not missing production checks;
-unanswered required semantics or unexplained count gaps still block a conclusion.
+native behavior. First follow the shared
+[correspondence investigation](../analyze-swagger-typespec-lint-gap/SKILL.md#8-establish-correspondence-and-justify-normalization):
+use saved exact project/version/operation/model/schema/source identities and
+the semantic predicate. Message family can select a shared rule's check, but
+message text, operation, property name or count alone is not correspondence.
+Only after that attempt, retain genuinely unsupported member attribution as
+unassessed with missing evidence and limits, not zero. Keep group observations
+and independent member conclusions; attribution limits alone are not missing
+production checks. Unanswered required semantics or unexplained count gaps
+still block a conclusion.
 
 Related comparisons may use different options or alignment profiles only when
 those differences are explicit. Do not compare their totals as if they shared
@@ -409,7 +414,8 @@ retain the report and investigate. Do not turn it into a successful coverage
 result. Zero target findings do not prove that the rule executed meaningfully.
 Verify runtime package receipts against the injected candidate artifacts.
 
-Follow the population, project-set, fixture, outlier, and cardinality analysis in
+Follow the population, project-set, fixture, outlier, correspondence and
+**Gap analysis and decision** sequence in
 [analyze-swagger-typespec-lint-gap](../analyze-swagger-typespec-lint-gap/SKILL.md).
 Its two-report reconciliation applies only when comparing those historical
 reports; do not invent an old report for a fresh native-artifact run.
@@ -444,13 +450,11 @@ to equalize counts.
 
 Write `migration.md` using the shared
 [four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Link the original Swagger linter in the short conclusion. Keep raw diagnostic
-totals distinct from project counts and justified after-analysis counts. Explain
-only differing projects/diagnostic groups in section 4, with direct links to
-grouped evidence and code-backed examples in the appendix. Put technical context
-in NOTES, not a standalone fifth examples/actions section. Preserve behavior
-coverage, material gaps and all required controls, investigations and replay
-evidence; test-case counts do not measure production prevalence.
+Apply its whole-report refresh/read gate and
+[assessment/publication gate](../analyze-swagger-typespec-lint-gap/SKILL.md#assessment-and-publication-gate).
+Retain every member conclusion, both directions of differences, TypeSpec-only
+checks and all required controls/investigation/replay evidence. Separate observed
+warnings from pre-suppression predicate evidence and predicted gains.
 
 Return the report path, candidate/specs identities, actual loaded packages,
 selected/assessable/failed population, raw and aligned results, scope limitations,

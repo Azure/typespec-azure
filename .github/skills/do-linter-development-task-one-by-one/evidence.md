@@ -228,20 +228,14 @@ evaluation; current-time reassessment needs a fresh validator run.
 
 Write singleton, group and member `migration.md` using the shared
 [four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Keep the linked original Swagger linter and supported conclusion short, and
-diagnostic totals distinct from project counts. Section 4 covers only differing
-projects/diagnostic groups; the appendix groups their exact targets and both
-linters' counts, causes and dispositions. Retain matching controls separately.
-Put technical context in NOTES and source/schema examples, full investigations
-and replay instructions in `evidence-details.md` or an existing linked appendix.
-Do not add a standalone fifth examples/actions section. Supporting evidence
-remains required; moving it does not waive validation or hide material limits.
-
-The group note retains the member status matrix, combined raw/comparable counts,
-directional gaps and explanations in the corresponding sections. Link every
-member to its own semantic/fixture evidence and original validator source.
-Describe intentional native differences separately from functional equivalence.
-Do not invent per-member native coverage when attribution is unavailable.
+Apply its whole-report refresh/read gate and
+[assessment/publication gate](../analyze-swagger-typespec-lint-gap/SKILL.md#assessment-and-publication-gate):
+reconcile membership and raw/check/corresponding-warning scopes, and verify the
+assessed revision/closure behind current-source claims. Report-only refreshes
+reuse verified observations, not a newly labeled head run. Retain the member
+matrix, semantic/fixture evidence, original sources, matching controls and all
+audit/recovery proofs in directly linked `evidence-details.md` or an existing
+appendix. Moving evidence never waives acceptance or replay requirements.
 Keep public native docs native-first, with all original mappings in their
 dedicated provenance section.
 
