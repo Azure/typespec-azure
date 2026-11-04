@@ -71,6 +71,7 @@ export function createTCGCContext(
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
+    convertDiscriminatedUnionsToModels: true,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
     __referencedTypeCache: new Map<
@@ -173,6 +174,8 @@ export interface CreateSdkContextOptions {
   exportTCGCoutput?: boolean; // this flag is for emitter to export TCGC output as yaml file
   flattenUnionAsEnum?: boolean; // this flag is for emitter to decide whether tcgc should flatten union as enum
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
+  /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
+  convertDiscriminatedUnionsToModels?: boolean;
 }
 
 export async function createSdkContext<
@@ -238,6 +241,7 @@ export async function createSdkContext<
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
+    convertDiscriminatedUnionsToModels: options?.convertDiscriminatedUnionsToModels ?? true,
   };
 
   if (context.options["examples-dir"]) {
