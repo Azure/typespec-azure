@@ -181,4 +181,95 @@ describe("path expansion helper emission", () => {
       expect(client.includes("preserveQueryExpansions(")).toBe(preserve);
     },
   );
+
+  it.each([
+    { route: "/items", parameter: "@query value: string", helpers: [] },
+    { route: "/items{.value}", parameter: "value?: string", helpers: [] },
+    {
+      route: "/items{/value*}",
+      parameter: "value: string[]",
+      helpers: ["splitURIPath", "parseURIArray"],
+    },
+    {
+      route: "/items{/value*}",
+      parameter: "value: Record<int32>",
+      helpers: ["splitURIPath", "parseURIMap"],
+    },
+    {
+      route: "/items{?value*}",
+      parameter: "value: int32[]",
+      helpers: ["parseURIArray"],
+    },
+    {
+      route: "/items{?value}",
+      parameter: "value: string[]",
+      helpers: ["parseRawURIQuery", "splitURIQuery", "parseURIArray", "parseURIQueryArray"],
+    },
+    { route: "/items{?value*}", parameter: "value: Record<int32>", helpers: [] },
+    {
+      route: "/items{?value}",
+      parameter: "value: Record<int32>",
+      helpers: [
+        "parseRawURIQuery",
+        "splitURIQuery",
+        "parseURIArray",
+        "parseURIQueryArray",
+        "parseURIMap",
+        "parseURIQueryMap",
+      ],
+    },
+    { route: "/items{?value*}", parameter: "value: Filter", helpers: [] },
+    {
+      route: "/items{?value}",
+      parameter: "value: Filter",
+      helpers: [
+        "parseRawURIQuery",
+        "splitURIQuery",
+        "parseURIArray",
+        "parseURIQueryArray",
+        "parseURIMap",
+        "parseURIQueryMap",
+        "parseURIQueryObject",
+      ],
+    },
+    { route: "/items{?value}", parameter: 'value: { kind: "fixed"; }', helpers: [] },
+  ])(
+    "emits only required fake URI helpers for $parameter at $route",
+    async ({ route, parameter, helpers }) => {
+      const files = await emitGoFor(
+        `
+        @service namespace Expansions;
+        model Filter { field: string; count?: int32; }
+        @route("${route}") op read(${parameter}): void;
+      `,
+        { "generate-fakes": true },
+      );
+      const internal = files.get("fake/zz_internal.go")!;
+      const emitted = Array.from(
+        internal.matchAll(/func ((?:splitURI|parseURI|parseRawURI)\w*)[([]/g),
+        (match) => match[1],
+      );
+      expect(emitted.sort()).toEqual([...helpers].sort());
+    },
+  );
+
+  it("does not carry fake helper requirements into another package", async () => {
+    await emitGoFor(
+      `
+        @service namespace Expansions;
+        @route("/items{?value}")
+        op read(value: Record<int32>, @header name?: string): void;
+      `,
+      { "generate-fakes": true },
+    );
+    const files = await emitGoFor(
+      `
+        @service namespace Plain;
+        @route("/items") op read(): void;
+      `,
+      { "generate-fakes": true },
+    );
+    const internal = files.get("fake/zz_internal.go")!;
+    expect(internal).not.toMatch(/^func \w/m);
+  });
 });

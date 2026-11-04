@@ -8,6 +8,7 @@ import { CodegenError } from "../core/errors.js";
 import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
 import { getPathExpansionStyle } from "../core/path-expansion.js";
+import type { RequiredHelpers } from "./internal.js";
 
 /** Emits a typed parser shared by URI-template arrays, maps, and object members. */
 function valueParser(type: go.WireType, pkg: go.FakePackage, imports: ImportManager): string {
@@ -94,6 +95,7 @@ export function parseURITemplateParameter(
   pkg: go.FakePackage,
   imports: ImportManager,
   indent: helpers.Indentation,
+  requiredHelpers: RequiredHelpers,
 ): string {
   const fail = "if err != nil { return nil, err }\n";
   const parseFail = "if parseErr != nil { return nil, parseErr }\n";
@@ -113,18 +115,24 @@ export function parseURITemplateParameter(
     text += `parsed, parseErr := (${valueParser(param.type, pkg, imports)})(${value})\n${parseFail}`;
     text += `${result} = parsed\n}\n`;
   } else if (param.kind === "pathCollectionParam" || param.kind === "pathMapParam") {
+    requiredHelpers.splitURIPath = true;
     const { prefix, separator } = getPathExpansionStyle(param);
     const values = `${result}Values`;
     text += `${values}, err := splitURIPath(${raw}, ${JSON.stringify(prefix)}, ${JSON.stringify(separator)})\n${fail}`;
     const parser = valueParser(param.type.itemType, pkg, imports);
-    const parse =
-      param.kind === "pathMapParam"
-        ? `parseURIMap(${values}, ${param.explode}, ${param.isEncoded}, ${parser})`
-        : `parseURIArray(${values}, ${param.isEncoded}, ${parser})`;
+    let parse: string;
+    if (param.kind === "pathMapParam") {
+      requiredHelpers.parseURIMap = true;
+      parse = `parseURIMap(${values}, ${param.explode}, ${param.isEncoded}, ${parser})`;
+    } else {
+      requiredHelpers.parseURIArray = true;
+      parse = `parseURIArray(${values}, ${param.isEncoded}, ${parser})`;
+    }
     text += `${result}, err := ${parse}\n${fail}`;
   } else if (param.kind === "queryMapParam") {
     const parser = valueParser(param.type.itemType, pkg, imports);
     if (!param.explode) {
+      requiredHelpers.parseURIQueryMap = true;
       const parse = `parseURIQueryMap(${raw}, ${parser})`;
       if (go.isRequiredParameter(param.style)) {
         text += `${result}, err := ${parse}\n${fail}`;
@@ -164,12 +172,19 @@ export function parseURITemplateParameter(
       }
     }
   } else {
-    const parse =
-      param.kind === "queryCollectionParam"
-        ? param.collectionFormat === "multi"
-          ? `parseURIArray(${raw}, false, ${valueParser(param.type.itemType, pkg, imports)})`
-          : `parseURIQueryArray(${raw}, ${valueParser(param.type.itemType, pkg, imports)})`
-        : `(${valueParser(go.unwrapPtr(param.type), pkg, imports)})(${raw})`;
+    let parse: string;
+    if (param.kind === "queryCollectionParam") {
+      const parser = valueParser(param.type.itemType, pkg, imports);
+      if (param.collectionFormat === "multi") {
+        requiredHelpers.parseURIArray = true;
+        parse = `parseURIArray(${raw}, false, ${parser})`;
+      } else {
+        requiredHelpers.parseURIQueryArray = true;
+        parse = `parseURIQueryArray(${raw}, ${parser})`;
+      }
+    } else {
+      parse = `(${valueParser(go.unwrapPtr(param.type), pkg, imports)})(${raw})`;
+    }
     if (go.isRequiredParameter(param.style)) {
       text += `${result}, err := ${parse}\n${fail}`;
     } else {
