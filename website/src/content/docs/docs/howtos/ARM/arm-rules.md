@@ -54,6 +54,7 @@ Of course, in this case, the best resolution would be to follow the advice in th
 ## Evaluating Rule Violations
 
 The tables below provide guidance to rule authors and ARM reviewers on how to evaluate violations of TypeSpec ARM rules. Rules are grouped by the library that defines them and listed alphabetically by name. For each rule, the tables give a link to its reference documentation, the corresponding LintDiff rule (if any), and the impact of a violation, including the area it affects.
+| [`lro-missing-polling-metadata`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-missing-polling-metadata/) | [`LroExtension`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-extension.md) (partial), [`XMSLongRunningOperationProperty`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-long-running-operation-property.md) | **API, SDK.** Require native polling metadata for PATCH/provider/collection POST `202` responses or PUT/PATCH/POST/DELETE `200`/`201`/`202`/`204` responses with polling headers. Disabled in the central resource-manager ruleset; included in ARM library `all`. |
 
 ### Rules in @azure-tools/typespec-azure-core
 
