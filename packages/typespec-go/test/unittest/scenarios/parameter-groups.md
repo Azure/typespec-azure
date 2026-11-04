@@ -365,7 +365,7 @@ func ExampleParameterGroupOperationsClient_SharedParameterGroup2() {
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
-	res, err := clientFactory.NewParameterGroupOperationsClient().SharedParameterGroup2(ctx, "2025-01-01", "myResourceGroup", "myWidget", testmodule.TestManagementRequestOptions{ClientRequestID: "<clientRequestID>"}, nil)
+	res, err := clientFactory.NewParameterGroupOperationsClient().SharedParameterGroup2(ctx, "2025-01-01", "myResourceGroup", "myWidget", testmodule.TestManagementRequestOptions{ClientRequestID: "client-req-002"}, nil)
 	if err != nil {
 		log.Fatalf("failed to finish the request: %v", err)
 	}

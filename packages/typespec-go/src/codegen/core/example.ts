@@ -823,8 +823,21 @@ function isParamByValue(p: go.ParameterExample): boolean {
  */
 function shouldRenderParam(param: go.MethodParameter, example: go.MethodExample): boolean {
   if (go.isLiteralParameter(param.style)) return false;
-  if (example.parameters.find((p) => p.parameter === param)) return true;
+  if (findParamExample(param, example)) return true;
   return go.isRequiredParameter(param.style);
+}
+
+function findParamExample(
+  param: go.MethodParameter,
+  example: go.MethodExample,
+): go.ParameterExample | undefined {
+  return example.parameters.find(
+    (p) =>
+      p.parameter === param ||
+      (param.group?.required &&
+        p.parameter.group === param.group &&
+        p.parameter.name === param.name),
+  );
 }
 
 /**
@@ -838,7 +851,7 @@ function getParamExampleValue(
   example: go.MethodExample,
   imports: ImportManager,
 ): string {
-  const paramExample = example.parameters.find((p) => p.parameter === param);
+  const paramExample = findParamExample(param, example);
   if (paramExample) {
     return getExampleValue(
       pkg,

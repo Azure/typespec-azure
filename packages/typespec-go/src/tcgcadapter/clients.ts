@@ -739,7 +739,8 @@ export class ClientAdapter {
       let requestToken: go.HeaderScalarParameter | go.QueryScalarParameter;
       switch (tokenReq.kind) {
         case "method": {
-          const tokenParam = paramsMap.get(tokenReq);
+          const tokenParams = paramsMap.get(tokenReq);
+          const tokenParam = tokenParams?.[0];
           if (!tokenParam) {
             throw new AdapterError(
               "InternalError",
@@ -748,6 +749,7 @@ export class ClientAdapter {
             );
           }
           if (
+            tokenParams?.length !== 1 ||
             tokenParam.kind === "queryCollectionParam" ||
             tokenParam.kind === "queryMapParam" ||
             (go.isQueryParameter(tokenParam) && tokenParam.queryExpansion)
@@ -832,17 +834,19 @@ export class ClientAdapter {
             reinjectedParam.__raw?.node,
           );
         }
-        const goParam = paramsMap.get(reinjectedParam);
-        if (!goParam) {
+        const goParams = paramsMap.get(reinjectedParam);
+        if (!goParams) {
           throw new AdapterError(
             "InternalError",
             `missing re-injection parameter name ${reinjectedParam.name} for operation ${method.name}`,
             method.__raw?.node,
           );
-        } else if (goParam.kind === "headerScalarParam") {
-          continue;
         }
-        paramsForReinjection.push(goParam);
+        for (const goParam of goParams) {
+          if (goParam.kind !== "headerScalarParam") {
+            paramsForReinjection.push(goParam);
+          }
+        }
       }
     }
     return paramsForReinjection;
@@ -1058,16 +1062,18 @@ export class ClientAdapter {
           helpers.getEffectiveName(param, go.isRequiredParameter(style)),
           "Param",
         );
-        for (const member of this.adaptQueryParameterGroup(
+        const members = this.adaptQueryParameterGroup(
           queryType,
           name,
           go.isRequiredParameter(style),
           optionalGroup,
           opParam.serializedName,
           opParam.explode,
-        )) {
+        );
+        for (const member of members) {
           addParameterToMethod(member, opParam);
         }
+        pageableParamsMap.set(param, members);
         continue;
       }
 
@@ -1271,8 +1277,9 @@ export class ClientAdapter {
           switch (adaptedParam.kind) {
             case "headerScalarParam":
             case "queryCollectionParam":
+            case "queryMapParam":
             case "queryScalarParam":
-              pageableParamsMap.set(param, adaptedParam);
+              pageableParamsMap.set(param, [adaptedParam]);
           }
         }
       }
@@ -2405,9 +2412,10 @@ export class ClientAdapter {
   }
 
   private adaptPathQueryType(sdkType: tcgc.SdkType): Exclude<go.WireType, go.Ptr> {
+    const collectionType = sdkType.kind === "nullable" ? sdkType.type : sdkType;
     if (
-      (sdkType.kind === "array" || sdkType.kind === "dict") &&
-      sdkType.valueType.kind === "nullable"
+      (collectionType.kind === "array" || collectionType.kind === "dict") &&
+      collectionType.valueType.kind === "nullable"
     ) {
       throw new AdapterError(
         "UnsupportedTsp",
@@ -2767,7 +2775,7 @@ interface ParameterStyleInfo {
  */
 type ParamsMapForPageable = Map<
   tcgc.SdkMethodParameter,
-  go.HeaderScalarParameter | go.QueryParameter
+  Array<go.HeaderScalarParameter | go.QueryParameter>
 >;
 
 /**
