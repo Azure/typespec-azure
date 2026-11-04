@@ -17,7 +17,7 @@ import { ImportManager } from "./imports.js";
  * @returns the generated response handler code as a string.
  */
 export function createResponseHandler(
-  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod,
+  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod | go.SseMethod,
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
@@ -27,10 +27,12 @@ export function createResponseHandler(
 
   const resultVarName = "result";
   text += `${indent.get()}${resultVarName} := ${method.returns.name}{}\n`;
-  text += `${indent.get()}${helpers.buildIfBlock(indent, {
-    condition: "!runtime.HasStatusCode(resp, successCodes...)",
-    body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
-  })}\n`;
+  if (method.kind !== "sseMethod") {
+    text += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "!runtime.HasStatusCode(resp, successCodes...)",
+      body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
+    })}\n`;
+  }
 
   for (const header of method.returns.headers) {
     text += formatHeaderResponseValue(
@@ -111,6 +113,9 @@ export function createResponseHandler(
           imports,
           indent,
         );
+        break;
+      case "sseResult":
+        // The connector validates the response and transfers the body to the event reader.
         break;
       default:
         result satisfies never;
@@ -224,7 +229,7 @@ function generateResponseUnmarshaller(
 
 // use this to generate the code that will help process values returned in response headers
 function formatHeaderResponseValue(
-  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod,
+  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod | go.SseMethod,
   headerResp: go.HeaderScalarResponse | go.HeaderMapResponse,
   respObj: string,
   zeroResp: string,
