@@ -178,7 +178,7 @@ authorize refresh, or waive any required gate.
    pinned shared compatible baseline, lightweight injected positive/compliant
    preflight controls, then the declared
    full required population. Apply the count policy below and
-   [gap analysis](../analyze-swagger-typespec-lint-gap/SKILL.md).
+   [Gap analysis and decision](../analyze-swagger-typespec-lint-gap/SKILL.md#9-gap-analysis-and-decision).
    Keep compile/parse/worker/projection failures unassessed. Investigate every
    one-sided project and both directions of outliers. Do not change the rule
    simply to equalize counts. Read the full saved population and selected
@@ -249,14 +249,15 @@ can hide missing findings plus false positives; inspect diagnostic outliers and
 keep discriminating member controls, including missing-member and wrong-but-equal
 negative controls. Full overlap or count agreement alone is not equivalence.
 
-Per-member native counts/coverage/correspondence require deterministic tested
-attribution. Whole-group count comparison does not require artificial Swagger
-IDs on production diagnostics. If attribution is unavailable, mark that member
-detail unassessed, retain its Swagger observations and semantic conclusion, and
-do not publish an invented percentage. That reporting limit alone is not a
-production defect; an unanswered required semantic question, unexplained group
-gap or execution failure still blocks success. General many-to-many analysis
-requires a separate design.
+Follow the shared
+[correspondence investigation](../analyze-swagger-typespec-lint-gap/SKILL.md#8-establish-correspondence-and-justify-normalization)
+before declaring member attribution unavailable. Reconcile source membership and
+raw/check/corresponding-warning scopes under the
+[assessment/publication gate](../analyze-swagger-typespec-lint-gap/SKILL.md#assessment-and-publication-gate).
+Whole-group comparison needs no artificial production Swagger IDs. Attribution
+limits alone are not production defects; required semantic questions, unexplained
+gaps, execution failures or deferred missing required functionality still block
+success. General many-to-many analysis requires a separate design.
 
 ## Baselines and evidence publication
 

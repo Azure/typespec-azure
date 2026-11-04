@@ -76,9 +76,10 @@ stabilize, not a per-edit debugger. Preserve all final verification/review gates
 
 Both flows must create or refresh `migration.md` under the shared
 [four-section report plus NOTES contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note).
-Review the concise report and its linked evidence together: preserve evidenced
-positives, actual counts, core/corner-case context and quickly accessible examples
-without weakening any required investigation or acceptance gate.
+Apply its whole-report refresh/read gate to the main report and all member notes,
+and its [assessment/publication gate](../analyze-swagger-typespec-lint-gap/SKILL.md#assessment-and-publication-gate)
+before making current-source claims. Preserve all investigation/acceptance gates;
+**Gap analysis and decision** separates coverage from recommended action.
 
 All rule PR descriptions follow the shared
 [two-section PR body](../shared/migration-pr-description.md): original Swagger
