@@ -588,7 +588,10 @@ function getSdkTypeExample(
           return diagnostics.wrap(undefined);
         }
       case "enum":
-        if (type.values.some((v) => v.value === example) || !type.isFixed) {
+        if (
+          type.values.some((v) => (v.serializationOptions?.json?.name ?? v.value) === example) ||
+          !type.isFixed
+        ) {
           return getSdkBaseTypeExample(
             typeof example as "string" | "number",
             type,
@@ -600,7 +603,7 @@ function getSdkTypeExample(
           return diagnostics.wrap(undefined);
         }
       case "enumvalue":
-        if (type.value === example) {
+        if ((type.serializationOptions?.json?.name ?? type.value) === example) {
           return getSdkBaseTypeExample(
             typeof example as "string" | "number",
             type,
@@ -809,13 +812,13 @@ function getSdkModelExample(
     while (modelQueue.length > 0) {
       const model = modelQueue.pop()!;
       for (const property of model.properties) {
-        // for query/path/cookie/header parameters, they should have been handled in parameters.
-        if (
-          property.kind === "property" &&
-          property.serializationOptions.json?.name &&
-          !properties.has(property.serializationOptions.json.name)
-        ) {
-          properties.set(property.serializationOptions.json.name, property);
+        if (property.kind !== "property") {
+          continue;
+        }
+        const name =
+          property.serializationOptions.json?.name ?? property.__raw?.name ?? property.name;
+        if (!properties.has(name)) {
+          properties.set(name, property);
         }
       }
       if (model.additionalProperties && additionalPropertiesType === undefined) {

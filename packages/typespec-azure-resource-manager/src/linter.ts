@@ -58,6 +58,7 @@ import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
 import { useScopeForExtensionRoutingRule } from "./rules/use-scope-for-extension-routing.js";
+import { useScopePathStandardNameRule } from "./rules/use-scope-path-standard-name.js";
 import { useStandardErrorRule } from "./rules/use-standard-error.js";
 import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
@@ -125,6 +126,7 @@ const rules = [
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
   noNestedSystemDataRule,
+  useScopePathStandardNameRule,
 ];
 
 export const $linter = defineLinter({
