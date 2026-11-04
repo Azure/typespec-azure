@@ -1,61 +1,70 @@
 import {
-  type Interface,
-  type Model,
-  type ModelProperty,
-  type Operation,
-  type Program,
   createRule,
   fileRef,
   getLocationContext,
   getProperty,
   isArrayModelType,
+  isList,
+  isTemplateDeclaration,
   walkPropertiesInherited,
+  type Interface,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
 } from "@typespec/compiler";
-import { type HttpOperationResponse } from "@typespec/http";
-import { resolveArmResources } from "../resource.js";
+import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
+import { isListOperation } from "@typespec/rest";
+import { getArmResourceOperationData } from "../operations.js";
 
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
   docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
-  description: "ARM list responses must use a value array and the standard nextLink envelope.",
+  description: "List responses must use a value array and the standard nextLink envelope.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
-    default:
-      "ARM resource list response models must declare exactly the `value` and `nextLink` properties.",
-    valueArray: "ARM resource list responses must declare a 'value' property of array type.",
+    default: "List response models must declare exactly the `value` and `nextLink` properties.",
+    valueArray: "List responses must declare a 'value' property of array type.",
   },
   create(context) {
     return {
-      root(program) {
-        const provider = resolveArmResources(program);
-        const checked = new Set<Operation>();
-        for (const resource of provider.resources ?? []) {
-          for (const { operation, httpOperation } of resource.operations.lists) {
-            if (checked.has(operation)) continue;
-            checked.add(operation);
+      operation(operation) {
+        if (
+          getLocationContext(context.program, operation.interface ?? operation).type !==
+            "project" ||
+          isTemplateDeclaration(operation) ||
+          (operation.interface !== undefined && isTemplateDeclaration(operation.interface))
+        ) {
+          return;
+        }
 
-            const responseModel = get200ResponseModel(httpOperation.responses);
-            if (responseModel === undefined) continue;
+        const program = context.program;
+        if (
+          !isList(program, operation) &&
+          !isListOperation(program, operation) &&
+          getArmResourceOperationData(program, operation)?.kind !== "list"
+        ) {
+          return;
+        }
 
-            const value = getProperty(responseModel, "value");
-            if (
-              value !== undefined &&
-              (value.type.kind !== "Model" || !isArrayModelType(value.type))
-            ) {
-              context.reportDiagnostic({
-                target: getDiagnosticTarget(program, operation, value),
-                messageId: "valueArray",
-              });
-              continue;
-            }
+        const [httpOperation] = getHttpOperation(program, operation);
+        const responseModel = get200ResponseModel(httpOperation.responses);
+        if (responseModel === undefined) return;
 
-            for (const invalidTarget of getInvalidTargets(responseModel)) {
-              context.reportDiagnostic({
-                target: getDiagnosticTarget(program, operation, invalidTarget),
-              });
-            }
-          }
+        const value = getProperty(responseModel, "value");
+        if (value !== undefined && (value.type.kind !== "Model" || !isArrayModelType(value.type))) {
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(program, operation, value),
+            messageId: "valueArray",
+          });
+          return;
+        }
+
+        for (const invalidTarget of getInvalidTargets(responseModel)) {
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(program, operation, invalidTarget),
+          });
         }
       },
     };

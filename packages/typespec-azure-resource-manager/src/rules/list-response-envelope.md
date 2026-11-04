@@ -1,4 +1,4 @@
-ARM list responses must use a predictable envelope containing exactly an array-valued `value` and
+List responses must use a predictable envelope containing exactly an array-valued `value` and
 `nextLink`. Additional top-level properties or a missing envelope property make generated clients
 and pagination tooling handle list operations inconsistently.
 
@@ -9,7 +9,10 @@ and pagination tooling handle list operations inconsistently.
 Collection response envelopes with other shapes violate the ARM RPC contract and can produce
 inconsistent generated client pagination behavior.
 
-This rule applies to HTTP 200 response models of ARM resource list operations.
+This rule applies to HTTP 200 response models of list operations, including
+non-resource lists. Use `@list`, `@listsResource`, or an ARM list operation template
+to declare a list operation. A continuation-link decorator is not required for
+this rule to check the response envelope.
 
 Inherited envelope properties are included. The `value` property must be an array,
 and the next-link property must be named `nextLink`, not a custom envelope name.
@@ -19,11 +22,10 @@ Prefer standard ARM list operation templates, which provide this envelope.
 
 ```tsp
 @service
-@armProviderNamespace
 namespace Contoso.Widgets;
 
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
+model Widget {
+  name: string;
 }
 
 model WidgetListResult {
@@ -35,29 +37,31 @@ model WidgetListResult {
   totalCount?: int32;
 }
 
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget>;
-  listByParent is ArmResourceListByParent<Widget, Response = ArmResponse<WidgetListResult>>;
-}
+@list
+@get
+op listWidgets(): WidgetListResult;
 ```
 
 ## ✅ Correct
 
 ```tsp
 @service
-@armProviderNamespace
 namespace Contoso.Widgets;
 
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
+model Widget {
+  name: string;
 }
 
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget>;
-  listByParent is ArmResourceListByParent<Widget>;
+model WidgetListResult {
+  @pageItems value: Widget[];
+
+  @nextLink
+  nextLink?: string;
 }
+
+@list
+@get
+op listWidgets(): WidgetListResult;
 ```
 
 ## LintDiff Equivalent

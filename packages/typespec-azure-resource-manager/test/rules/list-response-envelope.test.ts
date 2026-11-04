@@ -74,7 +74,7 @@ it.each(["string", "Widget", "Record<string>"])(
       .expect(armList(`model WidgetListResult { value: ${type}; nextLink?: string; }`))
       .toEmitDiagnostics({
         code: diagnosticCode,
-        message: "ARM resource list responses must declare a 'value' property of array type.",
+        message: "List responses must declare a 'value' property of array type.",
       });
   },
 );
@@ -260,7 +260,7 @@ it("ignores collection-shaped GET paths not registered as resource lists", async
     .toBeValid();
 });
 
-it.each(["get", "post"])("ignores unassociated @list %s operations", async (verb) => {
+it.each(["get", "post"])("checks unassociated @list %s operations", async (verb) => {
   await tester
     .expect(
       `
@@ -276,10 +276,10 @@ it.each(["get", "post"])("ignores unassociated @list %s operations", async (verb
       op search(): WidgetListResult;
     `,
     )
-    .toBeValid();
+    .toEmitDiagnostics({ code: diagnosticCode });
 });
 
-it("ignores paging operations without ARM resources", async () => {
+it("checks list operations without ARM resources", async () => {
   await tester
     .expect(
       `
@@ -293,6 +293,130 @@ it("ignores paging operations without ARM resources", async () => {
       @list
       @get
       op list(): Page;
+    `,
+    )
+    .toEmitDiagnostics({ code: diagnosticCode });
+});
+
+it("checks @list operations without a next-link marker", async () => {
+  await tester
+    .expect(
+      `
+      @service
+      namespace Contoso;
+      model Page { @pageItems value: string[]; }
+      @list
+      @get
+      op list(): Page;
+    `,
+    )
+    .toEmitDiagnostics({ code: diagnosticCode });
+});
+
+it("accepts non-resource list responses with the standard envelope", async () => {
+  await tester
+    .expect(
+      `
+      @service
+      namespace Contoso;
+      model Page {
+        @pageItems value: string[];
+        nextLink?: url;
+      }
+      @list
+      @post
+      op list(): Page;
+    `,
+    )
+    .toBeValid();
+});
+
+it.each([
+  ["value: Widget[];", false],
+  ["value: Widget[]; nextLink?: string;", true],
+])("checks REST lists without @list or ARM resource metadata: %s", async (properties, valid) => {
+  const result = tester.expect(`
+    @service
+    namespace Contoso;
+    model Widget { name: string; }
+    model Page { ${properties} }
+    @listsResource(Widget)
+    @get
+    op list(): Page;
+  `);
+  if (valid) {
+    await result.toBeValid();
+  } else {
+    await result.toEmitDiagnostics({ code: diagnosticCode });
+  }
+});
+
+it("checks ARM lists even without resource lifecycle operations", async () => {
+  await tester
+    .expect(
+      armList("model WidgetListResult { value: Widget[]; }").replace(
+        "read is ArmResourceRead<Widget>;",
+        "",
+      ),
+    )
+    .toEmitDiagnostics({ code: diagnosticCode });
+});
+
+it("ignores uninstantiated list operation and interface templates", async () => {
+  await tester
+    .expect(
+      `
+      model Page<T> {
+        @pageItems value: T[];
+        nextLink?: url;
+        totalCount?: int32;
+      }
+      @list
+      @get
+      op list<T>(): Page<T>;
+      interface Collections<T> {
+        @list
+        @get
+        list(): Page<T>;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
+it("checks instantiated list interfaces once", async () => {
+  await tester
+    .expect(
+      `
+      @service
+      namespace Contoso;
+      model Page<T> {
+        @pageItems value: T[];
+        nextLink?: url;
+        totalCount?: int32;
+      }
+      interface Collections<T> {
+        @list
+        @get
+        list(): Page<T>;
+      }
+      interface Widgets extends Collections<string> {}
+    `,
+    )
+    .toEmitDiagnostics({ code: diagnosticCode });
+});
+
+it("does not infer lists from paging properties alone", async () => {
+  await tester
+    .expect(
+      `
+      model Page {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+        totalCount?: int32;
+      }
+      @get
+      op read(): Page;
     `,
     )
     .toBeValid();

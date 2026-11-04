@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Identify `list-response-envelope` operations through `resolveArmResources` and each resource's list operations instead of URL paths or paging decorators. Skip unassociated operations and validate inherited envelope properties.
+Check `list-response-envelope` for all declared list operations, including non-resource lists and lists without continuation-link metadata. Do not infer lists from URL paths. Include inherited envelope properties.
