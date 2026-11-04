@@ -80,6 +80,12 @@ function getGenerationOptions(typeSpecFile: string): string[] {
       `${emitterName}.advanced-versioning=true`,
       `${emitterName}.generate-async-methods=true`,
       `${emitterName}.enable-sync-stack=false`,
+      `${emitterName}.client-side-validations=true`,
+    );
+  } else if (/tsp\/arm-internal\.tsp$/.test(normalized)) {
+    options.push(
+      `${emitterName}.generate-async-methods=true`,
+      `${emitterName}.advanced-versioning=true`,
     );
   } else if (/tsp\/protocol-api-sync-over-async\.tsp$/.test(normalized)) {
     options.push(`${emitterName}.enable-sync-stack=false`);
@@ -92,6 +98,11 @@ function getGenerationOptions(typeSpecFile: string): string[] {
     options.push(
       `${emitterName}.enable-subclient=true`,
       `${emitterName}.include-api-view-properties=false`,
+    );
+  } else if (/tsp\/experimental\.tsp$/.test(normalized)) {
+    options.push(
+      `${emitterName}.experimental-annotation=tsptest.experimental.annotations.Preview`,
+      `${emitterName}.customization-class=../../customization/src/main/java/ExperimentalCustomization.java`,
     );
   }
 
