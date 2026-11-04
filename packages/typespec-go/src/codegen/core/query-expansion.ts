@@ -7,6 +7,7 @@ import * as go from "../../codemodel/index.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 
+/** Returns whether a query expansion needs per-component escaping to preserve its delimiters. */
 export function isRawQueryExpansion(param: go.QueryParameter): boolean {
   return (
     (param.kind === "queryMapParam" && !param.explode) ||
@@ -15,6 +16,10 @@ export function isRawQueryExpansion(param: go.QueryParameter): boolean {
   );
 }
 
+/**
+ * Selects expansions whose existing raw values must survive when their setters can be skipped.
+ * Covers omitted optional values and parameters not reinjected on later pages.
+ */
 export function preservedQueryExpansions(
   method: go.MethodType | go.NextPageMethod,
   params: Array<go.QueryParameter>,
@@ -43,12 +48,14 @@ export function preservedQueryExpansions(
   });
 }
 
+/** Emits only the query expansion helpers needed by operations in this package. */
 export function generateQueryExpansionHelpers(pkg: go.PackageContent): string {
   let required = false;
   let preserve = false;
   let map = false;
   let object = false;
   let array = false;
+  /** Tracks the helpers needed to encode and preserve a method's query expansions. */
   const track = (method: go.MethodType | go.NextPageMethod): void => {
     const encoded = helpers.getMethodParamGroups(method).encodedQueryParams;
     const params = encoded.filter(isRawQueryExpansion);

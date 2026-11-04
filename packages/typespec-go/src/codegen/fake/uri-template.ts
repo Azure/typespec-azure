@@ -81,6 +81,10 @@ function valueParser(type: go.WireType, pkg: go.FakePackage, imports: ImportMana
   return `func(v string) (${typeName}, error) { ${body} }`;
 }
 
+/**
+ * Emits Go code that parses a URI-template path or query parameter into a typed fake argument.
+ * Handles expansion delimiters and escaping while preserving optional parameter presence.
+ */
 export function parseURITemplateParameter(
   param: go.PathParameter | go.QueryParameter,
   raw: string,

@@ -190,7 +190,7 @@ export class TypeAdapter {
 
     // now adapt model fields
     for (const modelType of modelTypes) {
-      const content = aggregateProperties(this.ctx, modelType.tcgc);
+      const content = helpers.aggregateProperties(this.ctx, modelType.tcgc);
       for (const prop of content.props) {
         const field = this.getModelField(prop, modelType.tcgc);
         modelType.go.fields.push(field);
@@ -207,6 +207,10 @@ export class TypeAdapter {
     this.resolveSseEnvelopeFields();
   }
 
+  /**
+   * Finds models used only by bundled query parameters so they aren't emitted as payload models.
+   * Rejects bundled query models also reachable from request or response bodies.
+   */
   private getQueryOnlyModels(): Set<tcgc.SdkModelType> {
     const queryTypes = new Set<tcgc.SdkType>();
     const queryModels = new Set<tcgc.SdkModelType>();
@@ -1711,7 +1715,7 @@ export class TypeAdapter {
     // unions can also be referenced from model fields or additional properties, never appearing
     // directly in a method signature
     for (const sdkModel of this.ctx.sdkPackage.models) {
-      const { props, addlProps } = aggregateProperties(this.ctx, sdkModel);
+      const { props, addlProps } = helpers.aggregateProperties(this.ctx, sdkModel);
       recursiveAddValueTypeUsage(addlProps);
       for (const property of props) {
         recursiveAddValueTypeUsage(property.type);
@@ -1913,42 +1917,4 @@ interface ModelTypeSdkModelType {
 interface InterfaceTypeSdkModelType {
   go: go.Interface;
   tcgc: tcgc.SdkModelType;
-}
-
-// aggregate the properties from the provided type and its parent types.
-// this includes any inherited additional properties.
-export function aggregateProperties(
-  sdkContext: tcgc.SdkContext,
-  model: tcgc.SdkModelType,
-): { props: Array<tcgc.SdkModelPropertyType>; addlProps?: tcgc.SdkType } {
-  const allProps = new Array<tcgc.SdkModelPropertyType>();
-  for (const prop of model.properties) {
-    if (tcgc.isHttpMetadata(sdkContext, prop)) {
-      continue;
-    }
-    allProps.push(prop);
-  }
-
-  let addlProps = model.additionalProperties;
-  let parent = model.baseModel;
-  while (parent) {
-    for (const parentProp of parent.properties) {
-      if (tcgc.isHttpMetadata(sdkContext, parentProp)) {
-        continue;
-      }
-      const exists = allProps.find((p) => p.name === parentProp.name);
-      if (exists) {
-        // don't add the duplicate. the TS compiler has better enforcement than OpenAPI
-        // to ensure that duplicate fields with different types aren't added.
-        continue;
-      }
-      allProps.push(parentProp);
-    }
-    // if we haven't found additional properties yet and the parent has it, use it
-    if (!addlProps && parent.additionalProperties) {
-      addlProps = parent.additionalProperties;
-    }
-    parent = parent.baseModel;
-  }
-  return { props: allProps, addlProps: addlProps };
 }

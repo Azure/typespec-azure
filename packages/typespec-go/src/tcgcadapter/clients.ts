@@ -18,7 +18,7 @@ import {
 } from "../naming/naming.js";
 import { AdapterError } from "./errors.js";
 import * as helpers from "./helpers.js";
-import { aggregateProperties, TypeAdapter } from "./types.js";
+import { TypeAdapter } from "./types.js";
 
 /**
  * used to convert tcgc clients and their methods to Go code model types
@@ -2304,6 +2304,11 @@ export class ClientAdapter {
     return structType;
   }
 
+  /**
+   * Flattens a query object into scalar parameters sharing URI-template expansion metadata.
+   * Places required members in a named argument group and optional members in method options;
+   * an optional query object makes all its members optional. Literals are serialized internally.
+   */
   private adaptQueryParameterGroup(
     model: tcgc.SdkModelType,
     name: string,
@@ -2318,7 +2323,7 @@ export class ClientAdapter {
     group.docs.description = model.doc;
     const expansion: go.QueryExpansion = { queryParameter, explode };
     const params = new Array<go.QueryScalarParameter>();
-    const { props, addlProps } = aggregateProperties(this.ta.ctx, model);
+    const { props, addlProps } = helpers.aggregateProperties(this.ta.ctx, model);
     if (addlProps || helpers.isPolymorphicRoot(model) || model.discriminatorValue) {
       throw new AdapterError(
         "UnsupportedTsp",

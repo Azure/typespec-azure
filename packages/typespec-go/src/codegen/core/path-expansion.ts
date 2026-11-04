@@ -7,6 +7,10 @@ import * as go from "../../codemodel/index.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 
+/**
+ * Returns the URI-template expansion prefix and collection separator for a path parameter.
+ * Accounts for the path style, explode setting, and matrix parameter names.
+ */
 export function getPathExpansionStyle(param: go.PathParameter): {
   prefix: string;
   separator: string;
