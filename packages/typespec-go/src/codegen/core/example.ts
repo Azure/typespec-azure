@@ -827,6 +827,10 @@ function shouldRenderParam(param: go.MethodParameter, example: go.MethodExample)
   return go.isRequiredParameter(param.style);
 }
 
+/**
+ * Finds a parameter's example by identity, or by group identity and field name for required groups.
+ * Shared groups retain the first operation's field objects, so later operations need the fallback.
+ */
 function findParamExample(
   param: go.MethodParameter,
   example: go.MethodExample,

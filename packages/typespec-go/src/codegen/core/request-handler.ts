@@ -934,6 +934,11 @@ function emitPathEscape(pp: go.PathParameter, paramName: string, imports: Import
   return paramName;
 }
 
+/**
+ * Returns a Go expression that formats a path parameter for URI-template substitution.
+ * Collections use expansion helpers that escape components before inserting delimiters;
+ * scalar formatting leaves escaping to the caller.
+ */
 function formatPathParamValue(
   param: go.PathParameter,
   pkg: go.PackageContent,
@@ -957,6 +962,7 @@ function formatPathParamValue(
   return text;
 }
 
+/** Emits Go code that collects and sorts map keys for deterministic expansion order. */
 function emitSortedMapKeys(
   paramName: string,
   imports: ImportManager,
@@ -971,6 +977,10 @@ function emitSortedMapKeys(
   return text;
 }
 
+/**
+ * Emits Go code that serializes a query map as exploded entries or a comma-delimited expansion.
+ * Escapes components before inserting delimiters unless unencoded output is requested.
+ */
 function emitQueryObject(
   pkg: go.PackageContent,
   param: go.QueryMapParameter,
@@ -1227,6 +1237,7 @@ function isSliceOfTimeForMarshalling(type: go.Slice<go.Ptr<go.Time> | go.Time>):
   return false;
 }
 
+/** Compares query parameters by wire name, using the outer name for non-exploded bundles. */
 function sortQueryParams(a: go.QueryParameter, b: go.QueryParameter): number {
   return helpers.sortAscending(
     a.queryExpansion?.explode === false ? a.queryExpansion.queryParameter : a.queryParameter,
@@ -1234,6 +1245,10 @@ function sortQueryParams(a: go.QueryParameter, b: go.QueryParameter): number {
   );
 }
 
+/**
+ * Selects one representative per non-exploded query bundle so each bundle is serialized once.
+ * Retains individual parameters and exploded bundle members.
+ */
 function uniqueQueryExpansions(params: Array<go.QueryParameter>): Array<go.QueryParameter> {
   const seen = new Set<go.QueryExpansion>();
   return params.filter((param) => {
@@ -1248,6 +1263,7 @@ function uniqueQueryExpansions(params: Array<go.QueryParameter>): Array<go.Query
   });
 }
 
+/** Returns all members of a parameter's non-exploded query bundle, or just the parameter itself. */
 function queryExpansionMembers(
   param: go.QueryParameter,
   params: Array<go.QueryParameter>,
@@ -1257,6 +1273,10 @@ function queryExpansionMembers(
     : [param];
 }
 
+/**
+ * Emits Go code that serializes a non-exploded query bundle as alternating field names and values.
+ * Respects member presence and client-side defaults, leaving existing values unchanged when no members are included.
+ */
 function emitQueryExpansion(
   expansion: go.QueryExpansion,
   params: Array<go.QueryParameter>,
