@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Extend `arm-resource-patch` to compare effective PUT and PATCH input properties using native JSON names, request visibility and version availability, including inherited writable leaves and absent or void PUT bodies. Preserve recursive, missing and empty PATCH-body safeguards without adding a separately configured rule.
+Extend `arm-resource-patch` to require nonempty PATCH input whose writable JSON property names are present in the corresponding PUT input, including inherited and nested properties. Covers `PatchPropertiesCorrespondToPutProperties` using source models; historical API-version shapes are not evaluated.

@@ -879,7 +879,7 @@ interface Widgets {
     };
   }
 
-  it("compares body properties in every declared service version", async () => {
+  it("compares source properties without applying historical availability", async () => {
     await tester
       .expect(
         `
@@ -938,18 +938,15 @@ interface Widgets {
           message:
             "The property 'historicalProperty' in the PATCH body does not correspond to a property in the PUT body.",
         },
-        {
-          code,
-          message:
-            "The property 'currentProperty' in the PATCH body does not correspond to a property in the PUT body.",
-        },
       ]);
   });
 
-  it.each(["extends", "spread"])("respects %s properties in nested namespaces", async (shape) => {
-    await tester
-      .expect(
-        `
+  it.each(["extends", "spread"])(
+    "compares source %s properties in nested namespaces",
+    async (shape) => {
+      await tester
+        .expect(
+          `
         @Azure.ResourceManager.armProviderNamespace
         @service @versioned(Versions)
         namespace Microsoft.TestService {
@@ -966,15 +963,12 @@ interface Widgets {
           }
         }
       `,
-      )
-      .toEmitDiagnostics({
-        code,
-        message:
-          "The property 'missing' in the PATCH body does not correspond to a property in the PUT body.",
-      });
-  });
+        )
+        .toBeValid();
+    },
+  );
 
-  it("resolves dependency versions instead of using service version indices", async () => {
+  it("compares dependency source models without applying selected dependency versions", async () => {
     await tester
       .expect(
         `
@@ -999,15 +993,11 @@ interface Widgets {
         }
       `,
       )
-      .toEmitDiagnostics({
-        code,
-        message:
-          "The property 'missing' in the PATCH body does not correspond to a property in the PUT body.",
-      });
+      .toBeValid();
   });
 
   it.each(["operation", "interface"])(
-    "does not pair nonconcurrent %s declarations",
+    "pairs source %s declarations without historical availability filtering",
     async (shape) => {
       await tester
         .expect(
@@ -1027,7 +1017,7 @@ interface Widgets {
         }
       `,
         )
-        .toBeValid();
+        .toEmitDiagnostics(missingProperty("missing"));
     },
   );
 
@@ -1049,9 +1039,11 @@ interface Widgets {
       .toBeValid();
   });
 
-  it.each(["put", "patch"])("recognizes removed explicit %s body parameters", async (verb) => {
-    const expectation = tester.expect(
-      `
+  it.each(["put", "patch"])(
+    "uses source explicit %s body parameters despite historical removal",
+    async (verb) => {
+      const expectation = tester.expect(
+        `
         @Azure.ResourceManager.armProviderNamespace
         @service @versioned(Versions)
         namespace Microsoft.TestService {
@@ -1065,14 +1057,8 @@ interface Widgets {
           ): void;
         }
       `,
-    );
-    if (verb === "put") {
-      await expectation.toEmitDiagnostics(missingProperty("common"));
-    } else {
-      await expectation.toEmitDiagnostics({
-        code,
-        message: "The PATCH operation must have a request body.",
-      });
-    }
-  });
+      );
+      await expectation.toBeValid();
+    },
+  );
 });
