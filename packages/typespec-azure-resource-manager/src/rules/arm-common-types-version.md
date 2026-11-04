@@ -5,8 +5,7 @@ common-types version. A decorator on an API version enum member overrides the
 namespace selection for that API version.
 
 The rule warns when explicit version configuration is missing or when an
-effective selection is older than the latest available version. It checks
-version selections, not individual legacy type usages.
+effective selection is older than the latest available version.
 
 ## Impact
 
