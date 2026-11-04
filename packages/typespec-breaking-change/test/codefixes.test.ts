@@ -1,11 +1,136 @@
-import { describe, it, expect } from "vitest";
+import { applyCodeFix, resolvePath, type Program } from "@typespec/compiler";
+import { createTester } from "@typespec/compiler/testing";
+import { describe, expect, it } from "vitest";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { createApproveBreakingChangeCodeFix } from "../src/suppression/codefixes.js";
 import { emitFindingDiagnostics } from "../src/suppression/diagnostics.js";
-import { analyzeProgram } from "../src/pipeline/orchestrator.js";
-import { Tester } from "./test-host.js";
 import type { Finding } from "../src/types.js";
+import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 describe("codefixes", () => {
+  const editedSourceTester = createTester(resolvePath(import.meta.dirname, ".."), {
+    libraries: [
+      "@typespec/http",
+      "@typespec/rest",
+      "@typespec/versioning",
+      "@azure-tools/typespec-azure-core",
+    ],
+  });
+  async function applyApproval(program: Program, finding: Finding): Promise<string> {
+    const fix = createApproveBreakingChangeCodeFix(finding);
+    expect(fix).toBeDefined();
+    let updated = "";
+    await applyCodeFix(
+      {
+        ...program.host,
+        writeFile: async (path, content) => {
+          expect(program.sourceFiles.has(path)).toBe(true);
+          updated = content;
+        },
+      },
+      fix!,
+    );
+    expect(updated).not.toBe("");
+    return updated;
+  }
+
+  it("applies a qualified, version-scoped approval without approving another transition", async () => {
+    const { program } = await TesterWithSuppressions.compile(`
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2023-01-01", v2: "2024-01-01", v3: "2025-01-01", v4: "2026-01-01" }
+      model Widget {
+        name: string;
+        @removed(Versions.v2) @added(Versions.v3) @removed(Versions.v4)
+        legacy?: string;
+      }
+      @get @route("/widgets") op read(): Widget;
+    `);
+    const result = analyzeProgram(program);
+    expect(result.findings).toHaveLength(3);
+    const finding = result.findings[0];
+    const message = 'Approved "quote", backslash \\, and newline\nnext line';
+    const updated = await applyApproval(program, {
+      ...finding,
+      diff: { ...finding.diff, message },
+    });
+    expect(updated).toContain("@Azure.Core.approvedBreakingChange(");
+    expect(updated).toContain('since: "2024-01-01"');
+    const { program: approved } = await editedSourceTester.compile(
+      updated.replace("using Azure.Core;\n", ""),
+    );
+    expect(
+      analyzeProgram(approved).findings.map((item) => ({
+        version: item.versionPair.headVersion,
+        suppressed: item.suppressed,
+        reason: item.suppressionReason,
+      })),
+    ).toEqual([
+      { version: "2024-01-01", suppressed: true, reason: `Approved: ${message}` },
+      { version: "2025-01-01", suppressed: false, reason: undefined },
+      { version: "2026-01-01", suppressed: false, reason: undefined },
+    ]);
+  });
+
+  it("applies an unversioned approval to the head property for same-version changes", async () => {
+    const source = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      model Widget { value: string; }
+      @get @route("/widgets") op read(): Widget;
+    `;
+    const { program: base } = await TesterWithSuppressions.compile(source);
+    const { program: head } = await TesterWithSuppressions.compile(
+      source.replace("value: string", "value: int32"),
+    );
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+    expect(result.findings).toHaveLength(1);
+    const updated = await applyApproval(head, result.findings[0]);
+    expect(updated).toContain("@Azure.Core.approvedUnversionedChange(");
+    expect(updated).not.toContain("since:");
+    const { program: approved } = await editedSourceTester.compile(updated);
+    expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
+      { suppressed: true, phase: "same-version" },
+    ]);
+  });
+
+  it("places removal approvals on a surviving head operation, not a deleted base property", async () => {
+    const source = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      model Widget { name: string; legacy?: string; }
+      @get @route("/widgets") op read(): Widget;
+    `;
+    const { program: base } = await TesterWithSuppressions.compile(source);
+    const { program: head } = await TesterWithSuppressions.compile(
+      source.replace("legacy?: string;", ""),
+    );
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+    expect(result.findings).toHaveLength(1);
+    const updated = await applyApproval(head, result.findings[0]);
+    expect(updated).not.toContain("legacy?:");
+    expect(updated).toContain('path: "responses.200.body.properties.legacy"');
+    const { program: approved } = await editedSourceTester.compile(updated);
+    expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
+      { suppressed: true },
+    ]);
+  });
+
+  it("does not offer an edit to a removed baseline operation", async () => {
+    const source = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      @get @route("/keep") op keep(): string;
+      @get @route("/removed") op removed(): string;
+    `;
+    const { program: base } = await Tester.compile(source);
+    const { program: head } = await Tester.compile(
+      source.replace('@get @route("/removed") op removed(): string;', ""),
+    );
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+    expect(result.findings).toMatchObject([{ diff: { kind: "OperationRemoved" } }]);
+    expect(createApproveBreakingChangeCodeFix(result.findings[0])).toBeUndefined();
+  });
+
   it("creates a codefix for a finding with origin", async () => {
     const { program } = await Tester.compile(`
       @versioned(Versions)
@@ -38,7 +163,12 @@ describe("codefixes", () => {
     const mockFinding: Finding = {
       diff: {
         kind: "OperationAdded" as any,
-        identity: { operation: { method: "GET", path: "/test" }, component: "request", statusCode: undefined, element: "" },
+        identity: {
+          operation: { method: "GET", path: "/test" },
+          component: "request",
+          statusCode: undefined,
+          element: "",
+        },
         message: "test",
       },
       severity: "error",
@@ -348,7 +478,19 @@ describe("diagnostics", () => {
       ...result,
       findings: [
         {
-          diff: { kind: "OperationRemoved", message: "test", origin: undefined, headType: undefined, baseType: undefined, identity: { operation: { method: "GET", path: "/x" }, component: "request", statusCode: undefined, element: "" } },
+          diff: {
+            kind: "OperationRemoved",
+            message: "test",
+            origin: undefined,
+            headType: undefined,
+            baseType: undefined,
+            identity: {
+              operation: { method: "GET", path: "/x" },
+              component: "request",
+              statusCode: undefined,
+              element: "",
+            },
+          },
           severity: "error" as const,
           rule: "default",
           phase: "cross-version" as const,
