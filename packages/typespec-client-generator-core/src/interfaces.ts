@@ -120,6 +120,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /** Whether a string client location requires preserving the exact client name. */
+  isExactName?: boolean;
   services: Namespace[];
   /** The type associated with this client. If it is created from string client location, or is a merged client, this will be undefined. */
   type?: Namespace | Interface;
