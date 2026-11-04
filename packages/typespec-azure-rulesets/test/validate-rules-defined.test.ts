@@ -69,6 +69,12 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("enables continuation token response guidance for data-plane APIs", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/continuation-token-response";
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
