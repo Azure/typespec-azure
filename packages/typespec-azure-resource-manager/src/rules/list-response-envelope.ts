@@ -4,18 +4,15 @@ import {
   type ModelProperty,
   type Operation,
   type Program,
-  type Type,
   createRule,
   fileRef,
   getLocationContext,
-  getPagingOperation,
   getProperty,
   isArrayModelType,
-  isList,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { type HttpOperationResponse, getHttpOperation } from "@typespec/http";
-import { getArmProviderNamespace } from "../namespace.js";
+import { type HttpOperationResponse } from "@typespec/http";
+import { resolveArmResources } from "../resource.js";
 
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
@@ -25,91 +22,45 @@ export const listResponseEnvelopeRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
     default:
-      "Collection GET response models must declare exactly the `value` and `nextLink` properties.",
-    valueArray: "Paged ARM list responses must declare a 'value' property of array type.",
+      "ARM resource list response models must declare exactly the `value` and `nextLink` properties.",
+    valueArray: "ARM resource list responses must declare a 'value' property of array type.",
   },
   create(context) {
     return {
-      operation: (operation) => {
-        const [httpOperation] = getHttpOperation(context.program, operation);
-        const collection =
-          operation.namespace !== undefined &&
-          getArmProviderNamespace(context.program, operation.namespace) !== undefined &&
-          httpOperation.verb === "get" &&
-          isCollectionGetPath(httpOperation.path);
-        const [paging] = isList(context.program, operation)
-          ? getPagingOperation(context.program, operation)
-          : [];
-        const paged =
-          getLocationContext(context.program, operation).type === "project" &&
-          paging?.output.nextLink !== undefined;
-        if (!collection && !paged) {
-          return;
-        }
+      root(program) {
+        const provider = resolveArmResources(program);
+        const checked = new Set<Operation>();
+        for (const resource of provider.resources ?? []) {
+          for (const { operation, httpOperation } of resource.operations.lists) {
+            if (checked.has(operation)) continue;
+            checked.add(operation);
 
-        if (paged) {
-          for (const response of httpOperation.responses) {
-            if (response.statusCodes !== 200) continue;
-            for (const { body } of response.responses) {
-              if (body === undefined) continue;
-              const invalidValue = getInvalidValueTarget(operation, body.type);
-              if (invalidValue !== undefined) {
-                context.reportDiagnostic({
-                  target: getDiagnosticTarget(context.program, operation, invalidValue),
-                  messageId: "valueArray",
-                });
-                return;
-              }
-              if (body.type.kind === "Model") {
-                const invalidTargets = getInvalidTargets(body.type);
-                for (const invalidTarget of invalidTargets) {
-                  context.reportDiagnostic({
-                    target: getDiagnosticTarget(context.program, operation, invalidTarget),
-                  });
-                }
-                if (invalidTargets.length > 0) return;
-              }
+            const responseModel = get200ResponseModel(httpOperation.responses);
+            if (responseModel === undefined) continue;
+
+            const value = getProperty(responseModel, "value");
+            if (
+              value !== undefined &&
+              (value.type.kind !== "Model" || !isArrayModelType(value.type))
+            ) {
+              context.reportDiagnostic({
+                target: getDiagnosticTarget(program, operation, value),
+                messageId: "valueArray",
+              });
+              continue;
+            }
+
+            for (const invalidTarget of getInvalidTargets(responseModel)) {
+              context.reportDiagnostic({
+                target: getDiagnosticTarget(program, operation, invalidTarget),
+              });
             }
           }
-          return;
-        }
-
-        const responseModel = get200ResponseModel(httpOperation.responses);
-        if (responseModel === undefined) {
-          return;
-        }
-        const value = getProperty(responseModel, "value");
-        if (value !== undefined && (value.type.kind !== "Model" || !isArrayModelType(value.type))) {
-          context.reportDiagnostic({
-            target: getDiagnosticTarget(context.program, operation, value),
-            messageId: "valueArray",
-          });
-          return;
-        }
-
-        for (const invalidTarget of getInvalidTargets(responseModel)) {
-          context.reportDiagnostic({
-            target: getDiagnosticTarget(context.program, operation, invalidTarget),
-          });
         }
       },
     };
   },
 });
-
-function isCollectionGetPath(path: string): boolean {
-  const pathWithoutQuery = path.split("?")[0];
-  if (pathWithoutQuery.endsWith("}") || path.endsWith("operations") || path.endsWith("default")) {
-    return false;
-  }
-
-  const providerTail = pathWithoutQuery.split(".").at(-1);
-  return (
-    providerTail !== undefined &&
-    providerTail.includes("/") &&
-    providerTail.split("/").length % 2 === 0
-  );
-}
 
 function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefined {
   for (const response of responses) {
@@ -124,7 +75,7 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
       }
 
       const bodyModel = body.property?.type.kind === "Model" ? body.property.type : body.type;
-      if (isArrayModelType(bodyModel) || bodyModel.properties.size === 0) {
+      if (isArrayModelType(bodyModel) || [...walkPropertiesInherited(bodyModel)].length === 0) {
         continue;
       }
 
@@ -158,7 +109,7 @@ function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
 function getDiagnosticTarget(
   program: Program,
   operation: Operation,
-  invalidTarget: Model | ModelProperty | Operation,
+  invalidTarget: Model | ModelProperty,
 ): Interface | Operation | Model | ModelProperty {
   if (getLocationContext(program, invalidTarget).type === "project") {
     return invalidTarget;
@@ -169,14 +120,4 @@ function getDiagnosticTarget(
   }
 
   return operation.interface ?? operation;
-}
-
-function getInvalidValueTarget(
-  operation: Operation,
-  type: Type,
-): Model | ModelProperty | Operation | undefined {
-  if (type.kind !== "Model") return operation;
-  const value = getProperty(type, "value");
-  if (value === undefined) return type;
-  return value.type.kind === "Model" && isArrayModelType(value.type) ? undefined : value;
 }
