@@ -22,6 +22,12 @@ declare const __COMMIT_HASH__: string | undefined;
 
 const commit = typeof __COMMIT_HASH__ !== "undefined" ? __COMMIT_HASH__ : undefined;
 const pr = typeof __PR__ !== "undefined" ? __PR__ : undefined;
+const csharpEmitters = [
+  "@azure-typespec/http-client-csharp",
+  "@azure-typespec/http-client-csharp-mgmt",
+  "@azure-typespec/http-client-csharp-provisioning",
+];
+const libraries = [...PlaygroundManifest.libraries, ...csharpEmitters];
 const PlaygroundFooter = () => {
   const prItem = pr ? (
     <FooterItem link={`https://github.com/azure/typespec-azure/pull/${pr}`}>
@@ -56,6 +62,8 @@ const App = () => {
   return (
     <StandalonePlayground
       {...PlaygroundManifest}
+      libraries={libraries}
+      deferredEmitters={csharpEmitters}
       samples={samples}
       emitterViewers={{
         "@typespec/openapi3": [SwaggerUIViewer],
