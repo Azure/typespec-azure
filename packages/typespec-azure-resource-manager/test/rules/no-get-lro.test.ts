@@ -100,6 +100,45 @@ it("checks global HTTP operations when no service is declared", async () => {
     .toEmitDiagnostics(diagnostic);
 });
 
+it("checks operations nested inside an HTTP service", async () => {
+  await tester
+    .expect(
+      `
+    @service namespace Api {
+      namespace Nested {
+        @get @route("/read") op read(): ArmAcceptedLroResponse;
+      }
+    }
+  `,
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+
+it("does not recurse into namespaces in the implicit global service", async () => {
+  await tester
+    .expect(
+      `
+    namespace Helpers {
+      @get @route("/helper") op helper(): ArmAcceptedLroResponse;
+    }
+  `,
+    )
+    .toBeValid();
+});
+
+it("excludes global operations when an explicit service is declared", async () => {
+  await tester
+    .expect(
+      `
+    @service namespace Api {
+      @get @route("/read") op read(): { value: string; };
+    }
+    @get @route("/helper") op helper(): ArmAcceptedLroResponse;
+  `,
+    )
+    .toBeValid();
+});
+
 it.each(["post", "put", "patch", "delete"])("allows a long-running %s", async (verb) => {
   await tester
     .expect(

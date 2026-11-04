@@ -1,7 +1,6 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { createRule, fileRef, isTemplateDeclaration } from "@typespec/compiler";
-import { getAllHttpServices, type HttpOperation } from "@typespec/http";
-import { isTemplatedInterfaceOperation } from "./utils.js";
+import { createRule, fileRef, listOperationsIn, listServices } from "@typespec/compiler";
+import { getHttpOperation } from "@typespec/http";
 
 export const noGetLroRule = createRule({
   name: "no-get-lro",
@@ -13,18 +12,20 @@ export const noGetLroRule = createRule({
     default: "GET operations must not be long-running. Use a non-GET operation to initiate an LRO.",
   },
   create(context) {
-    let operations: Map<HttpOperation["operation"], HttpOperation> | undefined;
+    const globalNamespace = context.program.getGlobalNamespaceType();
+    const services = listServices(context.program).map((service) => service.type);
+    const serviceOperations = new Set(
+      (services.length > 0 ? services : [globalNamespace]).flatMap((namespace) =>
+        listOperationsIn(namespace, { recursive: namespace !== globalNamespace }),
+      ),
+    );
     return {
       operation(op) {
-        if (isTemplateDeclaration(op) || isTemplatedInterfaceOperation(op)) {
+        if (!serviceOperations.has(op)) {
           return;
         }
-        operations ??= new Map(
-          getAllHttpServices(context.program)[0].flatMap((service) =>
-            service.operations.map((httpOperation) => [httpOperation.operation, httpOperation]),
-          ),
-        );
-        if (operations.get(op)?.verb !== "get") {
+        const [httpOperation] = getHttpOperation(context.program, op);
+        if (httpOperation.verb !== "get") {
           return;
         }
         if (getLroMetadata(context.program, op) !== undefined) {
