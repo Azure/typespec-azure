@@ -9,11 +9,7 @@ and pagination tooling handle list operations inconsistently.
 Collection response envelopes with other shapes violate the ARM RPC contract and can produce
 inconsistent generated client pagination behavior.
 
-The rule uses `resolveArmResources` to identify each resource's `operations.lists`
-and checks their HTTP 200 response models. Resources without list operations are
-skipped. List membership comes from ARM resource metadata, not URL path patterns,
-`@list`, or paging decorators. Unassociated operations are not checked, even if
-they have collection-shaped paths or paging metadata.
+This rule applies to HTTP 200 response models of ARM resource list operations.
 
 Inherited envelope properties are included. The `value` property must be an array,
 and the next-link property must be named `nextLink`, not a custom envelope name.
@@ -75,11 +71,7 @@ The checks formerly proposed as `list-response-value-array` are part of the exis
 | [GetCollectionOnlyHasValueAndNextLink](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/get-collection-only-has-value-and-next-link.ts) | Checks that eligible collection response models have exactly the `value` and `nextLink` envelope properties, including inherited properties. |
 | [CollectionObjectPropertiesNaming](https://github.com/Azure/azure-openapi-validator/blob/main/docs/collection-object-properties-naming.md)                                                 | Requires the `value` property to be an array and combines that requirement with the standard envelope names.                                 |
 
-Swagger identifies collection GET APIs through path heuristics. The native TypeSpec
-rule instead checks list operations associated with resolved ARM resources, without
-reimplementing those path heuristics or requiring paging metadata. Checks use HTTP
-200 response bodies. `list-operation-missing-pageable` remains a separate metadata
-check.
+Paging metadata is checked separately by `list-operation-missing-pageable`.
 
 The combined native contract intentionally rejects a custom next-link property name even when it has valid paging metadata. These mappings describe TypeSpec response models and metadata, not emitted Swagger inspection or unchanged historical diagnostic counts.
 
