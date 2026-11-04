@@ -14,7 +14,6 @@ version selections, not individual legacy type usages.
 
 Missing or outdated common-types selections can leave an API and its generated
 SDKs using older shared schemas and parameters. Latest-version warnings are
-enabled wherever this rule is enabled, including the resource-manager ruleset.
 
 ## ❌ Incorrect
 
