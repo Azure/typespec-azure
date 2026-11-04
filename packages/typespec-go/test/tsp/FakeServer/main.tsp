@@ -99,6 +99,14 @@ op labelScalar(value: string): void;
 op matrixScalar(value: int32): void;
 @route("/uri/path-scalar{/value}")
 op pathScalar(value: string): void;
+@route("/uri/optional-label{.value}")
+op optionalLabel(value?: string): void;
+@route("/uri/optional-matrix{;value}")
+op optionalMatrix(value?: string): void;
+@route("/uri/optional-path{/value}")
+op optionalPath(value?: string): void;
+@route("/uri/optional-label-number{.value}")
+op optionalLabelNumber(value?: int32): void;
 @route("/uri/typed-array{/value*}")
 op typedArray(value: int32[]): void;
 @route("/uri/time-array{/value*}")
@@ -192,6 +200,24 @@ model PlainQueryPage {
 @list
 @route("/uri/query-paged-plain{?value,filter,values}")
 op queryPagedPlain(value: Record<int32>, filter: QueryFields, values: string[]): PlainQueryPage;
+
+model ReinjectQueryOptions {
+  @query values: Record<int32>;
+  @query filter: QueryFields;
+}
+model ReinjectQueryPage {
+  @pageItems items: string[];
+  @nextLink nextLink?: Azure.Core.Legacy.parameterizedNextLink<[
+    ReinjectQueryOptions.values,
+    ReinjectQueryOptions.filter
+  ]>;
+}
+@list
+@route("/uri/query-reinjected{?values,filter}")
+op queryReinjected(...ReinjectQueryOptions, @query marker: string): ReinjectQueryPage;
+@list
+@route("/uri/query-reinjected-exploded{?values*,filter*}")
+op queryReinjectedExploded(...ReinjectQueryOptions, @query marker: string): ReinjectQueryPage;
 
 model LiteralQueryFields {
   kind: "fixed";

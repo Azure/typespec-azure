@@ -82,7 +82,7 @@ function valueParser(type: go.WireType, pkg: go.FakePackage, imports: ImportMana
 }
 
 export function parseURITemplateParameter(
-  param: go.PathCollectionParameter | go.PathMapParameter | go.QueryParameter,
+  param: go.PathParameter | go.QueryParameter,
   raw: string,
   result: string,
   querySource: string,
@@ -94,7 +94,21 @@ export function parseURITemplateParameter(
   const fail = "if err != nil { return nil, err }\n";
   const parseFail = "if parseErr != nil { return nil, parseErr }\n";
   let text = "";
-  if (param.kind === "pathCollectionParam" || param.kind === "pathMapParam") {
+  if (param.kind === "pathScalarParam") {
+    imports.add("strings");
+    const { prefix } = getPathExpansionStyle(param);
+    text += `var ${result} ${go.getTypeDeclaration(param.type, pkg)}\n`;
+    text += `if ${raw} != "" {\n`;
+    let value = `strings.TrimPrefix(${raw}, ${JSON.stringify(prefix)})`;
+    if (param.isEncoded) {
+      imports.add("net/url");
+      text += `unescaped, unescapeErr := url.PathUnescape(${value})\n`;
+      text += "if unescapeErr != nil { return nil, unescapeErr }\n";
+      value = "unescaped";
+    }
+    text += `parsed, parseErr := (${valueParser(param.type, pkg, imports)})(${value})\n${parseFail}`;
+    text += `${result} = parsed\n}\n`;
+  } else if (param.kind === "pathCollectionParam" || param.kind === "pathMapParam") {
     const { prefix, separator } = getPathExpansionStyle(param);
     const values = `${result}Values`;
     text += `${values}, err := splitURIPath(${raw}, ${JSON.stringify(prefix)}, ${JSON.stringify(separator)})\n${fail}`;

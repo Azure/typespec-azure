@@ -101,6 +101,10 @@ describe("path expansion helper emission", () => {
     { location: "query", collection: "(int32 | null)[]" },
     { location: "path", collection: "Record<int32 | null>" },
     { location: "query", collection: "Record<int32 | null>" },
+    { location: "path", collection: "(int32 | null)[] | null" },
+    { location: "query", collection: "(int32 | null)[] | null" },
+    { location: "path", collection: "Record<int32 | null> | null" },
+    { location: "query", collection: "Record<int32 | null> | null" },
   ])("rejects nullable entries in $location $collection", async ({ location, collection }) => {
     await expect(
       emitGoFor(`

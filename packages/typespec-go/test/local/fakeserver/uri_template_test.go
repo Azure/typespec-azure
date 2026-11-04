@@ -216,6 +216,78 @@ func TestURITemplateQueryPreservesNextLinkExpansion(t *testing.T) {
 	}
 }
 
+func TestURITemplateQueryReinjectsMapsAndObjects(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		exploded bool
+		query    string
+		nextLink string
+	}{
+		{"standard", false, "filter=field,a%2Cb,count,0,enabled,false&values=a%2Cb,2&marker=",
+			"/uri/query-reinjected?filter=field,stale&values=a%2Cb,9&marker=next"},
+		{"standard-no-query", false, "filter=field,a%2Cb,count,0,enabled,false&values=a%2Cb,2&marker=",
+			"/uri/query-reinjected"},
+		{"exploded", true, "a%2Cb=2&count=0&enabled=false&field=a%2Cb&marker=",
+			"/uri/query-reinjected-exploded?a%2Cb=9&field=stale&count=9&enabled=true&marker=next"},
+		{"exploded-no-query", true, "a%2Cb=2&count=0&enabled=false&field=a%2Cb&marker=",
+			"/uri/query-reinjected-exploded"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			requests := 0
+			client, err := fakeserver.NewClientWithNoCredential("https://fake.endpoint",
+				&fakeserver.ClientOptions{ClientOptions: policy.ClientOptions{
+					Transport: uriTemplateTransport(func(req *http.Request) (*http.Response, error) {
+						body := `{"items":["second"]}`
+						switch requests {
+						case 0:
+							require.Equal(t, tt.query+"first", req.URL.RawQuery)
+							body = `{"items":["first"],"nextLink":"` + tt.nextLink + `"}`
+						case 1:
+							query := strings.TrimSuffix(tt.query, "&marker=")
+							if strings.Contains(tt.nextLink, "?") {
+								query = tt.query + "next"
+							}
+							require.Equal(t, query, req.URL.RawQuery)
+						default:
+							t.Fatal("unexpected page request")
+						}
+						requests++
+						return &http.Response{StatusCode: http.StatusOK,
+							Header: http.Header{"Content-Type": {"application/json"}},
+							Body:   io.NopCloser(strings.NewReader(body)), Request: req}, nil
+					}),
+				}},
+			)
+			require.NoError(t, err)
+			values := map[string]int32{"a,b": 2}
+			filter := fakeserver.QueryFields{Field: "a,b"}
+			var more func() bool
+			var nextPage func(context.Context) error
+			if tt.exploded {
+				pager := client.NewQueryReinjectedExplodedPager(values, "first", filter,
+					&fakeserver.ClientQueryReinjectedExplodedOptions{Count: to.Ptr[int32](0), Enabled: to.Ptr(false)})
+				more = pager.More
+				nextPage = func(ctx context.Context) error {
+					_, err := pager.NextPage(ctx)
+					return err
+				}
+			} else {
+				pager := client.NewQueryReinjectedPager(values, "first", filter,
+					&fakeserver.ClientQueryReinjectedOptions{Count: to.Ptr[int32](0), Enabled: to.Ptr(false)})
+				more = pager.More
+				nextPage = func(ctx context.Context) error {
+					_, err := pager.NextPage(ctx)
+					return err
+				}
+			}
+			for more() {
+				require.NoError(t, nextPage(context.Background()))
+			}
+			require.Equal(t, 2, requests)
+		})
+	}
+}
+
 func TestURITemplateFakeRoundTrip(t *testing.T) {
 	array := []string{"a/b", "a,b", "%20", "a+b = c", "", "a.b"}
 	record := map[string]int32{"a/b": 0, "a,b": -2, "%20": 3, "a=b": 4, "a.b": 5, "a+b c": 6, "%2C": 7}
@@ -241,6 +313,15 @@ func TestURITemplateFakeRoundTrip(t *testing.T) {
 		{"LabelScalar", []any{"a/b %20", nil}},
 		{"MatrixScalar", []any{int32(42), nil}},
 		{"PathScalar", []any{"a/b %20", nil}},
+		{"OptionalLabel", []any{nil}},
+		{"OptionalLabel", []any{&fakeserver.ClientOptionalLabelOptions{Value: to.Ptr("")}}},
+		{"OptionalLabel", []any{&fakeserver.ClientOptionalLabelOptions{Value: to.Ptr("a/b %20")}}},
+		{"OptionalMatrix", []any{nil}},
+		{"OptionalMatrix", []any{&fakeserver.ClientOptionalMatrixOptions{Value: to.Ptr("")}}},
+		{"OptionalPath", []any{nil}},
+		{"OptionalPath", []any{&fakeserver.ClientOptionalPathOptions{Value: to.Ptr("")}}},
+		{"OptionalLabelNumber", []any{nil}},
+		{"OptionalLabelNumber", []any{&fakeserver.ClientOptionalLabelNumberOptions{Value: to.Ptr[int32](0)}}},
 		{"TypedArray", []any{[]int32{0, -2, 3}, nil}},
 		{"TimeArray", []any{[]time.Time{date}, nil}},
 		{"EnumArray", []any{[]fakeserver.IntEnum{fakeserver.IntEnumOne, fakeserver.IntEnumTwo}, nil}},
