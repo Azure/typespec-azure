@@ -80,6 +80,9 @@ Apply its whole-report refresh/read gate to the main report and all member notes
 and its [assessment/publication gate](../analyze-swagger-typespec-lint-gap/SKILL.md#assessment-and-publication-gate)
 before making current-source claims. Preserve all investigation/acceptance gates;
 **Gap analysis and decision** separates coverage from recommended action.
+Require the shared contract's explicit **Assessed coverage** summary in
+section 2, with scoped quantitative evidence and honest unassessed limits;
+a raw-diagnostic scorecard alone is not an assessment.
 
 All rule PR descriptions follow the shared
 [two-section PR body](../shared/migration-pr-description.md): original Swagger
