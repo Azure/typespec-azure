@@ -5,7 +5,7 @@ vi.mock("@azure-tools/typespec-autorest", () => {
   throw new Error("Native lint must not load the AutoRest emitter.");
 });
 vi.mock("@azure-tools/typespec-client-generator-core", () => {
-  throw new Error("Native lint must not load TCGC.");
+  throw new Error("ARM lint must not load TCGC.");
 });
 
 it("loads the ARM public entry point without emitter or TCGC dependencies", () => {
