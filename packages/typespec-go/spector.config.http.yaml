@@ -37,7 +37,8 @@ specs:
   "server/path/single": { options: { module: singlegroup } }
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
-  special-words: { options: { module: specialwordsgroup } }
+  "special-words": { options: { module: specialwordsgroup } }
+  "streaming/sse": { options: { module: ssegroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
   "type/dictionary": { options: { module: dictionarygroup } }
   "type/enum/extensible": { options: { module: extensiblegroup } }

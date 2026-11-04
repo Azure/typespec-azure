@@ -18,7 +18,7 @@ namespace Microsoft.ContosoRelationships;
 /** Contoso Relationships API versions */
 enum Versions {
   /** 2024-06-01 version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   `2024-06-01`,
 }
 
