@@ -69,8 +69,8 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("enables continuation token response guidance for data-plane and ARM APIs", () => {
-    const ruleName = "@azure-tools/typespec-azure-core/continuation-token-response";
+  it("disallows continuation tokens in data-plane and ARM APIs", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-continuation-token";
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], true);
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
   });

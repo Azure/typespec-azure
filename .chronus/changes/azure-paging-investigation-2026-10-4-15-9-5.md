@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Add the `continuation-token-response` linter rule to warn when a `@list` operation has a request `@continuationToken` but no response `@continuationToken`, including responses that page using `@nextLink`.
+Add the `no-continuation-token` linter rule to warn on `@continuationToken` usage in Azure APIs, including paired request and response tokens. Prefer `@nextLink` pagination instead.

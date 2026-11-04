@@ -4,13 +4,13 @@ import { badRecordTypeRule } from "./rules/bad-record-type.js";
 import { byosRule } from "./rules/byos.js";
 import { casingRule } from "./rules/casing-style.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
-import { continuationTokenResponseRule } from "./rules/continuation-token-response.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
+import { noContinuationTokenRule } from "./rules/no-continuation-token.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
@@ -90,7 +90,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
-  continuationTokenResponseRule,
+  noContinuationTokenRule,
 ];
 
 export const $linter = defineLinter({
