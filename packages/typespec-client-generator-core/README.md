@@ -118,16 +118,17 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                                                                                                                                                  | Description                                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-client-generator-core/use-create-for-put`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-create-for-put)                     | ARM PUT SDK method names should use 'create' as the verb prefix.                                                                                                    |
-| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)               | Client names should end with 'Client'.                                                                                                                              |
-| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)             | Avoid naming conflicts between a property and a model of the same name.                                                                                             |
-| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.                                                                     |
-| [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                   | Model names should use recommended suffixes for C# SDKs.                                                                                                            |
-| [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms) | C# SDK names should use standard acronym casing.                                                                                                                    |
-| [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                     | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
-| [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                   | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
+| Name                                                                                                                                                                                                          | Description                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-client-generator-core/use-correct-verb`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-correct-verb)                                 | PUT, PATCH, and DELETE SDK method names should start with 'create', 'update', and 'delete', respectively.                                                           |
+| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)                       | Client names should end with 'Client'.                                                                                                                              |
+| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)                     | Avoid naming conflicts between a property and a model of the same name.                                                                                             |
+| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                         | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.                                                                     |
+| [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                           | Model names should use recommended suffixes for C# SDKs.                                                                                                            |
+| [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms)         | C# SDK names should use standard acronym casing.                                                                                                                    |
+| [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                             | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
+| [`@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-operation-group-name-conflict) | Operation group names should not conflict with type names in the same namespace.                                                                                    |
+| [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
 
 ## Decorators
 
@@ -146,6 +147,8 @@ Available ruleSets:
 - [`@clientOption`](#@clientoption)
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
+- [`@dynamicModel`](#@dynamicmodel)
+- [`@lroStatusMetadata`](#@lrostatusmetadata)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
@@ -999,6 +1002,83 @@ model MyModel {
   prop: stringlike;
 }
 ```
+
+#### `@dynamicModel`
+
+Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+A dynamic model represents updates as JSON Patch operations rather than a replacement of the full model.
+In C# generation, a marked model exposes patch-aware properties and a `JsonPatch`-backed `Patch` API.
+This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
+
+```typespec
+@Azure.ClientGenerator.Core.dynamicModel(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The model or namespace to mark as dynamic.
+`Model | Namespace`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                                                                                                                        |
+| ----- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning. |
+
+##### Examples
+
+###### Mark a model as dynamic
+
+```typespec
+@dynamicModel("csharp")
+model Pet {
+  name: string;
+}
+```
+
+###### Mark a namespace for C# dynamic-model metadata
+
+```typespec
+@dynamicModel("csharp")
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+}
+```
+
+#### `@lroStatusMetadata`
+
+Marks a status-monitor model property as transient polling data that the SDK should expose to
+callers while the long-running operation is in progress, for scenarios like reporting progress,
+usage, or job statistics. Emitters whose operations return only the final result, such as Python
+and JavaScript, would otherwise need handwritten code to surface these values; marked properties
+appear on the emitter's idiomatic poller or operation object instead. The property does not affect
+polling, status evaluation, errors, or final-result extraction.
+
+Values come from the most recent status-monitor response the SDK has received, including the
+initial response when it contains the status-monitor model. Any value may be absent until a
+response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+Emitters should keep these values current after each poll. Metadata is not part of the
+continuation token; after rehydration, the next poll populates it again.
+
+Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
+are diagnosed once at declaration time.
+
+```typespec
+@Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The status-monitor model property.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
 
 #### `@operationGroup`
 

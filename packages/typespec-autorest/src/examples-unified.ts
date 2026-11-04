@@ -12,6 +12,7 @@ import {
   getRelativePathFromDirectory,
   joinPaths,
   normalizePath,
+  type DiagnosticTarget,
   type Program,
 } from "@typespec/compiler";
 
@@ -21,6 +22,7 @@ export interface UnifiedExamplesResult {
   readonly byOperationKey: Map<string, ResolvedExample[]>;
   /** Diagnostics produced while resolving. */
   readonly diagnostics: readonly ExampleDiagnostic[];
+  readonly operationTargets: Map<string, DiagnosticTarget>;
 }
 
 async function isFile(program: Program, path: string): Promise<boolean> {
@@ -83,9 +85,18 @@ export async function loadUnifiedExamples(
 ): Promise<UnifiedExamplesResult> {
   const filePaths = await discoverUnifiedExampleFiles(program, baseDir);
   const files: LoadedExampleFile[] = [];
+  const operationTargets = new Map<string, DiagnosticTarget>();
   for (const path of filePaths) {
     const file = await program.host.readFile(path);
-    files.push(loadExampleFile(getRelativePathFromDirectory(baseDir, path, false), file.text));
+    const loaded = loadExampleFile(getRelativePathFromDirectory(baseDir, path, false), file.text);
+    files.push(loaded);
+    if (loaded.data && typeof loaded.data === "object" && !Array.isArray(loaded.data)) {
+      for (const key of Object.keys(loaded.data)) {
+        if (key.startsWith("$")) continue;
+        const node = loaded.document.getIn([key], true) as { range?: [number, number, number] };
+        operationTargets.set(key, { file, pos: node?.range?.[0] ?? 0, end: node?.range?.[1] ?? 0 });
+      }
+    }
   }
 
   const resolved = resolveExampleFiles(files, apiVersion, [...versionOrder]);
@@ -99,7 +110,7 @@ export async function loadUnifiedExamples(
     }
   }
 
-  return { byOperationKey, diagnostics: resolved.diagnostics };
+  return { byOperationKey, diagnostics: resolved.diagnostics, operationTargets };
 }
 
 /** Map a Swagger `operationId` (`Interface_Method`) to its unified operation key. */
