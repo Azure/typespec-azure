@@ -31,6 +31,7 @@ import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
+import { pageableRequires200ResponseRule } from "./rules/pageable-requires-200-response.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";
 import { preventUnknownType } from "./rules/prevent-unknown.js";
@@ -89,6 +90,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
+  pageableRequires200ResponseRule,
 ];
 
 export const $linter = defineLinter({
