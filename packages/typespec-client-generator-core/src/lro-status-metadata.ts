@@ -45,7 +45,8 @@ export function resolveLroStatusMetadata(
       continue;
     }
 
-    properties.push({ property: diagnostics.pipe(getSdkModelPropertyType(context, property)) });
+    const sdkProperty = diagnostics.pipe(getSdkModelPropertyType(context, property));
+    properties.push({ property: sdkProperty, propertySegments: [sdkProperty] });
   }
 
   return diagnostics.wrap(properties);

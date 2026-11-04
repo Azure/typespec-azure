@@ -2529,6 +2529,7 @@ function updateLroStatusMetadataUsageAndAccess(
       const sdkProperty = getEffectiveSdkModelProperty(metadata.responseModel, rawProperty);
       if (!sdkProperty) continue;
       selection.property = sdkProperty;
+      selection.propertySegments = [sdkProperty];
       retained.push(selection);
 
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));

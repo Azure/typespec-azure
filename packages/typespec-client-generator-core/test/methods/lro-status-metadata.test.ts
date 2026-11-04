@@ -100,7 +100,9 @@ describe("LRO status metadata", () => {
       pollingProperties.find((x) => x.name === "details"),
       pollingProperties.find((x) => x.name === "requestToken"),
     ]);
-    for (const { property } of statusMetadata) {
+    for (const { property, propertySegments } of statusMetadata) {
+      expect(propertySegments).toHaveLength(1);
+      strictEqual(propertySegments[0], property);
       strictEqual(
         property,
         pollingProperties.find((candidate) => candidate.__raw === property.__raw),
@@ -113,6 +115,14 @@ describe("LRO status metadata", () => {
     strictEqual(percent.optional, true);
     strictEqual(percent.type.kind, "int32");
     expect(percent.decorators.map((x) => x.name)).toContain("TypeSpec.@encode");
+    expect(statusMetadata.map((x) => x.propertySegments.map((p) => p.name))).toEqual([
+      ["percentComplete"],
+      ["details"],
+      ["requestToken"],
+    ]);
+    expect(
+      statusMetadata.map((x) => x.propertySegments.map((p) => p.serializationOptions.json?.name)),
+    ).toEqual([["percent_complete"], ["details"], ["request_token"]]);
   });
 
   it("retains only the selected nested graph as output", async () => {
@@ -466,6 +476,12 @@ model JobState extends PollingMetadataBase {`,
         ),
     ).toBe(true);
     strictEqual(metadata.property.type, rebasedDetails);
+    expect(metadata.propertySegments).toHaveLength(1);
+    strictEqual(metadata.propertySegments[0], metadata.property);
+    expect(metadata.propertySegments.map((p) => p.name)).toEqual(["rebasedDetails"]);
+    expect(metadata.propertySegments.map((p) => p.serializationOptions.json?.name)).toEqual([
+      "rebased_details",
+    ]);
     strictEqual(metadata.property.serializationOptions.json?.name, "rebased_details");
     expect(rebasedDetails.usage & UsageFlags.Output).toBe(UsageFlags.Output);
   });
