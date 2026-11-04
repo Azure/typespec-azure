@@ -16,7 +16,13 @@ export class RequiredHelpers {
   readRequestBody: boolean;
   splitHelper: boolean;
   tracker: boolean;
-  uriTemplate: boolean;
+  splitURIPath: boolean;
+  parseURIArray: boolean;
+  parseURIMap: boolean;
+  parseRawURIQuery: boolean;
+  parseURIQueryArray: boolean;
+  parseURIQueryMap: boolean;
+  parseURIQueryObject: boolean;
 
   constructor() {
     this.getHeaderValue = false;
@@ -27,7 +33,13 @@ export class RequiredHelpers {
     this.readRequestBody = false;
     this.splitHelper = false;
     this.tracker = false;
-    this.uriTemplate = false;
+    this.splitURIPath = false;
+    this.parseURIArray = false;
+    this.parseURIMap = false;
+    this.parseRawURIQuery = false;
+    this.parseURIQueryArray = false;
+    this.parseURIQueryMap = false;
+    this.parseURIQueryObject = false;
   }
 }
 
@@ -75,8 +87,31 @@ export function generateServerInternal(
   if (requiredHelpers.tracker) {
     body += emitTracker(imports);
   }
-  if (requiredHelpers.uriTemplate) {
-    body += emitURITemplate(imports);
+  const queryMap = requiredHelpers.parseURIQueryMap || requiredHelpers.parseURIQueryObject;
+  const queryArray = requiredHelpers.parseURIQueryArray || queryMap;
+  if (requiredHelpers.splitURIPath) {
+    body += emitSplitURIPath(imports);
+  }
+  if (queryArray) {
+    body += emitSplitURIQuery(imports);
+  }
+  if (requiredHelpers.parseURIArray || queryArray) {
+    body += emitParseURIArray(imports);
+  }
+  if (requiredHelpers.parseURIMap || queryMap) {
+    body += emitParseURIMap(imports);
+  }
+  if (requiredHelpers.parseRawURIQuery) {
+    body += emitParseRawURIQuery(imports);
+  }
+  if (queryArray) {
+    body += emitParseURIQueryArray(imports);
+  }
+  if (queryMap) {
+    body += emitParseURIQueryMap();
+  }
+  if (requiredHelpers.parseURIQueryObject) {
+    body += emitParseURIQueryObject(imports);
   }
 
   return text + imports.text() + body;
@@ -111,9 +146,8 @@ func getOptional[T any](v T) *T {
 `;
 }
 
-function emitURITemplate(imports: ImportManager): string {
+function emitSplitURIPath(imports: ImportManager): string {
   imports.add("fmt");
-  imports.add("net/url");
   imports.add("strings");
   return `
 	func splitURIPath(value, prefix, separator string) ([]string, error) {
@@ -125,14 +159,24 @@ function emitURITemplate(imports: ImportManager): string {
 		}
 		return strings.Split(strings.TrimPrefix(value, prefix), separator), nil
 	}
+`;
+}
 
+function emitSplitURIQuery(imports: ImportManager): string {
+  imports.add("strings");
+  return `
 	func splitURIQuery(value string) []string {
 		if value == "" {
 			return []string{}
 		}
 		return strings.Split(value, ",")
 	}
+`;
+}
 
+function emitParseURIArray(imports: ImportManager): string {
+  imports.add("net/url");
+  return `
 	func parseURIArray[T any](values []string, unescape bool, parse func(string) (T, error)) ([]T, error) {
 		if values == nil {
 			return nil, nil
@@ -154,7 +198,14 @@ function emitURITemplate(imports: ImportManager): string {
 		}
 		return result, nil
 	}
+`;
+}
 
+function emitParseURIMap(imports: ImportManager): string {
+  imports.add("fmt");
+  imports.add("net/url");
+  imports.add("strings");
+  return `
 	func parseURIMap[T any](values []string, explode, unescape bool, parse func(string) (T, error)) (map[string]T, error) {
 		if values == nil {
 			return nil, nil
@@ -195,7 +246,13 @@ function emitURITemplate(imports: ImportManager): string {
 		}
 		return result, nil
 	}
+`;
+}
 
+function emitParseRawURIQuery(imports: ImportManager): string {
+  imports.add("net/url");
+  imports.add("strings");
+  return `
 	func parseRawURIQuery(query string) (url.Values, error) {
 		result := url.Values{}
 		for _, part := range strings.Split(query, "&") {
@@ -211,7 +268,12 @@ function emitURITemplate(imports: ImportManager): string {
 		}
 		return result, nil
 	}
+`;
+}
 
+function emitParseURIQueryArray(imports: ImportManager): string {
+  imports.add("net/url");
+  return `
 	func parseURIQueryArray[T any](value string, parse func(string) (T, error)) ([]T, error) {
 		parts := splitURIQuery(value)
 		for i, part := range parts {
@@ -223,7 +285,11 @@ function emitURITemplate(imports: ImportManager): string {
 		}
 		return parseURIArray(parts, false, parse)
 	}
+`;
+}
 
+function emitParseURIQueryMap(): string {
+  return `
 	func parseURIQueryMap[T any](value string, parse func(string) (T, error)) (map[string]T, error) {
 		parts, err := parseURIQueryArray(value, func(v string) (string, error) { return v, nil })
 		if err != nil {
@@ -231,7 +297,13 @@ function emitURITemplate(imports: ImportManager): string {
 		}
 		return parseURIMap(parts, false, false, parse)
 	}
+`;
+}
 
+function emitParseURIQueryObject(imports: ImportManager): string {
+  imports.add("fmt");
+  imports.add("net/url");
+  return `
 	func parseURIQueryObject(value string, keys []string) (url.Values, error) {
 		fields := make(map[string]bool, len(keys))
 		for _, key := range keys {

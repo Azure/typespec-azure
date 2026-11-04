@@ -36,7 +36,7 @@ export class OperationGroupContent {
 }
 
 // used to track the helpers we need to emit. they're all false by default.
-const requiredHelpers = new RequiredHelpers();
+let requiredHelpers = new RequiredHelpers();
 
 export function getServerName(client: go.Client): string {
   // for the fake server, we use the suffix Server instead of Client
@@ -51,6 +51,7 @@ export function getServerName(client: go.Client): string {
  * @returns the contents to generate or an empty object
  */
 export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): ServerContent {
+  requiredHelpers = new RequiredHelpers();
   const operations = new Array<OperationGroupContent>();
   for (const client of pkg.parent.clients) {
     if (client.clientAccessors.length === 0 && helpers.clientHasNoExportedMethods(client)) {
@@ -1302,7 +1303,7 @@ function parseHeaderPathQueryParams(
   );
   const rawQueryVariable = rawQuery ? allocateLocalName("rawQP") : "";
   if (rawQuery) {
-    requiredHelpers.uriTemplate = true;
+    requiredHelpers.parseRawURIQuery = true;
     content += `${indent.get()}${rawQueryVariable}, err := parseRawURIQuery(req.URL.RawQuery)\n`;
     content += `${indent.get()}if err != nil { return nil, err }\n`;
   }
@@ -1315,7 +1316,7 @@ function parseHeaderPathQueryParams(
       !param.queryExpansion.explode &&
       !queryExpansions.has(param.queryExpansion)
     ) {
-      requiredHelpers.uriTemplate = true;
+      requiredHelpers.parseURIQueryObject = true;
       const name = allocateLocalName(`queryExpansion${queryExpansions.size}`);
       queryExpansions.set(param.queryExpansion, name);
       const keys = method.parameters
@@ -1391,7 +1392,6 @@ function parseHeaderPathQueryParams(
         (param.collectionFormat === "csv" || param.collectionFormat === "multi")) ||
       (go.isQueryParameter(param) && param.queryExpansion)
     ) {
-      requiredHelpers.uriTemplate ||= param.kind !== "pathScalarParam";
       content += parseURITemplateParameter(
         param,
         paramValue,
@@ -1401,6 +1401,7 @@ function parseHeaderPathQueryParams(
         pkg,
         imports,
         indent,
+        requiredHelpers,
       );
       continue;
     }
