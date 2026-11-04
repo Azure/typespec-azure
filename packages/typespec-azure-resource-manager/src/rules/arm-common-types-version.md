@@ -13,7 +13,7 @@ version selections, not individual legacy type usages.
 - **Area:** API, SDK
 
 Missing or outdated common-types selections can leave an API and its generated
-SDKs using older shared schemas and parameters. Latest-version warnings are
+SDKs using older shared schemas and parameters.
 
 ## ❌ Incorrect
 
