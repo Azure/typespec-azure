@@ -1,14 +1,14 @@
-Operations marked with `@list` that return an `@nextLink` must define an HTTP 200 response.
+Operations marked with `@list` must define an HTTP 200 response, regardless of whether they use next-link or continuation-token pagination.
 
 This requirement applies to both ARM and data-plane operations, regardless of HTTP verb. Implicit 200 responses are accepted, as are 200 responses alongside other status codes. A default response or a `2XX` status-code range does not replace an explicit 200 response.
 
-The rule does not apply to ordinary operations or to lists without next-link paging.
+The rule does not apply to operations without `@list`.
 
 ## Impact
 
 - **Area:** API, SDK
 
-A pageable operation without a 200 response does not satisfy the AutoRest paging contract and can produce an incorrect SDK response.
+Consistent HTTP 200 responses let clients handle list results reliably across pagination strategies.
 
 ## Examples
 
@@ -72,7 +72,7 @@ op searchWidgets is RpcOperation<
 
 [PageableRequires200Response](https://github.com/Azure/azure-openapi-validator/blob/main/docs/pageable-requires200-response.md)
 
-The Swagger rule is an error. This TypeSpec rule is a warning, consistent with the other Azure Core linter rules. It checks the presence of a 200 response, not the response schema. Legacy `x-ms-pageable` operations with `nextLinkName: null` are outside this rule's native next-link paging scope.
+The Swagger rule is an error. This TypeSpec rule is a warning, consistent with the other Azure Core linter rules. It checks the presence of a 200 response, not the response schema. Its scope is all operations marked with `@list`, including continuation-token lists for which the AutoRest emitter does not generate `x-ms-pageable`.
 
 The ARM `use-standard-response-codes` rule also requires 200 for GET operations in services, but permits POST 201. This rule supplies the missing non-GET and data-plane check. Enabling both rules can report the same missing 200 on a pageable GET; fixing the response resolves both findings.
 

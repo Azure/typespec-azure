@@ -28,7 +28,7 @@ beforeEach(async () => {
 const diagnostic = {
   code: "@azure-tools/typespec-azure-core/pageable-requires-200-response",
   severity: "warning",
-  message: "Next-link pageable operations must define a 200 response.",
+  message: "List operations must define a 200 response.",
 } as const;
 
 it.each(["get", "post"])("reports a pageable %s with only a 201 response", async (verb) => {
@@ -99,12 +99,26 @@ it("does not impose paging response codes on operations without @list", async ()
     .toBeValid();
 });
 
-it("does not require 200 for lists without next-link paging", async () => {
+it("requires 200 for continuation-token lists without next-link paging", async () => {
   await tester
     .expect(
       `
         @list @post op list(): {
           @statusCode status: 201;
+          @pageItems value: string[];
+          @continuationToken token?: string;
+        };
+        `,
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+
+it("accepts 200 for continuation-token lists without next-link paging", async () => {
+  await tester
+    .expect(
+      `
+        @list @post op list(): {
+          @statusCode status: 200;
           @pageItems value: string[];
           @continuationToken token?: string;
         };
