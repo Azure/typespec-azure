@@ -112,8 +112,17 @@ export function parseURITemplateParameter(
       text += "if unescapeErr != nil { return nil, unescapeErr }\n";
       value = "unescaped";
     }
-    text += `parsed, parseErr := (${valueParser(param.type, pkg, imports)})(${value})\n${parseFail}`;
-    text += `${result} = parsed\n}\n`;
+    if (go.unwrapPtr(param.type).kind === "string") {
+      if (!param.isEncoded) {
+        text += `parsed := ${value}\n`;
+        value = "parsed";
+      }
+      text += `${result} = ${param.type.kind === "ptr" ? "&" : ""}${value}\n`;
+    } else {
+      text += `parsed, parseErr := (${valueParser(param.type, pkg, imports)})(${value})\n${parseFail}`;
+      text += `${result} = parsed\n`;
+    }
+    text += "}\n";
   } else if (param.kind === "pathCollectionParam" || param.kind === "pathMapParam") {
     requiredHelpers.splitURIPath = true;
     const { prefix, separator } = getPathExpansionStyle(param);
