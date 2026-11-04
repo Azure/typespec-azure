@@ -968,6 +968,46 @@ interface Widgets {
     },
   );
 
+  it("compares source nested types without filtering newly added models", async () => {
+    await tester
+      .expect(
+        `
+        @service @versioned(Versions) namespace Test;
+        enum Versions { v1, v2 }
+        model PutNested { common?: string; }
+        @added(Versions.v2)
+        model PatchNested { common?: string; }
+        model PutBody { nested?: PutNested; }
+        model PatchBody {
+          @typeChangedFrom(Versions.v2, PutNested)
+          nested?: PatchNested;
+        }
+        @route("/widgets") @put op put(@body body: PutBody): void;
+        @route("/widgets") @patch op patch(@body body: PatchBody): void;
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("uses the last resolved source PATCH at a shared path without historical selection", async () => {
+    await tester
+      .expect(
+        `
+        @service @versioned(Versions) namespace Test;
+        enum Versions { v1, v2 }
+        model PutBody { common?: string; }
+        model PreviousPatch { extra?: string; }
+        model CurrentPatch { common?: string; }
+        @route("/widgets") @put op put(@body body: PutBody): void;
+        @removed(Versions.v2)
+        @sharedRoute @route("/widgets") @patch op previous(@body body: PreviousPatch): void;
+        @added(Versions.v2)
+        @sharedRoute @route("/widgets") @patch op current(@body body: CurrentPatch): void;
+      `,
+      )
+      .toBeValid();
+  });
+
   it("compares dependency source models without applying selected dependency versions", async () => {
     await tester
       .expect(
