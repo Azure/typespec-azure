@@ -32,27 +32,6 @@ type LroClientResult = Pick<
   | "finalResultPath"
 >;
 
-const rawLroProtocolMetadataCache = new WeakMap<
-  Program,
-  Map<Operation, LroProtocolMetadata | undefined>
->();
-
-/** Returns cached Azure.Core protocol facts without applying TCGC client-result policy. @internal */
-export function getCachedLroProtocolMetadata(
-  program: Program,
-  operation: Operation,
-): LroProtocolMetadata | undefined {
-  let programCache = rawLroProtocolMetadataCache.get(program);
-  if (!programCache) {
-    programCache = new Map();
-    rawLroProtocolMetadataCache.set(program, programCache);
-  }
-  if (!programCache.has(operation)) {
-    programCache.set(operation, getLroProtocolMetadata(program, operation));
-  }
-  return programCache.get(operation);
-}
-
 /**
  * Selects the client result without discovering or changing protocol facts.
  * Core keeps a separate compatibility policy for its combined metadata API.
@@ -136,7 +115,7 @@ function createLroMetadata(
 
 /** Raw LRO metadata only; the legacy @markAsLro fallback is handled separately. */
 export function getRawLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
-  const protocol = getCachedLroProtocolMetadata(program, operation);
+  const protocol = getLroProtocolMetadata(program, operation);
   return protocol ? createLroMetadata(protocol, resolveLroClientResult(protocol)) : undefined;
 }
 
@@ -154,7 +133,7 @@ export function getClientLroMetadataWithDiagnostics(
   }
 
   // A client result selection customizes a native LRO; it does not create LRO metadata.
-  const protocol = getCachedLroProtocolMetadata(context.program, operation);
+  const protocol = getLroProtocolMetadata(context.program, operation);
   if (!protocol) {
     diagnostics.add(
       createDiagnostic({

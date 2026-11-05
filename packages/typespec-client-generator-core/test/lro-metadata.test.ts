@@ -93,6 +93,7 @@ it.each([
 it("keeps the complete resource as the TCGC default for a resource PUT", async () => {
   const { program } = await AzureCoreTester.compile(`
     @service namespace TestService;
+    alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
     model Payload { value: string; }
     @resource("jobs") model Job {
       @key id: string;
@@ -102,8 +103,7 @@ it("keeps the complete resource as the TCGC default for a resource PUT", async (
     @get @route("/jobs/{id}") op read(@path id: string): Job;
     @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
     @pollingOperation(poll)
-    @createsOrReplacesResource(Job)
-    @put @route("/jobs/{id}") op start(@path id: string): Job;
+    op start is Operations.LongRunningResourceCreateOrReplace<Job>;
   `);
   const [services] = getAllHttpServices(program);
   const operation = services[0].operations.find((o) => o.operation.name === "start")!.operation;

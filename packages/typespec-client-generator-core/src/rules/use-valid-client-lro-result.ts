@@ -1,6 +1,7 @@
+import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import { createRule, fileRef, paramMessage, type ModelProperty } from "@typespec/compiler";
 import { clientLroResultKey, negationScopesKey } from "../internal-utils.js";
-import { getCachedLroProtocolMetadata, isLroProtocolResultProperty } from "../lro-metadata.js";
+import { isLroProtocolResultProperty } from "../lro-metadata.js";
 
 export const useValidClientLroResultRule = createRule({
   name: "use-valid-client-lro-result",
@@ -24,7 +25,7 @@ export const useValidClientLroResultRule = createRule({
           .filter((selection): selection is ModelProperty => selection?.kind === "ModelProperty");
         if (selectedProperties.length === 0) return;
 
-        const protocol = getCachedLroProtocolMetadata(context.program, operation);
+        const protocol = getLroProtocolMetadata(context.program, operation);
         if (!protocol?.initial.resourceOperation) return;
 
         const resultProperty = selectedProperties.find((selection) =>

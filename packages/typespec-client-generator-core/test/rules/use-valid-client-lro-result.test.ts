@@ -11,6 +11,7 @@ const ruleCode = "@azure-tools/typespec-client-generator-core/use-valid-client-l
 
 const resourceLro = `
   @service namespace TestService;
+  alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
 
   model Payload { value: string; }
 
@@ -25,9 +26,7 @@ const resourceLro = `
   @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
 
   @pollingOperation(poll)
-  @createsOrReplacesResource(Job)
-  @put @route("/jobs/{id}")
-  op start(@path id: string): Job;
+  op start is Operations.LongRunningResourceCreateOrReplace<Job>;
 `;
 
 const actionLro = `
@@ -90,6 +89,7 @@ describe("use-valid-client-lro-result", () => {
     const diagnostics = await AzureCoreTester.diagnose(
       `
         @service namespace TestService;
+        alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
 
         model Payload { value: string; }
 
@@ -105,9 +105,7 @@ describe("use-valid-client-lro-result", () => {
 
         #suppress "${ruleCode}" "Preserve the GA SDK return type."
         @pollingOperation(poll)
-        @createsOrReplacesResource(Job)
-        @put @route("/jobs/{id}")
-        op start(@path id: string): Job;
+        op start is Operations.LongRunningResourceCreateOrReplace<Job>;
 
         @@clientLroResult(start, Job.result, "python");
       `,

@@ -5,6 +5,7 @@ import "@typespec/versioning";
 
 using Azure.ClientGenerator.Core;
 using Azure.Core;
+using global.Azure.Core.Traits;
 using Spector;
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -27,6 +28,10 @@ enum Versions {
   v2022_12_01_preview: "2022-12-01-preview",
 }
 
+alias Operations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
+  NoRepeatableRequests &
+  NoClientRequestId>;
+
 model JobResult {
   value: string;
 }
@@ -34,6 +39,7 @@ model JobResult {
 @resource("jobs")
 model Job {
   @key
+  @visibility(Lifecycle.Read)
   id: string;
 
   @lroStatus
@@ -51,50 +57,39 @@ op getDefaultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVersionPa
 @get
 op pollDefaultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVersionParameter): Job;
 
-alias JobAcceptedResponse = global.Azure.Core.Foundations.AcceptedResponse<Job> & {
-  @pollingLocation
-  @header("Operation-Location")
-  operationLocation: ResourceLocation<Job>;
-};
-
 @scenario
 @scenarioDoc("""
   Verifies that a resource create-or-replace LRO returns the complete resource even when its
   polling model defines an `@lroResult` property.
+  PUT /default/jobs/default with api-version=2022-12-01-preview and body {"status": "Running"}.
+  Expect 201 with an Operation-Location pointing to /default/jobs/default/status.
+  Poll until status is Succeeded, then GET /default/jobs/default with the same api-version.
+  Expect the complete Job: {"id": "default", "status": "Succeeded", "result": {"value": "completed"}}.
   """)
 @pollingOperation(pollDefaultJob)
-@createsOrReplacesResource(Job)
-@route("/default/jobs/{id}")
-@put
-op createDefault(
-  @path id: string,
-  ...global.Azure.Core.Foundations.ApiVersionParameter,
-): JobAcceptedResponse;
+@route("/default")
+op createDefault is Operations.LongRunningResourceCreateOrReplace<Job>;
 
-@route("/compatibility/jobs/{id}")
+@route("/client-result/jobs/{id}")
 @get
-op getCompatibilityJob(@path id: string, ...global.Azure.Core.Foundations.ApiVersionParameter): Job;
+op getClientResultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVersionParameter): Job;
 
-@route("/compatibility/jobs/{id}/status")
+@route("/client-result/jobs/{id}/status")
 @get
-op pollCompatibilityJob(
-  @path id: string,
-  ...global.Azure.Core.Foundations.ApiVersionParameter,
-): Job;
+op pollClientResultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVersionParameter): Job;
 
 #suppress "@azure-tools/typespec-client-generator-core/use-valid-client-lro-result" "Preserve the return type of an existing GA SDK."
 @scenario
 @scenarioDoc("""
   Verifies that `@clientLroResult` can preserve an existing SDK contract that returns the
   established result property of a resource LRO.
+  PUT /client-result/jobs/client-result with api-version=2022-12-01-preview and body {"status": "Running"}.
+  Expect 201 with an Operation-Location pointing to /client-result/jobs/client-result/status.
+  Poll until status is Succeeded, then GET /client-result/jobs/client-result with the same api-version.
+  Expect the selected JobResult: {"value": "completed"}, not the enclosing Job.
   """)
-@pollingOperation(pollCompatibilityJob)
-@createsOrReplacesResource(Job)
-@route("/compatibility/jobs/{id}")
-@put
-op createCompatibility(
-  @path id: string,
-  ...global.Azure.Core.Foundations.ApiVersionParameter,
-): JobAcceptedResponse;
+@pollingOperation(pollClientResultJob)
+@route("/client-result")
+op createWithClientLroResult is Operations.LongRunningResourceCreateOrReplace<Job>;
 
-@@clientLroResult(createCompatibility, Job.result);
+@@clientLroResult(createWithClientLroResult, Job.result);

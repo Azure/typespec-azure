@@ -27,6 +27,7 @@ const monitorService = `
 
 const resourceService = `
   @service namespace TestService;
+  alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
   @resource("widgets")
   model Widget { @key id: string; value: string; }
   model Status {
@@ -35,8 +36,7 @@ const resourceService = `
   @get @route("/widgets/{id}") op read(@path id: string): Widget;
   @get @route("/operations/{id}") op poll(@path id: string): Status;
   @pollingOperation(poll)
-  @createsOrReplacesResource(Widget)
-  @put @route("/widgets/{id}") op start(@path id: string): Widget;
+  op start is Operations.LongRunningResourceCreateOrReplace<Widget>;
 `;
 
 describe("@clientLroResult", () => {
@@ -320,6 +320,7 @@ describe("@clientLroResult", () => {
   it("selects the shared-model PUT completion response", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
+      alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
       model Payload { value: string; }
       @resource("jobs") model Job {
         @key id: string;
@@ -329,8 +330,7 @@ describe("@clientLroResult", () => {
       @get @route("/jobs/{id}") op read(@path id: string): Job;
       @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
       @pollingOperation(poll)
-      @createsOrReplacesResource(Job)
-      @put @route("/jobs/{id}") op start(@path id: string): Job;
+      op start is Operations.LongRunningResourceCreateOrReplace<Job>;
       @@clientLroResult(start, Job);
     `);
     const context = await createSdkContextForTester(program);
@@ -349,6 +349,7 @@ describe("@clientLroResult", () => {
   it("allows a resource PUT to preserve an existing result-property contract", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
+      alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
       model Payload { value: string; }
       @resource("jobs") model Job {
         @key id: string;
@@ -358,8 +359,7 @@ describe("@clientLroResult", () => {
       @get @route("/jobs/{id}") op read(@path id: string): Job;
       @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
       @pollingOperation(poll)
-      @createsOrReplacesResource(Job)
-      @put @route("/jobs/{id}") op start(@path id: string): Job;
+      op start is Operations.LongRunningResourceCreateOrReplace<Job>;
       @@clientLroResult(start, Job.result);
     `);
     const context = await createSdkContextForTester(program);
@@ -385,6 +385,7 @@ describe("@clientLroResult", () => {
   it("selects an inherited protocol result property for a resource PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
+      alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
       model Payload { value: string; }
       model ResultProperties { @lroResult result: Payload; }
       @resource("jobs") model Job extends ResultProperties {
@@ -394,8 +395,7 @@ describe("@clientLroResult", () => {
       @get @route("/jobs/{id}") op read(@path id: string): Job;
       @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
       @pollingOperation(poll)
-      @createsOrReplacesResource(Job)
-      @put @route("/jobs/{id}") op start(@path id: string): Job;
+      op start is Operations.LongRunningResourceCreateOrReplace<Job>;
       @@clientLroResult(start, Job.result);
     `);
     const context = await createSdkContextForTester(program);

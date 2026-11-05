@@ -12,12 +12,12 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 const apiVersion = "2022-12-01-preview";
 const jobResult = { value: "completed" };
 let defaultPollCount = 0;
-let compatibilityPollCount = 0;
+let clientResultPollCount = 0;
 
-function createPollHandler(counter: "default" | "compatibility") {
+function createPollHandler(counter: "default" | "client-result") {
   return (req: MockRequest) => {
     req.expect.containsQueryParam("api-version", apiVersion);
-    const pollCount = counter === "default" ? defaultPollCount++ : compatibilityPollCount++;
+    const pollCount = counter === "default" ? defaultPollCount++ : clientResultPollCount++;
     return {
       status: 200,
       body: json(
@@ -29,7 +29,7 @@ function createPollHandler(counter: "default" | "compatibility") {
   };
 }
 
-function createScenario(kind: "default" | "compatibility"): ScenarioMockApi {
+function createScenario(kind: "default" | "client-result"): ScenarioMockApi {
   const resourcePath = `/azure/client-generator-core/lro/result/${kind}/jobs/${kind}`;
   const pollingPath = `${resourcePath}/status`;
   const pollHandler = createPollHandler(kind);
@@ -41,12 +41,13 @@ function createScenario(kind: "default" | "compatibility"): ScenarioMockApi {
       uri: resourcePath,
       method: "put",
       request: {
+        body: json({ status: "Running" }),
         query: {
           "api-version": apiVersion,
         },
       },
       response: {
-        status: 202,
+        status: 201,
         headers: {
           "operation-location": dyn`${dynItem("baseUrl")}${pollingPath}?api-version=${apiVersion}`,
         },
@@ -54,13 +55,14 @@ function createScenario(kind: "default" | "compatibility"): ScenarioMockApi {
       },
       handler: (req: MockRequest) => {
         req.expect.containsQueryParam("api-version", apiVersion);
+        req.expect.bodyEquals({ status: "Running" });
         if (kind === "default") {
           defaultPollCount = 0;
         } else {
-          compatibilityPollCount = 0;
+          clientResultPollCount = 0;
         }
         return {
-          status: 202,
+          status: 201,
           headers: {
             "operation-location": `${req.baseUrl}${pollingPath}?api-version=${apiVersion}`,
           },
@@ -117,5 +119,5 @@ function createScenario(kind: "default" | "compatibility"): ScenarioMockApi {
 }
 
 Scenarios.Azure_ClientGenerator_Core_Lro_Result_createDefault = createScenario("default");
-Scenarios.Azure_ClientGenerator_Core_Lro_Result_createCompatibility =
-  createScenario("compatibility");
+Scenarios.Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResult =
+  createScenario("client-result");

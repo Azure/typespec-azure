@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add Spector scenarios for the default resource LRO result and the `@clientLroResult` compatibility override.
+Add template-based resource PUT Spector scenarios for the default LRO result and a result selected with `@clientLroResult`.

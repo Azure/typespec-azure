@@ -87,7 +87,6 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getClientLroMetadataWithDiagnostics } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -1320,7 +1319,7 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
  * Retrieves Long Running Operation (LRO) metadata for a given operation.
  *
  * This function serves as a wrapper that:
- * 1. Selects the native client result from Azure Core's LRO protocol facts
+ * 1. Reads the emitter-scoped metadata resolved during type processing
  * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
  *    and return a mock LRO metadata object if the operation is marked as LRO
  *
@@ -1333,7 +1332,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
-  const lroMetaData = ignoreDiagnostics(getClientLroMetadataWithDiagnostics(context, operation));
+  const lroMetaData = context.__clientLroMetadataCache.get(operation);
   if (lroMetaData) return lroMetaData;
   if (getMarkAsLro(context, operation)) {
     // we guard against this in the setting of `@markAsLro`
