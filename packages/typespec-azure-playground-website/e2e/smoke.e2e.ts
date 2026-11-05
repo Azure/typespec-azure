@@ -57,4 +57,52 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     expect(result.files).toContain("playground_server.go");
     expect(result.metadata.emitterVersion).toBeTruthy();
   });
+
+  test("emits an Azure Python client in the browser", async ({ page }) => {
+    test.setTimeout(120_000);
+    const runtimeRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/pyodide/")) runtimeRequests.push(request.url());
+    });
+    await page.goto(host);
+    await page.waitForFunction(() => (window as any).host !== undefined);
+    expect(runtimeRequests).toEqual([]);
+    const result = await page.evaluate(async () => {
+      const { host, compiler } = window as any;
+      await host.writeFile(
+        "/test/python.tsp",
+        `
+          import "@typespec/http";
+          using TypeSpec.Http;
+          @service
+          @server("https://example.com", "Example")
+          namespace Playground;
+          model Widget { name: string; }
+          @get @route("/widgets/{name}")
+          op getWidget(@path name: string): Widget;
+        `,
+      );
+      const program = await compiler.compile(host, "/test/python.tsp", {
+        emit: ["@azure-tools/typespec-python"],
+        options: {
+          "@azure-tools/typespec-python": {
+            namespace: "azure.playground",
+            "package-name": "azure-playground",
+          },
+        },
+        outputDir: "/test/python-output",
+      });
+      if (program.hasError()) {
+        throw new Error(program.diagnostics.map((x: any) => x.message).join("\n"));
+      }
+      const outputDir = "/test/python-output/@azure-tools/typespec-python/azure/playground";
+      return {
+        client: (await host.readFile(`${outputDir}/_client.py`)).text,
+        models: (await host.readFile(`${outputDir}/models/_models.py`)).text,
+      };
+    });
+    expect(result.client).toContain("class PlaygroundClient");
+    expect(result.client).toContain("from azure.core");
+    expect(result.models).toContain("class Widget");
+  });
 });

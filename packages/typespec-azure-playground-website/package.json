@@ -58,6 +58,7 @@
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@azure-tools/typespec-go": "workspace:^",
+    "@azure-tools/typespec-python": "workspace:^",
     "@azure-tools/typespec-ts": "workspace:^",
     "@fluentui/react-components": "catalog:",
     "@fluentui/react-icons": "catalog:",

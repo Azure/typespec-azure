@@ -546,6 +546,9 @@ overrides:
 
 packageExtensionsChecksum: sha256-hcvadM+VJpLUMniZQB2V94wn6/ia0AagJQWqGCRFSUc=
 
+patchedDependencies:
+  '@typespec/http-client-python@0.39.0': 008b36a9ec91d168574e19d2591a565a59b677c9a86f521b9701dd9f5836a339
+
 importers:
 
   .:
@@ -3461,6 +3464,9 @@ importers:
       '@azure-tools/typespec-go':
         specifier: workspace:^
         version: link:../typespec-go
+      '@azure-tools/typespec-python':
+        specifier: workspace:^
+        version: link:../typespec-python
       '@azure-tools/typespec-ts':
         specifier: workspace:^
         version: link:../typespec-ts
@@ -4015,7 +4021,7 @@ importers:
     dependencies:
       '@typespec/http-client-python':
         specifier: 'catalog:'
-        version: 0.39.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
+        version: 0.39.0(patch_hash=008b36a9ec91d168574e19d2591a565a59b677c9a86f521b9701dd9f5836a339)(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)
       semver:
         specifier: 'catalog:'
         version: 7.8.5
@@ -16657,7 +16663,7 @@ snapshots:
     dependencies:
       '@typescript/old': typescript@6.0.3
 
-  '@typespec/http-client-python@0.39.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
+  '@typespec/http-client-python@0.39.0(patch_hash=008b36a9ec91d168574e19d2591a565a59b677c9a86f521b9701dd9f5836a339)(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
       '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
