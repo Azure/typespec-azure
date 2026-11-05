@@ -149,6 +149,15 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps private endpoint API completeness guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    const rule = ResourceManagerLinter.rules.find(
+      (candidate) => candidate.name === "private-endpoint-apis-missing",
+    );
+    ok(rule);
+  });
+
   it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
     const name = "lro-missing-polling-metadata";
     strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
