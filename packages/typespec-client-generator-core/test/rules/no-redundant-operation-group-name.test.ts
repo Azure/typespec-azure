@@ -171,6 +171,37 @@ it("uses an explicitly named subclient", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
+it("uses a common client name override instead of the explicit subclient name", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace Test {}
+      @client({service: Test}) namespace RootClient {
+        @client({name: "Items"}) @clientName("Paths") interface Other {
+          @get @route("/one") op listPaths(): string;
+          @get @route("/two") op listItems(): string;
+        }
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic());
+});
+
+it("ignores a language-specific override on an explicitly named subclient", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace Test {}
+      @client({service: Test}) namespace RootClient {
+        @client({name: "Items"}) @clientName("Paths", "csharp") interface Other {
+          @get op listItems(): string;
+        }
+      }
+    `,
+    )
+    .toEmitDiagnostics(diagnostic("listItems", "Items"));
+});
+
 it("honors relocation to an actual group in both directions", async () => {
   await tester
     .expect(

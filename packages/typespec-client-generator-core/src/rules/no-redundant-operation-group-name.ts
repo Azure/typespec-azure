@@ -1,5 +1,6 @@
 import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
+import { getClientNameOverride } from "../decorators.js";
 import { AllScopes } from "../internal-utils.js";
 import { getLibraryName } from "../public-utils.js";
 
@@ -22,7 +23,10 @@ export const noRedundantOperationGroupNameRule = createRule({
       operation(operation) {
         const client = tcgcContext.getClientForOperation(operation);
         if (!client?.parent) return;
-        const groupName = client.name;
+        const groupName =
+          client.type && getClientNameOverride(tcgcContext, client.type, AllScopes)
+            ? getLibraryName(tcgcContext, client.type, AllScopes)
+            : client.name;
         const noun = groupName.endsWith("s") ? groupName.slice(0, -1) : groupName;
         if (noun.length === 0) return;
         const methodName = getLibraryName(tcgcContext, operation, AllScopes);

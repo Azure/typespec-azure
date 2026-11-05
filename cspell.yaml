@@ -48,6 +48,7 @@ enableFiletypes:
   - tsp
   - typespec
 words:
+  - aeiou
   - allof
   - apim
   - apos
