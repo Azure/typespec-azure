@@ -434,14 +434,30 @@ Use exactly four numbered sections followed by an unnumbered `NOTES` section:
    equal totals. Mark unsupported comparison/attribution unassessed, and non-lint
    outcomes not applicable, rather than inventing zero or matching counts.
    Keep project overlap and detailed location summaries out of the scorecard.
-   Immediately after the table, briefly summarize the evidenced causes of any
-   remaining gap and link first to
+   Immediately after the table, require an explicit **Assessed coverage**
+   summary, not just raw totals or a list of possible causes. State the
+   evidence-backed coverage outcome for the assessed policy, supported by
+   quantified observations and their scope. Use justified comparable counts
+   when available; otherwise report the verified diagnostic categories or
+   assessed subsets and explain what their counts establish. Distinguish
+   predicate classification from proven semantic disposition: an unequal-schema
+   count, for example, is not automatically a false-positive count.
+   Keep covered behavior, material missing/deferred behavior and unassessed
+   scope visible. If complete correspondence is unsupported, explicitly mark
+   comparable violation totals/coverage percentages unassessed and identify
+   the missing evidence; do not omit known assessed data or invent adjusted
+   totals. If no behavioral assessment is supported, say so and carry that
+   limitation into the conclusion and existing acceptance gates.
+   Equal totals or zero warnings alone do not establish coverage.
+   Briefly explain the evidenced causes of any remaining gap and link first to
    `[Why diagnostic counts differ](#4-why-diagnostic-counts-differ)`, where the
    reader can follow links to detailed evidence. Identify unresolved causes as
-   unresolved, not accepted differences. Do not repeat member-total arithmetic,
-   callback-family accounting, exact-reproduction receipts or tracing provenance
-   here; put the breakdown in section 4 and technical context in NOTES or the
-   linked evidence. Retain any qualification needed to interpret the table.
+   unresolved, not accepted differences. Keep the assessment concise: retain
+   detailed member/callback accounting and investigations in section 4 or its
+   linked evidence, and exact-reproduction receipts/tracing provenance in NOTES
+   or linked evidence. Brief quantified semantic categories needed to interpret
+   the assessed outcome belong here. Retain qualifications needed to interpret
+   the table; do not turn category counts into matched defects or a coverage rate.
 3. **Function-level coverage.** Use a compact three-column table:
    **Behavior**, **Result**, and **Rationale**, covering material checks and
    compliant controls. Keep the result to the coverage status; explain why that
@@ -518,7 +534,15 @@ Reported diagnostics means individual findings, not projects.
 | Reported diagnostics                          | <raw total>           | <raw total>           |
 | <Justified common unit and grouping identity> | <count or unassessed> | <count or unassessed> |
 
-<Brief explanation of the evidenced causes of the remaining gap, with any unresolved causes stated explicitly.>
+**Assessed coverage:** <Evidence-backed coverage outcome and policy, supported by
+quantified comparable findings or verified categories/subsets with their scope.
+State what those data establish, material missing/deferred behavior and what
+remains unassessed; raw totals alone are not the assessment.>
+
+<If complete correspondence is unsupported, identify the missing evidence and
+mark comparable violation totals/coverage percentages unassessed. Do not discard
+known assessed subsets or invent adjusted counts. Briefly explain remaining
+evidenced causes and explicitly unresolved causes.>
 See [Why diagnostic counts differ](#4-why-diagnostic-counts-differ) for the breakdown and remaining limitations.
 
 ## 3. Function-level coverage
@@ -554,7 +578,9 @@ Before publishing or refreshing, read the entire main report, all member notes
 and linked grouped conclusions together, not just sections 1 and 2. Can the
 reader readily decide: Is migration complete, and for which policy? What do the
 numbers count? Why do they differ? What should change, and why is it worth the
-complexity? What remains uncertain? Check that scorecards, behavior tables,
+complexity? What remains uncertain? Verify section 2 includes an evidence-backed
+assessed outcome and scoped quantitative data, not only raw totals or general
+causes; unsupported assessment must be explicitly unassessed. Check that scorecards, behavior tables,
 decisions and limitations answer consistently, with matching controls separate
 from differences and technical proofs directly linked. Quality is the reader's
 decision, not word count or outline compliance. Remove stale summaries and
