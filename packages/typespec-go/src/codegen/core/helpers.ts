@@ -16,6 +16,25 @@ export const RFC3339Format = "time.RFC3339Nano";
 export const RFC1123Format = "time.RFC1123";
 export const plainTimeFormat = "time.TimeOnly";
 
+/** Returns public union fields, retaining hidden SSE sentinels only when JSON usage needs them. */
+export function getUnionFields(union: go.UnionStruct): Array<go.UnionField> {
+  if (union.usage & go.UnionStructFlags.SumType) {
+    return union.fields;
+  }
+  return union.fields.filter((field) => !isSseTerminalSentinel(field));
+}
+
+/** Identifies unnamed terminal string literals, which are control markers rather than payloads. */
+export function isSseTerminalSentinel(field: go.UnionField): boolean {
+  const type = go.unwrapPtr(field.type);
+  return (
+    field.sse?.terminal === true &&
+    !field.sse.name &&
+    type.kind === "literal" &&
+    typeof type.literal === "string"
+  );
+}
+
 // matches both current format (DO NOT EDIT on same line as Code generated)
 // and legacy autorest format (DO NOT EDIT on a separate line)
 export const doNotEditRegex =
@@ -202,11 +221,12 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
   for (const methodParam of methodParams) {
     let paramName = methodParam.name;
     // when creating the method sig for fooCreateRequest, if the options type is empty
-    // or only contains the ResumeToken param use _ for the param name to quiet the linter
+    // or only contains client-side options use _ for the param name to quiet the linter
     if (
       methodParam.kind === "paramGroup" &&
-      (methodParam.params.length === 0 ||
-        (methodParam.params.length === 1 && methodParam.params[0].kind === "resumeTokenParam"))
+      methodParam.params.every(
+        (param) => param.kind === "resumeTokenParam" || param.kind === "sseLastEventIDParam",
+      )
     ) {
       paramName = "_";
     }
@@ -663,6 +683,7 @@ export function getResultFieldName(method: go.MethodType): string {
     case "binaryResult":
     case "headAsBooleanResult":
     case "monomorphicResult":
+    case "sseResult":
       return result.fieldName;
     case "modelResult":
     case "polymorphicResult":
