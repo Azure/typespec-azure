@@ -94,6 +94,21 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("enables consolidated ARM common-types version guidance", () => {
+    const ruleset = $linter.ruleSets?.["resource-manager"];
+    ok(ruleset);
+    ok(ruleset.enable?.["@azure-tools/typespec-azure-resource-manager/arm-common-types-version"]);
+    const removedRule =
+      "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types";
+    strictEqual(ruleset.enable?.[removedRule], undefined);
+    strictEqual(ruleset.disable?.[removedRule], undefined);
+    ok(
+      !ResourceManagerLinter.rules.some(
+        (rule) => rule.name === "use-latest-version-of-common-types",
+      ),
+    );
+  });
+
   it("keeps RPaaS extension-routing guidance opt-in in the general Azure rulesets", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
@@ -136,6 +151,26 @@ describe("expect all rules to be defined", () => {
     for (const rulesetName of ["data-plane", "resource-manager"]) {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }
+  });
+
+  it("keeps private endpoint API completeness guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    const rule = ResourceManagerLinter.rules.find(
+      (candidate) => candidate.name === "private-endpoint-apis-missing",
+    );
+    ok(rule);
+  });
+
+  it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
+    const name = "lro-missing-polling-metadata";
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(
+      $linter.ruleSets?.["resource-manager"].enable?.[
+        `@azure-tools/typespec-azure-resource-manager/${name}`
+      ],
+      false,
+    );
   });
 
   it("keeps ARM resource-group path guidance opt-in", () => {

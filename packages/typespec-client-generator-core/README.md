@@ -1101,8 +1101,8 @@ response containing it arrives. Metadata remains exposed on failed or canceled t
 Emitters should keep these values current after each poll. Metadata is not part of the
 continuation token; after rehydration, the next poll populates it again.
 
-Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
-are diagnosed once at declaration time.
+Multiple declarations use the standard TCGC scope rules, including overlapping scopes.
+Each selected property appears only once in the metadata collection.
 
 ```typespec
 @Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
