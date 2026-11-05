@@ -13,6 +13,16 @@ same artifact-injection and comparison path. This is an analysis workflow, not
 authorization to modify the rule, enable it by default, or rewrite the migration
 queue.
 
+## Private corpus selection
+
+When the caller requests `RPSaaSMaster` coverage, read the
+[private corpus contract](private-corpus.md) before baseline discovery or setup.
+It selects only the caller's allowlisted services, all their TypeSpec projects
+and supported API versions, a separate private baseline and an independent
+private `migration.md`. Its privacy/publication and population overrides take
+precedence over the public-fork defaults below. This is invocation context, not
+a new analyzer CLI option. Public coverage remains the default.
+
 ## Cost-aware invocation
 
 Read the shared [analysis-first policy](../shared/analysis-first-lint-migration.md)
