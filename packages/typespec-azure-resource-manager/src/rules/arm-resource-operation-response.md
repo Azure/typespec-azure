@@ -2,7 +2,7 @@ Operations on a resource such as read, create, update, and list must all return 
 
 Registered resource create-or-update operations using PUT must also have a request body whose effective payload type is the registered resource model. Use `ArmResourceCreateOrReplaceSync<Resource>` rather than overriding its request model. Request visibility is respected when resolving implicit bodies; aliases of the resource are accepted, but separately declared input models are not.
 
-The PUT request check uses the existing registered-resource lifecycle traversal. It does not independently scan custom HTTP PUT operations or require arbitrary payload models to be registered. `use-operation-decorator` checks operation registration. Multipart request bodies are outside this request-model comparison. Existing lifecycle and list response validation is unchanged; this rule does not add HTTP status or content-variant selection.
+The PUT request check covers all registered create-or-update operations, including legacy templates and multiple aliases for the same resource. It does not independently scan custom HTTP PUT operations or require arbitrary payload models to be registered. `use-operation-decorator` checks operation registration. Multipart request bodies are outside this request-model comparison. Existing lifecycle and list response validation is unchanged; this rule does not add HTTP status or content-variant selection.
 
 :::note
 ARM RPC rule: [`RPC-008`](https://armwiki.azurewebsites.net/api_contracts/guidelines/rpc.html)

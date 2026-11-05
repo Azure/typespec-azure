@@ -46,6 +46,119 @@ it.each([
 });
 
 describe("registered resource PUT requests", () => {
+  const legacyOperations = `
+    @armResourceOperations interface LegacyOps extends Azure.ResourceManager.Legacy.LegacyOperations<
+      {...ApiVersionParameter, ...SubscriptionIdParameter, ...ResourceGroupParameter, ...Azure.ResourceManager.Legacy.Provider},
+      {@path @segment("widgets") @key widgetName: string;}
+    > {}
+  `;
+
+  it("checks legacy PUT aliases even when their list-map names collide", async () => {
+    await tester
+      .expect(
+        `${models}
+        ${legacyOperations}
+        model Input { value?: string; }
+        @route("/first") @armResourceOperations interface First {
+          create is LegacyOps.CreateOrUpdateAsync<Widget, Request = Input>;
+        }
+        @route("/second") @armResourceOperations interface Second {
+          create is LegacyOps.CreateOrUpdateSync<Widget, Request = Input>;
+        }
+      `,
+      )
+      .toEmitDiagnostics([
+        requestDiagnostic("Microsoft.Test.Input"),
+        requestDiagnostic("Microsoft.Test.Input"),
+      ]);
+  });
+
+  it("checks a PUT overwritten by another lifecycle registration", async () => {
+    await tester
+      .expect(
+        t.code`${models}
+        model Input { value?: string; }
+        @route("/first") @armResourceOperations interface First {
+          @put @armResourceCreateOrUpdate(Widget)
+          ${t.op("create")}(...ResourceInstanceParameters<Widget>, @bodyRoot body: Input): ArmResponse<Widget>;
+        }
+        @route("/second") @armResourceOperations interface Second {
+          create is ArmResourceCreateOrReplaceSync<Widget>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ create }) => [
+        {
+          ...requestDiagnostic("Microsoft.Test.Input"),
+          pos: getSourceLocation(create).pos,
+          end: getSourceLocation(create).end,
+        },
+      ]);
+  });
+
+  it("reports once for duplicate registrations of the same resource operation", async () => {
+    await tester
+      .expect(
+        `${models}
+        model Input { value?: string; }
+        @armResourceOperations interface Widgets {
+          @put @armResourceCreateOrUpdate(Widget) @armResourceCreateOrUpdate(Widget)
+          create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Input): ArmResponse<Widget>;
+        }
+      `,
+      )
+      .toEmitDiagnostics([requestDiagnostic("Microsoft.Test.Input")]);
+  });
+
+  it("accepts a legacy PUT using its canonical resource", async () => {
+    await tester
+      .expect(
+        `${models}
+        ${legacyOperations}
+        @armResourceOperations interface Widgets {
+          create is LegacyOps.CreateOrUpdateAsync<Widget>;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("preserves suppression on a newly checked legacy PUT", async () => {
+    await Tester.compile(
+      `${models}
+        ${legacyOperations}
+        model Input { value?: string; }
+        @armResourceOperations interface Widgets {
+          #suppress "${code}" "Existing API uses a separate request model."
+          create is LegacyOps.CreateOrUpdateAsync<Widget, Request = Input>;
+        }
+      `,
+      { compilerOptions: { linterRuleSet: { enable: { [code]: true } } } },
+    );
+  });
+
+  it("does not compare PUT action inputs with the parent resource", async () => {
+    await tester
+      .expect(
+        `${models}
+        @armResourceOperations interface Widgets {
+          @put @armResourceAction(Widget)
+          associate(...ResourceInstanceParameters<Widget>, @bodyRoot body: Other): ArmResponse<Widget>;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    "@post @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Other): ArmResponse<Widget>;",
+    "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @multipartBody body: { part: HttpPart<Other> }): ArmResponse<Widget>;",
+  ])("preserves non-PUT and multipart exclusions: %s", async (operation) => {
+    await tester
+      .expect(`${models} @armResourceOperations interface Widgets { ${operation} }`)
+      .toBeValid();
+  });
+
   it.each(["TrackedResource", "ProxyResource"])(
     "accepts standard %s PUT templates",
     async (base) => {

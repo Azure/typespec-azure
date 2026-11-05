@@ -12,9 +12,13 @@ import {
   isVoidType,
   paramMessage,
 } from "@typespec/compiler";
-import { createMetadataInfo, resolveRequestVisibility } from "@typespec/http";
+import { createMetadataInfo, getHttpOperation, resolveRequestVisibility } from "@typespec/http";
 
-import { type ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
+import {
+  type ArmLifecycleOperationKind,
+  getArmResourceOperationList,
+  resolveResourceOperations,
+} from "../operations.js";
 import { getArmResource } from "../resource.js";
 import { isInternalTypeSpec } from "./utils.js";
 
@@ -38,12 +42,18 @@ export const armResourceOperationsRule = createRule({
           const armResource = getArmResource(context.program, model);
           if (armResource) {
             const resourceOperations = resolveResourceOperations(context.program, model);
-            const createOperation = resourceOperations.lifecycle.createOrUpdate;
-            if (
-              createOperation?.httpOperation.verb === "put" &&
-              !isInternalTypeSpec(context.program, createOperation.operation)
-            ) {
-              const { httpOperation, operation } = createOperation;
+            const checkedOperations = new Set<Operation>();
+            for (const { kind, operation } of getArmResourceOperationList(context.program, model)) {
+              if (
+                kind !== "createOrUpdate" ||
+                isInternalTypeSpec(context.program, operation) ||
+                checkedOperations.has(operation)
+              ) {
+                continue;
+              }
+              checkedOperations.add(operation);
+              const [httpOperation] = getHttpOperation(context.program, operation);
+              if (httpOperation.verb !== "put") continue;
               const body = httpOperation.parameters.body;
               if (body === undefined || isVoidType(body.type)) {
                 context.reportDiagnostic({ target: operation, messageId: "missingRequest" });
