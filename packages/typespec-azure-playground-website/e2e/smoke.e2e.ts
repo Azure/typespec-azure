@@ -6,33 +6,64 @@ const csharpEmitters = [
   "@azure-typespec/http-client-csharp-mgmt",
   "@azure-typespec/http-client-csharp-provisioning",
 ];
+const server = "https://csharp-playground-server.azurewebsites.net";
+const storage = "https://typespec.blob.core.windows.net/pkgs";
+const generators = csharpEmitters.map((packageName, index) => ({
+  packageName,
+  packageVersion: `1.0.${index}`,
+  generatorName: ["AzureClientGenerator", "ManagementClientGenerator", "ProvisioningGenerator"][
+    index
+  ],
+}));
 
 test.beforeEach(async ({ page }) => {
-  for (const name of csharpEmitters) {
-    await page.route(`https://typespec.blob.core.windows.net/pkgs/${name}/latest.json`, (route) =>
+  await page.route(`${server}/generators`, (route) =>
+    route.fulfill({
+      headers: { "access-control-allow-origin": "*" },
+      json: { generators },
+    }),
+  );
+  for (const { packageName, packageVersion } of generators) {
+    const base = `${storage}/${packageName}/${packageVersion}`;
+    await page.route(`${base}/import-map.json`, (route) =>
       route.fulfill({
         headers: { "access-control-allow-origin": "*" },
-        json: { imports: { [name]: `${host}/test-emitters/${name}.js` } },
+        json: {
+          version: packageVersion,
+          imports: {
+            [packageName]: `${base}/index.js`,
+            "@typespec/http-client": `${base}/peer.js`,
+          },
+        },
+      }),
+    );
+    await page.route(`${base}/peer.js`, (route) =>
+      route.fulfill({
+        headers: { "access-control-allow-origin": "*" },
+        contentType: "application/javascript",
+        body: `export const runtimeVersion = ${JSON.stringify(packageVersion)};`,
       }),
     );
   }
 });
 
-test("loads Azure C# emitters on demand from their standalone import maps", async ({ page }) => {
+test("loads Azure C# emitters on demand at each server's package version", async ({ page }) => {
   const loadedEmitters: string[] = [];
-  for (const name of csharpEmitters) {
-    await page.route(`${host}/test-emitters/${name}.js`, (route) => {
+  for (const { packageName: name, packageVersion } of generators) {
+    await page.route(`${storage}/${name}/${packageVersion}/index.js`, (route) => {
       loadedEmitters.push(name);
       return route.fulfill({
+        headers: { "access-control-allow-origin": "*" },
         contentType: "application/javascript",
         body: `
+            import { runtimeVersion } from "@typespec/http-client";
             export const $lib = { name: ${JSON.stringify(name)}, emitter: {} };
             const $onEmit = async ({ program, emitterOutputDir }) => {
-              await program.host.writeFile(emitterOutputDir + "/Widget.cs", "public class Widget {}");
+              await program.host.writeFile(emitterOutputDir + "/Widget.cs", "// " + runtimeVersion + "\\npublic class Widget {}");
             };
             export const _TypeSpecLibrary_ = {
               typespecSourceFiles: {
-                "package.json": ${JSON.stringify(JSON.stringify({ name, version: "1.0.0", main: "index.js" }))},
+                "package.json": ${JSON.stringify(JSON.stringify({ name, version: packageVersion, main: "index.js" }))},
               },
               jsSourceFiles: { "index.js": { $lib, $onEmit } },
             };
@@ -45,7 +76,7 @@ test("loads Azure C# emitters on demand from their standalone import maps", asyn
   await page.waitForFunction(() => (window as any).host !== undefined);
   expect(loadedEmitters).toEqual([]);
 
-  for (const name of csharpEmitters) {
+  for (const { packageName: name, packageVersion } of generators) {
     const output = await page.evaluate(async (emitter) => {
       const { host: browserHost, compiler } = window as any;
       await browserHost.loadLibrary(emitter);
@@ -60,9 +91,38 @@ test("loads Azure C# emitters on demand from their standalone import maps", asyn
       return (await browserHost.readFile(`/test/csharp-output/${emitter}/Widget.cs`)).text;
     }, name);
     expect(output).toContain("public class Widget");
+    expect(output).toContain(`// ${packageVersion}`);
   }
   expect(loadedEmitters).toEqual(csharpEmitters);
 });
+
+for (const failure of ["catalog", "browser map"]) {
+  test(`keeps existing emitters usable when the C# ${failure} is unavailable`, async ({ page }) => {
+    await page.route(
+      failure === "catalog"
+        ? `${server}/generators`
+        : `${storage}/${generators[0].packageName}/${generators[0].packageVersion}/import-map.json`,
+      (route) =>
+        route.fulfill({ status: 503, headers: { "access-control-allow-origin": "*" }, body: "" }),
+    );
+    await page.goto(host);
+    await expect(
+      page.getByText("Azure C# emitters are unavailable", { exact: false }),
+    ).toBeVisible();
+    await page.waitForFunction(() => (window as any).host !== undefined);
+    expect(
+      await page.evaluate(async () => {
+        const { host: browserHost, compiler } = window as any;
+        await browserHost.writeFile(
+          "/test/existing.tsp",
+          'import "@typespec/http"; model Widget {}',
+        );
+        const program = await compiler.compile(browserHost, "/test/existing.tsp", {});
+        return program.hasError();
+      }),
+    ).toBe(false);
+  });
+}
 
 test.describe("typespec-azure-playground-website UI tests", () => {
   test.skip(process.platform === "win32", "https://github.com/microsoft/typespec/issues/1223");
