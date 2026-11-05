@@ -38,8 +38,8 @@ model DecoratorOptions {
  * Emitters should keep these values current after each poll. Metadata is not part of the
  * continuation token; after rehydration, the next poll populates it again.
  *
- * Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
- * are diagnosed once at declaration time.
+ * Multiple declarations use the standard TCGC scope rules, including overlapping scopes.
+ * Each selected property appears only once in the metadata collection.
  *
  * @param target The status-monitor model property.
  * @param scope Specifies the target language emitters.
