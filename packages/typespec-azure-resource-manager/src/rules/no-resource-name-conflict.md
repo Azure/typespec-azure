@@ -3,8 +3,7 @@ the `resourceName` values returned by `resolveArmResources`, not the `name` prop
 instance or its ARM resource type.
 
 The same model can describe several resource occurrences at different scopes or paths. Give each
-occurrence a unique name when instantiating its operations. Renaming only the operation interface
-does not set its resource metadata name.
+occurrence a unique name when instantiating its operations.
 
 ## Incorrect
 
@@ -40,12 +39,9 @@ namespace ScaleSetVmScope {
   model Target is ScaleSetVm;
 }
 
-interface EmployeeOperations<
-  Scope extends Azure.ResourceManager.Foundations.SimpleResource,
-  ResourceName extends valueof string = ""
-> {
-  get is Extension.Read<Scope, Employee, OverrideResourceName = ResourceName>;
-  list is Extension.ListByTarget<Scope, Employee, OverrideResourceName = ResourceName>;
+interface EmployeeOperations<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+  list is Extension.ListByTarget<Scope, Employee>;
 }
 
 @armResourceOperations
@@ -57,10 +53,19 @@ interface ScaleSetVmEmployees extends EmployeeOperations<ScaleSetVmScope.Target>
 
 ## Correct
 
-Keep the models and paths unchanged. Supply a distinct logical name for each concrete operations
-interface, and forward it to every operation through `OverrideResourceName`:
+Keep the models and paths unchanged. Add a `ResourceName` parameter to the shared operations
+template and forward it to every operation through `OverrideResourceName`. Supply a distinct
+logical name when instantiating each concrete operations interface:
 
 ```typespec
+interface EmployeeOperations<
+  Scope extends Azure.ResourceManager.Foundations.SimpleResource,
+  ResourceName extends valueof string
+> {
+  get is Extension.Read<Scope, Employee, OverrideResourceName = ResourceName>;
+  list is Extension.ListByTarget<Scope, Employee, OverrideResourceName = ResourceName>;
+}
+
 @armResourceOperations
 interface VmEmployees extends EmployeeOperations<Vm.Target, "VmEmployee"> {}
 
@@ -69,16 +74,8 @@ interface ScaleSetVmEmployees
   extends EmployeeOperations<ScaleSetVmScope.Target, "ScaleSetVmEmployee"> {}
 ```
 
-For the original alias-only pattern, `ExternalResource` and `ExternalChildResource` have different
-model names, so identical terminal path segments alone do not cause a modern extension-name
-collision. Legacy path-derived defaults can collide on those segments. Always check the resolved
-logical names rather than assuming that alias names or paths uniquely name the metadata.
-
 For standard resource operations, specific extensions, legacy templates, and resources at different
 scopes, see [Authoring resource metadata](../../../howtos/ARM/resource-metadata.md).
-
-The rule uses the program's declaration view, including versioned declarations, and compares names
-exactly. Synthetic external parents without resource operations are excluded.
 
 ## Impact
 
