@@ -45,6 +45,86 @@ it.each([
     .toEmitDiagnostics([responseDiagnostic]);
 });
 
+it.each([
+  "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Unregistered>;",
+  "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Unregistered>;",
+  "@get @armResourceList(Widget) list(...Foundations.SubscriptionScope<Widget>): ArmResponse<ResourceListResult<Unregistered>>;",
+])("rejects an unrelated unregistered success body: %s", async (operation) => {
+  await tester
+    .expect(
+      `${models}
+      model Unregistered { properties?: { state?: string; }; }
+      @armResourceOperations interface Widgets { ${operation} }
+    `,
+    )
+    .toEmitDiagnostics([responseDiagnostic]);
+});
+
+it("accepts a discriminated resource subtype as its base resource response", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace namespace Microsoft.Test;
+      @discriminator("kind")
+      model Widget is ProxyResource<{}> {
+        ...ResourceNameParameter<Widget>;
+        kind: string;
+      }
+      model Variant extends Widget { kind: "variant"; }
+      @armResourceOperations interface Widgets {
+        @get @armResourceRead(Widget)
+        read(...ResourceInstanceParameters<Widget>): ArmResponse<Variant>;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
+it("does not accept an unrelated subtype without a discriminator", async () => {
+  await tester
+    .expect(
+      `${models}
+      model Variant extends Widget { extra?: string; }
+      @armResourceOperations interface Widgets {
+        @get @armResourceRead(Widget)
+        read(...ResourceInstanceParameters<Widget>): ArmResponse<Variant>;
+      }
+    `,
+    )
+    .toEmitDiagnostics([responseDiagnostic]);
+});
+
+it("ignores non-success response bodies", async () => {
+  await tester
+    .expect(
+      `${models}
+      model Failure { @statusCode status: 409; @bodyRoot body: { message: string; }; }
+      @armResourceOperations interface Widgets {
+        @get @armResourceRead(Widget)
+        read(...ResourceInstanceParameters<Widget>): ArmResponse<Widget> | Failure;
+      }
+    `,
+    )
+    .toBeValid();
+});
+
+it("checks response aliases overwritten by another lifecycle registration", async () => {
+  await tester
+    .expect(
+      `${models}
+      model Result { value?: string; }
+      @route("/first") @armResourceOperations interface First {
+        @put @armResourceCreateOrUpdate(Widget)
+        create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Result>;
+      }
+      @route("/second") @armResourceOperations interface Second {
+        create is ArmResourceCreateOrReplaceSync<Widget>;
+      }
+    `,
+    )
+    .toEmitDiagnostics([responseDiagnostic]);
+});
+
 describe("registered resource PUT requests", () => {
   const legacyOperations = `
     @armResourceOperations interface LegacyOps extends Azure.ResourceManager.Legacy.LegacyOperations<

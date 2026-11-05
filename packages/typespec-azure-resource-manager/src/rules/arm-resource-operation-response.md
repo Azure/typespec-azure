@@ -2,7 +2,9 @@ Operations on a resource such as read, create, update, and list must all return 
 
 Registered resource create-or-update operations using PUT must also have a request body whose effective payload type is the registered resource model. Use `ArmResourceCreateOrReplaceSync<Resource>` rather than overriding its request model. Request visibility is respected when resolving implicit bodies; aliases of the resource are accepted, but separately declared input models are not.
 
-The PUT request check covers all registered create-or-update operations, including legacy templates and multiple aliases for the same resource. It does not independently scan custom HTTP PUT operations or require arbitrary payload models to be registered. `use-operation-decorator` checks operation registration. Multipart request bodies are outside this request-model comparison. Existing lifecycle and list response validation is unchanged; this rule does not add HTTP status or content-variant selection.
+The PUT request check covers all registered create-or-update operations, including legacy templates and multiple aliases for the same resource. It does not independently scan custom HTTP PUT operations or require arbitrary request models to be registered. `use-operation-decorator` checks operation registration. Multipart request bodies are outside this request-model comparison.
+
+Response validation covers every registered lifecycle/list alias and resolves HTTP success payloads, not the response wrapper types. A separately declared, unregistered response model does not escape comparison with the registered resource. Paged list responses compare their item type, and discriminated base/derived resource responses are accepted. Bodyless and non-success responses are not resource-schema comparisons; their status/body requirements are checked by other rules.
 
 :::note
 ARM RPC rule: [`RPC-008`](https://armwiki.azurewebsites.net/api_contracts/guidelines/rpc.html)
@@ -20,9 +22,9 @@ This rule corresponds to the LintDiff rule [PutGetPatchResponseSchema](https://g
 
 ### Consolidated PUT coverage
 
-The PUT request check addresses the resource-reuse intent of [PutRequestResponseSchemeArm](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-request-response-scheme-arm.md) through the registered resource model. Existing response validation and operation-registration rules provide complementary coverage for [ConsistentResponseSchemaForPut](https://github.com/Azure/azure-openapi-validator/blob/main/docs/consistent-response-schema-for-put.md) and [XmsResourceInPutResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-resource-in-put-response.md).
+The PUT request check addresses the resource-reuse intent of [PutRequestResponseSchemeArm](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-request-response-scheme-arm.md) through the registered resource model. Response validation provides complementary canonical-resource consistency; Azure Core `response-schema-problem` owns comparisons of different success-status response schemas. The separate `arm-put-response-resource` rule addresses the resource-marker policy of [XmsResourceInPutResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-resource-in-put-response.md).
 
-This is not equivalent to running those Swagger checks on every HTTP PUT. It does not compare arbitrary 200/201 schemas, validate the `x-ms-azure-resource` extension, or establish that every response body is registered.
+This is not equivalent to running those Swagger checks on every HTTP PUT. This rule does not compare arbitrary 200/201 schemas or validate the `x-ms-azure-resource` extension, and it depends on correct canonical operation associations.
 
 ## ❌ Incorrect
 
