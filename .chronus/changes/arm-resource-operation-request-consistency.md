@@ -2,6 +2,7 @@
 changeKind: feature
 packages:
   - "@azure-tools/typespec-azure-resource-manager"
+  - "@azure-tools/typespec-azure-rulesets"
 ---
 
 Extend `arm-resource-operation-response` to require a request body matching the registered resource model for all registered PUT create-or-update operations, including legacy templates and multiple aliases. Respect request visibility and validate actual HTTP success payloads, including unregistered response models, against the canonical resource while accepting paged items and discriminated resource variants.
