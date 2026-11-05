@@ -240,8 +240,3 @@ allowBuilds:
   tree-sitter-javascript: false
   tree-sitter-python: false
   tree-sitter-typescript: false
-
-# Stable Python wheels are present in npm but missing from the playground blob feed.
-# Keep browser generation on the same pinned package version using its npm CDN asset.
-patchedDependencies:
-  "@typespec/http-client-python@0.39.0": patches/@typespec__http-client-python@0.39.0.patch
