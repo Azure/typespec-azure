@@ -49,8 +49,7 @@ export const defaultInEnumRule = createRule({
             break;
           case "EnumValue":
             matches = members.some(
-              (member) =>
-                member.value === (defaultValue.value.value ?? defaultValue.value.name),
+              (member) => member.value === (defaultValue.value.value ?? defaultValue.value.name),
             );
             break;
           default:

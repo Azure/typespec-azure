@@ -7,11 +7,7 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   const runner = await Tester.createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    defaultInEnumRule,
-    "@azure-tools/typespec-azure-core",
-  );
+  tester = createLinterRuleTester(runner, defaultInEnumRule, "@azure-tools/typespec-azure-core");
 });
 
 describe("extensible enum defaults", () => {
@@ -40,22 +36,27 @@ describe("extensible enum defaults", () => {
 
   it("compares values rather than variant names", async () => {
     await tester
-      .expect(`
+      .expect(
+        `
         union PetKind { Cat: "cat", Dog: "dog", string }
         model Pet { kind: PetKind = "Cat"; }
-      `)
+      `,
+      )
       .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
     await tester
-      .expect(`
+      .expect(
+        `
         union PetKind { Cat: "cat", Dog: "dog", string }
         model Pet { kind: PetKind = PetKind.Cat; }
-      `)
+      `,
+      )
       .toBeValid();
   });
 
   it("includes values from nested unions and enums", async () => {
     await tester
-      .expect(`
+      .expect(
+        `
         enum LegacyKind { Cat: "cat" }
         union KnownKind { LegacyKind, Dog: "dog" }
         union PetKind { KnownKind, string }
@@ -63,49 +64,60 @@ describe("extensible enum defaults", () => {
           cat: PetKind = LegacyKind.Cat;
           dog: PetKind = "dog";
         }
-      `)
+      `,
+      )
       .toBeValid();
     await tester
-      .expect(`
+      .expect(
+        `
         enum LegacyKind { Cat: "cat" }
         union PetKind { LegacyKind, string }
         model Pet { kind: PetKind = "bird"; }
-      `)
+      `,
+      )
       .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
   });
 
-  it("compares numeric literals without losing precision or their sign", async () => {
+  it("preserves the numeric precision exposed by the compiler", async () => {
     await tester
-      .expect(`
+      .expect(
+        `
         union Count { Known: 9007199254740993, int64 }
         model Settings { count: Count = 9007199254740993; }
-      `)
+      `,
+      )
       .toBeValid();
     await tester
-      .expect(`
+      .expect(
+        `
         union Count { Known: 9007199254740993, int64 }
-        model Settings { count: Count = 9007199254740992; }
-      `)
+        model Settings { count: Count = 9007199254740994; }
+      `,
+      )
       .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
   });
 
   it("recognizes numeric values included from enums", async () => {
     await tester
-      .expect(`
+      .expect(
+        `
         enum KnownCount { Zero: 0, One: 1 }
         union Count { KnownCount, int32 }
         model Settings {
           literal: Count = 0;
           member: Count = KnownCount.Zero;
         }
-      `)
+      `,
+      )
       .toBeValid();
     await tester
-      .expect(`
+      .expect(
+        `
         enum KnownCount { Zero: 0, One: 1 }
         union Count { KnownCount, int32 }
         model Settings { count: Count = 2; }
-      `)
+      `,
+      )
       .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
   });
 
@@ -119,33 +131,35 @@ describe("extensible enum defaults", () => {
 describe("other defaults", () => {
   it("does not constrain scalars or unions without declared enum values", async () => {
     await tester
-      .expect(`
+      .expect(
+        `
         model Settings {
           name: string = "other";
           count: int32 = 0;
           enabled: boolean = false;
           value: string | int32 = "other";
         }
-      `)
+      `,
+      )
       .toBeValid();
   });
 
   it("accepts omitted defaults and compiler-checked closed enum defaults", async () => {
     await tester
-      .expect(`
+      .expect(
+        `
         enum Kind { Cat: "cat", Dog: "dog" }
         model Pet {
           unspecified: "cat" | "dog" | string;
           closedUnion: "cat" | "dog" = "cat";
           closedEnum: Kind = Kind.Cat;
         }
-      `)
+      `,
+      )
       .toBeValid();
   });
 
   it("accepts an explicitly nullable default", async () => {
-    await tester
-      .expect(`model Pet { kind: "cat" | "dog" | string | null = null; }`)
-      .toBeValid();
+    await tester.expect(`model Pet { kind: "cat" | "dog" | string | null = null; }`).toBeValid();
   });
 });
