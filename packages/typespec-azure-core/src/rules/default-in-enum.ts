@@ -1,11 +1,12 @@
 import {
-  type ModelProperty,
-  Numeric,
   createRule,
   fileRef,
   ignoreDiagnostics,
+  type ModelProperty,
+  Numeric,
+  type Union,
 } from "@typespec/compiler";
-import { getUnionAsEnum } from "../helpers/union-enums.js";
+import { getUnionAsEnum, type UnionEnumVariant } from "../helpers/union-enums.js";
 
 export const defaultInEnumRule = createRule({
   name: "default-in-enum",
@@ -29,7 +30,7 @@ export const defaultInEnumRule = createRule({
           return;
         }
 
-        const members = [...enumType.flattenedMembers.values()];
+        const members = [...getDeclaredMembers(property.type)];
         let matches: boolean;
         switch (defaultValue.valueKind) {
           case "StringValue":
@@ -46,6 +47,7 @@ export const defaultInEnumRule = createRule({
                     : undefined;
               return value?.toString() === defaultValue.value.toString();
             });
+
             break;
           case "EnumValue":
             matches = members.some(
@@ -63,3 +65,22 @@ export const defaultInEnumRule = createRule({
     };
   },
 });
+
+function* getDeclaredMembers(union: Union): Generator<UnionEnumVariant<string | number>> {
+  for (const variant of union.variants.values()) {
+    switch (variant.type.kind) {
+      case "String":
+      case "Number":
+        yield { value: variant.type.value, type: variant };
+        break;
+      case "Union":
+        yield* getDeclaredMembers(variant.type);
+        break;
+      case "Enum":
+        for (const member of variant.type.members.values()) {
+          yield { value: member.value ?? member.name, type: member };
+        }
+        break;
+    }
+  }
+}

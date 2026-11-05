@@ -78,6 +78,21 @@ describe("extensible enum defaults", () => {
       .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
   });
 
+  it.each([
+    [`union Known { Cat: "cat" } union Kind { Known, Cat: "kitten", string }`, `"cat"`],
+    [
+      `union First { Value: "first" } union Second { Value: "second" } union Kind { First, Second, string }`,
+      `"first"`,
+    ],
+    [
+      `enum First { Value: "first" } enum Second { Value: "second" } union Kind { First, Second, string }`,
+      `"first"`,
+    ],
+    [`union Known { Value: 1 } union Kind { Known, Value: 2, int32 }`, `1`],
+  ])("retains declared defaults when included members reuse names: %s", async (types, value) => {
+    await tester.expect(`${types} model Settings { value: Kind = ${value}; }`).toBeValid();
+  });
+
   it("preserves the numeric precision exposed by the compiler", async () => {
     await tester
       .expect(
