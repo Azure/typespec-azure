@@ -39,7 +39,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
   docs: fileRef.fromPackageRoot("src/rules/no-unsafe-patch-body-properties.md"),
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-unsafe-patch-body-properties",
   description:
-    "ARM PATCH input must be a partial resource shape without writable immutable properties or defaults.",
+    "ARM PATCH request bodies should use partial resource shapes with optional fields, no immutable properties, and no defaults.",
   severity: "warning",
   messages: {
     missing: paramMessage`The property '${"propertyName"}' in the request body either does not appear in the resource model or is nested at the wrong level.`,
