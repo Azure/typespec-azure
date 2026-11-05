@@ -18,6 +18,11 @@
   },
   "type": "module",
   "main": "dist/src/index.js",
+  "browser": {
+    "./dist/src/emitter.js": "./dist/browser/emitter.js",
+    "assert": "./dist/browser/assert.js",
+    "child_process": false
+  },
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -32,6 +37,7 @@
     "build": "pnpm build:emitter && pnpm build:generator",
     "build:emitter": "node ./eng/scripts/copy-sources.ts && tsc -p .",
     "build:generator": "node ./eng/scripts/build-generator.ts",
+    "build:wasm": "pnpm build && node ./eng/scripts/build-wasm.ts",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
     "regenerate": "node ./eng/scripts/generate.ts",
