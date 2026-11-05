@@ -216,7 +216,7 @@ model Widget is TrackedResource<WidgetProperties> {
 }
 
 model WidgetPatchProperties {
-  /*target*/label?: string;
+  /*target*/displayName?: int32;
 }
 
 model WidgetPatch {
@@ -279,9 +279,9 @@ interface Widgets {
 
     it("diagnoses the incorrect ARM template fixture", async () => {
       await fixtureTester.expect(examples[0]).toEmitDiagnostics(({ pos }) => ({
-        ...missingProperty("label"),
+        ...incompatibleProperty("displayName"),
         pos: pos.target.pos,
-        end: pos.target.pos + "label?: string".length,
+        end: pos.target.pos + "displayName?: int32".length,
       }));
     });
 
@@ -766,6 +766,276 @@ interface Widgets {
       .toBeValid();
   });
 
+  describe("property contracts", () => {
+    it.each([
+      ["string", "int32"],
+      ["string[]", "int32[]"],
+      ["Record<string>", "Record<int32>"],
+    ])("rejects PUT %s with PATCH %s", async (put, patch) => {
+      await tester
+        .expect(
+          bodyPair(`
+          model PutBody { value?: ${put}; }
+          model PatchBody { /*target*/value?: ${patch}; }
+        `),
+        )
+        .toEmitDiagnostics(({ pos }) => ({
+          ...incompatibleProperty("value"),
+          pos: pos.target.pos,
+          end: pos.target.pos + `value?: ${patch}`.length,
+        }));
+    });
+
+    it.each([
+      ["@maxLength(256)", "string"],
+      ["@minLength(1)", "string"],
+      ["@maxItems(3)", "string[]"],
+      ["@minItems(1)", "string[]"],
+      ["@minValue(300)", "int32"],
+      ["@maxValue(28800)", "int32"],
+      ["@minValueExclusive(0)", "int32"],
+      ["@maxValueExclusive(10)", "int32"],
+    ])("rejects an omitted PUT constraint %s", async (constraint, type) => {
+      await tester
+        .expect(
+          bodyPair(`
+          model PutBody { ${constraint} value?: ${type}; }
+          model PatchBody { value?: ${type}; }
+        `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it("accepts narrower bounds, literals and different scalar names", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        @maxLength(256) scalar PutText extends string;
+        @maxLength(128) scalar PatchText extends string;
+        model PutBody {
+          text?: PutText;
+          @maxLength(10) literal?: string;
+          @minValue(0) @maxValue(1000) number?: int32;
+          @minValueExclusive(0) exclusive?: int32;
+          @maxItems(3) items?: string[];
+        }
+        model PatchBody {
+          @doc("An update") text?: PatchText = "default";
+          literal?: "short";
+          @minValue(0) number?: uint8;
+          @minValue(1) exclusive?: int32;
+          @maxItems(2) items?: string[];
+        }
+      `),
+        )
+        .toBeValid();
+    });
+
+    it("compares signed bounds without equating opposite values", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { @minValue(1) value?: int32; }
+        model PatchBody { @minValue(-1) value?: int32; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it("compares enum wire values rather than enum identities", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        enum PutChoice { first: "one", second: "two" }
+        enum PatchChoice { otherName: "one" }
+        model PutBody { value?: PutChoice; }
+        model PatchBody { value?: PatchChoice; }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        enum PutChoice { first: "one" }
+        enum PatchChoice { first: "one", extra: "two" }
+        model PutBody { value?: PutChoice; }
+        model PatchBody { value?: PatchChoice; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it("compares encoded scalar representations", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { value?: string; }
+        model PatchBody { @encode(string) value?: int64; }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { value?: int64; }
+        model PatchBody { @encode(string) value?: int64; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it("preserves encoding semantics and recognizes default JSON encodings", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { value?: utcDateTime; data?: bytes; }
+        model PatchBody {
+          @encode("rfc3339") value?: utcDateTime;
+          @encode("base64") data?: bytes;
+        }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { @encode("rfc3339") value?: utcDateTime; }
+        model PatchBody { @encode("rfc7231") value?: utcDateTime; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it.each(["Record", "Array"])("compares inherited %s indexers", async (collection) => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutValues extends ${collection}<string> {}
+        model PatchValues extends ${collection}<int32> {}
+        model PutBody { value?: PutValues; }
+        model PatchBody { value?: PatchValues; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+      await tester
+        .expect(
+          bodyPair(`
+        model PutValues extends ${collection}<string> {}
+        model PatchValues extends ${collection}<"narrower"> {}
+        model PutBody { value?: PutValues; }
+        model PatchBody { value?: PatchValues; }
+      `),
+        )
+        .toBeValid();
+    });
+
+    it("checks property constraints at recursive collection boundaries", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutNode { @maxItems(1) children?: PutNode[]; value?: string; }
+        model PatchNode { children?: PatchNode[]; value?: string; }
+        model PutBody { items?: Record<PutNode[]>; }
+        model PatchBody { items?: Record<PatchNode[]>; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("items"));
+    });
+
+    it("accepts equivalent inclusive and exclusive integer bounds", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { @minValue(1) @maxValueExclusive(11) value?: int64; }
+        model PatchBody { @minValueExclusive(0) @maxValue(10) value?: int64; }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { @minValue(1) value?: float64; }
+        model PatchBody { @minValueExclusive(0) value?: float64; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it("accepts partial collection objects with compatible writable properties", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutItem { common: string; required: int32; }
+        model PatchItem { common?: string; }
+        model PutBody { items?: PutItem[]; values?: Record<PutItem>; }
+        model PatchBody { items?: PatchItem[]; values?: Record<PatchItem>; }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        model PutItem { common: string; }
+        model PatchItem { common?: int32; }
+        model PutBody { items?: PutItem[]; }
+        model PatchBody { items?: PatchItem[]; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("items"));
+    });
+
+    it("allows property and dictionary resets but not null array elements", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { value?: string; tags?: Record<string>; }
+        model PatchBody { value?: string | null; tags?: Record<string | null>; }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { items?: string[]; }
+        model PatchBody { items?: (string | null)[]; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("items"));
+    });
+
+    it("requires a compatible candidate rather than the first same-name PUT leaf", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { first?: { value?: int32; }; second?: { value?: string; }; }
+        model PatchBody { value?: string; }
+      `),
+        )
+        .toBeValid();
+      await tester
+        .expect(
+          bodyPair(`
+        model PutBody { first?: { value?: int32; }; second?: { value?: boolean; }; }
+        model PatchBody { value?: string; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("value"));
+    });
+
+    it("terminates recursive collection contracts without skipping incompatible siblings", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+        model PutItem { children?: PutItem[]; value?: string; }
+        model PatchItem { children?: PatchItem[]; value?: int32; }
+        model PutBody { items?: PutItem[]; }
+        model PatchBody { items?: PatchItem[]; }
+      `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("items"));
+    });
+  });
+
   it("preserves fallback behavior for non-ARM payload shapes", async () => {
     await tester
       .expect(
@@ -876,6 +1146,13 @@ interface Widgets {
     return {
       code,
       message: `The property '${property}' in the PATCH body does not correspond to a property in the PUT body.`,
+    };
+  }
+
+  function incompatibleProperty(property: string) {
+    return {
+      code,
+      message: `The property '${property}' in the PATCH body must have a type and constraints compatible with its corresponding PUT property.`,
     };
   }
 

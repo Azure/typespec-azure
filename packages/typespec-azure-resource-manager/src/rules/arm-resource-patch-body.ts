@@ -7,6 +7,7 @@ import {
   type DiagnosticTarget,
   type LinterRuleContext,
   type Model,
+  type ModelProperty,
   type Program,
   type Type,
 } from "@typespec/compiler";
@@ -19,12 +20,14 @@ import {
   type HttpOperation,
   type MetadataInfo,
 } from "@typespec/http";
+import { createPatchPropertyCompatibility } from "./arm-resource-patch-compatibility.js";
 import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
 export const patchBodyMessages = {
   missingPatchBody: "The PATCH operation must have a request body.",
   emptyPatchBody: "The PATCH request body must contain at least one property.",
   missingProperty: paramMessage`The property '${"propertyName"}' in the PATCH body does not correspond to a property in the PUT body.`,
+  incompatibleProperty: paramMessage`The property '${"propertyName"}' in the PATCH body must have a type and constraints compatible with its corresponding PUT property.`,
 };
 
 export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMessages>) {
@@ -78,28 +81,40 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
             continue;
           }
           const putBody = put.parameters.body?.type;
-          const putPropertyNames = new Set<string>();
+          const putProperties = new Map<string, LeafProperty[]>();
           if (putBody !== undefined && !isVoidType(putBody)) {
             if (put.parameters.body?.bodyKind !== "single" || !isObjectBody(putBody)) {
               continue;
             }
             for (const property of collectLeafProperties(program, putBody, put, metadataInfo)) {
-              putPropertyNames.add(property.jsonName);
+              const candidates = putProperties.get(property.jsonName) ?? [];
+              candidates.push(property);
+              putProperties.set(property.jsonName, candidates);
             }
           }
+          const compatible = createPatchPropertyCompatibility(program, metadataInfo, patch, put);
           for (const patchProperty of patchProperties) {
-            if (putPropertyNames.has(patchProperty.jsonName)) {
+            const candidates = putProperties.get(patchProperty.jsonName);
+            if (
+              candidates?.some(
+                (candidate) =>
+                  (patchProperty.recursive && candidate.recursive) ||
+                  compatible(patchProperty.property, candidate.property),
+              )
+            ) {
               continue;
             }
+            const messageId = candidates ? "incompatibleProperty" : "missingProperty";
+            const reportKey = `${messageId}:${patchProperty.jsonName}`;
             const reportedNames = missingProperties.get(patchProperty.target) ?? new Set();
-            if (reportedNames.has(patchProperty.jsonName)) {
+            if (reportedNames.has(reportKey)) {
               continue;
             }
-            reportedNames.add(patchProperty.jsonName);
+            reportedNames.add(reportKey);
             missingProperties.set(patchProperty.target, reportedNames);
             context.reportDiagnostic({
               target: patchProperty.target,
-              messageId: "missingProperty",
+              messageId,
               format: { propertyName: patchProperty.jsonName },
             });
           }
@@ -112,6 +127,8 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
 type LeafProperty = {
   jsonName: string;
   target: DiagnosticTarget;
+  property: ModelProperty;
+  recursive: boolean;
 };
 
 function collectLeafProperties(
@@ -182,13 +199,14 @@ function collectTypeLeaves(
   for (const [jsonName, property] of properties) {
     const target =
       getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
-    const nested = hasPayloadProperties(
+    const recurse = hasPayloadProperties(
       program,
       property.type,
       metadataInfo,
       visibility,
       inExplicitBody,
-    )
+    );
+    const nested = recurse
       ? collectTypeLeaves(
           program,
           property.type,
@@ -200,7 +218,7 @@ function collectTypeLeaves(
         )
       : [];
     if (nested.length === 0) {
-      leaves.push({ jsonName, target });
+      leaves.push({ jsonName, target, property, recursive: recurse });
     } else {
       leaves.push(...nested);
     }
