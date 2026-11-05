@@ -2,13 +2,18 @@ import {
   createRule,
   fileRef,
   getNamespaceFullName,
+  ignoreDiagnostics,
   paramMessage,
   type Operation,
   type Program,
 } from "@typespec/compiler";
-import { getOperationVerb } from "@typespec/http";
-import { getActionDetails, type ActionDetails } from "@typespec/rest";
-import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
+import { getHttpOperation } from "@typespec/http";
+import { getActionDetails, isAutoRoute, type ActionDetails } from "@typespec/rest";
+import {
+  isExcludedCoreType,
+  isTemplatedInterfaceOperation,
+  isTemplatedOperationSignature,
+} from "./utils.js";
 
 function getOperationName(operation: Operation): string {
   const parts: string[] = [];
@@ -20,10 +25,6 @@ function getOperationName(operation: Operation): string {
   }
   parts.push(operation.name);
   return parts.join(".");
-}
-
-function getImplicitActionName(operation: Operation): string {
-  return operation.name[0].toLowerCase() + operation.name.slice(1);
 }
 
 function getSourceAction(
@@ -43,12 +44,11 @@ function getSourceAction(
 
 export const useExplicitActionRule = createRule({
   name: "use-explicit-action",
-  description: "Use an explicit suffix for POST actions.",
+  description: "Preserve the action segment when reusing POST actions.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-explicit-action",
   docs: fileRef.fromPackageRoot("src/rules/use-explicit-action.md"),
   messages: {
-    default: paramMessage`POST action "${"operationName"}" should specify its action suffix with @action("${"actionName"}").`,
     changed: paramMessage`Reusing POST action "${"sourceOperationName"}" as "${"operationName"}" changes its suffix from "${"sourceSuffix"}" to "${"targetSuffix"}". Specify the intended suffix with @action("${"sourceSuffix"}").`,
   },
   create(context) {
@@ -57,50 +57,41 @@ export const useExplicitActionRule = createRule({
         if (
           isExcludedCoreType(context.program, operation) ||
           isTemplatedInterfaceOperation(operation) ||
-          getOperationVerb(context.program, operation) !== "post"
+          isTemplatedOperationSignature(operation) ||
+          !operation.sourceOperation ||
+          !isAutoRoute(context.program, operation)
         ) {
           return;
         }
 
         const action = getActionDetails(context.program, operation);
-        if (action?.kind === "specified") {
+        const sourceAction = getSourceAction(context.program, operation);
+        if (!action || !sourceAction || sourceAction.details.name === action.name) {
           return;
         }
 
-        const inheritedAction = getSourceAction(context.program, operation);
-        const sourceAction =
-          inheritedAction && getOperationVerb(context.program, inheritedAction.operation) === "post"
-            ? inheritedAction
-            : undefined;
-        if (sourceAction?.details.kind === "specified") {
+        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
+        const sourceHttpOperation = ignoreDiagnostics(
+          getHttpOperation(context.program, sourceAction.operation),
+        );
+        if (
+          httpOperation.verb !== "post" ||
+          sourceHttpOperation.verb !== "post" ||
+          httpOperation.path === sourceHttpOperation.path
+        ) {
           return;
         }
 
-        const targetSuffix = action?.name ?? getImplicitActionName(operation);
-        if (sourceAction && sourceAction.details.name !== targetSuffix) {
-          context.reportDiagnostic({
-            messageId: "changed",
-            format: {
-              sourceOperationName: getOperationName(sourceAction.operation),
-              operationName: getOperationName(operation),
-              sourceSuffix: sourceAction.details.name,
-              targetSuffix,
-            },
-            target: operation,
-          });
-          return;
-        }
-
-        if (action?.kind === "automatic" || sourceAction) {
-          context.reportDiagnostic({
-            messageId: "default",
-            format: {
-              operationName: getOperationName(operation),
-              actionName: targetSuffix,
-            },
-            target: operation,
-          });
-        }
+        context.reportDiagnostic({
+          messageId: "changed",
+          format: {
+            sourceOperationName: getOperationName(sourceAction.operation),
+            operationName: getOperationName(operation),
+            sourceSuffix: sourceAction.details.name,
+            targetSuffix: action.name,
+          },
+          target: operation,
+        });
       },
     };
   },
