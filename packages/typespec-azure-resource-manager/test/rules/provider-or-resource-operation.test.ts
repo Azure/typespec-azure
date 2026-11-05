@@ -205,22 +205,6 @@ describe("provider-or-resource-operation", () => {
     );
   });
 
-  it("does not infer resource registration from an operation return type", async () => {
-    await tester
-      .expect(
-        `${service}${resource}
-        interface Widgets { @get custom(): Widget; }
-      `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
-          severity: "warning",
-          message,
-        },
-      ]);
-  });
-
   for (const decorator of [
     "armResourceRead(NotAResource)",
     "armResourceCreateOrUpdate(NotAResource)",

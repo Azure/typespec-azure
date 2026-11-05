@@ -1,7 +1,5 @@
 import { getNamespaceFullName } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { expect, it } from "vitest";
 import {
   getArmResource,
@@ -19,25 +17,43 @@ const compilerOptions = {
   },
 };
 
-it("registers every resource operation in the private-links sample", async () => {
-  const source = await readFile(
-    resolve(
-      import.meta.dirname,
-      "..",
-      "..",
-      "..",
-      "samples",
-      "specs",
-      "resource-manager",
-      "resource-common-properties",
-      "private-links",
-      "main.tsp",
-    ),
-    "utf8",
+it("registers resource operations for private links and endpoint connections", async () => {
+  const { program } = await Tester.compile(
+    `
+      @armProviderNamespace
+      namespace Microsoft.PrivateLinkTest;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+      model TestTrackedResource is TrackedResource<TestTrackedProperties> {
+        ...ResourceNameParameter<TestTrackedResource>;
+      }
+      model TestTrackedProperties {
+        @visibility(Lifecycle.Read)
+        endpoints?: PrivateEndpoint[];
+      }
+      @armResourceOperations
+      interface TrackedOperations
+        extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {}
+
+      model PrivateEndpoint is PrivateEndpointConnectionResource;
+      alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpoint>;
+      @armResourceOperations
+      interface PrivateEndpointConnections {
+        listByTestTrackedResource is PrivateEndpointOperations.ListByParent<TestTrackedResource>;
+        get is PrivateEndpointOperations.Read<TestTrackedResource>;
+        create is PrivateEndpointOperations.CreateOrReplaceSync<TestTrackedResource>;
+        delete is PrivateEndpointOperations.DeleteAsync<TestTrackedResource>;
+      }
+
+      model PrivateLinkResource is PrivateLink;
+      alias PrivateLinkOps = PrivateLinks<PrivateLinkResource>;
+      @armResourceOperations
+      interface PrivateLinkOperations {
+        listByTestTrackedResource is PrivateLinkOps.ListByParent<TestTrackedResource>;
+      }
+    `,
+    { compilerOptions },
   );
-  const { program } = await Tester.files({ "sample.tsp": source })
-    .import("./sample.tsp")
-    .compile("", { compilerOptions });
   const provider = program
     .getGlobalNamespaceType()
     .namespaces.get("Microsoft")!
