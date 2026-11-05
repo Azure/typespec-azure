@@ -40,7 +40,8 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
         const operationsByPath = new Map<string, { patch?: HttpOperation; put?: HttpOperation }>();
         for (const httpOperation of service.operations) {
           if (
-            getLocationContext(program, httpOperation.operation).type !== "project" ||
+            getLocationContext(program, getOperationTarget(program, httpOperation)).type !==
+              "project" ||
             (httpOperation.overloading !== undefined &&
               isOverloadSameEndpoint(
                 httpOperation as HttpOperation & { overloading: HttpOperation },
@@ -63,7 +64,7 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
           const patchBody = patch.parameters.body?.type;
           if (patchBody === undefined || isVoidType(patchBody)) {
             context.reportDiagnostic({
-              target: patch.operation,
+              target: getOperationTarget(program, patch),
               messageId: "missingPatchBody",
             });
             continue;
@@ -75,7 +76,7 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
           const patchProperties = collectLeafProperties(program, patchBody, patch, metadataInfo);
           if (patchProperties.length === 0) {
             context.reportDiagnostic({
-              target: patch.operation,
+              target: getOperationTarget(program, patch),
               messageId: "emptyPatchBody",
             });
             continue;
@@ -131,6 +132,13 @@ type LeafProperty = {
   recursive: boolean;
 };
 
+function getOperationTarget(program: Program, operation: HttpOperation): DiagnosticTarget {
+  const target = operation.operation;
+  return getLocationContext(program, target).type === "project"
+    ? target
+    : (target.interface ?? target);
+}
+
 function collectLeafProperties(
   program: Program,
   body: Type,
@@ -142,7 +150,7 @@ function collectLeafProperties(
   return collectTypeLeaves(
     program,
     body,
-    operation.operation,
+    getOperationTarget(program, operation),
     metadataInfo,
     visibility,
     bodyParameter?.bodyKind === "single" ? bodyParameter.isExplicit : false,

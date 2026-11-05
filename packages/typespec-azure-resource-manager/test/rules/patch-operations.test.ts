@@ -62,11 +62,23 @@ it("Requires PATCH to be a proper subset of resource for model references", asyn
        }
     `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message:
-        "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
-    });
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blahdeeblah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
+      },
+    ]);
 });
 
 it("Requires PATCH to be a proper subset of resource for model spread", async () => {
@@ -114,11 +126,23 @@ it("Requires PATCH to be a proper subset of resource for model spread", async ()
        }
     `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message:
-        "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
-    });
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blahdeeblah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
+      },
+    ]);
 });
 
 it("emit diagnostic when there is no request body", async () => {
@@ -172,10 +196,16 @@ it("emit diagnostic when there is no request body", async () => {
 
     `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message: "The request body of a PATCH must be a model with a subset of resource properties",
-    });
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message: "The PATCH operation must have a request body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message: "The request body of a PATCH must be a model with a subset of resource properties",
+      },
+    ]);
 });
 
 describe("writable input properties", () => {
@@ -287,6 +317,46 @@ interface Widgets {
 
     it("accepts the correct ARM template fixture", async () => {
       await fixtureTester.expect(examples[1]).toBeValid();
+    });
+
+    it("checks incompatible input against an inherited ARM create operation", async () => {
+      await fixtureTester
+        .expect(
+          examples[0].replace(
+            "interface Widgets {\n  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;",
+            "interface Widgets extends ResourceCreateAsync<Widget> {",
+          ),
+        )
+        .toEmitDiagnostics(incompatibleProperty("displayName"));
+    });
+
+    it.each([0, 1])("checks inherited ARM operation pairs for fixture %s", async (index) => {
+      const fixture = examples[index].replace(
+        /interface Widgets \{[\s\S]*?\n\}/,
+        `interface Widgets extends ResourceCreateAsync<Widget>,
+          ResourceUpdateAsync<Widget, WidgetPatchProperties> {}`,
+      );
+      if (index === 0) {
+        await fixtureTester.expect(fixture).toEmitDiagnostics(incompatibleProperty("displayName"));
+      } else {
+        await fixtureTester.expect(fixture).toBeValid();
+      }
+    });
+
+    it("targets a project interface for inherited library PATCH properties", async () => {
+      await fixtureTester
+        .expect(
+          examples[1].replace(
+            /interface Widgets \{[\s\S]*?\n\}/,
+            `interface Widgets extends ResourceUpdateAsync<Widget, WidgetPatchProperties> {
+              @TypeSpec.Rest.autoRoute
+              @put
+              createOrUpdate(...ResourceInstanceParameters<Widget>,
+                @body body: {properties?: WidgetProperties}): void;
+            }`,
+          ),
+        )
+        .toEmitDiagnostics(missingProperty("tags"));
     });
   });
 
