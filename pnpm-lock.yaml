@@ -3464,6 +3464,15 @@ importers:
       '@azure-tools/typespec-ts':
         specifier: workspace:^
         version: link:../typespec-ts
+      '@azure-typespec/http-client-csharp':
+        specifier: 1.0.0-alpha.20261023.4
+        version: 1.0.0-alpha.20261023.4(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+      '@azure-typespec/http-client-csharp-mgmt':
+        specifier: 1.0.0-alpha.20261026.6
+        version: 1.0.0-alpha.20261026.6(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+      '@azure-typespec/http-client-csharp-provisioning':
+        specifier: 1.0.0-alpha.20261027.3
+        version: 1.0.0-alpha.20261027.3(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
       '@fluentui/react-components':
         specifier: 'catalog:'
         version: 9.75.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(scheduler@0.28.0)
@@ -4644,6 +4653,15 @@ packages:
   '@azure-rest/core-client@2.9.0':
     resolution: {integrity: sha512-6933vNLqh06RR7rumnrq3UZIeBtRLeBHDPMrieDPIljiCaMMwt0nRw++nd3TOxiohtasNtm29rC+b/9ZVKCOqg==}
     engines: {node: '>=22.0.0'}
+
+  '@azure-typespec/http-client-csharp-mgmt@1.0.0-alpha.20261026.6':
+    resolution: {integrity: sha512-+ajAJWLh20yd3iiv66PDIuEuqNN0Ry20cwG7tBQRHrTj3rnSCFgwIoBbDX6gbp9viwNyUbskAZnBh4k98h1F9g==, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure-typespec/http-client-csharp-mgmt/-/http-client-csharp-mgmt-1.0.0-alpha.20261026.6.tgz}
+
+  '@azure-typespec/http-client-csharp-provisioning@1.0.0-alpha.20261027.3':
+    resolution: {integrity: sha512-6srCrSa2YP3YgBBm+XzsCxmr3TbUB4GAJiwhFt8cbV5vlqX0Dp2tPHUEs3J44inKS9fg/Nln07u4l9etJcsRAw==, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure-typespec/http-client-csharp-provisioning/-/http-client-csharp-provisioning-1.0.0-alpha.20261027.3.tgz}
+
+  '@azure-typespec/http-client-csharp@1.0.0-alpha.20261023.4':
+    resolution: {integrity: sha512-Zgvuk2T5NLr9qxRxIiTkl75ZslZsn6HQmswTkhgaKTCzq4MD0XlR4/EHmR6jvY+eaCtN093HCsZXIv6iuoAPDQ==, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure-typespec/http-client-csharp/-/http-client-csharp-1.0.0-alpha.20261023.4.tgz}
 
   '@azure/abort-controller@2.2.0':
     resolution: {integrity: sha512-fNAjWnA/nZ2jz31kxR/AqRaUT8ewHBw/WuBIosK0moMy1C9e5ValbDfFdIxJzVOOYaYkV/b2F1S4H/aHiqfVQg==}
@@ -8064,6 +8082,30 @@ packages:
     resolution: {integrity: sha512-mbCddXd+jm7hfx7w2YU64/Av4/NqqeG3GoRZgxPcgoTxYjhrcfJRw9ULch71SS4G+Q3bOXFhRvPqjguN0Hyp5w==}
     hasBin: true
 
+  '@typespec/emitter-framework@0.21.0':
+    resolution: {integrity: sha512-ACVZ6cUpO+dmzA0xbBxYuYAWwkPp59kABxIES5BRvhKg873hyI7o3vM3Ni+m5FK4JWlBdw1oR4QINSNUt5rDCw==, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typespec/emitter-framework/-/emitter-framework-0.21.0.tgz}
+    peerDependencies:
+      '@alloy-js/core': ^0.24.1
+      '@alloy-js/csharp': ^0.24.0
+      '@alloy-js/python': ^0.5.0
+      '@alloy-js/typescript': ^0.24.0
+      '@typespec/compiler': ^1.16.0
+
+  '@typespec/http-client-csharp@1.0.0-alpha.20261023.3':
+    resolution: {integrity: sha512-UhDIlN5DuW6GOzCM+5ILI8MpNmSlHWwLjtmmG5bdavjqrr37CVw86nvp4p3vxsBLRoDH103gsb2y0CAa4bqPYQ==, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typespec/http-client-csharp/-/http-client-csharp-1.0.0-alpha.20261023.3.tgz}
+    peerDependencies:
+      '@azure-tools/typespec-azure-core': '>=0.73.0 <0.74.0 || ~0.74.0-0'
+      '@azure-tools/typespec-client-generator-core': '>=0.73.0 <0.74.0 || ~0.74.0-0'
+      '@typespec/compiler': ^1.17.0
+      '@typespec/events': '>=0.87.0 <0.88.0 || ~0.88.0-0'
+      '@typespec/http': ^1.17.0
+      '@typespec/http-client': '>=0.17.0 <0.18.0 || ~0.18.0-0'
+      '@typespec/openapi': ^1.17.0
+      '@typespec/rest': '>=0.87.0 <0.88.0 || ~0.88.0-0'
+      '@typespec/sse': '>=0.87.0 <0.88.0 || ~0.88.0-0'
+      '@typespec/streams': '>=0.87.0 <0.88.0 || ~0.88.0-0'
+      '@typespec/versioning': '>=0.87.0 <0.88.0 || ~0.88.0-0'
+
   '@typespec/http-client-python@0.39.0':
     resolution: {integrity: sha512-JgvwmnH3Dm/LrQidAq8BIKTetedwHEayTLsolC4NpvOnYo0SloP3oxiJ5evIxiyUKbHg8Ir3/9L5tGu85q72+g==}
     engines: {node: '>=22.0.0'}
@@ -8082,6 +8124,15 @@ packages:
       '@typespec/streams': '>=0.87.0 <1.0.0'
       '@typespec/versioning': '>=0.87.0 <1.0.0'
       '@typespec/xml': '>=0.87.0 <1.0.0'
+
+  '@typespec/http-client@0.17.0':
+    resolution: {integrity: sha1-Z92YYnO4zIC0v8htDkxGrxjRuRk=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typespec/http-client/-/http-client-0.17.0.tgz}
+    peerDependencies:
+      '@alloy-js/core': ^0.24.1
+      '@alloy-js/typescript': ^0.24.0
+      '@typespec/compiler': ^1.16.0
+      '@typespec/emitter-framework': ^0.21.0
+      '@typespec/http': ^1.16.0
 
   '@typespec/ts-http-runtime@0.3.9':
     resolution: {integrity: sha512-edSdeAqkdxBVzA1yL1LrLCml1YjyCVvPMtMqJpbF+6K609tHe8V6sQUzFQSGcYNhcuhOceZtjvN32+mpIth30A==}
@@ -12844,6 +12895,61 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@azure-typespec/http-client-csharp-mgmt@1.0.0-alpha.20261026.6(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)':
+    dependencies:
+      '@azure-typespec/http-client-csharp': 1.0.0-alpha.20261023.4(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+      '@typespec/http-client-csharp': 1.0.0-alpha.20261023.3(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+    transitivePeerDependencies:
+      - '@azure-tools/typespec-azure-core'
+      - '@azure-tools/typespec-client-generator-core'
+      - '@typespec/compiler'
+      - '@typespec/events'
+      - '@typespec/http'
+      - '@typespec/http-client'
+      - '@typespec/openapi'
+      - '@typespec/rest'
+      - '@typespec/sse'
+      - '@typespec/streams'
+      - '@typespec/versioning'
+      - supports-color
+
+  '@azure-typespec/http-client-csharp-provisioning@1.0.0-alpha.20261027.3(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)':
+    dependencies:
+      '@azure-typespec/http-client-csharp': 1.0.0-alpha.20261023.4(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+      '@azure-typespec/http-client-csharp-mgmt': 1.0.0-alpha.20261026.6(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+      '@typespec/http-client-csharp': 1.0.0-alpha.20261023.3(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+      pluralize: 8.0.0
+    transitivePeerDependencies:
+      - '@azure-tools/typespec-azure-core'
+      - '@azure-tools/typespec-client-generator-core'
+      - '@typespec/compiler'
+      - '@typespec/events'
+      - '@typespec/http'
+      - '@typespec/http-client'
+      - '@typespec/openapi'
+      - '@typespec/rest'
+      - '@typespec/sse'
+      - '@typespec/streams'
+      - '@typespec/versioning'
+      - supports-color
+
+  '@azure-typespec/http-client-csharp@1.0.0-alpha.20261023.4(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)':
+    dependencies:
+      '@typespec/http-client-csharp': 1.0.0-alpha.20261023.3(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)
+    transitivePeerDependencies:
+      - '@azure-tools/typespec-azure-core'
+      - '@azure-tools/typespec-client-generator-core'
+      - '@typespec/compiler'
+      - '@typespec/events'
+      - '@typespec/http'
+      - '@typespec/http-client'
+      - '@typespec/openapi'
+      - '@typespec/rest'
+      - '@typespec/sse'
+      - '@typespec/streams'
+      - '@typespec/versioning'
+      - supports-color
+
   '@azure/abort-controller@2.2.0':
     dependencies:
       tslib: 2.8.1
@@ -13881,7 +13987,7 @@ snapshots:
 
   '@expressive-code/plugin-frames@0.44.3':
     dependencies:
-      '@expressive-code/core': 0.44.3
+      '@expressive-code/core': 0.44.2
 
   '@expressive-code/plugin-shiki@0.44.2':
     dependencies:
@@ -16657,6 +16763,31 @@ snapshots:
     dependencies:
       '@typescript/old': typescript@6.0.3
 
+  '@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)':
+    dependencies:
+      '@alloy-js/core': 0.25.0
+      '@alloy-js/csharp': 0.25.0
+      '@alloy-js/python': 0.6.0
+      '@alloy-js/typescript': 0.25.0
+      '@typespec/compiler': link:core/packages/compiler
+
+  '@typespec/http-client-csharp@1.0.0-alpha.20261023.3(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http))(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)':
+    dependencies:
+      '@azure-tools/typespec-azure-core': link:packages/typespec-azure-core
+      '@azure-tools/typespec-client-generator-core': link:packages/typespec-client-generator-core
+      '@azure/identity': 4.14.0
+      '@typespec/compiler': link:core/packages/compiler
+      '@typespec/events': link:core/packages/events
+      '@typespec/http': link:core/packages/http
+      '@typespec/http-client': 0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http)
+      '@typespec/openapi': link:core/packages/openapi
+      '@typespec/rest': link:core/packages/rest
+      '@typespec/sse': link:core/packages/sse
+      '@typespec/streams': link:core/packages/streams
+      '@typespec/versioning': link:core/packages/versioning
+    transitivePeerDependencies:
+      - supports-color
+
   '@typespec/http-client-python@0.39.0(@azure-tools/typespec-autorest@packages+typespec-autorest)(@azure-tools/typespec-azure-core@packages+typespec-azure-core)(@azure-tools/typespec-azure-resource-manager@packages+typespec-azure-resource-manager)(@azure-tools/typespec-azure-rulesets@packages+typespec-azure-rulesets)(@azure-tools/typespec-client-generator-core@packages+typespec-client-generator-core)(@typespec/compiler@core+packages+compiler)(@typespec/events@core+packages+events)(@typespec/http@core+packages+http)(@typespec/openapi@core+packages+openapi)(@typespec/rest@core+packages+rest)(@typespec/sse@core+packages+sse)(@typespec/streams@core+packages+streams)(@typespec/versioning@core+packages+versioning)(@typespec/xml@core+packages+xml)':
     dependencies:
       '@azure-tools/typespec-autorest': link:packages/typespec-autorest
@@ -16681,6 +16812,14 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@typespec/http-client@0.17.0(@alloy-js/core@0.25.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)(@typespec/emitter-framework@0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler))(@typespec/http@core+packages+http)':
+    dependencies:
+      '@alloy-js/core': 0.25.0
+      '@alloy-js/typescript': 0.25.0
+      '@typespec/compiler': link:core/packages/compiler
+      '@typespec/emitter-framework': 0.21.0(@alloy-js/core@0.25.0)(@alloy-js/csharp@0.25.0)(@alloy-js/python@0.6.0)(@alloy-js/typescript@0.25.0)(@typespec/compiler@core+packages+compiler)
+      '@typespec/http': link:core/packages/http
 
   '@typespec/ts-http-runtime@0.3.9':
     dependencies:

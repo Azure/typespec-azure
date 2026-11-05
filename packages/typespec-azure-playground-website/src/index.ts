@@ -22,6 +22,14 @@ export const TypeSpecPlaygroundConfig = {
     "@azure-tools/typespec-azure-rulesets",
     "@azure-tools/typespec-go",
     "@azure-tools/typespec-ts",
+    "@azure-typespec/http-client-csharp",
+    "@azure-typespec/http-client-csharp-mgmt",
+    "@azure-typespec/http-client-csharp-provisioning",
+  ],
+  deferredEmitters: [
+    "@azure-typespec/http-client-csharp",
+    "@azure-typespec/http-client-csharp-mgmt",
+    "@azure-typespec/http-client-csharp-provisioning",
   ],
   samples,
 } as const;

@@ -1,9 +1,4 @@
-import {
-  FluentProvider,
-  MessageBar,
-  MessageBarBody,
-  webLightTheme,
-} from "@fluentui/react-components";
+import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { MANIFEST } from "@typespec/compiler";
 import PlaygroundManifest from "@typespec/playground/manifest";
 import {
@@ -17,7 +12,6 @@ import "@typespec/playground/styles.css";
 import { registerMonacoDefaultWorkersForVite } from "@typespec/playground/vite/workers";
 import { createRoot } from "react-dom/client";
 import samples from "../samples/dist/samples.js";
-import { loadCSharpEmitters } from "./csharp-emitters.js";
 import { useImportCommandBarItem } from "./import.js";
 import "./style.css";
 
@@ -28,14 +22,6 @@ declare const __COMMIT_HASH__: string | undefined;
 
 const commit = typeof __COMMIT_HASH__ !== "undefined" ? __COMMIT_HASH__ : undefined;
 const pr = typeof __PR__ !== "undefined" ? __PR__ : undefined;
-let csharpEmitters: string[] = [];
-let csharpError: string | undefined;
-try {
-  csharpEmitters = await loadCSharpEmitters();
-} catch (error) {
-  csharpError = error instanceof Error ? error.message : String(error);
-}
-const libraries = [...PlaygroundManifest.libraries, ...csharpEmitters];
 const PlaygroundFooter = () => {
   const prItem = pr ? (
     <FooterItem link={`https://github.com/azure/typespec-azure/pull/${pr}`}>
@@ -70,8 +56,6 @@ const App = () => {
   return (
     <StandalonePlayground
       {...PlaygroundManifest}
-      libraries={libraries}
-      deferredEmitters={csharpEmitters}
       samples={samples}
       emitterViewers={{
         "@typespec/openapi3": [SwaggerUIViewer],
@@ -88,19 +72,7 @@ const App = () => {
 
 const root = createRoot(document.getElementById("root")!);
 root.render(
-  <FluentProvider
-    theme={webLightTheme}
-    style={{ height: "100vh", display: "flex", flexDirection: "column" }}
-  >
-    {csharpError && (
-      <MessageBar intent="warning">
-        <MessageBarBody>
-          Azure C# emitters are unavailable: {csharpError} Other emitters remain available.
-        </MessageBarBody>
-      </MessageBar>
-    )}
-    <div style={{ flex: 1, minHeight: 0 }}>
-      <App />
-    </div>
+  <FluentProvider theme={webLightTheme} style={{ height: "100vh" }}>
+    <App />
   </FluentProvider>,
 );

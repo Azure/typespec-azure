@@ -52,6 +52,9 @@
     "!dist/test/**"
   ],
   "dependencies": {
+    "@azure-typespec/http-client-csharp": "1.0.0-alpha.20261023.4",
+    "@azure-typespec/http-client-csharp-mgmt": "1.0.0-alpha.20261026.6",
+    "@azure-typespec/http-client-csharp-provisioning": "1.0.0-alpha.20261027.3",
     "@azure-tools/typespec-autorest": "workspace:^",
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
