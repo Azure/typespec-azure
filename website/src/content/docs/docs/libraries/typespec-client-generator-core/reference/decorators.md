@@ -853,6 +853,50 @@ model MyModel {
 }
 ```
 
+### `@dynamicModel` {#@Azure.ClientGenerator.Core.dynamicModel}
+
+Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+A dynamic model represents updates as JSON Patch operations rather than a replacement of the full model.
+In C# generation, a marked model exposes patch-aware properties and a `JsonPatch`-backed `Patch` API.
+This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
+
+```typespec
+@Azure.ClientGenerator.Core.dynamicModel(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The model or namespace to mark as dynamic.
+`Model | Namespace`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                                                                                                                        |
+| ----- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning. |
+
+#### Examples
+
+##### Mark a model as dynamic
+
+```typespec
+@dynamicModel("csharp")
+model Pet {
+  name: string;
+}
+```
+
+##### Mark a namespace for C# dynamic-model metadata
+
+```typespec
+@dynamicModel("csharp")
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+}
+```
+
 ### `@lroStatusMetadata` {#@Azure.ClientGenerator.Core.lroStatusMetadata}
 
 Marks a status-monitor model property as transient polling data that the SDK should expose to
@@ -868,8 +912,8 @@ response containing it arrives. Metadata remains exposed on failed or canceled t
 Emitters should keep these values current after each poll. Metadata is not part of the
 continuation token; after rehydration, the next poll populates it again.
 
-Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
-are diagnosed once at declaration time.
+Multiple declarations use the standard TCGC scope rules, including overlapping scopes.
+Each selected property appears only once in the metadata collection.
 
 ```typespec
 @Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
