@@ -171,6 +171,45 @@ describe("response bodies", () => {
       .toBeValid();
   });
 
+  describe("imported response templates", () => {
+    beforeEach(async () => {
+      const runner = await Tester.files({
+        "node_modules/response-templates/package.json": JSON.stringify({
+          exports: {
+            ".": { typespec: "./main.tsp" },
+          },
+        }),
+        "node_modules/response-templates/main.tsp": `
+          import "@typespec/http";
+          using TypeSpec.Http;
+          namespace ResponseTemplates;
+          model Result<T> { value: T; }
+          @get op read<T>(): T;
+        `,
+      })
+        .import("response-templates")
+        .wrap((code) => `@service namespace Service { ${code} }`)
+        .createInstance();
+      tester = createLinterRuleTester(
+        runner,
+        noUnnamedTypesRule,
+        "@azure-tools/typespec-azure-core",
+      );
+    });
+
+    it("accepts a named generic response from a library operation template", async () => {
+      await tester
+        .expect("op read is ResponseTemplates.read<ResponseTemplates.Result<string>>;")
+        .toBeValid();
+    });
+
+    it("reports an anonymous response passed to a library operation template", async () => {
+      await tester
+        .expect("op read is ResponseTemplates.read</*target*/{ value: string }>;")
+        .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+    });
+  });
+
   it.each([
     '@get @route("/widgets") op read<T>(): { value: T };',
     'interface Templates<T> { @get @route("/widgets") read(): { value: T }; }',
