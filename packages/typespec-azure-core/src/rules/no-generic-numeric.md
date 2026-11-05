@@ -8,7 +8,9 @@ Generic numeric types lose precision or cannot be represented by a strong numeri
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [ValidFormats](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2003).
+This rule is related to the Swagger linter rule [ValidFormats](https://github.com/Azure/azure-openapi-validator/blob/main/docs/valid-formats.md), but enforces a separate numeric precision policy. Generic numeric types can pass `ValidFormats` because that rule accepts schemas without a format and schemas with a recognized format.
+
+This rule does not validate format strings or reject every built-in numeric type whose emitted format is outside the Swagger allowlist. For example, `int8`, `uint32`, and `decimal128` are not prohibited by this rule.
 
 #### ❌ Incorrect
 
