@@ -28,9 +28,11 @@ import { improperSubscriptionListOperationRule } from "./rules/improper-subscrip
 import { listOperationMissingPageableRule } from "./rules/list-operation-missing-pageable.js";
 import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
+import { lroMissingPollingMetadataRule } from "./rules/lro-missing-polling-metadata.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
@@ -42,6 +44,7 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -56,6 +59,8 @@ import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
 import { useScopeForExtensionRoutingRule } from "./rules/use-scope-for-extension-routing.js";
+import { useScopePathStandardNameRule } from "./rules/use-scope-path-standard-name.js";
+import { useStandardErrorRule } from "./rules/use-standard-error.js";
 import { useStandardResponseCodesRule } from "./rules/use-standard-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
@@ -72,6 +77,7 @@ const rules = [
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,
+  useStandardErrorRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
@@ -98,6 +104,7 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
+  lroMissingPollingMetadataRule,
   listOperationMissingPageableRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
@@ -105,6 +112,7 @@ const rules = [
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
+  privateEndpointApisMissingRule,
   resourceNameRule,
   resourceMissingReadRule,
   retryAfterRule,
@@ -113,12 +121,14 @@ const rules = [
   useStandardResponseCodesRule,
   secretProprule,
   noEmptyModel,
+  noEmptyPostResponseRule,
   noReservedResourcePropertyRule,
   noTagsOnProxyResourceRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
+  useScopePathStandardNameRule,
 ];
 
 export const $linter = defineLinter({
