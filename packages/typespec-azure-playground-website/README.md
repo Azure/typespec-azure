@@ -36,14 +36,12 @@ These steps still run when using the emitter from the command line.
 
 ## Java WASM proof of concept
 
-Build the Java emitter and its TeaVM target from the repository root with JDK 17 or newer, then enable the opt-in playground integration:
+The normal repository build compiles the Java emitter and its TeaVM target with the pinned JDK 17. After building, start the playground without any feature flags:
 
 ```bash
-mise install java@microsoft-17
-mise exec java@microsoft-17 -- pnpm --filter @azure-tools/typespec-java build:wasm
-VITE_JAVA_WASM_POC=true mise exec -- pnpm --filter @azure-tools/typespec-azure-playground-website start
+mise exec -- pnpm --filter @azure-tools/typespec-azure-playground-website start
 ```
 
-Select `@azure-tools/typespec-java` for an Azure data-plane spec. The flag also enables local library bundles. The existing Java generator runs entirely in a lazily created Web Worker through TeaVM's WebAssembly GC backend; no server or local JVM is used for generation. Each emit gets a fresh worker to isolate the generator's process-global state.
+Select `@azure-tools/typespec-java` for an Azure data-plane spec. The existing Java generator runs entirely in a lazily created Web Worker through TeaVM's WebAssembly GC backend; no server or local JVM is used for generation. Each emit gets a fresh worker to isolate the generator's process-global state.
 
 This is an experimental browser target, not a replacement for the native emitter. ARM, SDK packaging, samples, tests, APIView metadata, customization, partial updates, and native formatting are excluded. The POC requires a browser supporting WebAssembly GC. Native CLI generation is unchanged.

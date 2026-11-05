@@ -59,7 +59,6 @@ test.describe("typespec-azure-playground-website UI tests", () => {
   });
 
   test("emits Java clients in WASM and isolates consecutive edits", async ({ page }) => {
-    test.skip(process.env.VITE_JAVA_WASM_POC !== "true", "The Java WASM POC is opt-in.");
     const runtimeRequests: string[] = [];
     page.on("request", (request) => {
       if (request.url().includes("/java-wasm/")) runtimeRequests.push(request.url());
