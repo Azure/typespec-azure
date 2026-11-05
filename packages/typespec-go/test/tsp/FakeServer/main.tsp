@@ -241,3 +241,14 @@ op optionalQueryArray(value?: string[]): void;
 op queryUintArray(value: uint32[]): void;
 @route("/uri/query-max-uint-array{?value*}")
 op queryMaxUintArray(value: uint64[]): void;
+
+@route("/uri/numeric/{i8}/{i16}/{u8}/{u16}/{u32}/{u64}")
+op numericPath(i8: int8, i16: int16, u8: uint8, u16: uint16, u32: uint32, u64: uint64): void;
+@route("/uri/numeric-query")
+op numericQuery(@query value: uint32, @query optional?: uint32): void;
+@route("/uri/numeric-matrix{;value}")
+op numericMatrix(value: uint32): void;
+@route("/uri/matrix-string-map{;value*}")
+op matrixStringMap(value: Record<string>): void;
+@route("/{+scope}/uri/scoped{/value*}/end")
+op scopedPath(scope: string, value: string[]): void;

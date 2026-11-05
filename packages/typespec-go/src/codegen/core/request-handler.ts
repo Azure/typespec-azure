@@ -105,20 +105,40 @@ export function createRequestHandler(
   const joinBeforeExpansion = methodParamGroups.pathParams.some(
     (param) => param.kind !== "pathScalarParam" || param.pathStyle !== "simple",
   );
+  const normalizeScalarsFirst =
+    joinBeforeExpansion &&
+    methodParamGroups.pathParams.some(
+      (param) => param.kind === "pathScalarParam" && param.pathStyle === "simple",
+    );
   let opEndpoint = hostParam;
   if (hasPathParams || (!pathContainsParms && pathStr.length > 1)) {
     // there are path params, or the path doesn't contain tokens and is not "/" so emit it
-    text += joinBeforeExpansion
-      ? `${indent.get()}urlPath := runtime.JoinPaths(${hostParam}, "${method.httpPath}")\n`
-      : `${indent.get()}urlPath := "${method.httpPath}"\n`;
+    text +=
+      joinBeforeExpansion && !normalizeScalarsFirst
+        ? `${indent.get()}urlPath := runtime.JoinPaths(${hostParam}, "${method.httpPath}")\n`
+        : `${indent.get()}urlPath := "${method.httpPath}"\n`;
     opEndpoint = joinBeforeExpansion ? "urlPath" : `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
   if (hasPathParams) {
     // swagger defines path params, emit path and replace tokens
     imports.add("strings");
-    // replace path parameters
-    for (const pp of methodParamGroups.pathParams) {
+    // Normalize scalar paths before inserting expansions whose segments must be preserved.
+    const pathParams = [...methodParamGroups.pathParams].sort(
+      (a, b) =>
+        Number(a.kind !== "pathScalarParam" || a.pathStyle !== "simple") -
+        Number(b.kind !== "pathScalarParam" || b.pathStyle !== "simple"),
+    );
+    let pathJoined = !normalizeScalarsFirst;
+    for (const pp of pathParams) {
+      if (
+        joinBeforeExpansion &&
+        !pathJoined &&
+        (pp.kind !== "pathScalarParam" || pp.pathStyle !== "simple")
+      ) {
+        text += `${indent.get()}urlPath = runtime.JoinPaths(${hostParam}, urlPath)\n`;
+        pathJoined = true;
+      }
       let paramValue: string;
       let optionalPathSep = false;
       if (pp.style === "literal") {
@@ -182,9 +202,12 @@ export function createRequestHandler(
         text += emitParamGroupCheck(pp, indent);
         let optionalValue = formatPathParamValue(pp, method.receiver.type.pkg, imports, indent);
         if (pp.kind === "pathScalarParam" && pp.pathStyle !== "simple") {
-          const prefix =
-            pp.pathStyle === "path" ? "/" : pp.pathStyle === "label" ? "." : `;${pp.pathSegment}=`;
-          optionalValue = `"${prefix}" + ${emitPathEscape(pp, optionalValue, imports)}`;
+          const { prefix } = getPathExpansionStyle(pp);
+          const escaped = emitPathEscape(pp, optionalValue, imports);
+          optionalValue =
+            pp.pathStyle === "matrix"
+              ? `expandPathMatrix(${JSON.stringify(prefix)}, ${escaped})`
+              : `${JSON.stringify(prefix)} + ${escaped}`;
         }
         text += `${indent.push().get()}${paramValue} = ${optionalValue}\n`;
         text += `${indent.pop().get()}}\n`;
@@ -202,8 +225,7 @@ export function createRequestHandler(
         }
       }
 
-      const prefix =
-        pp.pathStyle === "path" ? "/" : pp.pathStyle === "label" ? "." : `;${pp.pathSegment}=`;
+      const { prefix } = getPathExpansionStyle(pp);
       const optionalStyledScalar =
         pp.kind === "pathScalarParam" &&
         pp.pathStyle !== "simple" &&
@@ -218,7 +240,10 @@ export function createRequestHandler(
       }
 
       if (pp.kind === "pathScalarParam" && pp.pathStyle !== "simple" && !optionalStyledScalar) {
-        paramValue = `"${prefix}" + ${paramValue}`;
+        paramValue =
+          pp.pathStyle === "matrix"
+            ? `expandPathMatrix(${JSON.stringify(prefix)}, ${paramValue})`
+            : `${JSON.stringify(prefix)} + ${paramValue}`;
       }
 
       text += `${indent.get()}urlPath = strings.ReplaceAll(urlPath, "{${pp.pathSegment}}", ${paramValue})\n`;
