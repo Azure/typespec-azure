@@ -10,7 +10,12 @@ import { readFile } from "fs/promises";
 import { materializeLegacyExample } from "../legacy.js";
 import { deriveOperationKey } from "../migrate/operation-key.js";
 import { HTTP_METHODS, type ParameterLocation } from "../migrate/swagger-types.js";
-import { collectParamLocations, discoverSwaggerFiles } from "../migrate/swagger.js";
+import {
+  collectParamLocations,
+  discoverSwaggerFiles,
+  resolveParameterReferences,
+  versionFromPath,
+} from "../migrate/swagger.js";
 import { defaultLegacyExampleFilename, stripJsonExtension } from "../naming.js";
 import type { ExampleDiagnostic } from "../types.js";
 import { resolveExamplesDir } from "./resolve-dir.js";
@@ -43,7 +48,7 @@ export async function resolveLegacyExamples(
 ): Promise<ResolveLegacyResult> {
   const resolved = await resolveExamplesDir(dir, apiVersion);
   const diagnostics = [...resolved.diagnostics];
-  const metadata = await crawlOperationMetadata(dir);
+  const metadata = await crawlOperationMetadata(dir, apiVersion);
 
   const usedNames = new Set<string>();
   const files: LegacyExampleFile[] = [];
@@ -73,16 +78,21 @@ export async function resolveLegacyExamples(
 }
 
 /** Build a map of unified operation key → `{ operationId, bodyParameterName }` from the Swagger. */
-async function crawlOperationMetadata(dir: string): Promise<Map<string, OperationMetadata>> {
+async function crawlOperationMetadata(
+  dir: string,
+  apiVersion: string,
+): Promise<Map<string, OperationMetadata>> {
   const map = new Map<string, OperationMetadata>();
   for (const file of await discoverSwaggerFiles(dir)) {
+    if (versionFromPath(file) !== apiVersion) continue;
     let doc: any;
     try {
       doc = JSON.parse(await readFile(file, "utf-8"));
     } catch {
       continue;
     }
-    for (const pathItem of Object.values(doc.paths ?? {}) as any[]) {
+    const resolved = await resolveParameterReferences(doc, file);
+    for (const pathItem of Object.values(resolved.paths ?? {}) as any[]) {
       if (pathItem === null || typeof pathItem !== "object") continue;
       for (const method of HTTP_METHODS) {
         const operation = pathItem[method];

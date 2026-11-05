@@ -54,6 +54,7 @@ specs:
   type/array: true
   type/model/inheritance/recursive: true
   type/union: true
+  type/union/discriminated/extends: true
   payload/media-type: true
   payload/multipart: true
   payload/xml: true
