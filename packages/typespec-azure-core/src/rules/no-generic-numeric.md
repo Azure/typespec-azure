@@ -18,6 +18,7 @@ This rule does not validate format strings or reject every built-in numeric type
 model Widget {
   id: integer;
   cost: float;
+  amounts: decimal[];
 }
 ```
 
@@ -27,8 +28,11 @@ model Widget {
 model Widget {
   id: safeint;
   cost: float32;
+  amounts: float32[];
 }
 ```
+
+The same requirement applies to nested array elements and inline operation parameters, including query parameters. For example, use `@query amount: float32` instead of `@query amount: decimal`.
 
 This includes extending generic numeric types.
 
