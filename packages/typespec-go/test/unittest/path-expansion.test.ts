@@ -200,6 +200,8 @@ describe("path expansion helper emission", () => {
       parameter: "value: int32[]",
       helpers: ["parseURIArray"],
     },
+    { route: "/items{?value*}", parameter: "value: string[]", helpers: [] },
+    { route: "/items{?value*}", parameter: "value?: string[]", helpers: [] },
     {
       route: "/items{?value}",
       parameter: "value: string[]",
