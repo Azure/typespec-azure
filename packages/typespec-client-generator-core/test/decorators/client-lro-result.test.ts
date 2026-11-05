@@ -137,7 +137,7 @@ describe("@clientLroResult", () => {
       `,
     },
   ])(
-    "selects a templated result through a cloned polling model for $name",
+    "selects a result property through a cloned polling model for $name",
     async ({ tester, code, finalStateVia, finalStep }) => {
       const { program } = await tester.compile(`
         ${code}
