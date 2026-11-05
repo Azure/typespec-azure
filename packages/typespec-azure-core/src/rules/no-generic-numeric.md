@@ -19,6 +19,7 @@ model Widget {
   id: integer;
   cost: float;
   amounts: decimal[];
+  discounts: Record<decimal>;
 }
 ```
 
@@ -29,10 +30,11 @@ model Widget {
   id: safeint;
   cost: float32;
   amounts: float32[];
+  discounts: Record<float32>;
 }
 ```
 
-The same requirement applies to nested array elements and inline operation parameters, including query parameters. For example, use `@query amount: float32` instead of `@query amount: decimal`.
+The same requirement applies to array elements, dictionary values (including nested combinations of arrays and records), and inline operation parameters, including query parameters. For example, use `Record<float32>` instead of `Record<decimal>`, and `@query amount: float32` instead of `@query amount: decimal`.
 
 This includes extending generic numeric types.
 

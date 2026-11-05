@@ -6,6 +6,7 @@ import {
   createRule,
   fileRef,
   isArrayModelType,
+  isRecordModelType,
   paramMessage,
 } from "@typespec/compiler";
 
@@ -31,7 +32,11 @@ export const noGenericNumericRule = createRule({
     function checkProperty(prop: ModelProperty) {
       let type = prop.type;
       const visited = new Set<Model>();
-      while (type.kind === "Model" && isArrayModelType(type) && !visited.has(type)) {
+      while (
+        type.kind === "Model" &&
+        (isArrayModelType(type) || isRecordModelType(type)) &&
+        !visited.has(type)
+      ) {
         visited.add(type);
         type = type.indexer.value;
       }

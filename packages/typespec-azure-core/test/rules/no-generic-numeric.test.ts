@@ -143,7 +143,38 @@ it("emits warnings for generic numeric inline query parameters", async () => {
     );
 });
 
-it("allows specific numeric arrays and inline query parameters", async () => {
+it("emits warnings for generic numeric records, including nested records and arrays", async () => {
+  await tester
+    .expect(
+      `
+      model Widget {
+        integers: Record<integer>;
+        numbers: Record<numeric>;
+        floats: Record<float>;
+        decimals: Record<decimal>;
+        nested: Record<Record<decimal>>;
+        arrays: Record<decimal[]>;
+        records: Record<decimal>[];
+      }
+      `,
+    )
+    .toEmitDiagnostics(
+      [
+        ["integer", "int32"],
+        ["numeric", "int32"],
+        ["float", "float32"],
+        ["decimal", "float32"],
+        ["decimal", "float32"],
+        ["decimal", "float32"],
+        ["decimal", "float32"],
+      ].map(([name, alternative]) => ({
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message: `Don't use generic type '${name}'. Use a more specific type that specifies the bit size, such as '${alternative}' instead.`,
+      })),
+    );
+});
+
+it("allows specific numeric arrays, records and inline query parameters", async () => {
   await tester
     .expect(
       `
@@ -151,6 +182,9 @@ it("allows specific numeric arrays and inline query parameters", async () => {
         smallNumbers: int8[];
         unsignedNumbers: uint32[];
         preciseNumbers: decimal128[][];
+        smallRecords: Record<int8>;
+        unsignedRecords: Record<uint32[]>;
+        preciseRecords: Record<Record<decimal128>>;
       }
 
       op read(@query values: int32[], @query amount: float64): Widget;
@@ -159,13 +193,17 @@ it("allows specific numeric arrays and inline query parameters", async () => {
     .toBeValid();
 });
 
-it("handles recursive array models without reporting a generic numeric type", async () => {
+it("handles recursive array and record models without reporting a generic numeric type", async () => {
   await tester
     .expect(
       `
       model RecursiveArray extends Array<RecursiveArray> {}
+      model RecursiveRecord extends Record<RecursiveRecord> {}
+      model RecursiveMixed extends Record<RecursiveMixed[]> {}
       model Widget {
         values: RecursiveArray;
+        records: RecursiveRecord;
+        mixed: RecursiveMixed;
       }
       `,
     )
