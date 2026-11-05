@@ -76,6 +76,19 @@ it("checks all content variants for the selected status without duplicate warnin
     .toEmitDiagnostics([diagnostic]);
 });
 
+it.each([
+  "{ @statusCode status: 200; @bodyRoot body: void; }",
+  "{ @statusCode status: 200; @bodyRoot body: void; } | ArmCreatedResponse<Widget>",
+])("ignores explicit void bodies before selecting the success status: %s", async (response) => {
+  await tester
+    .expect(
+      `${service}
+      @put op replace(@body body: Unmarked): ${response};
+    `,
+    )
+    .toBeValid();
+});
+
 it.each(["true", '"custom"'])("accepts an explicit truthy resource marker: %s", async (value) => {
   await tester
     .expect(

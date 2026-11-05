@@ -108,6 +108,22 @@ it("ignores non-success response bodies", async () => {
     .toBeValid();
 });
 
+it.each([
+  "{ @statusCode status: 200; @bodyRoot body: void; }",
+  "ArmResponse<Widget> | { @statusCode status: 201; @bodyRoot body: void; }",
+])("ignores explicit void success payloads: %s", async (response) => {
+  await tester
+    .expect(
+      `${models}
+      @armResourceOperations interface Widgets {
+        @get @armResourceRead(Widget)
+        read(...ResourceInstanceParameters<Widget>): ${response};
+      }
+    `,
+    )
+    .toBeValid();
+});
+
 it("checks response aliases overwritten by another lifecycle registration", async () => {
   await tester
     .expect(

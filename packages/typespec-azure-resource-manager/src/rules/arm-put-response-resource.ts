@@ -3,6 +3,7 @@ import {
   fileRef,
   getLocationContext,
   isTemplateDeclarationOrInstance,
+  isVoidType,
   type Model,
   type Program,
   type Type,
@@ -44,7 +45,11 @@ export const armPutResponseResourceRule = createRule({
         for (const status of [200, 201]) {
           const bodies = httpOperation.responses
             .filter((response) => containsStatusCode(response.statusCodes, status))
-            .flatMap((response) => response.responses.flatMap(({ body }) => (body ? [body] : [])));
+            .flatMap((response) =>
+              response.responses.flatMap(({ body }) =>
+                body && !isVoidType(body.type) ? [body] : [],
+              ),
+            );
           if (bodies.length === 0) continue;
 
           if (bodies.some((body) => !hasResourceMarker(program, body.type))) {

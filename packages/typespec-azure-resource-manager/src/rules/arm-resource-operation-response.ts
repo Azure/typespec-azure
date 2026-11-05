@@ -101,7 +101,7 @@ function checkArmResourceOperationReturnType(
       continue;
     }
     for (const { body } of response.responses) {
-      if (body === undefined) continue;
+      if (body === undefined || isVoidType(body.type)) continue;
       let payload = body.type;
       if (list && payload.kind === "Model") {
         const items = isArrayModelType(payload) ? payload : getProperty(payload, "value")?.type;
