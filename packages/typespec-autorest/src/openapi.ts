@@ -385,6 +385,7 @@ export async function getOpenAPIForService(
   // Materialized unified example files all land in one shared `examples/` directory, so their names
   // must be unique across every operation, not just within one.
   const usedUnifiedFileNames = new Set<string>();
+  const matchedUnifiedOperations = new Set<string>();
 
   const routes = httpService.operations;
   // Filter routes to only include operations in scope for this emitter
@@ -428,6 +429,16 @@ export async function getOpenAPIForService(
     globalConsumes.has("application/xml");
 
   inScopeRoutes.forEach(emitOperation);
+
+  for (const key of unified.byOperationKey.keys()) {
+    if (!matchedUnifiedOperations.has(key)) {
+      reportDiagnostic(program, {
+        code: "unknown-example-operation",
+        format: { operation: key, version: unified.apiVersion ?? "unversioned" },
+        target: unified.operationTargets?.get(key) ?? NoTarget,
+      });
+    }
+  }
 
   emitParameters();
   emitSchemas(service.type);
@@ -715,6 +726,7 @@ export async function getOpenAPIForService(
     if (resolvedExamples === undefined || resolvedExamples.length === 0) {
       return;
     }
+    matchedUnifiedOperations.add(operationKeyForId(operationId));
 
     operationIdsWithExample.add(operationId);
     currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
@@ -3020,6 +3032,7 @@ interface ResolvedUnifiedExamples {
   readonly apiVersion?: string;
   /** Resolved examples grouped by unified operation key (e.g. `CaCertificates.get`). */
   readonly byOperationKey: UnifiedExamplesResult["byOperationKey"];
+  readonly operationTargets?: UnifiedExamplesResult["operationTargets"];
 }
 
 /**
@@ -3055,7 +3068,12 @@ async function resolveUnifiedExamples(
       target: NoTarget,
     });
   }
-  return { active: true, apiVersion, byOperationKey: result.byOperationKey };
+  return {
+    active: true,
+    apiVersion,
+    byOperationKey: result.byOperationKey,
+    operationTargets: result.operationTargets,
+  };
 }
 
 async function loadExamples(

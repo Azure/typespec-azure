@@ -133,14 +133,12 @@ PATCH for Resource tags only, a PATCH for all updateable properties, or a custom
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description                       | TypeSpec                                                                |
-| ------------------------------------------- | ----------------------------------------------------------------------- |
-| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                              |
-| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                             |
-| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`         |
-| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>`        |
-| Sync Lifecycle PATCH                        | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`  |
-| Async Lifecycle PATCH                       | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>` |
+| Operation Description                       | TypeSpec                                                         |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                       |
+| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                      |
+| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`  |
+| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>` |
 
 The `ArmCustomPatch*` templates are the recommended choice for PATCH operations. They take the
 resource type and your custom PATCH request type as parameters, giving you full control over the
