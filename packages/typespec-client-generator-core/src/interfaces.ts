@@ -76,6 +76,10 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
+  __lroStatusMetadataCache: Map<
+    Operation,
+    { responseModel: SdkModelType; properties: SdkLroStatusMetadata[] }
+  >;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
@@ -1233,6 +1237,12 @@ export interface SdkLroStatusMetadata {
    * state, not the LRO status, error, logical result, or a polling/final location.
    */
   property: SdkModelPropertyType;
+  /**
+   * Segments to get the selected value from `pollingInfo.responseModel`.
+   * Currently contains only `property`, including for inherited properties.
+   * Uses the effective SDK property after hierarchy reconciliation.
+   */
+  propertySegments: SdkModelPropertyType[];
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
