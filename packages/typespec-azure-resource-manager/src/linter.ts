@@ -28,6 +28,7 @@ import { improperSubscriptionListOperationRule } from "./rules/improper-subscrip
 import { listOperationMissingPageableRule } from "./rules/list-operation-missing-pageable.js";
 import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
+import { lroMissingPollingMetadataRule } from "./rules/lro-missing-polling-metadata.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
@@ -44,6 +45,7 @@ import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { noUnsafePatchBodyPropertiesRule } from "./rules/no-unsafe-patch-body-properties.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -103,6 +105,7 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
+  lroMissingPollingMetadataRule,
   listOperationMissingPageableRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
@@ -111,6 +114,7 @@ const rules = [
   noUnsafePatchBodyPropertiesRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
+  privateEndpointApisMissingRule,
   resourceNameRule,
   resourceMissingReadRule,
   retryAfterRule,
