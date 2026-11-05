@@ -1,10 +1,10 @@
-This diagnostic is issued when `@lroOperationId` targets a property that is not a supported operation ID source.
+This diagnostic is issued while processing an LRO when an active `@lroOperationId` selection on its status-monitor response model is not string-like. Annotations outside the selected LRO monitor or excluded by emitter scope or response visibility have no effect.
 
 `@lroOperationId` identifies either a path parameter of the linked LRO status-monitor operation or a string-like property of its response model.
 
 ## Impact
 
-- **Area:** LRO operation ID metadata. Compilation reports an error for an invalid source.
+- **Area:** LRO operation ID metadata. SDK generation reports an error and excludes the invalid response-property source.
 - **Not affected:** The service's HTTP contract and normal LRO polling behavior are unchanged.
 
 ## ❌ Incorrect Usage

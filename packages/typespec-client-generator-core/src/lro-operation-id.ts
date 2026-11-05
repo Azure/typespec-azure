@@ -45,7 +45,18 @@ export function resolveLroOperationId(
     );
   }
 
-  const propertySelections = getPropertySelections(context, raw.pollingInfo.responseModel);
+  const propertySelections = getPropertySelections(context, raw.pollingInfo.responseModel).filter(
+    (selection) => {
+      if ($(context.program).scalar.extendsString(selection.property.type)) return true;
+      diagnostics.add(
+        createDiagnostic({
+          code: "lro-operation-id-invalid-target",
+          target: selection.target,
+        }),
+      );
+      return false;
+    },
+  );
   if (propertySelections.length > 1) {
     diagnostics.add(
       createDiagnostic({

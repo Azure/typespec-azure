@@ -64,16 +64,15 @@ op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
 `;
 
 describe("LRO operation ID", () => {
-  it("requires the operation ID target to belong to a linked status monitor", async () => {
-    const diagnostics = await Tester.diagnose(`
+  it("ignores an operation ID annotation unused by an LRO", async () => {
+    const { program } = await Tester.compile(`
 model Invalid {
   @lroOperationId
-  value: string;
+  value: int32;
 }
 `);
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
-    });
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
   });
 
   it("exposes the exact linked operation ID path parameter", async () => {
@@ -251,12 +250,37 @@ op startPropertyJob is Azure.Core.Foundations.LongRunningOperation<
   });
 
   it("rejects a non-string status-monitor response property", async () => {
-    const diagnostics = await Tester.diagnose(
+    const { program } = await Tester.compile(
       propertyOperation.replace("operationId: string", "operationId: int32"),
     );
-    expectDiagnostics(diagnostics, {
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
     });
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId, undefined);
+  });
+
+  it.each([
+    '@lroOperationId("python")',
+    '@lroOperationId @scope("python")',
+    "@lroOperationId @visibility(Lifecycle.Create)",
+  ])("does not validate an excluded response ID: %s", async (decorators) => {
+    const { program } = await Tester.compile(
+      propertyOperation
+        .replace("@lroOperationId", decorators)
+        .replace("operationId: string", "operationId: int32"),
+    );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    expectDiagnostics(context.diagnostics, []);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId, undefined);
   });
 
   it.each(["@lroOperationId @path", "@path @lroOperationId"])(
@@ -346,16 +370,19 @@ model PropertyJobState {`,
     strictEqual(operationId.propertySegments[0], operationId.property);
   });
 
-  it("rejects a property outside the linked status-monitor response model", async () => {
-    const diagnostics = await Tester.diagnose(`
+  it("ignores a property outside the linked status-monitor response model", async () => {
+    const { program } = await Tester.compile(`
 model OtherStatus {
   @lroOperationId operationId: string;
 }
 ${propertyOperation.replace("@lroOperationId\n  operationId: string;", "operationId: string;")}
 `);
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/lro-operation-id-invalid-target",
-    });
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "startPropertyJob");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.operationId, undefined);
   });
 
   it("honors decorator scope for a status-monitor response property", async () => {
