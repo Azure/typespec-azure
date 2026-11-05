@@ -408,6 +408,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   }
 
   const finalResponse = getFinalResponse();
+  const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -432,6 +433,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
+    ...(statusMetadata && statusMetadata.length > 0 ? { statusMetadata } : {}),
   });
 
   function getSdkLroServiceFinalStep(
@@ -638,6 +640,9 @@ function getSdkMethodResponse(
     type = ignoreDiagnostics(
       getClientTypeWithDiagnostics(context, responseOverrideType, operation),
     );
+    if (type.kind === "bytes") {
+      type = { ...type, encode: "bytes" };
+    }
   } else if (getResponseAsBool(context, operation)) {
     type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {

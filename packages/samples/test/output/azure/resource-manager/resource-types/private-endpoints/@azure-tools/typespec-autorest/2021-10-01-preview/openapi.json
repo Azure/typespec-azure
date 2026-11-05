@@ -59,20 +59,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -90,10 +90,10 @@
         "description": "List Employee resources by subscription ID",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -106,7 +106,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -124,13 +124,13 @@
         "description": "List Employee resources by resource group",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           }
         ],
         "responses": {
@@ -143,7 +143,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -161,13 +161,13 @@
         "description": "Get a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -188,7 +188,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -201,13 +201,13 @@
         "description": "Create a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -254,7 +254,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -271,13 +271,13 @@
         "description": "Update a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -307,7 +307,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -320,13 +320,13 @@
         "description": "Delete a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -347,7 +347,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -360,13 +360,13 @@
         "description": "A sample HEAD operation to check resource existence",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -387,7 +387,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -402,13 +402,13 @@
         "description": "List Dependent resources by Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -429,7 +429,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -447,13 +447,13 @@
         "description": "Get a Dependent",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -482,7 +482,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -495,13 +495,13 @@
         "description": "Create a Dependent",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -556,7 +556,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -573,13 +573,13 @@
         "description": "Update a Dependent",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -617,7 +617,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -630,13 +630,13 @@
         "description": "Delete a Dependent",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -665,7 +665,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -680,13 +680,13 @@
         "description": "List Dependent PrivateEndpointConnections",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -715,7 +715,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -733,13 +733,13 @@
         "description": "Get a Dependent PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -758,20 +758,20 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -784,13 +784,13 @@
         "description": "Create a Dependent PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -809,7 +809,7 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           },
           {
             "name": "resource",
@@ -817,7 +817,7 @@
             "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           }
         ],
@@ -825,13 +825,13 @@
           "200": {
             "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
             "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             },
             "headers": {
               "Azure-AsyncOperation": {
@@ -848,7 +848,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -865,13 +865,13 @@
         "description": "Update a Dependent PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -890,7 +890,7 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           },
           {
             "name": "properties",
@@ -906,7 +906,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "202": {
@@ -926,7 +926,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -943,13 +943,13 @@
         "description": "Delete a Dependent PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -968,7 +968,7 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           }
         ],
         "responses": {
@@ -992,7 +992,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1011,13 +1011,13 @@
         "description": "A sample resource action that move employee to different location",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -1047,7 +1047,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1062,13 +1062,13 @@
         "description": "List Employee PrivateEndpointConnections",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -1089,7 +1089,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1107,13 +1107,13 @@
         "description": "Get a Employee PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -1124,20 +1124,20 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1150,13 +1150,13 @@
         "description": "Create a Employee PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -1167,7 +1167,7 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           },
           {
             "name": "resource",
@@ -1175,7 +1175,7 @@
             "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           }
         ],
@@ -1183,13 +1183,13 @@
           "200": {
             "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
             "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             },
             "headers": {
               "Azure-AsyncOperation": {
@@ -1206,7 +1206,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1223,13 +1223,13 @@
         "description": "Update a Employee PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -1240,7 +1240,7 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           },
           {
             "name": "properties",
@@ -1256,7 +1256,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "202": {
@@ -1276,7 +1276,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1293,13 +1293,13 @@
         "description": "Delete a Employee PrivateEndpointConnection",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "employeeName",
@@ -1310,7 +1310,7 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           }
         ],
         "responses": {
@@ -1334,7 +1334,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -1355,11 +1355,11 @@
           "description": "The private endpoint connection properties",
           "properties": {
             "privateEndpoint": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpoint",
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpoint",
               "description": "The private endpoint resource."
             },
             "privateLinkServiceConnectionState": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkServiceConnectionState",
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateLinkServiceConnectionState",
               "description": "A collection of information about the state of the connection between service consumer and provider."
             }
           }
@@ -1377,7 +1377,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ProxyResource"
         }
       ]
     },
@@ -1462,7 +1462,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/TrackedResource"
         }
       ]
     },
@@ -1588,7 +1588,7 @@
           "type": "array",
           "description": "The PrivateEndpointConnection items on this page",
           "items": {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/privatelinks.json#/definitions/PrivateEndpointConnection"
           }
         },
         "nextLink": {
