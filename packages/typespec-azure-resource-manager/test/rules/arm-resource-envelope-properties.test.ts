@@ -29,7 +29,7 @@ async function diagnoseWithRule(
   code: string | Record<string, string>,
   testRunner: TesterInstance = runner,
 ) {
-  const [, diagnostics] = await testRunner.compileAndDiagnose(code, {
+  return testRunner.diagnose(code, {
     compilerOptions: {
       linterRuleSet: {
         enable: {
@@ -38,7 +38,6 @@ async function diagnoseWithRule(
       },
     },
   });
-  return diagnostics;
 }
 
 it("succeed when only using allow properties at the root", async () => {
