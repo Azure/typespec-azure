@@ -1,4 +1,8 @@
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  expectDiagnostics,
+  type LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { useUnionHierarchyRule } from "../../src/rules/use-union-hierarchy.js";
 import { SimpleTester } from "../tester.js";
@@ -46,6 +50,7 @@ function reusedModel(target: string, modelName = "Derived", unionName = "First")
 describe("named union constraints", () => {
   it.each([
     ["models", `${base} union Choice { Base }`],
+    ["arrays", `${base} union Choice { values: Base[] }`],
     ["mixed variants", `${base} union Choice { Base, string, int32, null }`],
     ["model after non-model variants", `${base} union Choice { string, int32, null, Base }`],
     ["nullable models", `${base} union Choice { Base, null }`],
@@ -205,6 +210,68 @@ describe("named union constraints", () => {
       `,
       )
       .toEmitDiagnostics([missingExtends("Unconstrained"), reusedModel("invalid")]);
+  });
+});
+
+describe("array constraints", () => {
+  it("accepts arrays of derived models", async () => {
+    await tester
+      .expect(
+        `
+        model Named { name: string; }
+        model Cat extends Named { meow: boolean; }
+        model Dog extends Named { bark: boolean; }
+        union PetArrays extends Named[] { cats: Cat[], dogs: Dog[] }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("allows reuse of an array alternative across array-constrained unions", async () => {
+    await tester
+      .expect(
+        `
+        ${base}
+        model Derived extends Base {}
+        alias Items = Derived[];
+        alias Constraint = Base[];
+        union First extends Constraint { values: Items }
+        union Second extends Constraint { values: Items }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("leaves incompatible array element types to compiler assignability checks", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      ${base}
+      model Other { id: int32; }
+      union Choice extends Base[] { invalid: Other[] }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "unassignable",
+      message: /Type 'Other' is not assignable to type 'Base'/,
+    });
+  });
+
+  it.each([
+    ["dictionary", "model Base is Record<string>;"],
+    ["hybrid indexed object", "model Base is Record<string> { label: string; }"],
+  ])("still checks inheritance and ownership for a %s constraint", async (_, declaration) => {
+    await tester
+      .expect(
+        `
+        ${declaration}
+        model Copy is Base;
+        union First extends Base { first: Copy }
+        union Second extends Base { second: Copy }
+      `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("first"),
+        reusedModel("second", "Copy"),
+        diagnostic("second"),
+      ]);
   });
 });
 
