@@ -85,6 +85,14 @@ Duplicate resource records give Bicep and other consumers of `resolveArmResource
 
 The rule reports one warning on an identity operation from each duplicate record after the first, preferring a read operation and otherwise a create/update operation. It does not report every conflicting pair. Library declarations and synthetic ancestors without their own identity operations are not diagnostic targets.
 
+The rule is included in the ARM library's `all` ruleset but disabled in the central `resource-manager` ruleset pending fixes to existing service specifications. Enable it explicitly in `tspconfig.yaml` to check a service before rollout:
+
+```yaml
+linter:
+  enable:
+    "@azure-tools/typespec-azure-resource-manager/no-resource-instance-duplicates": true
+```
+
 ## Suppression
 
 Prefer consistent operation templates or explicitly aligned resource names. Suppression is acceptable only when an ARM reviewer approves intentionally retaining separate logical resource records and the consuming emitter can handle them. Place the directive above the operation named by the diagnostic, not above the resource model:
