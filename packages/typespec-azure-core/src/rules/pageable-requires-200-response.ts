@@ -1,9 +1,4 @@
-import {
-  createRule,
-  fileRef,
-  isList,
-  isTemplateDeclarationOrInstance,
-} from "@typespec/compiler";
+import { createRule, fileRef, isList, isTemplateDeclarationOrInstance } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 export const pageableRequires200ResponseRule = createRule({
