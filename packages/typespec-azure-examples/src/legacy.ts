@@ -32,7 +32,7 @@ interface RequestBuckets {
  * `typespec-autorest` emitter's legacy reconstruction, so both directions and both consumers agree.
  */
 export function materializeLegacyExample(
-  resolved: Pick<ResolvedExample, "request" | "responses" | "title" | "legacyFilename">,
+  resolved: Pick<ResolvedExample, "request" | "responses" | "id" | "title" | "legacyFilename">,
   options: { operationId: string; apiVersion: string; bodyParameterName?: string },
 ): LegacyExample {
   const request = (resolved.request ?? {}) as RequestBuckets;
@@ -55,6 +55,7 @@ export function materializeLegacyExample(
 
   const title =
     resolved.title ??
+    resolved.id ??
     (resolved.legacyFilename ? stripJsonExtension(resolved.legacyFilename) : undefined) ??
     options.operationId;
 

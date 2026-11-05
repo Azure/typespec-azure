@@ -13,5 +13,5 @@ def client():
         yield client
 
 
-def test_legacy_client_get(client: ApiVersionOverrideClient):
+def test_legacy_client_api_version_override(client: ApiVersionOverrideClient):
     client.legacy_client.get()

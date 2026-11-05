@@ -17,6 +17,7 @@ namespace Microsoft.ContosoProviderHub;
 /** Contoso API versions */
 enum Versions {
   /** 2025-11-19-preview version */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "Preserve older common-types schemas for this grandfathered API sample."
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @previewVersion
   `2025-11-19-preview`,

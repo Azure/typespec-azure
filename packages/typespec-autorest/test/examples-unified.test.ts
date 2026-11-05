@@ -97,6 +97,40 @@ async function compileVersioned(
 }
 
 describe("unified examples format", () => {
+  it("reports an unknown operation for each applicable API version", async () => {
+    tester.fs.add(
+      resolveVirtualPath("./examples.yaml"),
+      versionedExamplesYaml.replace("Widgets.get:", "Widgets.missing:"),
+    );
+    const [, diagnostics] = await tester.compileAndDiagnose(versionedSpec);
+    const errors = diagnostics.filter(
+      (diagnostic) =>
+        diagnostic.code === "@azure-tools/typespec-autorest/unknown-example-operation",
+    );
+    expect(errors).toHaveLength(2);
+    expect(errors.every((diagnostic) => diagnostic.severity === "error")).toBe(true);
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("Widgets.missing");
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("2023-01-01");
+    expect(errors.map((diagnostic) => diagnostic.message).join("\n")).toContain("2023-06-01");
+  });
+
+  it("does not report a later operation before its example becomes applicable", async () => {
+    tester.fs.add(
+      resolveVirtualPath("./examples.yaml"),
+      versionedExamplesYaml.replace(
+        "Widgets.create:\n  - request:",
+        'Widgets.create:\n  - since: "2023-06-01"\n    request:',
+      ),
+    );
+    const [, diagnostics] = await tester.compileAndDiagnose(
+      versionedSpec.replace(
+        '@operationId("Widgets_Create")',
+        '@added(Versions.v2)\n  @operationId("Widgets_Create")',
+      ),
+    );
+    expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+  });
+
   it("materializes legacy x-ms-examples from examples.yaml (auto-detected)", async () => {
     const { v1 } = await compileVersioned(versionedExamplesYaml);
 
@@ -119,11 +153,26 @@ describe("unified examples format", () => {
     expect(Object.keys(file).slice(0, 2)).toEqual(["title", "operationId"]);
   });
 
-  it("preserves the original legacy file name and derives the key from it", async () => {
-    const withFileName = `
+  it.each([
+    { name: "LF by default", options: {}, newline: "\n" },
+    { name: "configured CRLF", options: { "new-line": "crlf" }, newline: "\r\n" },
+  ])("ends materialized examples with a trailing newline ($name)", async ({ options, newline }) => {
+    await compileVersioned(versionedExamplesYaml, options);
+
+    const text = tester.fs.fs.get(
+      resolveVirtualPath("./tsp-output/stable/2023-01-01/examples/Widgets_Get.json"),
+    )!;
+    expect(text.endsWith(`}${newline}`)).toBe(true);
+  });
+
+  it.each(["id", "legacyFilename"])(
+    "preserves the filename and derives its key (%s)",
+    async (field) => {
+      const value = field === "id" ? "Get_Widget_Original" : "Get_Widget_Original.json";
+      const withFileName = `
 $namespace: WidgetService
 Widgets.get:
-  - legacyFilename: Get_Widget_Original.json
+  - ${field}: ${value}
     request:
       path:
         id: "1"
@@ -132,18 +181,19 @@ Widgets.get:
         body:
           name: base
 `;
-    const { v1 } = await compileVersioned(withFileName);
+      const { v1 } = await compileVersioned(withFileName);
 
-    // With no explicit title, the x-ms-examples key defaults to the legacy file name (no ext).
-    expect(v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"]).toEqual({
-      Get_Widget_Original: { $ref: "./examples/Get_Widget_Original.json" },
-    });
-    expect(
-      tester.fs.fs.has(
-        resolveVirtualPath("./tsp-output/stable/2023-01-01/examples/Get_Widget_Original.json"),
-      ),
-    ).toBe(true);
-  });
+      // With no explicit title, the x-ms-examples key defaults to the legacy file name (no ext).
+      expect(v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"]).toEqual({
+        Get_Widget_Original: { $ref: "./examples/Get_Widget_Original.json" },
+      });
+      expect(
+        tester.fs.fs.has(
+          resolveVirtualPath("./tsp-output/stable/2023-01-01/examples/Get_Widget_Original.json"),
+        ),
+      ).toBe(true);
+    },
+  );
 
   it("keeps an explicit title as the x-ms-examples key alongside the legacy file name", async () => {
     const withTitle = `

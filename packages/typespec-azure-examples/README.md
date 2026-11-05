@@ -45,6 +45,8 @@ CaCertificates.get:
   variants carry a quoted `since` and restate the full request/response.
 - Response status codes are bare integer keys. `api-version` is implicit; use the
   `{api-version}` placeholder where a version must be embedded in a value.
+- Optional `id` is the filename stem: `id: GetWidget` generates `GetWidget.json`.
+  Existing `legacyFilename: GetWidget.json` remains supported. Lineages still use titles.
 
 ## `tsp-examples validate`
 
@@ -70,6 +72,29 @@ found (use `--warn-as-error` to also fail on warnings).
   one file.
 - `{api-version}` is the only supported placeholder, and `api-version` must not appear as a
   request parameter.
+
+## `tsp-examples add`
+
+Add examples for a **newly-introduced API version**, adding an entry only where it is actually
+needed:
+
+```bash
+tsp-examples add SERVICE_DIR [--api-version VERSION]
+```
+
+For each operation in the target version's Swagger, `add` diffs the operation's contract against the
+previous version (parity with OpenAPI-diff / `oad`) and:
+
+- **unchanged** → does nothing (the existing lineage already resolves forward);
+- **changed** (parameters, request body, or a response shape differ) → appends a
+  `since: <target>` variant **cloned** from the operation's previous example, so you only edit the
+  delta;
+- **new operation** → adds a schema-shaped skeleton entry to fill in.
+
+The target version defaults to the newest one in `service.yaml`; override it with `--api-version`.
+The command is idempotent (re-running adds nothing) and validates its output. Use `--dry-run` to
+preview the updated files. The change detection reads the emitted Swagger during rollout; results
+are written back into the existing `examples.yaml` / `examples/*.yaml`.
 
 ## `tsp-examples-migrate`
 
@@ -132,8 +157,8 @@ is `<=` the target (the base entry applies from the earliest version). The `{api
 placeholder is substituted with the target version, and each resolved example is reconstructed into a
 classic `x-ms-examples` document — the `title`/`operationId` envelope and the flat `parameters` bag
 (with `api-version` re-added and the body under its Swagger parameter name), read from the service's
-Swagger. Files are named by their preserved `legacyFilename` (or the conventional
-`<OperationId>.json`). With `--out <dir>` each document is written as a separate JSON file; otherwise
+Swagger. Files are named `<id>.json`, by the compatibility `legacyFilename`, or by the conventional
+`<OperationId>.json`. With `--out <dir>` each document is written as a separate JSON file; otherwise
 a `filename → document` map is printed. Operations with no matching Swagger operation are reported
 and skipped.
 
@@ -156,12 +181,13 @@ const diagnostics = validateExampleFiles([file]);
 const { examples } = resolveExampleFiles([file], "2024-06-01", ["2024-06-01"]);
 ```
 
-Filesystem discovery, migration, and terminal diagnostic formatting require Node.js. They are
+Filesystem discovery, migration, example authoring, and terminal diagnostic formatting require Node.js. They are
 available from the explicit `/node` entrypoint; Node.js also automatically selects this entrypoint
 for imports from the package root, preserving existing Node.js usage. The CLI commands are unchanged.
 
 ```ts
 import {
+  add,
   validateExamplesDir,
   migrate,
   resolveExamplesDir,
@@ -172,4 +198,6 @@ const { diagnostics } = await validateExamplesDir("path/to/service");
 const { files } = await migrate("path/to/specs", { namespace: "Microsoft.EventGrid" });
 
 const { examples } = await resolveExamplesDir("path/to/service", "2024-06-01");
+
+const result = await add("path/to/service");
 ```

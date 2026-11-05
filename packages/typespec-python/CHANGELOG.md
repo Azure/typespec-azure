@@ -1,5 +1,9 @@
 # Release
 
+## 0.63.10
+
+- Bump @typespec/http-client-python to 0.39.0
+
 ## 0.63.9
 
 - Bump @typespec/http-client-python to 0.38.1 and bump latest typespec lib version

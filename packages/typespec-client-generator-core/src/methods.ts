@@ -401,12 +401,14 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   client: SdkClientType<TServiceOperation>,
 ): [SdkLroServiceMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  // TCGC selects the client result; Core remains responsible for protocol steps.
   const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return diagnostics.wrap(undefined);
   }
 
   const finalResponse = getFinalResponse();
+  const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -431,6 +433,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
+    ...(statusMetadata && statusMetadata.length > 0 ? { statusMetadata } : {}),
   });
 
   function getSdkLroServiceFinalStep(
@@ -637,6 +640,9 @@ function getSdkMethodResponse(
     type = ignoreDiagnostics(
       getClientTypeWithDiagnostics(context, responseOverrideType, operation),
     );
+    if (type.kind === "bytes") {
+      type = { ...type, encode: "bytes" };
+    }
   } else if (getResponseAsBool(context, operation)) {
     type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
@@ -648,6 +654,7 @@ function getSdkMethodResponse(
         access: "public",
         usage: UsageFlags.Output,
         variantTypes: allResponseBodies,
+        variants: new Map(allResponseBodies.map((type) => [Symbol("variant"), type])),
         name: createGeneratedName(context, operation, "UnionResponse"),
         isGeneratedName: true,
         isExactName: false,
