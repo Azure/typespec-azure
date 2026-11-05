@@ -107,31 +107,11 @@ named model for the composed request body.
 
 ## Implicit response bodies
 
-The rule also checks anonymous implicit model response bodies, such as
-`@get op read(): { value: string };`. Anonymous aliases and intersections are checked,
-as is each model alternative in a response union, including nested unions.
-Diagnostics target the original model expressions, not synthesized HTTP payloads.
-A shared model is reported once across properties, request bodies, operations and
-response status codes, including declarations imported from another project file.
-
-Named responses and complete spreads of a named payload remain valid, including
-when headers or status codes are declared inside the named model, outside its
-spread, or in both places. Adding payload properties outside the named model
-creates a new anonymous response shape and is reported. Empty, metadata-only,
-scalar, array and dictionary responses are not reported by the implicit-response check.
-Library operations and generic operation/interface templates are excluded from
-that check. Concrete operations inherited from instantiated interface templates
-are checked like directly declared operations.
-
-Explicit `@body` and `@bodyRoot` properties continue to use the existing
-property-type checks and template-argument exceptions.
+The rule also checks anonymous implicit model response bodies, such as `@get op read(): { value: string };`.
 
 ### Incorrect
 
-For an ARM resource read, use `ArmResourceRead` and customize its `Response` only
-when needed. Adding a payload property outside a named model creates an anonymous
-response shape. These excerpts assume an ARM provider context with `Widget` already
-declared and the HTTP and ARM namespaces in scope:
+Adding a payload property outside a named model creates an anonymous response shape. These excerpts assume an ARM provider context with `Widget` already declared and the HTTP and ARM namespaces in scope:
 
 ```tsp
 @armResourceOperations
@@ -149,34 +129,14 @@ interface Widgets {
 
 ### Correct
 
-Define the complete payload as a named model and spread it into the customized response:
+When no custom response is needed, prefer `ArmResourceRead<Widget>` without a `Response` override:
 
 ```tsp
-model WidgetResponse extends Widget {
-  etag: string;
-}
-
 @armResourceOperations
 interface Widgets {
-  get is ArmResourceRead<
-    Widget,
-    Response = {
-      @statusCode status: 200;
-      ...WidgetResponse;
-    }
-  >;
+  get is ArmResourceRead<Widget>;
 }
 ```
-
-When no custom response is needed, prefer `ArmResourceRead<Widget>` without a
-`Response` override. Its default response uses an explicit `@bodyRoot`. Concrete
-operations declared with `is ArmResourceRead<...>` are still checked when their
-customized responses have implicit payloads.
-
-The response check uses the existing `no-unnamed-types` rule's enablement. Both the
-data-plane and resource-manager rulesets enable this rule, so existing services
-can receive additional warnings. Use the existing rule ID for configuration and
-suppression; there is no separate response rule to enable.
 
 ## Suppression
 
@@ -192,7 +152,4 @@ and the Swagger validator reports them.
 
 The implicit-response check partially covers
 [AvoidAnonymousTypes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/avoid-anonymous-types.md).
-The Swagger rule checks emitted schema occurrences, whereas this rule reports
-original TypeSpec declarations once. Dictionary inlining, composition and
-emitter-specific naming can produce different findings; this is not exact
-Swagger diagnostic parity.
+It checks TypeSpec declarations, not emitted Swagger schemas. Named dictionaries and named models that an emitter inlines in `allOf` remain valid; Swagger schema overrides are not inspected.
