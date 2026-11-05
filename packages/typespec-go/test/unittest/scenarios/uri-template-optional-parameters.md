@@ -158,6 +158,13 @@ import (
 	"strings"
 )
 
+func expandPathMatrix(prefix, value string) string {
+	if value == "" {
+		return prefix
+	}
+	return prefix + "=" + value
+}
+
 func expandPathArray[T any](values []T, prefix, separator string, escape bool, format func(T) string) string {
 	parts := make([]string, 0, len(values))
 	for _, value := range values {
@@ -172,6 +179,15 @@ func expandPathArray[T any](values []T, prefix, separator string, escape bool, f
 	}
 	if len(parts) == 0 {
 		return ""
+	}
+	if strings.HasPrefix(prefix, ";") {
+		if separator != "," {
+			for i, part := range parts {
+				parts[i] = expandPathMatrix(prefix, part)
+			}
+			return strings.Join(parts, "")
+		}
+		return expandPathMatrix(prefix, strings.Join(parts, separator))
 	}
 	return prefix + strings.Join(parts, separator)
 }
@@ -197,13 +213,20 @@ func expandPathMap[T any](values map[string]T, prefix, separator string, escape,
 			}
 		}
 		if explode {
-			parts = append(parts, key+"="+value)
+			if prefix == ";" && value == "" {
+				parts = append(parts, key)
+			} else {
+				parts = append(parts, key+"="+value)
+			}
 		} else {
 			parts = append(parts, key, value)
 		}
 	}
 	if len(parts) == 0 {
 		return ""
+	}
+	if strings.HasPrefix(prefix, ";") && !explode {
+		return expandPathMatrix(prefix, strings.Join(parts, separator))
 	}
 	return prefix + strings.Join(parts, separator)
 }
@@ -388,7 +411,7 @@ func (client *ExpansionsClient) matrixCreateRequest(ctx context.Context, options
 	urlPath := runtime.JoinPaths(client.endpoint, "/matrix{values}")
 	optionalValues := ""
 	if options != nil && options.Values != nil {
-		optionalValues = expandPathArray(options.Values, ";values=", ";values=", true, func(value string) string {
+		optionalValues = expandPathArray(options.Values, ";values", ";values", true, func(value string) string {
 			return value
 		})
 	}

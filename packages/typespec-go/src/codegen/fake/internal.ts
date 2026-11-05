@@ -156,6 +156,26 @@ function emitSplitURIPath(imports: ImportManager): string {
 		if !strings.HasPrefix(value, prefix) {
 			return nil, fmt.Errorf("invalid URI expansion %q: expected prefix %q", value, prefix)
 		}
+		if strings.HasPrefix(prefix, ";") && prefix != ";" {
+			name := strings.TrimPrefix(prefix, ";")
+			parts := []string{strings.TrimPrefix(value, ";")}
+			if separator != "," {
+				parts = strings.Split(value, ";")[1:]
+			}
+			for i, part := range parts {
+				if part == name {
+					parts[i] = ""
+				} else if strings.HasPrefix(part, name+"=") {
+					parts[i] = strings.TrimPrefix(part, name+"=")
+				} else {
+					return nil, fmt.Errorf("invalid URI matrix entry %q: expected %q", part, name)
+				}
+			}
+			if separator == "," {
+				return strings.Split(parts[0], ","), nil
+			}
+			return parts, nil
+		}
 		return strings.Split(strings.TrimPrefix(value, prefix), separator), nil
 	}
 `;
@@ -205,7 +225,7 @@ function emitParseURIMap(imports: ImportManager): string {
   imports.add("net/url");
   imports.add("strings");
   return `
-	func parseURIMap[T any](values []string, explode, unescape bool, parse func(string) (T, error)) (map[string]T, error) {
+	func parseURIMap[T any](values []string, explode, unescape, allowEmpty bool, parse func(string) (T, error)) (map[string]T, error) {
 		if values == nil {
 			return nil, nil
 		}
@@ -214,7 +234,7 @@ function emitParseURIMap(imports: ImportManager): string {
 			pairs = make([]string, 0, len(values)*2)
 			for _, value := range values {
 				key, item, ok := strings.Cut(value, "=")
-				if !ok {
+				if !ok && !allowEmpty {
 					return nil, fmt.Errorf("invalid URI map entry %q: expected key=value", value)
 				}
 				pairs = append(pairs, key, item)
@@ -294,7 +314,7 @@ function emitParseURIQueryMap(): string {
 		if err != nil {
 			return nil, err
 		}
-		return parseURIMap(parts, false, false, parse)
+		return parseURIMap(parts, false, false, false, parse)
 	}
 `;
 }

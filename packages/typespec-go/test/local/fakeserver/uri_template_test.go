@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -36,6 +37,13 @@ func TestURITemplateExpansionBoundaries(t *testing.T) {
 		{"PathExplodedArray", []any{[]string{"a", "", "b"}, nil}, "/root/uri/path-explode/a//b/end", ""},
 		{"PathExplodedArray", []any{[]string{"a", ".", "b"}, nil}, "/root/uri/path-explode/a/./b/end", ""},
 		{"PathExplodedArray", []any{[]string{"a", "..", "b"}, nil}, "/root/uri/path-explode/a/../b/end", ""},
+		{"ScopedPath", []any{"/", []string{"a", "", ".", "..", "b"}, nil}, "/root/uri/scoped/a//./../b/end", ""},
+		{"ScopedPath", []any{"/subscriptions/test/", []string{"a", "", ".", "..", "b"}, nil}, "/root/subscriptions/test/uri/scoped/a//./../b/end", ""},
+		{"OptionalMatrix", []any{nil}, "/root/uri/optional-matrix", ""},
+		{"OptionalMatrix", []any{&fakeserver.ClientOptionalMatrixOptions{Value: to.Ptr("")}}, "/root/uri/optional-matrix;value", ""},
+		{"MatrixArray", []any{[]string{""}, nil}, "/root/uri/matrix;value", ""},
+		{"MatrixExplodedArray", []any{[]string{"", "b", ""}, nil}, "/root/uri/matrix-explode;value;value=b;value", ""},
+		{"MatrixStringMap", []any{map[string]string{"a": "", "b": "c"}, nil}, "/root/uri/matrix-string-map;a;b=c", ""},
 		{"QueryArray", []any{[]string{"a,b", "c"}, nil}, "/root/uri/query-array", "value=a%2Cb,c&"},
 		{"QueryArray", []any{[]string{"a", "b", "c"}, nil}, "/root/uri/query-array", "value=a,b,c&"},
 		{"QueryLiteral", []any{nil}, "/root/uri/query-literal", "filter=kind,fixed&"},
@@ -308,6 +316,9 @@ func TestURITemplateFakeRoundTrip(t *testing.T) {
 		{"LabelExplodedMap", []any{record, nil}},
 		{"MatrixArray", []any{array, nil}},
 		{"MatrixExplodedArray", []any{array, nil}},
+		{"MatrixArray", []any{[]string{""}, nil}},
+		{"MatrixExplodedArray", []any{[]string{""}, nil}},
+		{"MatrixStringMap", []any{map[string]string{"a": "", "b": "c"}, nil}},
 		{"MatrixMap", []any{record, nil}},
 		{"MatrixExplodedMap", []any{record, nil}},
 		{"LabelScalar", []any{"a/b %20", nil}},
@@ -333,6 +344,10 @@ func TestURITemplateFakeRoundTrip(t *testing.T) {
 		{"OptionalQueryArray", []any{&fakeserver.ClientOptionalQueryArrayOptions{Value: array}}},
 		{"QueryUintArray", []any{[]uint32{0, 4294967295}, nil}},
 		{"QueryMaxUintArray", []any{[]uint64{0, 18446744073709551615}, nil}},
+		{"NumericPath", []any{int8(-128), int16(-32768), uint8(255), uint16(65535), uint32(4294967295), uint64(18446744073709551615), nil}},
+		{"NumericQuery", []any{uint32(0), nil}},
+		{"NumericQuery", []any{uint32(4294967295), &fakeserver.ClientNumericQueryOptions{Optional: to.Ptr[uint32](0)}}},
+		{"NumericMatrix", []any{uint32(4294967295), nil}},
 		{"QueryLiteral", []any{nil}},
 		{"QueryMixedLiteral", []any{fakeserver.MixedLiteralQueryFields{Field: "a,b"},
 			&fakeserver.ClientQueryMixedLiteralOptions{Count: to.Ptr[int32](0)}}},
@@ -434,6 +449,65 @@ func TestURITemplateFakeRejectsMalformedMap(t *testing.T) {
 	}
 }
 
+func TestURITemplateFakeAcceptsLegacyMatrix(t *testing.T) {
+	called := 0
+	srv := &fake.Server{
+		OptionalMatrix: func(ctx context.Context, options *fakeserver.ClientOptionalMatrixOptions) (azfake.Responder[fakeserver.ClientOptionalMatrixResponse], azfake.ErrorResponder) {
+			called++
+			require.Equal(t, &fakeserver.ClientOptionalMatrixOptions{Value: to.Ptr("")}, options)
+			var resp azfake.Responder[fakeserver.ClientOptionalMatrixResponse]
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientOptionalMatrixResponse{}, nil)
+			return resp, azfake.ErrorResponder{}
+		},
+		MatrixExplodedArray: func(ctx context.Context, value []string, options *fakeserver.ClientMatrixExplodedArrayOptions) (azfake.Responder[fakeserver.ClientMatrixExplodedArrayResponse], azfake.ErrorResponder) {
+			called++
+			require.Equal(t, []string{"", "b", ""}, value)
+			var resp azfake.Responder[fakeserver.ClientMatrixExplodedArrayResponse]
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientMatrixExplodedArrayResponse{}, nil)
+			return resp, azfake.ErrorResponder{}
+		},
+		MatrixStringMap: func(ctx context.Context, value map[string]string, options *fakeserver.ClientMatrixStringMapOptions) (azfake.Responder[fakeserver.ClientMatrixStringMapResponse], azfake.ErrorResponder) {
+			called++
+			require.Equal(t, map[string]string{"a": "", "b": "c"}, value)
+			var resp azfake.Responder[fakeserver.ClientMatrixStringMapResponse]
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientMatrixStringMapResponse{}, nil)
+			return resp, azfake.ErrorResponder{}
+		},
+	}
+	for method, path := range map[string]string{
+		"OptionalMatrix":      "/uri/optional-matrix;value=",
+		"MatrixExplodedArray": "/uri/matrix-explode;value=;value=b;value=",
+		"MatrixStringMap":     "/uri/matrix-string-map;a=;b=c",
+	} {
+		req, err := http.NewRequest(http.MethodGet, "https://fake.endpoint"+path, nil)
+		require.NoError(t, err)
+		req = req.WithContext(context.WithValue(context.Background(), runtime.CtxAPINameKey{}, "Client."+method))
+		_, err = fake.NewServerTransport(srv).Do(req)
+		require.NoError(t, err)
+	}
+	require.Equal(t, 3, called)
+}
+
+func TestURITemplateFakePreservesEmptyOptionalInteger(t *testing.T) {
+	called := false
+	srv := &fake.Server{
+		NumericQuery: func(ctx context.Context, value uint32, options *fakeserver.ClientNumericQueryOptions) (azfake.Responder[fakeserver.ClientNumericQueryResponse], azfake.ErrorResponder) {
+			called = true
+			require.Zero(t, value)
+			require.Nil(t, options)
+			var resp azfake.Responder[fakeserver.ClientNumericQueryResponse]
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientNumericQueryResponse{}, nil)
+			return resp, azfake.ErrorResponder{}
+		},
+	}
+	req, err := http.NewRequest(http.MethodGet, "https://fake.endpoint/uri/numeric-query?value=0&optional=", nil)
+	require.NoError(t, err)
+	req = req.WithContext(context.WithValue(context.Background(), runtime.CtxAPINameKey{}, "Client.NumericQuery"))
+	_, err = fake.NewServerTransport(srv).Do(req)
+	require.NoError(t, err)
+	require.True(t, called)
+}
+
 func TestURITemplateFakeRejectsMalformedQuery(t *testing.T) {
 	for _, tt := range []struct {
 		method string
@@ -441,6 +515,7 @@ func TestURITemplateFakeRejectsMalformedQuery(t *testing.T) {
 		query  string
 	}{
 		{"QueryMap", "/uri/query-map", "value=key"},
+		{"SimpleExplodedMap", "/uri/simple-explode/key", ""},
 		{"QueryMap", "/uri/query-map", "value=key,not-an-int"},
 		{"QueryMap", "/uri/query-map", "value=a%ZZ,1"},
 		{"QueryMap", "/uri/query-map", "%ZZ=key,1"},
@@ -448,6 +523,13 @@ func TestURITemplateFakeRejectsMalformedQuery(t *testing.T) {
 		{"QueryObject", "/uri/query-object", "value=field,a,unknown,b"},
 		{"QueryObject", "/uri/query-object", "value=field,a%ZZ"},
 		{"BytesObject", "/uri/bytes-object", "value=value,a"},
+		{"NumericQuery", "/uri/numeric-query", "value=-1"},
+		{"NumericQuery", "/uri/numeric-query", "value=4294967296"},
+		{"NumericQuery", "/uri/numeric-query", "value=0&optional=-1"},
+		{"NumericQuery", "/uri/numeric-query", "value=0&optional=4294967296"},
+		{"NumericPath", "/uri/numeric/-129/0/0/0/0/0", ""},
+		{"NumericPath", "/uri/numeric/0/0/0/0/0/18446744073709551616", ""},
+		{"NumericMatrix", "/uri/numeric-matrix;value=-1", ""},
 	} {
 		t.Run(tt.method+"/"+tt.query, func(t *testing.T) {
 			called := false

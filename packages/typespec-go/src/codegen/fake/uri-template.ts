@@ -11,7 +11,11 @@ import { getPathExpansionStyle } from "../core/path-expansion.js";
 import type { RequiredHelpers } from "./internal.js";
 
 /** Emits a typed parser shared by URI-template arrays, maps, and object members. */
-function valueParser(type: go.WireType, pkg: go.FakePackage, imports: ImportManager): string {
+export function valueParser(
+  type: go.WireType,
+  pkg: go.FakePackage,
+  imports: ImportManager,
+): string {
   const wireType = go.unwrapPtr(type);
   const typeName = go.getTypeDeclaration(type, pkg);
   imports.addForType(type);
@@ -106,6 +110,9 @@ export function parseURITemplateParameter(
     text += `var ${result} ${go.getTypeDeclaration(param.type, pkg)}\n`;
     text += `if ${raw} != "" {\n`;
     let value = `strings.TrimPrefix(${raw}, ${JSON.stringify(prefix)})`;
+    if (param.pathStyle === "matrix") {
+      value = `strings.TrimPrefix(${value}, "=")`;
+    }
     if (param.isEncoded) {
       imports.add("net/url");
       text += `unescaped, unescapeErr := url.PathUnescape(${value})\n`;
@@ -132,7 +139,7 @@ export function parseURITemplateParameter(
     let parse: string;
     if (param.kind === "pathMapParam") {
       requiredHelpers.parseURIMap = true;
-      parse = `parseURIMap(${values}, ${param.explode}, ${param.isEncoded}, ${parser})`;
+      parse = `parseURIMap(${values}, ${param.explode}, ${param.isEncoded}, ${param.pathStyle === "matrix"}, ${parser})`;
     } else {
       requiredHelpers.parseURIArray = true;
       parse = `parseURIArray(${values}, ${param.isEncoded}, ${parser})`;

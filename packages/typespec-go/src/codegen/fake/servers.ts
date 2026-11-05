@@ -11,7 +11,7 @@ import { ImportManager } from "../core/imports.js";
 import { getPathExpansionStyle } from "../core/path-expansion.js";
 import { isRawQueryExpansion } from "../core/query-expansion.js";
 import { generateServerInternal, RequiredHelpers } from "./internal.js";
-import { parseURITemplateParameter } from "./uri-template.js";
+import { parseURITemplateParameter, valueParser } from "./uri-template.js";
 
 // contains the generated content for all servers and the required helpers
 export class ServerContent {
@@ -1220,7 +1220,13 @@ function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathP
     } else if (param.pathStyle !== "simple") {
       const { prefix } = getPathExpansionStyle(param);
       const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>${escapedPrefix}[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]*)`;
+      const suffix = `[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]*`;
+      let expansion = escapedPrefix + suffix;
+      if (param.pathStyle === "matrix" && prefix !== ";") {
+        const entry = `${escapedPrefix}(?:=${suffix.replace(";", "")})?`;
+        expansion = param.kind === "pathCollectionParam" && param.explode ? `(?:${entry})+` : entry;
+      }
+      replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>${expansion})`;
     }
     if (param.style === "optional" || param.style === "flag") {
       replaceWith += "?";
@@ -1385,8 +1391,8 @@ function parseHeaderPathQueryParams(
       param.kind === "pathCollectionParam" ||
       param.kind === "pathMapParam" ||
       (param.kind === "pathScalarParam" &&
-        param.pathStyle !== "simple" &&
-        param.style === "optional") ||
+        (param.pathStyle === "matrix" ||
+          (param.pathStyle !== "simple" && param.style === "optional"))) ||
       param.kind === "queryMapParam" ||
       (param.kind === "queryCollectionParam" &&
         (param.collectionFormat === "csv" ||
@@ -1605,31 +1611,30 @@ function parseHeaderPathQueryParams(
         content += `${indent.get()}return time.Unix(p, 0), nil\n${indent.pop().get()}})\n`;
         content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
       }
-    } else if (go.isScalar(paramType, "float32", "float64", "int32", "int64")) {
-      let parser: string;
-      if (!go.isRequiredParameter(param.style)) {
+    } else if (
+      go.isScalar(
+        paramType,
+        "float32",
+        "float64",
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "byte",
+        "rune",
+      ) ||
+      (paramType.kind === "constant" && paramType.type !== "string")
+    ) {
+      const parse = valueParser(paramType, pkg, imports);
+      const optional = !go.isRequiredParameter(param.style);
+      if (optional) {
         requiredHelpers.parseOptional = true;
-        parser = "parseOptional";
-      } else {
-        requiredHelpers.parseWithCast = true;
-        parser = "parseWithCast";
       }
-      if (
-        paramType.type === "float32" ||
-        paramType.type === "int32" ||
-        !go.isRequiredParameter(param.style)
-      ) {
-        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parser}(${paramValue}, func(v string) (${paramType.type}, error) {\n`;
-        content += `${indent.push().get()}p, parseErr := ${emitNumericConversion("v", paramType.type)}\n`;
-        content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return 0, parseErr\n${indent.pop().get()}}\n`;
-        let result = "p";
-        if (paramType.type === "float32" || paramType.type === "int32") {
-          result = `${paramType.type}(${result})`;
-        }
-        content += `${indent.get()}return ${result}, nil\n${indent.pop().get()}})\n`;
-      } else {
-        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${emitNumericConversion(paramValue, paramType.type)}\n`;
-      }
+      content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${optional ? `parseOptional(${paramValue}, ${parse})` : `(${parse})(${paramValue})`}\n`;
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     } else if (param.kind === "headerMapParam") {
       imports.add("strings");
@@ -1643,32 +1648,6 @@ function parseHeaderPathQueryParams(
       content += `${indent.push().get()}if ${localVar} == nil {\n${indent.push().get()}${localVar} = map[string]*string{}\n${indent.pop().get()}}\n`;
       content += `${indent.get()}${localVar}[hh[len("${headerPrefix}"):]] = to.Ptr(getHeaderValue(req.Header, hh))\n`;
       content += `${indent.pop().get()}}\n${indent.pop().get()}}\n`;
-    } else if (go.isConstant(paramType, "bool", "float32", "float64", "int32", "int64")) {
-      let parseHelper: string;
-      if (!go.isRequiredParameter(param.style)) {
-        requiredHelpers.parseOptional = true;
-        parseHelper = "parseOptional";
-      } else {
-        requiredHelpers.parseWithCast = true;
-        parseHelper = "parseWithCast";
-      }
-      let parse: string;
-      let zeroValue: string;
-      if (paramType.type === "bool") {
-        imports.add("strconv");
-        parse = "strconv.ParseBool(v)";
-        zeroValue = "false";
-      } else {
-        // emitNumericConversion adds the necessary import of strconv
-        parse = emitNumericConversion("v", paramType.type);
-        zeroValue = "0";
-      }
-      const toConstType = go.getTypeDeclaration(paramType, pkg);
-      content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parseHelper}(${paramValue}, func(v string) (${toConstType}, error) {\n`;
-      content += `${indent.push().get()}p, parseErr := ${parse}\n`;
-      content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return ${zeroValue}, parseErr\n${indent.pop().get()}}\n`;
-      content += `${indent.get()}return ${toConstType}(p), nil\n${indent.pop().get()}})\n`;
-      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     } else if (!go.isRequiredParameter(param.style)) {
       // we check this last as it's a superset of the previous conditions
       requiredHelpers.getOptional = true;
