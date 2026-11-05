@@ -1389,7 +1389,8 @@ function parseHeaderPathQueryParams(
         param.style === "optional") ||
       param.kind === "queryMapParam" ||
       (param.kind === "queryCollectionParam" &&
-        (param.collectionFormat === "csv" || param.collectionFormat === "multi")) ||
+        (param.collectionFormat === "csv" ||
+          (param.collectionFormat === "multi" && param.type.itemType.kind !== "string"))) ||
       (go.isQueryParameter(param) && param.queryExpansion)
     ) {
       content += parseURITemplateParameter(
