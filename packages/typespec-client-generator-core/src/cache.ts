@@ -173,7 +173,6 @@ function cloneSdkClient(client: SdkClient): SdkClient {
   return {
     kind: "SdkClient",
     name: client.name,
-    isExactName: client.isExactName,
     services: [...client.services],
     type: client.type,
     subClients: [],
