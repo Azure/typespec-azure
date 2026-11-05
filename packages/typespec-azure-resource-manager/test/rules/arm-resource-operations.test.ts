@@ -125,6 +125,37 @@ it("checks response aliases overwritten by another lifecycle registration", asyn
     .toEmitDiagnostics([responseDiagnostic]);
 });
 
+it.each(["ArmResponse<Widget[]>", "ArmResponse<{ value: Widget[]; nextLink?: string; }>"])(
+  "compares collection item types without requiring paging annotations: %s",
+  async (response) => {
+    await tester
+      .expect(
+        `${models}
+      @armResourceOperations interface Widgets {
+        @get @armResourceList(Widget)
+        list(...Foundations.SubscriptionScope<Widget>): ${response};
+      }
+    `,
+      )
+      .toBeValid();
+  },
+);
+
+it("does not reuse one list response's items for another success response", async () => {
+  await tester
+    .expect(
+      `${models}
+      model Result { value?: string; }
+      @armResourceOperations interface Widgets {
+        @get @armResourceList(Widget)
+        list(...Foundations.SubscriptionScope<Widget>):
+          ArmResponse<ResourceListResult<Widget>> | ArmCreatedResponse<Result>;
+      }
+    `,
+    )
+    .toEmitDiagnostics([responseDiagnostic]);
+});
+
 describe("registered resource PUT requests", () => {
   const legacyOperations = `
     @armResourceOperations interface LegacyOps extends Azure.ResourceManager.Legacy.LegacyOperations<

@@ -7,7 +7,7 @@ import {
   fileRef,
   getDiscriminator,
   getEffectiveModelType,
-  getPagingOperation,
+  getProperty,
   getTypeName,
   isArrayModelType,
   isVoidType,
@@ -90,7 +90,6 @@ function checkArmResourceOperationReturnType(
   if (isInternalTypeSpec(context.program, operation)) return;
   const program = context.program;
   const [httpOperation] = getHttpOperation(program, operation);
-  const [paging] = list ? getPagingOperation(program, operation) : [];
   for (const response of httpOperation.responses) {
     const status = response.statusCodes;
     if (
@@ -103,9 +102,13 @@ function checkArmResourceOperationReturnType(
     }
     for (const { body } of response.responses) {
       if (body === undefined) continue;
-      const items = paging?.output.pageItems.property.type;
-      const payload =
-        items?.kind === "Model" && isArrayModelType(items) ? items.indexer.value : body.type;
+      let payload = body.type;
+      if (list && payload.kind === "Model") {
+        const items = isArrayModelType(payload) ? payload : getProperty(payload, "value")?.type;
+        if (items?.kind === "Model" && isArrayModelType(items)) {
+          payload = items.indexer.value;
+        }
+      }
       const candidate =
         payload.kind === "Model" ? getEffectiveModelType(program, payload) : undefined;
       if (
