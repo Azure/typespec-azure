@@ -35,6 +35,7 @@ export type MethodParameter =
   | PathParameter
   | QueryParameter
   | ResumeTokenParameter
+  | SseLastEventIDParameter
   | URIParameter;
 
 /** parameter is sent in the HTTP request body */
@@ -314,6 +315,11 @@ export type QueryScalarParameterWireType = type.EncodedBytes | QueryScalarParame
 /** the synthesized resume token parameter for LROs */
 export interface ResumeTokenParameter extends HttpParameterBase {
   kind: "resumeTokenParam";
+}
+
+/** the synthesized resumption option for SSE streams */
+export interface SseLastEventIDParameter extends HttpParameterBase {
+  kind: "sseLastEventIDParam";
 }
 
 /** a segment of the host's URI */
@@ -713,6 +719,16 @@ export class ResumeTokenParameter extends HttpParameterBase implements ResumeTok
     super("ResumeToken", new type.String(), "optional", "method");
     this.kind = "resumeTokenParam";
     this.docs.summary = "Resumes the long-running operation from the provided token.";
+  }
+}
+
+export class SseLastEventIDParameter extends HttpParameterBase implements SseLastEventIDParameter {
+  constructor(name: string) {
+    super(name, new type.String(), "optional", "method");
+    this.kind = "sseLastEventIDParam";
+    this.docs.summary =
+      "Sets the Last-Event-ID request header. Use only when the service supports resuming from an event ID. " +
+      "The default is empty, which omits the header. This option does not enable automatic reconnection.";
   }
 }
 
