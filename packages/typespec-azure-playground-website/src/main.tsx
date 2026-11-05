@@ -13,6 +13,7 @@ import { registerMonacoDefaultWorkersForVite } from "@typespec/playground/vite/w
 import { createRoot } from "react-dom/client";
 import samples from "../samples/dist/samples.js";
 import { useImportCommandBarItem } from "./import.js";
+import { TypeSpecPlaygroundConfig } from "./index.js";
 import "./style.css";
 
 registerMonacoDefaultWorkersForVite();
@@ -56,6 +57,7 @@ const App = () => {
   return (
     <StandalonePlayground
       {...PlaygroundManifest}
+      libraries={TypeSpecPlaygroundConfig.libraries}
       samples={samples}
       emitterViewers={{
         "@typespec/openapi3": [SwaggerUIViewer],
