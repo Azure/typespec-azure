@@ -58,6 +58,35 @@ describe("GET request bodies", () => {
       .toEmitDiagnostics((result) => ({ ...diagnostic, pos: result.pos.target.pos }));
   });
 
+  it.each([
+    ["optional header-options wrapper", "params?: SearchRequestOptions"],
+    ["void body and header-options wrapper", "body: void, params?: SearchRequestOptions"],
+  ])("reports a client-only GET with an %s outside the declared service", async (_, parameters) => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace Microsoft.Search {
+          @get
+          op read(@header("x-ms-client-request-id") clientRequestId?: string): string;
+        }
+
+        namespace Customizations {
+          model SearchRequestOptions {
+            @header("x-ms-client-request-id")
+            clientRequestId?: string;
+          }
+
+          /*target*/@autoRoute
+          @get
+          @action("searchGetCustomization")
+          op searchGetCustomization(${parameters}): string;
+        }
+      `,
+      )
+      .toEmitDiagnostics((result) => ({ ...diagnostic, pos: result.pos.target.pos }));
+  });
+
   it("reports a multipart GET body", async () => {
     await tester
       .expect(
@@ -111,6 +140,26 @@ describe("GET request bodies", () => {
 });
 
 describe("operations without a GET request body", () => {
+  it("allows GET operations with spread header-only request options", async () => {
+    await tester
+      .expect(
+        `
+        namespace Customizations {
+          model SearchRequestOptions {
+            @header("x-ms-client-request-id")
+            clientRequestId?: string;
+          }
+
+          @autoRoute
+          @get
+          @action("searchGetCustomization")
+          op searchGetCustomization(...SearchRequestOptions): string;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
   it("allows GET operations with only HTTP metadata parameters", async () => {
     await tester
       .expect(
