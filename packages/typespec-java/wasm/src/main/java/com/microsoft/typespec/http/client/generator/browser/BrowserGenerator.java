@@ -38,7 +38,9 @@ public final class BrowserGenerator {
         Client client = plugin.processClient(codeModel);
         JavaPackage output = plugin.processTemplates(codeModel, client, JavaSettings.getInstance());
         JSObject files = newFiles();
-        output.getJavaFiles().forEach(file -> addFile(files, file.getFilePath(), file.getContents().toString()));
+        BrowserPostprocessor postprocessor = new BrowserPostprocessor();
+        output.getJavaFiles().forEach(file -> addFile(files, file.getFilePath(),
+            postprocessor.removeUnusedImports(file.getFilePath(), file.getContents().toString())));
         output.getXmlFiles().forEach(file -> addFile(files, file.getFilePath(), file.getContents().toString()));
         output.getTextFiles().forEach(file -> addFile(files, file.getFilePath(), file.getContents()));
         return files;

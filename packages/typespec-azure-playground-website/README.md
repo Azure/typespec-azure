@@ -42,6 +42,6 @@ The normal repository build compiles the Java emitter and its TeaVM target with 
 mise exec -- pnpm --filter @azure-tools/typespec-azure-playground-website start
 ```
 
-Select `@azure-tools/typespec-java` for an Azure data-plane spec. The existing Java generator runs entirely in a lazily created Web Worker through TeaVM's WebAssembly GC backend; no server or local JVM is used for generation. Each emit gets a fresh worker to isolate the generator's process-global state.
+Select `@azure-tools/typespec-java` for an Azure data-plane spec. The existing Java generator runs entirely in a lazily created Web Worker through TeaVM's WebAssembly GC backend; no server or local JVM is used for generation. Each emit gets a fresh worker to isolate the generator's process-global state. A browser-only postprocessor removes unused Java imports before returning files.
 
 This is an experimental browser target, not a replacement for the native emitter. ARM, SDK packaging, samples, tests, APIView metadata, customization, partial updates, and native formatting are excluded. The POC requires a browser supporting WebAssembly GC. Native CLI generation is unchanged.

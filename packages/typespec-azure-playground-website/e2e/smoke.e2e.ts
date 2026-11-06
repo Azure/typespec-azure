@@ -114,6 +114,9 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     expect(result.client).toContain("getWidget(");
     expect(result.firstModel).toContain("Widget next");
     expect(result.firstModel).not.toMatch(/import [^\n;]*\.\./);
+    expect(result.firstModel).not.toContain("import java.util.Base64;");
+    expect(result.firstModel).not.toContain("import java.util.stream.Collectors;");
+    expect(result.firstModel).toContain("import com.azure.json.JsonReader;");
     expect(result.firstModel).not.toContain("revision");
     expect(result.rejected).toEqual([
       expect.stringContaining("does not support customization or partial updates"),
