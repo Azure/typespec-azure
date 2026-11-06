@@ -10,6 +10,27 @@ import {
   SimpleTester,
 } from "../tester.js";
 
+it("keeps Legacy GET LROs usable with SDK lint guidance", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service namespace TestClient;
+      @Legacy.markAsLro
+      @get @route("/read") op get(): { value: string; };
+    `,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          extends: ["@azure-tools/typespec-client-generator-core/all"],
+        },
+      },
+    },
+  );
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods[0];
+  strictEqual(method.kind, "lro");
+  strictEqual(getLroMetadata(program, method.__raw), undefined);
+});
+
 it("should mark regular operation as LRO when decorated with @markAsLro", async () => {
   const { program } = await SimpleTester.compile(`
       @service

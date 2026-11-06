@@ -2,13 +2,6 @@
 changeKind: feature
 packages:
   - "@azure-tools/typespec-azure-resource-manager"
-  - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add `no-get-lro` rules that prevent long-running GET operations. The ARM rule
-reports native LROs, including customized templates and polling/result endpoints.
-The TCGC rule reports accepted `Legacy.markAsLro` declarations on GET operations
-in any SDK scope.
-
-These rules provide native guidance related to the Swagger linter
-`GetOperationMustNotBeLongRunning`.
+Add `no-get-lro` to prevent GET operations with native LRO metadata, including customized templates and polling/result endpoints. This provides native protocol guidance related to the Swagger linter `GetOperationMustNotBeLongRunning`; Legacy-only SDK declarations are not checked.

@@ -43,12 +43,7 @@ read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
 
 ## LintDiff Equivalent
 
-This rule and TCGC's `no-get-lro` jointly provide native guidance related to
+This rule provides native protocol guidance related to
 [GetOperationMustNotBeLongRunning](https://github.com/Azure/azure-openapi-validator/blob/e1b8b207a196cf2fc288593efec22e6e38ab98d5/docs/get-operation-must-not-be-long-running.md).
-ARM checks native protocol metadata. TCGC checks
-accepted SDK-specific `Legacy.markAsLro` declarations.
 
-The native policy is broader than the Swagger check. A GET recognized as an LRO
-warns even when its emitted document has no LRO flag. Raw LRO extensions alone
-are not checked. Diagnostic totals are therefore not necessarily equivalent to
-Swagger totals.
+A GET recognized as an LRO warns even when its emitted document has no LRO flag. This is not a full replacement for the Swagger check: raw LRO extensions and SDK `Legacy.markAsLro` declarations without native LRO metadata are not checked. Legacy compatibility declarations do not receive an additional GET-LRO warning from this rule. Diagnostic totals are therefore not necessarily equivalent to Swagger totals.
