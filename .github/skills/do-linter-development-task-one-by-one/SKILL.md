@@ -61,6 +61,17 @@ Native-first coverage discovers and pins the
 before specs setup. It reruns native diagnostics, not the Swagger suite.
 Only an explicitly requested separate producer creates or refreshes shared data.
 
+For an explicitly requested `RPSaaSMaster` corpus, apply the
+[private corpus contract](../analyze-native-lint-coverage/private-corpus.md)
+before discovery, publication preflight or setup. Keep `corpusProfile` separate
+from `flowVersion`; persist the private allowlist, all-project/all-supported-version
+inventory, baseline and evidence binding through every handoff. This context is
+not a queue CLI option and does not relax strict worker-command parsing.
+Resume the recorded corpus; never retarget an existing public task implicitly.
+Private evidence and its independent `migration.md` must not use public forks.
+An evidence-only reassessment uses the coverage skill, not a new development/
+promotion cycle. A skill-update-only request runs neither queue nor corpus.
+
 Native-first tasks use three persistent worktrees: native development, specs
 runtime, and combined coverage/evidence. Prefer verified compatible local
 worktrees before creating missing roles; follow the

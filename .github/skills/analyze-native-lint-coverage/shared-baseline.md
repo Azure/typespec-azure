@@ -6,6 +6,19 @@ migration remains available through `--flow legacy` and compatibility/resumption
 routing; its execution contract is unchanged.
 Do not regenerate Swagger for each rule or candidate.
 
+For explicitly requested `RPSaaSMaster` coverage, first apply the
+[private corpus contract](private-corpus.md). The public repository, discovery,
+source-preservation and latest-version population described below are not
+private-corpus defaults. Discover or explicitly produce a separate private
+baseline bound to its allowlist and all-supported-version inventory; never
+advance public discovery with private evidence or reuse public data as private
+coverage. Unsupported selection/version/profile capabilities are prerequisites,
+not permission to weaken baseline verification.
+The [private baseline procedure](private-baseline.md) declares its concrete
+discovery defaults, private schema-2 descriptor, pinned binding and recovery
+commands. The schema-1 public descriptor and full-public population below remain
+unchanged; never send a private schema to an unsupported package-level runner.
+
 ## Monthly evaluation snapshot
 
 Use one frozen specs commit across migrations in a TypeSpec dependency-upgrade

@@ -12,7 +12,13 @@ import shutil
 import subprocess
 import sys
 import tarfile
+from urllib.parse import quote
 import uuid
+
+
+PRIVATE_REPOSITORY = "Azure/azure-rest-api-specs-pr"
+PRIVATE_REF = "evidence/shared-swagger-baseline-rpsaas"
+PRIVATE_DISCOVERY = ".lintdiff-baselines/rpsaas/current.json"
 
 
 def require(condition, message):
@@ -20,7 +26,7 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def load_json(path):
+def parse_json(text):
     def pairs(items):
         result = {}
         for key, value in items:
@@ -28,8 +34,12 @@ def load_json(path):
             result[key] = value
         return result
 
-    return json.loads(Path(path).read_text(encoding="utf-8"), object_pairs_hook=pairs,
+    return json.loads(text, object_pairs_hook=pairs,
                       parse_constant=lambda value: require(False, f"Invalid JSON: {value}"))
+
+
+def load_json(path):
+    return parse_json(Path(path).read_text(encoding="utf-8"))
 
 
 def identity(value):
@@ -87,17 +97,73 @@ def repository(value):
         token(part) for part in value.split("/"))
 
 
+def ref_name(value):
+    require(isinstance(value, str) and value and ".." not in value and
+            all(token(part) and not part.endswith((".", ".lock")) for part in value.split("/")),
+            "Invalid metadata ref")
+    return value
+
+
+def validate_corpus(value):
+    fields(value, "profile sourceBranch serviceList services versionPolicy projectVersions "
+           "validationProfile", "private corpus")
+    require(value["profile"] == "rpsaas-private" and value["sourceBranch"] == "RPSaaSMaster"
+            and value["versionPolicy"] == "all-supported", "Unsupported private corpus policy")
+    service_list = value["serviceList"]
+    fields(service_list, "url updatedAt sha256", "service-list identity")
+    require(isinstance(service_list["url"], str) and re.fullmatch(
+        r"https://github\.com/Azure/azure-rest-api-specs-pr/issues/[1-9][0-9]*"
+        r"#issuecomment-[1-9][0-9]*", service_list["url"]), "Invalid private service-list URL")
+    timestamp(service_list["updatedAt"])
+    hex_value(service_list["sha256"], 64, "service-list checksum")
+    services = value["services"]
+    require(isinstance(services, list) and services and
+            all(isinstance(service, str) and re.fullmatch(
+                r"specification/[A-Za-z0-9][A-Za-z0-9._-]*", service) for service in services),
+            "Invalid private service allowlist")
+    require(len({service.casefold() for service in services}) == len(services),
+            "Duplicate private service")
+    versions = value["projectVersions"]
+    require(isinstance(versions, list) and versions, "Missing private project/version inventory")
+    selected = set()
+    project_names = {}
+    observed_services = set()
+    for entry in versions:
+        fields(entry, "project apiVersion", "project/version entry")
+        project = relative_name(entry["project"])
+        require(project == entry["project"] and token(entry["apiVersion"]),
+                "Invalid project/version identity")
+        service = "/".join(project.split("/")[:2])
+        require(service in services, "Project outside private allowlist")
+        require(project_names.setdefault(project.casefold(), project) == project,
+                "Case-colliding private project paths")
+        key = (project.casefold(), entry["apiVersion"].casefold())
+        require(key not in selected, "Duplicate project/version identity")
+        selected.add(key)
+        observed_services.add(service)
+    require(observed_services == set(services), "Private service population mismatch")
+    profile = value["validationProfile"]
+    fields(profile, "id sha256", "validation profile")
+    require(profile["id"] == "production-arm", "Unsupported private validation profile")
+    hex_value(profile["sha256"], 64, "validation profile checksum")
+
+
 def validate_descriptor(value):
-    fields(value, "schemaVersion baselineId assessmentMode source producer dataset baselineIdentity archive",
+    require(isinstance(value, dict) and type(value.get("schemaVersion")) is int
+            and value["schemaVersion"] in (1, 2), "Unsupported descriptor schema")
+    private = value["schemaVersion"] == 2
+    fields(value, "schemaVersion baselineId assessmentMode source producer dataset baselineIdentity archive"
+           + (" corpus" if private else ""),
            "descriptor")
-    require(type(value["schemaVersion"]) is int and value["schemaVersion"] == 1,
-            "Unsupported descriptor schema")
+    if private:
+        validate_corpus(value["corpus"])
     require(value["assessmentMode"] == "swagger-baseline", "Not a Swagger baseline descriptor")
     require(token(value["baselineId"]), "Invalid baselineId")
     hex_value(value["baselineIdentity"], 64, "baselineIdentity")
     source = value["source"]
     fields(source, "repository commit preservationRepository preservationRef", "source")
-    require(source["repository"] == "Azure/azure-rest-api-specs", "Unsupported source repository")
+    require(source["repository"] == (PRIVATE_REPOSITORY if private else "Azure/azure-rest-api-specs"),
+            "Unsupported source repository")
     require(repository(source["preservationRepository"]), "Invalid preservation repository")
     hex_value(source["commit"], 40, "source commit")
     require(isinstance(source["preservationRef"], str) and
@@ -118,11 +184,17 @@ def validate_descriptor(value):
             "Shared baseline requires full ARM population")
     timestamp(producer["observedAt"])
     counts = value["dataset"]
-    fields(counts, "projects swaggerFiles compileFailures validationFailures observations rulesWithFindings",
+    fields(counts, "projects swaggerFiles compileFailures validationFailures observations rulesWithFindings"
+           + (" projectVersions" if private else ""),
            "dataset counts")
     require(all(integer(count) for count in counts.values()) and counts["projects"] > 0
             and counts["swaggerFiles"] > 0 and counts["compileFailures"] == 0
             and counts["validationFailures"] == 0, "Invalid or failed dataset counts")
+    if private:
+        versions = value["corpus"]["projectVersions"]
+        require(counts["projectVersions"] == len(versions) and
+                counts["projects"] == len({entry["project"] for entry in versions}),
+                "Private descriptor population mismatch")
     archive = value["archive"]
     fields(archive, "repository release name sha256 bytes", "archive")
     require(repository(archive["repository"]) and
@@ -132,6 +204,86 @@ def validate_descriptor(value):
     hex_value(archive["sha256"], 64, "archive checksum")
     require(integer(archive["bytes"], 1), "Invalid archive size")
     return value
+
+
+def gh(endpoint, raw=False):
+    args = ["gh", "api", endpoint]
+    if raw:
+        args += ["-H", "Accept: application/vnd.github.raw+json"]
+    return subprocess.run(args, check=True, stdout=subprocess.PIPE).stdout
+
+
+def require_private_repository(name):
+    require(repository(name), "Invalid private repository")
+    info = parse_json(gh(f"repos/{name}"))
+    require(info.get("private") is True and info.get("permissions", {}).get("pull") is True,
+            "Private baseline repository must be private and readable")
+
+
+def validate_binding(value, descriptor, descriptor_sha):
+    fields(value, "schemaVersion corpusProfile metadataRepository metadataRef metadataCommit "
+           "discoveryPath discoverySha256 descriptorPath descriptorSha256 baselineId "
+           "baselineIdentity corpusIdentity", "private discovery binding")
+    require(type(value["schemaVersion"]) is int and value["schemaVersion"] == 1
+            and value["corpusProfile"] == "rpsaas-private", "Invalid private discovery binding")
+    require(repository(value["metadataRepository"]), "Invalid metadata repository")
+    ref_name(value["metadataRef"])
+    hex_value(value["metadataCommit"], 40, "metadata commit")
+    for key in ("discoveryPath", "descriptorPath"):
+        relative_name(value[key])
+    for key in ("discoverySha256", "descriptorSha256", "baselineIdentity", "corpusIdentity"):
+        hex_value(value[key], 64, key)
+    require(value["descriptorSha256"] == descriptor_sha and
+            value["baselineId"] == descriptor["baselineId"] and
+            value["baselineIdentity"] == descriptor["baselineIdentity"] and
+            value["corpusIdentity"] == identity(descriptor["corpus"]),
+            "Private discovery binding mismatch")
+    return value
+
+
+def discover(output, repository_name=PRIVATE_REPOSITORY, ref=PRIVATE_REF,
+             discovery_path=PRIVATE_DISCOVERY):
+    output = Path(output)
+    require(output.is_absolute() and not output.exists() and not output.is_symlink(),
+            "Discovery output must be absolute and must not exist")
+    ref_name(ref)
+    discovery_path = relative_name(discovery_path)
+    output.mkdir(parents=True, exist_ok=False)
+    require_private_repository(repository_name)
+    commit = parse_json(gh(f"repos/{repository_name}/commits/{quote(ref, safe='')}"))["sha"]
+    hex_value(commit, 40, "metadata commit")
+
+    def read_at_commit(name):
+        return gh(f"repos/{repository_name}/contents/{quote(name, safe='/')}?ref={commit}", raw=True)
+
+    discovery_bytes = read_at_commit(discovery_path)
+    (output / "discovery.json").write_bytes(discovery_bytes)
+    discovery = parse_json(discovery_bytes)
+    fields(discovery, "schemaVersion corpusProfile baselineId descriptorPath descriptorSha256",
+           "private discovery")
+    require(type(discovery["schemaVersion"]) is int and discovery["schemaVersion"] == 2
+            and discovery["corpusProfile"] == "rpsaas-private", "Unsupported private discovery")
+    hex_value(discovery["descriptorSha256"], 64, "descriptor checksum")
+    descriptor_path = relative_name(discovery["descriptorPath"])
+    descriptor_bytes = read_at_commit(descriptor_path)
+    (output / "descriptor.json").write_bytes(descriptor_bytes)
+    descriptor_sha = hashlib.sha256(descriptor_bytes).hexdigest()
+    require(descriptor_sha == discovery["descriptorSha256"], "Discovery descriptor checksum mismatch")
+    descriptor = validate_descriptor(parse_json(descriptor_bytes))
+    require(descriptor["schemaVersion"] == 2 and
+            descriptor["baselineId"] == discovery["baselineId"], "Private discovery identity mismatch")
+    binding = validate_binding({
+        "schemaVersion": 1, "corpusProfile": "rpsaas-private",
+        "metadataRepository": repository_name, "metadataRef": ref, "metadataCommit": commit,
+        "discoveryPath": discovery_path,
+        "discoverySha256": hashlib.sha256(discovery_bytes).hexdigest(),
+        "descriptorPath": descriptor_path, "descriptorSha256": descriptor_sha,
+        "baselineId": descriptor["baselineId"], "baselineIdentity": descriptor["baselineIdentity"],
+        "corpusIdentity": identity(descriptor["corpus"])}, descriptor, descriptor_sha)
+    (output / "binding.json").write_text(json.dumps(binding, indent=2) + "\n",
+                                       encoding="utf-8", newline="\n")
+    return {"descriptor": str(output / "descriptor.json"), "binding": str(output / "binding.json"),
+            "metadataCommit": commit, "baselineIdentity": descriptor["baselineIdentity"]}
 
 
 def relative_name(value):
@@ -199,6 +351,8 @@ def inventory(root):
 
 
 def verify(output, descriptor):
+    private = descriptor["schemaVersion"] == 2
+    dataset_schema = 5 if private else 4
     manifest = load_json(output / "manifest.json")
     baseline = load_json(output / "baseline.json")
     require(isinstance(manifest, dict) and isinstance(baseline, dict), "Invalid sealed JSON objects")
@@ -208,7 +362,8 @@ def verify(output, descriptor):
             and manifest.get("completionScope") == "swagger-only"
             and manifest.get("nativeAssessment") == "not-run", "Invalid Swagger-only sealed manifest")
     timestamp(manifest.get("finishedAt"))
-    require(type(baseline.get("schemaVersion")) is int and baseline.get("schemaVersion") == 1,
+    require(type(baseline.get("schemaVersion")) is int
+            and baseline.get("schemaVersion") == (2 if private else 1),
             "Unsupported baseline schema")
     require(identity(baseline) == descriptor["baselineIdentity"] == manifest.get("baselineIdentity"),
             "Baseline identity mismatch")
@@ -220,6 +375,11 @@ def verify(output, descriptor):
         require(context[key] == producer[key], f"Producer {key} mismatch")
     require(context.get("filter") is None and context.get("limit") is None,
             "Baseline selection mismatch")
+    if private:
+        require(context.get("corpus") == descriptor["corpus"] and
+                context["specsRepository"].removesuffix(".git") ==
+                "https://github.com/" + descriptor["source"]["repository"],
+                "Private corpus/source context mismatch")
     root = output / "dataset"
     actual = inventory(root)
     expected = {}
@@ -242,29 +402,46 @@ def verify(output, descriptor):
     meta = load_json(referenced("_meta.json"))
     commit = context["specsCommit"]
     require(isinstance(meta, dict) and type(meta.get("schemaVersion")) is int
-            and meta.get("schemaVersion") == 4 and meta.get("complete") is True
+            and meta.get("schemaVersion") == dataset_schema and meta.get("complete") is True
             and meta.get("specsCommit") == commit
             and meta.get("specsRepository") == context["specsRepository"]
-            and meta.get("filters") == {"serviceType": "resource-manager"},
+            and meta.get("filters") == {"serviceType": "resource-manager",
+                                       **({"corpus": descriptor["corpus"]} if private else {})},
             "Incompatible dataset metadata")
     projects = meta["projects"]
     counts = descriptor["dataset"]
-    require(isinstance(projects, list) and len(projects) == counts["projects"]
+    require(isinstance(projects, list)
+            and len(projects) == counts["projectVersions" if private else "projects"]
             and projects == baseline["projects"], "Project population mismatch")
     selected = set()
     selected_names = set()
+    selected_versions = set()
     swagger_count = 0
     for project in projects:
         name = relative_name(project["sourcePath"])
-        require(name.casefold() not in selected_names and project["compileStatus"] == "success"
+        version = project.get("apiVersion")
+        key = (name.casefold(), version) if private else name.casefold()
+        require(key not in selected_names and project["compileStatus"] == "success"
                 and project["validationStatus"] == "success", "Duplicate or failed project")
         selected.add(name)
-        selected_names.add(name.casefold())
+        selected_names.add(key)
+        if private:
+            require(token(version) and project["swaggerFiles"], "Missing private version Swagger")
+            selected_versions.add((name, version))
         for key in ("typespecFiles", "swaggerFiles", "swaggerAssets", "rawFiles"):
             require(isinstance(project[key], list), f"Missing project inventory: {key}")
             for file in project[key]:
                 referenced(file)
         swagger_count += len(project["swaggerFiles"])
+        if private:
+            for file in project["swaggerFiles"]:
+                document = load_json(referenced(file))
+                require(document.get("info", {}).get("version") == version,
+                        "Private Swagger API-version mismatch")
+    if private:
+        require(selected_versions == {(entry["project"], entry["apiVersion"])
+                                      for entry in descriptor["corpus"]["projectVersions"]},
+                "Private project/version population mismatch")
     require(swagger_count == counts["swaggerFiles"], "Swagger file count mismatch")
     for key in ("commonTypesFiles", "resultFiles"):
         require(isinstance(meta[key], list), f"Missing metadata inventory: {key}")
@@ -277,10 +454,12 @@ def verify(output, descriptor):
         "validatedProjects": counts["projects"], "validationFailures": 0,
         "violations": counts["observations"], "distinctRules": counts["rulesWithFindings"],
     }
+    if private:
+        required["projectVersions"] = counts["projectVersions"]
     require(summary == required, "Dataset summary mismatch")
     index = load_json(referenced("validator-results.json"))
     require(isinstance(index, dict) and type(index.get("schemaVersion")) is int
-            and index.get("schemaVersion") == 4 and index.get("specsCommit") == commit
+            and index.get("schemaVersion") == dataset_schema and index.get("specsCommit") == commit
             and isinstance(index.get("rules"), dict), "Invalid validator index")
     total = 0
     shards = []
@@ -288,7 +467,7 @@ def verify(output, descriptor):
         require(rule and integer(entry["count"], 1), "Invalid validator index count")
         shard = load_json(referenced(entry["resultsFile"]))
         require(isinstance(shard, dict) and type(shard.get("schemaVersion")) is int
-                and shard.get("schemaVersion") == 4 and shard.get("specsCommit") == commit
+                and shard.get("schemaVersion") == dataset_schema and shard.get("specsCommit") == commit
                 and shard.get("rule") == rule and isinstance(shard.get("results"), list)
                 and len(shard["results"]) == entry["count"], f"Invalid validator shard: {rule}")
         for finding in shard["results"]:
@@ -297,6 +476,9 @@ def verify(output, descriptor):
                     and isinstance(finding.get("path"), list)
                     and all(isinstance(part, str) or integer(part) for part in finding["path"]),
                     f"Invalid validator observation: {rule}")
+            if private:
+                require((finding["project"], finding.get("apiVersion")) in selected_versions,
+                        "Invalid private observation version")
         total += entry["count"]
         shards.append(relative_name(entry["resultsFile"]))
     require(sorted(shards) == sorted(relative_name(file) for file in meta["resultFiles"])
@@ -305,16 +487,26 @@ def verify(output, descriptor):
             and len(shards) == counts["rulesWithFindings"], "Validator totals mismatch")
 
 
-def fetch(descriptor_path, output, archive=None):
+def fetch(descriptor_path, output, archive=None, binding=None):
     descriptor_path, output = Path(descriptor_path), Path(output)
     require(descriptor_path.is_absolute() and output.is_absolute(), "Use absolute descriptor/output paths")
     descriptor = validate_descriptor(load_json(descriptor_path))
+    pinned = None
+    if descriptor["schemaVersion"] == 2:
+        require(binding is not None, "Private baseline requires a pinned discovery binding")
+        binding = Path(binding)
+        require(binding.is_absolute(), "Use an absolute binding path")
+        pinned = validate_binding(load_json(binding), descriptor, digest(descriptor_path))
+    else:
+        require(binding is None, "Public baseline does not accept a private discovery binding")
     require(not output.exists() and not output.is_symlink(), "Output must not exist; preserve prior evidence")
     if archive is not None:
         archive = Path(archive)
         require(archive.is_absolute() and archive.is_file(), "Use an absolute existing archive path")
     output.mkdir(parents=True, exist_ok=False)
     if archive is None:
+        if pinned:
+            require_private_repository(descriptor["archive"]["repository"])
         # Private download staging stays beside the requested output, never in system temp.
         staging = output.parent / (output.name + ".download-" + uuid.uuid4().hex)
         staging.mkdir(mode=0o700)
@@ -328,19 +520,29 @@ def fetch(descriptor_path, output, archive=None):
     verify(output, descriptor)
     return {"baselineRun": str(output.resolve()), "baselineId": descriptor["baselineId"],
             "sourceCommit": descriptor["source"]["commit"],
-            "baselineIdentity": descriptor["baselineIdentity"], "swaggerGeneration": "not-run"}
+            "baselineIdentity": descriptor["baselineIdentity"], "swaggerGeneration": "not-run",
+            **({"binding": pinned} if pinned else {})}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
+    discover_parser = commands.add_parser("discover", help="Pin private baseline metadata; never produce it")
+    discover_parser.add_argument("--repository", default=PRIVATE_REPOSITORY)
+    discover_parser.add_argument("--ref", default=PRIVATE_REF)
+    discover_parser.add_argument("--path", default=PRIVATE_DISCOVERY)
+    discover_parser.add_argument("--output", required=True)
     fetch_parser = commands.add_parser("fetch")
     fetch_parser.add_argument("--descriptor", required=True)
     fetch_parser.add_argument("--output", required=True)
     fetch_parser.add_argument("--archive")
+    fetch_parser.add_argument("--binding")
     args = parser.parse_args()
     try:
-        print(json.dumps(fetch(args.descriptor, args.output, args.archive)))
+        result = (discover(args.output, args.repository, args.ref, args.path)
+                  if args.command == "discover" else
+                  fetch(args.descriptor, args.output, args.archive, args.binding))
+        print(json.dumps(result))
     except (ValueError, KeyError, TypeError, AttributeError, OverflowError, OSError, tarfile.TarError,
             subprocess.CalledProcessError) as error:
         print(f"Shared Swagger baseline prerequisite failed: {error}. "
