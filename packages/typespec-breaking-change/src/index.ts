@@ -1,28 +1,27 @@
 export {
-  canonicalizeOperations,
-  type CanonicalizationResult,
-  type CanonicalizedOperation,
-} from "./diff/canonicalize.js";
-export { formatResult, main, parseArgs, type CliOptions } from "./cli/cli.js";
-export { createApproveBreakingChangeCodeFix } from "./suppression/codefixes.js";
-export { compileService, type CompileOptions } from "./cli/compile.js";
-export {
   $approvedBreakingChange,
   $approvedUnversionedChange,
+  BreakingChangeStateKeys,
+  diffKinds,
   findSuppressions,
   findUnversionedSuppressions,
   getSuppressions,
   getUnversionedSuppressions,
+  isDiffKind,
+  type DiffKind,
   type ResolvedSuppression,
   type SuppressionMetadata,
 } from "@azure-tools/typespec-azure-core";
-export { emitFindingDiagnostics } from "./suppression/diagnostics.js";
+export { formatResult, main, parseArgs, type CliOptions, type CliOutput } from "./cli/cli.js";
+export { compileService, type CompileOptions } from "./cli/compile.js";
+export {
+  canonicalizeOperations,
+  type CanonicalizationResult,
+  type CanonicalizedOperation,
+} from "./diff/canonicalize.js";
 export * from "./diff/diff-engine.js";
-export { diffKinds, isDiffKind, type DiffKind } from "@azure-tools/typespec-azure-core";
 export * from "./diff/diff-operations.js";
 export * from "./diff/diff-types.js";
-export { BreakingChangeStateKeys } from "@azure-tools/typespec-azure-core";
-export { matchOperations, type MatchedOperation, type OperationMatchResult } from "./suppression/match.js";
 export {
   getOperationIdentity,
   identityKey,
@@ -36,30 +35,47 @@ export * from "./pipeline/orchestrator.js";
 export * from "./pipeline/policy.js";
 export { resolveFindingLocation } from "./pipeline/resolve-location.js";
 export {
+  buildComparisonPairs,
+  buildPhaseAPairs,
+  buildPhaseBPairs,
+  createVersionedView,
+  defaultVersionClassifier,
+  enumerateVersions,
+  type ServiceVersionInfo,
+  type VersionClassifier,
+} from "./pipeline/versions.js";
+export * from "./reporting/reporter-console.js";
+export * from "./reporting/reporter-github.js";
+export * from "./reporting/reporter-json.js";
+export * from "./reporting/reporter-markdown.js";
+export {
   diffKindCatalog,
   getDiffKindCatalogEntry,
   type DiffKindCatalogEntry,
   type DiffKindSupportStatus,
 } from "./rule-catalog.js";
-export * from "./reporting/reporter-console.js";
-export * from "./reporting/reporter-github.js";
-export * from "./reporting/reporter-json.js";
-export * from "./reporting/reporter-markdown.js";
-export * from "./suppression/suppression-guidance.js";
-export * from "./suppression/suppression.js";
+export { detectAmbiguousSuppressions, type AmbiguityResult } from "./suppression/ambiguity.js";
+export {
+  compareInventories,
+  compareSuppressions,
+  type ClassifiedSuppression,
+  type SuppressionClassificationKind,
+  type SuppressionComparisonResult,
+} from "./suppression/classification.js";
+export { createApproveBreakingChangeCodeFix } from "./suppression/codefixes.js";
+export { emitFindingDiagnostics } from "./suppression/diagnostics.js";
 export {
   buildSuppressionInventory,
   suppressionIdentityKey,
   type NormalizedSuppressionRecord,
 } from "./suppression/inventory.js";
 export {
-  compareSuppressions,
-  compareInventories,
-  type ClassifiedSuppression,
-  type SuppressionClassificationKind,
-  type SuppressionComparisonResult,
-} from "./suppression/classification.js";
-export { detectAmbiguousSuppressions, type AmbiguityResult } from "./suppression/ambiguity.js";
+  matchOperations,
+  type MatchedOperation,
+  type OperationMatchResult,
+} from "./suppression/match.js";
+export * from "./suppression/suppression-guidance.js";
+export * from "./suppression/suppression.js";
 export { isOperationIdentity, isServiceIdentity } from "./types.js";
 export type {
   AnalysisResult,
@@ -81,13 +97,3 @@ export type {
   VersionPair,
   VersionedView,
 } from "./types.js";
-export {
-  buildComparisonPairs,
-  buildPhaseAPairs,
-  buildPhaseBPairs,
-  createVersionedView,
-  defaultVersionClassifier,
-  enumerateVersions,
-  type ServiceVersionInfo,
-  type VersionClassifier,
-} from "./pipeline/versions.js";

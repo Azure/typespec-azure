@@ -1,9 +1,26 @@
-import { mkdtemp, rm } from "fs/promises";
+import { stat } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@typespec/compiler", () => ({
+  formatDiagnostic: (diagnostic: { message: string }) => diagnostic.message,
+}));
+vi.mock("../src/reporting/reporter-console.js", () => ({ formatConsoleReport: () => "report" }));
+vi.mock("../src/reporting/reporter-github.js", () => ({ formatGithubReport: () => "report" }));
+vi.mock("../src/reporting/reporter-json.js", () => ({ formatJsonReport: () => "{}" }));
+vi.mock("../src/reporting/reporter-markdown.js", () => ({ renderMarkdownSummary: () => "report" }));
+
+vi.mock("fs/promises", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("fs/promises")>();
+  return { ...actual, stat: vi.fn(actual.stat) };
+});
 
 describe("CLI main module", () => {
+  beforeEach(async () => {
+    const actual = await vi.importActual<typeof import("fs/promises")>("fs/promises");
+    vi.mocked(stat).mockReset().mockImplementation(actual.stat);
+  });
   afterEach(() => {
     vi.restoreAllMocks();
     vi.resetModules();
@@ -20,13 +37,13 @@ describe("CLI main module", () => {
       analyzeProgram: vi.fn(),
     }));
 
-    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const output = { log: vi.fn(), error: vi.fn() };
     const { main } = await import("../src/cli/cli.js");
 
-    const code = await main(["head.tsp"]);
+    const code = await main(["head.tsp"], output);
 
     expect(code).toBe(2);
-    expect(errorSpy).toHaveBeenCalledWith("Analysis failed: boom");
+    expect(output.error).toHaveBeenCalledWith("Analysis failed: boom");
   });
 
   it("formats non-Error failures in the catch path", async () => {
@@ -55,12 +72,7 @@ describe("CLI main module", () => {
       worktreePath: "/tmp/worktree-root",
       cleanup,
     }));
-    // Use a real temp directory as the "mapped" base path so the CLI's
-    // fs.stat existence check (real fs, not mocked) succeeds — this test is
-    // exercising the two-program (base+head) branch, distinct from the
-    // "folder didn't exist at base revision" fallback covered separately
-    // below.
-    const mappedBasePath = await mkdtemp(join(tmpdir(), "typespec-breaking-change-cli-test-"));
+    const mappedBasePath = join(tmpdir(), "typespec-breaking-change-cli-test");
     const mapPathIntoWorktree = vi.fn(async () => mappedBasePath);
 
     vi.doMock("../src/cli/git-checkout.js", () => ({
@@ -93,6 +105,7 @@ describe("CLI main module", () => {
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const { main } = await import("../src/cli/cli.js");
+    vi.mocked(stat).mockResolvedValueOnce({} as Awaited<ReturnType<typeof stat>>);
 
     const code = await main(["spec-folder", "--base-ref", "origin/main"]);
 
@@ -110,7 +123,6 @@ describe("CLI main module", () => {
     expect(cleanup).toHaveBeenCalledOnce();
 
     logSpy.mockRestore();
-    await rm(mappedBasePath, { recursive: true, force: true });
   });
 
   it("falls back to single-program analysis when the folder doesn't exist at --base-ref", async () => {
@@ -140,12 +152,12 @@ describe("CLI main module", () => {
       summary: { servicesAnalyzed: 1, comparisonsPerformed: 1, versionComparisons: [] },
     }));
     vi.doMock("../src/pipeline/orchestrator.js", () => ({ analyzeBaseAndHead, analyzeProgram }));
-    // Real fs.stat: the mocked worktree path genuinely doesn't exist on disk,
-    // so this exercises the "folder didn't exist at base revision" fallback
-    // without needing to mock fs/promises at all.
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const { main } = await import("../src/cli/cli.js");
+    vi.mocked(stat).mockRejectedValueOnce(
+      Object.assign(new Error("Missing fixture"), { code: "ENOENT" }),
+    );
 
     const code = await main(["spec-folder", "--base-ref", "origin/main"]);
 
@@ -194,18 +206,32 @@ describe("CLI main module", () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const { main } = await import("../src/cli/cli.js");
 
-    const code = await main([
-      "spec-folder",
-      "--base",
-      "base-folder",
-      "--base-ref",
-      "origin/main",
-    ]);
+    const code = await main(["spec-folder", "--base", "base-folder", "--base-ref", "origin/main"]);
 
     expect(code).toBe(0);
     expect(checkoutRevision).not.toHaveBeenCalled();
 
     logSpy.mockRestore();
+  });
+
+  it("does not treat filesystem permission failures as an absent baseline", async () => {
+    const cleanup = vi.fn(async () => undefined);
+    vi.doMock("../src/cli/git-checkout.js", () => ({
+      checkoutRevision: vi.fn(async () => ({ worktreePath: "/tmp/worktree-root", cleanup })),
+      getRepoRoot: vi.fn(async () => "/tmp"),
+      mapPathIntoWorktree: vi.fn(async () => "/tmp/worktree-root/spec-folder"),
+    }));
+    const compileService = vi.fn();
+    vi.doMock("../src/cli/compile.js", () => ({ compileService }));
+    const output = { log: vi.fn(), error: vi.fn() };
+    const { main } = await import("../src/cli/cli.js");
+    vi.mocked(stat).mockRejectedValueOnce(
+      Object.assign(new Error("Permission denied"), { code: "EACCES" }),
+    );
+    expect(await main(["spec-folder", "--base-ref", "HEAD"], output)).toBe(2);
+    expect(output.error).toHaveBeenCalledWith("Analysis failed: Permission denied");
+    expect(compileService).not.toHaveBeenCalled();
+    expect(cleanup).toHaveBeenCalledOnce();
   });
 
   it("cleans up the worktree checkout even when analysis throws", async () => {
@@ -269,7 +295,9 @@ describe("CLI main module", () => {
     process.argv = ["node", "typespec-breaking-change-cli", "head.tsp"];
 
     try {
-      const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => undefined) as typeof process.exit);
+      const exitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation((() => undefined) as typeof process.exit);
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
       await import("../src/cli/cli.js");

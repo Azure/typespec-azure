@@ -143,6 +143,7 @@ export async function checkoutRevision(
     throw new Error(
       `Failed to check out revision "${commitish}" (resolved to ${sha}) as a git worktree: ` +
         `${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     );
   }
 
@@ -213,7 +214,7 @@ async function linkNodeModulesIfPresent(repoRoot: string, worktreeRoot: string):
   // regular directory symlink is created) — passing it unconditionally lets
   // this work without an elevated/developer-mode symlink privilege on
   // Windows, which a plain "dir" symlink would otherwise require.
-  await symlink(sourceNodeModules, targetNodeModules, "junction").catch(() => undefined);
+  await symlink(sourceNodeModules, targetNodeModules, "junction");
 }
 
 async function directoryOf(path: string): Promise<string> {
