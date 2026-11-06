@@ -1,77 +1,120 @@
-Resources must have unique logical names across all ARM services in a program. This rule checks
-the `resourceName` values returned by `resolveArmResources`, not the `name` property of a resource
-instance or its ARM resource type.
+Resources must have unique logical names across all ARM services in a program.
 
 The same model can describe several resource occurrences at different scopes or paths. Give each
 occurrence a unique name when instantiating its operations.
 
 ## Incorrect
 
-The following example describes an Employee extension on a VM and on a VM in a scale set. Both
-target paths end in `"virtualMachines", "vmName"`. The target models are both named `Target`,
-in separate namespaces, so both Employee occurrences default to `TargetEmployee`.
+The following example describes RunCommand resources under a VM and under a VM in a scale set.
+The ARM resource types are `Microsoft.Compute/virtualMachines/runCommands` and
+`Microsoft.Compute/virtualMachineScaleSets/virtualMachines/runCommands`. The legacy operation
+templates derive their default logical names from the last two resource-type segments, so both
+occurrences are named `VirtualMachinesRunCommands`.
 
 ```typespec
+import "@typespec/http";
+import "@typespec/rest";
 import "@azure-tools/typespec-azure-resource-manager";
 
+using TypeSpec.Http;
+using TypeSpec.Rest;
 using Azure.ResourceManager;
 
 @armProviderNamespace
-namespace Microsoft.Contoso;
+namespace Microsoft.Compute;
 
-model Employee is ExtensionResource<{}> {
-  ...ResourceNameParameter<Employee>;
+model RunCommandProperties {
+  /** The command to execute on the virtual machine. */
+  command?: string;
 }
 
-alias VirtualMachine = Extension.ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
-alias ScaleSet = Extension.ExternalResource<
-  "Microsoft.Compute",
-  "virtualMachineScaleSets",
-  "scaleSetName"
->;
-alias ScaleSetVm = Extension.ExternalChildResource<ScaleSet, "virtualMachines", "vmName">;
-
-namespace Vm {
-  model Target is VirtualMachine;
+model RunCommand is ProxyResource<RunCommandProperties> {
+  ...ResourceNameParameter<RunCommand>;
 }
 
-namespace ScaleSetVmScope {
-  model Target is ScaleSetVm;
-}
+alias VmParameters = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+  ...Legacy.Provider;
 
-interface EmployeeOperations<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
-  get is Extension.Read<Scope, Employee>;
-  list is Extension.ListByTarget<Scope, Employee>;
+  @path
+  @key
+  @segment("virtualMachines")
+  vmName: string;
+};
+
+alias ScaleSetVmParameters = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+  ...Legacy.Provider;
+
+  @path
+  @key
+  @segment("virtualMachineScaleSets")
+  scaleSetName: string;
+
+  @path
+  @key
+  @segment("virtualMachines")
+  vmName: string;
+};
+
+alias RunCommandParameters = {
+  @path
+  @key
+  @segment("runCommands")
+  commandName: string;
+};
+
+interface RunCommandOperations<ParentParameters extends {}>
+  extends Legacy.LegacyOperations<ParentParameters, RunCommandParameters> {}
+
+alias VmOperations = RunCommandOperations<VmParameters>;
+alias ScaleSetVmOperations = RunCommandOperations<ScaleSetVmParameters>;
+
+@armResourceOperations
+interface VmRunCommands {
+  get is VmOperations.Read<RunCommand>;
+  list is VmOperations.List<RunCommand>;
 }
 
 @armResourceOperations
-interface VmEmployees extends EmployeeOperations<Vm.Target> {}
-
-@armResourceOperations
-interface ScaleSetVmEmployees extends EmployeeOperations<ScaleSetVmScope.Target> {}
+interface ScaleSetVmRunCommands {
+  get is ScaleSetVmOperations.Read<RunCommand>;
+  list is ScaleSetVmOperations.List<RunCommand>;
+}
 ```
 
 ## Correct
 
 Keep the models and paths unchanged. Add a `ResourceName` parameter to the shared operations
-template and forward it to every operation through `OverrideResourceName`. Supply a distinct
-logical name when instantiating each concrete operations interface:
+template and forward it to `Legacy.LegacyOperations`. Supply a distinct name when instantiating
+the template for each resource occurrence. This replaces the operations declarations above:
 
 ```typespec
-interface EmployeeOperations<
-  Scope extends Azure.ResourceManager.Foundations.SimpleResource,
-  ResourceName extends valueof string
-> {
-  get is Extension.Read<Scope, Employee, OverrideResourceName = ResourceName>;
-  list is Extension.ListByTarget<Scope, Employee, OverrideResourceName = ResourceName>;
+interface RunCommandOperations<ParentParameters extends {}, ResourceName extends valueof string>
+  extends Legacy.LegacyOperations<
+      ParentParameters,
+      RunCommandParameters,
+      ResourceName = ResourceName
+    > {}
+
+alias VmOperations = RunCommandOperations<VmParameters, "VmRunCommand">;
+alias ScaleSetVmOperations = RunCommandOperations<ScaleSetVmParameters, "ScaleSetVmRunCommand">;
+
+@armResourceOperations
+interface VmRunCommands {
+  get is VmOperations.Read<RunCommand>;
+  list is VmOperations.List<RunCommand>;
 }
 
 @armResourceOperations
-interface VmEmployees extends EmployeeOperations<Vm.Target, "VmEmployee"> {}
-
-@armResourceOperations
-interface ScaleSetVmEmployees
-  extends EmployeeOperations<ScaleSetVmScope.Target, "ScaleSetVmEmployee"> {}
+interface ScaleSetVmRunCommands {
+  get is ScaleSetVmOperations.Read<RunCommand>;
+  list is ScaleSetVmOperations.List<RunCommand>;
+}
 ```
 
 For standard resource operations, specific extensions, legacy templates, and resources at different

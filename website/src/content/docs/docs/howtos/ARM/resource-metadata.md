@@ -40,7 +40,12 @@ using Azure.ResourceManager;
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
-model Employee is ProxyResource<{}> {
+model EmployeeProperties {
+  /** The employee's department. */
+  department?: string;
+}
+
+model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
@@ -97,7 +102,12 @@ using Azure.ResourceManager;
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
-model Employee is ExtensionResource<{}> {
+model EmployeeProperties {
+  /** The employee's department. */
+  department?: string;
+}
+
+model Employee is ExtensionResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
@@ -186,7 +196,12 @@ using Azure.ResourceManager;
 @armProviderNamespace
 namespace Microsoft.Contoso;
 
-model Employee is ProxyResource<{}> {
+model EmployeeProperties {
+  /** The employee's department. */
+  department?: string;
+}
+
+model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
@@ -202,6 +217,7 @@ alias SubscriptionEmployeeOperations = Legacy.LegacyOperations<
     @segment("employees")
     employeeName: string;
   },
+  // Specify the logical resource name for the subscription-scoped occurrence.
   ResourceName = "SubscriptionEmployee"
 >;
 
@@ -216,6 +232,7 @@ alias TenantEmployeeOperations = Legacy.LegacyOperations<
     @segment("employees")
     employeeName: string;
   },
+  // Specify a different logical resource name for the tenant-scoped occurrence.
   ResourceName = "TenantEmployee"
 >;
 
@@ -251,6 +268,9 @@ The [`no-resource-name-conflict`](../../libraries/azure-resource-manager/rules/n
 rule checks exact logical-name collisions across the ARM services in a compiled program. It uses
 the declaration view, not a selected API version, and excludes synthetic external parents without
 resource operations.
+
+The rule is disabled by default in the Azure `resource-manager` ruleset. Enable it explicitly to
+check resource metadata names.
 
 Do not suppress this rule. Bicep and provisioning consumers may use resource names as type names,
 file names, or keys. Duplicate names can overwrite generated declarations or drop a resource from

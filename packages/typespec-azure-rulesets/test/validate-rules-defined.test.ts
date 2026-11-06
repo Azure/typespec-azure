@@ -69,9 +69,9 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("enables ARM resource metadata name conflict detection", () => {
+  it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
     strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
   });
