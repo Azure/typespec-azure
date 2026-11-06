@@ -192,6 +192,48 @@ describe("use-explicit-action", () => {
       .toBeValid();
   });
 
+  it("does not treat template instantiation as reusing a concrete action", async () => {
+    await tester
+      .expect(
+        `
+        model Request { value: string; }
+
+        @autoRoute @action
+        op genericAction<T>(@body body: T): void;
+        op concreteAction is genericAction<Request>;
+
+        @route("/interfaces")
+        @autoRoute
+        interface Actions<T> {
+          @action op original(@body body: T): void;
+        }
+        alias ConcreteActions = Actions<Request>;
+        op renamedAction is ConcreteActions.original;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("checks subsequent reuse of a concrete action created from a template", async () => {
+    await tester
+      .expect(
+        `
+        @autoRoute @action
+        op genericAction<T>(@body body: T): void;
+        op concreteAction is genericAction<string>;
+        op renamedAction is concreteAction;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/use-explicit-action",
+          severity: "warning",
+          message:
+            'Reusing POST action "Azure.MyService.concreteAction" as "Azure.MyService.renamedAction" changes its suffix from "concreteAction" to "renamedAction". Specify the intended suffix with @action("concreteAction").',
+        },
+      ]);
+  });
+
   it("does not warn for reused actions in library namespaces", async () => {
     const libraryTester = createLinterRuleTester(
       await Tester.createInstance(),

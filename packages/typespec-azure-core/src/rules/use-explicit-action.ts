@@ -3,6 +3,7 @@ import {
   fileRef,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isTemplateDeclarationOrInstance,
   paramMessage,
   type Operation,
   type Program,
@@ -66,7 +67,14 @@ export const useExplicitActionRule = createRule({
 
         const action = getActionDetails(context.program, operation);
         const sourceAction = getSourceAction(context.program, operation);
-        if (!action || !sourceAction || sourceAction.details.name === action.name) {
+        if (
+          !action ||
+          !sourceAction ||
+          isTemplateDeclarationOrInstance(sourceAction.operation) ||
+          (sourceAction.operation.interface &&
+            isTemplateDeclarationOrInstance(sourceAction.operation.interface)) ||
+          sourceAction.details.name === action.name
+        ) {
           return;
         }
 
