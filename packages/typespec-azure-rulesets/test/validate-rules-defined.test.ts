@@ -90,6 +90,22 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps the existing ARM response rule enabled after consolidating PUT body checks", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
+    ok(ResourceManagerLinter.rules.some((rule) => rule.name === "arm-resource-operation-response"));
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "put-resource-schema-consistency"),
+    );
+    ok(!ResourceManagerLinter.rules.some((rule) => rule.name === "arm-put-response-resource"));
+    strictEqual(
+      $linter.ruleSets?.["resource-manager"].enable?.[
+        "@azure-tools/typespec-azure-resource-manager/arm-put-response-resource"
+      ],
+      undefined,
+    );
+  });
+
   it("enables consolidated ARM common-types version guidance", () => {
     const ruleset = $linter.ruleSets?.["resource-manager"];
     ok(ruleset);

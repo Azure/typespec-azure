@@ -59,7 +59,7 @@ model TestTrackedProperties {
   endpoints?: PrivateEndpoint[];
 }
 
-model PrivateEndpoint is PrivateEndpointConnection;
+model PrivateEndpoint is PrivateEndpointConnectionResource;
 alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpoint>;
 
 /** Private connection operations */
