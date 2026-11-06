@@ -90,6 +90,20 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("enables the strengthened documentation-required rule without a separate quality rule", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/documentation-required";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], true);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/no-uninformative-doc"
+        ],
+        undefined,
+      );
+    }
+    ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-uninformative-doc"));
+  });
+
   it("enables consolidated ARM common-types version guidance", () => {
     const ruleset = $linter.ruleSets?.["resource-manager"];
     ok(ruleset);
