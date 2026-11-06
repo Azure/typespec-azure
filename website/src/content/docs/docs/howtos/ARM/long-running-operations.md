@@ -40,6 +40,21 @@ The default `LroHeaders` for PUT is:
 ArmAsyncOperationHeader<FinalResult = MyResource> & Azure.Core.Foundations.RetryAfterHeader
 ```
 
+### Using the original URI for the final result
+
+To keep `Azure-AsyncOperation` for polling and resolve the final resource from the original URI,
+set `@Azure.Core.useFinalStateVia("original-uri")` on the operation. Keep
+`ArmAsyncOperationHeader<FinalResult = MyResource>` in `LroHeaders`:
+
+```typespec
+@Azure.Core.useFinalStateVia("original-uri")
+op createOrUpdate is ArmResourceCreateOrReplaceAsync<
+  MyResource,
+  LroHeaders = ArmAsyncOperationHeader<FinalResult = MyResource> &
+    Azure.Core.Foundations.RetryAfterHeader
+>;
+```
+
 ### Customizing to use a Location header
 
 To use a `Location` header instead of `Azure-AsyncOperation`, override the `LroHeaders` parameter.
@@ -127,10 +142,10 @@ The default `LroHeaders` for DELETE is:
 ArmLroLocationHeader<FinalResult = void> & Azure.Core.Foundations.RetryAfterHeader
 ```
 
-### Customizing to use an Azure-AsyncOperation header
+### Using an Azure-AsyncOperation header for polling
 
-To use an `Azure-AsyncOperation` header instead of `Location`, override the `LroHeaders` parameter.
-Keep `FinalResult` as `void` because delete operations do not return a resource body:
+DELETE supports `Azure-AsyncOperation` polling. Override the `LroHeaders` parameter to use it instead
+of `Location`. Keep `FinalResult` as `void` because delete operations do not return a resource body:
 
 ```typespec
 op delete is ArmResourceDeleteWithoutOkAsync<
