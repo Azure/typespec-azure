@@ -17,24 +17,10 @@ work that requires polling.
 
 ## ❌ Incorrect
 
-The read template is customized with a long-running response.
+Assume `Widget` is an existing ARM resource and the following operation belongs to its resource operations interface. The read template is customized with a long-running response.
 
 ```tsp
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
-}
+read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
 ```
 
 ## ✅ Correct
@@ -42,21 +28,7 @@ interface Widgets {
 Keep the standard read response.
 
 ```tsp
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget>;
-}
+read is ArmResourceRead<Widget>;
 ```
 
 ## Suppression
@@ -65,22 +37,8 @@ For an approved compatibility exception, suppress the fully qualified rule on
 the operation and document the reason:
 
 ```tsp
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  #suppress "@azure-tools/typespec-azure-resource-manager/no-get-lro" "Approved compatibility exception."
-  read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
-}
+#suppress "@azure-tools/typespec-azure-resource-manager/no-get-lro" "Approved compatibility exception."
+read is ArmResourceRead<Widget, Response = ArmAcceptedLroResponse>;
 ```
 
 ## LintDiff Equivalent

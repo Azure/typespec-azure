@@ -15,45 +15,17 @@ action template when the operation starts work.
 
 ## ❌ Incorrect
 
+Assume `Widget` is an existing ARM resource and the following operation belongs to its resource operations interface.
+
 ```tsp
-import "@azure-tools/typespec-azure-resource-manager";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  @Azure.ClientGenerator.Core.Legacy.markAsLro
-  read is ArmResourceRead<Widget>;
-}
+@Azure.ClientGenerator.Core.Legacy.markAsLro
+read is ArmResourceRead<Widget>;
 ```
 
 ## ✅ Correct
 
 ```tsp
-import "@azure-tools/typespec-azure-resource-manager";
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget>;
-}
+read is ArmResourceRead<Widget>;
 ```
 
 For an approved compatibility exception, place
