@@ -7,6 +7,10 @@ export default defineConfig(({ mode }) => {
   const useLocalLibraries = env["VITE_USE_LOCAL_LIBRARIES"] === "true";
   return definePlaygroundViteConfig({
     ...TypeSpecPlaygroundConfig,
+    libraries: TypeSpecPlaygroundConfig.libraries.filter(
+      (library) =>
+        !TypeSpecPlaygroundConfig.deferredEmitters.some((emitter) => emitter === library),
+    ),
     links: {
       documentationUrl: "https://azure.github.io/typespec-azure",
     },
