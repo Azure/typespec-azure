@@ -106,7 +106,230 @@ class SharedBaselineTests(unittest.TestCase):
         self.write(self.descriptor_path, self.descriptor)
 
     def fetch(self, name="output"):
+        if hasattr(self, "binding_path"):
+            return shared.fetch(self.descriptor_path, self.root / name, self.archive,
+                                binding=self.binding_path)
         return shared.fetch(self.descriptor_path, self.root / name, self.archive)
+
+    def private_baseline(self):
+        project = self.projects[0]
+        project["apiVersion"] = "2026-01-01-preview"
+        previous = copy.deepcopy(project)
+        previous.update(apiVersion="2025-01-01", swaggerFiles=["swagger-old.json"],
+                        swaggerAssets=["swagger-old.json"])
+        self.projects.append(previous)
+        corpus = {
+            "profile": "rpsaas-private", "sourceBranch": "RPSaaSMaster",
+            "serviceList": {
+                "url": "https://github.com/Azure/azure-rest-api-specs-pr/issues/1#issuecomment-2",
+                "updatedAt": "2026-11-01T00:00:00Z", "sha256": "e" * 64},
+            "services": ["specification/example"], "versionPolicy": "all-supported",
+            "projectVersions": [{"project": item["sourcePath"], "apiVersion": item["apiVersion"]}
+                                for item in self.projects],
+            "validationProfile": {"id": "production-arm", "sha256": "f" * 64}}
+        self.descriptor.update(schemaVersion=2, corpus=corpus)
+        private_repo = "Azure/azure-rest-api-specs-pr"
+        self.descriptor["source"].update(repository=private_repo,
+                                         preservationRepository=private_repo)
+        self.descriptor["archive"]["repository"] = private_repo
+        self.descriptor["dataset"].update(projectVersions=2, swaggerFiles=2, observations=2)
+        self.baseline["schemaVersion"] = 2
+        self.baseline["context"].update(
+            specsRepository="https://github.com/" + private_repo, corpus=corpus)
+        meta = shared.load_json(self.dataset / "_meta.json")
+        meta.update(schemaVersion=5, projects=self.projects,
+                    specsRepository="https://github.com/" + private_repo,
+                    filters={"serviceType": "resource-manager", "corpus": corpus})
+        meta["summary"].update(projectVersions=2, emittedSwaggerFiles=2, violations=2)
+        self.write(self.dataset / "_meta.json", meta)
+        index = shared.load_json(self.dataset / "validator-results.json")
+        index.update(schemaVersion=5, totalViolations=2)
+        index["rules"]["First"]["count"] = 2
+        self.write(self.dataset / "validator-results.json", index)
+        shard = shared.load_json(self.dataset / "results" / "First.json")
+        shard["schemaVersion"] = 5
+        finding = shard["results"][0]
+        finding["apiVersion"] = project["apiVersion"]
+        shard["results"].append({**finding, "apiVersion": previous["apiVersion"],
+                                 "swaggerFile": "swagger-old.json"})
+        self.write(self.dataset / "results" / "First.json", shard)
+        for item in self.projects:
+            self.write(self.dataset / item["swaggerFiles"][0],
+                       {"swagger": "2.0", "info": {"version": item["apiVersion"]}})
+        self.seal()
+        self.pin_private_descriptor()
+
+    def pin_private_descriptor(self):
+        self.binding_path = self.root / "binding.json"
+        self.write(self.binding_path, {
+            "schemaVersion": 1, "corpusProfile": "rpsaas-private",
+            "metadataRepository": "Azure/azure-rest-api-specs-pr",
+            "metadataRef": "evidence/shared-swagger-baseline-rpsaas",
+            "metadataCommit": "1" * 40,
+            "discoveryPath": ".lintdiff-baselines/rpsaas/current.json",
+            "discoverySha256": "2" * 64,
+            "descriptorPath": ".lintdiff-baselines/rpsaas/test/baseline.json",
+            "descriptorSha256": shared.digest(self.descriptor_path),
+            "baselineId": self.descriptor["baselineId"],
+            "baselineIdentity": self.descriptor["baselineIdentity"],
+            "corpusIdentity": shared.identity(self.descriptor["corpus"])})
+
+    def test_private_all_version_baseline_and_offline_resume(self):
+        self.private_baseline()
+        with patch.object(subprocess, "run", side_effect=AssertionError("No network")):
+            first = self.fetch("private-first")
+            second = self.fetch("private-resume")
+        self.assertEqual(first["baselineIdentity"], second["baselineIdentity"])
+        self.assertEqual(first["binding"]["metadataCommit"], "1" * 40)
+        self.assertEqual(first["swaggerGeneration"], "not-run")
+
+    def test_private_binding_required_and_mismatches_rejected_before_fetch(self):
+        self.private_baseline()
+        with self.assertRaisesRegex(ValueError, "binding"):
+            shared.fetch(self.descriptor_path, self.root / "unbound", self.archive)
+        for key, value in (("metadataCommit", "main"), ("descriptorSha256", "0" * 64),
+                           ("baselineIdentity", "0" * 64), ("corpusIdentity", "0" * 64),
+                           ("descriptorPath", "../escape.json"),
+                           ("corpusProfile", "public-arm")):
+            with self.subTest(key=key):
+                binding = shared.load_json(self.binding_path)
+                binding[key] = value
+                self.write(self.binding_path, binding)
+                with patch.object(subprocess, "run", side_effect=AssertionError("No network")):
+                    with self.assertRaises(ValueError):
+                        self.fetch(key)
+                self.assertFalse((self.root / key).exists())
+                self.pin_private_descriptor()
+
+    def test_private_descriptor_rejects_wrong_source_selection_or_profile(self):
+        self.private_baseline()
+        mutations = [
+            lambda value: value["source"].update(repository="Azure/azure-rest-api-specs"),
+            lambda value: value["corpus"].update(versionPolicy="latest"),
+            lambda value: value["corpus"]["services"].append("specification/EXAMPLE"),
+            lambda value: value["corpus"]["services"].append("specification/missing"),
+            lambda value: value["corpus"]["projectVersions"][0].update(
+                project="specification/not-selected"),
+            lambda value: value["corpus"]["projectVersions"].append(
+                value["corpus"]["projectVersions"][0]),
+            lambda value: value["corpus"]["validationProfile"].update(id="rpaas"),
+        ]
+        for number, mutate in enumerate(mutations):
+            with self.subTest(number=number):
+                value = copy.deepcopy(self.descriptor)
+                mutate(value)
+                with self.assertRaises(ValueError):
+                    shared.validate_descriptor(value)
+        value = copy.deepcopy(self.descriptor)
+        value["dataset"]["projects"] = 2
+        value["corpus"]["projectVersions"][0]["project"] = "specification/example/Project"
+        value["corpus"]["projectVersions"][1]["project"] = "specification/example/project"
+        with self.assertRaisesRegex(ValueError, "Case-colliding"):
+            shared.validate_descriptor(value)
+
+    def test_private_population_versions_and_observations_are_verified(self):
+        self.private_baseline()
+        mutations = [
+            ("_meta.json", lambda value: value["projects"].pop()),
+            ("_meta.json", lambda value: value["filters"]["corpus"].update(versionPolicy="latest")),
+            ("_meta.json", lambda value: value["projects"][1].update(apiVersion="2024-01-01")),
+            ("_meta.json", lambda value: value["projects"][1].update(validationStatus="failed")),
+            ("results/First.json", lambda value: value["results"][1].pop("apiVersion")),
+            ("results/First.json", lambda value: value["results"][1].update(apiVersion="unknown")),
+            ("swagger-old.json", lambda value: value["info"].update(version="2024-01-01")),
+        ]
+        for number, (name, mutate) in enumerate(mutations):
+            with self.subTest(name=name, number=number):
+                file = self.dataset.joinpath(*name.split("/"))
+                original = file.read_bytes()
+                value = shared.load_json(file)
+                mutate(value)
+                self.write(file, value)
+                self.seal()
+                self.pin_private_descriptor()
+                try:
+                    with self.assertRaises(ValueError):
+                        self.fetch(f"private-invalid-{number}")
+                finally:
+                    file.write_bytes(original)
+
+    def private_discovery_responses(self):
+        descriptor = self.descriptor_path.read_bytes()
+        discovery = json.dumps({
+            "schemaVersion": 2, "corpusProfile": "rpsaas-private",
+            "baselineId": self.descriptor["baselineId"],
+            "descriptorPath": ".lintdiff-baselines/rpsaas/test/baseline.json",
+            "descriptorSha256": hashlib.sha256(descriptor).hexdigest()}).encode("utf-8")
+        return [b'{"private":true,"permissions":{"pull":true}}',
+                json.dumps({"sha": "1" * 40}).encode("utf-8"), discovery, descriptor]
+
+    def test_private_discovery_pins_metadata_before_reading_descriptors(self):
+        self.private_baseline()
+        with patch.object(shared, "gh", side_effect=self.private_discovery_responses()) as api:
+            result = shared.discover(self.root / "selection")
+        self.assertEqual(api.call_count, 4)
+        for call in api.call_args_list[2:]:
+            self.assertIn("?ref=" + "1" * 40, call.args[0])
+        self.assertEqual(Path(result["descriptor"]).read_bytes(), self.descriptor_path.read_bytes())
+        with patch.object(shared, "gh", side_effect=AssertionError("No moving refs on resume")):
+            receipt = shared.fetch(result["descriptor"], self.root / "discovered-run",
+                                   self.archive, binding=result["binding"])
+        self.assertEqual(receipt["binding"]["metadataCommit"], "1" * 40)
+
+    def test_private_discovery_access_missing_and_corrupt_data_no_fallback(self):
+        self.private_baseline()
+        cases = [
+            [b'{"private":false,"permissions":{"pull":true}}'],
+            [b'{"private":true,"permissions":{"pull":false}}'],
+            [subprocess.CalledProcessError(1, ["gh"])],
+            self.private_discovery_responses()[:1] + [subprocess.CalledProcessError(1, ["gh"])],
+            self.private_discovery_responses()[:2] + [subprocess.CalledProcessError(1, ["gh"])],
+            self.private_discovery_responses()[:2] + [b"{}"],
+            self.private_discovery_responses()[:3] + [b"{}"],
+        ]
+        for number, responses in enumerate(cases):
+            with self.subTest(number=number):
+                with patch.object(shared, "gh", side_effect=responses) as api:
+                    with self.assertRaises((ValueError, subprocess.CalledProcessError)):
+                        shared.discover(self.root / f"bad-discovery-{number}")
+                self.assertLessEqual(api.call_count, len(responses))
+
+    def test_private_download_checks_repository_visibility_before_asset_access(self):
+        self.private_baseline()
+        with patch.object(shared, "gh", return_value=b'{"private":false}') as api:
+            with patch.object(subprocess, "run", side_effect=AssertionError("No asset access")):
+                with self.assertRaisesRegex(ValueError, "must be private"):
+                    shared.fetch(self.descriptor_path, self.root / "public-asset",
+                                 binding=self.binding_path)
+        api.assert_called_once_with("repos/Azure/azure-rest-api-specs-pr")
+
+        def download(args, check):
+            self.assertEqual(args[5], "Azure/azure-rest-api-specs-pr")
+            self.assertTrue(check)
+            shutil.copyfile(self.archive, Path(args[-1]) / "swagger-test.tar.gz")
+        with patch.object(shared, "gh",
+                          return_value=b'{"private":true,"permissions":{"pull":true}}'):
+            with patch.object(subprocess, "run", side_effect=download) as run:
+                receipt = shared.fetch(self.descriptor_path, self.root / "private-download",
+                                       binding=self.binding_path)
+        self.assertEqual(run.call_count, 1)
+        self.assertEqual(receipt["binding"]["corpusIdentity"],
+                         shared.identity(self.descriptor["corpus"]))
+
+    def test_private_discovery_cli_uses_explicit_override_and_outputs_binding(self):
+        self.private_baseline()
+        args = ["shared_baseline.py", "discover", "--repository", "example/private-evidence",
+                "--ref", "evidence/private", "--path", "baselines/current.json",
+                "--output", str(self.root / "override")]
+        with patch.object(shared, "gh", side_effect=self.private_discovery_responses()) as api:
+            with patch("sys.argv", args), patch("sys.stdout", new_callable=io.StringIO) as stdout:
+                self.assertEqual(shared.main(), 0)
+        self.assertEqual(api.call_args_list[0].args[0], "repos/example/private-evidence")
+        result = json.loads(stdout.getvalue())
+        binding = shared.load_json(result["binding"])
+        self.assertEqual(binding["metadataRepository"], "example/private-evidence")
+        self.assertEqual(binding["metadataRef"], "evidence/private")
+        self.assertEqual(binding["discoveryPath"], "baselines/current.json")
 
     def test_success_local_no_network_and_cross_rule_reuse(self):
         with patch.object(subprocess, "run", side_effect=AssertionError("No network")):

@@ -14,6 +14,10 @@ baseline bound to its allowlist and all-supported-version inventory; never
 advance public discovery with private evidence or reuse public data as private
 coverage. Unsupported selection/version/profile capabilities are prerequisites,
 not permission to weaken baseline verification.
+The [private baseline procedure](private-baseline.md) declares its concrete
+discovery defaults, private schema-2 descriptor, pinned binding and recovery
+commands. The schema-1 public descriptor and full-public population below remain
+unchanged; never send a private schema to an unsupported package-level runner.
 
 ## Monthly evaluation snapshot
 

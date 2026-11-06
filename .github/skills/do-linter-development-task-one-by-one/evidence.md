@@ -11,6 +11,12 @@ destination below. Use verified authorized private storage and a separate
 `migration.md`; never publish private source, inventory, diagnostics or derived
 findings in these public forks. Keep corpus identities and reports independent.
 The integrity, immutable-asset, byte-hash and recovery gates still apply.
+Select and persist the
+[explicit private discovery binding](../analyze-native-lint-coverage/private-baseline.md#explicit-discovery-binding)
+before setup. Reports and phase handoffs retain its pinned metadata commit and
+descriptor/baseline identities; resumptions never resolve the moving pointer
+again. Baseline publication requires the producer's verified private round trip
+before discovery advances.
 
 ## Shared Swagger publication and discovery
 
