@@ -16,7 +16,9 @@ Many target languages cannot represent inline union types or anonymous models di
 
 ## Examples
 
-#### ❌ Incorrect
+### ❌ Incorrect
+
+#### Property types
 
 Using inline union expressions:
 
@@ -36,6 +38,8 @@ model Outer {
 }
 ```
 
+#### Request bodies
+
 Using an anonymous request body as a template argument:
 
 ```tsp
@@ -45,7 +49,29 @@ op send is Send<{
 }>;
 ```
 
-#### ✅ Correct
+#### Implicit response bodies
+
+The rule also checks anonymous implicit model response bodies, such as `@get op read(): { value: string };`.
+
+Adding a payload property outside a named model creates an anonymous response shape. These excerpts assume an ARM provider context with `Widget` already declared and the HTTP and ARM namespaces in scope:
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<
+    Widget,
+    Response = {
+      @statusCode status: 200;
+      ...Widget;
+      etag: string;
+    }
+  >;
+}
+```
+
+### ✅ Correct
+
+#### Property types
 
 Define unions as named types:
 
@@ -73,6 +99,8 @@ model Outer {
 }
 ```
 
+#### Request bodies
+
 Define a named request model before passing it to an operation template:
 
 ```tsp
@@ -82,6 +110,17 @@ model Request {
 
 @post op Send<T>(@body body: T): void;
 op send is Send<Request>;
+```
+
+#### Implicit response bodies
+
+When no custom response is needed, prefer `ArmResourceRead<Widget>` without a `Response` override:
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
 ```
 
 :::note
@@ -95,7 +134,7 @@ The following patterns are **not** flagged:
 - Nullable unions (e.g. `MyModel | null`)
 - Status code unions (e.g. `@statusCode _: 200 | 400`)
 - Content-type header unions (e.g. `@header contentType: "application/json" | "text/plain"`)
-- HTTP response envelope models (containing `@statusCode`, `@body`, `@header`, etc.)
+- HTTP response envelopes with explicit `@body`/`@bodyRoot`, or metadata without an anonymous implicit payload
 - Anonymous models used as template arguments outside request bodies, such as OAuth2 flow configuration
 - Types defined inside standard library namespaces (`TypeSpec.*`, `Azure.*`)
 - Unions where all non-null variants are scalars (e.g. `string | int32`)
@@ -116,3 +155,7 @@ The request-body check partially covers
 This rule checks native TypeSpec names, not emitted schema names. Named dictionary
 types such as `Record<string>` remain valid even when an emitter inlines their schemas
 and the Swagger validator reports them.
+
+The implicit-response check partially covers
+[AvoidAnonymousTypes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/avoid-anonymous-types.md).
+It checks TypeSpec declarations, not emitted Swagger schemas. Named dictionaries and named models that an emitter inlines in `allOf` remain valid; Swagger schema overrides are not inspected.

@@ -134,6 +134,19 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it.each(["data-plane", "resource-manager"])(
+    "uses the existing unnamed-types rule for %s response bodies",
+    (rulesetName) => {
+      const ruleset = $linter.ruleSets?.[rulesetName];
+      strictEqual(ruleset?.enable?.["@azure-tools/typespec-azure-core/no-unnamed-types"], true);
+      strictEqual(
+        ruleset?.enable?.["@azure-tools/typespec-azure-core/no-unnamed-response-bodies"],
+        undefined,
+      );
+      ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-unnamed-response-bodies"));
+    },
+  );
+
   it("keeps private endpoint API completeness guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
