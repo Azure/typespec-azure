@@ -5,8 +5,11 @@ package com.microsoft.typespec.http.client.generator.browser;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -29,6 +32,16 @@ public final class BrowserCompatibility {
         // TeaVM's distinct() resets its visited set between concatenated stream batches.
         Set<T> visited = new HashSet<>();
         return stream.filter(visited::add);
+    }
+
+    public static List<String> unformattedCode(Map<String, String> files) {
+        // Full Java files are cleaned after template generation, without native formatting.
+        return new ArrayList<>(files.values());
+    }
+
+    public static <T> Set<T> newKeySet() {
+        // Each worker runs one generator, so management mapper sets do not need concurrency.
+        return new HashSet<>();
     }
 
     public static String normalizeEolInTextBlock(String value, String separator) {

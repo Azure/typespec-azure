@@ -22,12 +22,9 @@ export async function $onEmit(context: EmitContext<EmitterOptions>) {
     };
     const model = await new CodeModelBuilder(program, { ...context, options }).build();
     if (!model || program.hasError()) return;
-    if (model.arm) {
-      throw new Error("The TeaVM POC supports Azure data-plane clients only.");
-    }
     const files = await generate(model, {
       ...options,
-      arm: false,
+      arm: model.arm,
       "include-api-view-properties": false,
       "license-header": model.info?.license?.extensions?.header,
     });

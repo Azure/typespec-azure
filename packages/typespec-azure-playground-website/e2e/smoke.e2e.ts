@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import samples from "../samples/dist/samples.js";
 
 const host = `http://localhost:5174`;
 
@@ -67,7 +68,7 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     await page.waitForFunction(() => (window as any).host !== undefined);
     expect(runtimeRequests).toEqual([]);
 
-    const result = await page.evaluate(async () => {
+    const result = await page.evaluate(async (armSample) => {
       const { host, compiler } = window as any;
       const source = `
         import "@typespec/http";
@@ -95,6 +96,11 @@ test.describe("typespec-azure-playground-website UI tests", () => {
       const firstModel = (await host.readFile(`${firstRoot}/models/Widget.java`)).text;
       const client = (await host.readFile(`${firstRoot}/PlaygroundClient.java`)).text;
       const rejected = await compile("com.azure.rejected", source, true);
+      const arm = await compile("com.azure.management", armSample.content);
+      if (arm.hasError()) throw new Error(arm.diagnostics.map((x: any) => x.message).join("\n"));
+      const armRoot =
+        "/test/com.azure.management/@azure-tools/typespec-java/src/main/java/com/azure/management";
+      const armModel = (await host.readFile(`${armRoot}/models/Employee.java`)).text;
       const second = await compile(
         "com.azure.second",
         source.replace("name: string;", "name: string; revision: int32;"),
@@ -126,13 +132,16 @@ test.describe("typespec-azure-playground-website UI tests", () => {
       return {
         firstModel,
         client,
+        armModel,
         rejected: rejected.diagnostics.map((x: any) => x.message),
         secondModel,
         wrappedModel: (await host.readFile(`${wrappedRoot}/models/Widget.java`)).text,
       };
-    });
+    }, samples["Tracked Resource"]);
     expect(result.client).toContain("class PlaygroundClient");
     expect(result.client).toContain("getWidget(");
+    expect(result.armModel).toContain("interface Employee");
+    expect(result.armModel).toContain("com.azure.core.management");
     expect(result.firstModel).toContain("Widget next");
     expect(result.firstModel).not.toMatch(/import [^\n;]*\.\./);
     expect(result.firstModel).not.toContain("import java.util.Base64;");
@@ -148,5 +157,6 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     expect(result.wrappedModel).toContain("import java.util.Base64;");
     expect(result.wrappedModel).toContain("import java.util.List;");
     expect(runtimeRequests.some((url) => url.endsWith("/generator.wasm"))).toBe(true);
+    expect(runtimeRequests.some((url) => url.endsWith("/arm.wasm"))).toBe(true);
   });
 });

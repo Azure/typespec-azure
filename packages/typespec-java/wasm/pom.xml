@@ -97,11 +97,21 @@
         <version>${teavm.version}</version>
         <executions>
           <execution>
+            <id>data-plane</id>
             <phase>process-classes</phase>
             <goals>
               <goal>compile</goal>
               <goal>copy-webassembly-gc-runtime</goal>
             </goals>
+          </execution>
+          <execution>
+            <id>arm</id>
+            <phase>process-classes</phase>
+            <goals><goal>compile</goal></goals>
+            <configuration>
+              <mainClass>com.microsoft.typespec.http.client.generator.browser.BrowserArmGenerator</mainClass>
+              <targetFileName>arm.wasm</targetFileName>
+            </configuration>
           </execution>
         </executions>
         <configuration>

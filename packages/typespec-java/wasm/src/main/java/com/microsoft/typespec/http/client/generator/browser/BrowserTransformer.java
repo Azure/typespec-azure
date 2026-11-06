@@ -3,6 +3,8 @@
 
 package com.microsoft.typespec.http.client.generator.browser;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.teavm.model.AccessLevel;
 import org.teavm.model.ClassHolder;
 import org.teavm.model.ClassHolderTransformer;
@@ -22,6 +24,7 @@ import org.teavm.model.instructions.InvokeInstruction;
 public final class BrowserTransformer implements ClassHolderTransformer {
     private static final String GENERATOR = "com.microsoft.typespec.http.client.generator.";
     private static final String LOGGING = "io.clientcore.core.instrumentation.logging.";
+    private final Set<String> submittedTypes = new HashSet<>();
 
     @Override
     public void transformClass(ClassHolder cls, ClassHolderTransformerContext context) {
@@ -59,12 +62,24 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                 && (name.equals("log") || name.equals("performLogging") || name.equals("recordExceptionDetails"))) {
                 method.setProgram(null);
                 ProgramEmitter.create(method, context.getHierarchy()).exit();
-            } else if (cls.getName().equals(GENERATOR + "core.model.projectmodel.Project")
+            } else if ((cls.getName().equals(GENERATOR + "core.model.projectmodel.Project")
+                || cls.getName().equals(GENERATOR + "mgmt.model.projectmodel.FluentProject"))
                 && name.equals("integrateWithSdk")) {
                 method.setProgram(null);
                 ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
                 pe.construct(UnsupportedOperationException.class,
                     pe.constant("SDK integration is not supported in the browser")).raise();
+            } else if (cls.getName().equals(GENERATOR + "core.preprocessor.Preprocessor")
+                && name.equals("createCodeModelDirectory")) {
+                method.setProgram(null);
+                ProgramEmitter.create(method, context.getHierarchy())
+                    .constantNull(ValueType.object("java.nio.file.Path")).returnValue();
+            } else if (cls.getName().equals(GENERATOR + "core.preprocessor.Preprocessor")
+                && name.equals("dumpCodeModel")) {
+                method.setProgram(null);
+                ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
+                pe.construct(UnsupportedOperationException.class,
+                    pe.constant("Code model snapshots are not supported in the browser")).raise();
             }
 
             Program program = method.getProgram();
@@ -101,6 +116,16 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                             }
                             invoke.setArguments(args);
                             invoke.setInstance(null);
+                        } else if (ref.getClassName().equals("java.util.concurrent.ConcurrentHashMap")
+                            && ref.getName().equals("newKeySet") && ref.parameterCount() == 0
+                            && cls.getName().startsWith(GENERATOR)) {
+                            invoke.setMethod(new MethodReference(BrowserCompatibility.class.getName(),
+                                "newKeySet", ValueType.object("java.util.Set")));
+                        } else if (ref.getClassName().equals(
+                            GENERATOR + "core.postprocessor.implementation.CodeFormatterUtil")
+                            && ref.getName().equals("formatCode") && ref.parameterCount() == 1) {
+                            invoke.setMethod(new MethodReference(BrowserCompatibility.class.getName(),
+                                "unformattedCode", ValueType.object("java.util.Map"), ValueType.object("java.util.List")));
                         } else if (ref.getClassName().equals("com.github.javaparser.utils.Utils")
                             && ref.getName().equals("normalizeEolInTextBlock")
                             && ref.parameterCount() == 2
@@ -120,10 +145,14 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                             || constant.getConstant()
                                 .equals(ValueType.object("javax.xml.stream.XMLStreamException")))) {
                         // These are used only for names of imports in generated XML code.
-                        ClassHolder namedType
-                            = new ClassHolder(((ValueType.Object) constant.getConstant()).getClassName());
-                        namedType.setParent("java.lang.Object");
-                        context.submit(namedType);
+                        String typeName = ((ValueType.Object) constant.getConstant()).getClassName();
+                        // Submitted classes are not immediately visible through the class source.
+                        if (submittedTypes.add(typeName)
+                            && context.getHierarchy().getClassSource().get(typeName) == null) {
+                            ClassHolder namedType = new ClassHolder(typeName);
+                            namedType.setParent("java.lang.Object");
+                            context.submit(namedType);
+                        }
                     }
                 }
 

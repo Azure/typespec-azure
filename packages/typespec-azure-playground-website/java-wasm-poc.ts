@@ -7,7 +7,7 @@ export function javaWasmPoc(): Plugin {
   return {
     name: "java-wasm-poc",
     async buildStart() {
-      for (const name of ["worker.js", "runtime.js", "generator.wasm"]) {
+      for (const name of ["worker.js", "runtime.js", "generator.wasm", "arm.wasm"]) {
         const path = new URL(`../typespec-java/dist/browser/java-wasm/${name}`, import.meta.url);
         assets.set(name, {
           content: await readFile(path),
