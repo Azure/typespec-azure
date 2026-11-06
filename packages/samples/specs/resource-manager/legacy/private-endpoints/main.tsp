@@ -125,6 +125,7 @@ interface Dependents {
     PrivateEndpointConnection,
     OptionalRequestBody = true
   >;
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-patch" "This legacy sample intentionally demonstrates a bodyless PATCH with PatchModel = void."
   updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
     Dependent,
     PrivateEndpointConnection,
