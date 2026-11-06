@@ -1,7 +1,6 @@
 ---
 changeKind: internal
 packages:
-  - "@azure-tools/typespec-go"
   - "@azure-tools/typespec-ts"
 ---
 
