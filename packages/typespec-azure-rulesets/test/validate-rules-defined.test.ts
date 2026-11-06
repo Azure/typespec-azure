@@ -69,6 +69,16 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("enables TCGC scope validation in all Azure rulesets", () => {
+    for (const name of ["data-plane", "resource-manager", "client-sdk"]) {
+      ok(
+        $linter.ruleSets?.[name].enable?.[
+          "@azure-tools/typespec-client-generator-core/no-unsupported-scope"
+        ],
+      );
+    }
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
