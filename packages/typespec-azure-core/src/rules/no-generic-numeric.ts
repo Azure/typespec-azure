@@ -1,4 +1,14 @@
-import { type Model, type Scalar, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Scalar,
+  createRule,
+  fileRef,
+  isArrayModelType,
+  isRecordModelType,
+  paramMessage,
+} from "@typespec/compiler";
 
 const disallowList = new Set(["integer", "numeric", "float", "decimal"]);
 const alternatives = new Map([
@@ -19,19 +29,39 @@ export const noGenericNumericRule = createRule({
     extend: paramMessage`Don't extend generic type '${"name"}'. Use a more specific type that specifies the bit size, such as '${"alternative"}' instead.`,
   },
   create(context) {
+    function checkProperty(prop: ModelProperty) {
+      let type = prop.type;
+      const visited = new Set<Model>();
+      while (
+        type.kind === "Model" &&
+        (isArrayModelType(type) || isRecordModelType(type)) &&
+        !visited.has(type)
+      ) {
+        visited.add(type);
+        type = type.indexer.value;
+      }
+      if (type.kind === "Scalar" && disallowList.has(type.name)) {
+        context.reportDiagnostic({
+          target: prop,
+          format: {
+            name: type.name,
+            alternative: alternatives.get(type.name)!,
+          },
+        });
+      }
+    }
+
     return {
       model: (model: Model) => {
-        for (const [_, prop] of model.properties) {
-          if (prop.type.kind === "Scalar") {
-            if (disallowList.has(prop.type.name)) {
-              context.reportDiagnostic({
-                target: prop,
-                format: {
-                  name: prop.type.name,
-                  alternative: alternatives.get(prop.type.name)!,
-                },
-              });
-            }
+        for (const prop of model.properties.values()) {
+          checkProperty(prop);
+        }
+      },
+      operation: (operation: Operation) => {
+        for (const prop of operation.parameters.properties.values()) {
+          // Spread parameters are checked on their source declarations.
+          if (!prop.sourceProperty) {
+            checkProperty(prop);
           }
         }
       },
