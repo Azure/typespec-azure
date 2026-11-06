@@ -45,12 +45,12 @@ function getSourceAction(
 
 export const useExplicitActionRule = createRule({
   name: "use-explicit-action",
-  description: "Preserve the action segment when reusing POST actions.",
+  description: "Preserve the action segment when reusing actions.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-explicit-action",
   docs: fileRef.fromPackageRoot("src/rules/use-explicit-action.md"),
   messages: {
-    changed: paramMessage`Reusing POST action "${"sourceOperationName"}" as "${"operationName"}" changes its suffix from "${"sourceSuffix"}" to "${"targetSuffix"}". Specify the intended suffix with @action("${"sourceSuffix"}").`,
+    changed: paramMessage`Reusing action "${"sourceOperationName"}" as "${"operationName"}" changes its suffix from "${"sourceSuffix"}" to "${"targetSuffix"}". Specify the intended suffix with @action("${"sourceSuffix"}").`,
   },
   create(context) {
     return {
@@ -82,11 +82,7 @@ export const useExplicitActionRule = createRule({
         const sourceHttpOperation = ignoreDiagnostics(
           getHttpOperation(context.program, sourceAction.operation),
         );
-        if (
-          httpOperation.verb !== "post" ||
-          sourceHttpOperation.verb !== "post" ||
-          httpOperation.path === sourceHttpOperation.path
-        ) {
+        if (httpOperation.path === sourceHttpOperation.path) {
           return;
         }
 

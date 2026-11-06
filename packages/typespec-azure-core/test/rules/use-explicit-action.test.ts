@@ -14,15 +14,17 @@ beforeEach(async () => {
 });
 
 describe("use-explicit-action", () => {
-  it.each(["", '@action("myNewAction")'])(
-    "warns only on reuse that changes the action segment (%s)",
-    async (decorator) => {
-      await tester
-        .expect(
-          `
+  it.each([
+    ["post", ""],
+    ["post", '@action("myNewAction")'],
+    ["get", ""],
+  ])("warns only on reuse that changes the action segment (%s, %s)", async (verb, decorator) => {
+    await tester
+      .expect(
+        `
           @autoRoute
           interface SomeInterface {
-            @post
+            @${verb}
             @action
             op myOldAction(): void;
           }
@@ -30,17 +32,16 @@ describe("use-explicit-action", () => {
           ${decorator}
           op myNewAction is SomeInterface.myOldAction;
           `,
-        )
-        .toEmitDiagnostics([
-          {
-            code: "@azure-tools/typespec-azure-core/use-explicit-action",
-            severity: "warning",
-            message:
-              'Reusing POST action "Azure.MyService.SomeInterface.myOldAction" as "Azure.MyService.myNewAction" changes its suffix from "myOldAction" to "myNewAction". Specify the intended suffix with @action("myOldAction").',
-          },
-        ]);
-    },
-  );
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/use-explicit-action",
+          severity: "warning",
+          message:
+            'Reusing action "Azure.MyService.SomeInterface.myOldAction" as "Azure.MyService.myNewAction" changes its suffix from "myOldAction" to "myNewAction". Specify the intended suffix with @action("myOldAction").',
+        },
+      ]);
+  });
 
   it.each(["", '@action("myAction")'])(
     "does not warn for an action that is not reused (%s)",
@@ -153,23 +154,21 @@ describe("use-explicit-action", () => {
           code: "@azure-tools/typespec-azure-core/use-explicit-action",
           severity: "warning",
           message:
-            'Reusing POST action "Azure.MyService.actionAlias" as "Azure.MyService.myNewAction" changes its suffix from "myOldAction" to "myNewAction". Specify the intended suffix with @action("myOldAction").',
+            'Reusing action "Azure.MyService.actionAlias" as "Azure.MyService.myNewAction" changes its suffix from "myOldAction" to "myNewAction". Specify the intended suffix with @action("myOldAction").',
         },
       ]);
   });
 
-  it("does not warn for reused non-actions or non-POST actions", async () => {
+  it("does not warn for reused non-actions", async () => {
     await tester
       .expect(
         `
         @autoRoute
         interface SomeInterface {
           @post op createWidget(): void;
-          @get @action op getAction(): void;
         }
 
         @route("/aliases") op createAlias is SomeInterface.createWidget;
-        op getAlias is SomeInterface.getAction;
         `,
       )
       .toBeValid();
@@ -229,7 +228,7 @@ describe("use-explicit-action", () => {
           code: "@azure-tools/typespec-azure-core/use-explicit-action",
           severity: "warning",
           message:
-            'Reusing POST action "Azure.MyService.concreteAction" as "Azure.MyService.renamedAction" changes its suffix from "concreteAction" to "renamedAction". Specify the intended suffix with @action("concreteAction").',
+            'Reusing action "Azure.MyService.concreteAction" as "Azure.MyService.renamedAction" changes its suffix from "concreteAction" to "renamedAction". Specify the intended suffix with @action("concreteAction").',
         },
       ]);
   });

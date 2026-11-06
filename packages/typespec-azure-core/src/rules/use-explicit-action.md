@@ -1,6 +1,4 @@
-This rule warns only when reusing a POST action changes its action segment and its resolved HTTP path. POST action suffixes default to the operation name, so reusing an action under a different name can silently change the route. Specify the intended suffix with `@action("suffix")` to preserve it.
-
-An action that is not reused does not need an explicit suffix. Reuse that preserves the action segment is also allowed, including reuse under a different route prefix. Instantiating an operation or interface template defines a new action rather than reusing a concrete action; subsequent reuse of that concrete action is checked. Operations whose explicit routes do not use the action segment are not flagged.
+This rule warns when reusing a POST action operation changes the action segment in its resolved HTTP path. POST action suffixes default to the operation name, so reusing an action without a specific action segment under a different name can silently change the route. Specify the intended suffix with `@action("suffix")` to preserve it.
 
 #### ❌ Incorrect
 
