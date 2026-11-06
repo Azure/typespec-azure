@@ -6,6 +6,9 @@ Emitter authors can use `resolveArmResources` from
 `@azure-tools/typespec-azure-resource-manager` to get a provider-wide view of the resources and
 operations declared by an ARM TypeSpec service.
 
+For guidance on declaring resources and assigning unique logical names in a service specification,
+see [Authoring resource metadata](./resource-metadata.md).
+
 The resolved metadata includes:
 
 - each concrete ARM resource occurrence and its TypeSpec model;
