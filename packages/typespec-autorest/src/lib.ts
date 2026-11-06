@@ -425,6 +425,12 @@ export const $lib = createTypeSpecLibrary({
         noOperationId: paramMessage`Skipping example file ${"filename"} because it does not contain an operationId and/or title.`,
       },
     },
+    "unknown-example-operation": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Example operation '${"operation"}' does not exist in API version '${"version"}'.`,
+      },
+    },
     "unified-example-loading": {
       severity: "warning",
       messages: {

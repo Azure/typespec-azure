@@ -1268,6 +1268,54 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeJob
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/jobs:analyze`
+
+Declares a Language-shaped job with several property-level status metadata selections, including
+inherited timestamps. Emitter tests should expose the latest received metadata on the poller or
+operation rather than waiting for the logical final result.
+Expected calls:
+
+- POST `/jobs:analyze` returns 202 with the initial status-monitor body and polling URI;
+  `statistics` and `errors` are absent
+- GET `/jobs/job-success` returns Running with one succeeded document and an updated timestamp
+- GET `/jobs/job-success` returns Succeeded with three succeeded documents, a newer timestamp,
+  an empty auxiliary `errors` array, and the result
+
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeJobWithFailure
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/jobs/failure:analyze`
+
+Declares a failed Language-shaped job using the same status-monitor model as `analyzeJob`.
+The auxiliary `errors` array contains item-level diagnostics and remains available as metadata
+even though the LRO fails. The separate structural `error` property is not selected as metadata.
+Emitter-specific tests must verify access on the poller or operation after handling its failure.
+Expected calls:
+
+- POST `/jobs/failure:analyze` returns 202 with the initial status-monitor body and polling URI
+- GET `/jobs/job-failure` returns Running with one succeeded document
+- GET `/jobs/job-failure` returns Failed with updated statistics, timestamp, item-level `errors`,
+  and the structural `error`, without a logical result
+
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/analyzers/{analyzerId}:analyze`
+
+Declares a Content Understanding-shaped flow for emitter tests of property-level
+`@lroStatusMetadata`.
+
+The optional `usage` value is a typed nested model with optional numeric fields and a token
+dictionary. The standard status-monitor `id` remains part of the response model and is not
+selected as auxiliary status metadata. Emitter-specific client tests can assert the generated
+public usage type and runtime value.
+
+Expected calls:
+
+- POST `/analyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+- GET the status-monitor URI returns a running status with nested `usage`
+- GET the status-monitor URI returns a succeeded status with nested `usage` and the result
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`
