@@ -97,6 +97,14 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                             }
                             invoke.setArguments(args);
                             invoke.setInstance(null);
+                        } else if (ref.getClassName().equals("com.github.javaparser.utils.Utils")
+                            && ref.getName().equals("normalizeEolInTextBlock")
+                            && ref.parameterCount() == 2
+                            && ref.parameterType(1).equals(ValueType.object("java.lang.String"))) {
+                            // JavaParser uses \R, which TeaVM's regex engine does not support.
+                            invoke.setMethod(new MethodReference(BrowserCompatibility.class.getName(),
+                                ref.getName(), ValueType.object("java.lang.String"),
+                                ValueType.object("java.lang.String"), ValueType.object("java.lang.String")));
                         } else if (ref.getClassName().equals("java.lang.ClassLoader")
                             && ref.getName().equals("getResourceAsStream")) {
                             invoke.setMethod(new MethodReference(GENERATOR + "browser.BrowserResources", "open",

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.javaparser.utils.Utils;
 import com.google.googlejavaformat.java.RemoveUnusedImports;
 import org.junit.jupiter.api.Test;
 
@@ -47,10 +48,12 @@ class BrowserPostprocessorTests {
             import java.util.Set;
             import java.time.Instant;
             import java.net.URI;
+            import java.io.IOException;
             import java.lang.Deprecated;
             /**
              * {@link Instant#compareTo(Instant) description}
              * @see URI
+             * @throws IOException when reading fails.
              */
             @Deprecated
             class Example<T extends Set<String>> {
@@ -62,12 +65,50 @@ class BrowserPostprocessorTests {
     }
 
     @Test
+    void preservesWrappedJavadocReferences() throws Exception {
+        String source = """
+            package sample;
+            import java.time.Instant;
+            import java.util.List;
+            import java.net.URI;
+            import missing.dependency.OnlyInProse;
+            import missing.dependency.OnlyInCode;
+            class Example {
+                /**
+                 * {@link
+                 * Instant}
+                 * {@code OnlyInCode}
+                 * @see java.util.Collections#unmodifiableList(
+                 *     List)
+                 * @param value OnlyInProse is not a reference.
+                 *     {@linkplain URI}
+                 */
+                void example(String value) {}
+            }
+            """;
+        String cleaned = postprocessor.removeUnusedImports("Example.java", source);
+        assertEquals(RemoveUnusedImports.removeUnusedImports(source), cleaned);
+        assertTrue(cleaned.contains("import java.time.Instant;"));
+        assertTrue(cleaned.contains("import java.util.List;"));
+        assertTrue(cleaned.contains("import java.net.URI;"));
+    }
+
+    @Test
     void preservesLineEndingsAndRemovesImplicitImports() throws Exception {
         String source = "package sample;\r\nimport missing.dependency.Unused;\r\nimport java.lang.String;\r\n"
             + "import sample.Example;\r\nimport sample.*;\r\nimport java.util.*;\r\n"
             + "class Example {\r\n\tString value;\r\n}\r\n";
         assertEquals(RemoveUnusedImports.removeUnusedImports(source),
             postprocessor.removeUnusedImports("Example.java", source));
+    }
+
+    @Test
+    void normalizesJavadocLineBreaksWithoutRegex() {
+        String source = "a\r\nb\rc\nd\u000Be\ff\u0085g\u2028h\u2029";
+        for (String separator : new String[] { "\n", "\r\n" }) {
+            assertEquals(Utils.normalizeEolInTextBlock(source, separator),
+                BrowserCompatibility.normalizeEolInTextBlock(source, separator));
+        }
     }
 
     @Test

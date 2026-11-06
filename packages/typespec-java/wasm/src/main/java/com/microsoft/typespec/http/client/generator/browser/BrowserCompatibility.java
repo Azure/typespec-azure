@@ -22,4 +22,21 @@ public final class BrowserCompatibility {
     public static Stream<String> splitAsStream(Pattern pattern, CharSequence value) {
         return Arrays.stream(pattern.split(value));
     }
+
+    public static String normalizeEolInTextBlock(String value, String separator) {
+        StringBuilder result = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            if (character == '\r' || character == '\n' || character == '\u000B' || character == '\f'
+                || character == '\u0085' || character == '\u2028' || character == '\u2029') {
+                if (character == '\r' && i + 1 < value.length() && value.charAt(i + 1) == '\n') {
+                    i++;
+                }
+                result.append(separator);
+            } else {
+                result.append(character);
+            }
+        }
+        return result.toString();
+    }
 }

@@ -13,15 +13,14 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.javadoc.description.JavadocDescription;
+import com.github.javaparser.javadoc.description.JavadocInlineTag;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 final class BrowserPostprocessor {
-    private static final Pattern JAVADOC_REFERENCES = Pattern.compile(
-        "\\{@(?:link|linkplain|value)\\s+([^}]+)\\}|(?m)^\\s*\\*?\\s*@(?:see|throws|exception|uses|provides)\\s+([^\\r\\n]+)");
     // RAW skips reflection-dependent validation, but still reports Java grammar errors.
     private final JavaParser parser = new JavaParser(new ParserConfiguration()
         .setLanguageLevel(ParserConfiguration.LanguageLevel.RAW)
@@ -39,11 +38,15 @@ final class BrowserPostprocessor {
         collectNames(unit, used);
         parsed.getCommentsCollection().ifPresent(comments -> {
             for (var comment : comments.getComments()) {
-                if (comment instanceof JavadocComment) {
-                    var references = JAVADOC_REFERENCES.matcher(comment.getContent());
-                    while (references.find()) {
-                        collectReferenceNames(references.group(1) == null ? references.group(2) : references.group(1),
-                            used);
+                if (comment instanceof JavadocComment javadocComment) {
+                    var javadoc = javadocComment.parse();
+                    collectJavadocNames(javadoc.getDescription(), used);
+                    for (var tag : javadoc.getBlockTags()) {
+                        collectJavadocNames(tag.getContent(), used);
+                        switch (tag.getTagName()) {
+                            case "see", "throws", "exception", "uses", "provides" ->
+                                collectReferenceNames(tag.getName().orElse(tag.getContent().toText()), used);
+                        }
                     }
                 }
             }
@@ -84,6 +87,16 @@ final class BrowserPostprocessor {
             result.delete(start, end);
         }
         return result.toString();
+    }
+
+    private static void collectJavadocNames(JavadocDescription description, Set<String> used) {
+        for (var element : description.getElements()) {
+            if (element instanceof JavadocInlineTag tag) {
+                switch (tag.getType()) {
+                    case LINK, LINKPLAIN, VALUE -> collectReferenceNames(tag.getContent(), used);
+                }
+            }
+        }
     }
 
     private static void collectNames(Node node, Set<String> used) {

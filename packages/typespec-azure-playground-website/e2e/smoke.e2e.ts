@@ -103,11 +103,32 @@ test.describe("typespec-azure-playground-website UI tests", () => {
         throw new Error(second.diagnostics.map((x: any) => x.message).join("\n"));
       const secondRoot =
         "/test/com.azure.second/@azure-tools/typespec-java/src/main/java/com/azure/second";
+      const secondModel = (await host.readFile(`${secondRoot}/models/Widget.java`)).text;
+      const wrapped = await compile(
+        "com.azure.wrapped",
+        source.replace(
+          "model Widget",
+          `
+            @doc("""
+            {@link
+            Base64}
+            {@link java.util.Collections#unmodifiableList(
+            List)}
+            """)
+            model Widget
+          `,
+        ),
+      );
+      if (wrapped.hasError())
+        throw new Error(wrapped.diagnostics.map((x: any) => x.message).join("\n"));
+      const wrappedRoot =
+        "/test/com.azure.wrapped/@azure-tools/typespec-java/src/main/java/com/azure/wrapped";
       return {
         firstModel,
         client,
         rejected: rejected.diagnostics.map((x: any) => x.message),
-        secondModel: (await host.readFile(`${secondRoot}/models/Widget.java`)).text,
+        secondModel,
+        wrappedModel: (await host.readFile(`${wrappedRoot}/models/Widget.java`)).text,
       };
     });
     expect(result.client).toContain("class PlaygroundClient");
@@ -124,6 +145,8 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     expect(result.secondModel).toContain("package com.azure.second.models;");
     expect(result.secondModel).toContain("revision");
     expect(result.secondModel).not.toContain("com.azure.first");
+    expect(result.wrappedModel).toContain("import java.util.Base64;");
+    expect(result.wrappedModel).toContain("import java.util.List;");
     expect(runtimeRequests.some((url) => url.endsWith("/generator.wasm"))).toBe(true);
   });
 });
