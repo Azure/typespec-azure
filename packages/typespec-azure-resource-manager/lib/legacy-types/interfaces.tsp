@@ -29,6 +29,7 @@ interface Operations<
   @autoRoute
   @armUpdateProviderNamespace
   @doc("List the operations for the provider")
+  @providerOperation
   @segment("operations")
   @get
   @list

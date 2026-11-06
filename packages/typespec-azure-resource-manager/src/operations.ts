@@ -35,6 +35,7 @@ import type {
   ArmResourceListDecorator,
   ArmResourceReadDecorator,
   ArmResourceUpdateDecorator,
+  ProviderOperationDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import type {
   ArmOperationOptions,
@@ -43,6 +44,7 @@ import type {
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
+import { getArmResource } from "./private.decorators.js";
 import {
   evaluateResourceNameExpression,
   getDefaultLegacyExtensionResourceName,
@@ -63,6 +65,37 @@ import { ArmStateKeys } from "./state.js";
 export type ArmLifecycleOperationKind =
   "read" | "createOrUpdate" | "update" | "delete" | "checkExistence";
 export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
+
+const [getProviderOperationState, setProviderOperation] = useStateMap<Operation, Operation>(
+  ArmStateKeys.providerOperation,
+);
+const [getOperationResource, setOperationResource] = useStateMap<Operation, Model>(
+  ArmStateKeys.resourceOperationResource,
+);
+
+/** Mark an operation as a provider operation rather than a resource operation. */
+export const $providerOperation: ProviderOperationDecorator = (context, target) => {
+  setProviderOperation(context.program, target, target);
+};
+
+/** Return the operation registered with `@providerOperation`, if any. */
+export function getProviderOperation(
+  program: Program,
+  operation: Operation,
+): Operation | undefined {
+  return getProviderOperationState(program, operation);
+}
+
+/** Whether the operation is registered with `@providerOperation`. */
+export function isProviderOperation(program: Program, operation: Operation): boolean {
+  return getProviderOperation(program, operation) !== undefined;
+}
+
+/** Whether the operation is registered against a registered ARM resource model. */
+export function isResourceOperation(program: Program, operation: Operation): boolean {
+  const resource = getOperationResource(program, operation);
+  return resource !== undefined && getArmResource(program, resource) !== undefined;
+}
 
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
@@ -273,6 +306,7 @@ export function setArmOperationIdentifier(
   // Initialize the operations for the resource type if not already done
   if (!getArmResourceOperationData(program, target)) {
     setArmResourceOperationData(program, target, { ...data });
+    setOperationResource(program, target, resourceType);
   }
 }
 
