@@ -23,6 +23,7 @@ import {
   type SdkEnumType,
   type SdkHttpOperation,
   type SdkPathParameter,
+  type SdkServiceConfiguration,
   type SdkServiceOperation,
   type SdkUnionType,
   type TCGCContext,
@@ -31,7 +32,9 @@ import {
 import {
   createGeneratedName,
   getActualClientType,
+  getClientDefaultServiceConfiguration,
   getClientDoc,
+  getClientServiceConfigurations,
   getTypeDecorators,
   getValueTypeValue,
   isSubscriptionId,
@@ -54,7 +57,10 @@ function getClientAuthentication(
   client: SdkClient,
 ): Authentication | undefined {
   const service = client.services[0];
-  return service ? getAuthentication(context.program, service) : undefined;
+  return (
+    getClientDefaultServiceConfiguration(context, client)?.authentication ??
+    (service ? getAuthentication(context.program, service) : undefined)
+  );
 }
 
 function getEndpointTypeFromSingleServer<
@@ -156,7 +162,10 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   const rawClient = client.__raw;
   // For multiple services, just take the first one to get servers
   const service = rawClient.services[0];
-  const servers = getServers(context.program, service);
+  const defaultConfiguration = getClientDefaultServiceConfiguration(context, rawClient);
+  const servers = defaultConfiguration
+    ? [defaultConfiguration.server]
+    : getServers(context.program, service);
   const types: SdkEndpointType[] = [];
 
   if (servers === undefined) {
@@ -254,14 +263,14 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     }
   }
   // Handle default client parameters (endpoint, credential, api version, subscription id)
-  addDefaultClientParameters(context, sdkClientType);
+  diagnostics.pipe(addDefaultClientParameters(context, sdkClientType));
 
   return diagnostics.wrap(sdkClientType);
 }
 
 function addDefaultClientParameters<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
+>(context: TCGCContext, client: SdkClientType<TServiceOperation>): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const defaultClientParamters = [];
   // there will always be an endpoint property
@@ -270,6 +279,8 @@ function addDefaultClientParameters<
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
+  const configurations = diagnostics.pipe(getSdkServiceConfigurations(context, client));
+  if (configurations) client.clientInitialization.serviceConfigurations = configurations;
   let apiVersionParam = context.__clientParametersCache
     .get(client.__raw)
     ?.find((x) => x.isApiVersionParam);
@@ -323,6 +334,37 @@ function addDefaultClientParameters<
     ...defaultClientParamters,
     ...client.clientInitialization.parameters,
   ];
+  return diagnostics.wrap(undefined);
+}
+
+function getSdkServiceConfigurations<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  client: SdkClientType<TServiceOperation>,
+): [SdkClientInitializationType["serviceConfigurations"], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const catalog = getClientServiceConfigurations(context, client.__raw);
+  if (!catalog) return diagnostics.wrap(undefined);
+  const configurations: SdkServiceConfiguration[] = [];
+  for (const configuration of catalog.configurations) {
+    const [endpoint] = diagnostics.pipe(
+      getEndpointTypeFromSingleServer(context, client, configuration.server),
+    );
+    configurations.push({
+      name: configuration.name,
+      endpoint: {
+        ...endpoint,
+        serverUrl: configuration.server.url,
+        templateArguments:
+          configuration.server.parameters.size === 0 ? [] : endpoint.templateArguments,
+      },
+      authentication: configuration.authentication,
+      credential: getSdkCredentialParameter(context, client, configuration.authentication),
+    });
+  }
+  return diagnostics.wrap({
+    defaultConfiguration: catalog.defaultConfiguration,
+    configurations,
+  });
 }
 
 function createSdkClientInitializationType<
