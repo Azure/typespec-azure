@@ -7,6 +7,11 @@
     "PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN"
   ],
   "tasks": {
+    "@typespec/http-client-python#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["dist/**", "generator/dist/**"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "lib/**", "tsconfig*.json", "package.json", ".scripts/**"],
