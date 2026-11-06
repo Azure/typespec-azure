@@ -8,24 +8,11 @@ The rule checks the resolved HTTP request body, including `@body`, `@bodyRoot`, 
 
 GET request bodies do not have generally defined HTTP semantics and may be rejected or ignored by clients, proxies, and caches. Removing an existing request body can be a breaking API and generated-SDK change and may require a service-side change.
 
-## Incorrect
+## ❌ Incorrect
 
-Adding a body through the standard ARM read template's `Parameters` customization creates a GET request body:
+Assume `Widget` is already declared as an ARM resource. Adding a body through the standard ARM read template's `Parameters` customization creates a GET request body:
 
 ```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 model ReadParameters {
   @TypeSpec.Http.body filter: {
     name: string;
@@ -38,24 +25,11 @@ interface Widgets {
 }
 ```
 
-## Correct
+## ✅ Correct
 
 Keep the GET operation bodyless:
 
 ```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<Widget>;
