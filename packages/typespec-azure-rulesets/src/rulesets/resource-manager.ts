@@ -42,6 +42,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-query-explode": true,
     "@azure-tools/typespec-azure-core/no-header-explode": true,
     "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": true,
+    "@azure-tools/typespec-azure-core/use-explicit-action": true,
 
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
