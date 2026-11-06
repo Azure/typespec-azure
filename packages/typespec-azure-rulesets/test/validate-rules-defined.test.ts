@@ -134,6 +134,13 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps GET request body guidance opt-in while including it in the ARM library all ruleset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-get-request-body";
+    strictEqual(ResourceManagerLinter.ruleSets?.all?.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
+
   it("keeps private endpoint API completeness guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
