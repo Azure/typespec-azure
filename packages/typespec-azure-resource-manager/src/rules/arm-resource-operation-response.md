@@ -1,10 +1,12 @@
-Operations on a resource such as read, create, update, and list must all return the resource type itself (or a collection of the resource type for list operations).
+Resource read, create, update, and list operations must return their associated resource model, or a collection of that model for list operations. A PUT request must also use the associated resource model.
 
-Registered resource create-or-update operations using PUT must also have a request body whose effective payload type is the registered resource model. Use `ArmResourceCreateOrReplaceSync<Resource>` rather than overriding its request model. Request visibility is respected when resolving implicit bodies; aliases of the resource are accepted, but separately declared input models are not.
+ARM PUT success responses must describe a resource, including PUTs authored through action or custom operations. Resource identity comes from native ARM declarations: registered resources, common resource bases and their descendants, and explicitly declared custom resources. Matching resource property names alone does not make a model a resource.
 
-The PUT request check covers all registered create-or-update operations, including legacy templates and multiple aliases for the same resource. It does not independently scan custom HTTP PUT operations or require arbitrary request models to be registered. `use-operation-decorator` checks operation registration. Multipart request bodies are outside this request-model comparison.
+Prefer standard resource and operation templates. For customized operations, use the appropriate ARM decorators so resource associations are available to tooling. A response that already fails the associated-resource comparison does not produce an additional resource-identity warning.
 
-Response validation covers every registered lifecycle/list alias and resolves HTTP success payloads, not the response wrapper types. A separately declared, unregistered response model does not escape comparison with the registered resource. Paged list responses compare their item type, and discriminated base/derived resource responses are accepted. Bodyless and non-success responses are not resource-schema comparisons; their status/body requirements are checked by other rules.
+The request comparison respects request visibility and accepts aliases of the associated resource, but not separately declared input models. Multipart request bodies are outside this comparison. List responses compare their item type; discriminated base/derived resource responses are accepted.
+
+The PUT resource-identity check uses the body-bearing 200 response, falling back to 201 when 200 has no body. Response envelopes are not resource payloads. Bodyless responses, non-success responses, and response status requirements remain the responsibility of other rules.
 
 :::note
 ARM RPC rule: [`RPC-008`](https://armwiki.azurewebsites.net/api_contracts/guidelines/rpc.html)
@@ -16,36 +18,42 @@ ARM RPC rule: [`RPC-008`](https://armwiki.azurewebsites.net/api_contracts/guidel
 
 The resource operation returns a response schema that violates the RPC contract.
 
-## LintDiff Equivalent
-
-This rule corresponds to the LintDiff rule [PutGetPatchResponseSchema](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3007) (the TypeSpec rule also covers `list`).
-
-### Consolidated PUT coverage
-
-The PUT request check addresses the resource-reuse intent of [PutRequestResponseSchemeArm](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-request-response-scheme-arm.md) through the registered resource model. Response validation provides complementary canonical-resource consistency; Azure Core `response-schema-problem` owns comparisons of different success-status response schemas. The separate `arm-put-response-resource` rule addresses the resource-marker policy of [XmsResourceInPutResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-resource-in-put-response.md).
-
-This is not equivalent to running those Swagger checks on every HTTP PUT. This rule does not compare arbitrary 200/201 schemas or validate the `x-ms-azure-resource` extension, and it depends on correct canonical operation associations.
-
 ## ❌ Incorrect
 
 ```tsp
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model Widget is ProxyResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetResult {
+  value?: string;
+}
+
 @armResourceOperations
-interface FooResources {
-  // Returns BarResource instead of FooResource
-  @get
-  @armResourceRead(FooResource)
-  get(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
+interface Widgets {
+  create is ArmResourceCreateOrReplaceSync<
+    Widget,
+    Response = ArmResponse<WidgetResult> | ArmCreatedResponse<WidgetResult>
+  >;
 }
 ```
 
 ## ✅ Correct
 
 ```tsp
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model Widget is ProxyResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
 @armResourceOperations
-interface FooResources {
-  @get
-  @armResourceRead(FooResource)
-  get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+interface Widgets {
+  create is ArmResourceCreateOrReplaceSync<Widget>;
 }
 ```
 
@@ -54,3 +62,13 @@ interface FooResources {
 Suppress only when required to match an existing API; otherwise use the standard operation templates and do not override the response parameter.
 
 For existing APIs with a distinct PUT request model, suppress `@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response` on the operation with a reason.
+
+Use the same operation-level suppression for an existing API that intentionally returns a non-resource result. Do not change the service contract or add resource fields merely to silence the warning.
+
+## LintDiff Equivalent
+
+The canonical-resource comparisons address [PutGetPatchResponseSchema](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3007), including native list-item comparisons, and the resource-reuse intent of [PutRequestResponseSchemeArm](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-request-response-scheme-arm.md). These comparisons require correct resource-operation associations.
+
+The native PUT resource-identity check addresses the authoring intent of [XmsResourceInPutResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-resource-in-put-response.md). It uses `resolveArmResources` and native resource declarations, not the `x-ms-azure-resource` extension. Extension overrides and custom-resource emission options do not define native resource identity. Operations omitted by the resolver are not recovered through a separate HTTP scan.
+
+Azure Core `response-schema-problem` owns comparisons between different success-status response schemas, corresponding to the intent of [ConsistentResponseSchemaForPut](https://github.com/Azure/azure-openapi-validator/blob/main/docs/consistent-response-schema-for-put.md). Canonical-resource validation complements that check but is not an arbitrary pairwise schema comparison. Diagnostic-count or emitted-schema equivalence is not implied by these mappings.

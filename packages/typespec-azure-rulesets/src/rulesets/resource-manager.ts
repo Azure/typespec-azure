@@ -83,7 +83,6 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": true,
-    "@azure-tools/typespec-azure-resource-manager/arm-put-response-resource": false,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,

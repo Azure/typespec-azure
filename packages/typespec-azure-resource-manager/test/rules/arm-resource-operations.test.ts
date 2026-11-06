@@ -5,15 +5,6 @@ import { beforeEach, describe, it } from "vitest";
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
 
 let tester: LinterRuleTester;
-
-beforeEach(async () => {
-  tester = createLinterRuleTester(
-    await Tester.createInstance(),
-    armResourceOperationsRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-});
-
 const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
 const models = `
   @armProviderNamespace namespace Microsoft.Test;
@@ -23,6 +14,165 @@ const models = `
   }> { ...ResourceNameParameter<Widget>; }
   model Other is ProxyResource<{}> { ...ResourceNameParameter<Other>; }
 `;
+
+beforeEach(async () => {
+  tester = createLinterRuleTester(
+    await Tester.createInstance(),
+    armResourceOperationsRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+describe("native PUT response resources", () => {
+  const service = `${models}
+    using TypeSpec.OpenAPI;
+    model Unmarked { value?: string; }
+    model Lookalike { ...Widget; }
+    @armVirtualResource("Microsoft.External")
+    model External {
+      @path @key("externalName") @segment("externals")
+      name: string;
+    }
+  `;
+  const nonResourceDiagnostic = {
+    code,
+    severity: "warning" as const,
+    message: "ARM PUT success responses must return a resource model.",
+  };
+  const put = (response: string) => `
+    interface Custom {
+      @put @route("/providers/Microsoft.Test/custom/{customName}")
+      replace(@path customName: string, @body body: Unmarked): ${response};
+    }
+  `;
+
+  it.each(["Unmarked", "Unmarked[]", "string", "unknown", "Lookalike"])(
+    "rejects a non-resource body without a canonical association: %s",
+    async (body) => {
+      await tester
+        .expect(`${service} ${put(`ArmResponse<${body}>`)}`)
+        .toEmitDiagnostics([nonResourceDiagnostic]);
+    },
+  );
+
+  it.each([
+    "ArmResponse<Widget>",
+    "ArmCreatedResponse<Widget>",
+    "CommonTypes.ProxyResource",
+    "ArmResponse<External>",
+  ])(
+    "accepts native resource identity without resolved lifecycle operations: %s",
+    async (response) => {
+      await tester.expect(`${service} ${put(response)}`).toBeValid();
+    },
+  );
+
+  it.each(["true", "false"])(
+    "recognizes an explicit custom resource independently of its marker option: %s",
+    async (option) => {
+      await tester
+        .expect(
+          `${service}
+          model CustomResource is Azure.ResourceManager.Legacy.CustomAzureResource<${option}> {
+            value?: string;
+          }
+          ${put("ArmResponse<CustomResource>")}
+        `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it("does not promote a DTO through an OpenAPI extension", async () => {
+    await tester
+      .expect(
+        `${service}
+        @@extension(Unmarked, "x-ms-azure-resource", true);
+        ${put("ArmResponse<Unmarked>")}
+      `,
+      )
+      .toEmitDiagnostics([nonResourceDiagnostic]);
+  });
+
+  it("does not erase native resource identity through an OpenAPI extension", async () => {
+    await tester
+      .expect(
+        `${service}
+        @@extension(Widget, "x-ms-azure-resource", false);
+        ${put("ArmResponse<Widget>")}
+      `,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    "ArmCreatedResponse<Unmarked>",
+    "{ @statusCode status: 200; } | ArmCreatedResponse<Unmarked>",
+    "{ @statusCode status: 200; @bodyRoot body: void; } | ArmCreatedResponse<Unmarked>",
+  ])("falls back to the body-bearing 201 response: %s", async (response) => {
+    await tester.expect(`${service} ${put(response)}`).toEmitDiagnostics([nonResourceDiagnostic]);
+  });
+
+  it("selects the body-bearing 200 before 201", async () => {
+    await tester
+      .expect(`${service} ${put("ArmResponse<Widget> | ArmCreatedResponse<Unmarked>")}`)
+      .toBeValid();
+  });
+
+  it("reports all failing content variants as one response-contract violation", async () => {
+    await tester
+      .expect(
+        `${service}
+        model OtherPayload { other?: string; }
+        ${put("ArmResponse<Unmarked> | ArmResponse<OtherPayload>")}
+      `,
+      )
+      .toEmitDiagnostics([nonResourceDiagnostic]);
+  });
+
+  it.each(["AcceptedResponse", "NoContentResponse", "void"])(
+    "leaves bodyless/status requirements to their existing owners: %s",
+    async (response) => {
+      await tester.expect(`${service} ${put(response)}`).toBeValid();
+    },
+  );
+
+  it("checks a PUT action without comparing its request with the parent resource", async () => {
+    await tester
+      .expect(
+        `${service}
+        @armResourceOperations interface Widgets {
+          read is ArmResourceRead<Widget>;
+          @put @armResourceAction(Widget)
+          execute(...ResourceInstanceParameters<Widget>, @body body: Unmarked): ArmResponse<Unmarked>;
+        }
+      `,
+      )
+      .toEmitDiagnostics([nonResourceDiagnostic]);
+  });
+
+  it("preserves authored suppression of the new response diagnostic", async () => {
+    await Tester.compile(
+      `${service}
+      interface Custom {
+        #suppress "${code}" "Existing API intentionally returns a command result."
+        @put @route("/providers/Microsoft.Test/custom/{customName}")
+        replace(@path customName: string, @body body: Unmarked): ArmResponse<Unmarked>;
+      }
+    `,
+      { compilerOptions: { linterRuleSet: { enable: { [code]: true } } } },
+    );
+  });
+
+  it("does not apply ARM resource policy to data-plane operations", async () => {
+    await tester
+      .expect(
+        "@service namespace DataPlane; interface Custom { @put replace(@body body: string): string; }",
+      )
+      .toBeValid();
+  });
+});
+
 const responseDiagnostic = {
   code,
   severity: "warning" as const,

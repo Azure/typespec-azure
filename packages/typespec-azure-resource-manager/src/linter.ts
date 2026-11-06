@@ -10,7 +10,6 @@ import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflic
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
 import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
-import { armPutResponseResourceRule } from "./rules/arm-put-response-resource.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
 import { interfacesRule } from "./rules/arm-resource-interfaces.js";
@@ -130,7 +129,6 @@ const rules = [
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
   useScopePathStandardNameRule,
-  armPutResponseResourceRule,
 ];
 
 export const $linter = defineLinter({

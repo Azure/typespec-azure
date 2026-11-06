@@ -97,6 +97,13 @@ describe("expect all rules to be defined", () => {
     ok(
       !ResourceManagerLinter.rules.some((rule) => rule.name === "put-resource-schema-consistency"),
     );
+    ok(!ResourceManagerLinter.rules.some((rule) => rule.name === "arm-put-response-resource"));
+    strictEqual(
+      $linter.ruleSets?.["resource-manager"].enable?.[
+        "@azure-tools/typespec-azure-resource-manager/arm-put-response-resource"
+      ],
+      undefined,
+    );
   });
 
   it("enables consolidated ARM common-types version guidance", () => {
