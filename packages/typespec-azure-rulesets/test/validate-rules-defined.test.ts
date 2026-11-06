@@ -149,6 +149,13 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps extensible enum default guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/default-in-enum";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
   it("keeps private endpoint API completeness guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
