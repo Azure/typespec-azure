@@ -138,6 +138,7 @@ function toSeries(
     label: labelOf(key),
     data: view.values[key] ?? [],
     color: seriesColor(index, theme),
+    comparisonKeys: view.comparisonKeys?.[key],
   }));
 }
 
@@ -408,6 +409,14 @@ function Dashboard() {
   return (
     <div className={mergeClasses(styles.root, loading && styles.stale)}>
       {header}
+      <MessageBar intent="info">
+        <MessageBarBody>
+          Raw measurements, not a smoothed trend. Lines and baseline comparisons separate
+          measurement methods, service revisions, Node versions and CPU models when recorded.
+          Compiler runs above their noise threshold are shown but excluded from comparisons. Shared
+          hosted runners can still vary; use a dedicated BENCHMARK_RUNNER for tighter control.
+        </MessageBarBody>
+      </MessageBar>
       <SummaryCards rows={summaryRows} theme={theme} />
 
       {dataset === "external" && data && (

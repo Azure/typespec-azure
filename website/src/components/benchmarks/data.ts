@@ -4,6 +4,7 @@ import type {
   HistoryEntry,
   MetricRow,
   MetricView,
+  RunnerInfo,
   TimeRange,
 } from "./types.js";
 
@@ -81,6 +82,63 @@ function metricsFor(entry: HistoryEntry, spec: string): Record<string, number> {
   return entry.specMetrics?.[spec] ?? {};
 }
 
+function runnerKey(runner: RunnerInfo | undefined) {
+  if (!runner) return null;
+  return [
+    runner.os.split("-")[0],
+    runner.arch,
+    runner.nodeVersion,
+    runner.cpuModel ?? null,
+    runner.cpuCount ?? null,
+  ];
+}
+
+/** Only compare like workloads on like machines; unknown legacy provenance stays separate. */
+function comparisonKey(entry: HistoryEntry, spec: string, metric: string): string {
+  const specs =
+    spec === "all"
+      ? Object.keys(entry.specMetrics ?? {})
+          .filter((name) => entry.specMetrics?.[name]?.[metric] !== undefined)
+          .sort()
+      : [spec];
+  const emission = metric === "emit" || metric.startsWith("emit/");
+  const emitterParts = metric.slice("emit/".length).split("/");
+  const emitter = emitterParts.slice(0, emitterParts[0].startsWith("@") ? 2 : 1).join("/");
+  return JSON.stringify([
+    entry.measurementMode ?? null,
+    specs.map((name) => {
+      const metadata = entry.specMetadata?.[name];
+      const runner = metadata?.runner ?? entry.runner;
+      const emitters =
+        metric === "emit" ? Object.keys(metadata?.emitterRunners ?? {}).sort() : [emitter];
+      const noisy =
+        !emission &&
+        metadata?.noiseThreshold !== undefined &&
+        Math.max(metadata.totalCv ?? 0, metadata.linterCv ?? 0) > metadata.noiseThreshold;
+      return [
+        name,
+        entry.specSources?.[name] ?? null,
+        emission
+          ? emitters.map((key) => [
+              key,
+              runnerKey(metadata?.emitterRunners[key] ?? runner),
+              key === "@azure-typespec/http-client-csharp"
+                ? (entry.externalEmitterVersions ?? null)
+                : null,
+            ])
+          : [
+              runnerKey(runner),
+              metadata?.warmup ?? null,
+              metadata ? metadata.iterations < 5 : null,
+              noisy ? entry.commit : null,
+            ],
+      ];
+    }),
+    // Legacy feeds without per-spec metrics still have a run-wide environment.
+    specs.length === 0 ? runnerKey(entry.runner) : null,
+  ]);
+}
+
 /**
  * Reduce the history to the current spec + time filters.
  *
@@ -102,8 +160,10 @@ export function buildMetricView(data: HistoryData, spec: string, range: TimeRang
   }
 
   const values: Record<string, (number | null)[]> = {};
+  const comparisonKeys: Record<string, string[]> = {};
   for (const label of labels) {
     values[label] = entries.map((e) => metricsFor(e, spec)[label] ?? null);
+    comparisonKeys[label] = entries.map((e) => comparisonKey(e, spec, label));
   }
 
   return {
@@ -111,6 +171,7 @@ export function buildMetricView(data: HistoryData, spec: string, range: TimeRang
     labels: [...labels].sort(),
     points,
     values,
+    comparisonKeys,
   };
 }
 
@@ -132,11 +193,13 @@ export function buildComparisonView(
   }));
 
   const values: Record<string, (number | null)[]> = {};
+  const comparisonKeys: Record<string, string[]> = {};
   for (const spec of specNames) {
     values[spec] = entries.map((e) => e.specMetrics?.[spec]?.[metricKey] ?? null);
+    comparisonKeys[spec] = entries.map((e) => comparisonKey(e, spec, metricKey));
   }
 
-  return { generated: data.generated, labels: [...specNames], points, values };
+  return { generated: data.generated, labels: [...specNames], points, values, comparisonKeys };
 }
 
 /** All spec names present in the data, whether or not the file lists them. */
@@ -176,18 +239,25 @@ const FALLBACK_BASELINE_SAMPLES = 10;
  * instead. If that window is too sparse to be meaningful it widens to a fixed
  * number of preceding runs. Only runs using the same measurement method are comparable.
  */
-export function trailingBaseline(values: (number | null)[], points: ChartPoint[]): number | null {
+export function trailingBaseline(
+  values: (number | null)[],
+  points: ChartPoint[],
+  comparisonKeys?: string[],
+): number | null {
   const latestIndex = lastValueIndex(values);
   if (latestIndex < 1) return null;
 
   const latestTime = new Date(points[latestIndex].timestamp).getTime();
   const mode = points[latestIndex].measurementMode;
+  const comparable = (index: number) =>
+    points[index].measurementMode === mode &&
+    (!comparisonKeys || comparisonKeys[index] === comparisonKeys[latestIndex]);
   const cutoff = latestTime - BASELINE_DAYS * DAY_MS;
 
   const windowed: number[] = [];
   for (let i = 0; i < latestIndex; i++) {
     const value = values[i];
-    if (value === null || points[i].measurementMode !== mode) continue;
+    if (value === null || !comparable(i)) continue;
     if (new Date(points[i].timestamp).getTime() >= cutoff) windowed.push(value);
   }
   if (windowed.length >= MIN_BASELINE_SAMPLES) return median(windowed);
@@ -195,7 +265,7 @@ export function trailingBaseline(values: (number | null)[], points: ChartPoint[]
   const recent: number[] = [];
   for (let i = latestIndex - 1; i >= 0 && recent.length < FALLBACK_BASELINE_SAMPLES; i--) {
     const value = values[i];
-    if (value !== null && points[i].measurementMode === mode) recent.push(value);
+    if (value !== null && comparable(i)) recent.push(value);
   }
   return median(recent);
 }
@@ -224,7 +294,8 @@ export function buildRows(view: MetricView, keys: string[], parentKey?: string):
   return keys.map((key) => {
     const values = view.values[key] ?? [];
     const latest = latestValue(values);
-    const baseline = trailingBaseline(values, view.points);
+    const comparisonKeys = view.comparisonKeys?.[key];
+    const baseline = trailingBaseline(values, view.points, comparisonKeys);
     const delta = latest !== null && baseline !== null ? latest - baseline : null;
     const deltaRatio = delta !== null && baseline ? delta / baseline : null;
     // The aggregate itself is not a share of anything.
@@ -233,7 +304,17 @@ export function buildRows(view: MetricView, keys: string[], parentKey?: string):
         ? latest / parentLatest
         : null;
 
-    return { key, name: shortLabel(key), latest, baseline, delta, deltaRatio, share, values };
+    return {
+      key,
+      name: shortLabel(key),
+      latest,
+      baseline,
+      delta,
+      deltaRatio,
+      share,
+      values,
+      comparisonKeys,
+    };
   });
 }
 

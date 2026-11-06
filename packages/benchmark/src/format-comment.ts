@@ -290,11 +290,16 @@ export function formatRunSummary(result: BenchmarkResult): string {
   );
 
   const specs = Object.values(result.specs);
-  if (result.measurementMode === "split") {
+  if (result.measurementMode) {
     lines.push(
       "**Sampling:** compilation and full-generation emitters are measured independently. " +
         "Emit is the sum of emitter estimates, not parallel job wall time.\n",
     );
+    if (result.measurementMode === "split-warm") {
+      lines.push(
+        "Compiler warmups and measurements share one process, with GC between compilations.\n",
+      );
+    }
     for (const spec of specs) {
       const counts = [
         ...new Set(

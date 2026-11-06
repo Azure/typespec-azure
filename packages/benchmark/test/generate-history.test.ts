@@ -7,6 +7,7 @@ import {
   getEmitterNames,
   trailingBaseline,
 } from "../../../website/src/components/benchmarks/data.js";
+import type { HistoryEntry } from "../../../website/src/components/benchmarks/types.js";
 import { buildHistory } from "../src/generate-history.js";
 import type { BenchmarkResult, RuntimeStats } from "../src/types.js";
 
@@ -68,6 +69,8 @@ it("discovers all emitters while preserving gaps in legacy history", () => {
       ]),
   );
   expect(history.entries[1].measurementMode).toBe("split");
+  expect(history.entries[1].specMetadata?.sample.iterations).toBe(1);
+  expect(history.entries[1].specMetadata?.sample.runner.nodeVersion).toBe("test");
 
   for (const spec of ["all", "sample"]) {
     const view = buildMetricView(history, spec, "all");
@@ -77,6 +80,93 @@ it("discovers all emitters while preserving gaps in legacy history", () => {
       expect(view.values[`emit/${name}/generate`]).toEqual([name === names[8] ? 15 : null, 15]);
     }
   }
+});
+
+it("uses only matching hardware and input revisions for dashboard baselines", () => {
+  const entry = (commit: string, total: number): HistoryEntry => ({
+    commit,
+    timestamp: "2026-10-15T00:00:00Z",
+    measurementMode: "split-warm",
+    metrics: { total },
+    specMetrics: { sample: { total } },
+    runner: { os: "linux-6.17", arch: "x64", nodeVersion: "v24.15.0", cpuModel: "CPU A" },
+    specSources: { sample: { repository: "repo", commit: "corpus-a", path: "sample" } },
+  });
+  const entries = [
+    entry("matching", 10),
+    entry("cpu", 100),
+    entry("source", 1000),
+    entry("latest", 20),
+  ];
+  entries[1].runner!.cpuModel = "CPU B";
+  entries[2].specSources!.sample.commit = "corpus-b";
+  const data = { generated: "now", labels: ["total"], entries };
+  for (const spec of ["all", "sample"]) {
+    expect(buildRows(buildMetricView(data, spec, "all"), ["total"])[0].baseline).toBe(10);
+  }
+  expect(
+    buildRows(buildComparisonView(data, "total", ["sample"], "all"), ["sample"])[0].baseline,
+  ).toBe(10);
+});
+
+it("keeps noisy compiler samples visible without reporting them as regressions", () => {
+  const runner = { os: "linux", arch: "x64", nodeVersion: "v24.15.0" };
+  const entries: HistoryEntry[] = [10, 100].map((total, index) => ({
+    commit: String(index),
+    timestamp: "2026-10-15T00:00:00Z",
+    measurementMode: "split-warm",
+    metrics: { total },
+    specMetrics: { sample: { total } },
+    specMetadata: {
+      sample: {
+        runner,
+        emitterRunners: {},
+        iterations: 25,
+        warmup: 3,
+        totalCv: 0.01,
+        linterCv: index === 0 ? 0.01 : 0.2,
+        noiseThreshold: 0.1,
+      },
+    },
+  }));
+  const rows = buildRows(
+    buildMetricView({ generated: "now", labels: ["total"], entries }, "sample", "all"),
+    ["total"],
+  );
+  expect(rows[0].values).toEqual([10, 100]);
+  expect(rows[0].latest).toBe(100);
+  expect(rows[0].baseline).toBeNull();
+  expect(detectChanges(rows)).toEqual({ improvements: [], regressions: [] });
+});
+
+it("uses each emitter's runner and C# version, not the compiler runner, for emitter comparisons", () => {
+  const compiler = { os: "linux", arch: "x64", nodeVersion: "v24.15.0", cpuModel: "compiler" };
+  const emitter = "emit/@azure-typespec/http-client-csharp";
+  const entries: HistoryEntry[] = [10, 100, 1000, 20].map((total, index) => ({
+    commit: String(index),
+    timestamp: "2026-10-15T00:00:00Z",
+    measurementMode: "split-warm",
+    metrics: { [emitter]: total },
+    specMetrics: { sample: { [emitter]: total } },
+    externalEmitterVersions: { csharp: index === 2 ? "other" : "pinned" },
+    specMetadata: {
+      sample: {
+        runner: { ...compiler, cpuModel: String(index) },
+        emitterRunners: {
+          "@azure-typespec/http-client-csharp": {
+            ...compiler,
+            cpuModel: index === 1 ? "other" : "emitter",
+          },
+        },
+        iterations: 25,
+      },
+    },
+  }));
+  const rows = buildRows(
+    buildMetricView({ generated: "now", labels: [emitter], entries }, "sample", "all"),
+    [emitter],
+  );
+  expect(rows[0].baseline).toBe(10);
 });
 
 it("anchors the baseline to the last non-null metric's method, not the last run's method", () => {

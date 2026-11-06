@@ -2,7 +2,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { BenchmarkResult, RuntimeStats, SpecBenchmarkResult } from "./types.js";
+import type { BenchmarkResult, RunnerInfo, RuntimeStats, SpecBenchmarkResult } from "./types.js";
 import { getCommitMetadata, gitCommand, type CommitMetadata } from "./utils.js";
 
 /** A single entry in the aggregated history. */
@@ -10,7 +10,22 @@ export interface HistoryEntry {
   commit: string;
   timestamp: string;
   commitTimestamp?: string;
-  measurementMode?: "split";
+  measurementMode?: BenchmarkResult["measurementMode"];
+  runner?: RunnerInfo;
+  specSources?: BenchmarkResult["specSources"];
+  externalEmitterVersions?: Record<string, string>;
+  specMetadata?: Record<
+    string,
+    {
+      runner: RunnerInfo;
+      emitterRunners: Record<string, RunnerInfo>;
+      iterations: number;
+      warmup?: number;
+      totalCv?: number;
+      linterCv?: number;
+      noiseThreshold?: number;
+    }
+  >;
   /** Averaged metrics across all specs */
   metrics: Record<string, number>;
   /** Per-spec metrics (spec name → flat metrics) */
@@ -144,6 +159,28 @@ export function buildHistory(
         commit: result.commit,
         timestamp: result.timestamp,
         measurementMode: result.measurementMode,
+        runner: result.runner,
+        specSources: result.specSources,
+        externalEmitterVersions: result.externalEmitterVersions,
+        specMetadata: Object.fromEntries(
+          Object.entries(result.specs).map(([specName, spec]) => [
+            specName,
+            {
+              runner: spec.runner ?? result.runner,
+              emitterRunners: Object.fromEntries(
+                Object.entries(spec.emitterMeasurements ?? {}).map(([name, value]) => [
+                  name,
+                  value.runner,
+                ]),
+              ),
+              iterations: spec.iterations,
+              warmup: spec.warmup,
+              totalCv: spec.variability?.total.cv,
+              linterCv: spec.variability?.linter?.cv,
+              noiseThreshold: spec.variability?.noiseGate?.thresholdCv,
+            },
+          ]),
+        ),
         metrics,
         specMetrics,
       });
