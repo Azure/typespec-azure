@@ -397,8 +397,13 @@ Keep `migration.md` concise and focused on the migration decision. Use
 receipt fields, filenames and quoted diagnostics unchanged.
 
 On refresh, first reconcile one underlying assessment, then rewrite the complete
-main and member narratives together. Replace superseded tables, classifications
-and summaries instead of appending corrections that leave competing conclusions.
+main report and all member notes together for human readers. Treat the whole
+document as editable, not as an original narrative to preserve with appended
+updates. Rework all four sections and NOTES into a single current explanation;
+do not only add corrections, patch newly changed findings or replace a few
+counts. Replace superseded tables, classifications and summaries, and remove
+stale or duplicated prose so readers do not have to reconcile old and new
+conclusions.
 Reader-appropriate aggregations may differ while remaining traceable to that
 assessment; do not impose one rule's grouping or data constants on other rules.
 Preserve all audit, recovery and semantic evidence through direct links, without

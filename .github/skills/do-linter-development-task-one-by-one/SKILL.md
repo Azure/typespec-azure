@@ -84,6 +84,12 @@ Require the shared contract's explicit **Assessed coverage** summary in
 section 2, with scoped quantitative evidence and honest unassessed limits;
 a raw-diagnostic scorecard alone is not an assessment.
 
+On every refresh, rewrite `migration.md` as a coherent whole for human readers,
+not an append-only update to the original. Rework all four sections and NOTES
+from the reconciled assessment; replace stale or duplicated explanations, not
+just the newest numbers. Preserve required evidence and honest limitations, with
+one consistent account of coverage, remaining gaps and recommended actions.
+
 All rule PR descriptions follow the shared
 [two-section PR body](../shared/migration-pr-description.md): original Swagger
 documentation/logic links, then the published `migration.md` link. Keep detailed
