@@ -75,7 +75,6 @@ import {
   type SdkArrayType,
   type SdkBuiltInKinds,
   type SdkBuiltInType,
-  type SdkClient,
   type SdkClientType,
   type SdkConstantType,
   type SdkCredentialParameter,
@@ -1685,40 +1684,6 @@ export function getEffectiveSdkModelProperty(
   return undefined;
 }
 
-export interface EffectiveSdkModelPropertySelection {
-  rawProperty: ModelProperty;
-  sdkProperty: SdkModelPropertyType;
-}
-
-export interface EffectiveSdkModelPropertyConflict {
-  rawProperty: ModelProperty;
-  clientName: string;
-}
-
-export function resolveEffectiveSdkModelProperties(
-  model: SdkModelType,
-  rawProperties: ModelProperty[],
-  reservedNames: string[] = [],
-): {
-  selections: EffectiveSdkModelPropertySelection[];
-  conflicts: EffectiveSdkModelPropertyConflict[];
-} {
-  const selections: EffectiveSdkModelPropertySelection[] = [];
-  const conflicts: EffectiveSdkModelPropertyConflict[] = [];
-  const seenNames = new Set(reservedNames);
-  for (const rawProperty of rawProperties) {
-    const sdkProperty = getEffectiveSdkModelProperty(model, rawProperty);
-    if (!sdkProperty) continue;
-    if (seenNames.has(sdkProperty.name)) {
-      conflicts.push({ rawProperty, clientName: sdkProperty.name });
-      continue;
-    }
-    seenNames.add(sdkProperty.name);
-    selections.push({ rawProperty, sdkProperty });
-  }
-  return { selections, conflicts };
-}
-
 function addPropertiesToModelType(
   context: TCGCContext,
   type: Model,
@@ -2083,6 +2048,7 @@ function updateTypesFromOperation(
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, []));
     }
     const httpBody = httpOperation.parameters.body;
     if (httpBody && !isNeverOrVoidType(httpBody.type)) {
@@ -2348,6 +2314,15 @@ function updateTypesFromOperation(
         "PollingResponse",
       );
     }
+    if (lroMetaData) {
+      const responseModel = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, lroMetaData.pollingInfo.responseModel),
+      );
+      const properties = diagnostics.pipe(resolveLroStatusMetadata(context, lroMetaData));
+      if (properties.length > 0) {
+        context.__lroStatusMetadataCache.set(operation, { responseModel, properties });
+      }
+    }
   } finally {
     popNamingContext(context); // pop operation
   }
@@ -2548,55 +2523,37 @@ function updateLroStatusMetadataUsageAndAccess(
   context: TCGCContext,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const processed = new Set<Operation>();
+  for (const [operation, metadata] of context.__lroStatusMetadataCache) {
+    const retained = [];
+    for (const selection of metadata.properties) {
+      const rawProperty = selection.property.__raw!;
+      const sdkProperty = getEffectiveSdkModelProperty(metadata.responseModel, rawProperty);
+      if (!sdkProperty) continue;
+      selection.property = sdkProperty;
+      selection.propertySegments = [sdkProperty];
+      retained.push(selection);
 
-  for (const client of listClients(context)) {
-    updateClientOperations(client);
-    for (const subClient of listSubClients(context, client, true)) {
-      updateClientOperations(subClient);
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
+      const operationAccess = getAccessOverride(context, operation) ?? "public";
+      const propertyAccess = getAccessOverride(context, sdkProperty.__raw ?? rawProperty);
+      if (operationAccess === "public" && propertyAccess === "internal") {
+        diagnostics.add(
+          createDiagnostic({
+            code: "conflict-access-override",
+            target: sdkProperty.__raw ?? rawProperty,
+          }),
+        );
+      }
+      diagnostics.pipe(
+        updateUsageOrAccess(context, propertyAccess ?? operationAccess, sdkProperty.type),
+      );
+      // Match the existing LRO serialization path's JSON assumption, not arbitrary media types.
+      setSerializationOptions(context, sdkProperty, ["application/json"]);
+      updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
     }
+    metadata.properties = retained;
   }
   return diagnostics.wrap(undefined);
-
-  function updateClientOperations(client: SdkClient): void {
-    for (const operation of listOperationsInClient(context, client)) {
-      if (processed.has(operation)) continue;
-      processed.add(operation);
-
-      const lroMetadata = getRawLroMetadata(context.program, operation);
-      if (!lroMetadata) continue;
-      const statusMetadata = diagnostics.pipe(
-        resolveLroStatusMetadata(context, operation, lroMetadata, isVisibleSdkProperty),
-      );
-      if (!statusMetadata) continue;
-
-      const pollingModel = diagnostics.pipe(
-        getSdkModelWithDiagnostics(context, lroMetadata.pollingInfo.responseModel),
-      );
-      for (const rawProperty of statusMetadata.properties) {
-        const sdkProperty = getEffectiveSdkModelProperty(pollingModel, rawProperty);
-        if (!sdkProperty) continue;
-
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
-        const operationAccess = getAccessOverride(context, operation) ?? "public";
-        const propertyAccess = getAccessOverride(context, sdkProperty.__raw ?? rawProperty);
-        if (operationAccess === "public" && propertyAccess === "internal") {
-          diagnostics.add(
-            createDiagnostic({
-              code: "conflict-access-override",
-              target: sdkProperty.__raw ?? rawProperty,
-            }),
-          );
-        }
-        diagnostics.pipe(
-          updateUsageOrAccess(context, propertyAccess ?? operationAccess, sdkProperty.type),
-        );
-        // Match the existing LRO serialization path's JSON assumption, not arbitrary media types.
-        setSerializationOptions(context, sdkProperty, ["application/json"]);
-        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
-      }
-    }
-  }
 }
 
 /**
@@ -2746,19 +2703,14 @@ function reconcilePropertiesAfterRebase(
  * Apply the same predicates as `addPropertiesToModelType` so our view of the
  * SDK-observable property set stays aligned with the actual SDK shape.
  */
-export type SdkPropertyVisibilityPredicate = (
-  context: TCGCContext,
-  property: ModelProperty,
-) => boolean;
-
-export const isVisibleSdkProperty: SdkPropertyVisibilityPredicate = (context, property) => {
+export function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
   return (
     !isStatusCode(context.program, property) &&
     !isNeverOrVoidType(property.type) &&
     !hasNoneVisibility(context, property) &&
     isInScope(context, property)
   );
-};
+}
 
 /**
  * Check if two property types are incompatible during `@hierarchyBuilding`
