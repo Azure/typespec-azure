@@ -1,4 +1,4 @@
-This rule warns when `resolveArmResources` returns distinct resources with the same ARM resource type and resource instance path. It compares provider names, resource type segments, and instance paths case-insensitively, retaining path parameter names. For example, `{partName}` and `{PartName}` match, but `{partName}` and `{name}` do not.
+Do not define multiple resources with the same ARM resource type and resource path. Resource types and paths are compared case-insensitively, including path parameter names. For example, `{partName}` and `{PartName}` match, but `{partName}` and `{name}` do not.
 
 Mixed legacy and standard operation templates can derive different logical resource names for the same instance, splitting its operations between separate resource records. Use consistent templates or explicitly align the legacy resource name with the standard resource name. Different scopes, parent paths, extension targets, or singleton names remain distinct instances.
 
@@ -17,13 +17,21 @@ using Azure.ResourceManager;
 @service
 namespace Microsoft.Contoso;
 
-model Widget is TrackedResource<{}> {
+model WidgetProperties {
+  label?: string;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
   ...ResourceNameParameter<Widget>;
 }
 
 @parentResource(Widget)
-model Part is ProxyResource<{}> {
+model Part is ProxyResource<PartProperties> {
   ...ResourceNameParameter<Part>;
+}
+
+model PartProperties {
+  description?: string;
 }
 ```
 
@@ -75,23 +83,24 @@ interface Parts {
 }
 ```
 
-If legacy routing must be retained, supply `ResourceName = "Part"` to `LegacyOperations` instead. Aligning logical names does not change the HTTP path; verify that the existing API contract is preserved when replacing templates.
+If legacy routing must be retained, override the resource name on the operation definition so it matches the standard operations:
+
+```typespec
+@armResourceOperations
+interface Parts {
+  get is ArmResourceRead<Part>;
+  createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part, OverrideResourceName = "Part">;
+  list is ArmResourceListByParent<Part>;
+}
+```
+
+This example uses the `PartsLegacy` interface defined above. The override aligns the resource names without changing the HTTP path.
 
 ## Impact
 
 - **Area:** Emitters
 
-Duplicate resource records give Bicep and other consumers of `resolveArmResources` an inconsistent resource graph. Lifecycle and list operations for one instance can be split between records, causing incomplete or ambiguous generated resource definitions. This rule diagnoses the authoring conflict; it does not merge records or alter resolver behavior.
-
-The rule reports one warning on an identity operation from each duplicate record after the first, preferring a read operation and otherwise a create/update operation. It does not report every conflicting pair. Library declarations and synthetic ancestors without their own identity operations are not diagnostic targets.
-
-The rule is included in the ARM library's `all` ruleset but disabled in the central `resource-manager` ruleset pending fixes to existing service specifications. Enable it explicitly in `tspconfig.yaml` to check a service before rollout:
-
-```yaml
-linter:
-  enable:
-    "@azure-tools/typespec-azure-resource-manager/no-resource-instance-duplicates": true
-```
+Duplicate resource records give Bicep templates, provisioning libraries, and other consumers of resource metadata an inconsistent resource graph. Lifecycle and list operations can be identified with the wrong resource, causing incorrect Bicep templates or generated resource definitions.
 
 ## Suppression
 

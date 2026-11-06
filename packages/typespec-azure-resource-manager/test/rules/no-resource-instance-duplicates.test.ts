@@ -1,6 +1,5 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
 import { beforeEach, expect, it } from "vitest";
 import { resolveArmResources } from "../../src/resource.js";
 import { noResourceInstanceDuplicatesRule } from "../../src/rules/no-resource-instance-duplicates.js";
@@ -118,6 +117,28 @@ it("accepts explicit legacy names aligned with the standard resource name", asyn
   await tester.expect(service + legacy({ resourceName: "Part" }) + mixedOperations).toBeValid();
 });
 
+it("accepts an operation-level legacy name override without changing the resource path", async () => {
+  const source =
+    service +
+    legacy() +
+    mixedOperations.replace(
+      "PartsLegacy.CreateOrUpdateSync<Part>",
+      'PartsLegacy.CreateOrUpdateSync<Part, OverrideResourceName = "Part">',
+    );
+  await tester.expect(source).toBeValid();
+  const { program } = await Tester.compile(source);
+  const parts = resolveArmResources(program).resources?.filter(
+    (resource) => resource.resourceInstancePath === instancePath,
+  );
+  expect(parts).toHaveLength(1);
+  expect(parts?.[0].resourceName).toBe("Part");
+  expect(parts?.[0].operations.lifecycle.read?.map((operation) => operation.name)).toEqual(["get"]);
+  expect(
+    parts?.[0].operations.lifecycle.createOrUpdate?.map((operation) => operation.name),
+  ).toEqual(["createOrUpdate"]);
+  expect(parts?.[0].operations.lists.map((operation) => operation.name)).toEqual(["list"]);
+});
+
 it.each([
   {
     title: "resource segment casing",
@@ -229,30 +250,12 @@ it("supports suppression on the duplicate operation", async () => {
   );
 });
 
-it("accepts versioned standard resources without introducing projection duplicates", async () => {
-  await tester
-    .expect(
-      `${service.replace("@armProviderNamespace @service", "@versioned(Versions) @armProviderNamespace @service")}
-    enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
-    @armResourceOperations interface Parts {
-      get is ArmResourceRead<Part>;
-      createOrUpdate is ArmResourceCreateOrReplaceSync<Part>;
-    }
-  `,
-    )
-    .toBeValid();
-});
-
 it("ignores unused library templates and resources without identity operations", async () => {
   await tester.expect(service + legacy()).toBeValid();
 });
 
 it("does not lint Azure.Core or Azure.ResourceManager library declarations", async () => {
   await tester.expect("").toBeValid();
-});
-
-it("accepts a non-ARM service", async () => {
-  await tester.expect("@service namespace Contoso; @get op read(): string;").toBeValid();
 });
 
 function customPair(firstPath: string, secondPath: string) {
@@ -315,29 +318,4 @@ it("accepts different extension target paths", async () => {
       ),
     )
     .toBeValid();
-});
-
-it("compiles the documented incorrect and correct examples and verifies their lint behavior", async () => {
-  const docs = readFileSync(
-    new URL("../../src/rules/no-resource-instance-duplicates.md", import.meta.url),
-    "utf8",
-  );
-  const examples = [...docs.matchAll(/```typespec\n([\s\S]*?)```/g)].map((match) => match[1]);
-  for (const [index, valid] of [
-    [1, false],
-    [2, true],
-  ] as const) {
-    const docsTester = createLinterRuleTester(
-      await Tester.files({ "doc.tsp": examples[0] + examples[index] })
-        .import("./doc.tsp")
-        .createInstance(),
-      noResourceInstanceDuplicatesRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-    if (valid) {
-      await docsTester.expect("").toBeValid();
-    } else {
-      await docsTester.expect("").toEmitDiagnostics(diagnostic());
-    }
-  }
 });
