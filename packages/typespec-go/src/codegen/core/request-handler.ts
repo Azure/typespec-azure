@@ -352,8 +352,8 @@ export function createRequestHandler(
   }
   // END add query parameters
 
-  if (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult") {
-    // skip auto-body downloading for binary stream responses
+  if (method.kind === "sseMethod" || (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult")) {
+    // skip auto-body downloading for streaming responses
     text += `${indent.get()}runtime.SkipBodyDownload(req)\n`;
   }
 
