@@ -1,0 +1,5 @@
+# Enable the provider for this library without requiring consumers to opt in.
+# Keep this file in package.json#files so the feature remains enabled when published.
+kind: project
+features:
+  - type-info-provider
