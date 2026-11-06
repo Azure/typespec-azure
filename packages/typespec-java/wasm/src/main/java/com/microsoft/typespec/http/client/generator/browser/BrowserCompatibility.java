@@ -6,6 +6,8 @@ package com.microsoft.typespec.http.client.generator.browser;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -21,6 +23,12 @@ public final class BrowserCompatibility {
 
     public static Stream<String> splitAsStream(Pattern pattern, CharSequence value) {
         return Arrays.stream(pattern.split(value));
+    }
+
+    public static <T> Stream<T> distinct(Stream<T> stream) {
+        // TeaVM's distinct() resets its visited set between concatenated stream batches.
+        Set<T> visited = new HashSet<>();
+        return stream.filter(visited::add);
     }
 
     public static String normalizeEolInTextBlock(String value, String separator) {

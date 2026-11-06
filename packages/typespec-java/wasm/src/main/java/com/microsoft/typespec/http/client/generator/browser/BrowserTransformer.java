@@ -78,6 +78,10 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                         if ((ref.getClassName().equals("java.lang.String") && ref.getName().equals("lines"))
                             || (ref.getClassName().equals("java.util.regex.Pattern")
                                 && ref.getName().equals("splitAsStream"))
+                            || (ref.getClassName().equals("java.util.stream.Stream")
+                                && ref.getName().equals("distinct")
+                                && cls.getName().startsWith(GENERATOR)
+                                && !cls.getName().equals(BrowserCompatibility.class.getName()))
                             || (ref.getClassName().equals("java.lang.Package")
                                 && ref.getName().equals("getName")
                                 && !cls.getName().equals(BrowserCompatibility.class.getName()))) {
