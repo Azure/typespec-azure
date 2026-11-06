@@ -33,7 +33,6 @@ import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
-import { noNestedSystemDataRule } from "./rules/no-nested-system-data.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
@@ -129,7 +128,6 @@ const rules = [
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
-  noNestedSystemDataRule,
   useScopePathStandardNameRule,
 ];
 
