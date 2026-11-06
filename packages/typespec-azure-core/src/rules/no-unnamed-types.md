@@ -16,7 +16,9 @@ Many target languages cannot represent inline union types or anonymous models di
 
 ## Examples
 
-#### ❌ Incorrect
+### ❌ Incorrect
+
+#### Property types
 
 Using inline union expressions:
 
@@ -36,6 +38,8 @@ model Outer {
 }
 ```
 
+#### Request bodies
+
 Using an anonymous request body as a template argument:
 
 ```tsp
@@ -45,7 +49,29 @@ op send is Send<{
 }>;
 ```
 
-#### ✅ Correct
+#### Implicit response bodies
+
+The rule also checks anonymous implicit model response bodies, such as `@get op read(): { value: string };`.
+
+Adding a payload property outside a named model creates an anonymous response shape. These excerpts assume an ARM provider context with `Widget` already declared and the HTTP and ARM namespaces in scope:
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<
+    Widget,
+    Response = {
+      @statusCode status: 200;
+      ...Widget;
+      etag: string;
+    }
+  >;
+}
+```
+
+### ✅ Correct
+
+#### Property types
 
 Define unions as named types:
 
@@ -73,6 +99,8 @@ model Outer {
 }
 ```
 
+#### Request bodies
+
 Define a named request model before passing it to an operation template:
 
 ```tsp
@@ -82,6 +110,17 @@ model Request {
 
 @post op Send<T>(@body body: T): void;
 op send is Send<Request>;
+```
+
+#### Implicit response bodies
+
+When no custom response is needed, prefer `ArmResourceRead<Widget>` without a `Response` override:
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
 ```
 
 :::note
@@ -104,39 +143,6 @@ The template-argument exception does not apply to nonempty anonymous models used
 the actual request body through `@body` or `@bodyRoot`, including ARM action templates.
 This includes unnamed models composed with intersections or model spreads; define a
 named model for the composed request body.
-
-## Implicit response bodies
-
-The rule also checks anonymous implicit model response bodies, such as `@get op read(): { value: string };`.
-
-### Incorrect
-
-Adding a payload property outside a named model creates an anonymous response shape. These excerpts assume an ARM provider context with `Widget` already declared and the HTTP and ARM namespaces in scope:
-
-```tsp
-@armResourceOperations
-interface Widgets {
-  get is ArmResourceRead<
-    Widget,
-    Response = {
-      @statusCode status: 200;
-      ...Widget;
-      etag: string;
-    }
-  >;
-}
-```
-
-### Correct
-
-When no custom response is needed, prefer `ArmResourceRead<Widget>` without a `Response` override:
-
-```tsp
-@armResourceOperations
-interface Widgets {
-  get is ArmResourceRead<Widget>;
-}
-```
 
 ## Suppression
 
