@@ -10,6 +10,7 @@ import { longRunningOperationsRequirePollingOperation } from "./rules/lro-pollin
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
+import { noContinuationTokenRule } from "./rules/no-continuation-token.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
@@ -89,6 +90,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
+  noContinuationTokenRule,
 ];
 
 export const $linter = defineLinter({
