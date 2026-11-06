@@ -90,9 +90,8 @@ describe("expect all rules to be defined", () => {
     }
   });
 
-  it("keeps redundant operation-group naming guidance opt-in", () => {
-    const ruleName =
-      "@azure-tools/typespec-client-generator-core/no-redundant-operation-group-name";
+  it("keeps repeated client-name guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/no-repeated-client-name";
     for (const rulesetName of ["client-sdk", "data-plane", "resource-manager"]) {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }

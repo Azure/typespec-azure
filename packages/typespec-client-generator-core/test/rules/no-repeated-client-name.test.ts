@@ -1,7 +1,7 @@
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, t, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { noRedundantOperationGroupNameRule } from "../../src/rules/no-redundant-operation-group-name.js";
+import { noRepeatedClientNameRule } from "../../src/rules/no-repeated-client-name.js";
 import { ArmTester, AzureCoreTester, SimpleTester } from "../tester.js";
 
 let tester: LinterRuleTester;
@@ -9,20 +9,20 @@ let tester: LinterRuleTester;
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await SimpleTester.import("@typespec/openapi").createInstance(),
-    noRedundantOperationGroupNameRule,
+    noRepeatedClientNameRule,
     "@azure-tools/typespec-client-generator-core",
   );
 });
 
 const header = "@service namespace Test;";
-const diagnostic = (methodName = "listPaths", groupName = "Paths") => ({
-  code: "@azure-tools/typespec-client-generator-core/no-redundant-operation-group-name",
+const diagnostic = (methodName = "listPaths", clientName = "Paths") => ({
+  code: "@azure-tools/typespec-client-generator-core/no-repeated-client-name",
   severity: "warning" as const,
-  message: `SDK method '${methodName}' repeats its operation group name '${groupName}'. Remove the group name from the method name.`,
+  message: `SDK method '${methodName}' repeats its owning subclient name '${clientName}'. Remove the client name from the method name.`,
 });
 
 it.each(["listPath", "listPaths", "PathDetails", "getPathStatus"])(
-  "reports the redundant group name in %s",
+  "reports the repeated subclient name in %s",
   async (name) => {
     await tester
       .expect(`${header} interface Paths { @get op ${name}(): string; }`)
@@ -64,7 +64,7 @@ it("reports each offending operation once, even with repeated matches", async ()
     .toEmitDiagnostics([diagnostic("listPathPaths"), diagnostic("getPath")]);
 });
 
-it("uses the full literal group name rather than a regex or underscore segment", async () => {
+it("uses the full literal subclient name rather than a regex or underscore segment", async () => {
   await tester
     .expect(
       `${header}
@@ -82,7 +82,7 @@ it("uses the full literal group name rather than a regex or underscore segment",
     .toEmitDiagnostics(diagnostic("listPath.Items", "Path.Items"));
 });
 
-it("accepts a group with no nonempty noun after removing its terminal s", async () => {
+it("accepts a subclient with no nonempty noun after removing its terminal s", async () => {
   await tester.expect(`${header} interface s { @get op list(): string; }`).toBeValid();
 });
 
@@ -98,7 +98,7 @@ it("uses common method name overrides in both directions", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-it("uses common group name overrides in both directions", async () => {
+it("uses common subclient name overrides in both directions", async () => {
   await tester
     .expect(
       `${header}
@@ -108,7 +108,7 @@ it("uses common group name overrides in both directions", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-it("ignores language-specific group and method overrides", async () => {
+it("ignores language-specific subclient and method overrides", async () => {
   await tester
     .expect(
       `${header}
@@ -144,7 +144,7 @@ it("checks only the immediate owning subclient, not its ancestors", async () => 
     .toBeValid();
 });
 
-it("does not treat root clients or unowned operations as operation groups", async () => {
+it("exempts root clients and unowned operations", async () => {
   await tester
     .expect(
       `
@@ -202,7 +202,7 @@ it("ignores a language-specific override on an explicitly named subclient", asyn
     .toEmitDiagnostics(diagnostic("listItems", "Items"));
 });
 
-it("honors relocation to an actual group in both directions", async () => {
+it("honors relocation to an actual subclient in both directions", async () => {
   await tester
     .expect(
       `${header}
@@ -214,7 +214,7 @@ it("honors relocation to an actual group in both directions", async () => {
     .toEmitDiagnostics(diagnostic());
 });
 
-it("checks virtual groups and exempts operations relocated to a root client", async () => {
+it("checks virtual subclients and exempts operations relocated to a root client", async () => {
   await tester
     .expect(
       `${header}
@@ -226,7 +226,7 @@ it("checks virtual groups and exempts operations relocated to a root client", as
     .toEmitDiagnostics(diagnostic());
 });
 
-it("uses ownership of inherited operations rather than the template group name", async () => {
+it("uses ownership of inherited operations rather than the template subclient name", async () => {
   await tester
     .expect(
       `${header}
@@ -291,7 +291,7 @@ it.each([
   async ({ base, setup, decorator, template }) => {
     const standardTester = createLinterRuleTester(
       await base.createInstance(),
-      noRedundantOperationGroupNameRule,
+      noRepeatedClientNameRule,
       "@azure-tools/typespec-client-generator-core",
     );
     await standardTester
