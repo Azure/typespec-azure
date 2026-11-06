@@ -21,6 +21,7 @@ export const TypeSpecPlaygroundConfig = {
     "@azure-tools/typespec-client-generator-core",
     "@azure-tools/typespec-azure-rulesets",
     "@azure-tools/typespec-go",
+    "@azure-tools/typespec-python",
     "@azure-tools/typespec-ts",
   ],
   samples,
