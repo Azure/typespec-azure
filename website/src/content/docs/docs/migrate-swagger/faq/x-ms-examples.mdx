@@ -1,8 +1,14 @@
 ---
-title: x-ms-examples example files
+title: Legacy x-ms-examples JSON files
 ---
 
 import { FileTree } from "@astrojs/starlight/components";
+
+:::caution
+This page describes the legacy JSON workflow. For unified YAML, follow
+[Author API examples in YAML](../../howtos/examples.md) and check SDK compatibility before migrating.
+The versioned `examples-dir` and `skip-example-copying` setup below is not the unified-YAML setup.
+:::
 
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
 If you use the `skip-example-copying` in typespec-autorest configuration as suggested below, examples will automatically be picked up from the examples directory adjacent to the spec. If you do not use this option, the examples must be placed in the `examples-dir` directory (default `{project-root}/examples`). Examples must all have the `operationId` property, allowing each example to be matched with the appropriate operation.
@@ -11,7 +17,7 @@ If you use the `skip-example-copying` in typespec-autorest configuration as sugg
 Do not use `@extension("x-ms-examples", "<value>")`.
 :::
 
-## Recommended configuration
+## Recommended legacy configuration
 
 We recommend using `skip-example-copying` together with an `examples-dir` that places examples under the versioned output folder. This keeps example files co-located with the generated swagger and avoids copying files during compilation.
 

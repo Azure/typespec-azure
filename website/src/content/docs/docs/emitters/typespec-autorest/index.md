@@ -43,6 +43,13 @@ autorest --input-file=./tsp-output/@azure-tools/typespec-autorest/openapi.json -
 
 ## Configuration
 
+For API example authoring, see [Author API examples in YAML](../../howtos/examples.md).
+
+:::caution
+Check SDK emitter support before replacing legacy JSON examples. AutoRest's YAML support alone
+does not guarantee that SDK samples will retain their examples.
+:::
+
 ### Emitter options:
 
 Emitter options can be configured via the `tspconfig.yaml` configuration:
@@ -116,7 +123,8 @@ Example: azureResourceProviderFolder is provided
 
 #### `examples-directory`
 
-Directory where the x-ms-examples are located so the emitter can automatically link.
+Deprecated alias of `examples-dir`, the legacy JSON examples directory. Unified YAML is authored at
+the project root; follow the guide above rather than moving it into versioned output folders.
 
 #### `version`
 

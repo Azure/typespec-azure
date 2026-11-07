@@ -70,6 +70,9 @@ Classes under `model.clientmodel` namespace is the client model, which is the re
 `ProxyMethod` and `ProxyMethodParameter` represents a proxy method (the REST API interface that will be supplied a proxy implementation by `RestProxy`) for the REST API, and its parameters.
 `ProxyMethodExample` represents the example request provided via `x-ms-examples` extension.
 
+For TypeSpec authoring, see [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
+**Caution:** the JSON inputs described here may be generated from YAML; check SDK support before replacing authored JSON examples.
+
 `ClientMethod`, `ClientMethodParameter`, and `ReturnValue` represents the (usually public) user-facing client method that calls the `ProxyMethod` to make the REST API call, and its parameters and return value.
 It is usually one-to-many mapping from `ProxyMethod` to `ClientMethod`, as client method has different overloading for convenience.
 
