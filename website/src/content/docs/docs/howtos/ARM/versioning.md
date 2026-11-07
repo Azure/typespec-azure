@@ -158,7 +158,7 @@ interface Employees {
 In version `v2`, you want to:
 
 - Make the `location` header parameter optional.
-- Add a new optional query parameter `orderBy`.
+- Add the standard optional `$filter` query parameter.
 
 You can achieve this using the `@madeOptional` and `@added` decorators:
 
@@ -173,8 +173,8 @@ interface Employees {
       location?: string;
 
       @added(Versions.v2)
-      @query("order-by")
-      orderBy?: string;
+      @query("$filter")
+      filter?: string;
     }
   >;
 }
@@ -183,7 +183,8 @@ interface Employees {
 **Explanation:**
 
 - `@madeOptional(Versions.v2)` makes `location` optional starting in v2.
-- `@added(Versions.v2)` adds the `orderBy` query parameter in v2 and later.
+- `@added(Versions.v2)` adds the `$filter` query parameter in v2 and later. ARM collection GET
+  operations do not allow other query parameters besides `api-version`.
 
 ### Converting an Operation from Synchronous to Asynchronous
 
