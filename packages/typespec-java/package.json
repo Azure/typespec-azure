@@ -18,6 +18,11 @@
   },
   "type": "module",
   "main": "dist/src/index.js",
+  "browser": {
+    "./dist/src/emitter.js": "./dist/browser/emitter.js",
+    "assert": "./dist/browser/assert.js",
+    "child_process": false
+  },
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -28,10 +33,11 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "clean": "rimraf ./dist ./temp ./generator",
-    "build": "pnpm build:emitter && pnpm build:generator",
+    "clean": "rimraf ./dist ./temp ./generator ./wasm/target",
+    "build": "pnpm build:emitter && pnpm build:generator && pnpm build:wasm",
     "build:emitter": "node ./eng/scripts/copy-sources.ts && tsc -p .",
     "build:generator": "node ./eng/scripts/build-generator.ts",
+    "build:wasm": "node ./eng/scripts/build-wasm.ts",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
     "regenerate": "node ./eng/scripts/generate.ts",
