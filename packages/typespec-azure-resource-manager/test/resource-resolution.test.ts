@@ -3836,6 +3836,8 @@ model DependentProperties {
 
     checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
+      { operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" },
+      { operationGroup: "DependentPrivateLinks", name: "list", kind: "list" },
     ]);
   });
 
@@ -5364,6 +5366,11 @@ model DependentProperties {
             name: "list",
             kind: "list",
           },
+          {
+            operationGroup: "DependentNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
         ],
         lifecycle: {
           read: [
@@ -5994,7 +6001,10 @@ interface SupportTicketsNoSubscription {
     ok(subResource);
     expect(subResource.resourceName).toEqual("SupportTickets");
     expect(subResource.operations.lifecycle.read).toHaveLength(1);
-    expect(subResource.operations.lists).toHaveLength(1);
+    checkArmOperationsHas(subResource.operations.lists, [
+      { operationGroup: "SupportTickets", name: "list", kind: "list" },
+      { operationGroup: "SupportTicketsNoSubscription", name: "list", kind: "list" },
+    ]);
 
     const tenantResource = provider.resources.find(
       (r) =>
@@ -6004,7 +6014,10 @@ interface SupportTicketsNoSubscription {
     ok(tenantResource);
     expect(tenantResource.resourceName).toEqual("SupportTickets");
     expect(tenantResource.operations.lifecycle.read).toHaveLength(1);
-    expect(tenantResource.operations.lists).toHaveLength(1);
+    checkArmOperationsHas(tenantResource.operations.lists, [
+      { operationGroup: "SupportTickets", name: "list", kind: "list" },
+      { operationGroup: "SupportTicketsNoSubscription", name: "list", kind: "list" },
+    ]);
   });
 
   it.each([
