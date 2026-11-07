@@ -30,7 +30,7 @@ import {
   hasDualFormatSupport,
   type ServiceOperation,
 } from "../utils/operation-util.js";
-import { getDocsFromDescription } from "./helpers/docs-helpers.js";
+import { getInputDocs } from "./helpers/docs-helpers.js";
 import { getOperationName } from "./helpers/naming-helpers.js";
 import type { OperationPathAndDeserDetails } from "./interfaces.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
@@ -183,7 +183,7 @@ export function buildOperationOptions(
     properties: additionalOptions.concat(
       options.map((p) => {
         return {
-          docs: getDocsFromDescription(p.doc),
+          docs: getInputDocs(p.type, p.doc),
           hasQuestionToken: true,
           type: getTypeExpression(context, p.type, { isOptional: true }),
           name: normalizeSdkName(p, NameType.Parameter),

@@ -84,6 +84,8 @@ export async function _bodyRootWithHeaderDeserialize(result: PathUncheckedRespon
 
   return;
 }
+
+/** Performs the bodyRootWithHeader operation. */
 export async function bodyRootWithHeader(
   context: Client,
   body: RequestBody,
@@ -177,6 +179,8 @@ export async function _createResourceDeserialize(result: PathUncheckedResponse):
 
   return;
 }
+
+/** Performs the createResource operation. */
 export async function createResource(
   context: Client,
   body: ResourceBody,
@@ -277,6 +281,8 @@ export async function _bodyRootWithOptionalHeaderDeserialize(
 
   return;
 }
+
+/** Performs the bodyRootWithOptionalHeader operation. */
 export async function bodyRootWithOptionalHeader(
   context: Client,
   body: OptionalHeaderBody,
@@ -371,6 +377,8 @@ export async function _createOptionalPathResourceDeserialize(
 
   return;
 }
+
+/** Performs the createOptionalPathResource operation. */
 export async function createOptionalPathResource(
   context: Client,
   body: OptionalPathBody,
@@ -472,6 +480,8 @@ export async function _createOptionalPathResourceDeserialize(
 
   return;
 }
+
+/** Performs the createOptionalPathResource operation. */
 export async function createOptionalPathResource(
   context: Client,
   options: CreateOptionalPathResourceOptionalParams = { requestOptions: {} },

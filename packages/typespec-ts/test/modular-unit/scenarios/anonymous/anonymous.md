@@ -99,6 +99,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   pathParam: string,
@@ -235,6 +237,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   pathParam: string,
@@ -364,6 +368,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   pathParam: string,
@@ -494,6 +500,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   pathParam: string,
@@ -577,6 +585,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   pathParam: string,
@@ -675,6 +685,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   pathParam: string,
@@ -757,6 +769,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Test,
@@ -838,6 +852,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Test,
@@ -908,6 +924,8 @@ export async function _readDeserialize(
 
   return _readResponseDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -976,6 +994,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return publishResultDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1067,6 +1087,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<{
 
   return _readResponseDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1223,6 +1245,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<R
 
   return returnBodyDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1438,6 +1462,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fozDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },

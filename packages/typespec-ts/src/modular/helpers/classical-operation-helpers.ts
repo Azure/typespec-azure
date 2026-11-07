@@ -119,6 +119,7 @@ export function getClassicalOperation(
       properties.push({
         kind: StructureKind.PropertySignature,
         name,
+        docs: [`The ${name} operation group.`],
         type: resolveReference(
           refkey(client, nextLayerInterfaceName, layer + 1, "classicOperations"),
         ),

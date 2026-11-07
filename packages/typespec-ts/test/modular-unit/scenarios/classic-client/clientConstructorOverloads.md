@@ -46,6 +46,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { GlobalServiceClientOptionalParams } from "./api/globalServiceContext.js";
 
+/** Client.GlobalService Resource Provider management API. */
 export class GlobalServiceClient {
   private _client: GlobalServiceContext;
   /** The pipeline used by this client to make requests */
@@ -170,6 +171,7 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { StandardServiceClientOptionalParams } from "./api/standardServiceContext.js";
 
+/** Client.StandardService Resource Provider management API. */
 export class StandardServiceClient {
   private _client: StandardServiceContext;
   /** The pipeline used by this client to make requests */
@@ -185,6 +187,7 @@ export class StandardServiceClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the checkNameAvailability operation. */
   checkNameAvailability(
     body: CheckNameAvailabilityInput,
     options: CheckNameAvailabilityOptionalParams = { requestOptions: {} },
@@ -300,12 +303,15 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { MixedServiceClientOptionalParams } from "./api/mixedServiceContext.js";
 
+/** Client.MixedService Resource Provider management API. */
 export class MixedServiceClient {
   private _client: MixedServiceContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Client.MixedService Resource Provider management API. */
   constructor(credential: TokenCredential, options?: MixedServiceClientOptionalParams);
+  /** Client.MixedService Resource Provider management API. */
   constructor(
     credential: TokenCredential,
     subscriptionId: string,
@@ -330,6 +336,7 @@ export class MixedServiceClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the listSkus operation. */
   listSkus(options: ListSkusOptionalParams = { requestOptions: {} }): Promise<SkuListResult> {
     return listSkus(this._client, options);
   }
