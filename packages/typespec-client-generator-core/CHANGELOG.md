@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.73.1
+
+### Features
+
+- [#5853](https://github.com/Azure/typespec-azure/pull/5853) Add the `@dynamicModel` decorator in Azure.ClientGenerator.Core to provide opt-in dynamic-model metadata for models or namespaces, with optional language scoping. Dynamic-model generation is currently supported only by the C# emitter; the shared decorator provides opt-in metadata pending emitter adoption and does not itself generate JSON Patch fields.
+
+
 ## 0.73.0
 
 ### Features
