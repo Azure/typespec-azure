@@ -187,8 +187,7 @@ export function emitNonModelResponseTypes(
 
   for (const subClient of clientMap) {
     const methodHierarchies = getMethodHierarchiesMap(context, subClient[1]);
-    for (const [prefixKey, operations] of methodHierarchies) {
-      const prefixes = prefixKey.split("/");
+    for (const [prefixes, operations] of methodHierarchies) {
       for (const op of operations) {
         const { shouldWrap, isBinary } = checkWrapNonModelReturn(context, op);
         if (!shouldWrap) {
@@ -197,7 +196,7 @@ export function emitNonModelResponseTypes(
         if (!modelsFile) {
           modelsFile = outputProject.createSourceFile(filepath);
         }
-        const method: [string[], typeof op] = [prefixes, op];
+        const method = [prefixes, op] as const;
         const typeAlias = buildNonModelResponseTypeDeclaration(context, method, isBinary);
         addDeclaration(modelsFile, typeAlias, refkey(op, "response"));
       }
@@ -627,7 +626,7 @@ function emitEnumMember(
   member: SdkEnumValueType,
   reportMemberNameDiagnostic = false, // if reportMemberNameDiagnostic is true, it will report diagnostic for enum member name
 ): EnumMemberStructure {
-  const shouldNormalizeName = !member.isExactName && !member.name.startsWith("$DO_NOT_NORMALIZE$");
+  const shouldNormalizeName = !member.isExactName;
   const enumTypeName = normalizeSdkName(member.enumType, NameType.Interface, {
     shouldGuard: true,
   });

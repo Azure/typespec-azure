@@ -4,7 +4,7 @@
 import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import { transformModularEmitterOptions } from "../modular/build-modular-options.js";
 import type { SdkContext } from "./interfaces.js";
-import { NameType, normalizeName } from "./name-utils.js";
+import { NameType, normalizeSdkName } from "./name-utils.js";
 import { getMethodHierarchiesMap } from "./operation-util.js";
 
 export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
@@ -38,9 +38,8 @@ export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
   for (const subClient of dpgContext.sdkPackage.clients) {
     const clientName = emitterOptions.options?.typespecTitleMap?.[subClient.name] ?? subClient.name;
     const methodMap = getMethodHierarchiesMap(dpgContext, subClient);
-    for (const [prefixKey, operations] of methodMap) {
-      const prefixes = prefixKey.split("/");
-      if (prefixKey === "") {
+    for (const [prefixes, operations] of methodMap) {
+      if (prefixes.length === 0) {
         for (const operation of operations) {
           const { name } = operation;
           const operationName = `${packageName}!${clientName}#${name}:member(1)`;
@@ -48,7 +47,7 @@ export function generateCrossLanguageDefinitionFile(dpgContext: SdkContext): {
         }
       } else {
         // e,g., @azure/ai-client!ConnectionsOperations#getConnectionWithSecrets:member": "Azure.AI.Projects.Connections.getConnectionWithSecrets"
-        const propertyType = `${normalizeName(prefixes[0] ?? "", NameType.OperationGroup)}Operations`;
+        const propertyType = `${normalizeSdkName(prefixes[0] ?? { name: "" }, NameType.OperationGroup)}Operations`;
         for (const operation of operations) {
           const { name } = operation;
           const operationName = `${packageName}!${propertyType}#${name}:member`;
