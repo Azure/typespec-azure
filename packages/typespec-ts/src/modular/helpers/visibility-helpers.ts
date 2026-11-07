@@ -3,14 +3,15 @@ import type {
   SdkModelPropertyType,
   SdkModelType,
   SdkServiceMethod,
+  SdkServiceResponseHeader,
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
+import { isReadOnly, UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import {
-  Visibility,
   getVisibilitySuffix,
   isVisible,
   resolveRequestVisibility,
+  Visibility,
 } from "@typespec/http";
 
 import { getAllOperationsFromClient } from "../../framework/hooks/sdk-types.js";
@@ -23,6 +24,22 @@ const responseUsageFlags =
   UsageFlags.LroInitial |
   UsageFlags.LroPolling |
   UsageFlags.LroFinalEnvelope;
+
+/** Shared input/output models must not require fields omitted by request serializers. */
+export function isOptionalModelProperty(
+  context: SdkContext,
+  property: SdkModelPropertyType | SdkServiceResponseHeader,
+  model?: SdkModelType,
+): boolean {
+  return (
+    property.optional ||
+    (property.kind === "property" &&
+      isReadOnly(property) &&
+      model !== undefined &&
+      (model.usage & UsageFlags.Input) !== 0 &&
+      !context.emitterOptions?.experimentalSplitModelsByVisibility)
+  );
+}
 
 interface SplitState {
   context: SdkContext;

@@ -13,6 +13,7 @@ import { useContext } from "../../context-manager.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import type { SdkContext } from "../../utils/interfaces.js";
+import { isOptionalModelProperty } from "../helpers/visibility-helpers.js";
 import { MultipartHelpers } from "../static-helpers-metadata.js";
 import { shouldEmitInline } from "./utils.js";
 
@@ -31,7 +32,7 @@ export function getModelExpression(
   }
 
   if (shouldEmitInline(type, options)) {
-    return emitInlineModel(context, type.properties);
+    return emitInlineModel(context, type.properties, type);
   } else {
     if (!options.skipPolymorphicUnion && type.discriminatedSubtypes) {
       return resolveReference(refkey(type, "polymorphicType"));
@@ -49,6 +50,7 @@ const externalModels: Record<string, string> = {
 export function emitInlineModel(
   context: SdkContext,
   properties: (SdkModelPropertyType | SdkServiceResponseHeader)[],
+  model?: SdkModelType,
 ): string {
   // generate Record<string, any> for empty anonymous object
   if (properties.length === 0) {
@@ -58,7 +60,7 @@ export function emitInlineModel(
       ${properties
         .map(
           (p) =>
-            `${normalizeModelPropertyName(context, p)}${p.optional ? "?" : ""}: ${getPropertyTypeExpression(context, p)}`,
+            `${normalizeModelPropertyName(context, p)}${isOptionalModelProperty(context, p, model) ? "?" : ""}: ${getPropertyTypeExpression(context, p)}`,
         )
         .join(",\n")}
     }`;
