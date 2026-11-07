@@ -27,6 +27,30 @@ describe("SSE connectors and resumption options", () => {
     expect(serde).not.toContain("var v time.Time");
   });
 
+  it("resolves a shared recursive envelope while its payload field is being adapted", async () => {
+    const files = await emitGoFor(
+      `
+      using TypeSpec.SSE;
+      @service namespace Test;
+      model Envelope {
+        @TypeSpec.Events.data payload: NestedEvents;
+      }
+      @TypeSpec.Events.events union Events { envelope: Envelope }
+      @TypeSpec.Events.events union NestedEvents { envelope: Envelope, text: string }
+      @route("/events") @get op receive(): SSEStream<Events>;
+      @route("/nested") @get op receiveNested(): SSEStream<NestedEvents>;
+    `,
+      { "generate-fakes": true },
+    );
+    expect(files.get("zz_models.go")).toContain("Payload *NestedEvents");
+    const serde = files.get("zz_unions_serde.go")!;
+    expect(
+      serde.match(/json.Marshal\(map\[string\]json.RawMessage\{"payload": frame.Data\}\)/g),
+    ).toHaveLength(2);
+    const encoder = files.get("fake/zz_sse_encoders.go")!;
+    expect(encoder.match(/data = rawMsg\["payload"\]/g)).toHaveLength(2);
+  });
+
   it.each([
     { variants: 'first: "one", second: "two"', field: "LiteralString", type: "string" },
     { variants: "first: Info, second: Info", field: "Info", type: "Info" },
