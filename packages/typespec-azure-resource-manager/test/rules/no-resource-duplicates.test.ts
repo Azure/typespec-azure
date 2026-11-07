@@ -2,7 +2,7 @@ import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, expect, it } from "vitest";
 import { resolveArmResources } from "../../src/resource.js";
-import { noResourceInstanceDuplicatesRule } from "../../src/rules/no-resource-instance-duplicates.js";
+import { noResourceDuplicatesRule } from "../../src/rules/no-resource-duplicates.js";
 
 let tester: LinterRuleTester;
 
@@ -10,7 +10,7 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noResourceInstanceDuplicatesRule,
+    noResourceDuplicatesRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -56,7 +56,7 @@ const diagnostic = (
   first = "Part",
   resourceType = "Microsoft.Contoso/widgets/parts",
 ) => ({
-  code: "@azure-tools/typespec-azure-resource-manager/no-resource-instance-duplicates",
+  code: "@azure-tools/typespec-azure-resource-manager/no-resource-duplicates",
   severity: "warning" as const,
   message: `Resource '${name}' resolves to the same resource type '${resourceType}' and instance path '${path}' as resource '${first}'. Use consistent resource names and operation templates so this instance resolves to a single resource.`,
 });
@@ -233,7 +233,7 @@ it("supports suppression on the duplicate operation", async () => {
     compilerOptions: {
       linterRuleSet: {
         enable: {
-          "@azure-tools/typespec-azure-resource-manager/no-resource-instance-duplicates": true,
+          "@azure-tools/typespec-azure-resource-manager/no-resource-duplicates": true,
         },
       },
     },
@@ -244,7 +244,7 @@ it("supports suppression on the duplicate operation", async () => {
   await Tester.compile(
     source.replace(
       "/*target*/",
-      '#suppress "@azure-tools/typespec-azure-resource-manager/no-resource-instance-duplicates" "Legacy naming retained for compatibility."\n',
+      '#suppress "@azure-tools/typespec-azure-resource-manager/no-resource-duplicates" "Legacy naming retained for compatibility."\n',
     ),
     options,
   );

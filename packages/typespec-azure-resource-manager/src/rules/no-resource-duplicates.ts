@@ -2,13 +2,13 @@ import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { resolveArmResources, type ResolvedResource } from "../resource.js";
 import { isInternalTypeSpec } from "./utils.js";
 
-export const noResourceInstanceDuplicatesRule = createRule({
-  name: "no-resource-instance-duplicates",
+export const noResourceDuplicatesRule = createRule({
+  name: "no-resource-duplicates",
   description:
     "ARM resource instances must resolve to a single resource per resource type and instance path.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-instance-duplicates",
-  docs: fileRef.fromPackageRoot("src/rules/no-resource-instance-duplicates.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-duplicates",
+  docs: fileRef.fromPackageRoot("src/rules/no-resource-duplicates.md"),
   messages: {
     default: paramMessage`Resource '${"name"}' resolves to the same resource type '${"resourceType"}' and instance path '${"path"}' as resource '${"firstName"}'. Use consistent resource names and operation templates so this instance resolves to a single resource.`,
   },

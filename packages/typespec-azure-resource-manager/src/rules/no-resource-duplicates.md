@@ -110,7 +110,7 @@ Prefer consistent operation templates or explicitly aligned resource names. Supp
 @armResourceOperations
 interface Parts {
   get is ArmResourceRead<Part>;
-  #suppress "@azure-tools/typespec-azure-resource-manager/no-resource-instance-duplicates" "ARM reviewer approved legacy logical names; the consumer handles split records."
+  #suppress "@azure-tools/typespec-azure-resource-manager/no-resource-duplicates" "ARM reviewer approved legacy logical names; the consumer handles split records."
   createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part>;
   list is ArmResourceListByParent<Part>;
 }
