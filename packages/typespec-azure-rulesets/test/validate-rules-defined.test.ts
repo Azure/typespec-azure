@@ -134,6 +134,14 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps ARM GET LRO guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-get-lro";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+      ok(!ruleset.enable?.[ruleName]);
+    }
+  });
+
   it("keeps private endpoint API completeness guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
