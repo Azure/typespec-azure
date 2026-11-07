@@ -1210,6 +1210,33 @@ export type ClientOptionDecorator = (
   scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Selects the client result of a long-running operation without changing its protocol.
+ * A model selects a response body available from the LRO protocol. A property selects the
+ * established status-monitor result while preserving its containing response as the envelope.
+ * Resource lifecycle operations return their resource or completion response by default.
+ * Selecting their status-monitor result property is supported only to preserve an existing SDK
+ * contract and reports the `use-valid-client-lro-result` warning.
+ *
+ * See [LRO result customization](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
+ * for supported selections.
+ *
+ * @param target The long-running operation to customize.
+ * @param result A response model, or the established status-monitor result property, belonging to the operation's LRO protocol.
+ * @param scope Specifies the target language emitters. If omitted, applies to all language emitters.
+ * @example Return an action's whole status monitor in JavaScript and its payload in Python.
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus, "javascript");
+ * @@clientLroResult(start, ActionStatus.result, "python");
+ * ```
+ */
+export type ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureClientGeneratorCoreDecorators = {
   lroStatusMetadata: LroStatusMetadataDecorator;
   clientName: ClientNameDecorator;
@@ -1234,6 +1261,7 @@ export type AzureClientGeneratorCoreDecorators = {
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
   clientOption: ClientOptionDecorator;
+  clientLroResult: ClientLroResultDecorator;
 };
 
 /**

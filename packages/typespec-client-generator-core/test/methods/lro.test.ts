@@ -17,7 +17,7 @@ function hasFlag<T extends number>(value: T, flag: T): boolean {
   return (value & flag) !== 0;
 }
 
-it("preserves the resource PUT job result, envelope, and extraction path independently", async () => {
+it("keeps the resource PUT result, envelope, and extraction path coherent", async () => {
   const { program } = await AzureCoreTester.compile(`
     @service namespace TestService;
     model Result { value: string; }
@@ -46,16 +46,14 @@ it("preserves the resource PUT job result, envelope, and extraction path indepen
   strictEqual(raw.finalStep?.kind, "pollingSuccessProperty");
   strictEqual(raw.finalResult, raw.pollingInfo.responseModel);
   strictEqual(raw.finalEnvelopeResult, raw.pollingInfo.responseModel);
-  strictEqual(raw.finalResultPath, "result");
+  strictEqual(raw.finalResultPath, undefined);
   const finalResponse = method.lroMetadata.finalResponse;
   ok(finalResponse);
-  strictEqual(finalResponse.result, finalResponse.envelopeResult);
   strictEqual(finalResponse.result.kind, "model");
   strictEqual(finalResponse.result.name, "Job");
-  strictEqual(finalResponse.resultSegments?.length, 1);
-  strictEqual(finalResponse.resultSegments[0].name, "result");
-  strictEqual(finalResponse.resultSegments[0].type.kind, "model");
-  strictEqual(finalResponse.resultSegments[0].type.name, "Result");
+  strictEqual(finalResponse.envelopeResult.kind, "model");
+  strictEqual(finalResponse.envelopeResult.name, "Job");
+  strictEqual(finalResponse.resultSegments, undefined);
   strictEqual(method.response.type, finalResponse.result);
   ok("__raw_lro_metadata" in method);
   strictEqual(method.__raw_lro_metadata, raw);

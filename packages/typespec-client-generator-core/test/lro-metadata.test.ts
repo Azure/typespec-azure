@@ -90,6 +90,37 @@ it.each([
   expectDiagnosticEmpty(program.diagnostics);
 });
 
+it("keeps the complete resource as the TCGC default for a resource PUT", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service namespace TestService;
+    alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
+    model Payload { value: string; }
+    @resource("jobs") model Job {
+      @key id: string;
+      @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+      @lroResult result: Payload;
+    }
+    @get @route("/jobs/{id}") op read(@path id: string): Job;
+    @get @route("/jobs/{id}/status") op poll(@path id: string): Job;
+    @pollingOperation(poll)
+    op start is Operations.LongRunningResourceCreateOrReplace<Job>;
+  `);
+  const [services] = getAllHttpServices(program);
+  const operation = services[0].operations.find((o) => o.operation.name === "start")!.operation;
+  const native = getRawLroMetadata(program, operation);
+  const legacy = getLroMetadata(program, operation);
+  ok(native);
+  ok(legacy);
+  strictEqual(native.finalResult, native.finalEnvelopeResult);
+  strictEqual(native.finalResultPath, undefined);
+  strictEqual(native.logicalPath, undefined);
+  strictEqual(legacy.finalResult, native.finalResult);
+  strictEqual(legacy.finalEnvelopeResult, native.finalEnvelopeResult);
+  strictEqual(legacy.finalResultPath, undefined);
+  strictEqual(legacy.logicalPath, undefined);
+  expectDiagnosticEmpty(program.diagnostics);
+});
+
 it("does not synthesize native LRO metadata for an ordinary operation", async () => {
   const { program } = await AzureCoreTester.compile(
     prefix + '@get @route("/widgets") op start(): Widget;',

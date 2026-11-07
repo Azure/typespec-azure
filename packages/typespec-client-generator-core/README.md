@@ -129,6 +129,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                             | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
 | [`@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-operation-group-name-conflict) | Operation group names should not conflict with type names in the same namespace.                                                                                    |
 | [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
+| [`@azure-tools/typespec-client-generator-core/use-valid-client-lro-result`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result)           | LRO client results should follow the operation's protocol result contract.                                                                                          |
 
 ## Decorators
 
@@ -142,6 +143,7 @@ Available ruleSets:
 - [`@clientDoc`](#@clientdoc)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientLocation`](#@clientlocation)
+- [`@clientLroResult`](#@clientlroresult)
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
 - [`@clientOption`](#@clientoption)
@@ -763,6 +765,43 @@ getHealthStatus(
 // client.tsp
 
 @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
+```
+
+#### `@clientLroResult`
+
+Selects the client result of a long-running operation without changing its protocol.
+A model selects a response body available from the LRO protocol. A property selects the
+established status-monitor result while preserving its containing response as the envelope.
+Resource lifecycle operations return their resource or completion response by default.
+Selecting their status-monitor result property is supported only to preserve an existing SDK
+contract and reports the `use-valid-client-lro-result` warning.
+
+See [LRO result customization](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
+for supported selections.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The long-running operation to customize.
+`Operation`
+
+##### Parameters
+
+| Name   | Type                                                            | Description                                                                                                     |
+| ------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| result | `Model \| ModelProperty`                                        | A response model, or the established status-monitor result property, belonging to the operation's LRO protocol. |
+| scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. If omitted, applies to all language emitters.                           |
+
+##### Examples
+
+###### Return an action's whole status monitor in JavaScript and its payload in Python.
+
+```typespec
+@@clientLroResult(start, ActionStatus, "javascript");
+@@clientLroResult(start, ActionStatus.result, "python");
 ```
 
 #### `@clientName`

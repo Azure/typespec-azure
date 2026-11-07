@@ -905,11 +905,11 @@ describe("LongRunningOperation", () => {
     deepStrictEqual(metadata.finalStateVia, "original-uri");
     deepStrictEqual(metadata.logicalResult.name, "TestModel");
     deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
-    deepStrictEqual(metadata.logicalPath, "result");
+    deepStrictEqual(metadata.logicalPath, undefined);
 
     deepStrictEqual((metadata.finalResult as Model)?.name, "TestModel");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResourceOperationStatus");
-    deepStrictEqual(metadata.finalResultPath, "result");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "TestModel");
+    strictEqual(metadata.finalResultPath, undefined);
   });
 
   it("Gets Lro for non-resource PUT with polling reference", async () => {

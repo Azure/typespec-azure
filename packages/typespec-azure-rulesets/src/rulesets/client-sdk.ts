@@ -10,6 +10,7 @@ export default {
     "@azure-tools/typespec-client-generator-core/get-operation-name": false,
     "@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict": false,
     "@azure-tools/typespec-client-generator-core/use-correct-verb": false,
+    "@azure-tools/typespec-client-generator-core/use-valid-client-lro-result": true,
   },
   disable: {
     "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms":
