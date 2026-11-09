@@ -4,6 +4,7 @@ import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
 import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acronyms.js";
 import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
 import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-name-conflict.rule.js";
+import { noRepeatedClientNameRule } from "./rules/no-repeated-client-name.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { unsupportedScopeRule } from "./rules/unsupported-scope.js";
@@ -20,6 +21,7 @@ const rules = [
   getOperationNameRule,
   noOperationGroupNameConflictRule,
   useUnionHierarchyRule,
+  noRepeatedClientNameRule,
   unsupportedScopeRule,
 ];
 
