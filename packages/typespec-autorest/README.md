@@ -220,7 +220,7 @@ Controls emission of a `service.yaml` manifest at the project root. "auto" (defa
 
 Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.
 
-See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/). **Caution:** check SDK emitter support before replacing legacy JSON sources.
+See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ## Decorators
 

@@ -45,11 +45,6 @@ autorest --input-file=./tsp-output/@azure-tools/typespec-autorest/openapi.json -
 
 For API example authoring, see [Author API examples in YAML](../../howtos/examples.md).
 
-:::caution
-Check SDK emitter support before replacing legacy JSON examples. AutoRest's YAML support alone
-does not guarantee that SDK samples will retain their examples.
-:::
-
 ### Emitter options:
 
 Emitter options can be configured via the `tspconfig.yaml` configuration:
