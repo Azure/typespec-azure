@@ -1,7 +1,6 @@
 import {
   type Model,
   type ModelProperty,
-  type Operation,
   type Scalar,
   createRule,
   fileRef,
@@ -9,6 +8,7 @@ import {
   isRecordModelType,
   paramMessage,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 const disallowList = new Set(["integer", "numeric", "float", "decimal"]);
 const alternatives = new Map([
@@ -29,40 +29,36 @@ export const noGenericNumericRule = createRule({
     extend: paramMessage`Don't extend generic type '${"name"}'. Use a more specific type that specifies the bit size, such as '${"alternative"}' instead.`,
   },
   create(context) {
-    function checkProperty(prop: ModelProperty) {
-      let type = prop.type;
-      const visited = new Set<Model>();
-      while (
-        type.kind === "Model" &&
-        (isArrayModelType(type) || isRecordModelType(type)) &&
-        !visited.has(type)
-      ) {
-        visited.add(type);
-        type = type.indexer.value;
-      }
-      if (type.kind === "Scalar" && disallowList.has(type.name)) {
-        context.reportDiagnostic({
-          target: prop,
-          format: {
-            name: type.name,
-            alternative: alternatives.get(type.name)!,
-          },
-        });
-      }
-    }
-
     return {
-      model: (model: Model) => {
-        for (const prop of model.properties.values()) {
-          checkProperty(prop);
+      modelProperty: (prop: ModelProperty) => {
+        const modelNode = prop.model?.node;
+        // Copied operation parameters are checked at their source declarations.
+        if (
+          prop.sourceProperty &&
+          modelNode?.parent?.kind === SyntaxKind.OperationSignatureDeclaration &&
+          modelNode.parent.parameters === modelNode
+        ) {
+          return;
         }
-      },
-      operation: (operation: Operation) => {
-        for (const prop of operation.parameters.properties.values()) {
-          // Spread parameters are checked on their source declarations.
-          if (!prop.sourceProperty) {
-            checkProperty(prop);
-          }
+
+        let type = prop.type;
+        const visited = new Set<Model>();
+        while (
+          type.kind === "Model" &&
+          (isArrayModelType(type) || isRecordModelType(type)) &&
+          !visited.has(type)
+        ) {
+          visited.add(type);
+          type = type.indexer.value;
+        }
+        if (type.kind === "Scalar" && disallowList.has(type.name)) {
+          context.reportDiagnostic({
+            target: prop,
+            format: {
+              name: type.name,
+              alternative: alternatives.get(type.name)!,
+            },
+          });
         }
       },
       scalar: (scalar: Scalar) => {

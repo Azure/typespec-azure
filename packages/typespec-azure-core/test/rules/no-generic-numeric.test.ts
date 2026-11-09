@@ -232,3 +232,48 @@ it("does not duplicate warnings when model properties are spread into operations
       },
     ]);
 });
+
+it("checks copied model properties and spread operation return properties", async () => {
+  await tester
+    .expect(
+      `
+      model Values {
+        amount: decimal;
+      }
+      model Copied {
+        ...Values;
+      }
+      op read(): {
+        ...Values;
+      };
+      `,
+    )
+    .toEmitDiagnostics(
+      Array.from({ length: 3 }, () => ({
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't use generic type 'decimal'. Use a more specific type that specifies the bit size, such as 'float32' instead.",
+      })),
+    );
+});
+
+it("does not duplicate warnings when operations reuse signatures", async () => {
+  await tester
+    .expect(
+      `
+      @route("/read")
+      op read(amount: decimal): void;
+      @route("/reuse")
+      op reuse is read;
+      @route("/reuse-again")
+      op reuseAgain is reuse;
+      `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-core/no-generic-numeric",
+        message:
+          "Don't use generic type 'decimal'. Use a more specific type that specifies the bit size, such as 'float32' instead.",
+      },
+    ]);
+});

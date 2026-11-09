@@ -12,7 +12,13 @@ This rule is related to the Swagger linter rule [ValidFormats](https://github.co
 
 This rule does not validate format strings or reject every built-in numeric type whose emitted format is outside the Swagger allowlist. For example, `int8`, `uint32`, and `decimal128` are not prohibited by this rule.
 
+The same requirement applies to array elements, dictionary values (including nested combinations of arrays and records), and inline operation parameters, including query parameters. For example, use `Record<float32>` instead of `Record<decimal>`, and `@query amount: float32` instead of `@query amount: decimal`.
+
+This includes extending generic numeric types.
+
 #### ❌ Incorrect
+
+##### Direct and collection members
 
 ```tsp
 model Widget {
@@ -23,22 +29,7 @@ model Widget {
 }
 ```
 
-#### ✅ Correct
-
-```tsp
-model Widget {
-  id: safeint;
-  cost: float32;
-  amounts: float32[];
-  discounts: Record<float32>;
-}
-```
-
-The same requirement applies to array elements, dictionary values (including nested combinations of arrays and records), and inline operation parameters, including query parameters. For example, use `Record<float32>` instead of `Record<decimal>`, and `@query amount: float32` instead of `@query amount: decimal`.
-
-This includes extending generic numeric types.
-
-#### ❌ Incorrect
+##### Derived numeric types
 
 ```tsp
 model GenericInteger extends integer;
@@ -49,6 +40,19 @@ model Widget {
 ```
 
 #### ✅ Correct
+
+##### Direct and collection members
+
+```tsp
+model Widget {
+  id: safeint;
+  cost: float32;
+  amounts: float32[];
+  discounts: Record<float32>;
+}
+```
+
+##### Derived numeric types
 
 ```tsp
 model Widget {
