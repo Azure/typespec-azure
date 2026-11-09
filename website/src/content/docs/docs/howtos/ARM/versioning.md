@@ -10,6 +10,8 @@ This document explains how to manage versioning in TypeSpec projects, including 
 
 Versioning allows you to evolve your API without breaking existing clients. By using versioning decorators, you can specify when resources, operations, or properties are added, removed, or changed.
 
+If a change corrects the API contract for one version, it is generally appropriate to make the same correction in previous versions that share that contract. Use version-specific models when an earlier version intentionally has a different contract.
+
 ## Declaring Versions
 
 Define your API versions in an enum. For each version, specify dependencies and common types as needed.
