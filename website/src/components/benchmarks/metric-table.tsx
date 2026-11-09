@@ -154,6 +154,7 @@ export function MetricTable({
         renderCell: (row) => (
           <Sparkline
             values={row.values}
+            comparisonKeys={row.comparisonKeys}
             color={trendColor(row.delta ?? 0, theme)}
             ariaLabel={`${row.name} trend`}
           />

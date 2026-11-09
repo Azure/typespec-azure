@@ -23,6 +23,7 @@
   "dependencies": {
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
+    "@typespec/http-client": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/sse": "workspace:^",
     "@typespec/streams": "workspace:^",

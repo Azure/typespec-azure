@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
-import { compileSpec } from "./compile.js";
+import { compileSpec, measureCompiler } from "./compile.js";
 import { inspectCSharpInstallation } from "./csharp.js";
 import {
   EXTERNAL_SPEC_CONFIG,
@@ -47,7 +47,11 @@ export async function createBenchmarkPlan(options: RunOptions): Promise<Benchmar
   );
   const local = dirs
     .filter((entry) => includes(entry.name) && existsSync(join(specsDir, entry.name, "main.tsp")))
-    .map((entry) => ({ name: entry.name, dir: join(specsDir, entry.name) }));
+    .map((entry) => ({
+      name: entry.name,
+      dir: join(specsDir, entry.name),
+      source: undefined,
+    }));
   const external = dirs
     .filter((entry) => existsSync(join(specsDir, entry.name, EXTERNAL_SPEC_CONFIG)))
     .map((entry) => loadExternalSpecConfig(join(specsDir, entry.name)))
@@ -68,7 +72,7 @@ export async function createBenchmarkPlan(options: RunOptions): Promise<Benchmar
     const dir = relative(root, source.dir);
     if (dir.startsWith("..") || isAbsolute(dir))
       throw new Error("Benchmark sources must be inside the repository.");
-    specs.push({ name: source.name, dir, emitters: config.emit ?? [] });
+    specs.push({ name: source.name, dir, emitters: config.emit ?? [], source: source.source });
   }
   if (new Set(specs.map((spec) => spec.name)).size !== specs.length) {
     throw new Error("Benchmark spec names must be unique.");
@@ -127,12 +131,11 @@ export async function runWorkload(
       }
     }
   }
-  return measureWorkload(plan, workload, (item) =>
-    compileSpec(
-      join(root, spec.dir),
-      undefined,
-      item.kind === "compiler" ? { kind: "compiler" } : { kind: "emitter", emitter: item.emitter },
-    ),
+  if (workload.kind === "compiler") {
+    return measureCompiler(join(root, spec.dir), plan, workload);
+  }
+  return measureWorkload(plan, workload, () =>
+    compileSpec(join(root, spec.dir), undefined, { kind: "emitter", emitter: workload.emitter }),
   );
 }
 
