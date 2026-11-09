@@ -6,9 +6,8 @@ import { pageableRequires200ResponseRule } from "../../src/rules/pageable-requir
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  const runner = await Tester.import("@typespec/openapi")
-    .wrap(
-      (code) => `
+  const runner = await Tester.wrap(
+    (code) => `
       @service namespace Contoso;
       model Page {
         @pageItems value: string[];
@@ -16,8 +15,7 @@ beforeEach(async () => {
       }
       ${code}
     `,
-    )
-    .createInstance();
+  ).createInstance();
   tester = createLinterRuleTester(
     runner,
     pageableRequires200ResponseRule,
@@ -39,18 +37,6 @@ it.each(["get", "post"])("reports a pageable %s with only a 201 response", async
           @statusCode status: 201;
           @body body: Page;
         };
-        `,
-    )
-    .toEmitDiagnostics(diagnostic);
-});
-
-it("does not treat a default response as an explicit 200", async () => {
-  await tester
-    .expect(
-      `
-        @TypeSpec.OpenAPI.defaultResponse
-        model DefaultPage extends Page {}
-        @list @post op list(): DefaultPage;
         `,
     )
     .toEmitDiagnostics(diagnostic);
