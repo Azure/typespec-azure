@@ -35,7 +35,7 @@ describe("buildLineages", () => {
       ],
       "Widgets_Get",
     );
-    // Key and file name both follow the default convention => neither title nor legacyFilename.
+    // Key and file name both follow the default convention => neither title nor id.
     expect(result).toEqual([
       {
         request: { path: { id: "1" } },
@@ -79,7 +79,7 @@ describe("buildLineages", () => {
     expect(result[0].since).toBe("2024-06-01");
   });
 
-  it("orders keys as title, since, legacyFilename, request, responses", () => {
+  it("orders keys as title, since, id, request, responses", () => {
     const result = build(
       [
         collected("2023-01-01", "A", { v: 1 }),
@@ -92,19 +92,19 @@ describe("buildLineages", () => {
     expect(sinceVariant && Object.keys(sinceVariant)).toEqual([
       "title",
       "since",
-      "legacyFilename",
+      "id",
       "request",
       "responses",
     ]);
   });
 
-  it("omits both title and legacyFilename when they follow the default convention", () => {
+  it("omits both title and id when they follow the default convention", () => {
     const result = build([collected("2023-01-01", "Widgets_Get", { name: "a" })], "Widgets_Get");
     expect(result[0].title).toBeUndefined();
-    expect(result[0].legacyFilename).toBeUndefined();
+    expect(result[0].id).toBeUndefined();
   });
 
-  it("stores only legacyFilename when the key is recoverable from the file name", () => {
+  it("stores only id when the key is recoverable from the file name", () => {
     // Key differs from operationId but equals the file name (minus extension) => file name only.
     const result = build(
       [
@@ -114,7 +114,7 @@ describe("buildLineages", () => {
       "Widgets_Get",
     );
     expect(result.map((v) => v.title)).toEqual([undefined, undefined]);
-    expect(result.map((v) => v.legacyFilename)).toEqual(["Custom_Name.json", "Custom_Name.json"]);
+    expect(result.map((v) => v.id)).toEqual(["Custom_Name", "Custom_Name"]);
   });
 
   it("stores a title when the key cannot be recovered from the file name", () => {
@@ -123,15 +123,15 @@ describe("buildLineages", () => {
       "Widgets_Get",
     );
     expect(result[0].title).toBe("Get a widget");
-    expect(result[0].legacyFilename).toBe("Widgets_Get.json");
+    expect(result[0].id).toBe("Widgets_Get");
   });
 
-  it("omits legacyFilename when the file follows the operationId + title default", () => {
+  it("omits id when the file follows the operationId + title default", () => {
     const result = build(
       [collected("2023-01-01", "With Filter", { name: "a" }, "Widgets_Get_With_Filter.json")],
       "Widgets_Get",
     );
     expect(result[0].title).toBe("With Filter");
-    expect(result[0].legacyFilename).toBeUndefined();
+    expect(result[0].id).toBeUndefined();
   });
 });

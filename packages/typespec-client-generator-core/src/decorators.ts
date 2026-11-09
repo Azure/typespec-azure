@@ -53,6 +53,9 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  DynamicModelDecorator,
+  LroOperationIdDecorator,
+  LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -107,6 +110,47 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
+
+export const $lroStatusMetadata: LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(context, $lroStatusMetadata, lroStatusMetadataKey, target, true, scope);
+};
+
+export function getLroStatusMetadataDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): boolean | undefined {
+  return getScopedDecoratorData(context, lroStatusMetadataKey, target);
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(
+    context,
+    $lroOperationId,
+    lroOperationIdKey,
+    target,
+    { target: context.decoratorTarget },
+    scope,
+  );
+};
+
+export function getLroOperationIdDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): { target: DiagnosticTarget } | undefined {
+  return getScopedDecoratorData(context, lroOperationIdKey, target);
+}
 
 /**
  * The set of emitters a scope string effectively selects.
@@ -721,7 +765,12 @@ export function getUsage(context: TCGCContext, entity: Model | Enum | Union): Us
   switch (entity.kind) {
     case "Union":
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "model" ||
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.usage;
       }
       return UsageFlags.None;
@@ -780,7 +829,12 @@ export function getAccess(
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "model" ||
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.access;
       }
       return "public";
@@ -1224,6 +1278,24 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   entity: Model,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {};
+
+export const $dynamicModel: DynamicModelDecorator = (
+  context: DecoratorContext,
+  target: Model | Namespace,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const [, positiveScopes] = parseScopes(normalizeScope(scope));
+  if (!positiveScopes?.includes("csharp")) {
+    reportDiagnostic(context.program, {
+      code: "decorator-requires-scope",
+      format: {
+        decoratorName: "dynamicModel",
+        allowedScopes: '"csharp"',
+      },
+      target,
+    });
+  }
+};
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 

@@ -9,6 +9,7 @@ export default {
     "@azure-tools/typespec-azure-core/casing-style": true,
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
     "@azure-tools/typespec-azure-core/no-boolean": false,
+    "@azure-tools/typespec-azure-core/no-redundant-summary": false,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
     "@azure-tools/typespec-azure-core/no-case-mismatch": true,
@@ -48,6 +49,7 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
+    "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
 
     // Azure core rules enabled via an optional rulesets
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,

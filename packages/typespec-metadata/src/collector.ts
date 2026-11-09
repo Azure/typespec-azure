@@ -120,7 +120,9 @@ function parsePython(
   if (packageName && !namespace) {
     namespace = String(packageName).replace(/-/g, ".");
   } else if (namespace && !packageName) {
-    packageName = String(namespace).replace(/\./g, "-");
+    packageName = String(namespace)
+      .replace(/(?:^|\.)_.*$/, "")
+      .replace(/\./g, "-");
   }
 
   return {
@@ -364,8 +366,7 @@ export function buildSpecMetadata(program: Program): TypeSpecMetadata {
   const doc = trimOrUndefined(getDoc(program, primaryNamespace));
 
   // Determine if this is data plane or management plane
-  // Check if namespace uses Azure.ResourceManager (management plane)
-  const isManagementPlane = checkIfManagementPlane(program, primaryNamespace);
+  const isManagementPlane = checkIfManagementPlane(primaryNamespace);
 
   return {
     namespace: namespaceName,
@@ -468,22 +469,17 @@ function selectPrimaryNamespace(namespaces: Namespace[], program: Program): Name
 
 /**
  * Checks if a namespace represents a management plane service.
- * Management plane services typically use Azure.ResourceManager.
+ * ARM library imports alone do not make a service a management plane service.
  */
-function checkIfManagementPlane(program: Program, ns: Namespace): boolean {
-  // Check if the namespace or any of its imports reference Azure.ResourceManager
-  const globalNs = program.getGlobalNamespaceType();
-
-  // Look for Azure.ResourceManager namespace
-  if (globalNs.namespaces.has("Azure")) {
-    const azureNs = globalNs.namespaces.get("Azure");
-    if (azureNs?.namespaces.has("ResourceManager")) {
-      // If Azure.ResourceManager exists in the program, it's likely management plane
+function checkIfManagementPlane(ns: Namespace): boolean {
+  for (let current: Namespace | undefined = ns; current; current = current.namespace) {
+    if (
+      current.decorators.some((decorator) => decorator.decorator.name === "$armProviderNamespace")
+    ) {
       return true;
     }
   }
 
-  // Default to data plane
   return false;
 }
 

@@ -4,10 +4,15 @@ import {
   type ModelProperty,
   type Operation,
   type Program,
+  type Type,
   createRule,
   fileRef,
   getLocationContext,
+  getPagingOperation,
+  getProperty,
   isArrayModelType,
+  isList,
+  walkPropertiesInherited,
 } from "@typespec/compiler";
 import { type HttpOperationResponse, getHttpOperation } from "@typespec/http";
 import { getArmProviderNamespace } from "../namespace.js";
@@ -15,31 +20,70 @@ import { getArmProviderNamespace } from "../namespace.js";
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
   docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
-  description:
-    "ARM collection GET response models must declare only the `value` and `nextLink` properties.",
+  description: "ARM list responses must use a value array and the standard nextLink envelope.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
     default:
       "Collection GET response models must declare exactly the `value` and `nextLink` properties.",
+    valueArray: "Paged ARM list responses must declare a 'value' property of array type.",
   },
   create(context) {
     return {
       operation: (operation) => {
-        if (
-          operation.namespace === undefined ||
-          getArmProviderNamespace(context.program, operation.namespace) === undefined
-        ) {
+        const [httpOperation] = getHttpOperation(context.program, operation);
+        const collection =
+          operation.namespace !== undefined &&
+          getArmProviderNamespace(context.program, operation.namespace) !== undefined &&
+          httpOperation.verb === "get" &&
+          isCollectionGetPath(httpOperation.path);
+        const [paging] = isList(context.program, operation)
+          ? getPagingOperation(context.program, operation)
+          : [];
+        const paged =
+          getLocationContext(context.program, operation).type === "project" &&
+          paging?.output.nextLink !== undefined;
+        if (!collection && !paged) {
           return;
         }
 
-        const [httpOperation] = getHttpOperation(context.program, operation);
-        if (httpOperation.verb !== "get" || !isCollectionGetPath(httpOperation.path)) {
+        if (paged) {
+          for (const response of httpOperation.responses) {
+            if (response.statusCodes !== 200) continue;
+            for (const { body } of response.responses) {
+              if (body === undefined) continue;
+              const invalidValue = getInvalidValueTarget(operation, body.type);
+              if (invalidValue !== undefined) {
+                context.reportDiagnostic({
+                  target: getDiagnosticTarget(context.program, operation, invalidValue),
+                  messageId: "valueArray",
+                });
+                return;
+              }
+              if (body.type.kind === "Model") {
+                const invalidTargets = getInvalidTargets(body.type);
+                for (const invalidTarget of invalidTargets) {
+                  context.reportDiagnostic({
+                    target: getDiagnosticTarget(context.program, operation, invalidTarget),
+                  });
+                }
+                if (invalidTargets.length > 0) return;
+              }
+            }
+          }
           return;
         }
 
         const responseModel = get200ResponseModel(httpOperation.responses);
         if (responseModel === undefined) {
+          return;
+        }
+        const value = getProperty(responseModel, "value");
+        if (value !== undefined && (value.type.kind !== "Model" || !isArrayModelType(value.type))) {
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(context.program, operation, value),
+            messageId: "valueArray",
+          });
           return;
         }
 
@@ -96,7 +140,7 @@ function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
   let hasValue = false;
   let hasNextLink = false;
 
-  for (const property of responseModel.properties.values()) {
+  for (const property of walkPropertiesInherited(responseModel)) {
     if (property.name === "value") {
       hasValue = true;
     } else if (property.name === "nextLink") {
@@ -114,7 +158,7 @@ function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
 function getDiagnosticTarget(
   program: Program,
   operation: Operation,
-  invalidTarget: Model | ModelProperty,
+  invalidTarget: Model | ModelProperty | Operation,
 ): Interface | Operation | Model | ModelProperty {
   if (getLocationContext(program, invalidTarget).type === "project") {
     return invalidTarget;
@@ -125,4 +169,14 @@ function getDiagnosticTarget(
   }
 
   return operation.interface ?? operation;
+}
+
+function getInvalidValueTarget(
+  operation: Operation,
+  type: Type,
+): Model | ModelProperty | Operation | undefined {
+  if (type.kind !== "Model") return operation;
+  const value = getProperty(type, "value");
+  if (value === undefined) return type;
+  return value.type.kind === "Model" && isArrayModelType(value.type) ? undefined : value;
 }

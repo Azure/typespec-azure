@@ -845,6 +845,9 @@ describe("LongRunningOperation", () => {
     ok(metadata);
     deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
     deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
+    if (metadata.statusMonitorStep?.kind === "nextOperationLink") {
+      deepStrictEqual(metadata.statusMonitorStep.operation?.name, "poll");
+    }
 
     deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
     deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");
@@ -2775,6 +2778,35 @@ JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
     deepStrictEqual(metadata.pollingInfo.resultProperty.name, "yeah");
     ok(metadata.pollingInfo.errorProperty);
     deepStrictEqual(metadata.pollingInfo.errorProperty.name, "nay");
+  });
+
+  it("resolves the error property from an implicit polling location", async () => {
+    const [_, metadata] = await compileLroOperation(
+      `
+      model PollingStatus {
+        @Azure.Core.lroStatus
+        status: "Succeeded" | "Canceled" | "Failed" | "Running";
+
+        @Azure.Core.lroErrorResult
+        failure: Azure.Core.Foundations.Error;
+      }
+
+      @route("/simpleWidgets")
+      @post
+      op createWidget(): {
+        @statusCode _: 202;
+
+        @pollingLocation
+        @header("Operation-Location")
+        operationLocation: ResourceLocation<PollingStatus>;
+      };
+      `,
+      "createWidget",
+    );
+
+    ok(metadata);
+    ok(metadata.pollingInfo.errorProperty);
+    deepStrictEqual(metadata.pollingInfo.errorProperty.name, "failure");
   });
 
   it("emits diagnostics for multiple lro result fields", async () => {

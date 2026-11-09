@@ -16,6 +16,80 @@ import {
   SimpleTester,
   SimpleTesterWithService,
 } from "../tester.js";
+
+it("keeps enum values and types separate from JSON and XML wire values", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    enum Status {
+      @encodedName("application/json", "unknown")
+      @encodedName("application/xml", "Unknown")
+      @clientName("Unspecified")
+      unspecified: 0,
+      @encodedName("application/json", "active")
+      active: 1,
+      other: 2,
+    }
+
+    model Result {
+      status: Status;
+      initial: Status.unspecified;
+    }
+    op send(@header contentType: "application/xml", @body body: Result): Result;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkEnum = context.sdkPackage.enums[0];
+  deepStrictEqual(
+    sdkEnum.values.map((value) => value.value),
+    [0, 1, 2],
+  );
+  strictEqual(sdkEnum.valueType.kind, "int32");
+  strictEqual(sdkEnum.values[0].name, "Unspecified");
+  strictEqual(sdkEnum.values[0].valueType.kind, "int32");
+  strictEqual(sdkEnum.values[0].serializationOptions?.json?.name, "unknown");
+  strictEqual(sdkEnum.values[0].serializationOptions?.xml?.name, "Unknown");
+  strictEqual(sdkEnum.values[1].serializationOptions?.json?.name, "active");
+  strictEqual(sdkEnum.values[1].serializationOptions?.xml, undefined);
+  strictEqual(sdkEnum.values[2].serializationOptions?.json, undefined);
+  strictEqual(sdkEnum.values[2].serializationOptions?.xml, undefined);
+  const initial = context.sdkPackage.models[0].properties.find((prop) => prop.name === "initial");
+  ok(initial);
+  strictEqual(initial.type.kind, "enumvalue");
+  strictEqual(initial.type.value, 0);
+  deepStrictEqual(initial.type.serializationOptions, sdkEnum.values[0].serializationOptions);
+});
+
+it("preserves encoded values when flattening enums into a union", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Status {
+      @encodedName("application/json", "wire-ready")
+      ready: "ready",
+      @encodedName("application/xml", "Empty")
+      @encodedName("application/json", "")
+      empty,
+    }
+    @usage(Usage.input | Usage.output)
+    union ExtendedStatus { Status, string }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkEnum = context.sdkPackage.enums.find((type) => type.name === "ExtendedStatus");
+  ok(sdkEnum);
+  strictEqual(sdkEnum.isUnionAsEnum, true);
+  deepStrictEqual(
+    sdkEnum.values.map((value) => value.value),
+    ["ready", "empty"],
+  );
+  deepStrictEqual(
+    sdkEnum.values.map((value) => [
+      value.serializationOptions?.json?.name,
+      value.serializationOptions?.xml?.name,
+    ]),
+    [
+      ["wire-ready", undefined],
+      ["", "Empty"],
+    ],
+  );
+});
+
 it("string extensible", async function () {
   const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
@@ -165,6 +239,97 @@ it("union as enum float type", async function () {
     values.map((x) => x.value),
     [1, 2, 3],
   );
+});
+
+for (const kind of ["string", "int32", "int64", "float32"] as const) {
+  for (const open of [true, false]) {
+    it(`${open ? "extensible" : "fixed"} union uses its ${kind} constraint as the value type`, async () => {
+      const values = kind === "string" ? ['"one"', '"two"'] : ["1", "2"];
+      const { program } = await SimpleTesterWithService.compile(`
+        @usage(Usage.input | Usage.output)
+        union Values extends ${kind} {
+          one: ${values[0]},
+          two: ${values[1]},
+          ${open ? `${kind},` : ""}
+        }
+      `);
+
+      const context = await createSdkContextForTester(program);
+      const sdkType = context.sdkPackage.enums[0];
+      strictEqual(sdkType.valueType.kind, kind);
+      strictEqual(sdkType.isFixed, !open);
+      deepStrictEqual(
+        sdkType.values.map((value) => value.value),
+        kind === "string" ? ["one", "two"] : [1, 2],
+      );
+      for (const value of sdkType.values) {
+        strictEqual(value.valueType, sdkType.valueType);
+      }
+    });
+  }
+}
+
+it("union constraint takes precedence over a narrower scalar variant", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    union Values extends int64 {
+      one: 1,
+      two: 2,
+      int32,
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
+  strictEqual(sdkType.valueType.kind, "int64");
+  strictEqual(sdkType.isFixed, false);
+});
+
+it("flattened union uses the nested union constraint as the value type", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    union BaseValues extends int64 {
+      one: 1,
+      two: 2,
+    }
+
+    @usage(Usage.input | Usage.output)
+    union Values {
+      BaseValues,
+      three: 3,
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums.find((e) => e.name === "Values");
+  ok(sdkType);
+  strictEqual(sdkType.valueType.kind, "int64");
+  strictEqual(sdkType.isFixed, true);
+  deepStrictEqual(
+    sdkType.values.map((value) => value.value),
+    [1, 2, 3],
+  );
+});
+
+it("nullable enum preserves the constrained union value type", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    union Values extends int64 {
+      one: 1,
+      two: 2,
+      int64,
+    }
+
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: Values | null;
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const nullableType = context.sdkPackage.models[0].properties[0].type;
+  strictEqual(nullableType.kind, "nullable");
+  strictEqual(nullableType.type.kind, "enum");
+  strictEqual(nullableType.type.valueType.kind, "int64");
+  strictEqual(nullableType.type.isFixed, false);
 });
 
 it("union of union as enum float type", async function () {

@@ -50,11 +50,13 @@ model Example {
   description?: string;
 
   /**
-   * Legacy `x-ms-examples` file name (e.g. `CaCertificates_Get.json`) this variant was migrated
-   * from. Preserved so an emitter can re-materialize the legacy file under its original name,
-   * keeping the diff minimal during rollout. When omitted, the emitter derives the file name (and
-   * the `x-ms-examples` key) from the operation id and `title`.
+   * Example filename stem (e.g. `CaCertificates_Get`, without `.json`). SDK and Swagger
+   * consumers generate `<id>.json`. When omitted, the filename is derived from the operation
+   * id and title. This does not change title-based version lineages.
    */
+  id?: string;
+
+  /** Compatibility spelling for existing files, including the `.json` extension. */
   legacyFilename?: string;
 
   /**

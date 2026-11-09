@@ -28,6 +28,8 @@ export interface ExampleDiagnostic {
 export interface ExampleVariant {
   readonly title?: string;
   readonly description?: string;
+  /** Example filename stem, without the `.json` extension. */
+  readonly id?: string;
   /** Legacy `x-ms-examples` file name this variant was migrated from, when preserved. */
   readonly legacyFilename?: string;
   readonly since?: string;
