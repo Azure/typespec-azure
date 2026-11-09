@@ -8,21 +8,15 @@ The rule checks the resolved HTTP request body, including `@body`, `@bodyRoot`, 
 
 GET and DELETE request bodies do not have generally defined HTTP semantics and may be rejected or ignored by clients, proxies, and caches. Removing an existing request body can be a breaking API and generated-SDK change and may require a service-side change.
 
-## Incorrect
+The examples assume `Widget` is already declared.
+
+## ❌ Incorrect
+
+### Data-plane operations
 
 Passing body parameters to an RPC operation creates a request body:
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-core";
-
-using TypeSpec.Http;
-using Azure.Core;
-
-model Widget {
-  name: string;
-}
-
 @route("/widgets")
 @get
 op readWidget is RpcOperation<
@@ -46,21 +40,37 @@ op deleteWidget is RpcOperation<
 >;
 ```
 
-## Correct
+### Azure Resource Manager
+
+Adding a body through a standard ARM operation template's `Parameters` customization also creates a request body.
+
+```tsp
+model ReadParameters {
+  @body filter: {
+    name: string;
+  };
+}
+
+model DeleteParameters {
+  @body options: {
+    force: boolean;
+  };
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget, Parameters = ReadParameters>;
+  delete is ArmResourceDeleteWithoutOkAsync<Widget, Parameters = DeleteParameters>;
+}
+```
+
+## ✅ Correct
+
+### Data-plane operations
 
 Use query parameters instead of a request body when the service supports them:
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-core";
-
-using TypeSpec.Http;
-using Azure.Core;
-
-model Widget {
-  name: string;
-}
-
 @route("/widgets")
 @get
 op readWidget is RpcOperation<
@@ -80,55 +90,11 @@ op deleteWidget is RpcOperation<
 >;
 ```
 
-## Azure Resource Manager
+### Azure Resource Manager
 
-Adding a body through a standard ARM operation template's `Parameters` customization also creates a request body.
-
-### Incorrect
+Keep the standard ARM read and delete operations bodyless:
 
 ```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model RequestParameters {
-  @TypeSpec.Http.body options: {
-    name: string;
-  };
-}
-
-@armResourceOperations
-interface Widgets {
-  get is ArmResourceRead<Widget, Parameters = RequestParameters>;
-  delete is ArmResourceDeleteWithoutOkAsync<Widget, Parameters = RequestParameters>;
-}
-```
-
-### Correct
-
-```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is TrackedResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @armResourceOperations
 interface Widgets {
   get is ArmResourceRead<Widget>;
