@@ -107,6 +107,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": true,
     "@azure-tools/typespec-azure-resource-manager/no-response-body": true,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-post": true,
+    "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info": false,
     "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": true,
     "@azure-tools/typespec-azure-resource-manager/patch-envelope": true,
     "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing": false,
@@ -126,5 +127,6 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
+    "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
   },
 } satisfies LinterRuleSet;
