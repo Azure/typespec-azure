@@ -1,5 +1,9 @@
 # Release
 
+## 0.63.11
+
+- Bump `@typespec/http-client-python` to 0.40.0
+
 ## 0.63.10
 
 - Bump @typespec/http-client-python to 0.39.0

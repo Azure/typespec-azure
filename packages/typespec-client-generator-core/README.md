@@ -129,6 +129,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                             | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
 | [`@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-operation-group-name-conflict) | Operation group names should not conflict with type names in the same namespace.                                                                                    |
 | [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
+| [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
 
 ## Decorators
 
@@ -148,6 +149,7 @@ Available ruleSets:
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
 - [`@dynamicModel`](#@dynamicmodel)
+- [`@lroOperationId`](#@lrooperationid)
 - [`@lroStatusMetadata`](#@lrostatusmetadata)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
@@ -1046,6 +1048,30 @@ namespace PetStore {
   }
 }
 ```
+
+#### `@lroOperationId`
+
+Identifies a server-issued long-running operation identifier exposed by a legacy service through
+either the status-monitor URI or its response body. This compatibility metadata does not drive
+polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+accessor and storage.
+
+```typespec
+@Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The operation identifier path parameter on the linked status-monitor operation, or
+a string-like property on its response model.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
 
 #### `@lroStatusMetadata`
 
