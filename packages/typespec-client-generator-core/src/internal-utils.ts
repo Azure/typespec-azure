@@ -1610,6 +1610,37 @@ function getConfigurationParameterEncoding(context: TCGCContext, parameter: Mode
   };
 }
 
+function isSameConfigurationParameterType(
+  left: Type,
+  right: Type,
+  active = new Map<Union, Set<Union>>(),
+): boolean {
+  if (left === right) return true;
+  if (left.kind !== right.kind || getTypeName(left) !== getTypeName(right)) return false;
+  if (left.kind === "Enum" && right.kind === "Enum") {
+    return unorderedArrayEquals(
+      [...left.members.values()],
+      [...right.members.values()],
+      (left, right) =>
+        left.name === right.name && (left.value ?? left.name) === (right.value ?? right.name),
+    );
+  }
+  if (left.kind === "Union" && right.kind === "Union") {
+    const pairs = active.get(left) ?? new Set<Union>();
+    if (pairs.has(right)) return true;
+    active.set(left, pairs);
+    pairs.add(right);
+    const equal = unorderedArrayEquals(
+      [...left.variants.values()],
+      [...right.variants.values()],
+      (left, right) => isSameConfigurationParameterType(left.type, right.type, active),
+    );
+    pairs.delete(right);
+    return equal;
+  }
+  return true;
+}
+
 export function isSameServiceConfigurations(
   context: TCGCContext,
   left: AzureServiceConfigurations | undefined,
@@ -1637,15 +1668,7 @@ export function isSameServiceConfigurations(
       const otherParameter = other.server.parameters.get(name);
       if (
         !otherParameter ||
-        getTypeName(parameter.type) !== getTypeName(otherParameter.type) ||
-        (parameter.type.kind === "Enum" &&
-          otherParameter.type.kind === "Enum" &&
-          !unorderedArrayEquals(
-            [...parameter.type.members.values()],
-            [...otherParameter.type.members.values()],
-            (left, right) =>
-              left.name === right.name && (left.value ?? left.name) === (right.value ?? right.name),
-          )) ||
+        !isSameConfigurationParameterType(parameter.type, otherParameter.type) ||
         parameter.optional !== otherParameter.optional ||
         !deepEquals(
           getConfigurationParameterEncoding(context, parameter),

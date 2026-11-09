@@ -732,13 +732,17 @@ it.each([false, true])(
   },
 );
 
-it.each([false, true])(
-  "compares merged endpoint anonymous enum wire values: conflict=%s",
-  async (conflict) => {
+it.each(
+  ["", " | null", ' | "west"'].flatMap((variant) =>
+    [false, true].map((conflict) => ({ variant, conflict })),
+  ),
+)(
+  "compares merged endpoint anonymous enum wire values$variant: conflict=$conflict",
+  async ({ variant, conflict }) => {
     const { program } = await AzureCoreTester.compile(`
       ${definitions}
-      model FirstParameters { region: enum { East: "east" }; }
-      model SecondParameters { region: enum { East: "${conflict ? "east-government" : "east"}" }; }
+      model FirstParameters { region: enum { East: "east" }${variant}; }
+      model SecondParameters { region: enum { East: "${conflict ? "east-government" : "east"}" }${variant}; }
       const FirstConfigurations = #{
         public: #{ endpoint: "https://{region}.example.com", parameters: typeref(FirstParameters), authentication: typeref(PublicAuth) },
       };
