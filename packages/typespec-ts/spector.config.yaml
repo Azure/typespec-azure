@@ -106,6 +106,7 @@ specs:
   azure/client-generator-core/deserialize-empty-string-as-null: true
   azure/resource-manager/operation-templates: true
   azure/client-generator-core/hierarchy-building: true
+  azure/client-generator-core/lro/result: true
   client/overload: true
   azure/client-generator-core/override: true
   # Only voidResponse is covered; bytesResponse returns a parsed object instead of raw bytes.
