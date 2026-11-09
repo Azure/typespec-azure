@@ -22,7 +22,7 @@ Encoding names and OpenAPI formats are different vocabularies: for example, `rfc
 
 #### ❌ Incorrect
 
-Unknown encoding on a model property:
+##### Model properties
 
 ```tsp
 model Foo {
@@ -31,7 +31,7 @@ model Foo {
 }
 ```
 
-Unknown encoding on a scalar:
+##### Scalars
 
 ```tsp
 @encode("custom-rfc")
@@ -40,7 +40,7 @@ scalar myDateTime extends utcDateTime;
 
 #### ✅ Correct
 
-Known encoding on a model property:
+##### Model properties
 
 ```tsp
 model Foo {
@@ -49,7 +49,7 @@ model Foo {
 }
 ```
 
-Known encoding on a scalar:
+##### Scalars
 
 ```tsp
 @encode("rfc3339")
