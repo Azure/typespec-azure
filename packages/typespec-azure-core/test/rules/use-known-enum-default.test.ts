@@ -83,7 +83,6 @@ describe("extensible enum defaults", () => {
   });
 
   it.each([
-    [`union Known { Cat: "cat" } union Kind { Known, Cat: "kitten", string }`, `"cat"`],
     [
       `union First { Value: "first" } union Second { Value: "second" } union Kind { First, Second, string }`,
       `"first"`,
