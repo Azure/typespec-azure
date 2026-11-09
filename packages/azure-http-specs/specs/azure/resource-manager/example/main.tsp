@@ -20,7 +20,7 @@ using Azure.ResourceManager;
   Generate management-plane sample code using the unified YAML example at examples.yaml.
   Do not set "examples-dir"; the scenario-local tspconfig.yaml enables discovery.
   Expected sample provenance: examples.yaml#list.
-  List provider operations at /providers/Microsoft.Example/operations.
+  List widgets in resource group test-rg, returning one widget named widget.
   """)
 namespace Azure.ResourceManager.Example;
 
@@ -35,4 +35,16 @@ enum Versions {
   "java"
 );
 
-interface Operations extends Azure.ResourceManager.Operations {}
+@resource("widgets")
+model Widget is ProxyResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {
+  description?: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  listByResourceGroup is ArmResourceListByParent<Widget>;
+}
