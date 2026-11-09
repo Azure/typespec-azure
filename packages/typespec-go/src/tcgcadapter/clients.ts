@@ -1755,7 +1755,7 @@ export class ClientAdapter {
       : method.receiver.type.name;
     const methodName =
       go.isLROMethod(method) || go.isPageableMethod(method)
-        ? ensureNameCase(method.naming.operationMethod)
+        ? helpers.getEffectiveName(sdkMethod, false)
         : ensureNameCase(method.name);
     let respEnvName = `${prefix}${methodName}Response`;
     if (sdkMethod.access === "internal") {
