@@ -37,6 +37,7 @@ import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
 import { noQueryInPostRule } from "./rules/no-query-in-post.js";
+import { noRepeatedPathInfoRule } from "./rules/no-repeated-path-info.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -44,6 +45,7 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -108,9 +110,11 @@ const rules = [
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   noQueryInPostRule,
+  noRepeatedPathInfoRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
+  privateEndpointApisMissingRule,
   resourceNameRule,
   resourceMissingReadRule,
   retryAfterRule,

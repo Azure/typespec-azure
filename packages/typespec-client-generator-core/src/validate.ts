@@ -10,7 +10,6 @@ export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core", {
     mutateNamespace: false,
   });
-
   validatePackage(tcgcContext);
   validateClients(tcgcContext);
   validateMethods(tcgcContext);
