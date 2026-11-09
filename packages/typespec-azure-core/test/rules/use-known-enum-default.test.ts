@@ -86,15 +86,25 @@ describe("extensible enum defaults", () => {
     [
       `union First { Value: "first" } union Second { Value: "second" } union Kind { First, Second, string }`,
       `"first"`,
+      `"second"`,
     ],
     [
       `enum First { Value: "first" } enum Second { Value: "second" } union Kind { First, Second, string }`,
       `"first"`,
+      `"second"`,
     ],
-    [`union Known { Value: 1 } union Kind { Known, Value: 2, int32 }`, `1`],
-  ])("retains declared defaults when included members reuse names: %s", async (types, value) => {
-    await tester.expect(`${types} model Settings { value: Kind = ${value}; }`).toBeValid();
-  });
+    [`union Known { Value: 1 } union Kind { Known, Value: 2, int32 }`, `1`, `2`],
+  ])(
+    "checks defaults against flattened values when included members reuse names: %s",
+    async (types, overriddenValue, retainedValue) => {
+      await tester
+        .expect(`${types} model Settings { value: Kind = ${overriddenValue}; }`)
+        .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/use-known-enum-default" });
+      await tester
+        .expect(`${types} model Settings { value: Kind = ${retainedValue}; }`)
+        .toBeValid();
+    },
+  );
 
   it("preserves the numeric precision exposed by the compiler", async () => {
     await tester

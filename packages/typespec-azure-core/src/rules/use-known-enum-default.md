@@ -1,6 +1,6 @@
 Defaults for extensible enums should be one of their declared values. Adding `string` or a numeric scalar to a union allows future values, but the default should describe a value the service already documents.
 
-This rule checks defaults on model properties and operation parameters whose types are extensible string or numeric enums. Values included through nested unions or enums are also recognized. It compares values, not variant names.
+This rule checks defaults on model properties and operation parameters whose types are extensible string or numeric enums. For nested unions and included enums, defaults are checked against the flattened enum values. It compares values, not variant names.
 
 Closed enums and closed literal unions already have their defaults checked by the TypeSpec compiler. Plain scalar properties and unions without declared enum values are not constrained by this rule. An explicitly nullable union may use `null` as its default.
 
