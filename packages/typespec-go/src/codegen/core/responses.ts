@@ -105,17 +105,24 @@ function generateUnmarshaller(
     go.isLROMethod(respEnv.method) && respEnv.method.finalResponseResultPath;
   // if the response envelope contains a discriminated type we need an unmarshaller
   let polymorphicRes: go.PolymorphicResult | undefined;
-  // in addition, some LRO result shapes require unmarshalling into a response field
-  let resultFieldName: string | undefined;
+  // in addition, if it's an LRO operation that returns a scalar, we will also need one
+  let monomorphicRes: go.MonomorphicResult | undefined;
+  // model results need a custom unmarshaller when extracted from a final response
+  let finalResponseModelRes: go.ModelResult | undefined;
   if (respEnv.result?.kind === "polymorphicResult") {
     polymorphicRes = respEnv.result;
   } else if (go.isLROMethod(respEnv.method) && respEnv.result?.kind === "monomorphicResult") {
-    resultFieldName = respEnv.result.fieldName;
+    monomorphicRes = respEnv.result;
   } else if (finalResponseResultPath && respEnv.result?.kind === "modelResult") {
-    resultFieldName = respEnv.result.type.name;
+    finalResponseModelRes = respEnv.result;
   }
 
-  if (!polymorphicRes && !resultFieldName && !finalResponseResultPath) {
+  if (
+    !polymorphicRes &&
+    !monomorphicRes &&
+    !finalResponseModelRes &&
+    !finalResponseResultPath
+  ) {
     // no unmarshaller required
     return "";
   }
@@ -153,9 +160,12 @@ function generateUnmarshaller(
     unmarshaller += `${indent.get()}}\n`;
     unmarshaller += `${indent.get()}${receiver}.${type} = res\n`;
     unmarshaller += `${indent.get()}return nil\n`;
-  } else if (resultFieldName) {
+  } else if (monomorphicRes) {
     imports.add("encoding/json");
-    unmarshaller += `${indent.get()}return json.Unmarshal(data, &${receiver}.${resultFieldName})\n`;
+    unmarshaller += `${indent.get()}return json.Unmarshal(data, &${receiver}.${monomorphicRes.fieldName})\n`;
+  } else if (finalResponseModelRes) {
+    imports.add("encoding/json");
+    unmarshaller += `${indent.get()}return json.Unmarshal(data, &${receiver}.${finalResponseModelRes.type.name})\n`;
   } else {
     throw new CodegenError("InternalError", `unhandled case for response envelope ${respEnv.name}`);
   }
