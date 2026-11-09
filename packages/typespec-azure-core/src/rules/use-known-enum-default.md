@@ -10,9 +10,9 @@ Closed enums and closed literal unions already have their defaults checked by th
 
 An undocumented default can leave clients unable to select or explain the service's default behavior. Add the intended default to the declared values, or choose an existing value.
 
-## Examples
+## ❌ Incorrect
 
-### Incorrect
+### Named union
 
 ```tsp
 union PetKind {
@@ -26,7 +26,19 @@ model Pet {
 }
 ```
 
-### Correct
+### ARM resource property
+
+Assume the tracked resource and its standard ARM operations are already defined; only the relevant properties are shown.
+
+```tsp
+model WidgetProperties {
+  mode: "automatic" | "manual" | string = "other";
+}
+```
+
+## ✅ Correct
+
+### Named union
 
 ```tsp
 union PetKind {
@@ -40,39 +52,11 @@ model Pet {
 }
 ```
 
-The same requirement applies to resource properties used by standard ARM operation templates.
-
-### Incorrect
+### ARM resource property
 
 ```tsp
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetProperties {
-  mode: "automatic" | "manual" | string = "other";
-}
-
-@armResourceOperations
-interface Widgets {
-  get is ArmResourceRead<Widget>;
-}
-```
-
-### Correct
-
-```tsp
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
 model WidgetProperties {
   mode: "automatic" | "manual" | string = "automatic";
-}
-
-@armResourceOperations
-interface Widgets {
-  get is ArmResourceRead<Widget>;
 }
 ```
 
@@ -82,7 +66,7 @@ Suppress only when an existing API intentionally uses an undeclared default that
 
 ```tsp
 model Pet {
-  #suppress "@azure-tools/typespec-azure-core/default-in-enum" "Preserve the existing API default."
+  #suppress "@azure-tools/typespec-azure-core/use-known-enum-default" "Preserve the existing API default."
   kind: "cat" | "dog" | string = "bird";
 }
 ```

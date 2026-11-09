@@ -19,6 +19,8 @@ export interface UnionEnumBase<K extends string, T> {
   include: UnionEnumBase<K, T>;
   /** Flattened member of this enum, this is the {@see members} with the members of the {@see include} union flattened inside. */
   flattenedMembers: Map<string | symbol, UnionEnumVariant<T>>;
+  /** All declared members, preserving inherited values even when member names collide. */
+  allMembers: UnionEnumVariant<T>[];
   /** If the enum is open. */
   open: boolean;
   /** If the union included null as a variant */
@@ -106,6 +108,7 @@ function getUnionAsEnumInternal(
   const kinds = new Set<UnionEnum["kind"]>();
   const members = new Map<string | symbol, UnionEnumVariant<any>>();
   const flattenedMembers = new Map<string | symbol, UnionEnumVariant<any>>();
+  const allMembers: UnionEnumVariant<string | number>[] = [];
   let open = false;
   let nullable = false;
   for (const variant of union.variants.values()) {
@@ -118,13 +121,13 @@ function getUnionAsEnumInternal(
         }
         break;
       case "String":
-        kinds.add("string");
-        members.set(variant.name, { value: variant.type.value, type: variant });
+      case "Number": {
+        kinds.add(variant.type.kind === "String" ? "string" : "number");
+        const member = { value: variant.type.value, type: variant };
+        members.set(variant.name, member);
+        allMembers.push(member);
         break;
-      case "Number":
-        kinds.add("number");
-        members.set(variant.name, { value: variant.type.value, type: variant });
-        break;
+      }
       case "Union":
         const parentUnion = diagnostics.pipe(getUnionAsEnumInternal(variant.type, visited));
         if (parentUnion !== undefined) {
@@ -138,12 +141,15 @@ function getUnionAsEnumInternal(
           for (const [key, value] of parentUnion.flattenedMembers) {
             flattenedMembers.set(key, value);
           }
+          allMembers.push(...parentUnion.allMembers);
         }
         break;
       case "Enum":
         for (const member of variant.type.members.values()) {
           kinds.add(typeof member.value === "number" ? "number" : "string");
-          flattenedMembers.set(member.name, { value: member.value ?? member.name, type: member });
+          const enumMember = { value: member.value ?? member.name, type: member };
+          flattenedMembers.set(member.name, enumMember);
+          allMembers.push(enumMember);
         }
         break;
       case "Scalar":
@@ -202,6 +208,7 @@ function getUnionAsEnumInternal(
       union,
       members,
       flattenedMembers,
+      allMembers,
       open,
       nullable,
     } as any,

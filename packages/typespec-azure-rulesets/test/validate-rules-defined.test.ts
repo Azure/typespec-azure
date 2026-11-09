@@ -150,7 +150,7 @@ describe("expect all rules to be defined", () => {
   });
 
   it("keeps extensible enum default guidance opt-in", () => {
-    const ruleName = "@azure-tools/typespec-azure-core/default-in-enum";
+    const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }

@@ -1,13 +1,17 @@
 import { Tester } from "#test/test-host.js";
 import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { defaultInEnumRule } from "../../src/rules/default-in-enum.js";
+import { useKnownEnumDefaultRule } from "../../src/rules/use-known-enum-default.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   const runner = await Tester.createInstance();
-  tester = createLinterRuleTester(runner, defaultInEnumRule, "@azure-tools/typespec-azure-core");
+  tester = createLinterRuleTester(
+    runner,
+    useKnownEnumDefaultRule,
+    "@azure-tools/typespec-azure-core",
+  );
 });
 
 describe("extensible enum defaults", () => {
@@ -18,7 +22,7 @@ describe("extensible enum defaults", () => {
     [`1 | 2 | int32`, `-1`],
   ])("warns when %s has an undeclared default %s", async (type, value) => {
     await tester.expect(`model Pet { kind: ${type} = ${value}; }`).toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-core/default-in-enum",
+      code: "@azure-tools/typespec-azure-core/use-known-enum-default",
       severity: "warning",
       message: "Default value should be one of the declared enum values.",
     });
@@ -42,7 +46,7 @@ describe("extensible enum defaults", () => {
         model Pet { kind: PetKind = "Cat"; }
       `,
       )
-      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
+      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/use-known-enum-default" });
     await tester
       .expect(
         `
@@ -75,7 +79,7 @@ describe("extensible enum defaults", () => {
         model Pet { kind: PetKind = "bird"; }
       `,
       )
-      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
+      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/use-known-enum-default" });
   });
 
   it.each([
@@ -109,7 +113,7 @@ describe("extensible enum defaults", () => {
         model Settings { count: Count = 9007199254740994; }
       `,
       )
-      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
+      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/use-known-enum-default" });
   });
 
   it("recognizes numeric values included from enums", async () => {
@@ -133,13 +137,13 @@ describe("extensible enum defaults", () => {
         model Settings { count: Count = 2; }
       `,
       )
-      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
+      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/use-known-enum-default" });
   });
 
   it("checks operation parameter defaults", async () => {
     await tester
       .expect(`op read(kind: "cat" | "dog" | string = "bird"): void;`)
-      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/default-in-enum" });
+      .toEmitDiagnostics({ code: "@azure-tools/typespec-azure-core/use-known-enum-default" });
   });
 });
 

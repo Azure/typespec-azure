@@ -4,16 +4,15 @@ import {
   ignoreDiagnostics,
   type ModelProperty,
   Numeric,
-  type Union,
 } from "@typespec/compiler";
-import { getUnionAsEnum, type UnionEnumVariant } from "../helpers/union-enums.js";
+import { getUnionAsEnum } from "../helpers/union-enums.js";
 
-export const defaultInEnumRule = createRule({
-  name: "default-in-enum",
-  docs: fileRef.fromPackageRoot("src/rules/default-in-enum.md"),
+export const useKnownEnumDefaultRule = createRule({
+  name: "use-known-enum-default",
+  docs: fileRef.fromPackageRoot("src/rules/use-known-enum-default.md"),
   description: "Defaults for extensible enums should be one of their declared values.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/default-in-enum",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-known-enum-default",
   messages: {
     default: "Default value should be one of the declared enum values.",
   },
@@ -30,7 +29,7 @@ export const defaultInEnumRule = createRule({
           return;
         }
 
-        const members = [...getDeclaredMembers(property.type)];
+        const members = enumType.allMembers;
         let matches: boolean;
         switch (defaultValue.valueKind) {
           case "StringValue":
@@ -65,22 +64,3 @@ export const defaultInEnumRule = createRule({
     };
   },
 });
-
-function* getDeclaredMembers(union: Union): Generator<UnionEnumVariant<string | number>> {
-  for (const variant of union.variants.values()) {
-    switch (variant.type.kind) {
-      case "String":
-      case "Number":
-        yield { value: variant.type.value, type: variant };
-        break;
-      case "Union":
-        yield* getDeclaredMembers(variant.type);
-        break;
-      case "Enum":
-        for (const member of variant.type.members.values()) {
-          yield { value: member.value ?? member.name, type: member };
-        }
-        break;
-    }
-  }
-}
