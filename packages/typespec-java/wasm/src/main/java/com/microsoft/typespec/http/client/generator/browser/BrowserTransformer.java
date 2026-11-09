@@ -116,6 +116,11 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                             }
                             invoke.setArguments(args);
                             invoke.setInstance(null);
+                        } else if (ref.getClassName().equals("javax.lang.model.SourceVersion")
+                            && ref.getName().equals("isName") && ref.parameterCount() == 1
+                            && cls.getName().startsWith(GENERATOR)) {
+                            invoke.setMethod(new MethodReference(BrowserCompatibility.class.getName(),
+                                "isJavaName", ValueType.object("java.lang.CharSequence"), ValueType.BOOLEAN));
                         } else if (ref.getClassName().equals("java.util.concurrent.ConcurrentHashMap")
                             && ref.getName().equals("newKeySet") && ref.parameterCount() == 0
                             && cls.getName().startsWith(GENERATOR)) {

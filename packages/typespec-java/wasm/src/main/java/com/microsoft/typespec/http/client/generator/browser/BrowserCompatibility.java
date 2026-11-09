@@ -3,6 +3,7 @@
 
 package com.microsoft.typespec.http.client.generator.browser;
 
+import com.github.javaparser.JavaParser;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -15,6 +16,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public final class BrowserCompatibility {
+    public static boolean isJavaName(CharSequence value) {
+        String name = value.toString();
+        var parsed = new JavaParser().parseName(name);
+        return parsed.isSuccessful() && parsed.getResult().orElseThrow().asString().equals(name);
+    }
+
     public static String packageName(Package value) {
         String name = value.getName();
         return name.endsWith(".") ? name.substring(0, name.length() - 1) : name;
