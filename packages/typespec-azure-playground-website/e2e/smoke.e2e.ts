@@ -157,6 +157,5 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     expect(result.wrappedModel).toContain("import java.util.Base64;");
     expect(result.wrappedModel).toContain("import java.util.List;");
     expect(runtimeRequests.some((url) => url.endsWith("/generator.wasm"))).toBe(true);
-    expect(runtimeRequests.some((url) => url.endsWith("/arm.wasm"))).toBe(true);
   });
 });

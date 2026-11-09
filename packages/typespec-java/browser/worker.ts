@@ -5,7 +5,7 @@ interface JavaWorker {
     };
   };
   generateJava(model: unknown, options: string): Record<string, string>;
-  onmessage: (event: MessageEvent<{ model: { arm?: boolean }; options: string }>) => Promise<void>;
+  onmessage: (event: MessageEvent<{ model: unknown; options: string }>) => Promise<void>;
   postMessage(message: { files?: Record<string, string>; error?: string }): void;
 }
 
@@ -14,7 +14,7 @@ scope.onmessage = async ({ data }) => {
   try {
     await import(new URL("./runtime.js", import.meta.url).href);
     const runtime = await scope.TeaVM.wasmGC.load(
-      new URL(data.model.arm ? "./arm.wasm" : "./generator.wasm", import.meta.url).href,
+      new URL("./generator.wasm", import.meta.url).href,
     );
     await runtime.exports.main([]);
     scope.postMessage({ files: scope.generateJava(data.model, data.options) });

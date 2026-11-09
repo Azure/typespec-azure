@@ -12,7 +12,7 @@ await execa(
 );
 const destination = new URL("dist/browser/java-wasm/", root);
 await mkdir(destination, { recursive: true });
-for (const name of ["generator.wasm", "arm.wasm", "runtime.js"]) {
+for (const name of ["generator.wasm", "runtime.js"]) {
   await cp(new URL(`wasm/target/wasm/${name}`, root), new URL(name, destination));
 }
 await cp(new URL("dist/browser/worker.js", root), new URL("worker.js", destination));

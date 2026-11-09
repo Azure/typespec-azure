@@ -8,20 +8,19 @@ import com.microsoft.typespec.http.client.generator.core.extension.model.codemod
 import com.microsoft.typespec.http.client.generator.core.extension.plugin.JavaSettings;
 import com.microsoft.typespec.http.client.generator.core.model.clientmodel.Client;
 import com.microsoft.typespec.http.client.generator.core.model.javamodel.JavaPackage;
+import com.microsoft.typespec.http.client.generator.fluent.TypeSpecFluentPlugin;
 import com.microsoft.typespec.http.client.generator.model.EmitterOptions;
 import io.clientcore.core.serialization.json.JsonReader;
-import java.util.function.BiFunction;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 
 public final class BrowserGenerator {
     public static void main(String[] args) {
-        publish((input, options) -> generate(input, options, BrowserGenerator::generateDataPlane));
+        publish(BrowserGenerator::generate);
     }
 
-    static JSObject generate(JSObject input, String optionsJson,
-        BiFunction<CodeModel, EmitterOptions, JavaPackage> generator) {
+    private static JSObject generate(JSObject input, String optionsJson) {
         EmitterOptions options;
         try (JsonReader reader = JsonReader.fromString(optionsJson)) {
             options = EmitterOptions.fromJson(reader);
@@ -33,7 +32,9 @@ public final class BrowserGenerator {
             options.setNamespace(codeModel.getLanguage().getJava().getNamespace());
         }
         options.setOutputDir("/output");
-        JavaPackage output = generator.apply(codeModel, options);
+        JavaPackage output = Boolean.TRUE.equals(options.getArm())
+            ? generateArm(codeModel, options)
+            : generateDataPlane(codeModel, options);
         JSObject files = newFiles();
         BrowserPostprocessor postprocessor = new BrowserPostprocessor();
         output.getJavaFiles().forEach(file -> addFile(files, file.getFilePath(),
@@ -44,9 +45,6 @@ public final class BrowserGenerator {
     }
 
     private static JavaPackage generateDataPlane(CodeModel codeModel, EmitterOptions options) {
-        if (Boolean.TRUE.equals(options.getArm())) {
-            throw new UnsupportedOperationException("The data-plane WASM target cannot generate ARM clients");
-        }
         TypeSpecPlugin plugin = new TypeSpecPlugin(options, false) {
             @Override
             public Boolean getBooleanValue(String key) {
@@ -57,13 +55,20 @@ public final class BrowserGenerator {
         return plugin.processTemplates(codeModel, client, JavaSettings.getInstance());
     }
 
+    private static JavaPackage generateArm(CodeModel codeModel, EmitterOptions options) {
+        TypeSpecFluentPlugin plugin = new TypeSpecFluentPlugin(options, false);
+        codeModel = plugin.preProcess(codeModel);
+        Client client = plugin.processClient(codeModel);
+        return plugin.processTemplates(codeModel, client);
+    }
+
     @JSFunctor
     interface Generator extends JSObject {
         JSObject generate(JSObject input, String optionsJson);
     }
 
     @JSBody(params = "generate", script = "globalThis.generateJava = generate;")
-    static native void publish(Generator generate);
+    private static native void publish(Generator generate);
 
     @JSBody(script = "return Object.create(null);")
     private static native JSObject newFiles();

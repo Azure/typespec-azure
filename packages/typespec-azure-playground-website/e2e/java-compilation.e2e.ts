@@ -8,15 +8,13 @@ import samples from "../samples/dist/samples.js";
 
 const run = promisify(execFile);
 
-for (const { sampleName, wasm, expectedFile } of [
+for (const { sampleName, expectedFile } of [
   {
     sampleName: "Widget Manager",
-    wasm: "generator.wasm",
     expectedFile: "contoso/widgetmanager/implementation/JsonMergePatchHelper.java",
   },
   {
     sampleName: "Tracked Resource",
-    wasm: "arm.wasm",
     expectedFile: "models/Employee.java",
   },
 ]) {
@@ -64,7 +62,7 @@ for (const { sampleName, wasm, expectedFile } of [
     expect(Object.keys(files)).toContainEqual(expect.stringContaining(expectedFile));
     expect(Object.keys(files)).toContain("pom.xml");
     expect(wasmRequests).toHaveLength(1);
-    expect(wasmRequests[0].endsWith(`/${wasm}`)).toBe(true);
+    expect(wasmRequests[0].endsWith("/generator.wasm")).toBe(true);
     const project = testInfo.outputPath("java");
     for (const [relative, content] of Object.entries(files)) {
       const parts = relative.split("/");
