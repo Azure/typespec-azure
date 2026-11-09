@@ -6,6 +6,7 @@ import { casingRule } from "./rules/casing-style.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
+import { listOperationMissing200ResponseRule } from "./rules/list-operation-missing-200-response.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
@@ -31,7 +32,6 @@ import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
-import { pageableRequires200ResponseRule } from "./rules/pageable-requires-200-response.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";
 import { preventUnknownType } from "./rules/prevent-unknown.js";
@@ -90,7 +90,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
-  pageableRequires200ResponseRule,
+  listOperationMissing200ResponseRule,
 ];
 
 export const $linter = defineLinter({

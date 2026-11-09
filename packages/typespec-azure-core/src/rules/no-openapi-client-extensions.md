@@ -49,28 +49,18 @@ Several LintDiff rules require or validate these same extensions in Swagger. Bec
 - `x-ms-azure-resource` — [ResourceHasXMsResourceEnabled (R2019)](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2019), [XmsResourceInPutResponse (R2062)](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2062)
 - `x-ms-secret` — [XMSSecretInResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-secret-in-response.md)
 
-The `x-ms-pageable` mapping above identifies the semantic paging constructs, not a response-code guarantee. Use [pageable-requires-200-response](./pageable-requires-200-response.md) to require HTTP 200 for operations marked with `@list`.
+The `x-ms-pageable` mapping above identifies the semantic paging constructs, not a response-code guarantee. Use [list-operation-missing-200-response](./list-operation-missing-200-response.md) to require HTTP 200 for operations marked with `@list`.
 
-## Examples
+## ❌ Incorrect
 
 ### `x-ms-long-running-operation`
-
-#### ❌ Incorrect
 
 ```tsp
 @OpenAPI.extension("x-ms-long-running-operation", true)
 op createWidget(...Widget): Widget;
 ```
 
-#### ✅ Correct
-
-```tsp
-op createWidget is Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace<Widget>;
-```
-
 ### `x-ms-enum`
-
-#### ❌ Incorrect
 
 ```tsp
 @OpenAPI.extension("x-ms-enum", #{ name: "PetKind", modelAsString: true })
@@ -80,7 +70,33 @@ enum PetKind {
 }
 ```
 
-#### ✅ Correct
+### `x-ms-client-name`
+
+```tsp
+model Widget {
+  @OpenAPI.extension("x-ms-client-name", "widgetName")
+  name: string;
+}
+```
+
+### `x-ms-secret`
+
+```tsp
+model Credentials {
+  @OpenAPI.extension("x-ms-secret", true)
+  key: string;
+}
+```
+
+## ✅ Correct
+
+### `x-ms-long-running-operation`
+
+```tsp
+op createWidget is Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace<Widget>;
+```
+
+### `x-ms-enum`
 
 ```tsp
 union PetKind {
@@ -92,17 +108,6 @@ union PetKind {
 
 ### `x-ms-client-name`
 
-#### ❌ Incorrect
-
-```tsp
-model Widget {
-  @OpenAPI.extension("x-ms-client-name", "widgetName")
-  name: string;
-}
-```
-
-#### ✅ Correct
-
 ```tsp
 model Widget {
   @clientName("widgetName")
@@ -111,17 +116,6 @@ model Widget {
 ```
 
 ### `x-ms-secret`
-
-#### ❌ Incorrect
-
-```tsp
-model Credentials {
-  @OpenAPI.extension("x-ms-secret", true)
-  key: string;
-}
-```
-
-#### ✅ Correct
 
 ```tsp
 model Credentials {

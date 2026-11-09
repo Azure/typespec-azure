@@ -10,13 +10,11 @@ The rule does not apply to operations without `@list`.
 
 Consistent HTTP 200 responses let clients handle list results reliably across pagination strategies.
 
-## Examples
+## ❌ Incorrect
 
 ### Standard ARM lists
 
 For a tracked resource named `Widget`, keep the standard list template's 200 response instead of replacing it with a 201 response.
-
-#### Incorrect
 
 ```tsp
 op listByResourceGroup is ArmResourceListByParent<
@@ -28,17 +26,9 @@ op listByResourceGroup is ArmResourceListByParent<
 >;
 ```
 
-#### Correct
-
-```tsp
-op listByResourceGroup is ArmResourceListByParent<Widget>;
-```
-
 ### Pageable data-plane POST operations
 
 The same requirement applies to a search operation using `RpcOperation` and the standard `Page<Widget>` response body.
-
-#### Incorrect
 
 ```tsp
 @list
@@ -53,7 +43,15 @@ op searchWidgets is RpcOperation<
 >;
 ```
 
-#### Correct
+## ✅ Correct
+
+### Standard ARM lists
+
+```tsp
+op listByResourceGroup is ArmResourceListByParent<Widget>;
+```
+
+### Pageable data-plane POST operations
 
 ```tsp
 @list
@@ -81,7 +79,7 @@ The ARM `use-standard-response-codes` rule also requires 200 for GET operations 
 Suppress only when required to describe an existing API. Changing a service's response status code may require a service change and can break existing clients.
 
 ```tsp
-#suppress "@azure-tools/typespec-azure-core/pageable-requires-200-response" "Preserve the existing service response."
+#suppress "@azure-tools/typespec-azure-core/list-operation-missing-200-response" "Preserve the existing service response."
 @list
 @post
 op searchWidgets is RpcOperation<
