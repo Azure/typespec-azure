@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { BrowserHost } from "@typespec/playground";
 import { execFile } from "node:child_process";
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
 import samples from "../samples/dist/samples.js";
@@ -52,7 +52,7 @@ for (const { sampleName, wasm, expectedFile } of [
           const path = `${directory}/${name}`;
           if ((await host.stat(path)).isDirectory()) {
             await visit(path);
-          } else if (path.endsWith(".java")) {
+          } else if (path.endsWith(".java") || path === `${root}/pom.xml`) {
             files[path.slice(root.length + 1)] = (await host.readFile(path)).text;
           }
         }
@@ -62,6 +62,7 @@ for (const { sampleName, wasm, expectedFile } of [
     }, sample);
 
     expect(Object.keys(files)).toContainEqual(expect.stringContaining(expectedFile));
+    expect(Object.keys(files)).toContain("pom.xml");
     expect(wasmRequests).toHaveLength(1);
     expect(wasmRequests[0].endsWith(`/${wasm}`)).toBe(true);
     const project = testInfo.outputPath("java");
@@ -72,7 +73,6 @@ for (const { sampleName, wasm, expectedFile } of [
       await mkdir(dirname(path), { recursive: true });
       await writeFile(path, content);
     }
-    await copyFile(new URL("./java/pom.xml", import.meta.url), join(project, "pom.xml"));
     const args = ["--batch-mode", "--no-transfer-progress", "-DskipTests", "compile"];
     const command = process.platform === "win32" ? (process.env.ComSpec ?? "cmd.exe") : "mvn";
     const commandArgs =

@@ -47,7 +47,12 @@ public final class BrowserGenerator {
         if (Boolean.TRUE.equals(options.getArm())) {
             throw new UnsupportedOperationException("The data-plane WASM target cannot generate ARM clients");
         }
-        TypeSpecPlugin plugin = new TypeSpecPlugin(options, false);
+        TypeSpecPlugin plugin = new TypeSpecPlugin(options, false) {
+            @Override
+            public Boolean getBooleanValue(String key) {
+                return "regenerate-pom".equals(key) ? Boolean.TRUE : super.getBooleanValue(key);
+            }
+        };
         Client client = plugin.processClient(codeModel);
         return plugin.processTemplates(codeModel, client, JavaSettings.getInstance());
     }
