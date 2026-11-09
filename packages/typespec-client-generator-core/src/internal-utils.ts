@@ -206,6 +206,71 @@ export function normalizeScope(scope?: LanguageScopes | DecoratorOptions): strin
 }
 
 /**
+ * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
+ * client-parameters model is passed directly as the second argument.
+ *
+ * Detection is based on model provenance rather than the model name alone:
+ * - The structural options `parameters` and `initializedBy` are declared only on
+ *   `ClientInitializationOptions`, so their presence unambiguously identifies the options bag
+ *   (this covers the common inline literal form `{ parameters: ..., scope: ... }`).
+ * - A *named* model that explicitly derives from `ClientInitializationOptions` through its
+ *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
+ *   ClientInitializationOptions { scope: "csharp"; }`).
+ *
+ * The provenance check follows `baseModel` (`extends`) as well as `sourceModel`/`sourceModels`
+ * (`model is`, `PickProperties`/`OmitProperties` and other spread-based transformations), so a named
+ * model derived from `ClientInitializationOptions` through any of those is still recognized.
+ *
+ * Anonymous model expressions are intentionally excluded from the provenance check: the compiler links
+ * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
+ * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
+ * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
+ * client-parameters model keeps its `scope` property a real client parameter, preserving backward
+ * compatibility for that previously supported form.
+ */
+export function isClientInitializationOptionsBag(options: Type): boolean {
+  if (options.kind !== "Model") {
+    return false;
+  }
+  if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
+    return true;
+  }
+  if (options.name === "") {
+    return false;
+  }
+  return derivesFromClientInitializationOptions(options);
+}
+
+/**
+ * Whether a model is `ClientInitializationOptions` (from `Azure.ClientGenerator.Core`) or derives
+ * from it through any combination of `extends` (`baseModel`) and `model is` / spread provenance
+ * (`sourceModel`/`sourceModels`).
+ */
+function derivesFromClientInitializationOptions(model: Model): boolean {
+  const visited = new Set<Model>();
+  const stack: (Model | undefined)[] = [model];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (current === undefined || visited.has(current)) {
+      continue;
+    }
+    visited.add(current);
+    if (
+      current.name === "ClientInitializationOptions" &&
+      current.namespace !== undefined &&
+      getNamespaceFullName(current.namespace) === "Azure.ClientGenerator.Core"
+    ) {
+      return true;
+    }
+    stack.push(current.baseModel, current.sourceModel);
+    for (const source of current.sourceModels) {
+      stack.push(source.model);
+    }
+  }
+  return false;
+}
+
+/**
  * Whether a decorator's `scope` argument is one of the marshalled forms handled by
  * {@link normalizeScope}: a legacy plain string, or a `valueof DecoratorOptions` value (a plain
  * JavaScript object). Compiler entities - a string-literal type from a custom decorator that

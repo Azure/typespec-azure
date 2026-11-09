@@ -9,19 +9,34 @@ import {
   type Type,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { parseScopes } from "../internal-utils.js";
+import { isClientInitializationOptionsBag, parseScopes } from "../internal-utils.js";
 
-export const noUnsupportedScopeRule = createRule({
-  name: "no-unsupported-scope",
-  description: "Use supported language scopes for TCGC decorators.",
+const supportedScopes = new Set([
+  "csharp",
+  "java",
+  "python",
+  "javascript",
+  "go",
+  "rust",
+  "cpp",
+  "autorest",
+]);
+const supportedScopesList = [...supportedScopes].map((scope) => `'${scope}'`).join(", ");
+const scopeSuggestions = new Map([
+  ["dotnet", "csharp"],
+  ["typescript", "javascript"],
+]);
+
+export const unsupportedScopeRule = createRule({
+  name: "unsupported-scope",
+  description: "Use supported scopes for TCGC decorators.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-unsupported-scope",
-  docs: fileRef.fromPackageRoot("src/rules/no-unsupported-scope.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/unsupported-scope",
+  docs: fileRef.fromPackageRoot("src/rules/unsupported-scope.md"),
   messages: {
-    default: paramMessage`Unsupported TCGC language scope '${"scope"}'. Supported Azure SDK scopes are 'csharp', 'java', 'python', 'javascript', and 'go'. Use 'javascript' for TypeScript SDKs.`,
+    default: paramMessage`Unsupported TCGC scope '${"scope"}'. Supported scopes are ${"supportedScopes"}.${"suggestion"}`,
   },
   create(context) {
-    const supportedScopes = new Set(["csharp", "java", "python", "javascript", "go"]);
     const reported = new Map<NonNullable<DecoratorArgument["node"]>, Set<string>>();
 
     function check(type: Type & DecoratedType) {
@@ -41,6 +56,13 @@ export const noUnsupportedScopeRule = createRule({
 
           let value = argument.value;
           if (value.entityKind === "Type" && value.kind === "Model") {
+            if (
+              parameter.name === "options" &&
+              definition.name === "@clientInitialization" &&
+              !isClientInitializationOptionsBag(value)
+            ) {
+              continue;
+            }
             const property = [...walkPropertiesInherited(value)].find((x) => x.name === "scope");
             if (!property) continue;
             value = property.type;
@@ -68,9 +90,14 @@ export const noUnsupportedScopeRule = createRule({
                 scopes.add(name);
                 reported.set(target, scopes);
               }
+              const suggestion = scopeSuggestions.get(name);
               context.reportDiagnostic({
                 target: target ?? type,
-                format: { scope: name },
+                format: {
+                  scope: name,
+                  supportedScopes: supportedScopesList,
+                  suggestion: suggestion ? ` Did you mean '${suggestion}' instead?` : "",
+                },
               });
             }
           }

@@ -47,7 +47,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": true,
 
     // TCGC rules
-    "@azure-tools/typespec-client-generator-core/no-unsupported-scope": true,
+    "@azure-tools/typespec-client-generator-core/unsupported-scope": true,
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
 

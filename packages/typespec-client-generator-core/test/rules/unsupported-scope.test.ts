@@ -1,13 +1,13 @@
-import { getSourceLocation, setTypeSpecNamespace } from "@typespec/compiler";
+import { setTypeSpecNamespace } from "@typespec/compiler";
 import {
   createLinterRuleTester,
+  extractSquiggles,
   mockFile,
-  t,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { noUnsupportedScopeRule } from "../../src/rules/no-unsupported-scope.js";
-import { ArmTester, SimpleTester } from "../tester.js";
+import { unsupportedScopeRule } from "../../src/rules/unsupported-scope.js";
+import { ArmTester, SimpleBaseTester, SimpleTester } from "../tester.js";
 
 let tester: LinterRuleTester;
 
@@ -15,16 +15,16 @@ beforeEach(async () => {
   const runner = await SimpleTester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noUnsupportedScopeRule,
+    unsupportedScopeRule,
     "@azure-tools/typespec-client-generator-core",
   );
 });
 
-describe("no-unsupported-scope", () => {
-  const diagnostic = (scope: string) => ({
-    code: "@azure-tools/typespec-client-generator-core/no-unsupported-scope",
+describe("unsupported-scope", () => {
+  const diagnostic = (scope: string, suggestion?: string) => ({
+    code: "@azure-tools/typespec-client-generator-core/unsupported-scope",
     severity: "warning" as const,
-    message: `Unsupported TCGC language scope '${scope}'. Supported Azure SDK scopes are 'csharp', 'java', 'python', 'javascript', and 'go'. Use 'javascript' for TypeScript SDKs.`,
+    message: `Unsupported TCGC scope '${scope}'. Supported scopes are 'csharp', 'java', 'python', 'javascript', 'go', 'rust', 'cpp', 'autorest'.${suggestion ? ` Did you mean '${suggestion}' instead?` : ""}`,
   });
 
   it.each([
@@ -33,6 +33,9 @@ describe("no-unsupported-scope", () => {
     "python",
     "javascript",
     "go",
+    "rust",
+    "cpp",
+    "autorest",
     "java, python",
     "!javascript",
     "!(csharp, java)",
@@ -59,50 +62,96 @@ describe("no-unsupported-scope", () => {
       .toBeValid();
   });
 
-  it.each(["typescript", "dotnet", "JavaScript", "custom"])(
-    "rejects unsupported scope %s",
-    async (scope) => {
-      await tester
-        .expect(`@alternateType(string, "${scope}") scalar CustomDate extends utcDateTime;`)
-        .toEmitDiagnostics([diagnostic(scope)]);
-    },
-  );
+  it.each(["JavaScript", "custom"])("rejects unsupported scope %s", async (scope) => {
+    await tester
+      .expect(`@alternateType(string, "${scope}") scalar CustomDate extends utcDateTime;`)
+      .toEmitDiagnostics([diagnostic(scope)]);
+  });
+
+  it.each([
+    ["typescript", "javascript"],
+    ["dotnet", "csharp"],
+  ])("suggests the supported scope for %s", async (scope, suggestion) => {
+    await tester
+      .expect(`@alternateType(string, "${scope}") scalar CustomDate extends utcDateTime;`)
+      .toEmitDiagnostics([diagnostic(scope, suggestion)]);
+  });
 
   it.each(["java, typescript", "!typescript", "!(java, typescript)", "!typescript, python"])(
     "checks every parsed scope in %s",
     async (scope) => {
       await tester
         .expect(`@clientName("Renamed", "${scope}") model Test {}`)
-        .toEmitDiagnostics([diagnostic("typescript")]);
+        .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
     },
   );
 
   it("reports all unsupported scopes without repeating the same scope", async () => {
     await tester
       .expect(`@clientName("Renamed", "typescript, ruby, typescript") model Test {}`)
-      .toEmitDiagnostics([diagnostic("typescript"), diagnostic("ruby")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript"), diagnostic("ruby")]);
   });
 
   it("checks value options bags", async () => {
     await tester
       .expect(`@clientName("Renamed", #{scope: "typescript"}) model Test {}`)
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("points to the unsupported scope argument", async () => {
-    await tester
-      .expect(t.code`@clientName("Renamed", "typescript") model ${t.model("Test")} {}`)
-      .toEmitDiagnostics(({ Test }) => {
-        const { file } = getSourceLocation(Test);
-        const pos = file.text.indexOf('"typescript"');
-        return { ...diagnostic("typescript"), pos, end: pos + '"typescript"'.length };
-      });
+    const { source, pos, end } = extractSquiggles(`
+      import "@azure-tools/typespec-client-generator-core";
+      using Azure.ClientGenerator.Core;
+      @clientName("Renamed", ~~~"typescript"~~~) model Test {}
+    `);
+    await createLinterRuleTester(
+      await SimpleBaseTester.createInstance(),
+      unsupportedScopeRule,
+      "@azure-tools/typespec-client-generator-core",
+    )
+      .expect(source)
+      .toEmitDiagnostics([{ ...diagnostic("typescript", "javascript"), pos, end }]);
   });
 
-  it.each(["client", "clientInitialization"])("checks @%s model options", async (decorator) => {
+  it("checks @client model options", async () => {
     await tester
-      .expect(`@${decorator}({scope: "typescript"}) namespace Test;`)
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .expect(`@client({scope: "typescript"}) namespace Test;`)
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
+  });
+
+  it("checks @clientInitialization options bags", async () => {
+    await tester
+      .expect(`@clientInitialization({parameters: {}, scope: "typescript"}) namespace Test;`)
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
+  });
+
+  it.each([
+    `@clientInitialization({scope: "https://management.azure.com/.default"}) namespace Test;`,
+    `model Parameters { scope: "https://management.azure.com/.default"; }
+     @clientInitialization(Parameters) namespace Test {}`,
+  ])("does not interpret legacy client parameters as emitter scopes: %s", async (code) => {
+    await tester.expect(code).toBeValid();
+  });
+
+  it.each([
+    `model Options extends ClientInitializationOptions { scope: "typescript"; }
+     @clientInitialization(Options) namespace Test {}`,
+    `model Options extends ClientInitializationOptions { scope: "typescript"; }
+     model Copy is PickProperties<Options, "scope">;
+     @clientInitialization(Copy) namespace Test {}`,
+  ])("checks scope-only options identified by model provenance: %s", async (code) => {
+    await tester.expect(code).toEmitDiagnostics([diagnostic("typescript", "javascript")]);
+  });
+
+  it("still checks a positional scope with legacy client parameters", async () => {
+    await tester
+      .expect(
+        `
+        @clientInitialization({scope: "https://management.azure.com/.default"}, "typescript")
+        namespace Test;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("checks inherited scope options", async () => {
@@ -114,7 +163,7 @@ describe("no-unsupported-scope", () => {
         @client(Options) namespace Test {}
       `,
       )
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it.each([
@@ -130,7 +179,7 @@ describe("no-unsupported-scope", () => {
     `@scope("typescript") op test(): void;`,
     `model Test {} @@clientName(Test, "Renamed", "typescript");`,
   ])("checks decorated declarations: %s", async (code) => {
-    await tester.expect(code).toEmitDiagnostics([diagnostic("typescript")]);
+    await tester.expect(code).toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("checks copied decorators only once", async () => {
@@ -143,13 +192,13 @@ describe("no-unsupported-scope", () => {
         model Derived extends Base {}
       `,
       )
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("checks uninstantiated templates", async () => {
     await tester
       .expect(`@clientName("Renamed", "typescript") model Test<T> { value: T; }`)
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("checks instantiated templates only once", async () => {
@@ -161,7 +210,7 @@ describe("no-unsupported-scope", () => {
         model Second is Test<int32>;
       `,
       )
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("checks scope values supplied as template arguments", async () => {
@@ -173,7 +222,7 @@ describe("no-unsupported-scope", () => {
         model Invalid is Test<"typescript">;
       `,
       )
-      .toEmitDiagnostics([diagnostic("typescript")]);
+      .toEmitDiagnostics([diagnostic("typescript", "javascript")]);
   });
 
   it("does not interpret other decorator arguments as scopes", async () => {
@@ -190,7 +239,7 @@ describe("no-unsupported-scope", () => {
       .createInstance();
     await createLinterRuleTester(
       runner,
-      noUnsupportedScopeRule,
+      unsupportedScopeRule,
       "@azure-tools/typespec-client-generator-core",
     )
       .expect(
@@ -205,14 +254,14 @@ describe("no-unsupported-scope", () => {
   it("supports suppression for already-shipped APIs", async () => {
     await SimpleTester.compile(
       `
-      #suppress "@azure-tools/typespec-client-generator-core/no-unsupported-scope" "Preserve the shipped API."
+      #suppress "@azure-tools/typespec-client-generator-core/unsupported-scope" "Preserve the shipped API."
       @alternateType(string, "typescript")
       scalar CustomDate extends utcDateTime;
     `,
       {
         compilerOptions: {
           linterRuleSet: {
-            enable: { "@azure-tools/typespec-client-generator-core/no-unsupported-scope": true },
+            enable: { "@azure-tools/typespec-client-generator-core/unsupported-scope": true },
           },
         },
       },
@@ -234,7 +283,7 @@ describe("no-unsupported-scope", () => {
     const runner = await ArmTester.createInstance();
     await createLinterRuleTester(
       runner,
-      noUnsupportedScopeRule,
+      unsupportedScopeRule,
       "@azure-tools/typespec-client-generator-core",
     )
       .expect("model Test {}")

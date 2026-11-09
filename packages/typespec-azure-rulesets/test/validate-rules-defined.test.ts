@@ -73,7 +73,7 @@ describe("expect all rules to be defined", () => {
     for (const name of ["data-plane", "resource-manager", "client-sdk"]) {
       ok(
         $linter.ruleSets?.[name].enable?.[
-          "@azure-tools/typespec-client-generator-core/no-unsupported-scope"
+          "@azure-tools/typespec-client-generator-core/unsupported-scope"
         ],
       );
     }
