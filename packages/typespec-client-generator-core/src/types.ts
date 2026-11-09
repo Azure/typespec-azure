@@ -1667,7 +1667,7 @@ export function getSdkModelPropertyType(
   return diagnostics.wrap(property);
 }
 
-function getEffectiveSdkModelProperty(
+export function getEffectiveSdkModelProperty(
   model: SdkModelType,
   rawProperty: ModelProperty,
 ): SdkModelPropertyType | undefined {
