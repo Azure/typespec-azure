@@ -138,7 +138,7 @@ model Employee {
 
 :::note
 
-Do not use the property-replacement pattern above just to change a paging `nextLink`'s URI or read-only/visibility metadata. In general, if it is worth correcting the API for one version, correct previous versions too when the field was already a URL; use version-specific models only when the earlier field was not a URL or the wire contract otherwise differs. For standard ARM list-operation and page templates, see [Resource List Operations](./resource-operations.md#resource-list-operations-get).
+If a change corrects the API contract for one version, it is generally appropriate to make the same correction in previous versions that share that contract. Use version-specific models when an earlier version intentionally has a different contract.
 
 :::
 
