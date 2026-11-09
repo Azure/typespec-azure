@@ -286,6 +286,7 @@ function validateServiceConfigurations(context: TCGCContext): void {
         .some(
           (service) =>
             !isSameServiceConfigurations(
+              context,
               catalog,
               getAzureServiceConfigurations(context.program, service),
             ),
@@ -305,6 +306,7 @@ function validateServiceConfigurations(context: TCGCContext): void {
       .find(
         (type) =>
           !isSameServiceConfigurations(
+            context,
             catalog,
             getClientServiceConfigurations(context, { ...client, type }),
           ),

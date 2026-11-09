@@ -119,7 +119,7 @@ ${x}
  * Base tester for TCGC tests with Azure Core libraries loaded but no auto-imports/usings.
  */
 export const AzureCoreBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
-  features: ["typeref"],
+  features: ["typeref", "declaration-expressions"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",

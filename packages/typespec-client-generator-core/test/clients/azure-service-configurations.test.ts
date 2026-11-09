@@ -732,6 +732,84 @@ it.each([false, true])(
   },
 );
 
+it.each([false, true])(
+  "compares merged endpoint anonymous enum wire values: conflict=%s",
+  async (conflict) => {
+    const { program } = await AzureCoreTester.compile(`
+      ${definitions}
+      model FirstParameters { region: enum { East: "east" }; }
+      model SecondParameters { region: enum { East: "${conflict ? "east-government" : "east"}" }; }
+      const FirstConfigurations = #{
+        public: #{ endpoint: "https://{region}.example.com", parameters: typeref(FirstParameters), authentication: typeref(PublicAuth) },
+      };
+      const SecondConfigurations = #{
+        public: #{ endpoint: "https://{region}.example.com", parameters: typeref(SecondParameters), authentication: typeref(PublicAuth) },
+      };
+      @service @azureServiceConfigurations(FirstConfigurations)
+      namespace First { @get @route("/first") op first(): void; }
+      @service @azureServiceConfigurations(SecondConfigurations)
+      namespace Second { @get @route("/second") op second(): void; }
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+    `);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toEqual([]);
+    expectDiagnostics(
+      program.diagnostics,
+      conflict
+        ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
+        : [],
+    );
+  },
+);
+
+it.each([
+  {
+    name: "different byte encodings",
+    first: '@encode("base64") region: bytes;',
+    second: '@encode("base64url") region: bytes;',
+    conflict: true,
+  },
+  {
+    name: "implicit and explicit base64",
+    first: "region: bytes;",
+    second: '@encode("base64") region: bytes;',
+    conflict: false,
+  },
+  {
+    name: "different timestamp wire types",
+    first: '@encode("unixTimestamp", int64) region: utcDateTime;',
+    second: '@encode("unixTimestamp", int32) region: utcDateTime;',
+    conflict: true,
+  },
+])("compares merged endpoint encodings: $name", async ({ first, second, conflict }) => {
+  const { program } = await AzureCoreTester.compile(`
+    ${definitions}
+    model FirstParameters { ${first} }
+    model SecondParameters { ${second} }
+    const FirstConfigurations = #{
+      public: #{ endpoint: "https://{region}.example.com", parameters: typeref(FirstParameters), authentication: typeref(PublicAuth) },
+    };
+    const SecondConfigurations = #{
+      public: #{ endpoint: "https://{region}.example.com", parameters: typeref(SecondParameters), authentication: typeref(PublicAuth) },
+    };
+    @service @azureServiceConfigurations(FirstConfigurations)
+    namespace First { @get @route("/first") op first(): void; }
+    @service @azureServiceConfigurations(SecondConfigurations)
+    namespace Second { @get @route("/second") op second(): void; }
+    @client({service: [First, Second], autoMergeService: true})
+    namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  expectDiagnostics(
+    program.diagnostics,
+    conflict
+      ? [{ code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service" }]
+      : [],
+  );
+});
+
 it("uses public authentication regardless of declaration order", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}

@@ -15,6 +15,7 @@ import {
   type Enum,
   getDeprecationDetails,
   getDoc,
+  getEncode,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getSummary,
@@ -100,7 +101,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics } from "./types.js";
+import { addEncodeInfo, getClientTypeWithDiagnostics, getSdkBuiltInType } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -1590,7 +1591,27 @@ function isSameConfigurationAuth(left: Authentication, right: Authentication): b
   );
 }
 
+function getConfigurationParameterEncoding(context: TCGCContext, parameter: ModelProperty) {
+  if (parameter.type.kind !== "Scalar") {
+    const encoding = getEncode(context.program, parameter);
+    return {
+      encode: encoding?.encoding,
+      wireType: encoding ? getTypeName(encoding.type) : undefined,
+    };
+  }
+  const type = getSdkBuiltInType(context, parameter.type);
+  context.program.reportDiagnostics(addEncodeInfo(context, parameter, type)[1]);
+  return {
+    encode: type.encode,
+    // Encoded bytes use strings even when the SDK type omits the default wire type.
+    wireType:
+      type.wireType?.kind ??
+      (type.kind === "bytes" && type.encode !== "bytes" ? "string" : type.kind),
+  };
+}
+
 export function isSameServiceConfigurations(
+  context: TCGCContext,
   left: AzureServiceConfigurations | undefined,
   right: AzureServiceConfigurations | undefined,
 ): boolean {
@@ -1617,7 +1638,19 @@ export function isSameServiceConfigurations(
       if (
         !otherParameter ||
         getTypeName(parameter.type) !== getTypeName(otherParameter.type) ||
+        (parameter.type.kind === "Enum" &&
+          otherParameter.type.kind === "Enum" &&
+          !unorderedArrayEquals(
+            [...parameter.type.members.values()],
+            [...otherParameter.type.members.values()],
+            (left, right) =>
+              left.name === right.name && (left.value ?? left.name) === (right.value ?? right.name),
+          )) ||
         parameter.optional !== otherParameter.optional ||
+        !deepEquals(
+          getConfigurationParameterEncoding(context, parameter),
+          getConfigurationParameterEncoding(context, otherParameter),
+        ) ||
         !deepEquals(
           parameter.defaultValue ? getValueTypeValue(parameter.defaultValue) : undefined,
           otherParameter.defaultValue ? getValueTypeValue(otherParameter.defaultValue) : undefined,
