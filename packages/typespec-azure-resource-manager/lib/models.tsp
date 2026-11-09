@@ -24,8 +24,6 @@ namespace Azure.ResourceManager;
  * model Employee is TrackedResource<EmployeeProperties> {
  *  ...ResourceNameParameter<
  *    Resource = Employee,
- *    KeyName = "employeeName",
- *    SegmentName = "employees",
  *    NamePattern = "^[^<>%&:?#/\\\\]+$"
  *  >;
  * }
@@ -103,13 +101,8 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
  *
  * @example
  * ```typespec
- * model PetInstance is ExtensionResource<PetProperties> {
- *  @key
- *  @path
- *  @segment("petInstances")
- *  @pattern("^[a-zA-Z0-9-]{3,24}$")
- *  @visibility(Lifecycle.Read)
- *  name: string;
+ * model Pet is ExtensionResource<PetProperties> {
+ *  ...ResourceNameParameter<Pet>;
  * }
  * ```
  */
@@ -427,7 +420,7 @@ alias Encryption = EncryptionProperty;
  *
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
- *   ...Encryption;
+ *   ...EncryptionProperty;
  * }
  * ```
  */

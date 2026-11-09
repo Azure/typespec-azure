@@ -6,17 +6,17 @@ llmstxt: true
 
 You can create parent/child relationships between resource types by using the `@parentResource` decorator when defining a resource type.
 
-For example, here's how you could create a new `AddressResource` resource under the `User` defined above:
+For example, here's how you could create a new `Address` resource under the `User` defined above:
 
 ```typespec
 /** An address resource belonging to a user resource */
 @parentResource(User)
-model AddressResource is ProxyResource<AddressResourceProperties> {
-  ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
+model Address is ProxyResource<AddressProperties> {
+  ...ResourceNameParameter<Address>;
 }
 
-/** The properties of AddressResource */
-model AddressResourceProperties {
+/** The properties of Address */
+model AddressProperties {
   /** The street address */
   streetAddress: string;
 
@@ -32,16 +32,16 @@ model AddressResourceProperties {
 
 @armResourceOperations
 interface Addresses {
-  get is ArmResourceRead<AddressResource>;
-  create is ArmResourceCreateOrReplaceSync<AddressResource>;
+  get is ArmResourceRead<Address>;
+  create is ArmResourceCreateOrReplaceSync<Address>;
   update is ArmCustomPatchSync<
-    AddressResource,
+    Address,
     Azure.ResourceManager.Foundations.ResourceUpdateModel<
-      AddressResource,
-      AddressResourceProperties
+      Address,
+      AddressProperties
     >
   >;
-  delete is ArmResourceDeleteSync<AddressResource>;
-  listByParent is ArmResourceListByParent<AddressResource>;
+  delete is ArmResourceDeleteSync<Address>;
+  listByParent is ArmResourceListByParent<Address>;
 }
 ```

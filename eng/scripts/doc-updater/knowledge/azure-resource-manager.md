@@ -64,6 +64,8 @@ Canonical ARM samples are under `packages/samples/specs/resource-manager/`:
 
 Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `operationsTest/` no longer exist.
 
+Canonical current ARM samples use `Azure.ResourceManager.CommonTypes.Versions.v6`. Getting-started examples should use v6 unless they are specifically demonstrating version progression or a feature's minimum supported common-types version.
+
 ## TSP Doc Comment Patterns
 
 - `@dev` comments are intentional and must never be removed or converted to regular doc comments.
@@ -171,6 +173,17 @@ Identity paths are matched case-insensitively for literal segments and by positi
 - `use-model-request-body` requires non-multipart request bodies to use plain models without indexers.
 - `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
 - `lro-response-mismatch` validates that PUT and PATCH final results match the resource type, DELETE final results are `void`, and POST final results match successful response bodies.
+- `use-resource-path-for-put` requires PUT paths to end in ARM resource type/name pairs after the provider namespace.
+- `use-scope-path-standard-name` requires the serialized scope parameter names `subscriptionId` and `resourceGroupName`.
+- `use-scope-for-extension-routing` is an opt-in RPaaS rule that requires arbitrary-scope extension routes; it is not a general restriction on specific-parent ARM extension resources.
+- `use-standard-response-codes` allows only standard ARM response codes and applies the stricter GET response requirements inside service namespaces.
+- `use-standard-error` requires non-HEAD operations to have an `@error` response using the ARM common-types `ErrorResponse`.
+- `no-response-body` requires empty bodies for 202, 204, and DELETE 200 responses and bodies for other success responses, except HEAD and POST 200.
+- `no-empty-post-response` requires synchronous resource POST 200 responses to have a body.
+- `no-tags-on-proxy-resource` rejects envelope `tags` on non-tracked resources.
+- `no-repeated-path-info` rejects PUT properties-bag members that repeat path or query parameter names.
+- `private-endpoint-apis-missing` requires a service that exposes any private endpoint path for a parent resource to expose the connection point, connection collection, and private link collection paths.
+- `lro-missing-polling-metadata` requires native polling metadata when asynchronous responses or polling headers indicate an LRO.
 
 When these rules are added or promoted, update both the generated linter reference and the manually maintained rule evaluation and RPC coverage guides.
 
@@ -183,3 +196,5 @@ The internal `getFeatureFileSet` accessor returns the enum configured by `@featu
 ## Documentation Feedback
 
 Use rendered documentation URLs for canonical sample links and link to canonical samples through the published samples site (`https://azure.github.io/typespec-azure/docs/samples/...`) rather than the repository source tree. In examples, omit every template argument that is equal to its declared default, including inferred `ResourceNameParameter` key, segment, and name-pattern values.
+
+Keep rule summaries focused on the public contract enforced by the rule. Avoid adding implementation-specific selector, projection, diagnostic-count, or targeting details to overview tables unless those details are necessary for users and are part of the stable documented behavior.

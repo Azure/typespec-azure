@@ -47,7 +47,7 @@ The following operation templates for different kinds of actions are provided in
 ## Custom Operations
 
 Alternately, you may define custom operations for extraordinary scenarios. Be sure to have a discussion with the ARM team before defining a custom operation.
-There are strict guidelines around ARM operations, and you may need to get special signoff for operation that are not expressible using the templates.
+There are strict guidelines around ARM operations, and you may need to get special signoff for operations that are not expressible using the templates.
 
 In a custom operation, you define the operation parameters, responses, http verb, and so on. For example, here is an operation defining a simple custom action.
 

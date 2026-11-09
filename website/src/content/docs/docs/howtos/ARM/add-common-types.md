@@ -58,12 +58,20 @@ Creating a new version of an existing common type mostly involves editing what i
      @@armCommonDefinition(
        ManagedServiceIdentityWithDelegation,
        "ManagedServiceIdentityWithDelegation",
-       Azure.ResourceManager.CommonTypes.Versions.v4
+       Azure.ResourceManager.CommonTypes.Versions.v4,
+       "managedidentitywithdelegation.json"
      );
      @@armCommonDefinition(
        ManagedServiceIdentityWithDelegation,
        "ManagedServiceIdentityWithDelegation",
-       Azure.ResourceManager.CommonTypes.Versions.v5
+       Azure.ResourceManager.CommonTypes.Versions.v5,
+       "managedidentitywithdelegation.json"
+     );
+     @@armCommonDefinition(
+       ManagedServiceIdentityWithDelegation,
+       "ManagedServiceIdentityWithDelegation",
+       Azure.ResourceManager.CommonTypes.Versions.v6,
+       "managedidentitywithdelegation.json"
      );
      ```
 

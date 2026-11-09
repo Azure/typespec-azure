@@ -23,10 +23,10 @@ The `Azure.ResourceManager` library provides the following header models for lon
 Each header model accepts a `FinalResult` parameter that indicates the type of the logical result
 of the operation. It is important that this value matches what the operation actually returns.
 
-## CreateOrUpdate (PUT)
+## CreateOrReplace (PUT)
 
-The `ArmResourceCreateOrReplaceAsync` and `ArmResourceCreateOrUpdateAsync` templates use
-`ArmAsyncOperationHeader` by default with the resource as the final result.
+The `ArmResourceCreateOrReplaceAsync` template uses `ArmAsyncOperationHeader` by default with the
+resource as the final result.
 
 ### Default
 

@@ -18,11 +18,11 @@ Define your API versions in an enum. For each version, specify dependencies and 
 /** Contoso API versions */
 enum Versions {
   /** 2021-10-01-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   v1,
 
   /** 2022-11-01-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   v2,
 }
 ```

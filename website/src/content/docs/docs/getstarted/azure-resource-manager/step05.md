@@ -33,7 +33,7 @@ using Azure.ResourceManager;
 /** Contoso Resource Provider management API */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
 namespace Microsoft.ContosoProviderHub;
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -101,12 +101,12 @@ interface Users {
 
 /** An address resource belonging to a user resource */
 @parentResource(User)
-model AddressResource is ProxyResource<AddressResourceProperties> {
-  ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
+model Address is ProxyResource<AddressProperties> {
+  ...ResourceNameParameter<Address>;
 }
 
-/** The properties of AddressResource */
-model AddressResourceProperties {
+/** The properties of Address */
+model AddressProperties {
   /** The street address */
   streetAddress: string;
 
@@ -125,17 +125,17 @@ model AddressResourceProperties {
 
 @armResourceOperations
 interface Addresses {
-  get is ArmResourceRead<AddressResource>;
-  create is ArmResourceCreateOrReplaceSync<AddressResource>;
+  get is ArmResourceRead<Address>;
+  create is ArmResourceCreateOrReplaceSync<Address>;
   update is ArmCustomPatchSync<
-    AddressResource,
+    Address,
     Azure.ResourceManager.Foundations.ResourceUpdateModel<
-      AddressResource,
-      AddressResourceProperties
+      Address,
+      AddressProperties
     >
   >;
-  delete is ArmResourceDeleteSync<AddressResource>;
-  listByParent is ArmResourceListByParent<AddressResource>;
+  delete is ArmResourceDeleteSync<Address>;
+  listByParent is ArmResourceListByParent<Address>;
   checkGlobalName is checkGlobalNameAvailability;
 }
 ```

@@ -17,7 +17,7 @@ For example:
 ```typespec
 @armProviderNamespace
 @service(#{ title: "Contoso User Service" })
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
 namespace Contoso.Users;
 ```
 
