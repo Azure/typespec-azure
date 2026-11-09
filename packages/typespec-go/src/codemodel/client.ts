@@ -327,6 +327,8 @@ interface LROMethodBase extends HttpMethodBase {
   finalStateVia?: FinalStateVia;
 
   operationLocationResultPath?: string;
+
+  finalResponseResultPath?: string[];
 }
 
 interface HttpMethodBase extends method.Method<Client, result.ResponseEnvelope> {
