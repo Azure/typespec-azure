@@ -72,6 +72,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": true,
     "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch": false,
     "@azure-tools/typespec-azure-resource-manager/use-standard-error": false,
+    "@azure-tools/typespec-azure-resource-manager/missing-error-decorator": false,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": true,
