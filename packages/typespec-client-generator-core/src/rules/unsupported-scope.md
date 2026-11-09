@@ -1,4 +1,4 @@
-Checks emitter scopes on TCGC decorators, including `@alternateType`, `@clientName`, and `@scope`. It validates legacy string arguments, `DecoratorOptions` values, and `scope` properties in `@client` and `@clientInitialization` options.
+Checks emitter scopes on TCGC decorators. It validates legacy string arguments, `DecoratorOptions` values, and `scope` properties in `@client` and `@clientInitialization` options.
 
 The supported scopes are:
 
