@@ -75,7 +75,7 @@ export function generateServerFactory(pkg: go.FakePackage, target: go.CodeModelT
   text += "func (s *ServerFactoryTransport) Do(req *http.Request) (*http.Response, error) {\n";
   text += `${indent.get()}rawMethod := req.Context().Value(runtime.CtxAPINameKey{})\n`;
   text += `${indent.get()}method, ok := rawMethod.(string)\n`;
-  text += `${indent.get()}if !ok {\n${indent.push().get()}return nil, nonRetriableError{errors.New("unable to dispatch request, missing value for CtxAPINameKey")}\n${indent.pop().get()}}\n\n`;
+  text += `${indent.get()}if !ok {\n${indent.push().get()}return nil, &nonRetriableError{errors.New("unable to dispatch request, missing value for CtxAPINameKey")}\n${indent.pop().get()}}\n\n`;
   text += `${indent.get()}client := method[:strings.Index(method, ".")]\n`;
   text += `${indent.get()}var resp *http.Response\n${indent.get()}var err error\n\n`;
   text += `${indent.get()}switch client {\n`;

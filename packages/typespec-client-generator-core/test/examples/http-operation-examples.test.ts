@@ -101,6 +101,59 @@ it("parameters", async () => {
   expectDiagnostics(context.diagnostics, []);
 });
 
+it.each(["filter", "filter*"])("query object {%s} retains scalar fields", async (expansion) => {
+  const instance = await SimpleTester.createInstance();
+  instance.fs.addTypeSpecFile(
+    "examples/query-object.json",
+    JSON.stringify({
+      operationId: "queryObject",
+      title: "query object",
+      parameters: {
+        filter: {
+          "display-name": "active",
+          count: 0,
+          enabled: false,
+          date: "2024-01-01T00:00:00Z",
+          kind: "fixed",
+        },
+      },
+      responses: { "204": {} },
+    }),
+  );
+  const { program } = await instance.compile(`
+    @service namespace TestClient;
+    model BaseFilter {
+      @encodedName("application/json", "display-name") name: string;
+    }
+    model Filter extends BaseFilter {
+      @clientName("total")
+      count?: int32;
+      enabled: boolean;
+      date: utcDateTime;
+      kind: "fixed";
+    }
+    @route("/items{?${expansion}}")
+    op queryObject(filter?: Filter): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, []);
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  strictEqual(operation.examples?.length, 1);
+  const value = operation.examples[0].parameters[0].value;
+  strictEqual(value.kind, "model");
+  deepStrictEqual(
+    Object.fromEntries(Object.entries(value.value).map(([name, field]) => [name, field.value])),
+    {
+      "display-name": "active",
+      count: 0,
+      enabled: false,
+      date: "2024-01-01T00:00:00Z",
+      kind: "fixed",
+    },
+  );
+});
+
 it("body with encoded name", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(

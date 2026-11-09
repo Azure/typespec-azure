@@ -232,6 +232,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Enumeration Types:**
 
 - [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- `SdkEnumValueType.value` retains the original member value, or its TypeSpec name when no value is specified. `@encodedName` names are exposed separately as `serializationOptions.json.name` and `serializationOptions.xml.name`; an unset option falls back to `value`. `SdkEnumType.valueType` and member `valueType` retain the client-facing type. Member options use the shared `SerializationOptions` type and follow the same content-type propagation as models and properties, including explicit serialization metadata on orphan types. This also applies to enum members flattened into unions. Emitters can use the options for the protocol being serialized without replacing client-facing enum values or defaults. Discriminator tags and subtype mapping keys retain their original spec values independently of encoded names; JSON example matching uses the JSON wire value.
 - For a union converted to an enum, an explicit scalar `extends` constraint determines `SdkEnumType.valueType` and the value type of its known variants, taking precedence over scalar variants and literal-based inference. For example, `union Priority extends int64 { low: 1, high: 2 }` has an `int64` value type rather than an inferred `int32`. The constraint does not make the enum extensible: `isFixed` remains `true` unless the union includes an open scalar variant, directly or through a nested union.
 
 **Literal Types:**
@@ -374,6 +375,79 @@ Azure.Core remains responsible for polling links, parameter bindings, terminal s
 The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
+
+#### LRO status metadata
+
+The TCGC-only `@lroStatusMetadata` decorator lets an SDK expose auxiliary status-monitor metadata without changing Azure.Core polling protocol semantics or the normal method response:
+
+```typespec
+model OperationStatus {
+  status: OperationState;
+
+  @lroStatusMetadata
+  percentComplete?: int32;
+
+  @lroStatusMetadata
+  requestId?: string;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(@path operationId: string): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.statusMetadata` contains wrappers around the exact cached `SdkModelPropertyType` objects from the polling response model, in deterministic direct-then-inherited model/property order. Consequently, client and wire names, optionality, decorators, serialization, and property types are preserved. These properties are auxiliary operation or poller state and do not affect polling, status evaluation, error handling, final-result extraction, or polling and final locations. TCGC diagnoses attempts to decorate those structural LRO properties. An auxiliary `errors` array containing per-item diagnostics may be selected, but a property designated as the structural LRO error by `@lroErrorResult` or Azure.Core conventions may not.
+
+Each active decorated direct or inherited property applies to every LRO that uses that status-monitor model. Decorate each property to expose several values; the decorator is property-level only. Nested properties are not scanned; decorate the direct property to expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`, and inclusion or negation on each property.
+
+Each entry also provides `propertySegments`, following the typed segment convention used by paging and LRO final results. The path is rooted at `pollingInfo.responseModel`, not the final result or HTTP response wrapper. Currently it contains a single segment identical to `property`, including for inherited properties; hierarchy reconciliation updates both to the retained SDK property. Segments carry SDK names in `name` and JSON wire names in `serializationOptions.json.name`. The path does not describe an arbitrary replacement model supplied by `@alternateType` through `pollingStep.responseBody`.
+
+Values come from the most recent status-monitor response the SDK has received, including the initial response when it contains the status-monitor model. Any value may be absent until a response containing it arrives. Metadata remains exposed on failed or canceled terminal responses, independently of whether a logical final result is available. Emitters expose these values on their idiomatic poller or operation object and should keep them current after each poll. Metadata is not part of the continuation token; after rehydration, it is populated again by the next poll.
+
+TCGC describes the selected properties, not runtime response values. Language emitters must implement this lifecycle and their public accessor shape; Spector HTTP scenarios alone do not demonstrate generated poller access or removal of SDK customizations. An emitter that already exposes a typed status-monitor response may satisfy this contract through its existing operation or poller API, provided it reflects the latest received response and remains accessible after failure or cancellation.
+
+Separate `@lroStatusMetadata` declarations on one property use the standard TCGC scope rules, including overlapping scopes. Each selected property appears only once in the metadata collection. Projected client-name conflicts are handled by the existing `duplicate-client-name` validation, not a separate LRO metadata diagnostic.
+
+Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
+
+#### Legacy LRO operation identity
+
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service that returns a server-issued identifier in its status-monitor URI, response body, or both:
+
+```typespec
+model OperationStatus {
+  @lroOperationId
+  id: string;
+
+  status: OperationState;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact `SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact `SdkModelPropertyType` for the status-monitor body. The path form is available from the initial response and must remain derivable after poller rehydration from the stored polling URL. The property form becomes available only after a status-monitor response is received.
+
+For `kind: "property"`, `propertySegments` gives the access path from `pollingInfo.responseModel` to the ID, following the segment representation used by paging metadata. Currently only direct or inherited properties are selectable, so the path is `[property]`; inheritance does not add a JSON nesting level. Each segment is the exact effective SDK property, carrying its client name and `serializationOptions.json.name` for emitters reading a typed model or raw JSON. An overridden base property is not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names and serialization metadata.
+
+TCGC validates active operation ID selections while processing each LRO. A selected response property must be string-like; invalid selections are diagnosed and omitted. Annotations on models not used by the LRO, or excluded by emitter scope or response visibility, have no effect.
+
+For example, after the body-only Translation scenario returns `{ id: "translation-123", status: "Running" }`, an emitter reads the selected `id` using `propertySegments` and exposes `"translation-123"` through its operation or poller accessor. No ID is available before that response in the body-only case. When both sources are selected, the URI-derived value is available first and the body value becomes available after polling. These scenarios supply HTTP fixtures; each emitter must implement and test the public accessor.
+
+This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no modeled polling operation cannot expose operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API, including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator. `@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret URI or a delete-until-gone resource name, is not an operation identifier.
 
 ### HTTP Operation Parameters Handling
 

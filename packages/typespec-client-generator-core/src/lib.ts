@@ -213,6 +213,37 @@ export const $lib = createTypeSpecLibrary({
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
+    "lro-status-metadata-structural-property": {
+      ...doc("lro-status-metadata-structural-property"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@lroStatusMetadata cannot select the status monitor's ${"role"} property '${"propertyName"}'.`,
+      },
+    },
+    "lro-operation-id-invalid-target": {
+      ...doc("lro-operation-id-invalid-target"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId can only be applied to a path parameter of the linked status-monitor operation or a string-like property of its response model.",
+      },
+    },
+    "lro-operation-id-duplicate": {
+      ...doc("lro-operation-id-duplicate"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId selects more than one source of the same kind on the linked status-monitor operation in the active emitter scope.",
+      },
+    },
+    "lro-operation-id-missing-link": {
+      ...doc("lro-operation-id-missing-link"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId requires the linked status-monitor operation to be reached through a response header or URL-valued body property.",
+      },
+    },
     "conflicting-multipart-model-usage": {
       ...doc("conflicting-multipart-model-usage"),
       severity: "error",
