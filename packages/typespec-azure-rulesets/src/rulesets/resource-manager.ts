@@ -126,5 +126,6 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
+    "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
   },
 } satisfies LinterRuleSet;
