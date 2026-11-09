@@ -228,7 +228,13 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public final class TestServiceClient {
+  public PagedIterable<User> listWithPage();
+}
+
+public final class TestServiceAsyncClient {
+  public PagedFlux<User> listWithPage();
+}
 ```
 
 ```go
@@ -306,7 +312,13 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public final class TestServiceClient {
+  public PagedIterable<User> listWithPage();
+}
+
+public final class TestServiceAsyncClient {
+  public PagedFlux<User> listWithPage();
+}
 ```
 
 ```go
@@ -383,7 +395,13 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public final class TestServiceClient {
+  public PagedIterable<User> listWithPage();
+}
+
+public final class TestServiceAsyncClient {
+  public PagedFlux<User> listWithPage();
+}
 ```
 
 ```go
@@ -402,7 +420,7 @@ type MyServiceClientListWithPageOptions struct {
 
 ```typespec
 @list
-op listWithPage(@query @continuationToken continuationToken?: string): {
+op listWithPage(@header @continuationToken continuationToken?: string): {
   @header
   @continuationToken
   continuationToken?: string;
@@ -460,7 +478,13 @@ export class TestServiceClient {
 ```
 
 ```java
-NOT_SUPPORTED
+public final class TestServiceClient {
+  public PagedIterable<User> listWithPage();
+}
+
+public final class TestServiceAsyncClient {
+  public PagedFlux<User> listWithPage();
+}
 ```
 
 ```go
