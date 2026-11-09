@@ -57,7 +57,7 @@ jobs:
       - name: Install Go lint tools
         run: |
           go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.15.0
+          curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.15.0
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Regenerate
