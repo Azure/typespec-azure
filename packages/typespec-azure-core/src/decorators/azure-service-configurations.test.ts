@@ -15,19 +15,79 @@ const authentication = `
 `;
 
 describe("Azure service configurations", () => {
+  it("accepts value catalogs and preserves the referenced authentication models", async () => {
+    const { program, Service } = await Tester.compile(t.code`
+      ${authentication}
+      const Configurations: Record<AzureServiceConfiguration> = #{
+        government: #{
+          endpoint: "https://api.loganalytics.us",
+          authentication: typeref(GovernmentAuth),
+        },
+        public: #{
+          endpoint: "https://api.loganalytics.io",
+          authentication: typeref(PublicAuth),
+        },
+      };
+      @azureServiceConfigurations(Configurations)
+      namespace ${t.namespace("Service")} {}
+    `);
+    const configurations = getAzureServiceConfigurations(program, Service)?.configurations;
+    expect(configurations?.map((configuration) => configuration.name)).toEqual([
+      "public",
+      "government",
+    ]);
+    expect(configurations?.[0].authentication.options[0].schemes[0].model).toBe(
+      program.getGlobalNamespaceType().models.get("PublicAuth"),
+    );
+    expect(configurations?.[1].authentication.options[0].schemes[0].model).toBe(
+      program.getGlobalNamespaceType().models.get("GovernmentAuth"),
+    );
+  });
+
+  it("passes referenced endpoint parameter models and their defaults to HTTP", async () => {
+    const { program, Service } = await Tester.compile(t.code`
+      ${authentication}
+      model Parameters { account: string = "default-account"; }
+      @azureServiceConfigurations(#{
+        public: #{
+          endpoint: "https://{account}.example.com",
+          authentication: typeref(PublicAuth),
+          parameters: typeref(Parameters),
+        },
+      })
+      namespace ${t.namespace("Service")} {}
+    `);
+    expect(getServers(program, Service)?.[0].parameters.get("account")).toMatchObject({
+      type: { kind: "Scalar", name: "string" },
+      defaultValue: { value: "default-account" },
+    });
+  });
+
+  it("rejects the replaced model-based catalog form", async () => {
+    const diagnostics = await Tester.diagnose(`
+      ${authentication}
+      model Configurations {
+        public: { endpoint: "https://example.com"; authentication: PublicAuth; };
+      }
+      @azureServiceConfigurations(Configurations)
+      namespace Service {}
+    `);
+    expectDiagnostics(diagnostics, { code: "invalid-argument" });
+  });
+
   it("uses public as the default regardless of declaration order", async () => {
     const { program, Service } = await Tester.compile(t.code`
       ${authentication}
-      model Configurations {
-        government: {
-          endpoint: "https://api.loganalytics.us";
-          authentication: GovernmentAuth;
-        };
-        public: {
-          endpoint: "https://api.loganalytics.io";
-          authentication: PublicAuth;
-        };
-      }
+      const Configurations = #{
+        government: #{
+          endpoint: "https://api.loganalytics.us",
+          authentication: typeref(GovernmentAuth),
+        },
+        public: #{
+          endpoint: "https://api.loganalytics.io",
+          authentication: typeref(PublicAuth),
+        },
+      };
       @azureServiceConfigurations(Configurations)
       namespace ${t.namespace("Service")} {}
     `);
@@ -56,16 +116,16 @@ describe("Azure service configurations", () => {
     const { program, Service } = await Tester.compile(t.code`
       ${authentication}
       model Key is ApiKeyAuth<ApiKeyLocation.header, "api-key">;
-      model Configurations {
-        public: {
-          endpoint: "https://public.example.com";
-          authentication: [PublicAuth, Key] | NoAuth;
-        };
-        government: {
-          endpoint: "https://government.example.com";
-          authentication: [GovernmentAuth, Key] | NoAuth;
-        };
-      }
+      const Configurations = #{
+        public: #{
+          endpoint: "https://public.example.com",
+          authentication: typeref([PublicAuth, Key] | NoAuth),
+        },
+        government: #{
+          endpoint: "https://government.example.com",
+          authentication: typeref([GovernmentAuth, Key] | NoAuth),
+        },
+      };
       @azureServiceConfigurations(Configurations)
       namespace ${t.namespace("Service")} {}
     `);
@@ -79,13 +139,13 @@ describe("Azure service configurations", () => {
   it("passes template parameter types and defaults to the HTTP server decorator", async () => {
     const { program, Service } = await Tester.compile(t.code`
       ${authentication}
-      model Configurations {
-        public: {
-          endpoint: "https://{account}.example.com";
-          parameters: { account: string = "default-account" };
-          authentication: PublicAuth;
-        };
-      }
+      const Configurations = #{
+        public: #{
+          endpoint: "https://{account}.example.com",
+          parameters: typeref({ account: string = "default-account" }),
+          authentication: typeref(PublicAuth),
+        },
+      };
       @azureServiceConfigurations(Configurations)
       namespace ${t.namespace("Service")} {}
     `);
@@ -106,16 +166,16 @@ describe("Azure service configurations", () => {
         tokenUrl: "https://government.example.com/token";
         scopes: ["government.read"];
       }]>;
-      model Configurations {
-        public: {
-          endpoint: "https://public.example.com";
-          authentication: PublicAuth | Key;
-        };
-        government: {
-          endpoint: "https://government.example.com";
-          authentication: [GovernmentTokenAuth, Key];
-        };
-      }
+      const Configurations = #{
+        public: #{
+          endpoint: "https://public.example.com",
+          authentication: typeref(PublicAuth | Key),
+        },
+        government: #{
+          endpoint: "https://government.example.com",
+          authentication: typeref([GovernmentTokenAuth, Key]),
+        },
+      };
       @azureServiceConfigurations(Configurations)
       namespace ${t.namespace("Service")} {}
     `);
@@ -137,9 +197,9 @@ describe("Azure service configurations", () => {
   it("preserves ordinary OAuth scopes", async () => {
     const { program, Service } = await Tester.compile(t.code`
       model Auth is AadOauth2Auth<["read", "write"]>;
-      model Configurations {
-        public: { endpoint: "{endpoint}"; parameters: { endpoint: url }; authentication: Auth };
-      }
+      const Configurations = #{
+        public: #{ endpoint: "{endpoint}", parameters: typeref({ endpoint: url }), authentication: typeref(Auth) },
+      };
       @azureServiceConfigurations(Configurations)
       namespace ${t.namespace("Service")} {}
     `);
@@ -151,50 +211,59 @@ describe("Azure service configurations", () => {
   it.each([
     {
       name: "an empty catalog",
-      configurations: "model Configurations {}",
+      configurations: "const Configurations = #{};",
       message: "Service configurations must declare a 'public' configuration.",
     },
     {
       name: "a catalog without public",
       configurations: `
-        model Configurations {
-          government: { endpoint: "https://example.com"; authentication: GovernmentAuth };
-        }`,
+        const Configurations = #{
+          government: #{ endpoint: "https://example.com", authentication: typeref(GovernmentAuth) },
+        };`,
       message: "Service configurations must declare a 'public' configuration.",
     },
     {
       name: "a capitalized Public configuration",
       configurations: `
-        model Configurations {
-          Public: { endpoint: "https://example.com"; authentication: PublicAuth };
-        }`,
+        const Configurations = #{
+          Public: #{ endpoint: "https://example.com", authentication: typeref(PublicAuth) },
+        };`,
       message: "Service configurations must declare a 'public' configuration.",
     },
     {
-      name: "a nonliteral endpoint",
+      name: "an empty endpoint",
       configurations: `
-        model Configurations {
-          public: { endpoint: string; authentication: PublicAuth };
-        }`,
-      message: "Configuration 'public' must declare a non-empty endpoint string literal.",
+        const Configurations = #{
+          public: #{ endpoint: " ", authentication: typeref(PublicAuth) },
+        };`,
+      message: "Configuration 'public' must declare a non-empty endpoint string.",
     },
     {
-      name: "an unknown configuration property",
+      name: "a blank configuration name",
       configurations: `
-        model Configurations {
-          public: { endpoint: "https://example.com"; authentication: PublicAuth; descripton: "typo" };
-        }`,
-      message: "Unknown service configuration property 'descripton'.",
+        const Configurations = #{
+          public: #{ endpoint: "https://example.com", authentication: typeref(PublicAuth) },
+          \` \`: #{ endpoint: "https://example.com", authentication: typeref(PublicAuth) },
+        };`,
+      message: "Each service configuration must have a non-empty name.",
+    },
+    {
+      name: "a reference to a non-authentication type",
+      configurations: `
+        const Configurations = #{
+          public: #{ endpoint: "https://example.com", authentication: typeref(string) },
+        };`,
+      message: "Authentication must reference a model, an OR union, or an AND tuple of models.",
     },
     {
       name: "a configuration without OAuth",
       configurations: `
-        model Configurations {
-          public: {
-            endpoint: "https://example.com";
-            authentication: ApiKeyAuth<ApiKeyLocation.header, "api-key">;
-          };
-        }`,
+        const Configurations = #{
+          public: #{
+            endpoint: "https://example.com",
+            authentication: typeref(ApiKeyAuth<ApiKeyLocation.header, "api-key">),
+          },
+        };`,
       message: "Service configurations must include an OAuth2 authentication scheme.",
     },
   ])("rejects $name", async ({ configurations, message }) => {
@@ -209,6 +278,32 @@ describe("Azure service configurations", () => {
     );
   });
 
+  it.each([
+    {
+      name: "an unknown configuration property",
+      configuration:
+        '#{ endpoint: "https://example.com", authentication: typeref(PublicAuth), descripton: "typo" }',
+    },
+    {
+      name: "missing authentication",
+      configuration: '#{ endpoint: "https://example.com" }',
+    },
+    {
+      name: "a reference to non-model endpoint parameters",
+      configuration:
+        '#{ endpoint: "https://example.com", authentication: typeref(PublicAuth), parameters: typeref(string) }',
+    },
+  ])("uses value type validation for $name", async ({ configuration }) => {
+    expectDiagnostics(
+      await Tester.diagnose(`
+        ${authentication}
+        @azureServiceConfigurations(#{ public: ${configuration} })
+        namespace Service {}
+      `),
+      { code: "invalid-argument" },
+    );
+  });
+
   it.each(["@useAuth(PublicAuth)", '@server("https://other.example.com")'])(
     "rejects a conflicting direct declaration in either order: %s",
     async (decorator) => {
@@ -217,9 +312,9 @@ describe("Azure service configurations", () => {
         expectDiagnostics(
           await Tester.diagnose(`
             ${authentication}
-            model Configurations {
-              public: { endpoint: "https://example.com"; authentication: PublicAuth };
-            }
+            const Configurations = #{
+              public: #{ endpoint: "https://example.com", authentication: typeref(PublicAuth) },
+            };
             ${directFirst ? decorator : pairing}
             ${directFirst ? pairing : decorator}
             namespace Service {}
@@ -238,9 +333,9 @@ describe("Azure service configurations", () => {
     expectDiagnostics(
       await Tester.diagnose(`
         ${authentication}
-        model Configurations {
-          public: { endpoint: "https://{account}.example.com"; authentication: PublicAuth };
-        }
+        const Configurations = #{
+          public: #{ endpoint: "https://{account}.example.com", authentication: typeref(PublicAuth) },
+        };
         @azureServiceConfigurations(Configurations)
         namespace Service {}
       `),

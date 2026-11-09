@@ -16,11 +16,11 @@ model AzureServiceConfiguration {
   /** The server URL or URL template, as accepted by `@server`. */
   endpoint: string;
 
-  /** Authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. */
-  authentication: unknown;
+  /** A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. */
+  authentication: TypeRef;
 
-  /** Parameters used in the endpoint URL template. */
-  parameters?: Record<unknown>;
+  /** A reference to the parameter model used in the endpoint URL template. */
+  parameters?: TypeRef<Reflection.Model>;
 
   /** Description of the server. */
   description?: string;

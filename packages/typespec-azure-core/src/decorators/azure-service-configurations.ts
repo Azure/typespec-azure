@@ -8,7 +8,6 @@ import {
   type Type,
   type Union,
   validateDecoratorUniqueOnNode,
-  walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
@@ -86,10 +85,11 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
     );
     return;
   }
-  const entries = [...walkPropertiesInherited(configurations)];
-  const selected = entries.find((entry) => entry.name === "public");
+  const diagnosticTarget = context.getArgumentTarget(0) ?? target;
+  const entries = Object.entries(configurations);
+  const selected = entries.find(([name]) => name === "public");
   if (!selected) {
-    invalid(configurations, "Service configurations must declare a 'public' configuration.");
+    invalid(diagnosticTarget, "Service configurations must declare a 'public' configuration.");
     return;
   }
   const ordered = [selected, ...entries.filter((entry) => entry !== selected)];
@@ -100,42 +100,23 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
     parameters?: Model;
     requirements: AuthenticationRequirement[];
   }[] = [];
-  for (const entry of ordered) {
-    if (!entry.name.trim() || entry.type.kind !== "Model") {
-      invalid(
-        entry,
-        "Each service configuration must be a named endpoint and authentication record.",
-      );
+  for (const [name, configuration] of ordered) {
+    if (!name.trim()) {
+      invalid(diagnosticTarget, "Each service configuration must have a non-empty name.");
       return;
     }
-    const properties = [...walkPropertiesInherited(entry.type)];
-    for (const property of properties) {
-      if (!["endpoint", "authentication", "parameters", "description"].includes(property.name)) {
-        invalid(property, `Unknown service configuration property '${property.name}'.`);
-        return;
-      }
-    }
-    const endpoint = properties.find((property) => property.name === "endpoint")?.type;
-    const authentication = properties.find((property) => property.name === "authentication")?.type;
-    const parameters = properties.find((property) => property.name === "parameters")?.type;
-    const description = properties.find((property) => property.name === "description")?.type;
-    if (endpoint?.kind !== "String" || !endpoint.value.trim()) {
+    const { endpoint, description } = configuration;
+    const authentication = configuration.authentication.target;
+    const parameters = configuration.parameters?.target;
+    if (!endpoint.trim()) {
       invalid(
-        entry,
-        `Configuration '${entry.name}' must declare a non-empty endpoint string literal.`,
+        diagnosticTarget,
+        `Configuration '${name}' must declare a non-empty endpoint string.`,
       );
-      return;
-    }
-    if (!authentication) {
-      invalid(entry, `Configuration '${entry.name}' must declare authentication requirements.`);
       return;
     }
     if (parameters !== undefined && parameters.kind !== "Model") {
-      invalid(entry, `Configuration '${entry.name}' parameters must be a model.`);
-      return;
-    }
-    if (description !== undefined && description.kind !== "String") {
-      invalid(entry, `Configuration '${entry.name}' description must be a string literal.`);
+      invalid(diagnosticTarget, `Configuration '${name}' parameters must reference a model.`);
       return;
     }
     const requirements: AuthenticationRequirement[] = [];
@@ -143,7 +124,7 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
     const collect = (type: Type): boolean => {
       if (type.kind === "Union") {
         if (active.has(type)) {
-          invalid(entry, "Authentication requirements cannot contain recursive unions.");
+          invalid(diagnosticTarget, "Authentication requirements cannot contain recursive unions.");
           return false;
         }
         active.add(type);
@@ -161,14 +142,17 @@ export const $azureServiceConfigurations: AzureServiceConfigurationsDecorator = 
         requirements.push({ type, models: type.values });
         return true;
       }
-      invalid(entry, "Authentication must be a model, an OR union, or an AND tuple of models.");
+      invalid(
+        diagnosticTarget,
+        "Authentication must reference a model, an OR union, or an AND tuple of models.",
+      );
       return false;
     };
     if (!collect(authentication)) return;
     records.push({
-      name: entry.name,
-      endpoint: endpoint.value,
-      description: description?.value,
+      name,
+      endpoint,
+      description,
       parameters,
       requirements,
     });

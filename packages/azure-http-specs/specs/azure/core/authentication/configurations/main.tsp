@@ -24,16 +24,13 @@ model GovernmentAuth is AadOauth2Auth<
   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
 >;
 
-model Configurations {
-  government: {
-    endpoint: "http://localhost:3000/government";
-    authentication: GovernmentAuth;
-  };
-  public: {
-    endpoint: "http://localhost:3000/public";
-    authentication: PublicAuth;
-  };
-}
+const Configurations: Record<AzureServiceConfiguration> = #{
+  government: #{
+    endpoint: "http://localhost:3000/government",
+    authentication: typeref(GovernmentAuth),
+  },
+  public: #{ endpoint: "http://localhost:3000/public", authentication: typeref(PublicAuth) },
+};
 
 // Service analogue: [Azure Monitor Logs](https://github.com/Azure/azure-sdk-for-go/blob/6aee0433368c2c3901003b9689b9ce9899e66854/sdk/monitor/query/azlogs/cloud_config.go#L8-L23) selects a cloud-specific endpoint/resource pair. Keep the real OAuth resources and authority URLs, but use local endpoints for the mock server.
 @scenario

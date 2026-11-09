@@ -96,12 +96,12 @@ model Azure.Core.AzureServiceConfiguration
 
 #### Properties
 
-| Name           | Type              | Description                                                                     |
-| -------------- | ----------------- | ------------------------------------------------------------------------------- |
-| endpoint       | `string`          | The server URL or URL template, as accepted by `@server`.                       |
-| authentication | `unknown`         | Authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. |
-| parameters?    | `Record<unknown>` | Parameters used in the endpoint URL template.                                   |
-| description?   | `string`          | Description of the server.                                                      |
+| Name           | Type      | Description                                                                                    |
+| -------------- | --------- | ---------------------------------------------------------------------------------------------- |
+| endpoint       | `string`  | The server URL or URL template, as accepted by `@server`.                                      |
+| authentication | `TypeRef` | A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. |
+| parameters?    | `TypeRef` | A reference to the parameter model used in the endpoint URL template.                          |
+| description?   | `string`  | Description of the server.                                                                     |
 
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 

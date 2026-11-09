@@ -20,8 +20,16 @@ Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and auth
 
 OAuth URL metadata does not change a caller-owned credential's authority or tenant.
 
+Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+
+```yaml
+kind: project
+features:
+  - typeref
+```
+
 ```typespec
-@Azure.Core.azureServiceConfigurations(configurations: Model)
+@Azure.Core.azureServiceConfigurations(configurations: valueof Record<Azure.Core.AzureServiceConfiguration>)
 ```
 
 #### Target
@@ -31,9 +39,9 @@ The namespace using these configurations.
 
 #### Parameters
 
-| Name           | Type    | Description                                    |
-| -------------- | ------- | ---------------------------------------------- |
-| configurations | `Model` | The named endpoint and authentication records. |
+| Name           | Type                                                   | Description                                    |
+| -------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| configurations | `valueof Record<Azure.Core.AzureServiceConfiguration>` | The named endpoint and authentication records. |
 
 #### Examples
 
@@ -49,16 +57,10 @@ model GovernmentAuth is AadOauth2Auth<
   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
 >;
 
-model Configurations {
-  public: {
-    endpoint: "https://api.loganalytics.io";
-    authentication: PublicAuth;
-  };
-  government: {
-    endpoint: "https://api.loganalytics.us";
-    authentication: GovernmentAuth;
-  };
-}
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{ endpoint: "https://api.loganalytics.io", authentication: typeref(PublicAuth) },
+  government: #{ endpoint: "https://api.loganalytics.us", authentication: typeref(GovernmentAuth) },
+};
 
 @service
 @azureServiceConfigurations(Configurations)

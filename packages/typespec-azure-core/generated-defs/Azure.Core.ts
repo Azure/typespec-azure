@@ -8,9 +8,32 @@ import type {
   Namespace,
   Operation,
   Type,
+  TypeRefValue,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+
+/**
+ * A deployment's HTTP endpoint and OAuth authentication requirements.
+ */
+export interface AzureServiceConfiguration {
+  /**
+   * The server URL or URL template, as accepted by `@server`.
+   */
+  readonly endpoint: string;
+  /**
+   * A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`.
+   */
+  readonly authentication: TypeRefValue;
+  /**
+   * A reference to the parameter model used in the endpoint URL template.
+   */
+  readonly parameters?: TypeRefValue;
+  /**
+   * Description of the server.
+   */
+  readonly description?: string;
+}
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -58,6 +81,14 @@ export type PollingLocationDecorator = (
  *
  * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
  *
+ * Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+ *
+ * ```yaml
+ * kind: project
+ * features:
+ *   - typeref
+ * ```
+ *
  * @param target The namespace using these configurations.
  * @param configurations The named endpoint and authentication records.
  * @example
@@ -73,16 +104,16 @@ export type PollingLocationDecorator = (
  *   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
  * >;
  *
- * model Configurations {
- *   public: {
- *     endpoint: "https://api.loganalytics.io";
- *     authentication: PublicAuth;
- *   };
- *   government: {
- *     endpoint: "https://api.loganalytics.us";
- *     authentication: GovernmentAuth;
- *   };
- * }
+ * const Configurations: Record<AzureServiceConfiguration> = #{
+ *   public: #{
+ *     endpoint: "https://api.loganalytics.io",
+ *     authentication: typeref(PublicAuth),
+ *   },
+ *   government: #{
+ *     endpoint: "https://api.loganalytics.us",
+ *     authentication: typeref(GovernmentAuth),
+ *   },
+ * };
  *
  * @service
  * @azureServiceConfigurations(Configurations)
@@ -94,7 +125,7 @@ export type PollingLocationDecorator = (
 export type AzureServiceConfigurationsDecorator = (
   context: DecoratorContext,
   target: Namespace,
-  configurations: Model,
+  configurations: Record<string, AzureServiceConfiguration>,
 ) => DecoratorValidatorCallbacks | void;
 
 /**

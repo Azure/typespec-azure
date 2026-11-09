@@ -12,6 +12,14 @@ namespace Azure.Core {
    *
    * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
    *
+   * Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+   *
+   * ```yaml
+   * kind: project
+   * features:
+   *   - typeref
+   * ```
+   *
    * @param target The namespace using these configurations.
    * @param configurations The named endpoint and authentication records.
    * @example
@@ -27,16 +35,16 @@ namespace Azure.Core {
    *   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
    * >;
    *
-   * model Configurations {
-   *   public: {
-   *     endpoint: "https://api.loganalytics.io";
-   *     authentication: PublicAuth;
-   *   };
-   *   government: {
-   *     endpoint: "https://api.loganalytics.us";
-   *     authentication: GovernmentAuth;
-   *   };
-   * }
+   * const Configurations: Record<AzureServiceConfiguration> = #{
+   *   public: #{
+   *     endpoint: "https://api.loganalytics.io",
+   *     authentication: typeref(PublicAuth),
+   *   },
+   *   government: #{
+   *     endpoint: "https://api.loganalytics.us",
+   *     authentication: typeref(GovernmentAuth),
+   *   },
+   * };
    *
    * @service
    * @azureServiceConfigurations(Configurations)
@@ -45,7 +53,10 @@ namespace Azure.Core {
    * }
    * ```
    */
-  extern dec azureServiceConfigurations(target: Namespace, configurations: Model);
+  extern dec azureServiceConfigurations(
+    target: Namespace,
+    configurations: valueof Record<AzureServiceConfiguration>
+  );
 
   /**
    * Decorator that marks a Version EnumMember as a preview version.
