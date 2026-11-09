@@ -1,0 +1,11 @@
+$namespace: Azure.ResourceManager.Example
+Operations.list:
+  - id: list
+    title: List operations
+    request: {}
+    responses:
+      200:
+        body:
+          value:
+            - name: Microsoft.Example/widgets/read
+              isDataAction: false
