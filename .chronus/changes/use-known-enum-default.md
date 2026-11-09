@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Add the `use-known-enum-default` linter rule to warn when an extensible enum's default is not one of its declared values. Expose all declared members through `getUnionAsEnum().allMembers`, preserving inherited values when member names collide.
+Add the `use-known-enum-default` linter rule to warn when an extensible enum's default is not one of its declared values.

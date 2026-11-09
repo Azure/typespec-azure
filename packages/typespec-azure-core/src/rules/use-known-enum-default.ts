@@ -4,8 +4,9 @@ import {
   ignoreDiagnostics,
   type ModelProperty,
   Numeric,
+  type Union,
 } from "@typespec/compiler";
-import { getUnionAsEnum } from "../helpers/union-enums.js";
+import { getUnionAsEnum, type UnionEnumVariant } from "../helpers/union-enums.js";
 
 export const useKnownEnumDefaultRule = createRule({
   name: "use-known-enum-default",
@@ -29,7 +30,8 @@ export const useKnownEnumDefaultRule = createRule({
           return;
         }
 
-        const members = enumType.allMembers;
+        // The name-keyed flattened map can omit distinct inherited values.
+        const members = [...getDeclaredMembers(property.type)];
         let matches: boolean;
         switch (defaultValue.valueKind) {
           case "StringValue":
@@ -64,3 +66,22 @@ export const useKnownEnumDefaultRule = createRule({
     };
   },
 });
+
+function* getDeclaredMembers(union: Union): Generator<UnionEnumVariant<string | number>> {
+  for (const variant of union.variants.values()) {
+    switch (variant.type.kind) {
+      case "String":
+      case "Number":
+        yield { value: variant.type.value, type: variant };
+        break;
+      case "Union":
+        yield* getDeclaredMembers(variant.type);
+        break;
+      case "Enum":
+        for (const member of variant.type.members.values()) {
+          yield { value: member.value ?? member.name, type: member };
+        }
+        break;
+    }
+  }
+}

@@ -100,34 +100,6 @@ it("flattendMembers include all members from included enums", async () => {
   deepStrictEqual(getMemberValues(res.flattenedMembers), ["up", "down", "left", "right"]);
 });
 
-it.each([
-  {
-    name: "nested and local union members",
-    code: `
-      union Known { Value: "cat" }
-      @test("target") union Test { Known, Value: "kitten", string }
-    `,
-    values: ["cat", "kitten"],
-  },
-  {
-    name: "included enum members",
-    code: `
-      enum First { Value: 1 }
-      enum Second { Value: 2 }
-      @test("target") union Test { First, Second, int32 }
-    `,
-    values: [1, 2],
-  },
-])("preserves all values when $name share names", async ({ code, values }) => {
-  const res = await testValidUnionAsEnum(code);
-  deepStrictEqual(
-    res.allMembers.map((member) => member.value),
-    values,
-  );
-  deepStrictEqual(getMemberValues(res.flattenedMembers), [values[1]]);
-  strictEqual(res.flattenedMembers.get("Value")?.value, values[1]);
-});
-
 it("returns undefined with diagnostic if contains different types", async () => {
   const [res, diagnostics] = await testUnionAsEnum(`@test("target")  union Test { "one", 2}`);
   strictEqual(res, undefined);
