@@ -19,7 +19,8 @@ import org.teavm.model.instructions.ClassConstantInstruction;
 import org.teavm.model.instructions.InvokeInstruction;
 
 /**
- * TeaVM-only adapters. The native generator JAR is never changed.
+ * Rewrites TeaVM's in-memory class model, not the native generator JAR.
+ * Revisit these substitutions when upstream generator calls or the TeaVM version change.
  */
 public final class BrowserTransformer implements ClassHolderTransformer {
     private static final String GENERATOR = "com.microsoft.typespec.http.client.generator.";
@@ -33,6 +34,7 @@ public final class BrowserTransformer implements ClassHolderTransformer {
         }
         for (MethodHolder method : cls.getMethods()) {
             String name = method.getName();
+            // Browser entrypoints supply options/models directly; omit native transport and logger discovery.
             if ((cls.getName().equals(GENERATOR + "core.extension.plugin.NewPlugin") && name.equals("<init>"))
                 || (cls.getName().equals(GENERATOR + "TypeSpecPlugin$MockConnection") && name.equals("<init>"))
                 || (cls.getName().equals("org.slf4j.LoggerFactory") && name.equals("<clinit>"))
@@ -45,6 +47,7 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                 pe.getField("org.slf4j.helpers.NOPLogger", "NOP_LOGGER",
                     ValueType.object("org.slf4j.helpers.NOPLogger")).returnValue();
             } else if (cls.getName().equals("org.slf4j.helpers.NOPLogger") && name.equals("error")) {
+                // Surface generator failures to the worker instead of silently discarding error logs.
                 method.setProgram(null);
                 ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
                 pe.construct(IllegalStateException.class, pe.var(1, String.class)).raise();
@@ -52,6 +55,7 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                 method.setProgram(null);
                 ProgramEmitter.create(method, context.getHierarchy()).constant(1).returnValue();
             } else if (cls.getName().equals(LOGGING + "ClientLogger") && name.startsWith("at")) {
+                // Keep fluent logging calls usable without initializing native logging providers.
                 method.setProgram(null);
                 ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
                 pe.getField(LOGGING + "LoggingEvent", "NOOP", ValueType.object(LOGGING + "LoggingEvent")).returnValue();
@@ -65,17 +69,20 @@ public final class BrowserTransformer implements ClassHolderTransformer {
             } else if ((cls.getName().equals(GENERATOR + "core.model.projectmodel.Project")
                 || cls.getName().equals(GENERATOR + "mgmt.model.projectmodel.FluentProject"))
                 && name.equals("integrateWithSdk")) {
+                // SDK repository probing needs a filesystem; fail explicitly if browser settings enable it.
                 method.setProgram(null);
                 ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
                 pe.construct(UnsupportedOperationException.class,
                     pe.constant("SDK integration is not supported in the browser")).raise();
             } else if (cls.getName().equals(GENERATOR + "core.preprocessor.Preprocessor")
                 && name.equals("createCodeModelDirectory")) {
+                // ARM preprocessing eagerly creates an otherwise unused diagnostic snapshot directory.
                 method.setProgram(null);
                 ProgramEmitter.create(method, context.getHierarchy())
                     .constantNull(ValueType.object("java.nio.file.Path")).returnValue();
             } else if (cls.getName().equals(GENERATOR + "core.preprocessor.Preprocessor")
                 && name.equals("dumpCodeModel")) {
+                // Snapshot writes are unsupported even though normal generation keeps all output in memory.
                 method.setProgram(null);
                 ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
                 pe.construct(UnsupportedOperationException.class,
@@ -100,6 +107,7 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                             || (ref.getClassName().equals("java.lang.Package")
                                 && ref.getName().equals("getName")
                                 && !cls.getName().equals(BrowserCompatibility.class.getName()))) {
+                            // Turn instance calls into static adapters, passing the receiver as argument zero.
                             var parameters = new ValueType[ref.parameterCount() + 2];
                             parameters[0] = ValueType.object(ref.getClassName());
                             for (int p = 0; p < ref.parameterCount(); p++) {
@@ -141,6 +149,7 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                                 ValueType.object("java.lang.String"), ValueType.object("java.lang.String")));
                         } else if (ref.getClassName().equals("java.lang.ClassLoader")
                             && ref.getName().equals("getResourceAsStream")) {
+                            // Templates/resources are embedded at build time instead of read from a runtime JAR.
                             invoke.setMethod(new MethodReference(GENERATOR + "browser.BrowserResources", "open",
                                 ValueType.object("java.lang.String"), ValueType.object("java.io.InputStream")));
                             invoke.setInstance(null);
@@ -166,7 +175,7 @@ public final class BrowserTransformer implements ClassHolderTransformer {
     }
 
     private static void submitReferenceArray(ClassHolderTransformerContext context) {
-        // Jackson's buffer recycler is confined to a single worker, so atomicity is unnecessary.
+        // TeaVM lacks AtomicReferenceArray; Jackson's single-worker buffer recycler needs only array semantics.
         ClassHolder array = new ClassHolder("java.util.concurrent.atomic.AtomicReferenceArray");
         array.setParent("java.lang.Object");
         array.setLevel(AccessLevel.PUBLIC);

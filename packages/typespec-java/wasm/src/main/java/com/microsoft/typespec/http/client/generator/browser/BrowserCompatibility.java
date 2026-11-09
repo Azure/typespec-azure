@@ -17,21 +17,25 @@ import java.util.stream.Stream;
 
 public final class BrowserCompatibility {
     public static boolean isJavaName(CharSequence value) {
+        // TeaVM lacks SourceVersion; parse the name without accepting normalized whitespace or comments.
         String name = value.toString();
         var parsed = new JavaParser().parseName(name);
         return parsed.isSuccessful() && parsed.getResult().orElseThrow().asString().equals(name);
     }
 
     public static String packageName(Package value) {
+        // TeaVM can report a trailing dot, which would produce invalid generated imports.
         String name = value.getName();
         return name.endsWith(".") ? name.substring(0, name.length() - 1) : name;
     }
 
     public static Stream<String> lines(String value) {
+        // TeaVM 0.16.0 lacks String.lines(), but implements BufferedReader.lines().
         return new BufferedReader(new StringReader(value)).lines();
     }
 
     public static Stream<String> splitAsStream(Pattern pattern, CharSequence value) {
+        // TeaVM 0.16.0 lacks Pattern.splitAsStream(); use its supported array-based split.
         return Arrays.stream(pattern.split(value));
     }
 
@@ -42,16 +46,17 @@ public final class BrowserCompatibility {
     }
 
     public static List<String> unformattedCode(Map<String, String> files) {
-        // Full Java files are cleaned after template generation, without native formatting.
+        // Native formatting needs javac/Eclipse internals; browser import cleanup runs after generation.
         return new ArrayList<>(files.values());
     }
 
     public static <T> Set<T> newKeySet() {
-        // Each worker runs one generator, so management mapper sets do not need concurrency.
+        // TeaVM lacks ConcurrentHashMap.newKeySet(); one generator per worker needs no concurrency.
         return new HashSet<>();
     }
 
     public static String normalizeEolInTextBlock(String value, String separator) {
+        // JavaParser uses unsupported regex \R; preserve its newline handling, including CRLF as one break.
         StringBuilder result = new StringBuilder(value.length());
         for (int i = 0; i < value.length(); i++) {
             char character = value.charAt(i);
