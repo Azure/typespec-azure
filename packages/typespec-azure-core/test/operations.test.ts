@@ -845,6 +845,9 @@ describe("LongRunningOperation", () => {
     ok(metadata);
     deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
     deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "ResourceOperationStatus");
+    if (metadata.statusMonitorStep?.kind === "nextOperationLink") {
+      deepStrictEqual(metadata.statusMonitorStep.operation?.name, "poll");
+    }
 
     deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
     deepStrictEqual(metadata.pollingInfo.responseModel.name, "ResourceOperationStatus");

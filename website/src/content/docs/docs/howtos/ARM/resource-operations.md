@@ -194,6 +194,8 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 | ListBySubscription | `listBySubscription is ArmListBySubscriptionScope<ResourceType>` |
 | ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`            |
 
+These templates model pageable list operations and default to `ArmResponse<ResourceListResult<Resource>>`. Use `ResourceListResult<T>`, the standard ARM page model, for the paging response when it fits the contract instead of hand-defining an operation or page envelope. If a custom page model is unavoidable, keep exactly one `@nextLink` property in each page model.
+
 The `ArmListBySubscriptionScope` template is used for listing a resource directly at the subscription
 scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
 Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.

@@ -413,6 +413,42 @@ Separate `@lroStatusMetadata` declarations on one property use the standard TCGC
 
 Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
 
+#### Legacy LRO operation identity
+
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service that returns a server-issued identifier in its status-monitor URI, response body, or both:
+
+```typespec
+model OperationStatus {
+  @lroOperationId
+  id: string;
+
+  status: OperationState;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact `SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact `SdkModelPropertyType` for the status-monitor body. The path form is available from the initial response and must remain derivable after poller rehydration from the stored polling URL. The property form becomes available only after a status-monitor response is received.
+
+For `kind: "property"`, `propertySegments` gives the access path from `pollingInfo.responseModel` to the ID, following the segment representation used by paging metadata. Currently only direct or inherited properties are selectable, so the path is `[property]`; inheritance does not add a JSON nesting level. Each segment is the exact effective SDK property, carrying its client name and `serializationOptions.json.name` for emitters reading a typed model or raw JSON. An overridden base property is not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names and serialization metadata.
+
+TCGC validates active operation ID selections while processing each LRO. A selected response property must be string-like; invalid selections are diagnosed and omitted. Annotations on models not used by the LRO, or excluded by emitter scope or response visibility, have no effect.
+
+For example, after the body-only Translation scenario returns `{ id: "translation-123", status: "Running" }`, an emitter reads the selected `id` using `propertySegments` and exposes `"translation-123"` through its operation or poller accessor. No ID is available before that response in the body-only case. When both sources are selected, the URI-derived value is available first and the body value becomes available after polling. These scenarios supply HTTP fixtures; each emitter must implement and test the public accessor.
+
+This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no modeled polling operation cannot expose operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API, including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator. `@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret URI or a delete-until-gone resource name, is not an operation identifier.
+
 ### HTTP Operation Parameters Handling
 
 The HTTP operation's parameters are inferred from TypeSpec HTTP lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different HTTP parameters are handled by specific logic based on the info from TypeSpec HTTP lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).
