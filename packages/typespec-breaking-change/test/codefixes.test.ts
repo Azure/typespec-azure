@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { createApproveBreakingChangeCodeFix } from "../src/suppression/codefixes.js";
 import { emitFindingDiagnostics } from "../src/suppression/diagnostics.js";
-import type { Finding } from "../src/types.js";
+import { isOperationIdentity, type Finding } from "../src/types.js";
 import { Tester, TesterWithSuppressions } from "./test-host.js";
 
 describe("codefixes", () => {
@@ -17,7 +17,7 @@ describe("codefixes", () => {
     ],
   });
   async function applyApproval(program: Program, finding: Finding): Promise<string> {
-    const fix = createApproveBreakingChangeCodeFix(finding);
+    const fix = createApproveBreakingChangeCodeFix(finding, program);
     expect(fix).toBeDefined();
     let updated = "";
     await applyCodeFix(
@@ -32,6 +32,12 @@ describe("codefixes", () => {
     );
     expect(updated).not.toBe("");
     return updated;
+  }
+  function operationPath(finding: Finding): string {
+    if (!isOperationIdentity(finding.diff.identity)) {
+      throw new Error("Expected an operation finding");
+    }
+    return finding.diff.identity.operation.path;
   }
 
   it("applies a qualified, version-scoped approval without approving another transition", async () => {
@@ -115,20 +121,106 @@ describe("codefixes", () => {
     ]);
   });
 
-  it("does not offer an edit to a removed baseline operation", async () => {
+  it.each(["interface", "namespace"])(
+    "approves only the deleted operation under its surviving %s parent",
+    async (parentKind) => {
+      const removed = '@get @route("/first/removed") op removed(): string;';
+      const other = '@get @route("/first/other") op other(): string;';
+      const sameName = '@get @route("/second/removed") op removed(): string;';
+      const source = `
+        @service @versioned(Versions) namespace TestService;
+        enum Versions { v1: "2024-01-01" }
+        namespace First {
+          ${parentKind} Operations {
+            @get @route("/first/keep") op keep(): string;
+            ${removed}
+            ${other}
+          }
+        }
+        namespace Second {
+          ${parentKind} Operations {
+            @get @route("/second/keep") op keep(): string;
+            ${sameName}
+          }
+        }
+      `;
+      const { program: base } = await TesterWithSuppressions.compile(source);
+      const { program: head } = await TesterWithSuppressions.compile(
+        source.replace(removed, "").replace(other, "").replace(sameName, ""),
+      );
+      const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+      expect(result.findings).toHaveLength(3);
+      const finding = result.findings.find(
+        (item) => operationPath(item) === "/first/removed" && item.diff.kind === "OperationRemoved",
+      );
+      expect(finding).toBeDefined();
+      const updated = await applyApproval(head, finding!);
+      expect(updated).not.toContain("op removed");
+      expect(updated).toContain('kind: "OperationRemoved", path: "removed"');
+      expect(updated).toMatch(new RegExp(`\\}\\)\\s+${parentKind} Operations`));
+      const { program: approved } = await editedSourceTester.compile(updated);
+      const findings = analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings;
+      expect(
+        findings
+          .map((item) => ({
+            path: operationPath(item),
+            suppressed: item.suppressed,
+          }))
+          .sort((a, b) => a.path.localeCompare(b.path)),
+      ).toEqual([
+        { path: "/first/other", suppressed: false },
+        { path: "/first/removed", suppressed: true },
+        { path: "/second/removed", suppressed: false },
+      ]);
+    },
+  );
+
+  it.each(["interface", "namespace"])(
+    "does not offer a baseline edit when the deleted operation's %s parent is gone",
+    async (parentKind) => {
+      const parent = `${parentKind} Operations {
+        @get @route("/removed") op removed(): string;
+      }`;
+      const source = `
+        @service @versioned(Versions) namespace TestService;
+        enum Versions { v1: "2024-01-01" }
+        @get @route("/keep") op keep(): string;
+        namespace First { ${parent} }
+        namespace Second { ${parentKind} Operations {} }
+      `;
+      const { program: base } = await TesterWithSuppressions.compile(source);
+      const { program: head } = await TesterWithSuppressions.compile(source.replace(parent, ""));
+      const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+      expect(result.findings).toMatchObject([{ diff: { kind: "OperationRemoved" } }]);
+      expect(createApproveBreakingChangeCodeFix(result.findings[0], head)).toBeUndefined();
+    },
+  );
+
+  it("requires an operation path for approvals on the surviving namespace", async () => {
     const source = `
       @service @versioned(Versions) namespace TestService;
       enum Versions { v1: "2024-01-01" }
       @get @route("/keep") op keep(): string;
       @get @route("/removed") op removed(): string;
     `;
-    const { program: base } = await Tester.compile(source);
-    const { program: head } = await Tester.compile(
-      source.replace('@get @route("/removed") op removed(): string;', ""),
+    const { program: base } = await TesterWithSuppressions.compile(source);
+    const { program: head } = await TesterWithSuppressions.compile(
+      source
+        .replace('@get @route("/removed") op removed(): string;', "")
+        .replace(
+          "@service",
+          '@approvedUnversionedChange("Reviewed", #{kind: "OperationRemoved"}) @service',
+        ),
     );
     const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
-    expect(result.findings).toMatchObject([{ diff: { kind: "OperationRemoved" } }]);
-    expect(createApproveBreakingChangeCodeFix(result.findings[0])).toBeUndefined();
+    expect(result.findings).toMatchObject([
+      { diff: { kind: "OperationRemoved" }, suppressed: false },
+    ]);
+    const updated = await applyApproval(head, result.findings[0]);
+    const { program: approved } = await editedSourceTester.compile(updated);
+    expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
+      { suppressed: true },
+    ]);
   });
 
   it("creates a codefix for a finding with origin", async () => {

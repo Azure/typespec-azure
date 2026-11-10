@@ -12,6 +12,7 @@ import type {
   VersionComparisonSummary,
   VersionPair,
 } from "../types.js";
+import { isOperationIdentity } from "../types.js";
 import { classifyDiffs } from "./policy.js";
 import { resolveBaseSourceLocations, resolveHeadSourceLocations } from "./resolve-location.js";
 import {
@@ -612,7 +613,11 @@ function collapsePhaseADuplicates(findings: Finding[]): Finding[] {
     }
 
     // For Phase A, dedup key excludes version pair — same element+kind = same change
-    const key = `${f.diff.kind}|${f.diff.identity.element}|${f.suppressed}`;
+    const operationScope =
+      f.diff.kind === "OperationRemoved" && isOperationIdentity(f.diff.identity)
+        ? JSON.stringify([f.diff.identity.operation.method, f.diff.identity.operation.path])
+        : "";
+    const key = `${f.diff.kind}|${operationScope}|${f.diff.identity.element}|${f.suppressed}`;
     if (seen.has(key)) continue;
     seen.add(key);
     result.push(f);
