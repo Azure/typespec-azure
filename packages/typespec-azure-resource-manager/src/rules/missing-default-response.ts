@@ -1,11 +1,5 @@
-import {
-  createRule,
-  fileRef,
-  isTemplateDeclarationOrInstance,
-  type Operation,
-} from "@typespec/compiler";
+import { createRule, fileRef, isTemplateDeclarationOrInstance } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
-import { hasDefaultResponse, missingDefaultResponseReported } from "./http-response-utils.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const missingDefaultResponseRule = createRule({
@@ -18,10 +12,6 @@ export const missingDefaultResponseRule = createRule({
     default: "Operation is missing a default response. Include the standard ARM ErrorResponse.",
   },
   create(context) {
-    const missing = new Set<Operation>();
-    const reported = context.program.stateSet(missingDefaultResponseReported);
-    reported.clear();
-
     return {
       operation(operation) {
         if (
@@ -32,16 +22,8 @@ export const missingDefaultResponseRule = createRule({
         }
 
         const [responses] = getResponsesForOperation(context.program, operation);
-        if (!hasDefaultResponse(responses)) {
-          missing.add(operation);
-        }
-      },
-      exit() {
-        // Existing response checks run on both root and operation listeners.
-        for (const operation of missing) {
-          if (!reported.has(operation)) {
-            context.reportDiagnostic({ target: operation });
-          }
+        if (!responses.some((response) => response.statusCodes === "*")) {
+          context.reportDiagnostic({ target: operation });
         }
       },
     };

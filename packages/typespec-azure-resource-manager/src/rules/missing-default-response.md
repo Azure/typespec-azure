@@ -2,7 +2,7 @@ ARM operations must include a default response for status codes that are not exp
 
 Use the standard ARM operation templates with their default `CommonTypes.ErrorResponse`. A response marked with `@error` and no explicit status code provides a default response. A status-specific error, such as a marked `404` or `500`, does not replace the default response.
 
-This rule checks the presence of the fallback, not its payload shape or error marking. Those requirements are checked separately by `use-standard-error`. When an existing ARM response-code rule or its missing-error check already diagnoses the absent fallback on an operation, this rule does not repeat that diagnostic. Other response-code and error-payload requirements remain unchanged.
+This rule checks the presence of the fallback, not its payload shape or error marking. Those requirements are checked separately by `use-standard-error`. Each rule reports independently: enabling this rule together with existing ARM response-code or missing-error checks can produce multiple diagnostics for an operation without a default response.
 
 ## Impact
 
@@ -32,7 +32,7 @@ interface Widgets {
 
 ## Suppression
 
-Retain a missing default response only when required to preserve an existing, ARM-reviewed API contract. Apply `#suppress "@azure-tools/typespec-azure-resource-manager/missing-default-response" "Existing ARM-reviewed response contract retained for compatibility."` to the concrete operation. If another response rule owns the diagnostic, use that rule's suppression instead.
+Retain a missing default response only when required to preserve an existing, ARM-reviewed API contract. Apply `#suppress "@azure-tools/typespec-azure-resource-manager/missing-default-response" "Existing ARM-reviewed response contract retained for compatibility."` to the concrete operation. Other rules' diagnostics require their own suppressions.
 
 ## LintDiff Equivalent
 

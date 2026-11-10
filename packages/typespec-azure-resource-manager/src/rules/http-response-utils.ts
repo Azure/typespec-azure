@@ -1,19 +1,6 @@
-import type { Program } from "@typespec/compiler";
-import type { HttpOperation, HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
+import type { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 
 type StatusCode = HttpOperationResponse["statusCodes"];
-
-export const missingDefaultResponseReported = Symbol("missingDefaultResponseReported");
-
-export function hasDefaultResponse(responses: readonly HttpOperationResponse[]): boolean {
-  return responses.some((response) => response.statusCodes === "*");
-}
-
-export function recordMissingDefaultResponse(program: Program, operation: HttpOperation): void {
-  if (!hasDefaultResponse(operation.responses)) {
-    program.stateSet(missingDefaultResponseReported).add(operation.operation);
-  }
-}
 
 export function matchesStatusCode(status: StatusCode, expected: number): boolean {
   return typeof status === "object"

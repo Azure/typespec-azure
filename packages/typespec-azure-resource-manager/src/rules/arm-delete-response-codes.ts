@@ -2,7 +2,6 @@ import { type Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { getArmResources } from "../resource.js";
-import { recordMissingDefaultResponse } from "./http-response-utils.js";
 
 /**
  * Verify that a delete operation only
@@ -35,7 +34,6 @@ export const armDeleteResponseCodesRule = createRule({
               statusCodes.size !== expected.size ||
               ![...statusCodes].every((v) => expected.has(v))
             ) {
-              recordMissingDefaultResponse(program, httpOp);
               context.reportDiagnostic({
                 target: deleteOperation.operation,
                 messageId: isAsync ? "async" : "sync",

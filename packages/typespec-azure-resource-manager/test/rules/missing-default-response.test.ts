@@ -153,7 +153,7 @@ it.each([
   ],
   ["delete", "ArmResourceDeleteSync<Widget, Error = never>", "arm-delete-operation-response-codes"],
 ])(
-  "does not repeat the existing %s resource response diagnostic",
+  "reports independently of the existing %s resource response diagnostic",
   async (_verb, template, rule) => {
     const [, diagnostics] = await Tester.compileAndDiagnose(
       `${resource}
@@ -170,14 +170,14 @@ it.each([
         },
       },
     );
-    expect(diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
-      `@azure-tools/typespec-azure-resource-manager/${rule}`,
-    ]);
+    expect(diagnostics.map((diagnostic) => diagnostic.code).sort()).toEqual(
+      [code, `@azure-tools/typespec-azure-resource-manager/${rule}`].sort(),
+    );
   },
 );
 
 it.each([false, true])(
-  "does not repeat a missing-error diagnostic regardless of rule order: %s",
+  "reports independently of a missing-error diagnostic regardless of rule order: %s",
   async (defaultFirst) => {
     const standardError = "@azure-tools/typespec-azure-resource-manager/use-standard-error";
     const [, diagnostics] = await Tester.compileAndDiagnose("@get op read(): string;", {
@@ -189,13 +189,12 @@ it.each([false, true])(
         },
       },
     });
-    expect(diagnostics).toMatchObject([
-      {
-        code: standardError,
-        message: "Operations must define at least one response marked with `@error`.",
-      },
-    ]);
-    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics.map((diagnostic) => diagnostic.code).sort()).toEqual(
+      [code, standardError].sort(),
+    );
+    expect(diagnostics.find((diagnostic) => diagnostic.code === standardError)).toMatchObject({
+      message: "Operations must define at least one response marked with `@error`.",
+    });
   },
 );
 

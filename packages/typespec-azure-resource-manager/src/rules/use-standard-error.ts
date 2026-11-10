@@ -10,7 +10,6 @@ import {
   type Type,
 } from "@typespec/compiler";
 import { getOperationVerb, getResponsesForOperation } from "@typespec/http";
-import { missingDefaultResponseReported } from "./http-response-utils.js";
 import { getSingleNonNullMember } from "./model-utils.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
@@ -46,7 +45,6 @@ export const useStandardErrorRule = createRule({
           isErrorModel(program, type),
         );
         if (errorTypes.length === 0) {
-          context.program.stateSet(missingDefaultResponseReported).add(operation);
           context.reportDiagnostic({ target: operation, messageId: "missingErrorResponse" });
           reported.add(source);
           return;
