@@ -51,7 +51,9 @@ namespace Logs {
 
 An empty catalog or a catalog declaring only PascalCase `Public` also fails this check.
 
-Use value records (`#{ ... }`), not model declarations, for the catalog and its entries. Reference authentication types with `typeref(...)` and endpoint parameter models with `parameters: typeref(Parameters)`. The compiler checks required properties, property value types, authentication reference constraints, and parameter model constraints; those failures use compiler diagnostics instead of this diagnostic.
+Use value records (`#{ ... }`), not model declarations, for the catalog and its entries. Reference authentication types with `typeref(...)` and declare endpoint parameters inline, for example `parameters: typeref({ endpoint: url })`. The compiler checks required properties, property value types, authentication reference constraints, and parameter model constraints; those failures use compiler diagnostics instead of this diagnostic.
+
+Authentication requirements follow `@useAuth` rules, and endpoint parameters follow `@server` rules. Invalid HTTP authentication definitions and missing URL-template parameters use those decorators' diagnostics rather than this diagnostic.
 
 Enable the experimental `typeref` feature in the consuming project's `tspconfig.yaml`:
 

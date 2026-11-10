@@ -44,15 +44,14 @@ describe("Azure service configurations", () => {
     );
   });
 
-  it("passes referenced endpoint parameter models and their defaults to HTTP", async () => {
+  it("passes inline endpoint parameters and their defaults to HTTP", async () => {
     const { program, Service } = await Tester.compile(t.code`
       ${authentication}
-      model Parameters { account: string = "default-account"; }
       @azureServiceConfigurations(#{
         public: #{
           endpoint: "https://{account}.example.com",
           authentication: typeref(PublicAuth),
-          parameters: typeref(Parameters),
+          parameters: typeref({ account: string = "default-account" }),
         },
       })
       namespace ${t.namespace("Service")} {}
@@ -335,17 +334,52 @@ describe("Azure service configurations", () => {
     },
   );
 
-  it("uses the HTTP diagnostic for undeclared server parameters", async () => {
-    expectDiagnostics(
-      await Tester.diagnose(`
-        ${authentication}
-        const Configurations = #{
-          public: #{ endpoint: "https://{account}.example.com", authentication: typeref(PublicAuth) },
-        };
-        @azureServiceConfigurations(Configurations)
-        namespace Service {}
-      `),
-      { code: "@typespec/http/missing-server-param" },
-    );
+  it.each([
+    {
+      name: "a non-value authentication model",
+      definitions: "model InvalidAuth { type: string; }",
+      auth: "InvalidAuth",
+      code: "invalid-value",
+    },
+    {
+      name: "a nested authentication union",
+      definitions: "union NestedAuth { oauth: GovernmentAuth }",
+      auth: "PublicAuth | NestedAuth",
+      code: "@typespec/http/invalid-type-for-auth",
+    },
+  ])(
+    "uses native diagnostics for $name in a later configuration",
+    async ({ definitions, auth, code }) => {
+      const [{ program, Service }, diagnostics] = await Tester.compileAndDiagnose(t.code`
+      ${authentication}
+      ${definitions}
+      @azureServiceConfigurations(#{
+        public: #{
+          endpoint: "https://public.example.com",
+          authentication: typeref(PublicAuth),
+        },
+        government: #{
+          endpoint: "https://government.example.com",
+          authentication: typeref(${auth}),
+        },
+      })
+      namespace ${t.namespace("Service")} {}
+    `);
+      expectDiagnostics(diagnostics, { code });
+      expect(getAzureServiceConfigurations(program, Service)).toBeUndefined();
+    },
+  );
+
+  it("uses the HTTP diagnostic without publishing a catalog for undeclared server parameters", async () => {
+    const [{ program, Service }, diagnostics] = await Tester.compileAndDiagnose(t.code`
+      ${authentication}
+      const Configurations = #{
+        public: #{ endpoint: "https://{account}.example.com", authentication: typeref(PublicAuth) },
+      };
+      @azureServiceConfigurations(Configurations)
+      namespace ${t.namespace("Service")} {}
+    `);
+    expectDiagnostics(diagnostics, { code: "@typespec/http/missing-server-param" });
+    expect(getAzureServiceConfigurations(program, Service)).toBeUndefined();
   });
 });

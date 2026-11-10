@@ -99,7 +99,7 @@ Available ruleSets:
 
 Pairs named HTTP server endpoints with OAuth authentication configurations.
 
-Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and calls `@useAuth` once with the combined OR of authentication requirements. Existing AND groups and credential alternatives are preserved.
+Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and exposes the combined OR of HTTP authentication requirements. Existing AND groups and credential alternatives are preserved.
 
 The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
 
@@ -153,6 +153,41 @@ const Configurations: Record<AzureServiceConfiguration> = #{
 @azureServiceConfigurations(Configurations)
 namespace Logs {
   @get op query(): string;
+}
+```
+
+###### Parameterized endpoint
+
+Declare endpoint parameters inline with `parameters: typeref({ ... })`, using the same property types and defaults as `@server`. Here, `account` is required and `region` defaults to `"westus"`.
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
+
+using TypeSpec.Http;
+using Azure.Core;
+
+model ServiceAuth is AadOauth2Auth<["https://example.com/.default"]>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{
+    endpoint: "https://{account}.{region}.example.com",
+    authentication: typeref(ServiceAuth),
+    parameters: typeref({
+      @doc("Account name.")
+      account: string,
+
+      @doc("Deployment region.")
+      region?: string = "westus",
+    }),
+    description: "Regional service endpoint",
+  },
+};
+
+@service
+@azureServiceConfigurations(Configurations)
+namespace RegionalService {
+  @get op read(): string;
 }
 ```
 
