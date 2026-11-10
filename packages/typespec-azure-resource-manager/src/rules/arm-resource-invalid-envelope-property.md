@@ -37,3 +37,28 @@ model FooResource is TrackedResource<{}> {
 ## Suppression
 
 Suppress only when required to match an existing API; otherwise use the standard property mix-ins.
+
+Place the suppression on a shared source property to suppress the violation for every resource that
+copies the property through a template or model spread:
+
+```tsp
+model LegacyEnvelope {
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property" "Matching legacy API"
+  legacyEnvelopeValue?: string;
+}
+```
+
+Place the suppression on a concrete resource to suppress only that resource while allowing the rule
+to report other consumers of the same source property:
+
+```tsp
+model LegacyEnvelope {
+  legacyEnvelopeValue?: string;
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property" "Matching legacy API"
+model FooResource is TrackedResource<FooProperties> {
+  ...ResourceNameParameter<FooResource>;
+  ...LegacyEnvelope;
+}
+```
