@@ -50,6 +50,7 @@ import type {
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   DynamicModelDecorator,
+  LroOperationIdDecorator,
   LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -121,6 +122,30 @@ export function getLroStatusMetadataDecorator(
   target: ModelProperty,
 ): boolean | undefined {
   return getScopedDecoratorData(context, lroStatusMetadataKey, target);
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(
+    context,
+    $lroOperationId,
+    lroOperationIdKey,
+    target,
+    { target: context.decoratorTarget },
+    scope,
+  );
+};
+
+export function getLroOperationIdDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): { target: DiagnosticTarget } | undefined {
+  return getScopedDecoratorData(context, lroOperationIdKey, target);
 }
 
 /**
