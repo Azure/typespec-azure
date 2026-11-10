@@ -1932,7 +1932,7 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
 
-export const markAsLroKey = createStateSymbol("markAsLro");
+const markAsLroKey = createStateSymbol("markAsLro");
 
 export const $markAsLro: MarkAsLroDecorator = (
   context: DecoratorContext,
@@ -1967,12 +1967,8 @@ export const $markAsLro: MarkAsLroDecorator = (
   setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
 };
 
-export function getMarkAsLro(
-  context: TCGCContext,
-  entity: Operation,
-  languageScope?: string | typeof AllScopes,
-): boolean {
-  return getScopedDecoratorData(context, markAsLroKey, entity, languageScope) ?? false;
+export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
 }
 
 const markAsPageableKey = createStateSymbol("markAsPageable");
