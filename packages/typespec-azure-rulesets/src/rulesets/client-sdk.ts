@@ -9,6 +9,7 @@ export default {
     "@azure-tools/typespec-client-generator-core/use-union-hierarchy": true,
     "@azure-tools/typespec-client-generator-core/get-operation-name": false,
     "@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict": false,
+    "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
     "@azure-tools/typespec-client-generator-core/use-correct-verb": false,
     "@azure-tools/typespec-client-generator-core/use-valid-client-lro-result": true,
   },

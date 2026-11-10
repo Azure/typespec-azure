@@ -125,6 +125,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /** Whether a string client location requires preserving the exact client name. */
+  isExactName?: boolean;
   services: Namespace[];
   /** The type associated with this client. If it is created from string client location, or is a merged client, this will be undefined. */
   type?: Namespace | Interface;
@@ -1230,6 +1232,12 @@ export interface SdkLroServiceMetadata {
    * in continuation tokens; the next poll repopulates them after rehydration.
    */
   statusMetadata?: SdkLroStatusMetadata[];
+  /**
+   * Server-issued SDK long-running operation identifiers selected from the linked status-monitor
+   * operation, ordered by availability: polling URL path first, then status-monitor body property.
+   * This does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter.
+   */
+  operationId?: SdkLroOperationIdMetadata[];
 }
 
 export interface SdkLroStatusMetadata {
@@ -1242,6 +1250,29 @@ export interface SdkLroStatusMetadata {
    * Segments to get the selected value from `pollingInfo.responseModel`.
    * Currently contains only `property`, including for inherited properties.
    * Uses the effective SDK property after hierarchy reconciliation.
+   */
+  propertySegments: SdkModelPropertyType[];
+}
+
+export type SdkLroOperationIdMetadata =
+  SdkLroOperationIdPathMetadata | SdkLroOperationIdPropertyMetadata;
+
+export interface SdkLroOperationIdPathMetadata {
+  kind: "path";
+  /** Exact URI link from the status-monitor step. */
+  source: SdkOperationLink;
+  /** Exact path parameter selected from the linked status-monitor operation. */
+  pathParameter: SdkPathParameter;
+}
+
+export interface SdkLroOperationIdPropertyMetadata {
+  kind: "property";
+  /** Exact property selected from the status-monitor response model. */
+  property: SdkModelPropertyType;
+  /**
+   * Segments from `pollingInfo.responseModel` to the operation ID, using the same property
+   * objects as the response model. Currently `[property]`: only direct or inherited properties
+   * are selectable, and inheritance does not add a response-body segment.
    */
   propertySegments: SdkModelPropertyType[];
 }
@@ -1278,6 +1309,8 @@ export interface SdkNextOperationLink extends SdkLogicalOperationStep {
   kind: "nextOperationLink";
   responseModel: SdkModelType;
   target: SdkOperationLink;
+  /** Explicitly linked polling operation, when one was declared. */
+  operation?: SdkServiceOperation;
 }
 
 /**

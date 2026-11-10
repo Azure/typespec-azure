@@ -23,6 +23,7 @@ import {
   $dynamicModel,
   $flattenProperty,
   $legacyHierarchyBuilding,
+  $lroOperationId,
   $lroStatusMetadata,
   $markAsLro,
   $markAsPageable,
@@ -77,6 +78,7 @@ export const $decorators = {
     clientOption: $clientOption,
     dynamicModel: $dynamicModel,
     lroStatusMetadata: $lroStatusMetadata,
+    lroOperationId: $lroOperationId,
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {
