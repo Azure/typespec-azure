@@ -40,6 +40,7 @@ import { noQueryInPostRule } from "./rules/no-query-in-post.js";
 import { noRepeatedPathInfoRule } from "./rules/no-repeated-path-info.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
+import { noResourceDuplicatesRule } from "./rules/no-resource-duplicates.js";
 import { noResourceNameConflictRule } from "./rules/no-resource-name-conflict.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
@@ -133,6 +134,7 @@ const rules = [
   useScopeForExtensionRoutingRule,
   useScopePathStandardNameRule,
   noResourceNameConflictRule,
+  noResourceDuplicatesRule,
 ];
 
 export const $linter = defineLinter({
