@@ -11,80 +11,15 @@ The ARM resource types are `Microsoft.Compute/virtualMachines/runCommands` and
 templates derive their default logical names from the last two resource-type segments, so both
 occurrences are named `VirtualMachinesRunCommands`.
 
+These snippets assume `VmParameters` and `ScaleSetVmParameters` describe the respective parent
+paths, and `RunCommandParameters` adds the `runCommands` segment and command name parameter.
+
 ```typespec
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.ResourceManager;
-
-@armProviderNamespace
-namespace Microsoft.Compute;
-
-model RunCommandProperties {
-  /** The command to execute on the virtual machine. */
-  command?: string;
-}
-
-model RunCommand is ProxyResource<RunCommandProperties> {
-  ...ResourceNameParameter<RunCommand>;
-}
-
-alias VmParameters = {
-  ...ApiVersionParameter;
-  ...SubscriptionIdParameter;
-  ...ResourceGroupParameter;
-  ...Legacy.Provider;
-
-  @path
-  @key
-  @segment("virtualMachines")
-  vmName: string;
-};
-
-alias ScaleSetVmParameters = {
-  ...ApiVersionParameter;
-  ...SubscriptionIdParameter;
-  ...ResourceGroupParameter;
-  ...Legacy.Provider;
-
-  @path
-  @key
-  @segment("virtualMachineScaleSets")
-  scaleSetName: string;
-
-  @path
-  @key
-  @segment("virtualMachines")
-  vmName: string;
-};
-
-alias RunCommandParameters = {
-  @path
-  @key
-  @segment("runCommands")
-  commandName: string;
-};
-
 interface RunCommandOperations<ParentParameters extends {}>
   extends Legacy.LegacyOperations<ParentParameters, RunCommandParameters> {}
 
 alias VmOperations = RunCommandOperations<VmParameters>;
 alias ScaleSetVmOperations = RunCommandOperations<ScaleSetVmParameters>;
-
-@armResourceOperations
-interface VmRunCommands {
-  get is VmOperations.Read<RunCommand>;
-  list is VmOperations.List<RunCommand>;
-}
-
-@armResourceOperations
-interface ScaleSetVmRunCommands {
-  get is ScaleSetVmOperations.Read<RunCommand>;
-  list is ScaleSetVmOperations.List<RunCommand>;
-}
 ```
 
 ## Correct
@@ -103,18 +38,6 @@ interface RunCommandOperations<ParentParameters extends {}, ResourceName extends
 
 alias VmOperations = RunCommandOperations<VmParameters, "VmRunCommand">;
 alias ScaleSetVmOperations = RunCommandOperations<ScaleSetVmParameters, "ScaleSetVmRunCommand">;
-
-@armResourceOperations
-interface VmRunCommands {
-  get is VmOperations.Read<RunCommand>;
-  list is VmOperations.List<RunCommand>;
-}
-
-@armResourceOperations
-interface ScaleSetVmRunCommands {
-  get is ScaleSetVmOperations.Read<RunCommand>;
-  list is ScaleSetVmOperations.List<RunCommand>;
-}
 ```
 
 For standard resource operations, specific extensions, legacy templates, and resources at different
