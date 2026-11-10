@@ -71,6 +71,16 @@ use an unversioned namespace only when that is the actual diagnostic target.
 Preserve existing baseline annotations and avoid duplicate additions for shared
 declarations or repeated entrypoints.
 
+Use a backward-compatibility justification, not a promise of a future upgrade.
+For example:
+
+```tsp
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "Preserve the existing v5 common-types contract for backward compatibility."
+```
+
+Keep the actual selected version in the reason (for example v3, v4 or v5).
+Do not use "pending a separately reviewed upgrade."
+
 Read the complete diff and map every edit to the report. Do not change API
 contracts, common-types selections, dependencies, lockfiles, generated Swagger
 or CI settings. Do not run local compilation, builds, tests, lint, formatting,
@@ -81,7 +91,7 @@ lightweight checks on an independently requested skill update.
 Publish one suppression-only draft PR after the causality analysis. Its
 description links the linter PR and report, records source identities and edit
 counts, and says local validation was intentionally not run. Add its verified
-URL directly under the linter PR's existing Migration report section using the
+URL in a peer `## Companion suppression PR` section after Migration report using the
 [description contract](../shared/migration-pr-description.md), preserving the
 original headings, source links and report URL. Link back in the companion's
 description and update report NOTES. Verify actual pushed heads, file scope,
@@ -92,6 +102,12 @@ landing, merge, request/rerun/wait for CI, or require checkpoint B to complete
 this proposal. Ordinary CI triggered by publication may run independently;
 do not claim it passed. A complete companion does not waive an existing failed
 gate or establish success of the full native/legacy linter task.
+
+An explicitly requested heading or justification-only correction is not a
+diagnostic refresh. Keep the existing targets, PR and source branch, publish a
+normal incremental commit for reason changes, and update descriptions/report
+metadata as needed. Do not rebuild from `typespec-next`, regenerate diagnostics
+or force-push for a presentation-only correction.
 
 ## Explicit refresh only
 

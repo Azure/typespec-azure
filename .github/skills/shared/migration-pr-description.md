@@ -15,7 +15,8 @@ titles under their phase-specific contracts; do not invent a native rule name
 for a guidance-only outcome. Preserve existing PR titles unless correction is
 requested.
 
-The entire PR body must contain exactly these two sections, in this order:
+The PR body starts with these two required sections, in this order. Add the
+conditional companion section below only when a verified companion exists.
 
 ```markdown
 ## Original Swagger linter
@@ -46,13 +47,17 @@ local path, folder, archive, or unpublished branch. A group links its group note
 here; the group note links all member notes.
 
 For the queue's [companion suppression workflow](../do-linter-development-task-one-by-one/companion-suppressions.md),
-also include the verified companion URL directly beneath that report link:
+add a third peer section after Migration report, with the verified companion URL:
 
 ```markdown
-Companion suppression PR: [Azure/azure-rest-api-specs#<number>](<verified companion PR URL>)
+## Companion suppression PR
+
+[Azure/azure-rest-api-specs#<number>](<verified companion PR URL>)
 ```
 
-Keep the same two headings and all original source/report links. This limited
+Use the same heading level as Original Swagger linter and Migration report,
+not an inline label inside Migration report. Preserve both required headings
+and all original source/report links. This limited
 addition is part of default initial delivery when attributable CI findings
 justify a companion; do not add a placeholder or imply its CI passed.
 
@@ -66,7 +71,7 @@ or a description update, and recheck the unchanged link after report updates.
 
 Do not add an introduction, summary, checklist, implementation explanation,
 validation section, provenance block, local worktree paths, footer, or other
-body content beyond the companion link authorized above. Do not copy a
+body content beyond the companion section authorized above. Do not copy a
 repository PR template into the body.
 This contract replaces generic PR-description requirements for these migration
 PRs. Put other required links, including unrelated spec-fix and source-repair

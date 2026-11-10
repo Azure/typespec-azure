@@ -1092,7 +1092,7 @@ implementation, including any rename made during promotion or review. Preserve
 an existing OPEN task PR's recorded title unless a correction is part of the
 request; this convention alone does not authorize renaming existing PRs.
 
-Use the shared [two-section PR body](../shared/migration-pr-description.md):
+Use the shared [PR body contract](../shared/migration-pr-description.md):
 original Swagger documentation/logic links, then the published `migration.md`
 link. Add no other body content.
 

@@ -205,7 +205,7 @@ consumer locally.
    native finding/comparison metrics are not applicable, not zero or equivalent.
 5. **Checkpoint A: development review.** After all required development checks
    and independent local review, publish/update the one native draft PR, with
-   the shared [PR title and two-section body](../shared/migration-pr-description.md).
+   the shared [PR title and body contract](../shared/migration-pr-description.md).
    Native rule implementations use
    `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`,
    matching promotion PRs; the destination name is the final unqualified

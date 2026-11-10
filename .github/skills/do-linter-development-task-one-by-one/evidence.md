@@ -213,7 +213,7 @@ the tested snapshot; retain both identities where different. Evidence commit
 `E` references `C`, `S`, `P` and baseline `B`; the native PR's migration-report
 section links directly to `migration.md` on the actual evidence branch whose
 verified pushed head is `E`, under the shared
-[two-section PR body](../shared/migration-pr-description.md). Keep provenance in
+[PR body contract](../shared/migration-pr-description.md). Keep provenance in
 that report or its appendix, not extra PR content.
 Do not amend `C` merely to insert its own evidence hash.
 The evidence publisher returns `E` after pushing; `migration.md` need not
