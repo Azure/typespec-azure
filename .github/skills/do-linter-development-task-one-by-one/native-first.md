@@ -129,6 +129,14 @@ diagnostic gaps. A strict verifier's runtime-closure mismatch alone is not a
 blocker; this assumption does not prove identical emission or semantic equivalence,
 authorize refresh, or waive any required gate.
 
+During preparation, inspect the actual consumer integration suite and compile
+flags. If restored/default-enabled guidance produces warnings and integration
+uses `--warn-as-error`, record the likely downstream rollout dependency and its
+authorized scope before final evidence work. Warning-bearing frozen coverage
+does not establish green integration against a different current consumer
+population. Do not silently disable the rule, upgrade published contracts,
+extend cross-repository publication scope, or merge compatibility changes.
+
 ## Execute one implementation, with two review checkpoints
 
 1. **Classify and discover.** Run the native
@@ -292,7 +300,9 @@ initial cycle plus at most three task-wide semantic repair cycles; one eligible
 setup-only orchestration retry; three local draft corrections per phase/cycle
 and existing per-round review allowance; three coordinator reserve attempts;
 one native timeout diagnosis; one baseline comparison; the existing bounded
-setup-hook diagnostic/correction. Group size never multiplies allowances.
+setup-hook diagnostic/correction; and the prospective
+[local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery).
+Group size never multiplies allowances.
 Map development and promotion phase counters to development and readiness;
 returning to a phase or resuming a task never resets them. Preserve the current
 eligibility, explicit-authorization and quiescence rules, not just the numbers.
