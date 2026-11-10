@@ -95,9 +95,20 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
           }
           const compatible = createPatchPropertyCompatibility(program, metadataInfo, patch, put);
           for (const patchProperty of patchProperties) {
-            const candidates = putProperties.get(patchProperty.jsonName);
+            const candidates =
+              !patchProperty.recursive &&
+              isObjectBody(patchProperty.property.type) &&
+              putBody !== undefined
+                ? findPropertiesAtPath(
+                    program,
+                    putBody,
+                    patchProperty.jsonPath,
+                    put,
+                    metadataInfo,
+                  ).map((property) => ({ property, recursive: false }))
+                : (putProperties.get(patchProperty.jsonName) ?? []);
             if (
-              candidates?.some(
+              candidates.some(
                 (candidate) =>
                   (patchProperty.recursive && candidate.recursive) ||
                   compatible(patchProperty.property, candidate.property),
@@ -105,7 +116,7 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
             ) {
               continue;
             }
-            const messageId = candidates ? "incompatibleProperty" : "missingProperty";
+            const messageId = candidates.length > 0 ? "incompatibleProperty" : "missingProperty";
             const reportKey = `${messageId}:${patchProperty.jsonName}`;
             const reportedNames = missingProperties.get(patchProperty.target) ?? new Set();
             if (reportedNames.has(reportKey)) {
@@ -127,6 +138,7 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
 
 type LeafProperty = {
   jsonName: string;
+  jsonPath: string[];
   target: DiagnosticTarget;
   property: ModelProperty;
   recursive: boolean;
@@ -155,7 +167,42 @@ function collectLeafProperties(
     visibility,
     bodyParameter?.bodyKind === "single" ? bodyParameter.isExplicit : false,
     new Set(),
+    [],
   );
+}
+
+function findPropertiesAtPath(
+  program: Program,
+  body: Type,
+  jsonPath: string[],
+  operation: HttpOperation,
+  metadataInfo: MetadataInfo,
+): ModelProperty[] {
+  const visibility = resolveRequestVisibility(program, operation.operation, operation.verb);
+  const bodyParameter = operation.parameters.body;
+  const inExplicitBody = bodyParameter?.bodyKind === "single" ? bodyParameter.isExplicit : false;
+  let types = [body];
+  let properties: ModelProperty[] = [];
+  for (const jsonName of jsonPath) {
+    properties = types.flatMap((type) => {
+      while (type.kind === "Union") {
+        const member = getSingleNonNullMember(type);
+        if (member === undefined) return [];
+        type = member;
+      }
+      if (type.kind !== "Model") return [];
+      return [...walkJsonProperties(program, type)]
+        .filter(
+          ([name, property]) =>
+            name === jsonName &&
+            metadataInfo.isPayloadProperty(property, visibility, inExplicitBody) &&
+            !isNeverType(property.type),
+        )
+        .map(([, property]) => property);
+    });
+    types = properties.map((property) => property.type);
+  }
+  return properties;
 }
 
 function isObjectBody(type: Type): boolean {
@@ -178,6 +225,7 @@ function collectTypeLeaves(
   visibility: Visibility,
   inExplicitBody: boolean | undefined,
   visiting: Set<Model>,
+  parentPath: string[],
 ): LeafProperty[] {
   if (type.kind === "Union") {
     const member = getSingleNonNullMember(type);
@@ -190,6 +238,7 @@ function collectTypeLeaves(
           visibility,
           inExplicitBody,
           visiting,
+          parentPath,
         )
       : [];
   }
@@ -214,6 +263,8 @@ function collectTypeLeaves(
       visibility,
       inExplicitBody,
     );
+    const jsonPath = [...parentPath, jsonName];
+    const candidate = { jsonName, jsonPath, target, property, recursive: recurse };
     const nested = recurse
       ? collectTypeLeaves(
           program,
@@ -223,10 +274,11 @@ function collectTypeLeaves(
           visibility,
           inExplicitBody,
           visiting,
+          jsonPath,
         )
       : [];
     if (nested.length === 0) {
-      leaves.push({ jsonName, target, property, recursive: recurse });
+      leaves.push(candidate);
     } else {
       leaves.push(...nested);
     }

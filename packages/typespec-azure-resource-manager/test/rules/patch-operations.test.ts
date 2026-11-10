@@ -438,6 +438,123 @@ interface Widgets {
       .toBeValid();
   });
 
+  describe("opaque object containers", () => {
+    it("accepts a corresponding object with no Update-visible children", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody { properties?: Properties; tags?: string; }
+          model PatchBody { properties?: Properties; tags?: string; }
+        `),
+        )
+        .toBeValid();
+    });
+
+    it("matches nested nullable containers by inherited and encoded JSON paths", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Base {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model Properties extends Base {}
+          model PutBody {
+            @encodedName("application/json", "outer")
+            putOuter?: {
+              @encodedName("application/json", "settings") putSettings?: Properties | null;
+            };
+          }
+          model PatchBody {
+            @encodedName("application/json", "outer")
+            patchOuter?: {
+              @encodedName("application/json", "settings") patchSettings?: Properties | null;
+            };
+          }
+        `),
+        )
+        .toBeValid();
+    });
+
+    it.each([
+      ["absent", "", "/*target*/properties?: Properties;"],
+      [
+        "read-only",
+        "@visibility(Lifecycle.Read) properties?: Properties;",
+        "/*target*/properties?: Properties;",
+      ],
+      [
+        "behind a read-only ancestor",
+        "@visibility(Lifecycle.Read) outer?: { properties?: Properties; };",
+        "outer?: { /*target*/properties?: Properties; };",
+      ],
+      [
+        "at another payload position",
+        "other?: { properties?: Properties; };",
+        "/*target*/properties?: Properties;",
+      ],
+    ])("rejects a PUT counterpart that is %s", async (_, put, patch) => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody { ${put} tags?: string; }
+          model PatchBody { ${patch} tags?: string; }
+        `),
+        )
+        .toEmitDiagnostics(({ pos }) => ({
+          ...missingProperty("properties"),
+          pos: pos.target.pos,
+          end: pos.target.pos + "properties?: Properties".length,
+        }));
+    });
+
+    it("does not confuse dotted JSON names with nested paths", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody {
+            @encodedName("application/json", "outer.settings") combined?: Properties;
+          }
+          model PatchBody { outer?: { settings?: Properties; }; }
+        `),
+        )
+        .toEmitDiagnostics(missingProperty("settings"));
+    });
+
+    it("resolves finite opaque paths through recursive PUT ancestors", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model PutBody { next?: PutBody; settings?: {}; }
+          model PatchBody { next?: { settings?: {}; }; }
+        `),
+        )
+        .toBeValid();
+    });
+
+    it("checks the corresponding type instead of a compatible same-name object elsewhere", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody { properties?: string; other?: { properties?: {}; }; }
+          model PatchBody { properties?: Properties; }
+        `),
+        )
+        .toEmitDiagnostics(incompatibleProperty("properties"));
+    });
+  });
+
   it("finds inherited writable PUT leaves behind read-only direct members", async () => {
     await tester
       .expect(

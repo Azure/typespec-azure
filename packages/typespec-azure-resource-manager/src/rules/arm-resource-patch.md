@@ -6,6 +6,8 @@ The comparison includes scalar encodings, enum values, array and dictionary cont
 
 Nested and inherited properties, encoded JSON names and each operation's request visibility are included. Operations inherited into project interfaces are also checked, with library-defined findings targeted at the project interface. A shared resource property hidden from PUT input by `@parameterVisibility(Lifecycle.Create)` cannot satisfy PATCH correspondence. Expose it in PUT input or remove it from PATCH input. A nonempty PATCH body cannot correspond to an absent or void PUT body. Unsupported or ambiguous body types are not treated as empty objects.
 
+An object whose children are not writable in PATCH is compared with the PUT property at the same JSON payload position. Its container must still be valid PUT input with a compatible type; an unrelated same-named property does not satisfy this check.
+
 The check uses source models, not individual API-version shapes. Version-specific additions, removals, renames and type changes are not evaluated; version-dependent mismatches may therefore be missed or reported incorrectly. Shared version-aware lint evaluation is tracked in [#5875](https://github.com/Azure/typespec-azure/issues/5875).
 
 ## Impact
