@@ -6,6 +6,7 @@ import { casingRule } from "./rules/casing-style.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
+import { listOperationMissing200ResponseRule } from "./rules/list-operation-missing-200-response.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
@@ -24,6 +25,7 @@ import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noRedundantSummaryRule } from "./rules/no-redundant-summary.js";
+import { noRequestBodyRule } from "./rules/no-request-body.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-name-mismatch.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
@@ -69,6 +71,7 @@ const rules = [
   noUnnamedTypesRule,
   noHeaderExplodeRule,
   noRedundantSummaryRule,
+  noRequestBodyRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
   preventRestLibraryInterfaces,
@@ -89,6 +92,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
+  listOperationMissing200ResponseRule,
 ];
 
 export const $linter = defineLinter({

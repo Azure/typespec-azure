@@ -11,6 +11,7 @@ export default {
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
     "@azure-tools/typespec-azure-core/no-boolean": false,
     "@azure-tools/typespec-azure-core/no-redundant-summary": false,
+    "@azure-tools/typespec-azure-core/no-request-body": false,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
     "@azure-tools/typespec-azure-core/no-case-mismatch": true,
@@ -42,6 +43,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-query-explode": true,
     "@azure-tools/typespec-azure-core/no-header-explode": true,
     "@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": true,
+    "@azure-tools/typespec-azure-core/list-operation-missing-200-response": false,
 
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
@@ -127,5 +129,6 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
+    "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
   },
 } satisfies LinterRuleSet;

@@ -67,9 +67,9 @@ jobs:
       - template: /eng/pipelines/templates/install.yml
 
       - task: GoTool@0
-        displayName: "Use Go 1.26.1"
+        displayName: "Use Go 1.27.3"
         inputs:
-          version: "1.26.1"
+          version: "1.27.3"
 
       - task: DownloadPipelineArtifact@2
         displayName: Restore turbo build cache
