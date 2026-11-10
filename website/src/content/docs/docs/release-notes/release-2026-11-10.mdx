@@ -8,14 +8,23 @@
 - [#5959](https://github.com/Azure/typespec-azure/pull/5959) Add the `list-operation-missing-200-response` lint rule to require an HTTP 200 response on operations marked with `@list`, including data-plane and POST operations.
 - [#5507](https://github.com/Azure/typespec-azure/pull/5507) Add the `no-redundant-summary` lint rule to warn when a declaration's summary repeats its documentation.
 - [#5986](https://github.com/Azure/typespec-azure/pull/5986) Add the `no-request-body` lint rule to report GET and DELETE operations with request bodies across data-plane and Azure Resource Manager APIs.
-  
+
   ```tsp
   @get
-  op read(@body filter: { name: string }): string; // warning: GET request body
-  
+  op read(
+    @body filter: {
+      name: string;
+    },
+  ): string; // warning: GET request body
+
   @delete
-  op remove(@body options: { force: boolean }): void; // warning: DELETE request body
+  op remove(
+    @body options: {
+      force: boolean;
+    },
+  ): void; // warning: DELETE request body
   ```
+
 - [#5782](https://github.com/Azure/typespec-azure/pull/5782) Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Active selections are validated during LRO processing; unused or out-of-scope annotations have no effect. Includes emitter scopes and representative Spector scenarios.
 - [#5546](https://github.com/Azure/typespec-azure/pull/5546) Separate native LRO protocol analysis from client-result selection. Add `getLroProtocolMetadata` in `Azure.Core` with protocol facts grouped into required initial, polling, and completion objects alongside the top-level operation. Route TCGC result selection and native model usage through these facts, preserving all leaf field semantics, the flat `getLroMetadata` contract, and existing SDK result contracts.
 - [#5973](https://github.com/Azure/typespec-azure/pull/5973) Add the `use-known-enum-default` linter rule to warn when an extensible enum's default is not one of its declared values.
@@ -23,12 +32,14 @@
 ### @azure-tools/typespec-azure-resource-manager
 
 - [#5451](https://github.com/Azure/typespec-azure/pull/5451) Add the `use-standard-error` lint rule, promoting the LintDiff `LroErrorContent` check to help ARM APIs use consistent error responses. Operations other than HEAD must declare an `@error` response and use `Azure.ResourceManager.CommonTypes.ErrorResponse` for error payloads.
-  
+
   Error bodies must use the standard model directly, including through aliases or an explicit `@body` property.
+
 - [#5638](https://github.com/Azure/typespec-azure/pull/5638) Add the opt-in `no-empty-post-response` lint rule requiring a response payload for synchronous ARM resource POST 200 responses.
 - [#5526](https://github.com/Azure/typespec-azure/pull/5526) Add the `no-repeated-path-info` lint rule to warn when ARM PUT resource properties repeat path or query parameter names, honoring JSON-encoded property names and including concrete operations inherited from generic interfaces.
-  
+
   This complements `arm-resource-duplicate-property`, which checks duplication of resource envelope property names rather than URI parameter names.
+
 - [#5878](https://github.com/Azure/typespec-azure/pull/5878) Add the `no-resource-name-conflict` ARM linter rule to detect duplicate logical resource names across services. Keep the rule opt-in in the Azure `resource-manager` ruleset. Document explicit resource naming for standard operations, specific extensions, legacy templates, and different scopes.
 - [#5766](https://github.com/Azure/typespec-azure/pull/5766) Add the `private-endpoint-apis-missing` lint rule to require complete registered ARM private endpoint API sets.
 - [#5654](https://github.com/Azure/typespec-azure/pull/5654) Add the `resource-missing-read` lint rule requiring a read operation for ARM resources with create or update operations.
@@ -37,10 +48,11 @@
 - [#5684](https://github.com/Azure/typespec-azure/pull/5684) Add the opt-in `use-scope-for-extension-routing` rule for managed RPaaS extension-routing contracts. The rule requires arbitrary-scope paths rather than hardcoded parent paths. ARM library `all` does not enable this RPaaS-specific policy; specific-parent extension paths remain supported for ordinary ARM contracts.
 - [#5859](https://github.com/Azure/typespec-azure/pull/5859) Add the `use-scope-path-standard-name` lint rule for standard ARM resource-group and subscription path parameter names.
 - [#5652](https://github.com/Azure/typespec-azure/pull/5652) Add the `lro-missing-polling-metadata` lint rule, consolidating `LroExtension` and `XMSLongRunningOperationProperty`. Require native polling metadata for PATCH and marked provider/collection POST operations returning `202`, and for PUT/PATCH/POST/DELETE operations whose `200`, `201`, `202`, or `204` responses contain `Location` or `Azure-AsyncOperation` headers.
-  
+
   Use asynchronous ARM templates or preserve supported semantic LRO headers. Check concrete operations within explicit service namespaces, including nested namespaces, without a global fallback. Report once on the authored operation even when both checks apply, and resolve each eligible operation once across overlapping service declarations, including compliant operations.
-  
+
   The rule is disabled in the central resource-manager ruleset and included in the ARM library's compiler-generated `all` ruleset.
+
 - [#5974](https://github.com/Azure/typespec-azure/pull/5974) Add `no-resource-duplicates` to warn when `resolveArmResources` returns distinct records with the same case-insensitive resource type and instance path, retaining path parameter names. Register the rule disabled in the central `resource-manager` ruleset pending fixes to existing service specifications; it is available through explicit enablement or the ARM library's `all` ruleset.
 - [#5502](https://github.com/Azure/typespec-azure/pull/5502) Add the `no-tags-on-proxy-resource` lint rule for detecting unsupported envelope tags on non-tracked ARM resources, with a removal code fix for directly declared envelope tags. Resource-specific properties bags are not checked. Document how to remove unsupported tags or use the `TrackedResource` template when ARM tags are required.
 - [#5431](https://github.com/Azure/typespec-azure/pull/5431) Add selected-version and multi-service views plus dependency-neutral logical name customization to `resolveArmResources`. Callers can select independent namespace/version references for services that share an ARM provider string and receive one combined provider result. Deferred naming formulas apply consumer model names to every model-derived part of a resource name while preserving explicit names and structural grouping; complete resource names can be overridden per occurrence, synthetic resources can be identified by default name or ARM instance path, and returned resource kinds are presented consistently as `Tracked` or `Proxy`. The existing no-options call continues to return the multi-version declaration view, with an ARM emitter how-to covering resource extraction, service/version discovery, selected versions, and TCGC client naming.
@@ -53,10 +65,11 @@
 - [#5853](https://github.com/Azure/typespec-azure/pull/5853) Add the `@dynamicModel` decorator in Azure.ClientGenerator.Core to provide opt-in dynamic-model metadata for models or namespaces, with optional language scoping. Dynamic-model generation is currently supported only by the C# emitter; the shared decorator provides opt-in metadata pending emitter adoption and does not itself generate JSON Patch fields.
 - [#5782](https://github.com/Azure/typespec-azure/pull/5782) Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Active selections are validated during LRO processing; unused or out-of-scope annotations have no effect. Includes emitter scopes and representative Spector scenarios.
 - [#5677](https://github.com/Azure/typespec-azure/pull/5677) Add the scoped, property-level `@lroStatusMetadata` decorator with exact typed SDK metadata for auxiliary LRO status-monitor values and a latest-response lifecycle contract for poller or operation state, including failure and cancellation.
-  
+
   Multiple declarations on one property may use disjoint emitter scopes; overlapping scopes are diagnosed once at declaration time.
-  
+
   Access overrides now run after legacy hierarchy reconciliation and status metadata graph promotion, so overrides also apply to types materialized by those steps. This changes the processing order for all TCGC models, not only LROs.
+
 - [#5955](https://github.com/Azure/typespec-azure/pull/5955) Add `no-repeated-client-name` to warn when a common SDK method name repeats its owning subclient name, covering the SDK naming intent of `OperationIdNounVerb`. Renaming a shipped SDK method can break callers.
 - [#5591](https://github.com/Azure/typespec-azure/pull/5591) Add the `no-operation-group-name-conflict` lint rule to warn when an interface or
   namespace containing operations has the same name as a type declared in its parent
@@ -66,25 +79,26 @@
 - [#5710](https://github.com/Azure/typespec-azure/pull/5710) Expose paired endpoint and OAuth configurations through `client.clientInitialization.serviceConfigurations` without changing existing HTTP-based client initialization. Each client reads the catalog declared on its first service, with the required `public` server first; SDK-namespace catalogs do not override it. Multi-service clients use the first service's endpoint, authentication, and configuration catalog without requiring equality across services.
 - [#5601](https://github.com/Azure/typespec-azure/pull/5601) Load unified YAML examples through the shared examples resolver and normalize them into the existing SDK example model, while preserving legacy JSON loading.
 - [#5648](https://github.com/Azure/typespec-azure/pull/5648) Expose a union's explicit `extends` constraint through `SdkUnionType.baseType`. The base type receives the union's usage, access, and serialization information. TCGC leaves `baseType` undefined when variants only happen to share a common ancestor.
-  
+
   ```typespec
   model PetBase {
     name: string;
   }
-  
+
   model Cat extends PetBase {
     meow: boolean;
   }
-  
+
   model Dog extends PetBase {
     bark: boolean;
   }
-  
+
   union Pet extends PetBase {
     cat: Cat,
     dog: Dog,
   }
   ```
+
 - [#5734](https://github.com/Azure/typespec-azure/pull/5734) Infer enum value types from explicit scalar `extends` constraints on unions, preserving the declared scalar precision for known variants without changing whether the union is fixed or extensible.
 - [#5727](https://github.com/Azure/typespec-azure/pull/5727) Expose union variant names and SDK types through `SdkUnionType.variants`, an ordered `Map<string | symbol, SdkType>` matching the compiler's variant keys. Named variants use their declared string names, unnamed/default variants retain their compiler symbol keys, and synthesized variants use unique symbols. The existing `variantTypes` property retains the same type references and ordering.
 - [#5673](https://github.com/Azure/typespec-azure/pull/5673) Consolidate `use-create-for-put`, PATCH naming guidance, and DELETE naming guidance into the opt-in `use-correct-verb` lint rule. Common SDK method names must start with `create` for PUT, `update` for PATCH, and `delete` for DELETE, case-insensitively. Replace `use-create-for-put` in linter configuration and suppressions with `use-correct-verb`; enabling it also checks PATCH and DELETE. Renaming an already-shipped SDK method may be a breaking change.
@@ -137,4 +151,3 @@
 ### @azure-tools/azure-http-specs
 
 - [#5656](https://github.com/Azure/typespec-azure/pull/5656) Select ARM common types v5 for the common-properties Spector scenarios so inherited resource IDs use `armResourceIdentifier`.
-
