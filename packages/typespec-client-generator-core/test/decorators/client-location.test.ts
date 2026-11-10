@@ -1,5 +1,5 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import {
@@ -12,6 +12,109 @@ import {
 } from "../tester.js";
 
 describe("Operation", () => {
+  it("preserves exact names for distinct language-scoped operation groups", async () => {
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
+        @service
+        namespace TestService;
+
+        interface ElasticMonitorResources {
+          @route("/hosts")
+          vMHostList(): void;
+          @route("/details")
+          details(): void;
+          @route("/collection")
+          vMCollectionUpdate(): void;
+        }
+        `,
+        `
+        @@clientLocation(TestService.ElasticMonitorResources.vMHostList, exact("vMHost"), "javascript");
+        @@clientLocation(TestService.ElasticMonitorResources.details, exact("vMIngestion"), "javascript");
+        @@clientLocation(TestService.ElasticMonitorResources.vMCollectionUpdate, exact("vMCollection"), "javascript");
+        `,
+      ),
+    );
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-ts",
+    });
+    const clients = context.sdkPackage.clients[0].children;
+    ok(clients);
+    deepStrictEqual(
+      clients.map((client) => ({
+        name: client.name,
+        isExactName: client.isExactName,
+        methods: client.methods.map((method) => method.name),
+      })),
+      [
+        { name: "vMHost", isExactName: true, methods: ["vMHostList"] },
+        { name: "vMIngestion", isExactName: true, methods: ["details"] },
+        { name: "vMCollection", isExactName: true, methods: ["vMCollectionUpdate"] },
+      ],
+    );
+    for (const client of clients) {
+      strictEqual(client.__raw.clientPath, `TestServiceClient.${client.name}`);
+      strictEqual(client.clientInitialization.name, `${client.name}Options`);
+    }
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const pythonClients = pythonContext.sdkPackage.clients[0].children;
+    strictEqual(pythonClients?.length, 1);
+    strictEqual(pythonClients[0].name, "ElasticMonitorResources");
+    strictEqual(pythonClients[0].isExactName, false);
+    strictEqual(pythonClients[0].methods.length, 3);
+  });
+
+  it.each([
+    ['exact("vMHost")', 'exact("vMHost")'],
+    ['exact("vMHost")', '"vMHost"'],
+    ['"vMHost"', 'exact("vMHost")'],
+  ])("shares a virtual group for targets %s and %s", async (first, second) => {
+    const { program } = await SimpleTesterWithService.compile(`
+      @route("/first")
+      @clientLocation(${first})
+      op first(): void;
+      @route("/second")
+      @clientLocation(${second})
+      op second(): void;
+    `);
+    const context = await createSdkContextForTester(program);
+    const clients = context.sdkPackage.clients[0].children;
+    strictEqual(clients?.length, 1);
+    strictEqual(clients[0].name, "vMHost");
+    strictEqual(clients[0].isExactName, true);
+    deepStrictEqual(
+      clients[0].methods.map((method) => method.name),
+      ["first", "second"],
+    );
+  });
+
+  it("moves an operation to an existing group with an exact name", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      @route("/moved")
+      @clientLocation(exact("vMHost"))
+      op moved(): void;
+
+      @clientName("vMHost")
+      interface Hosts {
+        @route("/existing")
+        existing(): void;
+      }
+    `);
+    const context = await createSdkContextForTester(program);
+    const clients = context.sdkPackage.clients[0].children;
+    strictEqual(clients?.length, 1);
+    strictEqual(clients[0].name, "vMHost");
+    strictEqual(clients[0].isExactName, true);
+    deepStrictEqual(
+      clients[0].methods.map((method) => method.name),
+      ["moved", "existing"],
+    );
+  });
+
   it("@clientLocation client-location-wrong-type", async () => {
     const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
       `
