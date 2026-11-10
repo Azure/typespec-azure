@@ -18,16 +18,11 @@ ARM RPC rule: [`RPC-008`](https://armwiki.azurewebsites.net/api_contracts/guidel
 
 The resource operation returns a response schema that violates the RPC contract.
 
+The examples assume `Widget` is a registered ARM resource in an ARM provider namespace.
+
 ## ❌ Incorrect
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 model WidgetResult {
   value?: string;
 }
@@ -44,13 +39,6 @@ interface Widgets {
 ## ✅ Correct
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @armResourceOperations
 interface Widgets {
   create is ArmResourceCreateOrReplaceSync<Widget>;
