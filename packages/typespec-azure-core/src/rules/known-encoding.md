@@ -16,11 +16,13 @@ Non-standard formats are transmitted as the raw, unencoded wire type, which hurt
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [ValidFormats](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2003).
+This rule provides encoding-related authoring checks associated with the Swagger linter rule [ValidFormats](https://github.com/Azure/azure-openapi-validator/blob/main/docs/valid-formats.md). It checks supported `@encode` names on scalars and model properties, not all emitted OpenAPI format strings.
+
+Encoding names and OpenAPI formats are different vocabularies: for example, `rfc3339` is an encoding name, while `date-time` is an OpenAPI format. This rule complements `no-format`; neither is a one-to-one replacement for the Swagger format allowlist.
 
 #### ❌ Incorrect
 
-Unknown encoding on a model property:
+##### Model properties
 
 ```tsp
 model Foo {
@@ -29,7 +31,7 @@ model Foo {
 }
 ```
 
-Unknown encoding on a scalar:
+##### Scalars
 
 ```tsp
 @encode("custom-rfc")
@@ -38,7 +40,7 @@ scalar myDateTime extends utcDateTime;
 
 #### ✅ Correct
 
-Known encoding on a model property:
+##### Model properties
 
 ```tsp
 model Foo {
@@ -47,7 +49,7 @@ model Foo {
 }
 ```
 
-Known encoding on a scalar:
+##### Scalars
 
 ```tsp
 @encode("rfc3339")
