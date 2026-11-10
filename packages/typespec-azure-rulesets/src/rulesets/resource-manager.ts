@@ -9,6 +9,7 @@ export default {
     "@azure-tools/typespec-azure-core/byos": true,
     "@azure-tools/typespec-azure-core/casing-style": true,
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
+    "@azure-tools/typespec-azure-core/use-known-enum-default": false,
     "@azure-tools/typespec-azure-core/no-boolean": false,
     "@azure-tools/typespec-azure-core/no-redundant-summary": false,
     "@azure-tools/typespec-azure-core/no-request-body": false,
