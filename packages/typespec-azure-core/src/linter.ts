@@ -6,6 +6,7 @@ import { casingRule } from "./rules/casing-style.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
+import { listOperationMissing200ResponseRule } from "./rules/list-operation-missing-200-response.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
@@ -91,6 +92,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
+  listOperationMissing200ResponseRule,
 ];
 
 export const $linter = defineLinter({
