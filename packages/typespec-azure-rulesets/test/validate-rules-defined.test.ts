@@ -197,6 +197,19 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("keeps combined ARM collection guidance opt-in and retires the old rule", () => {
+    const name = "list-response-envelope";
+    const fullName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+    const retired = "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable";
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[fullName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[fullName], false);
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "list-operation-missing-pageable"),
+    );
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[retired], undefined);
+  });
+
   it("keeps ARM resource-group path guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-scope-path-standard-name";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);

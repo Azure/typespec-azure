@@ -1,182 +1,247 @@
 import {
+  createRule,
+  fileRef,
+  getLocationContext,
+  getNamespaceFullName,
+  getPagingOperation,
+  isArrayModelType,
+  isList,
+  isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
+  resolveEncodedName,
+  walkPropertiesInherited,
   type Interface,
   type Model,
   type ModelProperty,
   type Operation,
   type Program,
   type Type,
-  createRule,
-  fileRef,
-  getLocationContext,
-  getPagingOperation,
-  getProperty,
-  isArrayModelType,
-  isList,
-  walkPropertiesInherited,
 } from "@typespec/compiler";
-import { type HttpOperationResponse, getHttpOperation } from "@typespec/http";
-import { getArmProviderNamespace } from "../namespace.js";
+import {
+  createMetadataInfo,
+  getHttpOperation,
+  Visibility,
+  type HttpStatusCodesEntry,
+} from "@typespec/http";
+import { isCollectionPath } from "./utils.js";
 
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
   docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
-  description: "ARM list responses must use a value array and the standard nextLink envelope.",
+  description:
+    "ARM list operations must declare paging metadata and use the standard response envelope.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
     default:
-      "Collection GET response models must declare exactly the `value` and `nextLink` properties.",
-    valueArray: "Paged ARM list responses must declare a 'value' property of array type.",
+      "Collection response models must declare exactly the `value` and `nextLink` properties.",
+    valueArray: "Collection responses must declare a 'value' property of array type.",
+    missingList: "Collection GET operations must use `@list`.",
+    pageItems: "The collection response `value` must use `@pageItems`.",
+    nextLink: "The collection response `nextLink` must use `@nextLink`.",
+    pagingNextLink: "Collection operations must declare `@nextLink` paging metadata.",
+    additionalProperties: "Collection response models must not allow additional properties.",
+    pagingName: "Paging property TypeSpec names must match their JSON wire names.",
   },
   create(context) {
+    const program = context.program;
+    const metadata = createMetadataInfo(program);
     return {
       operation: (operation) => {
-        const [httpOperation] = getHttpOperation(context.program, operation);
-        const collection =
-          operation.namespace !== undefined &&
-          getArmProviderNamespace(context.program, operation.namespace) !== undefined &&
-          httpOperation.verb === "get" &&
-          isCollectionGetPath(httpOperation.path);
-        const [paging] = isList(context.program, operation)
-          ? getPagingOperation(context.program, operation)
-          : [];
-        const paged =
-          getLocationContext(context.program, operation).type === "project" &&
-          paging?.output.nextLink !== undefined;
-        if (!collection && !paged) {
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          (operation.interface !== undefined && isTemplateDeclaration(operation.interface)) ||
+          (getLocationContext(program, operation).type !== "project" &&
+            (operation.interface === undefined ||
+              getLocationContext(program, operation.interface).type !== "project"))
+        )
           return;
-        }
 
-        if (paged) {
-          for (const response of httpOperation.responses) {
-            if (response.statusCodes !== 200) continue;
-            for (const { body } of response.responses) {
-              if (body === undefined) continue;
-              const invalidValue = getInvalidValueTarget(operation, body.type);
-              if (invalidValue !== undefined) {
-                context.reportDiagnostic({
-                  target: getDiagnosticTarget(context.program, operation, invalidValue),
-                  messageId: "valueArray",
-                });
-                return;
-              }
-              if (body.type.kind === "Model") {
-                const invalidTargets = getInvalidTargets(body.type);
-                for (const invalidTarget of invalidTargets) {
-                  context.reportDiagnostic({
-                    target: getDiagnosticTarget(context.program, operation, invalidTarget),
-                  });
-                }
-                if (invalidTargets.length > 0) return;
-              }
+        const [httpOperation] = getHttpOperation(program, operation);
+        const list = isList(program, operation);
+        const collection =
+          httpOperation.verb === "get" &&
+          isCollectionPath(httpOperation.path.split("?")[0], {
+            excludeTerminalPathParameter: true,
+            excludeDefaultSegment: true,
+          });
+        if (!list && !collection) return;
+        if (!list)
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(program, operation, operation),
+            messageId: "missingList",
+          });
+
+        const [paging] = getPagingOperation(program, operation);
+        const reported = new Map<Model | ModelProperty | Operation, Set<string>>();
+        const report = (
+          target: Model | ModelProperty | Operation,
+          messageId:
+            | "default"
+            | "valueArray"
+            | "pageItems"
+            | "nextLink"
+            | "pagingNextLink"
+            | "additionalProperties"
+            | "pagingName",
+        ) => {
+          let messages = reported.get(target);
+          if (!messages) reported.set(target, (messages = new Set()));
+          if (messages.has(messageId)) return;
+          messages.add(messageId);
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(program, operation, target),
+            messageId,
+          });
+        };
+        const checkBody = (type: Type, isExplicit: boolean) => {
+          if (type.kind === "Union") {
+            for (const variant of type.variants.values()) {
+              checkBody(variant.type, isExplicit);
+            }
+            return;
+          }
+          if (type.kind !== "Model" || isArrayModelType(type)) {
+            const target = type.kind === "Model" ? type : operation;
+            report(target, "valueArray");
+            report(target, "pageItems");
+            report(target, "default");
+            return;
+          }
+          const properties = [...walkPropertiesInherited(type)].filter((property) =>
+            metadata.isPayloadProperty(property, Visibility.Read, isExplicit),
+          );
+          const jsonName = (property: ModelProperty) =>
+            resolveEncodedName(program, property, "application/json");
+          const value = properties.find((property) => jsonName(property) === "value");
+          const nextLink = properties.find((property) => jsonName(property) === "nextLink");
+          if (value && value.name !== "value") report(value, "pagingName");
+          if (nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingName");
+          if (!value || value.type.kind !== "Model" || !isArrayModelType(value.type)) {
+            report(value ?? type, "valueArray");
+          }
+          if (
+            !value ||
+            (paging?.output.pageItems.property !== value &&
+              !(
+                value.type.kind === "Model" &&
+                isArrayModelType(value.type) &&
+                hasPagingDecorator(value, "@pageItems")
+              ))
+          ) {
+            report(value ?? type, "pageItems");
+          }
+          if (
+            nextLink &&
+            paging?.output.nextLink?.property !== nextLink &&
+            !hasPagingDecorator(nextLink, "@nextLink")
+          ) {
+            report(nextLink, "nextLink");
+          }
+          if (!nextLink) report(type, "default");
+          for (const property of properties) {
+            if (jsonName(property) !== "value" && jsonName(property) !== "nextLink") {
+              report(property, "default");
             }
           }
-          return;
+          for (let model: Model | undefined = type; model; model = model.baseModel) {
+            if (model.indexer !== undefined) {
+              report(type, "additionalProperties");
+              break;
+            }
+          }
+        };
+        for (const response of httpOperation.responses) {
+          if (!includes200(response.statusCodes)) continue;
+          for (const { body } of response.responses) {
+            if (body === undefined || body.bodyKind !== "single") {
+              const target = body?.property ?? operation;
+              report(target, "valueArray");
+              report(target, "pageItems");
+              report(target, "default");
+            } else {
+              checkBody(body.type, body.isExplicit);
+            }
+          }
         }
-
-        const responseModel = get200ResponseModel(httpOperation.responses);
-        if (responseModel === undefined) {
-          return;
+        for (const pagingProperty of [paging?.output.pageItems, paging?.output.nextLink]) {
+          const property = pagingProperty?.property;
+          if (
+            property &&
+            property.name !== resolveEncodedName(program, property, "application/json") &&
+            ![...reported].some(
+              ([target, messages]) =>
+                target.kind === "ModelProperty" &&
+                messages.has("pagingName") &&
+                isHttpPayloadCloneOf(target, property),
+            )
+          ) {
+            report(property, "pagingName");
+          }
         }
-        const value = getProperty(responseModel, "value");
-        if (value !== undefined && (value.type.kind !== "Model" || !isArrayModelType(value.type))) {
-          context.reportDiagnostic({
-            target: getDiagnosticTarget(context.program, operation, value),
-            messageId: "valueArray",
-          });
-          return;
+        const hasReported = (messageId: string) =>
+          [...reported.values()].some((messages) => messages.has(messageId));
+        if (paging === undefined && !hasReported("pageItems")) {
+          report(operation, "pageItems");
         }
-
-        for (const invalidTarget of getInvalidTargets(responseModel)) {
-          context.reportDiagnostic({
-            target: getDiagnosticTarget(context.program, operation, invalidTarget),
-          });
+        if (
+          !(paging?.output.nextLink || hasNextLink(operation.returnType)) &&
+          !hasReported("nextLink")
+        ) {
+          report(operation, "pagingNextLink");
         }
       },
     };
   },
 });
 
-function isCollectionGetPath(path: string): boolean {
-  const pathWithoutQuery = path.split("?")[0];
-  if (pathWithoutQuery.endsWith("}") || path.endsWith("operations") || path.endsWith("default")) {
-    return false;
-  }
+function includes200(status: HttpStatusCodesEntry): boolean {
+  return status === 200 || (typeof status === "object" && status.start <= 200 && status.end >= 200);
+}
 
-  const providerTail = pathWithoutQuery.split(".").at(-1);
+// HTTP may synthesize a filtered body model whose properties clone the original response properties.
+function isHttpPayloadCloneOf(clone: ModelProperty, original: ModelProperty): boolean {
+  const model = clone.model;
   return (
-    providerTail !== undefined &&
-    providerTail.includes("/") &&
-    providerTail.split("/").length % 2 === 0
+    clone.sourceProperty === original &&
+    model?.node === undefined &&
+    model !== undefined &&
+    model.sourceModels.some(({ model: source }) =>
+      [...walkPropertiesInherited(source)].includes(original),
+    )
   );
 }
 
-function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefined {
-  for (const response of responses) {
-    if (response.statusCodes !== 200) {
-      continue;
-    }
-
-    for (const content of response.responses) {
-      const body = content.body;
-      if (body?.bodyKind !== "single" || body.type.kind !== "Model") {
-        continue;
-      }
-
-      const bodyModel = body.property?.type.kind === "Model" ? body.property.type : body.type;
-      if (isArrayModelType(bodyModel) || bodyModel.properties.size === 0) {
-        continue;
-      }
-
-      return bodyModel;
-    }
-  }
-
-  return undefined;
+// Paging metadata can be absent or point to another property when the compiler reports errors.
+function hasPagingDecorator(property: ModelProperty, name: "@pageItems" | "@nextLink"): boolean {
+  return property.decorators.some(
+    (x) =>
+      x.definition?.name === name && getNamespaceFullName(x.definition.namespace) === "TypeSpec",
+  );
 }
 
-function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
-  const invalidTargets: ModelProperty[] = [];
-  let hasValue = false;
-  let hasNextLink = false;
-
-  for (const property of walkPropertiesInherited(responseModel)) {
-    if (property.name === "value") {
-      hasValue = true;
-    } else if (property.name === "nextLink") {
-      hasNextLink = true;
-    } else {
-      invalidTargets.push(property);
-    }
+function hasNextLink(type: Type, visited = new Set<Type>()): boolean {
+  if (visited.has(type)) return false;
+  visited.add(type);
+  if (type.kind === "Union") {
+    return [...type.variants.values()].some((variant) => hasNextLink(variant.type, visited));
   }
-
-  return invalidTargets.length === 0 && (!hasValue || !hasNextLink)
-    ? [responseModel]
-    : invalidTargets;
+  if (type.kind === "Model") {
+    return [...walkPropertiesInherited(type)].some(
+      (property) =>
+        hasPagingDecorator(property, "@nextLink") || hasNextLink(property.type, visited),
+    );
+  }
+  return false;
 }
 
 function getDiagnosticTarget(
   program: Program,
   operation: Operation,
-  invalidTarget: Model | ModelProperty | Operation,
+  target: Model | ModelProperty | Operation,
 ): Interface | Operation | Model | ModelProperty {
-  if (getLocationContext(program, invalidTarget).type === "project") {
-    return invalidTarget;
-  }
-
-  if (getLocationContext(program, operation).type === "project") {
-    return operation;
-  }
-
-  return operation.interface ?? operation;
-}
-
-function getInvalidValueTarget(
-  operation: Operation,
-  type: Type,
-): Model | ModelProperty | Operation | undefined {
-  if (type.kind !== "Model") return operation;
-  const value = getProperty(type, "value");
-  if (value === undefined) return type;
-  return value.type.kind === "Model" && isArrayModelType(value.type) ? undefined : value;
+  if (getLocationContext(program, target).type === "project") return target;
+  return getLocationContext(program, operation).type === "project"
+    ? operation
+    : (operation.interface ?? operation);
 }

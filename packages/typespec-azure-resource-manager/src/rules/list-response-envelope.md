@@ -1,23 +1,18 @@
-ARM list responses must use a predictable envelope containing exactly an array-valued `value` and
-`nextLink`. Additional top-level properties or a missing envelope property make generated clients
-and pagination tooling handle list operations inconsistently.
+ARM collection operations must use a predictable response envelope and TypeSpec paging metadata. Prefer the standard ARM list operation templates.
 
 ## Impact
 
-- **Area:** API
+- **Area:** API, SDK
 
-Collection response envelopes with other shapes violate the ARM RPC contract and can produce
-inconsistent generated client pagination behavior.
+The rule checks project `@list` operations, including operations inherited by project interfaces, regardless of verb or route. It also checks project GET operations on collection-shaped provider paths, including resource and provider actions and `/operations`. A collection GET must be marked `@list`. Paging metadata is checked independently of HTTP response status. HTTP 200 response envelopes must contain only an array-valued JSON `value` with `@pageItems` and a JSON `nextLink` with `@nextLink`. Inherited properties are included. `@nextLink` may be optional in the response: its absence at runtime indicates there is no next page. Extra top-level properties and indexers allowing additional properties are reported independently of missing metadata or invalid envelope properties.
 
-The rule combines collection-path and paging-metadata checks under the existing
-`list-response-envelope` rule name. ARM-provider collection GET paths retain their
-envelope validation. Authored `@list` operations with a paging `@nextLink` are also
-checked, including POST list actions and operations without provider metadata.
-Inherited envelope properties are included. The `value` property must be an array,
-and the next-link property must be named `nextLink`, not a custom envelope name.
-Prefer standard ARM list operation templates, which provide this envelope.
+The TypeSpec names of paging properties must match their JSON wire names: AutoRest uses the TypeSpec names in emitted paging metadata. For a 200 envelope, name those properties `value` and `nextLink` in TypeSpec as well as JSON; `@encodedName` cannot be used to give differently named paging properties those JSON names.
+
+Every HTTP 200 response alternative is checked, including each member of a union and any explicit status-code range containing 200. Bodyless responses, arrays, scalars, records, files, and multipart bodies do not provide the required envelope. Default (`*`) and non-200 responses are outside this rule's response check.
 
 ## ❌ Incorrect
+
+### Unmarked collection and extra response property
 
 ```tsp
 model WidgetListResult {
@@ -31,35 +26,50 @@ model WidgetListResult {
 op listWidgets(@path subscriptionId: string): WidgetListResult;
 ```
 
+### List action with a nonstandard item property
+
+```tsp
+model WidgetPage {
+  @pageItems items: Widget[];
+  @nextLink nextLink?: string;
+}
+
+@post @list op listWidgets(): WidgetPage;
+```
+
 ## ✅ Correct
+
+### Custom list operation
 
 ```tsp
 model WidgetListResult {
-  value: Widget[];
-  nextLink?: string;
+  @pageItems value: Widget[];
+  @nextLink nextLink?: string;
 }
 
 @route("/subscriptions/{subscriptionId}/providers/Contoso.Widgets/widgets")
 @get
+@list
 op listWidgets(@path subscriptionId: string): WidgetListResult;
+```
+
+### Standard ARM template
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  listByParent is ArmResourceListByParent<Widget>;
+}
 ```
 
 ## LintDiff Equivalent
 
-### Consolidated list-response coverage
+The rule combines [GetCollectionOnlyHasValueAndNextLink](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/get-collection-only-has-value-and-next-link.ts), [CollectionObjectPropertiesNaming](https://github.com/Azure/azure-openapi-validator/blob/main/docs/collection-object-properties-naming.md), and [XmsPageableForListCalls](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-pageable-for-list-calls.md). It checks native TypeSpec metadata and response models, not emitted Swagger. The former proposed `list-response-value-array` checks remain part of this rule.
 
-The checks formerly proposed as `list-response-value-array` are part of the existing `list-response-envelope` rule; its public name is retained.
+## Migration
 
-| Migrated lintdiff rule                                                                                                                                                                     | Coverage in this existing TypeSpec rule                                                                                                      |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| [GetCollectionOnlyHasValueAndNextLink](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/get-collection-only-has-value-and-next-link.ts) | Checks that eligible collection response models have exactly the `value` and `nextLink` envelope properties, including inherited properties. |
-| [CollectionObjectPropertiesNaming](https://github.com/Azure/azure-openapi-validator/blob/main/docs/collection-object-properties-naming.md)                                                 | Requires the `value` property to be an array and combines that requirement with the standard envelope names.                                 |
-
-Both applicability populations are retained: ARM-provider collection GET paths and authored `@list` operations whose paging metadata has a `@nextLink`, including POST actions and provider-free operations. Checks use HTTP 200 response bodies. Paging metadata alone does not prove the array or envelope shape; `list-operation-missing-pageable` remains a separate metadata check.
-
-The combined native contract intentionally rejects a custom next-link property name even when it has valid paging metadata. These mappings describe TypeSpec response models and metadata, not emitted Swagger inspection or unchanged historical diagnostic counts.
+The `list-operation-missing-pageable` rule ID has been retired. Replace it with `list-response-envelope` in linter configurations and suppressions, reviewing each suppression because the combined rule also checks envelope shape. The combined rule remains disabled by default in `@azure-tools/typespec-azure-rulesets/resource-manager` and remains part of the ARM library's `all` ruleset.
 
 ## Suppression
 
-Suppress this rule only when compatibility requirements prevent the response envelope from
-containing exactly `value` and `nextLink`.
+Suppress this rule only when compatibility requirements prevent the standard collection envelope or paging metadata.
