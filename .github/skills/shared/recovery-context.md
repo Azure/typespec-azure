@@ -42,7 +42,8 @@ bases, owners or repair history.
 Native-first maps the existing development/promotion preparation budgets to
 development/release-readiness. All eligibility and finite limits below still
 apply: task-wide orchestration/semantic-repair/reserve/timeout/comparison/hook
-allowances are shared by the whole group, never multiplied per member.
+allowances, including the bounded local UTF-8 recovery below, are shared by the
+whole group, never multiplied per member.
 Checkpoint B production-semantic defects return to A then B under the existing
 three-repair-cycle cap; documentation-only corrections reuse A only when its
 applicable content/inputs are unchanged. Keep all earlier failures and counters.
@@ -174,6 +175,16 @@ green, increase timeouts, skip tests, or fix unrelated code. A failed required
 check cannot be demoted after the fact, and missing prior classification must
 not be filled in opportunistically.
 
+## Local helper execution
+
+Run task-owned Python helpers with `python -X utf8` (prefixed by `mise exec --`
+when available). Explicitly specify `encoding="utf-8"` for text reads and
+writes, including JSON, Markdown and appended status metadata; generate
+publication text with LF endings. Do not rely on Windows' default text encoding.
+Keep structured console output ASCII-escaped when a shell may re-encode it.
+Read Git blobs, archives and raw captures as bytes; never re-encode immutable
+evidence to fix a reader.
+
 ## Validation receipt parsing
 
 Use these rules for development, promotion and review handoffs; do not build a
@@ -234,13 +245,24 @@ correction allowances. Record the following before escalating:
 
 Do not require the user to debug policy selection. Separate these cases:
 
+- **Administrative recording failed:** inspect the actual receipt schema rather
+  than assuming equivalent records use identical keys. A state-writer exception
+  is not a failed product test or CI job. When no particular recording tool is
+  mandated and authoritative passing receipts, content identities and verified
+  remote state already establish every required fact, persist a complete
+  schema-correct direct handoff without rerunning that writer or the
+  passing checks merely to reconstruct bookkeeping. Retain the failed writer
+  and reconcile its side effects. Missing facts, failed assertions or incomplete
+  required records still block; this is not a validation or publication waiver.
 - **Actual permission/capability missing:** name the repository, operation and
   unsupported control or denied access. Previously verified access is not a
   blocker merely because an earlier summary says "authorization required."
 - **Already permitted continuation:** verified explicit-target worktree reuse,
   an unattempted publication after its preflight obstacle is resolved, or a
   disclosed supplemental limitation may permit the next unfinished step.
-  Verify their specific contracts; do not rerun a failed command.
+  Verify their specific contracts; do not rerun a failed command without an
+  applicable bounded correction. Check the local UTF-8 recovery below before
+  escalating an otherwise eligible encoding-only failure after budget exhaustion.
 - **A new exception or retry is needed:** preserve the stop and exact finite
   authorization required. Generic "continue" or "give access" does not increase
   a retry budget, override a user-imposed gate, permit app ownership adoption,
@@ -263,16 +285,17 @@ sentence. Record the request and response together. Generic access approval or
 
 Use these decision cases when reviewing changes to the contracts:
 
-| Case                                                                                   | Expected outcome                                                            |
-| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Clean, recorded CLI task worktree; no PR attempt; explicit targeting now available     | Verify reuse and creation binding; continue without app adoption.           |
-| Ownerless worktree needs an app-session creation binding                               | Require authorized app adoption; CLI presence is not a bypass.              |
-| Optional broad run times out; exact required checks pass; no task-linked failure found | Disclose the limitation and continue; no automatic full-suite retry.        |
-| Same run was explicitly required by the user                                           | Remain blocked until the required gate is satisfied or the user changes it. |
-| Required test fails, even in apparently unrelated setup                                | Preserve the failed gate and bounded recovery policy.                       |
-| Supplemental assertion demonstrates a source-rule defect                               | Return source-repair evidence; do not patch only the promoted copy.         |
-| PR creation response is indeterminate and the exact query is empty                     | Do not resend; preserve publication-recovery stop.                          |
-| Content changes or prior owner activity is uncertain                                   | Invalidate affected evidence or stop; do not reuse by path/name alone.      |
+| Case                                                                                   | Expected outcome                                                                                           |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Clean, recorded CLI task worktree; no PR attempt; explicit targeting now available     | Verify reuse and creation binding; continue without app adoption.                                          |
+| Ownerless worktree needs an app-session creation binding                               | Require authorized app adoption; CLI presence is not a bypass.                                             |
+| Optional broad run times out; exact required checks pass; no task-linked failure found | Disclose the limitation and continue; no automatic full-suite retry.                                       |
+| Same run was explicitly required by the user                                           | Remain blocked until the required gate is satisfied or the user changes it.                                |
+| Administrative writer fails after all required facts were independently verified       | Reconcile authoritative receipts and persist the complete handoff; do not invent a duplicate product gate. |
+| Required test fails, even in apparently unrelated setup                                | Preserve the failed gate and bounded recovery policy.                                                      |
+| Supplemental assertion demonstrates a source-rule defect                               | Return source-repair evidence; do not patch only the promoted copy.                                        |
+| PR creation response is indeterminate and the exact query is empty                     | Do not resend; preserve publication-recovery stop.                                                         |
+| Content changes or prior owner activity is uncertain                                   | Invalidate affected evidence or stop; do not reuse by path/name alone.                                     |
 
 ## Opt-in post-merge source repair
 
@@ -382,6 +405,41 @@ of network/authentication, review requests, publication, email or unknown
 cleanup. When ineligible or exhausted, report the precise blocker rather than
 asking the user for a generic "continue." Explicit finite resumption remains
 available, but is not needed for an eligible reserve attempt.
+
+### Bounded local UTF-8 recovery
+
+For queue tasks started under this contract, invocation authorizes **one
+encoding-only local helper correction per rule task**, shared across phases,
+members and reviews. Prefer the ordinary draft allowance while available; after
+both ordinary and coordinator-reserve exhaustion, the coordinator may grant this allowance
+to the same owner without user input. Record the grant and debit before dispatch;
+preserve every earlier counter and failure. Reloading these instructions does
+not grant recovery to a historical stopped task or override an explicit user limit.
+
+Require all of the following:
+
+- The original traceback and actual input bytes prove a task-owned local
+  reader/writer used the wrong default encoding. A decode error alone does not
+  prove valid UTF-8 input or establish the cause.
+- Commands have stopped; input/content identities and side effects are known.
+  Any partial task-owned output can be safely restored from preserved bytes.
+  No product validation failure or data mismatch is being relabeled as encoding.
+- The correction changes only explicit UTF-8 text I/O, UTF-8 Python execution,
+  or structured console escaping. Assertions, required fields, validation
+  population, source/artifacts, dependencies and raw evidence stay unchanged.
+
+Correct the helper and rerun its original failed evidence-processing scope
+once, including invalidated checks. Reuse unchanged passing product receipts;
+do not rerun builds/corpus merely because their receipt reader failed. Retain
+the original exception, corrective diff, debit and complete rerun result.
+A second failure exhausts this allowance; any further action needs an already
+applicable remaining allowance or the normal precise blocker handoff.
+
+This never retries external side effects, publication, email, CI or failed
+product validation, and never authorizes unknown cleanup or skill edits during
+an active loop. Review collector/API parsing and collector-result display remain
+exclusively subject to the review skill's stricter local-collector recovery.
+Standalone skills receive no additional allowance from this queue policy.
 
 ### Bounded native baseline comparison
 

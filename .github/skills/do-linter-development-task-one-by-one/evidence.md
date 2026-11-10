@@ -99,12 +99,21 @@ preserving it; this is not permission to allow arbitrary drive paths or skip
 the remaining sanitization checks.
 
 When validating evidence with tools installed in a prepared native/tooling
-checkout, explicitly select that checkout's configuration. The command's cwd
-alone does not prevent configuration discovery beside the target files.
+checkout, use that prepared checkout as the formatter's cwd as well as explicitly
+selecting its configuration and the applicable ignore file. An explicit config
+alone may not resolve bare plugins from an unprepared evidence cwd; cwd alone
+does not prevent configuration discovery beside the target files.
 Verify configuration equivalence and retain applicable rules and overrides.
 Disable nested discovery only when no distinct required configuration is
 omitted. Do not install or build the evidence checkout merely to load an
 identical configuration from the prepared checkout.
+
+Apply the shared [local helper execution](../shared/recovery-context.md#local-helper-execution)
+defaults to evidence validators and publication/status writers, not just the
+review collector. For a proven encoding-only helper failure, use the existing
+ordinary correction or the coordinator-owned
+[bounded local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery);
+do not report it as failed CI or request user input while that recovery is eligible.
 
 Write generated publication text, including JSON and task-scoped
 `.gitattributes`, as UTF-8 with LF endings before freezing published hashes.

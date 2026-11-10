@@ -331,6 +331,8 @@ Keep an ordered ledger with one entry per parsed queue entry:
 - coordinator-owned local reserve usage (three total per task) and native
   baseline-comparison usage (one per task), eligibility decisions, same-owner
   handoffs and required rerun results; preserve these across every phase/cycle
+- bounded local UTF-8 recovery usage (one prospective encoding-only correction
+  per task), eligibility evidence and same-owner grant; never reset ordinary counters
 - predeclared required/supplemental validation plan, authority and per-command
   disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
@@ -568,18 +570,23 @@ side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-Except for the narrowly eligible native-test timeout and setup-hook recovery below,
+Except for the narrowly eligible native-test timeout, setup-hook recovery below,
+and shared [local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery),
 external/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
 
 Before treating an exhausted local allowance as terminal, apply the shared
 [coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+For a proven local encoding-only helper failure, also evaluate the separate
+[bounded local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery)
+before asking the user, including when both ordinary and reserve budgets are
+exhausted. It is not permission to retry a real failed test, CI or publication.
 Keep the task running during its nonterminal handoff. This queue invocation
 authorizes the coordinator, not the worker, to allocate up to three reserve
 attempts across the entire rule task. Continue the same owner without restarting
 its phase or review pair; retain ordinary counters and all failed attempts.
-Local-recovery, native-comparison and setup-hook handoffs are explicit exceptions
+Local-recovery, local-UTF-8, native-comparison and setup-hook handoffs are explicit exceptions
 to the otherwise restricted same-worker follow-ups. In app-session mode, continue the
 recorded phase owner instead. Do not create a replacement worker or a fresh
 review invocation for either handoff. Pass both task-wide counters and the
