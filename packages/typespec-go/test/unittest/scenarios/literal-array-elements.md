@@ -32,10 +32,17 @@ op create(@body preferences: Preferences): Preferences;
 package testmodule
 
 type Preferences struct {
-	BooleanValues                       []*bool
-	EnumValues                          []*Tier
-	NumericValues                       []*int32
-	StorageAccountAccessTierPreferences []*string
+	// FLAG; CONSTANT; Field has constant value []bool{true}, any specified value is ignored.
+	BooleanValues []bool
+
+	// FLAG; CONSTANT; Field has constant value []Tier{TierArchive}, any specified value is ignored.
+	EnumValues []Tier
+
+	// FLAG; CONSTANT; Field has constant value []int32{1}, any specified value is ignored.
+	NumericValues []int32
+
+	// FLAG; CONSTANT; Field has constant value []string{"Archive"}, any specified value is ignored.
+	StorageAccountAccessTierPreferences []string
 }
 ```
 
@@ -51,17 +58,23 @@ package testmodule
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"reflect"
 )
 
 // MarshalJSON implements the json.Marshaller interface for type Preferences.
 func (p Preferences) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]any)
-	populate(objectMap, "booleanValues", p.BooleanValues)
-	populate(objectMap, "enumValues", p.EnumValues)
-	populate(objectMap, "numericValues", p.NumericValues)
-	populate(objectMap, "storageAccountAccessTierPreferences", p.StorageAccountAccessTierPreferences)
+	if p.BooleanValues != nil {
+		objectMap["booleanValues"] = []bool{true}
+	}
+	if p.EnumValues != nil {
+		objectMap["enumValues"] = []Tier{TierArchive}
+	}
+	if p.NumericValues != nil {
+		objectMap["numericValues"] = []int32{int32(1)}
+	}
+	if p.StorageAccountAccessTierPreferences != nil {
+		objectMap["storageAccountAccessTierPreferences"] = []string{"Archive"}
+	}
 	return json.Marshal(objectMap)
 }
 
@@ -92,16 +105,6 @@ func (p *Preferences) UnmarshalJSON(data []byte) error {
 		}
 	}
 	return nil
-}
-
-func populate(m map[string]any, k string, v any) {
-	if v == nil {
-		return
-	} else if azcore.IsNullValue(v) {
-		m[k] = nil
-	} else if !reflect.ValueOf(v).IsNil() {
-		m[k] = v
-	}
 }
 
 func unpopulate(data json.RawMessage, fn string, v any) error {
@@ -149,7 +152,10 @@ op read(): Preferences;
 package testmodule
 
 type Preferences struct {
-	NullableValues                      []*string
+	// FLAG; CONSTANT
+	NullableValues []string
+
+	// FLAG; CONSTANT
 	StorageAccountAccessTierPreferences []string
 }
 ```
@@ -164,15 +170,17 @@ package testmodule
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"reflect"
 )
 
 // MarshalJSON implements the json.Marshaller interface for type Preferences.
 func (p Preferences) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]any)
-	populate(objectMap, "nullableValues", p.NullableValues)
-	populate(objectMap, "storageAccountAccessTierPreferences", p.StorageAccountAccessTierPreferences)
+	if p.NullableValues != nil {
+		objectMap["nullableValues"] = []string{"Archive"}
+	}
+	if p.StorageAccountAccessTierPreferences != nil {
+		objectMap["storageAccountAccessTierPreferences"] = []string{"Archive"}
+	}
 	return json.Marshal(objectMap)
 }
 
@@ -197,16 +205,6 @@ func (p *Preferences) UnmarshalJSON(data []byte) error {
 		}
 	}
 	return nil
-}
-
-func populate(m map[string]any, k string, v any) {
-	if v == nil {
-		return
-	} else if azcore.IsNullValue(v) {
-		m[k] = nil
-	} else if !reflect.ValueOf(v).IsNil() {
-		m[k] = v
-	}
 }
 
 func unpopulate(data json.RawMessage, fn string, v any) error {

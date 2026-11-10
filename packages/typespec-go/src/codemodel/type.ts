@@ -362,6 +362,7 @@ export type SliceElementType =
   | Constant
   | EncodedBytes
   | Interface
+  | Literal<Constant | Scalar | String>
   | Map
   | Model
   | MultipartContent

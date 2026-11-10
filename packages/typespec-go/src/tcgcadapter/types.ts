@@ -258,7 +258,11 @@ export class TypeAdapter {
           return <go.Slice>arrayType;
         }
 
-        let elementType = this.getWireType(valueType, elementTypeByValue, substituteDiscriminator);
+        const elementType = this.getWireType(
+          valueType,
+          elementTypeByValue,
+          substituteDiscriminator,
+        );
         switch (elementType.kind) {
           case "constantDef":
           case "constantValue":
@@ -271,6 +275,7 @@ export class TypeAdapter {
             );
         }
 
+        let sliceElementType: go.SliceElementType;
         if (elementType.kind === "literal") {
           if (!helpers.isSliceElementLiteral(elementType)) {
             throw new AdapterError(
@@ -279,14 +284,15 @@ export class TypeAdapter {
               type.valueType.__raw?.node,
             );
           }
-          // An element literal does not make the entire array a constant.
-          elementType = elementType.type;
+          // literals are always encoded by value
+          sliceElementType = elementType;
+        } else {
+          sliceElementType =
+            !myElementTypeByValue && helpers.isPtrType(elementType)
+              ? this.getPtrType(elementType)
+              : elementType;
         }
 
-        const sliceElementType =
-          !myElementTypeByValue && helpers.isPtrType(elementType)
-            ? this.getPtrType(elementType)
-            : elementType;
         arrayType = new go.Slice(sliceElementType);
         arrayType.xmlName = xmlItemsName;
         this.types.set(keyName, arrayType);

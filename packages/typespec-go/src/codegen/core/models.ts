@@ -395,20 +395,20 @@ function generateModelDefs(
         (fieldType.kind !== "literal" || model.usage === go.UsageFlags.Output)
       ) {
         descriptionMods.push("REQUIRED");
-      } else if (fieldType.kind === "literal") {
+      } else if (fieldType.kind === "literal" || go.isSlice(fieldType, "literal")) {
         if (!field.annotations.required) {
           descriptionMods.push("FLAG");
         }
         descriptionMods.push("CONSTANT");
       }
-      if (fieldType.kind === "literal" && model.usage !== go.UsageFlags.Output) {
+      if ((fieldType.kind === "literal" || go.isSlice(fieldType, "literal")) && model.usage !== go.UsageFlags.Output) {
         // add a comment with the const value for const properties that are sent over the wire
         if (field.docs.description) {
           field.docs.description += "\n";
         } else {
           field.docs.description = "";
         }
-        field.docs.description += `Field has constant value ${helpers.formatLiteralValue(fieldType, false)}, any specified value is ignored.`;
+        field.docs.description += `Field has constant value ${formatLiteralValue(fieldType, model.pkg, false)}, any specified value is ignored.`;
       } else if (fieldType.kind === "rawJSON") {
         // raw JSON is emitted as []byte, so document that the field contains raw
         // JSON and that the caller is responsible for marshaling their data structure.
@@ -722,8 +722,8 @@ function generateJSONMarshallerBody(
       marshaller += `${indent.get()}}\n`;
       marshaller += `${indent.get()}populate(objectMap, "${field.serializedName}", aux)\n`;
       modelDef.SerDe.needsJSONPopulate = true;
-    } else if (fieldType.kind === "literal") {
-      const setter = `objectMap["${field.serializedName}"] = ${helpers.formatLiteralValue(fieldType, true)}`;
+    } else if (fieldType.kind === "literal" || go.isSlice(fieldType, "literal")) {
+      const setter = `objectMap["${field.serializedName}"] = ${formatLiteralValue(fieldType, modelDef.Model.pkg, true)}`;
       if (!field.annotations.required) {
         marshaller += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
         marshaller += `${indent.push().get()}${setter}\n`;
@@ -1597,4 +1597,14 @@ function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): stri
     }
   }
   return serialization;
+}
+
+/** expanded version of helpers.formatLiteralValue than handles slices */
+function formatLiteralValue(type: go.Literal | go.Slice<go.Literal<go.Constant | go.Scalar | go.String>>, pkg: go.PackageContent, withCast: boolean): string {
+  switch (type.kind) {
+    case "literal":
+      return helpers.formatLiteralValue(type, withCast);
+    case "slice":
+      return `[]${go.getTypeDeclaration(type.itemType.type, pkg)}{${helpers.formatLiteralValue(type.itemType, withCast)}}`;
+  }
 }
