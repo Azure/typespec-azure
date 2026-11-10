@@ -44,6 +44,7 @@ import {
   type HttpOperationMultipartBody,
   type HttpPayloadBody,
   Visibility,
+  getAuthentication,
   getServers,
   isHeader,
   isOrExtendsHttpFile,
@@ -1546,11 +1547,14 @@ function getSdkCredentialType(
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClientType<SdkHttpOperation>,
-  authentication: Authentication | undefined = client.authentication,
+  authentication?: Authentication,
 ): SdkCredentialParameter | undefined {
-  if (!authentication) return undefined;
+  // Multiple services only deal with the first server config
+  const service = client.__raw.services[0];
+  const auth = authentication ?? getAuthentication(context.program, service);
+  if (!auth) return undefined;
   return {
-    type: getSdkCredentialType(context, client, authentication),
+    type: getSdkCredentialType(context, client, auth),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,

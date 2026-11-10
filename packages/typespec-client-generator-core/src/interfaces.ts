@@ -83,7 +83,6 @@ export interface TCGCContext {
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
-  __mergedSubClientTypes?: Map<SdkClient, (Namespace | Interface)[]>;
   __clientToOperationsCache?: Map<SdkClient, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient>;
   __clientParametersCache: Map<SdkClient, SdkMethodParameter[]>;
@@ -625,7 +624,7 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
-  /** Paired deployment configurations; existing initialization fields describe public. */
+  /** Paired deployment configurations from the first service; initialization parameters are unchanged. */
   serviceConfigurations?: {
     defaultConfiguration: string;
     configurations: SdkServiceConfiguration[];

@@ -47,6 +47,7 @@ import {
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
+  getServers,
   type HttpOperation,
   type HttpOperationResponseContent,
   type HttpPayloadBody,
@@ -1382,17 +1383,12 @@ export function getClientServiceConfigurations(
   context: TCGCContext,
   client: SdkClient,
 ): AzureServiceConfigurations | undefined {
-  const defaults = client.services.map((service) =>
-    getAzureServiceConfigurations(context.program, service),
-  );
-  for (let current: SdkClient | undefined = client; current; current = current.parent) {
-    const type = current.type ?? context.__mergedSubClientTypes?.get(current)?.[0];
-    if (!type) continue;
-    const candidate = getAzureServiceConfigurations(context.program, type);
-    // Inherited service defaults must not hide a customized SDK parent's catalog.
-    if (candidate && !defaults.includes(candidate)) return candidate;
-  }
-  return defaults[0];
+  const service = client.services[0];
+  const catalog = getAzureServiceConfigurations(context.program, service);
+  // Do not inherit a catalog whose server is not declared on this service.
+  return getServers(context.program, service)?.[0] === catalog?.configurations[0].server
+    ? catalog
+    : undefined;
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {

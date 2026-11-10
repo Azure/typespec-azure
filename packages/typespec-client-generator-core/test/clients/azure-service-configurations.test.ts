@@ -1,5 +1,6 @@
+import { getAzureServiceConfigurations } from "@azure-tools/typespec-azure-core";
 import { expectDiagnostics, resolveVirtualPath } from "@typespec/compiler/testing";
-import { getAuthentication, getHttpOperation } from "@typespec/http";
+import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
 import { ok } from "assert";
 import { expect, it } from "vitest";
 import { parse } from "yaml";
@@ -28,7 +29,7 @@ function getCredential(client: SdkClientType) {
 }
 
 it.each(["python", "csharp", "java", "go", "ts"])(
-  "projects paired configurations and default initialization for %s",
+  "projects paired configurations without changing HTTP initialization for %s",
   async (language) => {
     const { program } = await AzureCoreTester.compile(`
       ${definitions}
@@ -67,24 +68,49 @@ it.each(["python", "csharp", "java", "go", "ts"])(
       flows: [{ scopes: [{ value: "https://api.loganalytics.us/.default" }] }],
     });
     const credential = getCredential(client);
-    expect(credential.type).toMatchObject({
-      kind: "credential",
-      scheme: {
-        model: { name: "PublicAuth" },
-        flows: [{ scopes: [{ value: "https://api.loganalytics.io/.default" }] }],
-      },
-    });
+    ok(credential.type.kind === "union");
+    expect(credential.type.variantTypes.map((type) => type.scheme.model.name)).toEqual([
+      "PublicAuth",
+      "GovernmentAuth",
+    ]);
     const endpoint = client.clientInitialization.parameters.find(
       (parameter) => parameter.kind === "endpoint",
     );
-    expect(endpoint?.type).toMatchObject({
-      kind: "endpoint",
-      templateArguments: [{ clientDefaultValue: "https://api.loganalytics.io" }],
-    });
-    expect(client.authentication?.options).toHaveLength(1);
-    expect(getAuthentication(program, client.__raw.services[0])?.options).toHaveLength(2);
+    ok(endpoint?.type.kind === "union");
+    expect(
+      endpoint.type.variantTypes.map((type) => type.templateArguments[0].clientDefaultValue),
+    ).toEqual(["https://api.loganalytics.io", "https://api.loganalytics.us"]);
+    const service = client.__raw.services[0];
+    expect(client.authentication).toBe(getAuthentication(program, service));
+    expect(client.authentication?.options).toHaveLength(2);
+    const rawCatalog = getAzureServiceConfigurations(program, service);
+    const defaultConfiguration = rawCatalog?.configurations.find(
+      (configuration) => configuration.name === rawCatalog.defaultConfiguration,
+    );
+    ok(defaultConfiguration);
+    expect(getServers(program, service)?.[0]).toBe(defaultConfiguration.server);
   },
 );
+
+it("keeps a versioned service's catalog aligned with its HTTP metadata", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    ${definitions}
+    @service @versioned(Versions) @azureServiceConfigurations(Configurations)
+    namespace Service {
+      enum Versions { v1: "2025-01-01", v2: "2026-01-01" }
+      @get op read(): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const client = context.sdkPackage.clients[0];
+  expect(
+    client.clientInitialization.serviceConfigurations?.configurations.map(
+      (configuration) => configuration.endpoint.serverUrl,
+    ),
+  ).toEqual(["https://api.loganalytics.io", "https://api.loganalytics.us"]);
+  expect(client.authentication).toBe(getAuthentication(program, client.__raw.services[0]));
+});
 
 it("keeps ordinary multi-flow OAuth scopes unchanged without a configuration catalog", async () => {
   const { program } = await AzureCoreTester.compile(`
@@ -175,7 +201,13 @@ it("retains required instance endpoints and key/token alternatives in every conf
       ],
     });
   }
-  expect(getCredential(client).type).toMatchObject({ kind: "union", variantTypes: [{}, {}] });
+  const credential = getCredential(client);
+  ok(credential.type.kind === "union");
+  expect(credential.type.variantTypes.map((type) => type.scheme.model.name)).toEqual([
+    "PublicAuth",
+    "Key",
+    "GovernmentAuth",
+  ]);
 });
 
 it("keeps OR-of-AND requirements local to each configuration", async () => {
@@ -205,7 +237,7 @@ it("keeps OR-of-AND requirements local to each configuration", async () => {
 });
 
 it.each(["virtual", "auto-merged"])(
-  "inherits a customized parent's catalog for %s children",
+  "keeps the service's catalog despite SDK-parent overrides for %s children",
   async (kind) => {
     const { program } = await AzureCoreTester.compile(`
           ${definitions}
@@ -228,54 +260,42 @@ it.each(["virtual", "auto-merged"])(
       (candidate) => candidate.name === (kind === "virtual" ? "Moved" : "Operations"),
     );
     ok(child);
-    expect(child.clientInitialization.serviceConfigurations).toMatchObject({
-      defaultConfiguration: "public",
-      configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
-    });
+    for (const current of [client, child]) {
+      expect(
+        current.clientInitialization.serviceConfigurations?.configurations.map(
+          (configuration) => configuration.endpoint.serverUrl,
+        ),
+      ).toEqual(["https://api.loganalytics.io", "https://api.loganalytics.us"]);
+      expect(current.__raw.services[0]).toBe(client.__raw.services[0]);
+      expect(current.authentication).toBe(getAuthentication(program, client.__raw.services[0]));
+    }
     expect(child.clientInitialization.serviceConfigurations).not.toBe(
       client.clientInitialization.serviceConfigurations,
     );
   },
 );
 
-it("prefers a child namespace's catalog over a customized SDK parent", async () => {
+it("does not apply an enclosing namespace's catalog to a service without its own servers", async () => {
   const { program } = await AzureCoreTester.compile(`
-        ${definitions}
-        const LocalConfigurations = #{
-          public: #{ endpoint: "https://local.example.com", authentication: typeref(GovernmentAuth) },
-        };
-        @service @azureServiceConfigurations(Configurations)
-        namespace Service {
-          @azureServiceConfigurations(LocalConfigurations)
-          namespace Operations { @get @route("/child") op read(): void; }
-        }
-        const PrivateConfigurations = #{
-          public: #{ endpoint: "https://private.example.com", authentication: typeref(PublicAuth) },
-        };
-        @azureServiceConfigurations(PrivateConfigurations)
-        @client({name: "Customized", service: Service, autoMergeService: true})
-        namespace Clients.Customized {}
-      `);
+    ${definitions}
+    @azureServiceConfigurations(Configurations)
+    namespace Parent {
+      @service namespace Service { @get op read(): void; }
+    }
+  `);
   const context = await createSdkContextForTester(program);
   expect(context.diagnostics).toEqual([]);
   const client = context.sdkPackage.clients[0];
-  const child = client.children?.[0];
-  expect(client.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "public",
-    configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
-  });
-  expect(child?.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "public",
-    configurations: [{ endpoint: { serverUrl: "https://local.example.com" } }],
-  });
-  ok(child);
-  expect(getCredential(child).type).toMatchObject({
-    kind: "credential",
-    scheme: { model: { name: "GovernmentAuth" } },
-  });
+  expect(client.clientInitialization).not.toHaveProperty("serviceConfigurations");
+  expect(client.authentication).toBeUndefined();
+  const endpoint = client.clientInitialization.parameters.find(
+    (parameter) => parameter.kind === "endpoint",
+  );
+  ok(endpoint?.type.kind === "endpoint");
+  expect(endpoint.type.templateArguments[0].clientDefaultValue).toBeUndefined();
 });
 
-it("preserves matching catalogs on merged children and grandchildren", async () => {
+it("keeps the service's catalog on merged children and grandchildren", async () => {
   const { program } = await AzureCoreTester.compile(`
     ${definitions}
     const LocalConfigurations = #{
@@ -312,76 +332,23 @@ it("preserves matching catalogs on merged children and grandchildren", async () 
   const root = context.sdkPackage.clients[0];
   const child = root.children?.[0];
   const grandchild = child?.children?.[0];
-  expect(root.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "public",
-    configurations: [{ endpoint: { serverUrl: "https://private.example.com" } }],
-  });
-  expect(child?.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "public",
-    configurations: [{ endpoint: { serverUrl: "https://local.example.com" } }],
-  });
-  expect(grandchild?.clientInitialization.serviceConfigurations).toMatchObject({
-    defaultConfiguration: "public",
-    configurations: [{ endpoint: { serverUrl: "https://nested.example.com" } }],
-  });
   ok(child && grandchild);
-  for (const client of [child, grandchild]) {
-    expect(getCredential(client).type).toMatchObject({
-      kind: "credential",
-      scheme: { model: { name: "GovernmentAuth" } },
-    });
+  for (const client of [root, child, grandchild]) {
+    expect(
+      client.clientInitialization.serviceConfigurations?.configurations.map(
+        (configuration) => configuration.endpoint.serverUrl,
+      ),
+    ).toEqual(["https://api.loganalytics.io", "https://api.loganalytics.us"]);
+    expect(client.__raw.services[0]).toBe(root.__raw.services[0]);
+    const credential = getCredential(client);
+    ok(credential.type.kind === "union");
+    expect(credential.type.variantTypes.map((type) => type.scheme.model.name)).toEqual([
+      "PublicAuth",
+      "GovernmentAuth",
+    ]);
   }
   expect(grandchild.methods.map((method) => method.name)).toEqual(["first", "second"]);
 });
-
-it.each(["child", "grandchild"])(
-  "uses the first catalog on merged %s namespaces even when later catalogs differ",
-  async (level) => {
-    const { program } = await AzureCoreTester.compile(`
-      ${definitions}
-      const FirstLocal = #{
-        public: #{ endpoint: "https://first.example.com", authentication: typeref(GovernmentAuth) },
-      };
-      const SecondLocal = #{
-        public: #{ endpoint: "https://second.example.com", authentication: typeref(GovernmentAuth) },
-      };
-      @service @azureServiceConfigurations(Configurations)
-      namespace First {
-        @azureServiceConfigurations(FirstLocal)
-        namespace Operations {
-          ${level === "grandchild" ? "@azureServiceConfigurations(FirstLocal)" : ""}
-          namespace Nested { @get @route("/first") op first(): void; }
-        }
-      }
-      @service @azureServiceConfigurations(Configurations)
-      namespace Second {
-        @azureServiceConfigurations(${level === "child" ? "SecondLocal" : "FirstLocal"})
-        namespace Operations {
-          ${level === "grandchild" ? "@azureServiceConfigurations(SecondLocal)" : ""}
-          namespace Nested { @get @route("/second") op second(): void; }
-        }
-      }
-      @client({service: [First, Second], autoMergeService: true})
-      namespace Combined {}
-    `);
-    const context = await createSdkContextForTester(program);
-    expectDiagnostics(program.diagnostics, []);
-    expect(context.diagnostics).toEqual([]);
-    const child = context.sdkPackage.clients[0].children?.[0];
-    const grandchild = child?.children?.[0];
-    for (const client of [child, grandchild]) {
-      ok(client);
-      expect(
-        client.clientInitialization.serviceConfigurations?.configurations[0].endpoint.serverUrl,
-      ).toBe("https://first.example.com");
-      expect(getCredential(client).type).toMatchObject({
-        kind: "credential",
-        scheme: { model: { name: "GovernmentAuth" } },
-      });
-    }
-    expect(grandchild?.methods.map((method) => method.name)).toEqual(["first", "second"]);
-  },
-);
 
 it("does not overwrite explicit operation and interface authentication", async () => {
   const { program } = await AzureCoreTester.compile(`
@@ -486,14 +453,13 @@ it.each(["First, Second", "Second, First"])(
     const endpoint = client.clientInitialization.parameters.find(
       (parameter) => parameter.kind === "endpoint",
     );
-    expect(endpoint?.type).toMatchObject({
-      kind: "endpoint",
-      templateArguments: [
-        {
-          clientDefaultValue: first ? "https://first.example.com" : "https://second.example.com",
-        },
-      ],
-    });
+    ok(endpoint);
+    const endpoints = endpoint.type.kind === "union" ? endpoint.type.variantTypes : [endpoint.type];
+    expect(endpoints.map((type) => type.templateArguments[0].clientDefaultValue)).toEqual(
+      first
+        ? ["https://first.example.com"]
+        : ["https://second.example.com", "https://government.example.com"],
+    );
     const expectedAuth = {
       model: { name: first ? "PublicAuth" : "GovernmentAuth" },
       flows: [
@@ -567,22 +533,6 @@ it("projects configuration-specific authentication and credential alternatives",
     ["PublicAuth", "Key", "NoAuth"],
     ["GovernmentTokenAuth", "Key"],
   ]);
-});
-
-it("uses public authentication regardless of declaration order", async () => {
-  const { program } = await AzureCoreTester.compile(`
-    ${definitions}
-    @service @azureServiceConfigurations(Configurations)
-    namespace Service { @get op read(): void; }
-  `);
-  const context = await createSdkContextForTester(program);
-  expect(context.diagnostics).toEqual([]);
-  const client = context.sdkPackage.clients[0];
-  expect(getCredential(client).type).toMatchObject({
-    kind: "credential",
-    scheme: { model: { name: "PublicAuth" } },
-  });
-  expect(client.clientInitialization.serviceConfigurations?.defaultConfiguration).toBe("public");
 });
 
 it("does not bind configurations by matching scopes", async () => {
@@ -661,13 +611,11 @@ it("includes endpoint parameter types reachable only from a non-default configur
   expect(context.sdkPackage.enums).toContain(region);
 });
 
-it.each(["child", "grandchild"])(
-  "includes endpoint enums referenced only by a %s catalog",
-  async (level) => {
-    const { program } = await AzureCoreTester.compile(`
+it("includes non-default endpoint enums from a child's own service", async () => {
+  const { program } = await AzureCoreTester.compile(`
       ${definitions}
       enum Region { East: "east", West: "west" }
-      const LocalConfigurations = #{
+      const RegionalConfigurations = #{
         public: #{ endpoint: "https://local.example.com", authentication: typeref(PublicAuth) },
         government: #{
           endpoint: "https://{region}.government.example.com",
@@ -676,22 +624,28 @@ it.each(["child", "grandchild"])(
         },
       };
       @service @azureServiceConfigurations(Configurations)
-      namespace Service {
-        ${level === "child" ? "@azureServiceConfigurations(LocalConfigurations)" : ""}
+      namespace First { @get @route("/first") op first(): void; }
+      @service @azureServiceConfigurations(RegionalConfigurations)
+      namespace Second {
         namespace Operations {
-          ${level === "grandchild" ? "@azureServiceConfigurations(LocalConfigurations)" : ""}
-          namespace Nested { @get op read(): void; }
+          @get @route("/second") op second(): void;
         }
       }
-    `);
-    const context = await createSdkContextForTester(program);
-    expect(context.diagnostics).toEqual([]);
-    const child = context.sdkPackage.clients[0].children?.[0];
-    const client = level === "child" ? child : child?.children?.[0];
-    const configuration = client?.clientInitialization.serviceConfigurations?.configurations[1];
-    const region = configuration?.endpoint.templateArguments[0].type;
-    ok(region?.kind === "enum");
-    expect(region.usage & UsageFlags.Input).toBeTruthy();
-    expect(context.sdkPackage.enums).toContain(region);
-  },
-);
+      @client({service: [First, Second], autoMergeService: true})
+      namespace Combined {}
+  `);
+  const context = await createSdkContextForTester(program);
+  expect(context.diagnostics).toEqual([]);
+  const root = context.sdkPackage.clients[0];
+  const child = root.children?.[0];
+  expect(root.__raw.services[0].name).toBe("First");
+  expect(child?.__raw.services[0].name).toBe("Second");
+  expect(
+    root.clientInitialization.serviceConfigurations?.configurations[1].endpoint.serverUrl,
+  ).toBe("https://api.loganalytics.us");
+  const configuration = child?.clientInitialization.serviceConfigurations?.configurations[1];
+  const region = configuration?.endpoint.templateArguments[0].type;
+  ok(region?.kind === "enum");
+  expect(region.usage & UsageFlags.Input).toBeTruthy();
+  expect(context.sdkPackage.enums).toContain(region);
+});

@@ -62,7 +62,7 @@ For services with caller-supplied instance endpoints, use `endpoint: "{endpoint}
 
 Compile `main.tsp` using your language emitter as described in [Setup](./01setup.mdx).
 
-TCGC keeps the existing client endpoint, credential, and authentication fields aligned with the `public` default. The complete catalog is available on `client.clientInitialization.serviceConfigurations`:
+TCGC keeps the existing HTTP-based client initialization unchanged: the endpoint parameter includes all servers from the client's first service, and the credential and authentication fields include that service's combined authentication alternatives. Azure Core places the `public` server first, matching the catalog's default. The complete paired catalog is available separately on `client.clientInitialization.serviceConfigurations`:
 
 | Field                             | Meaning                                                |
 | --------------------------------- | ------------------------------------------------------ |
@@ -74,7 +74,7 @@ TCGC keeps the existing client endpoint, credential, and authentication fields a
 
 An adopting emitter must select the endpoint and authentication from the same entry. For Government, that means `https://api.loganalytics.us`, the `login.microsoftonline.us` OAuth URLs, and `https://api.loganalytics.us/.default`; it must not combine the Government endpoint with Public scopes.
 
-Child clients inherit the nearest configuration catalog, including a customized SDK parent's catalog, unless they declare a local override. Local catalogs must also declare `public`. Clients that merge services use the first service's endpoint, authentication, and configuration catalog; TCGC does not compare the other services' settings. If the first service has no catalog, a later service's catalog is not selected. Same-named merged child clients use the first child's local catalog, while preserving inherited SDK-parent overrides.
+Each client, including a child client, gets its catalog from the same first service used by its existing initialization logic. Only a catalog declared on that service is projected; catalogs on SDK-client namespaces or other non-service namespaces do not override it. Clients that merge services use the first service's endpoint, authentication, and configuration catalog; TCGC does not compare the other services' settings. If the first service has no catalog, a later service's catalog is not selected.
 
 ## Credential and runtime boundaries
 

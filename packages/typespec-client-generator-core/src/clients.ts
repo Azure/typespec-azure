@@ -1,7 +1,11 @@
-import type { AzureServiceConfigurations } from "@azure-tools/typespec-azure-core";
 import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getAuthentication, getServers, type HttpServer } from "@typespec/http";
+import {
+  type Authentication,
+  getAuthentication,
+  getServers,
+  type HttpServer,
+} from "@typespec/http";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -45,6 +49,14 @@ function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType |
     return undefined;
   }
   return context.getPackageVersionSdkEnum().get(client.services[0]);
+}
+
+function getClientAuthentication(
+  context: TCGCContext,
+  client: SdkClient,
+): Authentication | undefined {
+  const service = client.services[0];
+  return service ? getAuthentication(context.program, service) : undefined;
 }
 
 function getEndpointTypeFromSingleServer<
@@ -141,13 +153,12 @@ function getEndpointTypeFromSingleServer<
 function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   context: TCGCContext,
   client: SdkClientType<TServiceOperation>,
-  defaultServer?: HttpServer,
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const rawClient = client.__raw;
   // For multiple services, just take the first one to get servers
   const service = rawClient.services[0];
-  const servers = defaultServer ? [defaultServer] : getServers(context.program, service);
+  const servers = getServers(context.program, service);
   const types: SdkEndpointType[] = [];
 
   if (servers === undefined) {
@@ -208,8 +219,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     name = getLibraryName(context, client.type);
   }
   const clientType = getActualClientType(client);
-  const serviceConfigurations = getClientServiceConfigurations(context, client);
-  const service = client.services[0];
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -224,10 +233,9 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
-    // Azure Core keeps public first; otherwise use the first service's authentication.
-    authentication:
-      serviceConfigurations?.configurations[0].authentication ??
-      (service ? getAuthentication(context.program, service) : undefined),
+    // Multiple services currently use the first service for client-level endpoint and credential
+    // metadata. Keep authentication aligned with that behavior.
+    authentication: getClientAuthentication(context, client),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
@@ -248,34 +256,23 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     }
   }
   // Handle default client parameters (endpoint, credential, api version, subscription id)
-  diagnostics.pipe(addDefaultClientParameters(context, sdkClientType, serviceConfigurations));
+  addDefaultClientParameters(context, sdkClientType);
+  const configurations = diagnostics.pipe(getSdkServiceConfigurations(context, sdkClientType));
+  if (configurations) sdkClientType.clientInitialization.serviceConfigurations = configurations;
 
   return diagnostics.wrap(sdkClientType);
 }
 
 function addDefaultClientParameters<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  context: TCGCContext,
-  client: SdkClientType<TServiceOperation>,
-  serviceConfigurations?: AzureServiceConfigurations,
-): [void, readonly Diagnostic[]] {
+>(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
   const diagnostics = createDiagnosticCollector();
   const defaultClientParamters = [];
   // there will always be an endpoint property
-  defaultClientParamters.push(
-    diagnostics.pipe(
-      getSdkEndpointParameter(context, client, serviceConfigurations?.configurations[0].server),
-    ),
-  );
+  defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
   const credentialParam = getSdkCredentialParameter(context, client);
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
-  }
-  if (serviceConfigurations) {
-    client.clientInitialization.serviceConfigurations = diagnostics.pipe(
-      getSdkServiceConfigurations(context, client, serviceConfigurations),
-    );
   }
   let apiVersionParam = context.__clientParametersCache
     .get(client.__raw)
@@ -330,15 +327,15 @@ function addDefaultClientParameters<
     ...defaultClientParamters,
     ...client.clientInitialization.parameters,
   ];
-  return diagnostics.wrap(undefined);
 }
 
 function getSdkServiceConfigurations<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   client: SdkClientType<TServiceOperation>,
-  catalog: AzureServiceConfigurations,
-): [NonNullable<SdkClientInitializationType["serviceConfigurations"]>, readonly Diagnostic[]] {
+): [SdkClientInitializationType["serviceConfigurations"], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const catalog = getClientServiceConfigurations(context, client.__raw);
+  if (!catalog) return diagnostics.wrap(undefined);
   const configurations: SdkServiceConfiguration[] = [];
   for (const configuration of catalog.configurations) {
     const [endpoint] = diagnostics.pipe(
