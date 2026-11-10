@@ -1,6 +1,7 @@
 import { type Program, createRule, fileRef } from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
+import { recordMissingDefaultResponse } from "./http-response-utils.js";
 
 /**
  * Verify that a put operation has the correct response codes.
@@ -37,6 +38,7 @@ export const armPutResponseCodesRule = createRule({
                 statusCodes.size !== expected.size ||
                 ![...statusCodes].every((v) => expected.has(v))
               ) {
+                recordMissingDefaultResponse(program, op.httpOperation);
                 context.reportDiagnostic({
                   target: op.operation,
                 });

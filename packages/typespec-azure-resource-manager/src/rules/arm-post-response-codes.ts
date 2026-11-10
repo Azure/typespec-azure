@@ -4,6 +4,7 @@ import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import type { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import type { ArmResourceOperation } from "../operations.js";
 import { getArmResources } from "../resource.js";
+import { recordMissingDefaultResponse } from "./http-response-utils.js";
 
 /**
  * Verify that a post operation has the correct response codes.
@@ -40,6 +41,7 @@ export const armPostResponseCodesRule = createRule({
       const expected =
         statusCodes.size === 2 ? new Set(["202", "*"]) : new Set(["202", "200", "*"]);
       if (statusCodes.size !== expected.size || ![...statusCodes].every((v) => expected.has(v))) {
+        recordMissingDefaultResponse(context.program, op.httpOperation);
         context.reportDiagnostic({
           target: op.operation,
           messageId: "async",
@@ -76,6 +78,7 @@ export const armPostResponseCodesRule = createRule({
             statusCodes.size === expected.size && [...statusCodes].every((v) => expected.has(v)),
         )
       ) {
+        recordMissingDefaultResponse(context.program, op.httpOperation);
         context.reportDiagnostic({
           target: op.operation,
           messageId: "sync",
