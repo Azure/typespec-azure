@@ -46,7 +46,9 @@ See [Configuring output directory for more info](https://typespec.io/docs/handbo
 
 **Type:** `string`
 
-Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 

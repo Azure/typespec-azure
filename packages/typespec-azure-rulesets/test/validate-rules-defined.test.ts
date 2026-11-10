@@ -164,6 +164,13 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps extensible enum default guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
   it("keeps GET and DELETE request body guidance opt-in in both presets", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-request-body";
     ok(AzureCoreLinter.rules.some((rule) => rule.name === "no-request-body"));
