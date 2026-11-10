@@ -10,6 +10,8 @@ This document explains how to manage versioning in TypeSpec projects, including 
 
 Versioning allows you to evolve your API without breaking existing clients. By using versioning decorators, you can specify when resources, operations, or properties are added, removed, or changed.
 
+If a change corrects the API contract for one version, it is generally appropriate to make the same correction in previous versions that share that contract. Use version-specific models when an earlier version intentionally has a different contract.
+
 ## Declaring Versions
 
 Define your API versions in an enum. For each version, specify dependencies and common types as needed.
@@ -158,7 +160,7 @@ interface Employees {
 In version `v2`, you want to:
 
 - Make the `location` header parameter optional.
-- Add a new optional query parameter `orderBy`.
+- Add the standard optional `$filter` query parameter.
 
 You can achieve this using the `@madeOptional` and `@added` decorators:
 
@@ -173,8 +175,8 @@ interface Employees {
       location?: string;
 
       @added(Versions.v2)
-      @query("order-by")
-      orderBy?: string;
+      @query("$filter")
+      filter?: string;
     }
   >;
 }
@@ -183,7 +185,8 @@ interface Employees {
 **Explanation:**
 
 - `@madeOptional(Versions.v2)` makes `location` optional starting in v2.
-- `@added(Versions.v2)` adds the `orderBy` query parameter in v2 and later.
+- `@added(Versions.v2)` adds the `$filter` query parameter in v2 and later. ARM collection GET
+  operations do not allow other query parameters besides `api-version`.
 
 ### Converting an Operation from Synchronous to Asynchronous
 

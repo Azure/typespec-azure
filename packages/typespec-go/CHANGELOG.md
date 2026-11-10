@@ -1,5 +1,20 @@
 # Release History
 
+## 0.18.0
+
+### Features
+
+- [#5850](https://github.com/Azure/typespec-azure/pull/5850) Support generating Go clients in the browser playground using its virtual filesystem.
+  Browser generation skips native Go formatting, module tidying, and post-generation transformations.
+  Command-line generation is unchanged.
+- [#5858](https://github.com/Azure/typespec-azure/pull/5858) Add support for emitting SSE operations, including JSON and text events, encoded and polymorphic envelope payloads, terminal events, and fake servers.
+
+### Bug Fixes
+
+- [#5779](https://github.com/Azure/typespec-azure/pull/5779) Ensure operation errors are assigned before returning when `inject-spans` is enabled so tracing spans record HTTP response and decoding failures.
+- [#5893](https://github.com/Azure/typespec-azure/pull/5893) Return `fake/nonRetriableError` by reference and update the receiver on the marker method to match.
+
+
 ## 0.17.6
 
 ### Bug Fixes

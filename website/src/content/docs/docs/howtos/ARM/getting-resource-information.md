@@ -78,6 +78,40 @@ for (const operation of provider.providerOperations ?? []) {
 }
 ```
 
+## How list operations are associated
+
+List operations do not create resource identities. The resolver first detects occurrences from read and create/update operations, then associates each registered list with existing occurrences of its resource model:
+
+- Every resource kind matches its immediate parent collection: the instance path with its final resource-name segment removed. A parent resource's collection does not automatically match a child or auxiliary resource.
+- Resource-group-scoped tracked resources also match the corresponding subscription collection, with the resource-group scope segment removed and the remaining provider, complete resource-type path, and parent identities preserved. Proxy, extension, and other resource kinds do not automatically match across scopes.
+- A nonempty explicit resource name supplied through `@armResourceList` or an operation template overrides automatic matching and selects every occurrence of that model with the matching logical name, even across scopes. If no name matches, the list remains unassociated. Empty or omitted name parameters use automatic matching.
+
+For example, a resource with the instance path:
+
+```text
+/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}
+```
+
+matches the immediate parent list path for every resource kind:
+
+```text
+/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets
+```
+
+If the resource is tracked, it also automatically matches the subscription list path:
+
+```text
+/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets
+```
+
+A proxy resource at that same instance path automatically matches only the immediate parent list path. For a child resource at `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/parts/{partName}`, the immediate parent list path is `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/parts`, not the widgets collection.
+
+Extension resources at tenant, subscription, resource group, management group, service group, and external-resource scopes remain separate occurrences. Each matches its own parent collection; sharing the same extension type does not imply cross-scope association.
+
+Lists are attached to every eligible identity, including equivalent-path records with different standard and legacy derived names. Unmatched lists remain in `provider.providerOperations` with `kind: "list"` and do not produce additional resources. Associated lists do not also appear as provider operations.
+
+Matching ignores HTTP parameter spelling and static-segment casing, but not path structure. Variable providers or type segments do not enable guessed cross-scope matches. Consumer naming callbacks run after list association, so customized names do not alter grouping or wire metadata.
+
 ## Resolve one API version
 
 Pass the exact value of a member in the service's `@versioned` enum:
