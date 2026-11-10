@@ -1094,7 +1094,7 @@ request; this convention alone does not authorize renaming existing PRs.
 
 Use the shared [PR body contract](../shared/migration-pr-description.md):
 original Swagger documentation/logic links, then the published `migration.md`
-link. Add no other body content.
+link and the verified companion section when applicable. Add no other body content.
 
 Keep all of the following required analysis in `migration.md` or its linked
 appendix, within the shared four-section report plus NOTES contract:
