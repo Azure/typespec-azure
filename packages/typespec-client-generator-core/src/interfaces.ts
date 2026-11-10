@@ -22,13 +22,13 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  Visibility,
   type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
   type HttpStatusCodeRange,
   type HttpVerb,
-  Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";
 
@@ -626,8 +626,21 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+  /** Paired deployment configurations from the first service; initialization parameters are unchanged. */
+  serviceConfigurations?: {
+    defaultConfiguration: string;
+    configurations: SdkServiceConfiguration[];
+  };
   /** How to initialize a client. */
   initializedBy: InitializedByFlags;
+}
+
+/** A deployment's endpoint and authentication, independent of native constructor shape. */
+export interface SdkServiceConfiguration {
+  name: string;
+  endpoint: SdkEndpointType;
+  authentication: Authentication;
+  credential?: SdkCredentialParameter;
 }
 
 /**
