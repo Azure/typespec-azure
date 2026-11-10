@@ -10,7 +10,7 @@ This rule checks the presence of the fallback, not its payload shape or error ma
 
 A default error response gives generated clients a consistent contract for unexpected failure status codes.
 
-## Incorrect
+## ❌ Incorrect
 
 Assume `Widget` is an ARM resource. Removing the template's error response leaves no default response.
 
@@ -21,7 +21,7 @@ interface Widgets {
 }
 ```
 
-## Correct
+## ✅ Correct
 
 ```tsp
 @armResourceOperations
