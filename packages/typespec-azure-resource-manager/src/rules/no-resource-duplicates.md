@@ -5,18 +5,6 @@ Mixed legacy and standard operation templates can derive different logical resou
 The examples below use these resource declarations:
 
 ```typespec
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.ResourceManager;
-
-@armProviderNamespace
-@service
-namespace Microsoft.Contoso;
-
 model WidgetProperties {
   label?: string;
 }
