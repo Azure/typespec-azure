@@ -104,6 +104,13 @@ describe("expect all rules to be defined", () => {
     ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-uninformative-doc"));
   });
 
+  it("keeps repeated client-name guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/no-repeated-client-name";
+    for (const rulesetName of ["client-sdk", "data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
   it("enables consolidated ARM common-types version guidance", () => {
     const ruleset = $linter.ruleSets?.["resource-manager"];
     ok(ruleset);
@@ -160,6 +167,27 @@ describe("expect all rules to be defined", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
+  it("keeps extensible enum default guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
+  it("keeps GET and DELETE request body guidance opt-in in both presets", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-request-body";
+    ok(AzureCoreLinter.rules.some((rule) => rule.name === "no-request-body"));
+    for (const rulesetName of ["resource-manager", "data-plane"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/rpc-operation-request-body"
+        ],
+        true,
+      );
     }
   });
 
