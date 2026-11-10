@@ -136,6 +136,11 @@ authorized scope before final evidence work. Warning-bearing frozen coverage
 does not establish green integration against a different current consumer
 population. Do not silently disable the rule, upgrade published contracts,
 extend cross-repository publication scope, or merge compatibility changes.
+The default [companion suppression proposal](companion-suppressions.md) is the
+narrowly authorized consumer scope when existing CI proves PR-caused findings.
+Its checkout starts from current canonical `typespec-next`, not the frozen
+coverage source. It is not a new replay worktree or permission to validate the
+consumer locally.
 
 ## Execute one implementation, with two review checkpoints
 
@@ -211,6 +216,12 @@ extend cross-repository publication scope, or merge compatibility changes.
    invocation carrying `flowVersion: native-first`, task/members and
    `checkpoint: development-review`. Preserve the full five-round limit,
    persistent agents, verified review-specific collection and parent approval.
+   Before the initial linter handoff, the coordinator prepares the default
+   [CI-derived companion proposal](companion-suppressions.md#initial-delivery-by-default)
+   when applicable, links it directly in the description, and records its
+   pinned linter/consumer identities. Missing evidence is disclosed, not
+   replaced by local validation or guessed suppressions. Existing companions
+   refresh only on explicit request; changed linter heads otherwise mark them stale.
 6. **Checkpoint B: release readiness.** Keep the same native publisher/PR.
    Apply the shared native contract's full package/docs/ruleset/integration
    requirements, a separate independent local readiness review, and a fresh
@@ -221,6 +232,12 @@ extend cross-repository publication scope, or merge compatibility changes.
    current applicable A/B reviews, required checks, evidence commit/assets and
    all links. Preserve intentional differences and limitations. Confirm every
    command/worker/review agent stopped before preparing the next task.
+
+Companion proposal completion is publication of the attributed suppression PR
+and direct links, not landing it or making external CI green. A user-requested
+proposal-only continuation does not run checkpoint B or CI/merge coordination.
+The full native task still retains its own required checks and readiness
+classification; a published companion is not a waiver or a passing CI result.
 
 If B changes production semantics, invalidate affected tests/coverage and return
 to A on the new content, then B. Documentation-only fixes repeat affected
