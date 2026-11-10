@@ -176,7 +176,17 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   }
-  if (format === "JSON" || format === "XML") {
+  if (format === "JSON" && (go.isSlice(type, "interface") || go.isMap(type, "interface"))) {
+    const suffix = type.kind === "slice" ? "Array" : "Map";
+    unmarshallerText += `${indent.get()}body, err := runtime.Payload(resp)\n`;
+    unmarshallerText += `${indent.get()}if err != nil {\n`;
+    unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
+    unmarshallerText += `${indent.pop().get()}}\n`;
+    unmarshallerText += `${indent.get()}${unmarshalTarget}, err = unmarshal${type.itemType.name}${suffix}(body)\n`;
+    unmarshallerText += `${indent.get()}if err != nil {\n`;
+    unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
+    unmarshallerText += `${indent.pop().get()}}\n`;
+  } else if (format === "JSON" || format === "XML") {
     if (type.kind === "rawJSON") {
       unmarshallerText += `${indent.get()}body, err := runtime.Payload(resp)\n`;
       unmarshallerText += `${indent.get()}if err != nil {\n`;

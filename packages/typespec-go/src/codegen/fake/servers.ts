@@ -85,7 +85,10 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
     // we might remove some clients from the list
     const finalSubClients = new Array<go.Client>();
     for (const clientAccessor of client.clientAccessors) {
-      if (helpers.clientHasNoExportedMethods(clientAccessor.returns)) {
+      if (
+        clientAccessor.returns.clientAccessors.length === 0 &&
+        helpers.clientHasNoExportedMethods(clientAccessor.returns)
+      ) {
         // client has no exported methods, skip it
         continue;
       }
@@ -332,7 +335,10 @@ function generateServerTransportClientDispatch(
     const visited = new Set<go.Client>();
     const queue = new Array<go.Client>();
     for (const clientAccessor of client.clientAccessors) {
-      if (helpers.clientHasNoExportedMethods(clientAccessor.returns)) {
+      if (
+        clientAccessor.returns.clientAccessors.length === 0 &&
+        helpers.clientHasNoExportedMethods(clientAccessor.returns)
+      ) {
         continue;
       }
       if (!visited.has(clientAccessor.returns)) {
@@ -344,7 +350,10 @@ function generateServerTransportClientDispatch(
     while (queue.length > 0) {
       const current = queue.shift()!;
       for (const clientAccessor of current.clientAccessors) {
-        if (helpers.clientHasNoExportedMethods(clientAccessor.returns)) {
+        if (
+          clientAccessor.returns.clientAccessors.length === 0 &&
+          helpers.clientHasNoExportedMethods(clientAccessor.returns)
+        ) {
           continue;
         }
         if (!visited.has(clientAccessor.returns)) {

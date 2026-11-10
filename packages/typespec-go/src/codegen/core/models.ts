@@ -562,6 +562,15 @@ function generateDiscriminatorMarkerMethod(
   modelDef: ModelDef,
   indent: helpers.Indentation,
 ) {
+  if (!type.rootType) {
+    const interfaceMethod = `is${type.name}`;
+    modelDef.Methods.push({
+      name: interfaceMethod,
+      desc: "",
+      text: `func (*${modelDef.Model.name}) ${interfaceMethod}() {}\n\n`,
+    });
+    return;
+  }
   const typeName = type.rootType.name;
   const receiver = modelDef.receiverName();
   const interfaceMethod = `Get${typeName}`;

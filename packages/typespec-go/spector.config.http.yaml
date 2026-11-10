@@ -59,6 +59,7 @@ specs:
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
   "type/union": { options: { module: uniongroup, slice-elements-byval: true } }
+  "type/union/discriminated": { options: { module: disriminatedgroup } }
   "versioning/added": { options: { module: versioningaddedgroup, slice-elements-byval: true } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
   "versioning/removed": { options: { module: removedgroup } }
@@ -78,5 +79,3 @@ specs:
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
-  # requires union support (new discriminator style)
-  "type/union/discriminated": false

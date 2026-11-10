@@ -2153,6 +2153,18 @@ export class ClientAdapter {
       }
       respEnv.result.docs.summary = sdkResponseType.summary;
       respEnv.result.docs.description = sdkResponseType.doc;
+    } else if (sdkResponseType.kind === "union" && sdkResponseType.discriminatedOptions) {
+      const type = this.ta.getWireType(sdkResponseType, false, true);
+      if (type.kind !== "interface") {
+        throw new AdapterError(
+          "InternalError",
+          `expected interface for discriminated union ${sdkResponseType.name}`,
+          sdkResponseType.__raw?.node,
+        );
+      }
+      respEnv.result = new go.PolymorphicResult(type);
+      respEnv.result.docs.summary = sdkResponseType.summary;
+      respEnv.result.docs.description = sdkResponseType.doc;
     } else if (sdkResponseType.kind === "union") {
       // multi-response
       const resultTypes: Record<number, go.WireType> = {};
@@ -2261,6 +2273,7 @@ export class ClientAdapter {
         return "ByteArray";
       case "enum":
       case "model":
+      case "union":
         return helpers.getEffectiveName(type);
       case "utcDateTime":
       case "offsetDateTime":
@@ -2633,85 +2646,143 @@ export class ClientAdapter {
   }
 
   private adaptExampleType(
-    exampleType: tcgc.SdkExampleValue,
+    exampleType: tcgc.SdkExampleValue | RawExampleValue,
     goType: go.WireType,
   ): Exclude<go.ExampleType, go.TokenCredentialExample> {
     goType = go.unwrapPtr(goType);
-    switch (exampleType.kind) {
-      case "string":
-        switch (goType.kind) {
-          case "constant":
-          case "encodedBytes":
-          case "etag":
-          case "literal":
-          case "readSeekCloser":
-          case "scalar":
-          case "string":
-          case "time":
-            return new go.StringExample(exampleType.value, goType);
-        }
-        break;
-      case "number":
-        switch (goType.kind) {
-          case "constant":
-          case "literal":
-          case "scalar":
-          case "time":
-            return new go.NumberExample(exampleType.value, goType);
-        }
-        break;
-      case "boolean":
-        switch (goType.kind) {
-          case "constant":
-          case "literal":
-          case "scalar":
-            return new go.BooleanExample(exampleType.value, goType);
-        }
-        break;
-      case "null":
-        return new go.NullExample(goType);
-      case "unknown":
-        if (goType.kind === "any") {
-          return new go.AnyExample(exampleType.value);
-        }
-        break;
-      case "array":
-        if (goType.kind === "slice") {
-          const ret = new go.ArrayExample(goType);
-          for (const v of exampleType.value) {
-            ret.value.push(this.adaptExampleType(v, goType.itemType));
-          }
-          return ret;
-        }
-        break;
-      case "dict":
-        if (goType.kind === "map") {
-          const ret = new go.DictionaryExample(goType);
-          for (const [k, v] of Object.entries(exampleType.value)) {
-            ret.value[k] = this.adaptExampleType(v, goType.itemType);
-          }
-          return ret;
-        }
-        break;
-      case "union":
+    if (exampleType.kind === "union") {
+      if (!exampleType.type.discriminatedOptions || goType.kind !== "interface") {
         throw new AdapterError("UnsupportedTsp", "unsupported example type kind union");
-      case "model":
+      }
+      // TCGC leaves union examples as raw JSON rather than recursively typed values.
+      exampleType = { kind: "raw", value: exampleType.value };
+    }
+    let value = exampleType.value;
+    if (exampleType.kind === "raw" && typeof value === "string") {
+      const scalar = goType.kind === "literal" ? goType.type : goType;
+      if (scalar.kind === "scalar" || scalar.kind === "constant") {
+        if (scalar.type === "bool") {
+          const boolean = value.trim().toLowerCase();
+          if (boolean !== "true" && boolean !== "false") {
+            throw new AdapterError("UnsupportedTsp", `cannot map example value '${value}' to bool`);
+          }
+          value = boolean === "true";
+        } else if (scalar.type !== "string" && scalar.type !== "byte") {
+          const number = Number(value);
+          if (value.trim() === "" || !Number.isFinite(number)) {
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `cannot map example value '${value}' to ${scalar.type}`,
+            );
+          }
+          value = number;
+        }
+      }
+    }
+    if (exampleType.kind === "null" || (exampleType.kind === "raw" && value === null)) {
+      return new go.NullExample(goType);
+    }
+    switch (goType.kind) {
+      case "any":
+        if (exampleType.kind === "unknown" || exampleType.kind === "raw") {
+          return new go.AnyExample(value);
+        }
+        break;
+      case "constant":
+      case "encodedBytes":
+      case "etag":
+      case "literal":
+      case "readSeekCloser":
+      case "scalar":
+      case "string":
+      case "time":
         if (
-          goType.kind === "interface" ||
-          goType.kind === "model" ||
-          goType.kind === "polymorphicModel"
+          (exampleType.kind === "string" || exampleType.kind === "raw") &&
+          typeof value === "string"
         ) {
+          return new go.StringExample(value, goType);
+        }
+        if (
+          (exampleType.kind === "number" || exampleType.kind === "raw") &&
+          typeof value === "number" &&
+          (goType.kind === "constant" ||
+            goType.kind === "literal" ||
+            goType.kind === "scalar" ||
+            goType.kind === "time")
+        ) {
+          return new go.NumberExample(value, goType);
+        }
+        if (
+          (exampleType.kind === "boolean" || exampleType.kind === "raw") &&
+          typeof value === "boolean" &&
+          (goType.kind === "constant" || goType.kind === "literal" || goType.kind === "scalar")
+        ) {
+          return new go.BooleanExample(value, goType);
+        }
+        break;
+      case "slice":
+        if ((exampleType.kind === "array" || exampleType.kind === "raw") && Array.isArray(value)) {
+          const items =
+            exampleType.kind === "array"
+              ? exampleType.value
+              : value.map((value: unknown): RawExampleValue => ({ kind: "raw", value }));
+          const ret = new go.ArrayExample(goType);
+          for (const item of items) {
+            ret.value.push(this.adaptExampleType(item, goType.itemType));
+          }
+          return ret;
+        }
+        break;
+      case "map":
+      case "interface":
+      case "model":
+      case "polymorphicModel":
+        if (
+          (exampleType.kind === "raw" ||
+            (exampleType.kind === "dict" && goType.kind === "map") ||
+            (exampleType.kind === "model" && goType.kind !== "map")) &&
+          typeof value === "object" &&
+          value !== null &&
+          !Array.isArray(value)
+        ) {
+          const entries =
+            exampleType.kind === "raw"
+              ? Object.entries(value).map(([key, value]): [string, RawExampleValue] => [
+                  key,
+                  { kind: "raw", value },
+                ])
+              : Object.entries(exampleType.value);
+          if (goType.kind === "map") {
+            const ret = new go.DictionaryExample(goType);
+            for (const [key, item] of entries) {
+              ret.value[key] = this.adaptExampleType(item, goType.itemType);
+            }
+            return ret;
+          }
           let concreteType: go.Model | go.PolymorphicModel | undefined;
           if (goType.kind === "interface") {
-            concreteType = goType.possibleTypes.find(
-              (t) =>
-                t.discriminatorValue?.literal === exampleType.type.discriminatorValue ||
-                (<go.ConstantValue>t.discriminatorValue?.literal).value ===
-                  exampleType.type.discriminatorValue,
-            );
+            const tag =
+              exampleType.kind === "model"
+                ? exampleType.type.discriminatorValue
+                : entries.find(([key]) => key === goType.discriminatorField)?.[1].value;
+            concreteType = goType.possibleTypes.find((t) => {
+              const literal = t.discriminatorValue;
+              return (
+                literal &&
+                (literal.type.kind === "constant"
+                  ? (<go.ConstantValue>literal.literal).value
+                  : literal.literal) === tag
+              );
+            });
             if (concreteType === undefined) {
               // can't find the sub type of a discriminated type, fallback to the base type
               concreteType = goType.rootType;
+            }
+            if (concreteType === undefined && exampleType.kind === "raw") {
+              throw new AdapterError(
+                "UnsupportedTsp",
+                `unrecognized discriminator value ${String(tag)} in example for ${goType.name}`,
+              );
             }
           } else {
             concreteType = goType;
@@ -2719,13 +2790,21 @@ export class ClientAdapter {
           if (concreteType === undefined) {
             throw new AdapterError(
               "InternalError",
-              `can not find concrete type for example type ${exampleType.type.name}`,
+              `can not find concrete type for example type ${exampleType.kind === "model" ? exampleType.type.name : goType.name}`,
             );
           }
           const ret = new go.StructExample(concreteType);
-          for (const [k, v] of Object.entries(exampleType.value)) {
+          const additionalProperties: Array<[string, tcgc.SdkExampleValue | RawExampleValue]> =
+            exampleType.kind === "model"
+              ? Object.entries(exampleType.additionalPropertiesValue ?? {})
+              : [];
+          for (const [k, v] of entries) {
             const field = concreteType.fields.find((f) => f.serializedName === k);
             if (!field) {
+              if (exampleType.kind === "raw") {
+                additionalProperties.push([k, v]);
+                continue;
+              }
               throw new AdapterError(
                 "InternalError",
                 `field with serializedName '${k}' not found in model '${concreteType.name}'.`,
@@ -2733,28 +2812,40 @@ export class ClientAdapter {
             }
             ret.value[field.name] = this.adaptExampleType(v, field.type);
           }
-          if (exampleType.additionalPropertiesValue) {
-            ret.additionalProperties = {};
-            for (const [k, v] of Object.entries(exampleType.additionalPropertiesValue)) {
-              const field = concreteType.fields.find((f) => go.isAdditionalProperties(f));
-              if (!field) {
+          for (const [k, v] of additionalProperties) {
+            const field = concreteType.fields.find(go.isAdditionalProperties);
+            if (!field) {
+              if (exampleType.kind === "raw") {
                 throw new AdapterError(
-                  "InternalError",
-                  `additional properties field not found in model '${concreteType.name}'.`,
+                  "UnsupportedTsp",
+                  `field ${k} not found in example model ${concreteType.name}`,
                 );
               }
-              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.itemType);
+              throw new AdapterError(
+                "InternalError",
+                `additional properties field not found in model '${concreteType.name}'.`,
+              );
             }
+            ret.additionalProperties ??= {};
+            ret.additionalProperties[k] = this.adaptExampleType(v, field.type.itemType);
           }
           return ret;
         }
         break;
+    }
+    if (exampleType.kind === "raw") {
+      throw new AdapterError("UnsupportedTsp", `cannot map example value to type ${goType.kind}`);
     }
     throw new AdapterError(
       "InternalError",
       `can not map go type into example type ${exampleType.kind}`,
     );
   }
+}
+
+interface RawExampleValue {
+  kind: "raw";
+  value: unknown;
 }
 
 interface HttpStatusCodeRange {

@@ -781,9 +781,13 @@ function generateFakeExample(goType: go.Type, name?: string): go.ExampleType {
     case "map":
       // return an empty map example for map types
       return new go.DictionaryExample(goType);
-    case "interface":
-      // for interface types, use the root type (which is a PolymorphicModel) to create an example
-      return new go.StructExample(goType.rootType);
+    case "interface": {
+      const model = goType.rootType ?? goType.possibleTypes[0];
+      if (!model) {
+        throw new CodegenError("InternalError", `no concrete type for interface ${goType.name}`);
+      }
+      return new go.StructExample(model);
+    }
     default:
       throw new CodegenError("InternalError", `unhandled fake example kind ${goType.kind}`);
   }

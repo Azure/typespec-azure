@@ -5,6 +5,50 @@ import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
 describe("Recursive type adaptation", () => {
+  it.each([
+    { type: "Pet[]", declaration: "PetArray []PetClassification", helper: "Array" },
+    { type: "Record<Pet>", declaration: "Value map[string]PetClassification", helper: "Map" },
+  ])(
+    "decodes a top-level $type response using discriminator helpers",
+    async ({ type, declaration, helper }) => {
+      const files = await emitGoFor(`
+      @service namespace Test;
+      model Cat { name: string; }
+      @discriminated union Pet { cat: Cat }
+      @route("/pets") @get op list(): ${type};
+    `);
+      expect(files.get("zz_responses.go")).toContain(declaration);
+      const client = [...files].find(([name]) => name.endsWith("_client.go"))?.[1];
+      expect(client).toContain("body, err := runtime.Payload(resp)");
+      expect(client).toContain(`, err = unmarshalPetClassification${helper}(body)`);
+      const helpers = files.get("zz_polymorphic_helpers.go")!;
+      expect(helpers).toContain(`func unmarshalPetClassification${helper}(`);
+      expect(helpers).toContain("func unmarshalPetClassification(");
+    },
+  );
+
+  it.each([
+    { modelName: "PetCat", unionFirst: false, kind: "variant type" },
+    { modelName: "PetCat", unionFirst: true, kind: "variant type" },
+    { modelName: "PetClassification", unionFirst: false, kind: "interface" },
+    { modelName: "PetClassification", unionFirst: true, kind: "interface" },
+  ])(
+    "rejects a model named $modelName colliding with a discriminated union (union first: $unionFirst)",
+    async ({ modelName, unionFirst, kind }) => {
+      const modelOperation = `@route("/model") @get op getModel(): ${modelName};`;
+      const unionOperation = '@route("/pet") @get op getPet(): Pet;';
+      await expect(
+        emitGoFor(`
+          @service namespace Test;
+          model Cat { meow: boolean; }
+          model ${modelName} { value: string; }
+          @discriminated union Pet { cat: Cat }
+          ${unionFirst ? unionOperation + modelOperation : modelOperation + unionOperation}
+        `),
+      ).rejects.toThrow(`duplicate discriminated union ${kind} name ${modelName}`);
+    },
+  );
+
   it("retains fields on mutually recursive models and union variants", async () => {
     const files = await emitGoFor(`
       @service namespace Test;
