@@ -69,6 +69,13 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
@@ -151,6 +158,13 @@ describe("expect all rules to be defined", () => {
 
   it("keeps redundant summary guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
+  it("keeps extensible enum default guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }

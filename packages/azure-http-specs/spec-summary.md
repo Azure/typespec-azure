@@ -2515,6 +2515,15 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_Example
+
+- Endpoint: `get https://management.azure.com`
+
+Generate management-plane sample code using the unified YAML example at examples.yaml.
+Do not set "examples-dir"; the scenario-local tspconfig.yaml enables discovery.
+Expected sample provenance: examples.yaml#list.
+List widgets in resource group test-rg, returning one widget named widget.
+
 ### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
 
 - Endpoint: `post https://management.azure.com`
