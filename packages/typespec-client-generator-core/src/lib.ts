@@ -575,13 +575,6 @@ export const $lib = createTypeSpecLibrary({
         default: "`@client` with multiple services is only allowed on `Namespace`.",
       },
     },
-    "inconsistent-multiple-service": {
-      ...doc("inconsistent-multiple-service"),
-      severity: "error",
-      messages: {
-        default: "All services must have the same server and auth definitions.",
-      },
-    },
     "inconsistent-multiple-service-dependency": {
       ...doc("inconsistent-multiple-service-dependency"),
       severity: "error",

@@ -51,7 +51,7 @@ namespace Logs {
 
 An empty catalog or a catalog declaring only PascalCase `Public` also fails this check.
 
-Use value records (`#{ ... }`), not model declarations, for the catalog and its entries. Reference authentication types with `typeref(...)` and endpoint parameter models with `parameters: typeref(Parameters)`. The compiler checks required properties, property value types, and parameter model constraints; those failures use compiler diagnostics instead of this diagnostic.
+Use value records (`#{ ... }`), not model declarations, for the catalog and its entries. Reference authentication types with `typeref(...)` and endpoint parameter models with `parameters: typeref(Parameters)`. The compiler checks required properties, property value types, authentication reference constraints, and parameter model constraints; those failures use compiler diagnostics instead of this diagnostic.
 
 Enable the experimental `typeref` feature in the consuming project's `tspconfig.yaml`:
 
@@ -113,37 +113,6 @@ Correct:
 ```typespec
 @azureServiceConfigurations(#{
   public: #{ endpoint: "https://api.loganalytics.io", authentication: typeref(ServiceAuth) },
-})
-namespace Logs {
-
-}
-```
-
-## Authentication requirement syntax
-
-Reference an ordinary HTTP authentication model, an OR union, or an AND tuple of models.
-
-Incorrect:
-
-```typespec
-@azureServiceConfigurations(#{
-  public: #{ endpoint: "https://api.loganalytics.io", authentication: typeref(string) },
-})
-namespace Logs {
-
-}
-```
-
-Reported message: `Authentication must reference a model, an OR union, or an AND tuple of models.`
-
-Correct:
-
-```typespec
-@azureServiceConfigurations(#{
-  public: #{
-    endpoint: "https://api.loganalytics.io",
-    authentication: typeref([ServiceAuth, ApiKeyAuth<ApiKeyLocation.header, "api-key">] | NoAuth),
-  },
 })
 namespace Logs {
 

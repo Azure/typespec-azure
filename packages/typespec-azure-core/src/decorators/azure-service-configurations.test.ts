@@ -248,14 +248,6 @@ describe("Azure service configurations", () => {
       message: "Each service configuration must have a non-empty name.",
     },
     {
-      name: "a reference to a non-authentication type",
-      configurations: `
-        const Configurations = #{
-          public: #{ endpoint: "https://example.com", authentication: typeref(string) },
-        };`,
-      message: "Authentication must reference a model, an OR union, or an AND tuple of models.",
-    },
-    {
       name: "a configuration without OAuth",
       configurations: `
         const Configurations = #{
@@ -287,6 +279,20 @@ describe("Azure service configurations", () => {
     {
       name: "missing authentication",
       configuration: '#{ endpoint: "https://example.com" }',
+    },
+    {
+      name: "a scalar authentication reference",
+      configuration: '#{ endpoint: "https://example.com", authentication: typeref(string) }',
+    },
+    {
+      name: "an authentication union containing a scalar",
+      configuration:
+        '#{ endpoint: "https://example.com", authentication: typeref(PublicAuth | string) }',
+    },
+    {
+      name: "an authentication tuple containing a scalar",
+      configuration:
+        '#{ endpoint: "https://example.com", authentication: typeref([PublicAuth, string]) }',
     },
     {
       name: "a reference to non-model endpoint parameters",

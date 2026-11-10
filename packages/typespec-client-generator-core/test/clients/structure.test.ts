@@ -1917,17 +1917,19 @@ it("recursive merge of same-named grandchildren across services", async () => {
   strictEqual(level1.parent, client);
 });
 
-it("error: inconsistent-multiple-service server", async () => {
+it("uses the first service's endpoint when merging different servers", async () => {
   const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
       `
         @service
         @server("https://servicea.example.com")
         namespace ServiceA {
+          @get @route("/first") op first(): void;
         }
         @service
         @server("https://serviceb.example.com")
         namespace ServiceB {
+          @get @route("/second") op second(): void;
     }`,
       `
         @client(
@@ -1941,26 +1943,35 @@ it("error: inconsistent-multiple-service server", async () => {
       `,
     ),
   );
-  await createSdkContextForTester(program);
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
-      message: "All services must have the same server and auth definitions.",
-    },
-  ]);
+  expectDiagnostics(diagnostics, []);
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, []);
+  const client = context.sdkPackage.clients[0];
+  const endpoint = client.clientInitialization.parameters.find((p) => p.kind === "endpoint");
+  ok(endpoint?.type.kind === "endpoint");
+  strictEqual(
+    endpoint.type.templateArguments[0].clientDefaultValue,
+    "https://servicea.example.com",
+  );
+  deepStrictEqual(
+    client.methods.map((method) => method.name),
+    ["first", "second"],
+  );
 });
 
-it("error: inconsistent-multiple-service-servers auth", async () => {
+it("uses the first service's authentication when merging different auth schemes", async () => {
   const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
       `
         @service
         @useAuth(BasicAuth)
         namespace ServiceA {
+          @get @route("/first") op first(): void;
         }
         @service
         @useAuth(BearerAuth)
         namespace ServiceB {
+          @get @route("/second") op second(): void;
     }`,
       `
         @client(
@@ -1974,13 +1985,18 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
       `,
     ),
   );
-  await createSdkContextForTester(program);
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
-      message: "All services must have the same server and auth definitions.",
-    },
-  ]);
+  expectDiagnostics(diagnostics, []);
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, []);
+  const client = context.sdkPackage.clients[0];
+  strictEqual(client.authentication?.options[0].schemes[0].type, "http");
+  const credential = client.clientInitialization.parameters.find((p) => p.kind === "credential");
+  ok(credential?.type.kind === "credential" && credential.type.scheme.type === "http");
+  strictEqual(credential.type.scheme.scheme, "Basic");
+  deepStrictEqual(
+    client.methods.map((method) => method.name),
+    ["first", "second"],
+  );
 });
 
 it("error: inconsistent-multiple-service-dependency", async () => {

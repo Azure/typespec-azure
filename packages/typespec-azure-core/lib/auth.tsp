@@ -17,7 +17,7 @@ model AzureServiceConfiguration {
   endpoint: string;
 
   /** A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. */
-  authentication: TypeRef;
+  authentication: TypeRef<{} | Reflection.Union | {}[]>;
 
   /** A reference to the parameter model used in the endpoint URL template. */
   parameters?: TypeRef<Reflection.Model>;

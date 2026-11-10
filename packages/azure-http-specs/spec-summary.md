@@ -1522,13 +1522,13 @@ The client call takes no API-version argument and must send the overridden query
 
 - Endpoint: `get /azure/core/authentication/configurations/default`
 
-Supply no configuration or endpoint override. The required public default is not the first declared configuration. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.io/.default, request path /public/azure/core/authentication/configurations/default, and response 204.
+Supply no configuration or endpoint override. The required public default is not the first declared configuration. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.io/.default to /azure/core/authentication/configurations/oauth2/public/token. Use the returned access_token as a Bearer token for /public/azure/core/authentication/configurations/default and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
 
 ### Azure_Core_Authentication_Configurations_governmentConfiguration
 
 - Endpoint: `get /azure/core/authentication/configurations/government`
 
-Select government without overriding the endpoint. A recording credential returns requested scopes joined by a space as its access token. Expect scope https://api.loganalytics.us/.default, request path /government/azure/core/authentication/configurations/government, and response 204.
+Select government without overriding the endpoint. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.us/.default to /azure/core/authentication/configurations/oauth2/government/token. Use the returned access_token as a Bearer token for /government/azure/core/authentication/configurations/government and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
 
 ### Azure_Core_Basic_createOrReplace
 

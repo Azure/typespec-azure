@@ -15,11 +15,9 @@ import {
   type Enum,
   getDeprecationDetails,
   getDoc,
-  getEncode,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getSummary,
-  getTypeName,
   getVisibilityForClass,
   ignoreDiagnostics,
   type Interface,
@@ -46,17 +44,13 @@ import {
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
-import { deepEquals } from "@typespec/compiler/utils";
 import {
-  type Authentication,
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
-  type HttpAuth,
   type HttpOperation,
   type HttpOperationResponseContent,
   type HttpPayloadBody,
-  type HttpServer,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -101,7 +95,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { addEncodeInfo, getClientTypeWithDiagnostics, getSdkBuiltInType } from "./types.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -1410,279 +1404,6 @@ export function getClientDefaultServiceConfiguration(
   return catalog?.configurations.find(
     (configuration) => configuration.name === catalog.defaultConfiguration,
   );
-}
-
-export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
-  if (left.length !== right.length) {
-    return false;
-  }
-  for (let i = 0; i < left.length; i++) {
-    if (left[i].url !== right[i].url) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function isSameAuth(left: Authentication, right: Authentication): boolean {
-  if (left.options.length !== right.options.length) {
-    return false;
-  }
-  for (let i = 0; i < left.options.length; i++) {
-    if (left.options[i].schemes.length !== right.options[i].schemes.length) {
-      return false;
-    }
-    for (let j = 0; j < left.options[i].schemes.length; j++) {
-      const leftScheme = left.options[i].schemes[j];
-      const rightScheme = right.options[i].schemes[j];
-      if (leftScheme.type !== rightScheme.type) {
-        return false;
-      }
-      switch (leftScheme.type) {
-        case "http":
-          compilerAssert(rightScheme.type === "http", "Unexpected auth scheme type mismatch");
-          if (leftScheme.scheme !== rightScheme.scheme) {
-            return false;
-          }
-          break;
-        case "apiKey":
-          compilerAssert(rightScheme.type === "apiKey", "Unexpected auth scheme type mismatch");
-          if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
-            return false;
-          }
-          break;
-        case "oauth2":
-          compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
-          if (leftScheme.flows.length !== rightScheme.flows.length) {
-            return false;
-          }
-          for (let k = 0; k < leftScheme.flows.length; k++) {
-            const leftFlow = leftScheme.flows[k];
-            const rightFlow = rightScheme.flows[k];
-            if (leftFlow.type !== rightFlow.type) {
-              return false;
-            }
-            if (leftFlow.scopes.length !== rightFlow.scopes.length) {
-              return false;
-            }
-            for (let l = 0; l < leftFlow.scopes.length; l++) {
-              if (leftFlow.scopes[l].value !== rightFlow.scopes[l].value) {
-                return false;
-              }
-            }
-            switch (leftFlow.type) {
-              case "authorizationCode":
-                compilerAssert(
-                  rightFlow.type === "authorizationCode",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "clientCredentials":
-                compilerAssert(
-                  rightFlow.type === "clientCredentials",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "implicit":
-                compilerAssert(
-                  rightFlow.type === "implicit",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "password":
-                compilerAssert(
-                  rightFlow.type === "password",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  ("tokenUrl" in leftFlow ? leftFlow.tokenUrl : undefined) !==
-                    ("tokenUrl" in rightFlow ? rightFlow.tokenUrl : undefined) ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-            }
-          }
-          break;
-        case "openIdConnect":
-          compilerAssert(
-            rightScheme.type === "openIdConnect",
-            "Unexpected auth scheme type mismatch",
-          );
-          if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
-            return false;
-          }
-          break;
-      }
-    }
-  }
-  return true;
-}
-
-function unorderedArrayEquals<T>(
-  left: readonly T[],
-  right: readonly T[],
-  equals: (left: T, right: T) => boolean,
-): boolean {
-  if (left.length !== right.length) return false;
-  const remaining = [...right];
-  return left.every((item) => {
-    const index = remaining.findIndex((other) => equals(item, other));
-    if (index === -1) return false;
-    remaining.splice(index, 1);
-    return true;
-  });
-}
-
-function isSameConfigurationAuthScheme(left: HttpAuth, right: HttpAuth): boolean {
-  if (left.type === "oauth2" && right.type === "oauth2") {
-    return unorderedArrayEquals(left.flows, right.flows, (leftFlow, rightFlow) => {
-      if (
-        !unorderedArrayEquals(
-          leftFlow.scopes,
-          rightFlow.scopes,
-          (leftScope, rightScope) => leftScope.value === rightScope.value,
-        )
-      )
-        return false;
-      // Scope ordering is handled above; reuse the existing flow URL comparison.
-      return isSameAuth(
-        { options: [{ schemes: [{ ...left, flows: [{ ...leftFlow, scopes: [] }] }] }] },
-        { options: [{ schemes: [{ ...right, flows: [{ ...rightFlow, scopes: [] }] }] }] },
-      );
-    });
-  }
-  if (
-    left.type === "openIdConnect" &&
-    right.type === "openIdConnect" &&
-    !unorderedArrayEquals(
-      left.scopes,
-      right.scopes,
-      (leftScope, rightScope) => leftScope === rightScope,
-    )
-  )
-    return false;
-  return isSameAuth({ options: [{ schemes: [left] }] }, { options: [{ schemes: [right] }] });
-}
-
-function isSameConfigurationAuth(left: Authentication, right: Authentication): boolean {
-  return unorderedArrayEquals(left.options, right.options, (leftOption, rightOption) =>
-    unorderedArrayEquals(leftOption.schemes, rightOption.schemes, isSameConfigurationAuthScheme),
-  );
-}
-
-function getConfigurationParameterEncoding(context: TCGCContext, parameter: ModelProperty) {
-  if (parameter.type.kind !== "Scalar") {
-    const encoding = getEncode(context.program, parameter);
-    return {
-      encode: encoding?.encoding,
-      wireType: encoding ? getTypeName(encoding.type) : undefined,
-    };
-  }
-  const type = getSdkBuiltInType(context, parameter.type);
-  context.program.reportDiagnostics(addEncodeInfo(context, parameter, type)[1]);
-  return {
-    encode: type.encode,
-    // Encoded bytes use strings even when the SDK type omits the default wire type.
-    wireType:
-      type.wireType?.kind ??
-      (type.kind === "bytes" && type.encode !== "bytes" ? "string" : type.kind),
-  };
-}
-
-function isSameConfigurationParameterType(
-  left: Type,
-  right: Type,
-  active = new Map<Union, Set<Union>>(),
-): boolean {
-  if (left === right) return true;
-  if (left.kind !== right.kind || getTypeName(left) !== getTypeName(right)) return false;
-  if (left.kind === "Enum" && right.kind === "Enum") {
-    return unorderedArrayEquals(
-      [...left.members.values()],
-      [...right.members.values()],
-      (left, right) =>
-        left.name === right.name && (left.value ?? left.name) === (right.value ?? right.name),
-    );
-  }
-  if (left.kind === "Union" && right.kind === "Union") {
-    const pairs = active.get(left) ?? new Set<Union>();
-    if (pairs.has(right)) return true;
-    active.set(left, pairs);
-    pairs.add(right);
-    const equal = unorderedArrayEquals(
-      [...left.variants.values()],
-      [...right.variants.values()],
-      (left, right) => isSameConfigurationParameterType(left.type, right.type, active),
-    );
-    pairs.delete(right);
-    return equal;
-  }
-  return true;
-}
-
-export function isSameServiceConfigurations(
-  context: TCGCContext,
-  left: AzureServiceConfigurations | undefined,
-  right: AzureServiceConfigurations | undefined,
-): boolean {
-  if (!left || !right) return left === right;
-  if (
-    left.defaultConfiguration !== right.defaultConfiguration ||
-    left.configurations.length !== right.configurations.length
-  )
-    return false;
-  const rightConfigurations = new Map(
-    right.configurations.map((configuration) => [configuration.name, configuration]),
-  );
-  return left.configurations.every((configuration) => {
-    const other = rightConfigurations.get(configuration.name);
-    if (
-      !other ||
-      configuration.server.url !== other.server.url ||
-      configuration.server.parameters.size !== other.server.parameters.size ||
-      !isSameConfigurationAuth(configuration.authentication, other.authentication)
-    )
-      return false;
-    for (const [name, parameter] of configuration.server.parameters) {
-      const otherParameter = other.server.parameters.get(name);
-      if (
-        !otherParameter ||
-        !isSameConfigurationParameterType(parameter.type, otherParameter.type) ||
-        parameter.optional !== otherParameter.optional ||
-        !deepEquals(
-          getConfigurationParameterEncoding(context, parameter),
-          getConfigurationParameterEncoding(context, otherParameter),
-        ) ||
-        !deepEquals(
-          parameter.defaultValue ? getValueTypeValue(parameter.defaultValue) : undefined,
-          otherParameter.defaultValue ? getValueTypeValue(otherParameter.defaultValue) : undefined,
-        )
-      )
-        return false;
-    }
-    return true;
-  });
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {

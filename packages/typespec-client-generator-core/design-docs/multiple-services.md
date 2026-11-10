@@ -86,7 +86,7 @@ namespace CombineClient;
 
 When TCGC detects multiple services in one client with `autoMergeService: true`, it will:
 
-1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property on `SdkClientType` will be an empty array `[]`. The per-service version mapping is stored at the package level in `SdkPackage.metadata.apiVersions` as a `Map<string, string>` (key = service namespace full qualified name, value = resolved version). The root client's `apiVersion` parameter will have `type.kind === "string"` instead of a specific enum and will always be `optional: true`. The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential. If services have different `@server` or `@useAuth` definitions, TCGC will report a diagnostic error (`inconsistent-multiple-service`). Each service's version is resolved independently: TCGC uses its latest version unless the emitter's `api-version` option selects another version. For nested service namespaces, each namespace segment is represented as a nested object in `tspconfig.yaml`.
+1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property on `SdkClientType` will be an empty array `[]`. The per-service version mapping is stored at the package level in `SdkPackage.metadata.apiVersions` as a `Map<string, string>` (key = service namespace full qualified name, value = resolved version). The root client's `apiVersion` parameter will have `type.kind === "string"` instead of a specific enum and will always be `optional: true`. The root client's endpoint, authentication, credential parameters, and service configuration catalog are created from the first service; TCGC does not require the other services' settings to match. Each service's version is resolved independently: TCGC uses its latest version unless the emitter's `api-version` option selects another version. For nested service namespaces, each namespace segment is represented as a nested object in `tspconfig.yaml`.
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersions` array and `apiVersion` initialization parameter with a `clientDefaultValue` set to the resolved version of its service.
 3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single sub-client. The merged sub-client will have empty `apiVersions` and a `string` type for the API version parameter (with `clientDefaultValue: undefined`), and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
@@ -658,7 +658,7 @@ In the first step design, when combining multiple services with an empty client 
 
 #### Endpoint and Credential Limitations
 
-When combining multiple services into a single client, all services must share the same endpoint and credential configuration. The root client's endpoint and credential parameters are created based on the first service in the array. If services have different `@server` or `@useAuth` definitions, emitters should report a diagnostic error.
+When combining multiple services into a single client, the root client's endpoint, authentication, credential parameters, and service configuration catalog come from the first service in the array. TCGC does not compare the other services' settings; authors must ensure the selected settings work for the combined client.
 
 #### Syntax Proposal
 
@@ -779,7 +779,7 @@ For maximum flexibility, users can fully customize how operations from different
 
 #### Endpoint and Credential Limitations
 
-Same as Scenario 2: when combining multiple services into a single client, all services must share the same endpoint and credential configuration. The root client's endpoint and credential parameters are created based on the first service in the array.
+Same as Scenario 2: the root client's endpoint, authentication, credential parameters, and service configuration catalog come from the first service in the array, without comparing the other services' settings.
 
 #### Syntax Proposal
 
@@ -924,7 +924,7 @@ The nested `@client` approach works alongside existing customization decorators:
 
 3. Root client without a parent must have at least one service (`root-client-missing-service` diagnostic).
 
-4. All services combined into a single client must have compatible `@server` and `@useAuth` definitions (`inconsistent-multiple-service` diagnostic).
+4. A combined client uses the first service's endpoint, authentication, and service configuration catalog without comparing the other services' settings.
 
 5. Multiple services in the `service` array can only be used on namespace targets, not interface targets (`invalid-client-service-multiple` diagnostic).
 
