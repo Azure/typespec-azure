@@ -156,6 +156,20 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps GET and DELETE request body guidance opt-in in both presets", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-request-body";
+    ok(AzureCoreLinter.rules.some((rule) => rule.name === "no-request-body"));
+    for (const rulesetName of ["resource-manager", "data-plane"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/rpc-operation-request-body"
+        ],
+        true,
+      );
+    }
+  });
+
   it("keeps private endpoint API completeness guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
