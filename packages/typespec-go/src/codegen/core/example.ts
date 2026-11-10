@@ -411,7 +411,7 @@ function getExampleValue(
           additionalPropertiesField.type.itemType.kind !== "ptr";
         const isAdditionalPropertiesPolymorphic =
           additionalPropertiesField.type.itemType.kind === "interface";
-        exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(isAdditionalPropertiesFieldByValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
+        exampleText += `${indent}\t${additionalPropertiesField.name}: ${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
           exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
         }

@@ -221,7 +221,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     __raw: client,
     kind: "client",
     name,
-    isExactName: client.type ? isExactClientName(context, client.type) : false,
+    isExactName:
+      client.isExactName || (client.type ? isExactClientName(context, client.type) : false),
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],

@@ -684,7 +684,7 @@ The operation to change location for.
 
 | Name   | Type                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client. Use `exact("name")` to preserve the exact casing of a string target in generated client code.                                                                                                                                                                                                                                                                                                                                                                                                              |
 | scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
@@ -729,6 +729,13 @@ interface ProductOperations {
   @clientLocation("ArchiveOperations")
   archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
 }
+```
+
+###### Move to a sub client with exact casing
+
+```typespec
+@clientLocation(exact("vMHost"), "javascript")
+op listVMHosts(): string[];
 ```
 
 ###### Move operation to root client
