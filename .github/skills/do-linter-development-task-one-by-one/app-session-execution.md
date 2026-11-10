@@ -652,7 +652,7 @@ failed wrapper to bypass an exhausted budget or retry an external operation.
 ## Publication checks
 
 For rule PR creation and description updates in either flow, require the shared
-[two-section PR body](../shared/migration-pr-description.md). Keep mappings,
+[PR body contract](../shared/migration-pr-description.md). Keep mappings,
 provenance, validation and other detailed evidence in the linked `migration.md`
 or its appendix. This restriction does not apply to skill-update PRs.
 
@@ -698,7 +698,7 @@ destination name for promotion or native-first implementation. Do not use the va
 for a differently named rule. Separately authorized or opted-in queue post-merge source repair
 retains the development skill's `[Swagger Linter Repair]` title pattern.
 Read back the published title and complete body to confirm they match the title
-and two-section description contracts before
+and PR description contracts before
 handoff. Preserve existing task PR titles unless correction was requested; do
 not rename them merely to apply the new convention during recovery or resumption.
 

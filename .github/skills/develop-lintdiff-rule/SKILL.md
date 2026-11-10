@@ -1026,9 +1026,9 @@ creating a draft PR.
    Preserve an existing
    OPEN task PR's recorded title unless a correction is part of the request;
    this convention alone does not authorize renaming existing PRs.
-7. Use the shared [two-section PR body](../shared/migration-pr-description.md):
+7. Use the shared [PR body contract](../shared/migration-pr-description.md):
    original Swagger documentation/logic links, then the published `migration.md`
-   link. Add no other body content.
+   link and the verified companion section when applicable. Add no other body content.
    Keep the following required explanation in `migration.md` or its linked
    appendix, within the shared four-section report plus NOTES contract:
    - **Original Swagger linter:** link the original documentation and

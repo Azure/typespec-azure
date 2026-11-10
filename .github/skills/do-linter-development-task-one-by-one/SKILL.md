@@ -110,9 +110,9 @@ just the newest numbers. Preserve required evidence and honest limitations, with
 one consistent account of coverage, remaining gaps and recommended actions.
 
 All rule PR descriptions follow the shared
-[two-section PR body](../shared/migration-pr-description.md): original Swagger
+[PR body contract](../shared/migration-pr-description.md): original Swagger
 documentation/logic links, then the published `migration.md` link and verified
-companion suppression PR link when applicable. Keep detailed
+companion suppression PR section when applicable. Keep detailed
 analysis and required evidence in that report, not additional PR sections.
 
 ## Legacy contract
