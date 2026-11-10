@@ -26,7 +26,7 @@ export const noReservedResourcePropertyRule = createRule({
   name: "no-reserved-resource-property",
   docs: fileRef.fromPackageRoot("src/rules/no-reserved-resource-property.md"),
   description:
-    "Reserved property names ('billingData' and 'systemData') must not be present in a resource's property bag. The property name is matched case-insensitively.",
+    "Reserved property names must not be present in a resource's property bag. The property name is matched case-insensitively.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-reserved-resource-property",
   messages: {
