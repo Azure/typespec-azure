@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Enable `@azure-tools/typespec-client-generator-core/unsupported-scope` in the `data-plane`, `resource-manager`, and `client-sdk` rulesets.
+Enable `@azure-tools/typespec-client-generator-core/unsupported-scope` in the `client-sdk` ruleset.

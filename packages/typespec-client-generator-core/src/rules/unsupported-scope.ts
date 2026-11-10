@@ -24,6 +24,7 @@ const supportedScopes = new Set([
 const supportedScopesList = [...supportedScopes].map((scope) => `'${scope}'`).join(", ");
 const scopeSuggestions = new Map([
   ["dotnet", "csharp"],
+  ["js", "javascript"],
   ["typescript", "javascript"],
 ]);
 

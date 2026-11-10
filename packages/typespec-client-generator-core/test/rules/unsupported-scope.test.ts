@@ -69,6 +69,7 @@ describe("unsupported-scope", () => {
   });
 
   it.each([
+    ["js", "javascript"],
     ["typescript", "javascript"],
     ["dotnet", "csharp"],
   ])("suggests the supported scope for %s", async (scope, suggestion) => {
