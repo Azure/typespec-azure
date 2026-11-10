@@ -1,5 +1,4 @@
 import {
-  type AzureServiceConfiguration,
   type AzureServiceConfigurations,
   FinalStateValue,
   getAzureServiceConfigurations,
@@ -1394,16 +1393,6 @@ export function getClientServiceConfigurations(
     if (candidate && !defaults.includes(candidate)) return candidate;
   }
   return defaults[0];
-}
-
-export function getClientDefaultServiceConfiguration(
-  context: TCGCContext,
-  client: SdkClient,
-): AzureServiceConfiguration | undefined {
-  const catalog = getClientServiceConfigurations(context, client);
-  return catalog?.configurations.find(
-    (configuration) => configuration.name === catalog.defaultConfiguration,
-  );
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {

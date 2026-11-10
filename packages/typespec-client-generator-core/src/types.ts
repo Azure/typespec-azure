@@ -44,7 +44,6 @@ import {
   type HttpOperationMultipartBody,
   type HttpPayloadBody,
   Visibility,
-  getAuthentication,
   getServers,
   isHeader,
   isOrExtendsHttpFile,
@@ -102,7 +101,6 @@ import {
   createGeneratedName,
   filterPreviewVersion,
   getAvailableApiVersions,
-  getClientDefaultServiceConfiguration,
   getClientDoc,
   getClientServiceConfigurations,
   getHttpBodyType,
@@ -1548,17 +1546,11 @@ function getSdkCredentialType(
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClientType<SdkHttpOperation>,
-  authentication?: Authentication,
+  authentication: Authentication | undefined = client.authentication,
 ): SdkCredentialParameter | undefined {
-  // Multiple services only deal with the first server config
-  const service = client.__raw.services[0];
-  const auth =
-    authentication ??
-    getClientDefaultServiceConfiguration(context, client.__raw)?.authentication ??
-    getAuthentication(context.program, service);
-  if (!auth) return undefined;
+  if (!authentication) return undefined;
   return {
-    type: getSdkCredentialType(context, client, auth),
+    type: getSdkCredentialType(context, client, authentication),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
@@ -2837,18 +2829,14 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInClient(context, client)) {
-      // operations on a client
-      diagnostics.pipe(updateTypesFromOperation(context, operation));
-    }
-    for (const sc of listSubClients(context, client, true)) {
-      for (const operation of listOperationsInClient(context, sc)) {
-        // operations on sub clients
+    const clients = [client, ...listSubClients(context, client, true)];
+    for (const current of clients) {
+      for (const operation of listOperationsInClient(context, current)) {
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
     }
     // server parameters
-    for (const current of [client, ...listSubClients(context, client, true)]) {
+    for (const current of clients) {
       const catalog = getClientServiceConfigurations(context, current);
       const servers = catalog
         ? catalog.configurations.map((configuration) => configuration.server)
