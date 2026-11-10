@@ -15,7 +15,6 @@ beforeEach(async () => {
 
 const code = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
 const missingList = { code, message: "Collection GET operations must use `@list`." };
-const pageItems = { code, message: "The collection response `value` must use `@pageItems`." };
 const nextLink = { code, message: "The collection response `nextLink` must use `@nextLink`." };
 const pagingNextLink = {
   code,
@@ -29,12 +28,13 @@ const valueArray = {
   code,
   message: "Collection responses must declare a 'value' property of array type.",
 };
-const envelope = {
+const extraProperty = {
   code,
-  message: "Collection response models must declare exactly the `value` and `nextLink` properties.",
+  message:
+    "Collection response models must not declare properties other than `value` and `nextLink`.",
 };
 
-it("reports independent missing list, metadata and extra properties on raw collection GETs", async () => {
+it("prioritizes missing @list over paging and extra-property defects", async () => {
   await tester
     .expect(
       `
@@ -42,10 +42,10 @@ it("reports independent missing list, metadata and extra properties on raw colle
     model Page { value: string[]; nextLink?: string; extra: string; other: string; }
   `,
     )
-    .toEmitDiagnostics([missingList, pageItems, nextLink, envelope, envelope]);
+    .toEmitDiagnostics(missingList);
 });
 
-it("does not claim nextLink metadata is missing when page items are absent", async () => {
+it("prioritizes missing @list over missing paging annotations", async () => {
   await tester
     .expect(
       `
@@ -53,10 +53,10 @@ it("does not claim nextLink metadata is missing when page items are absent", asy
     model Page { value: string[]; @nextLink nextLink?: string; extra: string; }
   `,
     )
-    .toEmitDiagnostics([missingList, pageItems, envelope]);
+    .toEmitDiagnostics(missingList);
 });
 
-it("reports array, paging and extra-property defects without masking each other", async () => {
+it("prioritizes an invalid value array over paging annotations and extra properties", async () => {
   await tester
     .expect(
       `
@@ -64,10 +64,10 @@ it("reports array, paging and extra-property defects without masking each other"
     model Page { value: string; @pageItems items: string[]; @nextLink nextLink?: string; extra: int32; }
   `,
     )
-    .toEmitDiagnostics([valueArray, pageItems, envelope, envelope]);
+    .toEmitDiagnostics(valueArray);
 });
 
-it("reports a missing nextLink property alongside extra properties", async () => {
+it("prioritizes a missing nextLink property over extra properties", async () => {
   await tester
     .expect(
       `
@@ -75,7 +75,7 @@ it("reports a missing nextLink property alongside extra properties", async () =>
     model Page { @pageItems value: string[]; extra: string; }
   `,
     )
-    .toEmitDiagnostics([envelope, envelope, pagingNextLink]);
+    .toEmitDiagnostics(pagingNextLink);
 });
 
 it("requires nextLink metadata even when runtime page items exist", async () => {
@@ -100,7 +100,7 @@ it("requires nextLink metadata when the only response is 201", async () => {
     .toEmitDiagnostics(pagingNextLink);
 });
 
-it("reports missing page items without claiming an existing nextLink is missing on a 201", async () => {
+it("prioritizes missing @list over missing page items on a 201", async () => {
   await tester
     .expect(
       `
@@ -108,7 +108,7 @@ it("reports missing page items without claiming an existing nextLink is missing 
     @get @route("/providers/Microsoft.Contoso/widgets") op widgets(): Created;
   `,
     )
-    .toEmitDiagnostics([missingList, pageItems]);
+    .toEmitDiagnostics(missingList);
 });
 
 it("accepts paging metadata on a 201 without imposing the 200 envelope check", async () => {
@@ -173,7 +173,7 @@ it("checks authored generic operation instantiations once", async () => {
     @list op one is generic<string>;
   `,
     )
-    .toEmitDiagnostics(envelope);
+    .toEmitDiagnostics(extraProperty);
 });
 
 it("reports an unmarked authored generic operation instead of its implicit instance", async () => {
@@ -202,7 +202,7 @@ it("checks operations authored through a generic interface", async () => {
     @@list(Widgets.widgets);
   `,
     )
-    .toEmitDiagnostics(envelope);
+    .toEmitDiagnostics(extraProperty);
 });
 
 it("accepts a compliant operation authored through a generic interface", async () => {
@@ -230,7 +230,7 @@ it("validates an authored ARM template instantiation with an invalid response ov
     }
   `,
     )
-    .toEmitDiagnostics([valueArray, pageItems, envelope]);
+    .toEmitDiagnostics(valueArray);
 });
 
 it("checks legacy library operations inherited by a project interface", async () => {
@@ -246,12 +246,11 @@ it("checks legacy library operations inherited by a project interface", async ()
     interface Operations extends Azure.ResourceManager.Legacy.Operations<ArmResponse<Page>> {}
   `,
     )
-    .toEmitDiagnostics(({ Page, items, extra }) => [
-      { ...valueArray, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
-      { ...pageItems, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
-      { ...envelope, pos: getSourceLocation(items).pos, end: getSourceLocation(items).end },
-      { ...envelope, pos: getSourceLocation(extra).pos, end: getSourceLocation(extra).end },
-    ]);
+    .toEmitDiagnostics(({ Page }) => ({
+      ...valueArray,
+      pos: getSourceLocation(Page).pos,
+      end: getSourceLocation(Page).end,
+    }));
 });
 
 it("accepts a project interface inheriting the standard library operations", async () => {
@@ -276,7 +275,7 @@ it("targets the project interface when an inherited response is library-owned", 
   `,
     )
     .toEmitDiagnostics(({ Operations }) =>
-      [valueArray, pageItems, envelope, pagingName].map((diagnostic) => ({
+      [valueArray, pagingName].map((diagnostic) => ({
         ...diagnostic,
         pos: getSourceLocation(Operations).pos,
         end: getSourceLocation(Operations).end,
@@ -301,10 +300,8 @@ it("reports an inherited non-array value on a template response override", async
     }
   `,
     )
-    .toEmitDiagnostics(({ badValue, items }) => [
+    .toEmitDiagnostics(({ badValue }) => [
       { ...valueArray, pos: getSourceLocation(badValue).pos, end: getSourceLocation(badValue).end },
-      { ...pageItems, pos: getSourceLocation(badValue).pos, end: getSourceLocation(badValue).end },
-      { ...envelope, pos: getSourceLocation(items).pos, end: getSourceLocation(items).end },
     ]);
 });
 
@@ -320,10 +317,7 @@ it("reports a custom next-link name on an ARM list response", async () => {
     }
   `,
     )
-    .toEmitDiagnostics(({ nextPage }) => [
-      envelope,
-      { ...envelope, pos: getSourceLocation(nextPage).pos, end: getSourceLocation(nextPage).end },
-    ]);
+    .toEmitDiagnostics(pagingNextLink);
 });
 
 it("checks a paginated ARM POST action template with no value property", async () => {
@@ -338,7 +332,7 @@ it("checks a paginated ARM POST action template with no value property", async (
     }
   `,
     )
-    .toEmitDiagnostics([valueArray, pageItems, envelope]);
+    .toEmitDiagnostics(valueArray);
 });
 
 it("keeps metadata and body defects separate for each operation", async () => {
@@ -350,7 +344,7 @@ it("keeps metadata and body defects separate for each operation", async () => {
     @route("/two") @post @list op two(): Page;
   `,
     )
-    .toEmitDiagnostics([envelope, envelope]);
+    .toEmitDiagnostics([extraProperty, extraProperty]);
 });
 
 it("does not claim a decorated nextLink is missing when compiler paging metadata is invalid", async () => {
@@ -366,7 +360,7 @@ it("does not claim a decorated nextLink is missing when compiler paging metadata
     reportDiagnostic: (diagnostic) => messages.push(diagnostic.messageId ?? "default"),
   });
   navigateProgram(runner.program, listener);
-  expect(messages).toEqual(["pageItems", "default"]);
+  expect(messages).toEqual(["pageItems"]);
   expect(diagnostics.some((x) => x.code === "missing-paging-items")).toBe(true);
 });
 
@@ -388,6 +382,6 @@ it("does not claim decorated envelope properties are undecorated when markers ar
     reportDiagnostic: (diagnostic) => messages.push(diagnostic.messageId ?? "default"),
   });
   navigateProgram(runner.program, listener);
-  expect(messages).toEqual(["default", "default"]);
+  expect(messages).toEqual(["extraProperty", "extraProperty"]);
   expect(diagnostics.some((x) => x.code === "duplicate-paging-prop")).toBe(true);
 });

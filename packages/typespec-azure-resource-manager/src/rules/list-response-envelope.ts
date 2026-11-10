@@ -25,6 +25,16 @@ import {
 } from "@typespec/http";
 import { isCollectionPath } from "./utils.js";
 
+type DiagnosticMessageId =
+  | "extraProperty"
+  | "valueArray"
+  | "missingList"
+  | "pageItems"
+  | "nextLink"
+  | "pagingNextLink"
+  | "additionalProperties"
+  | "pagingName";
+
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
   docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
@@ -33,8 +43,8 @@ export const listResponseEnvelopeRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
-    default:
-      "Collection response models must declare exactly the `value` and `nextLink` properties.",
+    extraProperty:
+      "Collection response models must not declare properties other than `value` and `nextLink`.",
     valueArray: "Collection responses must declare a 'value' property of array type.",
     missingList: "Collection GET operations must use `@list`.",
     pageItems: "The collection response `value` must use `@pageItems`.",
@@ -66,33 +76,24 @@ export const listResponseEnvelopeRule = createRule({
             excludeDefaultSegment: true,
           });
         if (!list && !collection) return;
-        if (!list)
+        if (!list) {
           context.reportDiagnostic({
             target: getDiagnosticTarget(program, operation, operation),
             messageId: "missingList",
           });
+          return;
+        }
 
         const [paging] = getPagingOperation(program, operation);
-        const reported = new Map<Model | ModelProperty | Operation, Set<string>>();
+        const reported = new Map<Model | ModelProperty | Operation, Set<DiagnosticMessageId>>();
         const report = (
           target: Model | ModelProperty | Operation,
-          messageId:
-            | "default"
-            | "valueArray"
-            | "pageItems"
-            | "nextLink"
-            | "pagingNextLink"
-            | "additionalProperties"
-            | "pagingName",
+          messageId: DiagnosticMessageId,
         ) => {
           let messages = reported.get(target);
           if (!messages) reported.set(target, (messages = new Set()));
           if (messages.has(messageId)) return;
           messages.add(messageId);
-          context.reportDiagnostic({
-            target: getDiagnosticTarget(program, operation, target),
-            messageId,
-          });
         };
         const checkBody = (type: Type, isExplicit: boolean) => {
           if (type.kind === "Union") {
@@ -104,8 +105,6 @@ export const listResponseEnvelopeRule = createRule({
           if (type.kind !== "Model" || isArrayModelType(type)) {
             const target = type.kind === "Model" ? type : operation;
             report(target, "valueArray");
-            report(target, "pageItems");
-            report(target, "default");
             return;
           }
           const properties = [...walkPropertiesInherited(type)].filter((property) =>
@@ -120,16 +119,13 @@ export const listResponseEnvelopeRule = createRule({
           if (!value || value.type.kind !== "Model" || !isArrayModelType(value.type)) {
             report(value ?? type, "valueArray");
           }
-          if (
-            !value ||
-            (paging?.output.pageItems.property !== value &&
-              !(
-                value.type.kind === "Model" &&
-                isArrayModelType(value.type) &&
-                hasPagingDecorator(value, "@pageItems")
-              ))
-          ) {
-            report(value ?? type, "pageItems");
+          if (value && value.type.kind === "Model" && isArrayModelType(value.type)) {
+            if (
+              paging?.output.pageItems.property !== value &&
+              !hasPagingDecorator(value, "@pageItems")
+            ) {
+              report(value, "pageItems");
+            }
           }
           if (
             nextLink &&
@@ -138,10 +134,10 @@ export const listResponseEnvelopeRule = createRule({
           ) {
             report(nextLink, "nextLink");
           }
-          if (!nextLink) report(type, "default");
+          if (!nextLink) report(type, "pagingNextLink");
           for (const property of properties) {
             if (jsonName(property) !== "value" && jsonName(property) !== "nextLink") {
-              report(property, "default");
+              report(property, "extraProperty");
             }
           }
           for (let model: Model | undefined = type; model; model = model.baseModel) {
@@ -157,8 +153,6 @@ export const listResponseEnvelopeRule = createRule({
             if (body === undefined || body.bodyKind !== "single") {
               const target = body?.property ?? operation;
               report(target, "valueArray");
-              report(target, "pageItems");
-              report(target, "default");
             } else {
               checkBody(body.type, body.isExplicit);
             }
@@ -179,16 +173,36 @@ export const listResponseEnvelopeRule = createRule({
             report(property, "pagingName");
           }
         }
-        const hasReported = (messageId: string) =>
+        const hasReported = (messageId: DiagnosticMessageId) =>
           [...reported.values()].some((messages) => messages.has(messageId));
-        if (paging === undefined && !hasReported("pageItems")) {
+        if (paging === undefined && !hasReported("pageItems") && !hasReported("valueArray")) {
           report(operation, "pageItems");
         }
         if (
           !(paging?.output.nextLink || hasNextLink(operation.returnType)) &&
-          !hasReported("nextLink")
+          !hasReported("nextLink") &&
+          !hasReported("pagingNextLink")
         ) {
           report(operation, "pagingNextLink");
+        }
+        const hasPagingIssue = [...reported.values()].some((messages) =>
+          [...messages].some(
+            (messageId) => messageId !== "extraProperty" && messageId !== "additionalProperties",
+          ),
+        );
+        for (const [target, messages] of reported) {
+          for (const messageId of messages) {
+            if (
+              hasPagingIssue &&
+              (messageId === "extraProperty" || messageId === "additionalProperties")
+            ) {
+              continue;
+            }
+            context.reportDiagnostic({
+              target: getDiagnosticTarget(program, operation, target),
+              messageId,
+            });
+          }
         }
       },
     };
