@@ -45,6 +45,17 @@ For native-first evidence, use the actual pushed evidence branch. Do not use a
 local path, folder, archive, or unpublished branch. A group links its group note
 here; the group note links all member notes.
 
+For the queue's [companion suppression workflow](../do-linter-development-task-one-by-one/companion-suppressions.md),
+also include the verified companion URL directly beneath that report link:
+
+```markdown
+Companion suppression PR: [Azure/azure-rest-api-specs#<number>](<verified companion PR URL>)
+```
+
+Keep the same two headings and all original source/report links. This limited
+addition is part of default initial delivery when attributable CI findings
+justify a companion; do not add a placeholder or imply its CI passed.
+
 Keep the branch and report path stable so later evidence commits appear through
 the same PR link. Do not replace the URL with a new commit permalink after each
 report update. Retain the published commit SHA and immutable report/receipt
@@ -55,10 +66,12 @@ or a description update, and recheck the unchanged link after report updates.
 
 Do not add an introduction, summary, checklist, implementation explanation,
 validation section, provenance block, local worktree paths, footer, or other
-body content. Do not copy a repository PR template into the body.
+body content beyond the companion link authorized above. Do not copy a
+repository PR template into the body.
 This contract replaces generic PR-description requirements for these migration
-PRs. Put any additional required links, including spec-fix and source-repair PRs,
-in the migration report or its appendix.
+PRs. Put other required links, including unrelated spec-fix and source-repair
+PRs, in the migration report or its appendix; the companion suppression link
+is the explicit exception.
 
 Keep all required analysis and evidence in `migration.md` or its linked appendix:
 validator/native mapping, original and native logic, examples, source provenance,
