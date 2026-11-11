@@ -7,6 +7,7 @@ const additionalPlaygroundPackages = [
   "@azure-typespec/http-client-csharp",
   "@azure-typespec/http-client-csharp-mgmt",
   "@azure-typespec/http-client-csharp-provisioning",
+  "@typespec/http-client-csharp",
 ];
 
 export const AsyncPlayground = ({
