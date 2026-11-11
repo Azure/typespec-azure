@@ -20,8 +20,6 @@ export interface WebsitePlaygroundProps {
   versionData: VersionData;
 }
 
-const deferredEmitters = ["@typespec/http-client-csharp"];
-
 export const WebsitePlayground = ({ versionData }: WebsitePlaygroundProps) => {
   const theme = useTheme();
 
@@ -37,12 +35,10 @@ export const WebsitePlayground = ({ versionData }: WebsitePlaygroundProps) => {
     <StandalonePlayground
       {...TypeSpecPlaygroundConfig}
       libraries={imports}
-      deferredEmitters={deferredEmitters}
       emitterViewers={{
         "@typespec/openapi3": [SwaggerUIViewer],
         "@azure-tools/typespec-autorest": [SwaggerUIViewer],
       }}
-      emitterOptions={{ "@typespec/http-client-csharp": { debounce: 500 } }}
       importConfig={{ useShim: true }}
       editorOptions={editorOptions}
       footer={<PlaygroundFooter versionData={versionData} />}
