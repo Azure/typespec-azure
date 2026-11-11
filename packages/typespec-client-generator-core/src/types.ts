@@ -120,7 +120,7 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getRawLroMetadata } from "./lro-metadata.js";
+import { getClientLroMetadataWithDiagnostics } from "./lro-metadata.js";
 import { resolveLroStatusMetadata } from "./lro-status-metadata.js";
 import {
   getCrossLanguageDefinitionId,
@@ -2200,7 +2200,8 @@ function updateTypesFromOperation(
     }
     popNamingContext(context);
 
-    const lroMetaData = getRawLroMetadata(program, operation);
+    const lroMetaData = diagnostics.pipe(getClientLroMetadataWithDiagnostics(context, operation));
+    context.__clientLroMetadataCache.set(operation, lroMetaData);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2308,6 +2309,15 @@ function updateTypesFromOperation(
         UsageFlags.LroFinalEnvelope,
         "FinalEnvelopeResult",
       );
+
+      // A required final operation can return a different body from the selected client result.
+      if (lroMetaData.finalStep?.kind === "finalOperationReference") {
+        updateUsageOrAccessForLroComponent(
+          lroMetaData.finalStep.responseModel,
+          UsageFlags.LroFinalEnvelope,
+          "FinalEnvelopeResult",
+        );
+      }
 
       // the polling model will have LroPolling.
       updateUsageOrAccessForLroComponent(

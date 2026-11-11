@@ -80,7 +80,6 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getRawLroMetadata } from "./lro-metadata.js";
 import { resolveLroOperationId } from "./lro-operation-id.js";
 import { getStatusMonitorLink } from "./lro-status-metadata.js";
 import {
@@ -417,7 +416,6 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
   const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
-  const nativeMetadata = getRawLroMetadata(context.program, operation);
   const operationIdSource = getStatusMonitorLink(statusMonitorStep);
   const pollingResponseBody = rawMetadata.pollingInfo.responseModel
     ? (diagnostics.pipe(
@@ -425,7 +423,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       ) as SdkModelType)
     : undefined;
   const operationId: SdkLroOperationIdMetadata[] = [];
-  for (const selection of diagnostics.pipe(resolveLroOperationId(context, nativeMetadata))) {
+  for (const selection of diagnostics.pipe(resolveLroOperationId(context, rawMetadata))) {
     if (selection.kind === "path") {
       const pathParameter = getStatusMonitorOperation(statusMonitorStep)?.parameters.find(
         (parameter): parameter is SdkPathParameter =>
@@ -630,18 +628,22 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
     ) as SdkModelType | SdkArrayType | SdkBuiltInType;
 
-    // find the property inside the envelope result using the final result path
+    // A direct result property can be inherited, so also search the envelope's base models.
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
     if (envelopeResult.kind === "model") {
       const resultPath = rawMetadata.finalResultPath;
-      for (const property of envelopeResult.properties) {
-        if (property.__raw === undefined || property.kind !== "property") {
-          continue;
+      let current: SdkModelType | undefined = envelopeResult;
+      while (current && !sdkProperty) {
+        for (const property of current.properties) {
+          if (property.__raw === undefined || property.kind !== "property") {
+            continue;
+          }
+          if (property.__raw?.name === resultPath) {
+            sdkProperty = property;
+            break;
+          }
         }
-        if (property.__raw?.name === resultPath) {
-          sdkProperty = property;
-          break;
-        }
+        current = current.baseModel;
       }
     }
 

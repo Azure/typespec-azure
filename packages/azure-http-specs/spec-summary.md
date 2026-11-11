@@ -1361,6 +1361,28 @@ Expected calls:
 - GET that exact status-monitor URI returns a running status with `id: translation-456`
 - GET that exact status-monitor URI returns a succeeded status with the same ID and result
 
+### Azure_ClientGenerator_Core_Lro_Result_createDefault
+
+- Endpoint: `get /azure/client-generator-core/lro/result/default`
+
+Verifies that a resource create-or-replace LRO returns the complete resource even when its
+polling model defines an `@lroResult` property.
+PUT /default/jobs/default with api-version=2022-12-01-preview and body {"status": "Running"}.
+Expect 201 with an Operation-Location pointing to /default/jobs/default/status.
+Poll until status is Succeeded, then GET /default/jobs/default with the same api-version.
+Expect the complete Job: {"id": "default", "status": "Succeeded", "result": {"value": "completed"}}.
+
+### Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResult
+
+- Endpoint: `get /azure/client-generator-core/lro/result/client-result`
+
+Verifies that `@clientLroResult` can preserve an existing SDK contract that returns the
+established result property of a resource LRO.
+PUT /client-result/jobs/client-result with api-version=2022-12-01-preview and body {"status": "Running"}.
+Expect 201 with an Operation-Location pointing to /client-result/jobs/client-result/status.
+Poll until status is Succeeded, then GET /client-result/jobs/client-result with the same api-version.
+Expect the selected JobResult: {"value": "completed"}, not the enclosing Job.
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`

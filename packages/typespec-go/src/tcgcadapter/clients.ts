@@ -570,12 +570,20 @@ export class ClientAdapter {
         goMethod.finalStateVia = <go.FinalStateVia>lroOptions["finalState"];
       }
       if (sdkMethod.lroMetadata.finalResponse?.resultSegments) {
-        // 'resultSegments' is designed for future extensibility, currently only has one segment
-        goMethod.operationLocationResultPath = sdkMethod.lroMetadata.finalResponse.resultSegments
-          .map((segment) => {
-            return segment.serializationOptions.json?.name;
-          })
-          .join(".");
+        const resultPath = sdkMethod.lroMetadata.finalResponse.resultSegments.map((segment) => {
+          return segment.serializationOptions.json?.name ?? segment.name;
+        });
+        const finalStep = sdkMethod.lroMetadata.finalStep;
+        const usesFinalResponse =
+          finalStep?.kind === "finalOperationLink" ||
+          finalStep?.kind === "finalOperationReference" ||
+          sdkMethod.lroMetadata.finalStateVia === "original-uri" ||
+          sdkMethod.lroMetadata.finalStateVia === "location";
+        if (usesFinalResponse) {
+          goMethod.finalResponseResultPath = resultPath;
+        } else {
+          goMethod.operationLocationResultPath = resultPath.join(".");
+        }
       }
     };
 

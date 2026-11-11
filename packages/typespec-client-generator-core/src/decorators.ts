@@ -37,6 +37,7 @@ import type {
   ClientDecorator,
   ClientDocDecorator,
   ClientInitializationDecorator,
+  ClientLroResultDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ClientOptionDecorator,
@@ -76,6 +77,7 @@ import {
   AllScopes,
   clientKey,
   clientLocationKey,
+  clientLroResultKey,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
@@ -1756,6 +1758,23 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
 
 export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
   return getScopedDecoratorData(context, responseAsBoolKey, target);
+}
+
+export const $clientLroResult: ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(context, $clientLroResult, clientLroResultKey, target, result, scope);
+};
+
+/** Gets the LRO result selected for the current language scope. @internal */
+export function getClientLroResult(
+  context: TCGCContext,
+  target: Operation,
+): Model | ModelProperty | undefined {
+  return getScopedDecoratorData(context, clientLroResultKey, target);
 }
 
 const clientDocKey = createStateSymbol("clientDoc");

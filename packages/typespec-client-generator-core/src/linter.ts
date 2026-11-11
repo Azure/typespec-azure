@@ -9,6 +9,7 @@ import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { useCorrectVerbRule } from "./rules/use-correct-verb.js";
 import { useUnionHierarchyRule } from "./rules/use-union-hierarchy.js";
+import { useValidClientLroResultRule } from "./rules/use-valid-client-lro-result.js";
 
 const rules = [
   useCorrectVerbRule,
@@ -20,6 +21,7 @@ const rules = [
   getOperationNameRule,
   noOperationGroupNameConflictRule,
   useUnionHierarchyRule,
+  useValidClientLroResultRule,
   noRepeatedClientNameRule,
 ];
 

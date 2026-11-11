@@ -622,6 +622,43 @@ getHealthStatus(
 @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
 ```
 
+### `@clientLroResult` {#@Azure.ClientGenerator.Core.clientLroResult}
+
+Selects the client result of a long-running operation without changing its protocol.
+A model selects a response body available from the LRO protocol. A property selects the
+established status-monitor result while preserving its containing response as the envelope.
+Resource lifecycle operations return their resource or completion response by default.
+Selecting their status-monitor result property is supported only to preserve an existing SDK
+contract and reports the `use-valid-client-lro-result` warning.
+
+See [LRO result customization](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
+for supported selections.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The long-running operation to customize.
+`Operation`
+
+#### Parameters
+
+| Name   | Type                                                            | Description                                                                                                     |
+| ------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| result | `Model \| ModelProperty`                                        | A response model, or the established status-monitor result property, belonging to the operation's LRO protocol. |
+| scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. If omitted, applies to all language emitters.                           |
+
+#### Examples
+
+##### Return an action's whole status monitor in JavaScript and its payload in Python.
+
+```typespec
+@@clientLroResult(start, ActionStatus, "javascript");
+@@clientLroResult(start, ActionStatus.result, "python");
+```
+
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
 
 Overrides the generated name for client SDK elements including clients, methods, parameters,

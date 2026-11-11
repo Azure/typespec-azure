@@ -372,9 +372,17 @@ Azure.Core remains responsible for polling links, parameter bindings, terminal s
 
 `lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
 
-The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` retain their existing shapes. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result-type defaults are preserved, but inconsistent resource PUT result/envelope/path combinations are corrected.
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
+
+#### Customizing LRO Results
+
+TCGC applies `@clientLroResult` when calculating the SDK-facing result without changing polling, parameter binding, or required final requests. A model selection must be a polling, final-operation, final-location, or applicable resource response body already identified by the LRO protocol. A property selection must be the direct established status-monitor result property; unrelated and nested selections report `invalid-client-lro-result`. The decorator supports the existing language scopes and overrides.
+
+TCGC derives the default result from the discovered protocol. When the result is a complete response body, no status-monitor extraction path is retained. Selecting a resource operation's established result property is supported for existing SDK compatibility but reports the suppressible `use-valid-client-lro-result` warning.
+
+`finalResponse.result` is the selected SDK type, `envelopeResult` is the response body containing it, and `resultSegments` identifies the selected direct property when one exists. The raw result paths likewise contain a name only for a direct property selection. Emitters must process `finalStep` independently because a required final request can return a different body from the selected result envelope.
 
 #### LRO status metadata
 
