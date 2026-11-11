@@ -6,7 +6,7 @@ ARM collection operations must use a predictable response envelope and TypeSpec 
 
 The rule checks project `@list` operations, including operations inherited by project interfaces, regardless of verb or route. It also checks project GET operations on collection-shaped provider paths, including resource and provider actions and `/operations`. A collection GET must be marked `@list`. Paging metadata is checked independently of HTTP response status. HTTP 200 response envelopes must contain only an array-valued JSON `value` with `@pageItems` and a JSON `nextLink` with `@nextLink`. Inherited properties are included. `@nextLink` may be optional in the response: its absence at runtime indicates there is no next page.
 
-The rule uses four diagnostic message types: missing `@list`, invalid `value` array, paging metadata/name issues, and extra properties. Diagnostics are prioritized per operation: an unmarked collection GET reports only the missing `@list`; otherwise, paging and envelope defects are reported before extra properties. Extra-property and open-indexer diagnostics are emitted only when no paging or envelope defect is found.
+The rule uses four diagnostic message types: missing `@list`, invalid `value` array, paging metadata/name issues, and invalid response envelopes. Independent operation and response defects can produce multiple diagnostics. Envelope diagnostics target the response model and cover missing or extra properties.
 
 The TypeSpec names of paging properties must match their JSON wire names: AutoRest uses the TypeSpec names in emitted paging metadata. For a 200 envelope, name those properties `value` and `nextLink` in TypeSpec as well as JSON; `@encodedName` cannot be used to give differently named paging properties those JSON names.
 

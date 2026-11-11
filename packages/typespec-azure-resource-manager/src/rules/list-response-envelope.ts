@@ -25,7 +25,7 @@ import {
 } from "@typespec/http";
 import { isCollectionPath } from "./utils.js";
 
-type DiagnosticMessageId = "extraProperty" | "valueArray" | "missingList" | "pagingMetadata";
+type DiagnosticMessageId = "invalidEnvelope" | "valueArray" | "missingList" | "pagingMetadata";
 type DiagnosticTarget = Model | ModelProperty | Operation;
 type PagingInfo = NonNullable<ReturnType<typeof getPagingOperation>[0]>;
 type DiagnosticReporter = (target: DiagnosticTarget, messageId: DiagnosticMessageId) => void;
@@ -39,8 +39,8 @@ export const listResponseEnvelopeRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
-    extraProperty:
-      "Collection response models must not allow properties beyond `value` and `nextLink`.",
+    invalidEnvelope:
+      "Collection response models must contain exactly `value` and `nextLink` properties.",
     valueArray: "Collection responses must declare a 'value' property of array type.",
     missingList: "Collection GET operations must use `@list`.",
     pagingMetadata:
@@ -62,7 +62,6 @@ export const listResponseEnvelopeRule = createRule({
             target: getDiagnosticTarget(program, operation, operation),
             messageId: "missingList",
           });
-          return;
         }
 
         const [paging] = getPagingOperation(program, operation);
@@ -72,13 +71,15 @@ export const listResponseEnvelopeRule = createRule({
             messageId,
           }),
         );
+        if (list && collection && !paging?.output.nextLink) {
+          diagnostics.report(operation, "pagingMetadata");
+        }
 
         for (const response of httpOperation.responses) {
           if (!includes200(response.statusCodes)) continue;
           for (const { body } of response.responses) {
             if (body === undefined || body.bodyKind !== "single") {
-              const target = body?.property ?? operation;
-              diagnostics.report(target, "valueArray");
+              if (list) diagnostics.report(body?.property ?? operation, "valueArray");
             } else {
               checkResponseBody(
                 program,
@@ -86,13 +87,14 @@ export const listResponseEnvelopeRule = createRule({
                 body.type,
                 body.isExplicit,
                 paging,
+                list,
                 metadata,
                 diagnostics.report,
               );
             }
           }
         }
-        checkPagingMetadata(operation, program, paging, diagnostics);
+        if (list) checkPagingMetadata(operation, program, paging, diagnostics);
         diagnostics.emit();
       },
     };
@@ -149,12 +151,8 @@ function createDiagnosticCollector(emitDiagnostic: DiagnosticReporter): {
           isHttpPayloadCloneOf(target, original),
       ),
     emit: () => {
-      const hasPagingIssue = [...reported.values()].some((messages) =>
-        [...messages].some((messageId) => messageId !== "extraProperty"),
-      );
       for (const [target, messages] of reported) {
         for (const messageId of messages) {
-          if (hasPagingIssue && messageId === "extraProperty") continue;
           emitDiagnostic(target, messageId);
         }
       }
@@ -168,17 +166,27 @@ function checkResponseBody(
   type: Type,
   isExplicit: boolean,
   paging: PagingInfo | undefined,
+  list: boolean,
   metadata: ReturnType<typeof createMetadataInfo>,
   report: DiagnosticReporter,
 ): void {
   if (type.kind === "Union") {
     for (const variant of type.variants.values()) {
-      checkResponseBody(program, operation, variant.type, isExplicit, paging, metadata, report);
+      checkResponseBody(
+        program,
+        operation,
+        variant.type,
+        isExplicit,
+        paging,
+        list,
+        metadata,
+        report,
+      );
     }
     return;
   }
   if (type.kind !== "Model" || isArrayModelType(type)) {
-    report(type.kind === "Model" ? type : operation, "valueArray");
+    if (list) report(type.kind === "Model" ? type : operation, "valueArray");
     return;
   }
 
@@ -190,38 +198,40 @@ function checkResponseBody(
   const value = properties.find((property) => jsonName(property) === "value");
   const nextLink = properties.find((property) => jsonName(property) === "nextLink");
 
-  if (!value || value.type.kind !== "Model" || !isArrayModelType(value.type)) {
+  if (list && (!value || value.type.kind !== "Model" || !isArrayModelType(value.type))) {
     report(value ?? type, "valueArray");
   } else if (
+    list &&
+    value &&
     paging?.output.pageItems.property !== value &&
     !hasPagingDecorator(value, "@pageItems")
   ) {
     report(value, "pagingMetadata");
   }
 
-  if (value && value.name !== "value") report(value, "pagingMetadata");
+  if (list && value && value.name !== "value") report(value, "pagingMetadata");
   if (
+    list &&
     nextLink &&
     paging?.output.nextLink?.property !== nextLink &&
     !hasPagingDecorator(nextLink, "@nextLink")
   ) {
     report(nextLink, "pagingMetadata");
   }
-  if (!nextLink) report(type, "pagingMetadata");
-  if (nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingMetadata");
+  if (list && nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingMetadata");
 
-  for (const property of properties) {
+  const hasExtraProperty = properties.some((property) => {
     const name = jsonName(property);
-    if (name !== "value" && name !== "nextLink") {
-      report(property, "extraProperty");
-    }
-  }
+    return name !== "value" && name !== "nextLink";
+  });
+  let hasIndexer = false;
   for (let model: Model | undefined = type; model; model = model.baseModel) {
     if (model.indexer !== undefined) {
-      report(type, "extraProperty");
+      hasIndexer = true;
       break;
     }
   }
+  if (!value || !nextLink || hasExtraProperty || hasIndexer) report(type, "invalidEnvelope");
 }
 
 function checkPagingMetadata(

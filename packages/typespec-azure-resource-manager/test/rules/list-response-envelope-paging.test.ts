@@ -24,12 +24,12 @@ const valueArray = {
   code,
   message: "Collection responses must declare a 'value' property of array type.",
 };
-const extraProperty = {
+const invalidEnvelope = {
   code,
-  message: "Collection response models must not allow properties beyond `value` and `nextLink`.",
+  message: "Collection response models must contain exactly `value` and `nextLink` properties.",
 };
 
-it("prioritizes missing @list over paging and extra-property defects", async () => {
+it("reports missing @list and extra response properties independently", async () => {
   await tester
     .expect(
       `
@@ -37,10 +37,10 @@ it("prioritizes missing @list over paging and extra-property defects", async () 
     model Page { value: string[]; nextLink?: string; extra: string; other: string; }
   `,
     )
-    .toEmitDiagnostics(missingList);
+    .toEmitDiagnostics([missingList, invalidEnvelope]);
 });
 
-it("prioritizes missing @list over missing paging annotations", async () => {
+it("does not report missing paging annotations on an unmarked operation", async () => {
   await tester
     .expect(
       `
@@ -48,10 +48,21 @@ it("prioritizes missing @list over missing paging annotations", async () => {
     model Page { value: string[]; @nextLink nextLink?: string; extra: string; }
   `,
     )
+    .toEmitDiagnostics([missingList, invalidEnvelope]);
+});
+
+it("does not apply the pageable value-array check to an unmarked operation", async () => {
+  await tester
+    .expect(
+      `
+    @route("/providers/Microsoft.Contoso/widgets") @get op widgets(): Page;
+    model Page { value: string; nextLink?: string; }
+  `,
+    )
     .toEmitDiagnostics(missingList);
 });
 
-it("prioritizes an invalid value array over paging annotations and extra properties", async () => {
+it("reports an invalid value array and extra properties independently", async () => {
   await tester
     .expect(
       `
@@ -59,10 +70,10 @@ it("prioritizes an invalid value array over paging annotations and extra propert
     model Page { value: string; @pageItems items: string[]; @nextLink nextLink?: string; extra: int32; }
   `,
     )
-    .toEmitDiagnostics(valueArray);
+    .toEmitDiagnostics([valueArray, invalidEnvelope]);
 });
 
-it("prioritizes a missing nextLink property over extra properties", async () => {
+it("reports paging and envelope warnings for a missing nextLink and extra properties", async () => {
   await tester
     .expect(
       `
@@ -70,7 +81,55 @@ it("prioritizes a missing nextLink property over extra properties", async () => 
     model Page { @pageItems value: string[]; extra: string; }
   `,
     )
-    .toEmitDiagnostics(pagingMetadata);
+    .toEmitDiagnostics([invalidEnvelope, pagingMetadata]);
+});
+
+it("reports an unmarked collection operation and its missing response nextLink", async () => {
+  await tester
+    .expect(
+      `
+    @route("/providers/Microsoft.Contoso/widgets") @get op /*widgets*/widgets(): Page;
+    model /*Page*/Page { @pageItems value: string[]; }
+  `,
+    )
+    .toEmitDiagnostics(({ widgets, Page }) => [
+      { ...missingList, pos: getSourceLocation(widgets).pos, end: getSourceLocation(widgets).end },
+      { ...invalidEnvelope, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
+    ]);
+});
+
+it("reports missing pageable metadata on a list operation and its invalid envelope", async () => {
+  await tester
+    .expect(
+      `
+    @route("/providers/Microsoft.Contoso/widgets") @get @list op /*widgets*/widgets(): Page;
+    model /*Page*/Page { @pageItems value: string[]; }
+  `,
+    )
+    .toEmitDiagnostics(({ widgets, Page }) => [
+      {
+        ...pagingMetadata,
+        pos: getSourceLocation(widgets).pos,
+        end: getSourceLocation(widgets).end,
+      },
+      { ...invalidEnvelope, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
+    ]);
+});
+
+it("reports missing pageable metadata even when a response property has a paging defect", async () => {
+  const runner = await Tester.createInstance();
+  await runner.compileAndDiagnose(`
+    @route("/providers/Microsoft.Contoso/widgets") @get @list op widgets(): Page;
+    model Page { value: string[]; extra: string; }
+  `);
+  const messages: string[] = [];
+  const listener = listResponseEnvelopeRule.create({
+    program: runner.program,
+    options: {},
+    reportDiagnostic: (diagnostic) => messages.push(diagnostic.messageId ?? "default"),
+  });
+  navigateProgram(runner.program, listener);
+  expect(messages).toEqual(["pagingMetadata", "pagingMetadata", "invalidEnvelope"]);
 });
 
 it("requires nextLink metadata even when runtime page items exist", async () => {
@@ -168,7 +227,7 @@ it("checks authored generic operation instantiations once", async () => {
     @list op one is generic<string>;
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
 it("reports an unmarked authored generic operation instead of its implicit instance", async () => {
@@ -197,7 +256,7 @@ it("checks operations authored through a generic interface", async () => {
     @@list(Widgets.widgets);
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
 it("accepts a compliant operation authored through a generic interface", async () => {
@@ -225,7 +284,7 @@ it("validates an authored ARM template instantiation with an invalid response ov
     }
   `,
     )
-    .toEmitDiagnostics(valueArray);
+    .toEmitDiagnostics([valueArray, invalidEnvelope]);
 });
 
 it("checks legacy library operations inherited by a project interface", async () => {
@@ -241,11 +300,10 @@ it("checks legacy library operations inherited by a project interface", async ()
     interface Operations extends Azure.ResourceManager.Legacy.Operations<ArmResponse<Page>> {}
   `,
     )
-    .toEmitDiagnostics(({ Page }) => ({
-      ...valueArray,
-      pos: getSourceLocation(Page).pos,
-      end: getSourceLocation(Page).end,
-    }));
+    .toEmitDiagnostics(({ Page }) => [
+      { ...valueArray, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
+      { ...invalidEnvelope, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
+    ]);
 });
 
 it("accepts a project interface inheriting the standard library operations", async () => {
@@ -270,7 +328,7 @@ it("targets the project interface when an inherited response is library-owned", 
   `,
     )
     .toEmitDiagnostics(({ Operations }) =>
-      [valueArray, pagingMetadata].map((diagnostic) => ({
+      [valueArray, invalidEnvelope, pagingMetadata].map((diagnostic) => ({
         ...diagnostic,
         pos: getSourceLocation(Operations).pos,
         end: getSourceLocation(Operations).end,
@@ -289,14 +347,15 @@ it("reports an inherited non-array value on a template response override", async
     @armProviderNamespace namespace Microsoft.Contoso;
     model Widget is ProxyResource<{}> { ...ResourceNameParameter<Widget>; }
     model BasePage { /*badValue*/value: string; @pageItems /*items*/items: Widget[]; @nextLink nextLink?: string; }
-    model Page extends BasePage {}
+    model /*Page*/Page extends BasePage {}
     @armResourceOperations interface Widgets {
       listByParent is ArmResourceListByParent<Widget, Response = ArmResponse<Page>>;
     }
   `,
     )
-    .toEmitDiagnostics(({ badValue }) => [
+    .toEmitDiagnostics(({ badValue, Page }) => [
       { ...valueArray, pos: getSourceLocation(badValue).pos, end: getSourceLocation(badValue).end },
+      { ...invalidEnvelope, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
     ]);
 });
 
@@ -312,7 +371,7 @@ it("reports a custom next-link name on an ARM list response", async () => {
     }
   `,
     )
-    .toEmitDiagnostics(pagingMetadata);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
 it("checks a paginated ARM POST action template with no value property", async () => {
@@ -327,7 +386,7 @@ it("checks a paginated ARM POST action template with no value property", async (
     }
   `,
     )
-    .toEmitDiagnostics(valueArray);
+    .toEmitDiagnostics([valueArray, invalidEnvelope]);
 });
 
 it("keeps metadata and body defects separate for each operation", async () => {
@@ -339,7 +398,7 @@ it("keeps metadata and body defects separate for each operation", async () => {
     @route("/two") @post @list op two(): Page;
   `,
     )
-    .toEmitDiagnostics([extraProperty, extraProperty]);
+    .toEmitDiagnostics([invalidEnvelope, invalidEnvelope]);
 });
 
 it("does not claim a decorated nextLink is missing when compiler paging metadata is invalid", async () => {
@@ -355,7 +414,7 @@ it("does not claim a decorated nextLink is missing when compiler paging metadata
     reportDiagnostic: (diagnostic) => messages.push(diagnostic.messageId ?? "default"),
   });
   navigateProgram(runner.program, listener);
-  expect(messages).toEqual(["pagingMetadata"]);
+  expect(messages).toEqual(["pagingMetadata", "invalidEnvelope"]);
   expect(diagnostics.some((x) => x.code === "missing-paging-items")).toBe(true);
 });
 
@@ -377,6 +436,6 @@ it("does not claim decorated envelope properties are undecorated when markers ar
     reportDiagnostic: (diagnostic) => messages.push(diagnostic.messageId ?? "default"),
   });
   navigateProgram(runner.program, listener);
-  expect(messages).toEqual(["extraProperty", "extraProperty"]);
+  expect(messages).toEqual(["invalidEnvelope"]);
   expect(diagnostics.some((x) => x.code === "duplicate-paging-prop")).toBe(true);
 });

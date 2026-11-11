@@ -14,9 +14,9 @@ beforeEach(async () => {
 }, 30_000);
 const code = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
 const missingList = { code, message: "Collection GET operations must use `@list`." };
-const extraProperty = {
+const invalidEnvelope = {
   code,
-  message: "Collection response models must not allow properties beyond `value` and `nextLink`.",
+  message: "Collection response models must contain exactly `value` and `nextLink` properties.",
 };
 const valueArray = {
   code,
@@ -39,7 +39,16 @@ it("recognizes provider and resource action paths and operations without provide
     @get @route("/providers/Microsoft.Contoso/listThings") op providerAction(): Page;
   `,
     )
-    .toEmitDiagnostics([missingList, missingList, missingList, missingList]);
+    .toEmitDiagnostics([
+      missingList,
+      invalidEnvelope,
+      missingList,
+      invalidEnvelope,
+      missingList,
+      invalidEnvelope,
+      missingList,
+      invalidEnvelope,
+    ]);
 });
 
 it("ignores non-list POSTs, point paths, default paths and uninstantiated templates", async () => {
@@ -76,7 +85,7 @@ it("checks an explicit response body rather than its HTTP wrapper", async () => 
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): WidgetResponse;
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
 it("reports an invalid shared body only once across response media types", async () => {
@@ -89,7 +98,7 @@ it("reports an invalid shared body only once across response media types", async
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): JsonResponse | XmlResponse;
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
 it("does not inspect non-200 responses", async () => {
@@ -113,10 +122,10 @@ it("reports inherited extra properties but ignores hidden and HTTP metadata", as
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
-it("prioritizes missing @list over invalid named arrays, direct arrays and scalar bodies", async () => {
+it("reports missing @list for named arrays, direct arrays and scalar bodies", async () => {
   await tester
     .expect(
       `
@@ -129,7 +138,7 @@ it("prioritizes missing @list over invalid named arrays, direct arrays and scala
     .toEmitDiagnostics([missingList, missingList, missingList]);
 });
 
-it("prioritizes missing @list over record, file and multipart bodies", async () => {
+it("reports missing @list and invalid record, file and multipart bodies", async () => {
   await tester
     .expect(
       `
@@ -139,7 +148,7 @@ it("prioritizes missing @list over record, file and multipart bodies", async () 
     op archives(): { @multipartBody fields: { file: HttpPart<Http.File>; }; };
   `,
     )
-    .toEmitDiagnostics([missingList, missingList, missingList]);
+    .toEmitDiagnostics([missingList, invalidEnvelope, missingList, missingList]);
 });
 
 it("checks each variant of a plain 200 response union", async () => {
@@ -151,7 +160,7 @@ it("checks each variant of a plain 200 response union", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
   `,
     )
-    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, invalidEnvelope]);
 });
 
 it("does not apply sibling spread-clone paging metadata to another response variant", async () => {
@@ -180,7 +189,7 @@ it("checks JSON wire names rather than TypeSpec property names", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics([valueArray, pagingMetadata, pagingMetadata, pagingMetadata]);
+    .toEmitDiagnostics([valueArray, invalidEnvelope, pagingMetadata, pagingMetadata]);
 });
 
 it("reports alternate TypeSpec names encoded as the standard JSON names", async () => {
@@ -320,10 +329,10 @@ it("rejects inherited indexers even on otherwise valid envelopes", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
-it("prioritizes missing nextLink metadata over an indexer", async () => {
+it("reports paging and envelope warnings for a missing nextLink and an indexer", async () => {
   await tester
     .expect(
       `
@@ -331,7 +340,7 @@ it("prioritizes missing nextLink metadata over an indexer", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics(pagingMetadata);
+    .toEmitDiagnostics([pagingMetadata, invalidEnvelope]);
 });
 
 it("checks each variant of an explicit 200 body union", async () => {
@@ -344,7 +353,7 @@ it("checks each variant of an explicit 200 body union", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Result;
   `,
     )
-    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, invalidEnvelope]);
 });
 
 it("reports a bodyless 200 even when the 201 response has paging metadata", async () => {
@@ -381,7 +390,7 @@ it("reports an explicitly empty 200 body even with paging on the 201 response", 
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Empty | Created;
   `,
     )
-    .toEmitDiagnostics([valueArray, pagingMetadata]);
+    .toEmitDiagnostics([valueArray, invalidEnvelope]);
 });
 
 it("reports an array variant alongside a compliant 200 envelope", async () => {
@@ -407,7 +416,7 @@ it("checks status ranges containing 200 but ignores ranges starting at 201", asy
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): InRange | Later | Page;
   `,
     )
-    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, invalidEnvelope]);
 });
 
 it("includes 200 at the upper boundary of a status range", async () => {
@@ -420,19 +429,20 @@ it("includes 200 at the upper boundary of a status range", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Result;
   `,
     )
-    .toEmitDiagnostics(extraProperty);
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
 it("targets the actual invalid value and extra properties", async () => {
   await tester
     .expect(
       `
-    model Page { /*badValue*/value: string; @pageItems /*items*/items: string[]; @nextLink nextLink?: string; /*extra*/extra: string; }
+    model /*Page*/Page { /*badValue*/value: string; @pageItems /*items*/items: string[]; @nextLink nextLink?: string; /*extra*/extra: string; }
     @get @list @route("/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics(({ badValue }) => [
+    .toEmitDiagnostics(({ badValue, Page }) => [
       { ...valueArray, pos: getSourceLocation(badValue).pos, end: getSourceLocation(badValue).end },
+      { ...invalidEnvelope, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
     ]);
 });
 
@@ -474,7 +484,7 @@ it("checks extension-scope collections in nested provider namespaces", async () 
     }
   `,
     )
-    .toEmitDiagnostics(missingList);
+    .toEmitDiagnostics([missingList, invalidEnvelope]);
 });
 
 it("ignores dynamic provider paths and provider-free noncollection GETs", async () => {
