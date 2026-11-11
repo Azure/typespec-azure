@@ -1,5 +1,9 @@
 # Release
 
+## 0.63.12
+
+No changes, version bump only.
+
 ## 0.63.11
 
 - Bump `@typespec/http-client-python` to 0.40.0
