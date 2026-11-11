@@ -25,15 +25,7 @@ import {
 } from "@typespec/http";
 import { isCollectionPath } from "./utils.js";
 
-type DiagnosticMessageId =
-  | "extraProperty"
-  | "valueArray"
-  | "missingList"
-  | "pageItems"
-  | "nextLink"
-  | "pagingNextLink"
-  | "additionalProperties"
-  | "pagingName";
+type DiagnosticMessageId = "extraProperty" | "valueArray" | "missingList" | "pagingMetadata";
 
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
@@ -44,14 +36,11 @@ export const listResponseEnvelopeRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
     extraProperty:
-      "Collection response models must not declare properties other than `value` and `nextLink`.",
+      "Collection response models must not allow properties beyond `value` and `nextLink`.",
     valueArray: "Collection responses must declare a 'value' property of array type.",
     missingList: "Collection GET operations must use `@list`.",
-    pageItems: "The collection response `value` must use `@pageItems`.",
-    nextLink: "The collection response `nextLink` must use `@nextLink`.",
-    pagingNextLink: "Collection operations must declare `@nextLink` paging metadata.",
-    additionalProperties: "Collection response models must not allow additional properties.",
-    pagingName: "Paging property TypeSpec names must match their JSON wire names.",
+    pagingMetadata:
+      "Collection responses must use JSON-named `value` and `nextLink` properties with `@pageItems` and `@nextLink` metadata.",
   },
   create(context) {
     const program = context.program;
@@ -114,8 +103,8 @@ export const listResponseEnvelopeRule = createRule({
             resolveEncodedName(program, property, "application/json");
           const value = properties.find((property) => jsonName(property) === "value");
           const nextLink = properties.find((property) => jsonName(property) === "nextLink");
-          if (value && value.name !== "value") report(value, "pagingName");
-          if (nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingName");
+          if (value && value.name !== "value") report(value, "pagingMetadata");
+          if (nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingMetadata");
           if (!value || value.type.kind !== "Model" || !isArrayModelType(value.type)) {
             report(value ?? type, "valueArray");
           }
@@ -124,7 +113,7 @@ export const listResponseEnvelopeRule = createRule({
               paging?.output.pageItems.property !== value &&
               !hasPagingDecorator(value, "@pageItems")
             ) {
-              report(value, "pageItems");
+              report(value, "pagingMetadata");
             }
           }
           if (
@@ -132,9 +121,9 @@ export const listResponseEnvelopeRule = createRule({
             paging?.output.nextLink?.property !== nextLink &&
             !hasPagingDecorator(nextLink, "@nextLink")
           ) {
-            report(nextLink, "nextLink");
+            report(nextLink, "pagingMetadata");
           }
-          if (!nextLink) report(type, "pagingNextLink");
+          if (!nextLink) report(type, "pagingMetadata");
           for (const property of properties) {
             if (jsonName(property) !== "value" && jsonName(property) !== "nextLink") {
               report(property, "extraProperty");
@@ -142,7 +131,7 @@ export const listResponseEnvelopeRule = createRule({
           }
           for (let model: Model | undefined = type; model; model = model.baseModel) {
             if (model.indexer !== undefined) {
-              report(type, "additionalProperties");
+              report(type, "extraProperty");
               break;
             }
           }
@@ -166,38 +155,30 @@ export const listResponseEnvelopeRule = createRule({
             ![...reported].some(
               ([target, messages]) =>
                 target.kind === "ModelProperty" &&
-                messages.has("pagingName") &&
+                messages.has("pagingMetadata") &&
                 isHttpPayloadCloneOf(target, property),
             )
           ) {
-            report(property, "pagingName");
+            report(property, "pagingMetadata");
           }
         }
         const hasReported = (messageId: DiagnosticMessageId) =>
           [...reported.values()].some((messages) => messages.has(messageId));
-        if (paging === undefined && !hasReported("pageItems") && !hasReported("valueArray")) {
-          report(operation, "pageItems");
+        if (paging === undefined && !hasReported("pagingMetadata") && !hasReported("valueArray")) {
+          report(operation, "pagingMetadata");
         }
         if (
           !(paging?.output.nextLink || hasNextLink(operation.returnType)) &&
-          !hasReported("nextLink") &&
-          !hasReported("pagingNextLink")
+          !hasReported("pagingMetadata")
         ) {
-          report(operation, "pagingNextLink");
+          report(operation, "pagingMetadata");
         }
         const hasPagingIssue = [...reported.values()].some((messages) =>
-          [...messages].some(
-            (messageId) => messageId !== "extraProperty" && messageId !== "additionalProperties",
-          ),
+          [...messages].some((messageId) => messageId !== "extraProperty"),
         );
         for (const [target, messages] of reported) {
           for (const messageId of messages) {
-            if (
-              hasPagingIssue &&
-              (messageId === "extraProperty" || messageId === "additionalProperties")
-            ) {
-              continue;
-            }
+            if (hasPagingIssue && messageId === "extraProperty") continue;
             context.reportDiagnostic({
               target: getDiagnosticTarget(program, operation, target),
               messageId,

@@ -16,26 +16,16 @@ const code = "@azure-tools/typespec-azure-resource-manager/list-response-envelop
 const missingList = { code, message: "Collection GET operations must use `@list`." };
 const extraProperty = {
   code,
-  message:
-    "Collection response models must not declare properties other than `value` and `nextLink`.",
+  message: "Collection response models must not allow properties beyond `value` and `nextLink`.",
 };
 const valueArray = {
   code,
   message: "Collection responses must declare a 'value' property of array type.",
 };
-const pageItems = { code, message: "The collection response `value` must use `@pageItems`." };
-const nextLink = { code, message: "The collection response `nextLink` must use `@nextLink`." };
-const pagingNextLink = {
+const pagingMetadata = {
   code,
-  message: "Collection operations must declare `@nextLink` paging metadata.",
-};
-const additionalProperties = {
-  code,
-  message: "Collection response models must not allow additional properties.",
-};
-const pagingName = {
-  code,
-  message: "Paging property TypeSpec names must match their JSON wire names.",
+  message:
+    "Collection responses must use JSON-named `value` and `nextLink` properties with `@pageItems` and `@nextLink` metadata.",
 };
 
 it("recognizes provider and resource action paths and operations without provider metadata", async () => {
@@ -161,7 +151,7 @@ it("checks each variant of a plain 200 response union", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
   `,
     )
-    .toEmitDiagnostics([pageItems, nextLink]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
 it("does not apply sibling spread-clone paging metadata to another response variant", async () => {
@@ -176,7 +166,7 @@ it("does not apply sibling spread-clone paging metadata to another response vari
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
   `,
     )
-    .toEmitDiagnostics([pageItems, nextLink]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
 it("checks JSON wire names rather than TypeSpec property names", async () => {
@@ -190,7 +180,7 @@ it("checks JSON wire names rather than TypeSpec property names", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics([valueArray, pagingNextLink, pagingName, pagingName]);
+    .toEmitDiagnostics([valueArray, pagingMetadata, pagingMetadata, pagingMetadata]);
 });
 
 it("reports alternate TypeSpec names encoded as the standard JSON names", async () => {
@@ -204,10 +194,10 @@ it("reports alternate TypeSpec names encoded as the standard JSON names", async 
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics([pagingName, pagingName]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
-it("reports mismatches independently for sibling spread response variants", async () => {
+it("reports paging defects for each sibling spread response variant", async () => {
   await tester
     .expect(
       `
@@ -222,7 +212,7 @@ it("reports mismatches independently for sibling spread response variants", asyn
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
   `,
     )
-    .toEmitDiagnostics([pagingName, pagingName, pagingName, pageItems, pagingName, nextLink]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, pagingMetadata, pagingMetadata]);
 });
 
 it("targets only the paging property whose TypeSpec name differs from the JSON name", async () => {
@@ -237,7 +227,7 @@ it("targets only the paging property whose TypeSpec name differs from the JSON n
   `,
     )
     .toEmitDiagnostics(({ wrong }) => ({
-      ...pagingName,
+      ...pagingMetadata,
       pos: getSourceLocation(wrong).pos,
       end: getSourceLocation(wrong).end,
     }));
@@ -256,7 +246,7 @@ it("reports encoded name mismatches only once in an implicit HTTP body", async (
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics([pagingName, pagingName]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
 it("accepts inherited alias properties in an explicit body and ignores invisible properties", async () => {
@@ -330,10 +320,10 @@ it("rejects inherited indexers even on otherwise valid envelopes", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics(additionalProperties);
+    .toEmitDiagnostics(extraProperty);
 });
 
-it("reports an indexer independently of a missing nextLink", async () => {
+it("prioritizes missing nextLink metadata over an indexer", async () => {
   await tester
     .expect(
       `
@@ -341,7 +331,7 @@ it("reports an indexer independently of a missing nextLink", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
   `,
     )
-    .toEmitDiagnostics(pagingNextLink);
+    .toEmitDiagnostics(pagingMetadata);
 });
 
 it("checks each variant of an explicit 200 body union", async () => {
@@ -354,7 +344,7 @@ it("checks each variant of an explicit 200 body union", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Result;
   `,
     )
-    .toEmitDiagnostics([pageItems, nextLink]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
 it("reports a bodyless 200 even when the 201 response has paging metadata", async () => {
@@ -391,7 +381,7 @@ it("reports an explicitly empty 200 body even with paging on the 201 response", 
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Empty | Created;
   `,
     )
-    .toEmitDiagnostics([valueArray, pagingNextLink]);
+    .toEmitDiagnostics([valueArray, pagingMetadata]);
 });
 
 it("reports an array variant alongside a compliant 200 envelope", async () => {
@@ -417,7 +407,7 @@ it("checks status ranges containing 200 but ignores ranges starting at 201", asy
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): InRange | Later | Page;
   `,
     )
-    .toEmitDiagnostics([pageItems, nextLink]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
 it("includes 200 at the upper boundary of a status range", async () => {

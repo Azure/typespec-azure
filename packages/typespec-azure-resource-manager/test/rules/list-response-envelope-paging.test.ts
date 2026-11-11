@@ -15,14 +15,10 @@ beforeEach(async () => {
 
 const code = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
 const missingList = { code, message: "Collection GET operations must use `@list`." };
-const nextLink = { code, message: "The collection response `nextLink` must use `@nextLink`." };
-const pagingNextLink = {
+const pagingMetadata = {
   code,
-  message: "Collection operations must declare `@nextLink` paging metadata.",
-};
-const pagingName = {
-  code,
-  message: "Paging property TypeSpec names must match their JSON wire names.",
+  message:
+    "Collection responses must use JSON-named `value` and `nextLink` properties with `@pageItems` and `@nextLink` metadata.",
 };
 const valueArray = {
   code,
@@ -30,8 +26,7 @@ const valueArray = {
 };
 const extraProperty = {
   code,
-  message:
-    "Collection response models must not declare properties other than `value` and `nextLink`.",
+  message: "Collection response models must not allow properties beyond `value` and `nextLink`.",
 };
 
 it("prioritizes missing @list over paging and extra-property defects", async () => {
@@ -75,7 +70,7 @@ it("prioritizes a missing nextLink property over extra properties", async () => 
     model Page { @pageItems value: string[]; extra: string; }
   `,
     )
-    .toEmitDiagnostics(pagingNextLink);
+    .toEmitDiagnostics(pagingMetadata);
 });
 
 it("requires nextLink metadata even when runtime page items exist", async () => {
@@ -86,7 +81,7 @@ it("requires nextLink metadata even when runtime page items exist", async () => 
     model Page { @pageItems value: string[]; nextLink?: string; }
   `,
     )
-    .toEmitDiagnostics(nextLink);
+    .toEmitDiagnostics(pagingMetadata);
 });
 
 it("requires nextLink metadata when the only response is 201", async () => {
@@ -97,7 +92,7 @@ it("requires nextLink metadata when the only response is 201", async () => {
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Created;
   `,
     )
-    .toEmitDiagnostics(pagingNextLink);
+    .toEmitDiagnostics(pagingMetadata);
 });
 
 it("prioritizes missing @list over missing page items on a 201", async () => {
@@ -134,7 +129,7 @@ it("reports paging property names that differ from JSON names on a 201", async (
     @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Created;
   `,
     )
-    .toEmitDiagnostics([pagingName, pagingName]);
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
 });
 
 it("accepts inherited metadata on authored lists and standard ARM templates", async () => {
@@ -275,7 +270,7 @@ it("targets the project interface when an inherited response is library-owned", 
   `,
     )
     .toEmitDiagnostics(({ Operations }) =>
-      [valueArray, pagingName].map((diagnostic) => ({
+      [valueArray, pagingMetadata].map((diagnostic) => ({
         ...diagnostic,
         pos: getSourceLocation(Operations).pos,
         end: getSourceLocation(Operations).end,
@@ -317,7 +312,7 @@ it("reports a custom next-link name on an ARM list response", async () => {
     }
   `,
     )
-    .toEmitDiagnostics(pagingNextLink);
+    .toEmitDiagnostics(pagingMetadata);
 });
 
 it("checks a paginated ARM POST action template with no value property", async () => {
@@ -360,7 +355,7 @@ it("does not claim a decorated nextLink is missing when compiler paging metadata
     reportDiagnostic: (diagnostic) => messages.push(diagnostic.messageId ?? "default"),
   });
   navigateProgram(runner.program, listener);
-  expect(messages).toEqual(["pageItems"]);
+  expect(messages).toEqual(["pagingMetadata"]);
   expect(diagnostics.some((x) => x.code === "missing-paging-items")).toBe(true);
 });
 
