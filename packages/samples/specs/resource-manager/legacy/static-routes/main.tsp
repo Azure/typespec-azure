@@ -107,7 +107,7 @@ interface EmplOps2
       },
       ErrorResponse,
       #{ useStaticRoute: true },
-      RoutedResourceName = "SubscriptionEmployee"
+      RoutedResourceName = "ResourceGroupEmployee"
     > {}
 
 alias BaseParams2 = {

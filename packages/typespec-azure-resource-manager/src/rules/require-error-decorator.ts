@@ -9,12 +9,12 @@ import { getHttpOperation } from "@typespec/http";
 import { matchesStatusCode } from "./http-response-utils.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
-export const missingErrorDecoratorRule = createRule({
-  name: "missing-error-decorator",
+export const requireErrorDecoratorRule = createRule({
+  name: "require-error-decorator",
   description: "Require @error on 4xx and 5xx response models, except HEAD 404 responses.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-error-decorator",
-  docs: fileRef.fromPackageRoot("src/rules/missing-error-decorator.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/require-error-decorator",
+  docs: fileRef.fromPackageRoot("src/rules/require-error-decorator.md"),
   messages: {
     default: paramMessage`Response status '${"statusCode"}' must use a response model marked with @error.`,
   },

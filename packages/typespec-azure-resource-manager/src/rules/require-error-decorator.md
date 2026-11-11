@@ -20,44 +20,24 @@ clients instead of following the client's error-handling path.
 ## Incorrect
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 model BadRequest {
   @statusCode statusCode: 400;
-  @body body: CommonTypes.ErrorResponse;
+  @body body: string;
 }
 
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget, Error = BadRequest>;
-}
+@get op read(): BadRequest;
 ```
 
 ## Correct
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
-model Widget is ProxyResource<{}> {
-  ...ResourceNameParameter<Widget>;
-}
-
 @error
 model BadRequest {
   @statusCode statusCode: 400;
-  @body body: CommonTypes.ErrorResponse;
+  @body body: string;
 }
 
-@armResourceOperations
-interface Widgets {
-  read is ArmResourceRead<Widget, Error = BadRequest>;
-}
+@get op read(): BadRequest;
 ```
 
 If several response variants share a status, mark all of their response models

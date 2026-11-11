@@ -2,7 +2,7 @@ import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { missingErrorDecoratorRule } from "../../src/rules/missing-error-decorator.js";
+import { requireErrorDecoratorRule } from "../../src/rules/require-error-decorator.js";
 
 let tester: LinterRuleTester;
 
@@ -10,14 +10,14 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    missingErrorDecoratorRule,
+    requireErrorDecoratorRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
 function diagnostic(statusCode: number | string) {
   return {
-    code: "@azure-tools/typespec-azure-resource-manager/missing-error-decorator",
+    code: "@azure-tools/typespec-azure-resource-manager/require-error-decorator",
     severity: "warning" as const,
     message: `Response status '${statusCode}' must use a response model marked with @error.`,
   };
