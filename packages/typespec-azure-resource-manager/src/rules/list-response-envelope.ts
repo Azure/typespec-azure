@@ -26,6 +26,10 @@ import {
 import { isCollectionPath } from "./utils.js";
 
 type DiagnosticMessageId = "extraProperty" | "valueArray" | "missingList" | "pagingMetadata";
+type DiagnosticTarget = Model | ModelProperty | Operation;
+type PagingInfo = NonNullable<ReturnType<typeof getPagingOperation>[0]>;
+type DiagnosticReporter = (target: DiagnosticTarget, messageId: DiagnosticMessageId) => void;
+type DiagnosticCollector = ReturnType<typeof createDiagnosticCollector>;
 
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
@@ -47,23 +51,11 @@ export const listResponseEnvelopeRule = createRule({
     const metadata = createMetadataInfo(program);
     return {
       operation: (operation) => {
-        if (
-          isTemplateDeclarationOrInstance(operation) ||
-          (operation.interface !== undefined && isTemplateDeclaration(operation.interface)) ||
-          (getLocationContext(program, operation).type !== "project" &&
-            (operation.interface === undefined ||
-              getLocationContext(program, operation.interface).type !== "project"))
-        )
-          return;
+        if (shouldSkipOperation(program, operation)) return;
 
         const [httpOperation] = getHttpOperation(program, operation);
         const list = isList(program, operation);
-        const collection =
-          httpOperation.verb === "get" &&
-          isCollectionPath(httpOperation.path.split("?")[0], {
-            excludeTerminalPathParameter: true,
-            excludeDefaultSegment: true,
-          });
+        const collection = isCollectionGet(httpOperation.verb, httpOperation.path);
         if (!list && !collection) return;
         if (!list) {
           context.reportDiagnostic({
@@ -74,121 +66,194 @@ export const listResponseEnvelopeRule = createRule({
         }
 
         const [paging] = getPagingOperation(program, operation);
-        const reported = new Map<Model | ModelProperty | Operation, Set<DiagnosticMessageId>>();
-        const report = (
-          target: Model | ModelProperty | Operation,
-          messageId: DiagnosticMessageId,
-        ) => {
-          let messages = reported.get(target);
-          if (!messages) reported.set(target, (messages = new Set()));
-          if (messages.has(messageId)) return;
-          messages.add(messageId);
-        };
-        const checkBody = (type: Type, isExplicit: boolean) => {
-          if (type.kind === "Union") {
-            for (const variant of type.variants.values()) {
-              checkBody(variant.type, isExplicit);
-            }
-            return;
-          }
-          if (type.kind !== "Model" || isArrayModelType(type)) {
-            const target = type.kind === "Model" ? type : operation;
-            report(target, "valueArray");
-            return;
-          }
-          const properties = [...walkPropertiesInherited(type)].filter((property) =>
-            metadata.isPayloadProperty(property, Visibility.Read, isExplicit),
-          );
-          const jsonName = (property: ModelProperty) =>
-            resolveEncodedName(program, property, "application/json");
-          const value = properties.find((property) => jsonName(property) === "value");
-          const nextLink = properties.find((property) => jsonName(property) === "nextLink");
-          if (value && value.name !== "value") report(value, "pagingMetadata");
-          if (nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingMetadata");
-          if (!value || value.type.kind !== "Model" || !isArrayModelType(value.type)) {
-            report(value ?? type, "valueArray");
-          }
-          if (value && value.type.kind === "Model" && isArrayModelType(value.type)) {
-            if (
-              paging?.output.pageItems.property !== value &&
-              !hasPagingDecorator(value, "@pageItems")
-            ) {
-              report(value, "pagingMetadata");
-            }
-          }
-          if (
-            nextLink &&
-            paging?.output.nextLink?.property !== nextLink &&
-            !hasPagingDecorator(nextLink, "@nextLink")
-          ) {
-            report(nextLink, "pagingMetadata");
-          }
-          if (!nextLink) report(type, "pagingMetadata");
-          for (const property of properties) {
-            if (jsonName(property) !== "value" && jsonName(property) !== "nextLink") {
-              report(property, "extraProperty");
-            }
-          }
-          for (let model: Model | undefined = type; model; model = model.baseModel) {
-            if (model.indexer !== undefined) {
-              report(type, "extraProperty");
-              break;
-            }
-          }
-        };
+        const diagnostics = createDiagnosticCollector((target, messageId) =>
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(program, operation, target),
+            messageId,
+          }),
+        );
+
         for (const response of httpOperation.responses) {
           if (!includes200(response.statusCodes)) continue;
           for (const { body } of response.responses) {
             if (body === undefined || body.bodyKind !== "single") {
               const target = body?.property ?? operation;
-              report(target, "valueArray");
+              diagnostics.report(target, "valueArray");
             } else {
-              checkBody(body.type, body.isExplicit);
+              checkResponseBody(
+                program,
+                operation,
+                body.type,
+                body.isExplicit,
+                paging,
+                metadata,
+                diagnostics.report,
+              );
             }
           }
         }
-        for (const pagingProperty of [paging?.output.pageItems, paging?.output.nextLink]) {
-          const property = pagingProperty?.property;
-          if (
-            property &&
-            property.name !== resolveEncodedName(program, property, "application/json") &&
-            ![...reported].some(
-              ([target, messages]) =>
-                target.kind === "ModelProperty" &&
-                messages.has("pagingMetadata") &&
-                isHttpPayloadCloneOf(target, property),
-            )
-          ) {
-            report(property, "pagingMetadata");
-          }
-        }
-        const hasReported = (messageId: DiagnosticMessageId) =>
-          [...reported.values()].some((messages) => messages.has(messageId));
-        if (paging === undefined && !hasReported("pagingMetadata") && !hasReported("valueArray")) {
-          report(operation, "pagingMetadata");
-        }
-        if (
-          !(paging?.output.nextLink || hasNextLink(operation.returnType)) &&
-          !hasReported("pagingMetadata")
-        ) {
-          report(operation, "pagingMetadata");
-        }
-        const hasPagingIssue = [...reported.values()].some((messages) =>
-          [...messages].some((messageId) => messageId !== "extraProperty"),
-        );
-        for (const [target, messages] of reported) {
-          for (const messageId of messages) {
-            if (hasPagingIssue && messageId === "extraProperty") continue;
-            context.reportDiagnostic({
-              target: getDiagnosticTarget(program, operation, target),
-              messageId,
-            });
-          }
-        }
+        checkPagingMetadata(operation, program, paging, diagnostics);
+        diagnostics.emit();
       },
     };
   },
 });
+
+function shouldSkipOperation(program: Program, operation: Operation): boolean {
+  if (
+    isTemplateDeclarationOrInstance(operation) ||
+    (operation.interface !== undefined && isTemplateDeclaration(operation.interface))
+  ) {
+    return true;
+  }
+  if (getLocationContext(program, operation).type === "project") return false;
+  return (
+    operation.interface === undefined ||
+    getLocationContext(program, operation.interface).type !== "project"
+  );
+}
+
+function isCollectionGet(verb: string, path: string): boolean {
+  return (
+    verb === "get" &&
+    isCollectionPath(path.split("?")[0], {
+      excludeTerminalPathParameter: true,
+      excludeDefaultSegment: true,
+    })
+  );
+}
+
+function createDiagnosticCollector(emitDiagnostic: DiagnosticReporter): {
+  report: DiagnosticReporter;
+  has: (messageId: DiagnosticMessageId) => boolean;
+  hasPagingCloneDiagnostic: (original: ModelProperty) => boolean;
+  emit: () => void;
+} {
+  const reported = new Map<DiagnosticTarget, Set<DiagnosticMessageId>>();
+  const report: DiagnosticReporter = (target, messageId) => {
+    let messages = reported.get(target);
+    if (!messages) reported.set(target, (messages = new Set()));
+    messages.add(messageId);
+  };
+  const has = (messageId: DiagnosticMessageId) =>
+    [...reported.values()].some((messages) => messages.has(messageId));
+
+  return {
+    report,
+    has,
+    hasPagingCloneDiagnostic: (original) =>
+      [...reported].some(
+        ([target, messages]) =>
+          target.kind === "ModelProperty" &&
+          messages.has("pagingMetadata") &&
+          isHttpPayloadCloneOf(target, original),
+      ),
+    emit: () => {
+      const hasPagingIssue = [...reported.values()].some((messages) =>
+        [...messages].some((messageId) => messageId !== "extraProperty"),
+      );
+      for (const [target, messages] of reported) {
+        for (const messageId of messages) {
+          if (hasPagingIssue && messageId === "extraProperty") continue;
+          emitDiagnostic(target, messageId);
+        }
+      }
+    },
+  };
+}
+
+function checkResponseBody(
+  program: Program,
+  operation: Operation,
+  type: Type,
+  isExplicit: boolean,
+  paging: PagingInfo | undefined,
+  metadata: ReturnType<typeof createMetadataInfo>,
+  report: DiagnosticReporter,
+): void {
+  if (type.kind === "Union") {
+    for (const variant of type.variants.values()) {
+      checkResponseBody(program, operation, variant.type, isExplicit, paging, metadata, report);
+    }
+    return;
+  }
+  if (type.kind !== "Model" || isArrayModelType(type)) {
+    report(type.kind === "Model" ? type : operation, "valueArray");
+    return;
+  }
+
+  const properties = [...walkPropertiesInherited(type)].filter((property) =>
+    metadata.isPayloadProperty(property, Visibility.Read, isExplicit),
+  );
+  const jsonName = (property: ModelProperty) =>
+    resolveEncodedName(program, property, "application/json");
+  const value = properties.find((property) => jsonName(property) === "value");
+  const nextLink = properties.find((property) => jsonName(property) === "nextLink");
+
+  if (!value || value.type.kind !== "Model" || !isArrayModelType(value.type)) {
+    report(value ?? type, "valueArray");
+  } else if (
+    paging?.output.pageItems.property !== value &&
+    !hasPagingDecorator(value, "@pageItems")
+  ) {
+    report(value, "pagingMetadata");
+  }
+
+  if (value && value.name !== "value") report(value, "pagingMetadata");
+  if (
+    nextLink &&
+    paging?.output.nextLink?.property !== nextLink &&
+    !hasPagingDecorator(nextLink, "@nextLink")
+  ) {
+    report(nextLink, "pagingMetadata");
+  }
+  if (!nextLink) report(type, "pagingMetadata");
+  if (nextLink && nextLink.name !== "nextLink") report(nextLink, "pagingMetadata");
+
+  for (const property of properties) {
+    const name = jsonName(property);
+    if (name !== "value" && name !== "nextLink") {
+      report(property, "extraProperty");
+    }
+  }
+  for (let model: Model | undefined = type; model; model = model.baseModel) {
+    if (model.indexer !== undefined) {
+      report(type, "extraProperty");
+      break;
+    }
+  }
+}
+
+function checkPagingMetadata(
+  operation: Operation,
+  program: Program,
+  paging: PagingInfo | undefined,
+  diagnostics: DiagnosticCollector,
+): void {
+  for (const pagingProperty of [paging?.output.pageItems, paging?.output.nextLink]) {
+    const property = pagingProperty?.property;
+    if (
+      property &&
+      property.name !== resolveEncodedName(program, property, "application/json") &&
+      !diagnostics.hasPagingCloneDiagnostic(property)
+    ) {
+      diagnostics.report(property, "pagingMetadata");
+    }
+  }
+  if (
+    paging === undefined &&
+    !diagnostics.has("pagingMetadata") &&
+    !diagnostics.has("valueArray")
+  ) {
+    diagnostics.report(operation, "pagingMetadata");
+  }
+  if (
+    !(paging?.output.nextLink || hasNextLink(operation.returnType)) &&
+    !diagnostics.has("pagingMetadata")
+  ) {
+    diagnostics.report(operation, "pagingMetadata");
+  }
+}
 
 function includes200(status: HttpStatusCodesEntry): boolean {
   return status === 200 || (typeof status === "object" && status.start <= 200 && status.end >= 200);
