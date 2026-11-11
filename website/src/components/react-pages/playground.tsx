@@ -1,3 +1,4 @@
+import { TypeSpecPlaygroundConfig } from "@azure-tools/typespec-azure-playground-website";
 import { FluentLayout } from "@components/fluent/fluent-layout";
 import "@typespec/playground/styles.css";
 import { useEffect, useState, type ReactNode } from "react";
@@ -15,7 +16,13 @@ export const AsyncPlayground = ({
     WebsitePlayground: typeof import("../playground-component/playground").WebsitePlayground;
   }>(undefined as any);
   useEffect(() => {
-    Promise.all([loadImportMap({ latestVersion }), import("../playground-component/playground")])
+    Promise.all([
+      loadImportMap({
+        latestVersion,
+        additionalPackages: TypeSpecPlaygroundConfig.deferredEmitters,
+      }),
+      import("../playground-component/playground"),
+    ])
       .then((x) => setMod({ versionData: x[0] as any, WebsitePlayground: x[1].WebsitePlayground }))
       .catch((e) => {
         throw e;

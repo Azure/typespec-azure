@@ -23,6 +23,21 @@ declare const __COMMIT_HASH__: string | undefined;
 
 const commit = typeof __COMMIT_HASH__ !== "undefined" ? __COMMIT_HASH__ : undefined;
 const pr = typeof __PR__ !== "undefined" ? __PR__ : undefined;
+
+// Deferred emitters are published separately from the Azure index, so add their import maps.
+const loadedEmitters = await Promise.all(
+  TypeSpecPlaygroundConfig.deferredEmitters.map(async (name) => {
+    const response = await fetch(`https://typespec.blob.core.windows.net/pkgs/${name}/latest.json`);
+    if (!response.ok) {
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to load latest index for ${name}: ${response.status}`);
+      return [];
+    }
+    (window as any).importShim.addImportMap(await response.json());
+    return [name];
+  }),
+);
+
 const PlaygroundFooter = () => {
   const prItem = pr ? (
     <FooterItem link={`https://github.com/azure/typespec-azure/pull/${pr}`}>
@@ -57,7 +72,7 @@ const App = () => {
   return (
     <StandalonePlayground
       {...PlaygroundManifest}
-      libraries={TypeSpecPlaygroundConfig.libraries}
+      libraries={[...PlaygroundManifest.libraries, ...loadedEmitters.flat()]}
       samples={samples}
       emitterViewers={{
         "@typespec/openapi3": [SwaggerUIViewer],

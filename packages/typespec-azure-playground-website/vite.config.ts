@@ -5,7 +5,7 @@ import { TypeSpecPlaygroundConfig } from "./src/index.js";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   const useLocalLibraries = env["VITE_USE_LOCAL_LIBRARIES"] === "true";
-  return definePlaygroundViteConfig({
+  const config = definePlaygroundViteConfig({
     ...TypeSpecPlaygroundConfig,
     libraries: TypeSpecPlaygroundConfig.libraries.filter(
       (library) =>
@@ -16,4 +16,14 @@ export default defineConfig(({ mode }) => {
     },
     skipBundleLibraries: !useLocalLibraries,
   });
+  config.plugins!.push({
+    name: "import-map-shim",
+    transformIndexHtml: {
+      order: "post",
+      // `importShim.addImportMap` requires shim mode, which ignores native import maps.
+      handler: (html) =>
+        html.replace('<script type="importmap">', '<script type="importmap-shim">'),
+    },
+  });
+  return config;
 });
