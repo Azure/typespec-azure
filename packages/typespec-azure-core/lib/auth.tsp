@@ -11,6 +11,21 @@ using Azure.Core.Traits.Private;
 
 namespace Azure.Core;
 
+/** A deployment's HTTP endpoint and OAuth authentication requirements. */
+model AzureServiceConfiguration {
+  /** The server URL or URL template, as accepted by `@server`. */
+  endpoint: string;
+
+  /** A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`. */
+  authentication: TypeRef<{} | Reflection.Union | {}[]>;
+
+  /** A reference to the parameter model used in the endpoint URL template. */
+  parameters?: TypeRef<Reflection.Model>;
+
+  /** Description of the server. */
+  description?: string;
+}
+
 /**
  * Azure Active Directory (AAD) Token Authentication Flow
  * @template AuthUrl The authorization URL.

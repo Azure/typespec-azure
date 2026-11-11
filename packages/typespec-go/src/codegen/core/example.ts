@@ -371,6 +371,7 @@ function getExampleValue(
     case "any":
       return jsonToGo(example.value, indent);
     case "array": {
+      imports?.addForType(example.type);
       const isElementByValue = example.type.itemType.kind !== "ptr";
       // if polymorphic, need to add type name in array, so inArray will be set to false
       // if other case, no need to add type name in array, so inArray will be set to true
@@ -383,6 +384,7 @@ function getExampleValue(
       return exampleText;
     }
     case "dictionary": {
+      imports?.addForType(example.type);
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       const isValueByValue = example.type.itemType.kind !== "ptr";
       const isValuePolymorphic = example.type.itemType.kind === "interface";
@@ -411,7 +413,7 @@ function getExampleValue(
           additionalPropertiesField.type.itemType.kind !== "ptr";
         const isAdditionalPropertiesPolymorphic =
           additionalPropertiesField.type.itemType.kind === "interface";
-        exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(isAdditionalPropertiesFieldByValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
+        exampleText += `${indent}\t${additionalPropertiesField.name}: ${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
           exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
         }
@@ -821,8 +823,25 @@ function isParamByValue(p: go.ParameterExample): boolean {
  */
 function shouldRenderParam(param: go.MethodParameter, example: go.MethodExample): boolean {
   if (go.isLiteralParameter(param.style)) return false;
-  if (example.parameters.find((p) => p.parameter.name === param.name)) return true;
+  if (findParamExample(param, example)) return true;
   return go.isRequiredParameter(param.style);
+}
+
+/**
+ * Finds a parameter's example by identity, or by group identity and field name for required groups.
+ * Shared groups retain the first operation's field objects, so later operations need the fallback.
+ */
+function findParamExample(
+  param: go.MethodParameter,
+  example: go.MethodExample,
+): go.ParameterExample | undefined {
+  return example.parameters.find(
+    (p) =>
+      p.parameter === param ||
+      (param.group?.required &&
+        p.parameter.group === param.group &&
+        p.parameter.name === param.name),
+  );
 }
 
 /**
@@ -836,7 +855,7 @@ function getParamExampleValue(
   example: go.MethodExample,
   imports: ImportManager,
 ): string {
-  const paramExample = example.parameters.find((p) => p.parameter.name === param.name);
+  const paramExample = findParamExample(param, example);
   if (paramExample) {
     return getExampleValue(
       pkg,

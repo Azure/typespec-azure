@@ -1316,6 +1316,51 @@ Expected calls:
 - GET the status-monitor URI returns a running status with nested `usage`
 - GET the status-monitor URI returns a succeeded status with nested `usage` and the result
 
+### Azure_ClientGenerator_Core_Lro_OperationId_analyze
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/documentModels/{modelId}:analyze`
+
+Declares a legacy Document Intelligence-shaped flow for emitter tests of
+`@lroOperationId` on the status-monitor operation ID path parameter.
+
+The status-monitor body does not model the server-issued result ID. The service returns the
+complete opaque status-monitor URI, including its API-version query, and polling must continue
+with that URI. Emitter-specific client tests can separately expose `analysis-123` as operation
+identity by binding the decorated `resultId` parameter to the returned URI.
+
+Expected calls:
+
+- POST `/documentModels/document-1:analyze` returns 202 with
+  `Operation-Location: {endpoint}/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status
+- GET that exact status-monitor URI returns a succeeded status with the analysis result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_startTranslation
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start`
+
+Declares a status-body operation ID flow where the polling URI does not contain the identifier. After a poll response, emitters use the operation ID property's segments to read `id` from `TranslationStatus` and expose `translation-123` on the SDK operation or poller. Before that response the ID is unavailable. It is not a request parameter and must not be used to construct the polling URL; polling continues with the complete `Operation-Location` URI. The scenario supplies the HTTP flow; emitter tests must verify their public operation-ID accessor.
+
+Expected calls:
+
+- POST `/translations:start` returns 202 with
+  `Operation-Location: {endpoint}/translations/status?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status with `id: translation-123`
+- GET that exact status-monitor URI returns a succeeded status with the same ID and result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_startTranslationWithPath
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start-with-path`
+
+Declares a Translation-shaped fallback flow with operation identity in both the Operation-Location path and the status-monitor body. Emitters can expose `translation-456` from the polling URI before the first poll, then use the body's `id` once a status response is available. The ID is SDK operation or poller state, not a replacement for the complete polling URI.
+
+Expected calls:
+
+- POST `/translations:start-with-path` returns 202 with
+  `Operation-Location: {endpoint}/translations/operations/translation-456?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status with `id: translation-456`
+- GET that exact status-monitor URI returns a succeeded status with the same ID and result
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`
@@ -1472,6 +1517,18 @@ The 'namespaceModelSerializable' operation verifies that models from the namespa
 Verifies that an API-version override on a child client replaces the default service API version.
 The client call takes no API-version argument and must send the overridden query parameter
 `api-version=2022-10-01` instead of the service version `2025-01-01`.
+
+### Azure_Core_Authentication_Configurations_defaultConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/default`
+
+Supply no configuration or endpoint override. The required public default is not the first declared configuration. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.io/.default to /azure/core/authentication/configurations/oauth2/public/token. Use the returned access_token as a Bearer token for /public/azure/core/authentication/configurations/default and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
+
+### Azure_Core_Authentication_Configurations_governmentConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/government`
+
+Select government without overriding the endpoint. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.us/.default to /azure/core/authentication/configurations/oauth2/government/token. Use the returned access_token as a Bearer token for /government/azure/core/authentication/configurations/government and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -2469,6 +2526,15 @@ Expected response body:
   }
 }
 ```
+
+### Azure_ResourceManager_Example
+
+- Endpoint: `get https://management.azure.com`
+
+Generate management-plane sample code using the unified YAML example at examples.yaml.
+Do not set "examples-dir"; the scenario-local tspconfig.yaml enables discovery.
+Expected sample provenance: examples.yaml#list.
+List widgets in resource group test-rg, returning one widget named widget.
 
 ### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
 
