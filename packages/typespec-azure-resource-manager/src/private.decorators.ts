@@ -89,7 +89,7 @@ import {
   armRenameListByOperationInternal,
   type ArmResourceOperation,
   getArmResourceOperations,
-  setArmOperationIdentifier,
+  validateArmOperationKind,
 } from "./operations.js";
 import { type ResourceNameExpression, setResourceNameExpression } from "./resource-name.js";
 import {
@@ -182,9 +182,6 @@ const $genericResourceInternal: GenericResourceInternalDecorator = (
     reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target });
     return;
   }
-
-  // Skip if already registered
-  if (getArmResource(program, target)) return;
 
   const armResourceDetails: ArmResourceDetails = {
     name: target.name,
@@ -834,9 +831,6 @@ function callLifecycleDecorator(
     case "list":
       context.call($listsResource, target, resourceType);
       break;
-    case "checkExistence":
-      context.call($armResourceCheckExistence, target, resourceType);
-      break;
   }
 }
 
@@ -849,6 +843,7 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -890,6 +885,7 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -925,6 +921,7 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -957,20 +954,10 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
     kind: operationType,
     operation: target,
     operationGroup: target.interface.name,
-    resource: resourceType,
     resourceName: resolvedResourceName,
     resourceKind: "legacy",
   };
   addArmResourceOperation(context.program, resourceType, opId);
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    kind: operationType,
-    name: target.name,
-    operation: target,
-    operationGroup: target.interface.name,
-    resourceModelName: resourceType.name,
-    resourceName: resolvedResourceName,
-    resourceKind: "legacy",
-  });
   setResourceNameExpression(context.program, target, resourceNameExpression);
 
   const { program } = context;
@@ -996,6 +983,7 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -1028,20 +1016,10 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
     kind: operationType,
     operation: target,
     operationGroup: target.interface.name,
-    resource: resourceType,
     resourceName: resolvedResourceName,
     resourceKind: "legacy-extension",
   };
   addArmResourceOperation(context.program, resourceType, opId);
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    kind: operationType,
-    name: target.name,
-    operation: target,
-    operationGroup: target.interface.name,
-    resourceModelName: resourceType.name,
-    resourceName: resolvedResourceName,
-    resourceKind: "legacy-extension",
-  });
   setResourceNameExpression(context.program, target, resourceNameExpression);
   const { program } = context;
   callLifecycleDecorator(context, target, resourceType, operationType);

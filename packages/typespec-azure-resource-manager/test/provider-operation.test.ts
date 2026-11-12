@@ -1,6 +1,21 @@
+import {
+  unsafe_mutateSubgraph,
+  unsafe_MutatorFlow,
+  unsafe_Realm,
+} from "@typespec/compiler/experimental";
 import { t } from "@typespec/compiler/testing";
+import { getResourceOperation } from "@typespec/rest";
+import { ok } from "node:assert";
 import { describe, expect, it } from "vitest";
 import { getProviderOperation, isProviderOperation, isResourceOperation } from "../src/index.js";
+import {
+  getArmResourceOperationData,
+  getArmResourceOperationList,
+  getOriginalResourceOperationModels,
+} from "../src/operations.js";
+import { getArmResource } from "../src/private.decorators.js";
+import { getResourceNameExpression } from "../src/resource-name.js";
+import { resolveArmResources } from "../src/resource.js";
 import { Tester } from "./tester.js";
 
 const service = `
@@ -65,6 +80,23 @@ describe("resource operations", () => {
     "armResourceAction",
     "armResourceCheckExistence",
   ]) {
+    it(`updates grouping without duplicate registrations for @${decorator}`, async () => {
+      const { program, operation } = await Tester.compile(t.code`
+        ${service}${resource}
+        interface Custom {
+          @route("/valid")
+          @${decorator}(Widget, "NamedWidgets")
+          @${decorator}(Widget)
+          ${t.op("operation")}(): void;
+        }
+      `);
+      const model = operation.interface!.namespace!.models.get("Widget")!;
+      const identifiers = [...getArmResourceOperationList(program, model)];
+      expect(identifiers.length).toBe(1);
+      expect(identifiers[0].resourceName).toBe("NamedWidgets");
+      expect(getArmResourceOperationData(program, operation)?.resourceName).toBe("NamedWidgets");
+    });
+
     it(`recognizes @${decorator} only for registered resource models`, async () => {
       const { program, valid, invalid } = await Tester.compile(t.code`
         ${service}${resource}
@@ -80,12 +112,55 @@ describe("resource operations", () => {
     });
   }
 
+  describe("operation registration consistency", () => {
+    it.each(["armResourceUpdate", "armResourceList", "armResourceAction"])(
+      "rejects @%s overriding a read before changing registration",
+      async (decorator) => {
+        const [{ program, operation }, diagnostics] = await Tester.compileAndDiagnose(t.code`
+            ${service}${resource}
+            interface Custom {
+              @route("/valid")
+              @${decorator}(Widget, "Rejected")
+              @armResourceRead(Widget, "Accepted")
+              ${t.op("operation")}(): void;
+            }
+          `);
+        expect(diagnostics).toMatchObject([
+          {
+            code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-kind-conflict",
+            severity: "error",
+          },
+        ]);
+        const model = operation.interface!.namespace!.models.get("Widget")!;
+        const identifiers = [...getArmResourceOperationList(program, model)];
+        expect(identifiers.length).toBe(1);
+        expect(identifiers[0]).toMatchObject({ kind: "read", resourceName: "Accepted" });
+        expect(getArmResourceOperationData(program, operation)).toMatchObject({
+          kind: "read",
+          resourceName: "Accepted",
+        });
+        expect(getResourceOperation(program, operation)?.operation).toBe("read");
+        expect(getResourceNameExpression(program, operation)).toEqual({
+          kind: "explicit",
+          value: "Accepted",
+        });
+      },
+    );
+  });
   for (const decorator of [
-    'extensionResourceOperation(Extension.Subscription, Widget, "read")',
-    'builtInResourceOperation(Extension.Subscription, Widget, "read")',
-    'legacyResourceOperation(Widget, "read")',
-    'legacyExtensionResourceOperation(Widget, "read")',
-  ]) {
+    "read",
+    "createOrUpdate",
+    "update",
+    "delete",
+    "list",
+    "action",
+    "checkExistence",
+  ].flatMap((kind) => [
+    `extensionResourceOperation(Extension.Subscription, Widget, "${kind}")`,
+    `builtInResourceOperation(Extension.Subscription, Widget, "${kind}")`,
+    `legacyResourceOperation(Widget, "${kind}")`,
+    `legacyExtensionResourceOperation(Widget, "${kind}")`,
+  ])) {
     it(`recognizes private registration through ${decorator}`, async () => {
       const { program, valid, invalid } = await Tester.compile(t.code`
         ${service}${resource}
@@ -98,11 +173,68 @@ describe("resource operations", () => {
           @Azure.ResourceManager.Private.${decorator.replace("Widget", "NotAResource")}
           ${t.op("invalid")}(): void;
         }
+
       `);
       expect(isResourceOperation(program, valid)).toBe(true);
       expect(isResourceOperation(program, invalid)).toBe(false);
     });
+
+    it(`overrides private grouping through ${decorator}`, async () => {
+      const { program, operation } = await Tester.compile(t.code`
+        ${service}${resource}
+        interface Custom {
+          @route("/valid")
+          @Azure.ResourceManager.Private.${decorator.slice(0, -1)}, "NamedWidgets")
+          @Azure.ResourceManager.Private.${decorator}
+          ${t.op("operation")}(): void;
+        }
+      `);
+      const model = operation.interface!.namespace!.models.get("Widget")!;
+      const identifiers = [...getArmResourceOperationList(program, model)];
+      expect(identifiers.length).toBe(1);
+      expect(identifiers[0].resourceName).toBe("NamedWidgets");
+      expect(getArmResourceOperationData(program, operation)?.resourceName).toBe("NamedWidgets");
+    });
   }
+
+  it.each([
+    'extensionResourceOperation(Extension.Subscription, Widget, "update", "Rejected")',
+    'builtInResourceOperation(Extension.Subscription, Widget, "list", "Rejected")',
+    'legacyResourceOperation(Widget, "action", "Rejected")',
+    'legacyExtensionResourceOperation(Widget, "checkExistence", "Rejected")',
+  ])("rejects a private kind override before side effects: %s", async (decorator) => {
+    const [{ program, operation }, diagnostics] = await Tester.compileAndDiagnose(t.code`
+      ${service}${resource}
+      interface Custom {
+        @route("/valid")
+        @Azure.ResourceManager.Private.${decorator}
+        @armResourceRead(Widget, "Accepted")
+        ${t.op("operation")}(): void;
+      }
+    `);
+    expect(diagnostics.map(({ code }) => code)).toEqual([
+      "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-kind-conflict",
+    ]);
+    expect(getArmResourceOperationData(program, operation)?.resourceName).toBe("Accepted");
+    expect(getResourceOperation(program, operation)?.operation).toBe("read");
+    expect(getResourceNameExpression(program, operation)).toEqual({
+      kind: "explicit",
+      value: "Accepted",
+    });
+  });
+
+  it.each([
+    ["genericResourceInternal", 'armResourceWithParameter({}, "widgets", "widgetName")', "Generic"],
+    ['armResourceWithParameter({}, "widgets", "widgetName")', "genericResourceInternal", "Proxy"],
+  ])("allows the outer model registration to overwrite %s / %s", async (outer, inner, kind) => {
+    const { program, Widget } = await Tester.compile(t.code`
+      ${service}
+      @Azure.ResourceManager.Private.${outer}
+      @Azure.ResourceManager.Private.${inner}
+      model ${t.model("Widget")} {}
+    `);
+    expect(getArmResource(program, Widget)?.kind).toBe(kind);
+  });
 
   it("recognizes standard, extension, and legacy templates", async () => {
     const { program, Standard, Extensions, Legacy, LegacyExtensions } = await Tester.compile(t.code`
@@ -132,5 +264,138 @@ describe("resource operations", () => {
         expect(isResourceOperation(program, operation)).toBe(true);
       }
     }
+  });
+});
+
+describe("resource registration version isolation", () => {
+  it.each([
+    ["2024-01-01", "2025-01-01", "2026-01-01"],
+    ["2026-01-01", "2025-01-01", "2024-01-01"],
+  ])("preserves grouping and original registrations in version order %j", async (...versions) => {
+    const { program, Widget, read } = await Tester.compile(t.code`
+      @armProviderNamespace @versioned(Versions) namespace Microsoft.Test;
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01", v3: "2026-01-01" }
+      @renamedFrom(Versions.v2, "OldWidget")
+      model ${t.model("Widget")} is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+      @armResourceOperations interface Widgets {
+        @armResourceRead(Widget, "NamedWidgets")
+        ${t.op("read")} is ArmResourceRead<Widget>;
+      }
+    `);
+    const original = resolveArmResources(program);
+    for (const version of versions) {
+      const provider = resolveArmResources(program, { version });
+      ok(provider?.resources);
+      const modelName = version === "2024-01-01" ? "OldWidget" : "Widget";
+      const resource = provider.resources.find(({ type }) => type.name === modelName)!;
+      const projectedRead = resource.operations.lifecycle.read![0].operation;
+      expect(projectedRead === read).toBe(false);
+      expect(resource.type === Widget).toBe(false);
+      expect(unsafe_Realm.realmForType.get(projectedRead)).toBe(
+        unsafe_Realm.realmForType.get(resource.type),
+      );
+      expect(getArmResourceOperationData(program, projectedRead)?.resourceName).toBe(
+        "NamedWidgets",
+      );
+      const identifiers = [...getArmResourceOperationList(program, resource.type)].filter(
+        ({ operation }) => operation === projectedRead,
+      );
+      expect(identifiers.length).toBe(1);
+      expect(identifiers[0].resource).toBeUndefined();
+      expect(identifiers[0].resourceName).toBe("NamedWidgets");
+      expect(isResourceOperation(program, projectedRead)).toBe(true);
+      const repeated = resolveArmResources(program, { version });
+      ok(repeated?.resources);
+      expect(
+        repeated.resources.find(({ type }) => type.name === modelName)!.type === resource.type,
+      ).toBe(true);
+    }
+    expect(resolveArmResources(program) === original).toBe(true);
+    expect(getArmResourceOperationData(program, read)?.resourceName).toBe("NamedWidgets");
+    const models = getOriginalResourceOperationModels(program);
+    expect(models.size).toBe(1);
+    expect(models.get(read)?.size).toBe(1);
+    expect(models.get(read)?.has(Widget)).toBe(true);
+  });
+
+  it("allows an operation-only mutation to share the original resource model", async () => {
+    const { program, Widget, read } = await Tester.compile(t.code`
+      ${service}
+      model ${t.model("Widget")} is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+      @armResourceOperations interface Widgets {
+        @armResourceRead(Widget, "NamedWidgets")
+        ${t.op("read")} is ArmResourceRead<Widget>;
+      }
+    `);
+    const projection = unsafe_mutateSubgraph(
+      program,
+      [
+        {
+          name: "Operation-only registration replay",
+          Model: {
+            filter: () => unsafe_MutatorFlow.DoNotMutate | unsafe_MutatorFlow.DoNotRecur,
+            mutate: () => {
+              throw new Error("The resource model must remain shared");
+            },
+          },
+          Operation: (_source, clone) => {
+            clone.name = "projectedRead";
+          },
+        },
+      ],
+      read,
+    );
+    ok(projection.type.kind === "Operation");
+    expect(projection.type === read).toBe(false);
+    expect(unsafe_Realm.realmForType.get(projection.type)).toBeDefined();
+    expect(unsafe_Realm.realmForType.get(Widget)).toBeUndefined();
+    expect(isResourceOperation(program, projection.type)).toBe(true);
+    expect(getArmResourceOperationData(program, projection.type)?.resourceName).toBe(
+      "NamedWidgets",
+    );
+    expect(getArmResourceOperationData(program, read)?.resourceName).toBe("NamedWidgets");
+    const models = getOriginalResourceOperationModels(program);
+    expect(models.has(projection.type)).toBe(false);
+    expect(models.get(read)?.has(Widget)).toBe(true);
+  });
+
+  it("keeps an unvisited operation unchanged when only its generic resource model is mutated", async () => {
+    const { program, read } = await Tester.compile(t.code`
+      ${service}
+      @Azure.ResourceManager.Private.genericResourceInternal
+      model Generic<T> { value: T; }
+      interface Custom {
+        @get @route("/generic")
+        @armResourceRead(Generic<string>, "NamedGenerics")
+        ${t.op("read")}(): void;
+      }
+    `);
+    const model = [...getOriginalResourceOperationModels(program).get(read)!][0];
+    const projection = unsafe_mutateSubgraph(
+      program,
+      [
+        {
+          name: "Model-only registration replay",
+          Model: {
+            filter: (source) =>
+              source === model
+                ? true
+                : unsafe_MutatorFlow.DoNotMutate | unsafe_MutatorFlow.DoNotRecur,
+            mutate: (_source, clone) => {
+              clone.name = "ProjectedGeneric";
+            },
+          },
+        },
+      ],
+      model,
+    );
+    ok(projection.type.kind === "Model");
+    expect(projection.type === model).toBe(false);
+    expect(getArmResource(program, projection.type)?.typespecType === projection.type).toBe(true);
+    expect(getArmResourceOperationList(program, projection.type).size).toBe(0);
+    expect(getArmResourceOperationData(program, read)?.resourceName).toBe("NamedGenerics");
+    const owners = getOriginalResourceOperationModels(program).get(read)!;
+    expect(owners.size).toBe(1);
+    expect(owners.has(model)).toBe(true);
   });
 });

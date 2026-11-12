@@ -12,8 +12,9 @@ import {
   unsafe_mutateSubgraph as mutateSubgraph,
   type unsafe_Mutator as Mutator,
   unsafe_MutatorFlow as MutatorFlow,
+  unsafe_Realm as Realm,
 } from "@typespec/compiler/experimental";
-import { useStateMap } from "@typespec/compiler/utils";
+import { useStateMap, useStateSet } from "@typespec/compiler/utils";
 import { $route, getHttpOperation, type HttpOperation, isPathParam } from "@typespec/http";
 import {
   $actionSegment,
@@ -66,16 +67,13 @@ export type ArmLifecycleOperationKind =
   "read" | "createOrUpdate" | "update" | "delete" | "checkExistence";
 export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
-const [getProviderOperationState, setProviderOperation] = useStateMap<Operation, Operation>(
+const [hasProviderOperation, addProviderOperation] = useStateSet<Operation>(
   ArmStateKeys.providerOperation,
-);
-const [getOperationResource, setOperationResource] = useStateMap<Operation, Model>(
-  ArmStateKeys.resourceOperationResource,
 );
 
 /** Mark an operation as a provider operation rather than a resource operation. */
 export const $providerOperation: ProviderOperationDecorator = (context, target) => {
-  setProviderOperation(context.program, target, target);
+  addProviderOperation(context.program, target);
 };
 
 /** Return the operation registered with `@providerOperation`, if any. */
@@ -83,7 +81,7 @@ export function getProviderOperation(
   program: Program,
   operation: Operation,
 ): Operation | undefined {
-  return getProviderOperationState(program, operation);
+  return hasProviderOperation(program, operation) ? operation : undefined;
 }
 
 /** Whether the operation is registered with `@providerOperation`. */
@@ -93,8 +91,44 @@ export function isProviderOperation(program: Program, operation: Operation): boo
 
 /** Whether the operation is registered against a registered ARM resource model. */
 export function isResourceOperation(program: Program, operation: Operation): boolean {
-  const resource = getOperationResource(program, operation);
-  return resource !== undefined && getArmResource(program, resource) !== undefined;
+  for (const [resource, identifiers] of getArmOperationLists(program)) {
+    if (getArmResource(program, resource) === undefined) continue;
+    for (const identifier of identifiers) {
+      if (identifier.operation === operation) return true;
+    }
+  }
+  return false;
+}
+
+/** @internal */
+export function getOriginalResourceOperationModels(program: Program): Map<Operation, Set<Model>> {
+  const result = new Map<Operation, Set<Model>>();
+  for (const [model, identifiers] of getArmOperationLists(program)) {
+    if (Realm.realmForType.get(model) !== undefined) continue;
+    for (const { operation } of identifiers) {
+      if (Realm.realmForType.get(operation) !== undefined) continue;
+      let models = result.get(operation);
+      if (models === undefined) result.set(operation, (models = new Set()));
+      models.add(model);
+    }
+  }
+  return result;
+}
+
+/** @internal */
+export function validateArmOperationKind(
+  program: Program,
+  operation: Operation,
+  kind: ArmOperationKind,
+): boolean {
+  const previous = getArmResourceOperationData(program, operation);
+  if (previous === undefined || previous.kind === kind) return true;
+  reportDiagnostic(program, {
+    code: "arm-resource-operation-kind-conflict",
+    target: operation,
+    format: { previousKind: previous.kind, kind },
+  });
+  return false;
 }
 
 export interface ArmResourceOperation extends ArmResourceOperationData {
@@ -245,30 +279,22 @@ function setResourceLifecycleOperation(
   };
 
   operations.lifecycle[kind] = operation as ArmResourceOperation;
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    name: target.name,
-    kind: kind,
-    operation: target,
-    operationGroup: target.interface.name,
-    resourceModelName: resourceType.name,
-    resourceName: resolvedResourceName,
-  });
   const operationId: ArmOperationIdentifier = {
     name: target.name,
     kind: kind,
     operation: target,
     operationGroup: target.interface.name,
-    resource: resourceType,
     resourceName: resolvedResourceName,
   };
   addArmResourceOperation(context.program, resourceType, operationId);
   setResourceNameExpression(context.program, target, resourceNameExpression);
 }
 
-export const [getArmOperationList, setArmOperationList] = useStateMap<
+const [getArmOperationList, setArmOperationList, getArmOperationLists] = useStateMap<
   Model,
   Set<ArmOperationIdentifier>
 >(ArmStateKeys.resourceOperationList);
+export { getArmOperationList, setArmOperationList };
 
 export function getArmResourceOperationList(
   program: Program,
@@ -288,8 +314,16 @@ export function addArmResourceOperation(
   operationData: ArmOperationIdentifier,
 ): void {
   const operations = getArmResourceOperationList(program, resourceType);
-  operations.add(operationData);
-  setArmOperationList(program, resourceType, operations);
+  const identifier = setArmOperationIdentifier(program, operationData.operation, resourceType, {
+    name: operationData.name,
+    kind: operationData.kind,
+    operation: operationData.operation,
+    operationGroup: operationData.operationGroup,
+    resourceModelName: resourceType.name,
+    resourceName: operationData.resourceName,
+    resourceKind: operationData.resourceKind,
+  });
+  operations.add(identifier);
 }
 
 export const [getArmResourceOperationData, setArmResourceOperationData] = useStateMap<
@@ -300,14 +334,18 @@ export const [getArmResourceOperationData, setArmResourceOperationData] = useSta
 export function setArmOperationIdentifier(
   program: Program,
   target: Operation,
-  resourceType: Model,
+  _resourceType: Model,
   data: ArmResourceOperationData,
-): void {
-  // Initialize the operations for the resource type if not already done
-  if (!getArmResourceOperationData(program, target)) {
-    setArmResourceOperationData(program, target, { ...data });
-    setOperationResource(program, target, resourceType);
-  }
+): ArmResourceOperationData {
+  const previous = getArmResourceOperationData(program, target);
+  const record =
+    previous === undefined
+      ? { ...data }
+      : Object.assign(previous, data, {
+          resourceKind: data.resourceKind,
+        });
+  setArmResourceOperationData(program, target, record);
+  return record;
 }
 
 export const $armResourceCheckExistence: ArmResourceCheckExistenceDecorator = (
@@ -316,6 +354,7 @@ export const $armResourceCheckExistence: ArmResourceCheckExistenceDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "checkExistence")) return;
   setResourceLifecycleOperation(context, target, resourceType, "checkExistence", resourceName);
 };
 
@@ -325,6 +364,7 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "read")) return;
   context.call($readsResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "read", resourceName);
 };
@@ -335,6 +375,7 @@ export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "createOrUpdate")) return;
   context.call($createsOrReplacesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate", resourceName);
 };
@@ -345,6 +386,7 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "update")) return;
   context.call($updatesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "update", resourceName);
 };
@@ -355,6 +397,7 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "delete")) return;
   context.call($deletesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "delete", resourceName);
 };
@@ -365,6 +408,7 @@ export const $armResourceList: ArmResourceListDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "list")) return;
   // Only register methods from non-templated interface types
   if (
     target.interface === undefined ||
@@ -394,18 +438,9 @@ export const $armResourceList: ArmResourceListDecorator = (
     kind: "list",
     operation: target,
     operationGroup: target.interface.name,
-    resource: resourceType,
     resourceName: resolvedResourceName,
   };
   addArmResourceOperation(context.program, resourceType, opId);
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    kind: "list",
-    name: target.name,
-    operation: target,
-    operationGroup: target.interface.name,
-    resourceModelName: resourceType.name,
-    resourceName: resolvedResourceName,
-  });
   setResourceNameExpression(context.program, target, resourceNameExpression);
 };
 
@@ -505,6 +540,7 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
+  if (!validateArmOperationKind(context.program, target, "action")) return;
   const { program } = context;
 
   // Only register methods from non-templated interface types
@@ -536,18 +572,9 @@ export const $armResourceAction: ArmResourceActionDecorator = (
     kind: "action",
     operation: target,
     operationGroup: target.interface.name,
-    resource: resourceType,
     resourceName: resolvedResourceName,
   };
   addArmResourceOperation(program, resourceType, opId);
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    kind: "action",
-    name: target.name,
-    operation: target,
-    operationGroup: target.interface.name,
-    resourceModelName: resourceType.name,
-    resourceName: resolvedResourceName,
-  });
   setResourceNameExpression(program, target, resourceNameExpression);
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);

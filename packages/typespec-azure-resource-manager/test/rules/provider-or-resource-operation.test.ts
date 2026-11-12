@@ -62,6 +62,60 @@ describe("provider-or-resource-operation", () => {
     await tester.expect(`${service} @providerOperation @get op information(): string;`).toBeValid();
   });
 
+  it.each([
+    "@providerOperation @armResourceRead(Widget)",
+    "@armResourceRead(Widget) @providerOperation",
+    "@providerOperation @armResourceRead(NotAResource)",
+    "@armResourceRead(NotAResource) @providerOperation",
+  ])("warns for mixed provider/resource registration: %s", async (decorators) => {
+    await tester
+      .expect(
+        `${service}${resource}
+        model NotAResource {}
+        interface Custom {
+          @get ${decorators} read(): void;
+        }
+      `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
+          severity: "warning",
+          message:
+            "This operation is registered as both a provider operation and a resource operation. Remove @providerOperation or the resource operation registration.",
+        },
+      ]);
+  });
+
+  it("warns when a provider marker is added to a resource template", async () => {
+    await tester
+      .expect(
+        `${service}${resource}
+        @armResourceOperations interface Widgets {
+          @providerOperation read is ArmResourceRead<Widget>;
+        }
+      `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
+          severity: "warning",
+          message:
+            "This operation is registered as both a provider operation and a resource operation. Remove @providerOperation or the resource operation registration.",
+        },
+      ]);
+  });
+
+  it("allows a provider operation with only a collection-action marker", async () => {
+    await tester
+      .expect(
+        `${service}
+      @providerOperation @armResourceCollectionAction @post op refresh(): void;
+    `,
+      )
+      .toBeValid();
+  });
+
   it("accepts extension and legacy resource operation registrations", async () => {
     await tester
       .expect(

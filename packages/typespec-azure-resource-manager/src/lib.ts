@@ -3,6 +3,12 @@ import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-resource-manager",
   diagnostics: {
+    "arm-resource-operation-kind-conflict": {
+      severity: "error",
+      messages: {
+        default: paramMessage`This operation is already registered as "${"previousKind"}" and cannot be registered as "${"kind"}". Use the same operation kind for every registration.`,
+      },
+    },
     "decorator-param-wrong-type": {
       severity: "error",
       messages: {
