@@ -16,8 +16,6 @@ const resource = `
 `;
 const message =
   "ARM operations must be registered as provider or resource operations. Use standard templates such as ArmProviderActionSync, ArmResourceRead, or Extension.Read, or apply @providerOperation to a custom provider operation.";
-const mixedMessage =
-  "An operation cannot be marked as both a provider operation and a resource operation. Remove @providerOperation from resource operations and register the resource using a standard resource template.";
 
 beforeEach(async () => {
   tester = createLinterRuleTester(
@@ -28,84 +26,6 @@ beforeEach(async () => {
 });
 
 describe("provider-or-resource-operation", () => {
-  for (const decorator of [
-    "armResourceRead",
-    "armResourceCreateOrUpdate",
-    "armResourceUpdate",
-    "armResourceDelete",
-    "armResourceList",
-    "armResourceAction",
-    "armResourceCheckExistence",
-  ]) {
-    for (const model of ["Widget", "NotAResource"]) {
-      it(`diagnoses mixed @${decorator} with ${model}`, async () => {
-        await tester
-          .expect(
-            `${service}${resource}
-          model NotAResource {}
-          interface Custom { @providerOperation @${decorator}(${model}) @get custom(): void; }
-        `,
-          )
-          .toEmitDiagnostics([
-            {
-              code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
-              severity: "warning",
-              message: mixedMessage,
-            },
-          ]);
-      });
-    }
-  }
-  for (const decorator of [
-    'extensionResourceOperation(Extension.Subscription, Widget, "read")',
-    'builtInResourceOperation(Extension.Subscription, Widget, "read")',
-    'legacyResourceOperation(Widget, "read")',
-    'legacyExtensionResourceOperation(Widget, "read")',
-  ]) {
-    it(`diagnoses mixed private ${decorator}`, async () => {
-      await tester
-        .expect(
-          `${service}${resource}
-        interface Custom { @Azure.ResourceManager.Private.${decorator} @providerOperation @get custom(): void; }
-      `,
-        )
-        .toEmitDiagnostics([
-          {
-            code: "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation",
-            severity: "warning",
-            message: mixedMessage,
-          },
-        ]);
-    });
-  }
-  it("accepts a provider operation with only a collection marker", async () => {
-    await tester
-      .expect(
-        `${service}
-      @providerOperation @armResourceCollectionAction @post op custom(): void;
-    `,
-      )
-      .toBeValid();
-  });
-  it("suppresses the mixed warning through the compiler", async () => {
-    await Tester.compile(
-      `${service}${resource}
-      interface Custom {
-        #suppress "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation" "Approved exception."
-        @providerOperation @armResourceRead(Widget) @get custom(): void;
-      }
-    `,
-      {
-        compilerOptions: {
-          linterRuleSet: {
-            enable: {
-              "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation": true,
-            },
-          },
-        },
-      },
-    );
-  });
   it("ignores library operations in Azure.Core and Azure.ResourceManager", async () => {
     await tester.expect("").toBeValid();
   });

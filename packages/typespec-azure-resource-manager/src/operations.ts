@@ -13,7 +13,7 @@ import {
   type unsafe_Mutator as Mutator,
   unsafe_MutatorFlow as MutatorFlow,
 } from "@typespec/compiler/experimental";
-import { useStateMap, useStateSet } from "@typespec/compiler/utils";
+import { useStateMap } from "@typespec/compiler/utils";
 import { $route, getHttpOperation, type HttpOperation, isPathParam } from "@typespec/http";
 import {
   $actionSegment,
@@ -44,7 +44,6 @@ import type {
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
-import { checkOperationResourceAssociation } from "./operation-association.js";
 import { getArmResource } from "./private.decorators.js";
 import {
   evaluateResourceNameExpression,
@@ -67,13 +66,16 @@ export type ArmLifecycleOperationKind =
   "read" | "createOrUpdate" | "update" | "delete" | "checkExistence";
 export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
-const [hasProviderOperation, addProviderOperation] = useStateSet<Operation>(
+const [getProviderOperationState, setProviderOperation] = useStateMap<Operation, Operation>(
   ArmStateKeys.providerOperation,
+);
+const [getOperationResource, setOperationResource] = useStateMap<Operation, Model>(
+  ArmStateKeys.resourceOperationResource,
 );
 
 /** Mark an operation as a provider operation rather than a resource operation. */
 export const $providerOperation: ProviderOperationDecorator = (context, target) => {
-  addProviderOperation(context.program, target);
+  setProviderOperation(context.program, target, target);
 };
 
 /** Return the operation registered with `@providerOperation`, if any. */
@@ -81,7 +83,7 @@ export function getProviderOperation(
   program: Program,
   operation: Operation,
 ): Operation | undefined {
-  return hasProviderOperation(program, operation) ? operation : undefined;
+  return getProviderOperationState(program, operation);
 }
 
 /** Whether the operation is registered with `@providerOperation`. */
@@ -91,7 +93,7 @@ export function isProviderOperation(program: Program, operation: Operation): boo
 
 /** Whether the operation is registered against a registered ARM resource model. */
 export function isResourceOperation(program: Program, operation: Operation): boolean {
-  const resource = getArmResourceOperationData(program, operation)?.resourceModel;
+  const resource = getOperationResource(program, operation);
   return resource !== undefined && getArmResource(program, resource) !== undefined;
 }
 
@@ -134,7 +136,6 @@ interface ArmResourceOperationData {
   operation: Operation;
   operationGroup: string;
   resourceModelName: string;
-  resourceModel?: Model;
   resourceName?: string;
   resourceKind?: "legacy" | "legacy-extension";
 }
@@ -228,7 +229,6 @@ function setResourceLifecycleOperation(
   ) {
     return;
   }
-  if (!checkOperationResourceAssociation(context.program, target, resourceType, kind)) return;
 
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
@@ -292,23 +292,10 @@ export function addArmResourceOperation(
   setArmOperationList(program, resourceType, operations);
 }
 
-const [getArmResourceOperationData, setOperationData] = useStateMap<
+export const [getArmResourceOperationData, setArmResourceOperationData] = useStateMap<
   Operation,
   ArmResourceOperationData
 >(ArmStateKeys.armResourceOperationData);
-export { getArmResourceOperationData };
-
-export function setArmResourceOperationData(
-  program: Program,
-  operation: Operation,
-  data: ArmResourceOperationData,
-): void {
-  const resourceModel = getArmResourceOperationData(program, operation)?.resourceModel;
-  setOperationData(program, operation, {
-    ...data,
-    resourceModel,
-  });
-}
 
 export function setArmOperationIdentifier(
   program: Program,
@@ -318,7 +305,8 @@ export function setArmOperationIdentifier(
 ): void {
   // Initialize the operations for the resource type if not already done
   if (!getArmResourceOperationData(program, target)) {
-    setOperationData(program, target, { ...data, resourceModel: resourceType });
+    setArmResourceOperationData(program, target, { ...data });
+    setOperationResource(program, target, resourceType);
   }
 }
 
@@ -385,7 +373,6 @@ export const $armResourceList: ArmResourceListDecorator = (
   ) {
     return;
   }
-  if (!checkOperationResourceAssociation(context.program, target, resourceType, "list")) return;
 
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
@@ -528,7 +515,6 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   ) {
     return;
   }
-  if (!checkOperationResourceAssociation(program, target, resourceType, "action")) return;
 
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later

@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, fileRef, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-resource-manager",
@@ -90,15 +90,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`API version '${"version"}' could not be projected.`,
-      },
-    },
-    "arm-resource-version-operation-association": {
-      severity: "error",
-      docs: fileRef.fromPackageRoot(
-        "src/diagnostics/arm-resource-version-operation-association.md",
-      ),
-      messages: {
-        default: paramMessage`Operation '${"operation"}' has an inconsistent resource association for API version '${"version"}'. Resource operation decorators must use resource models from the selected version.`,
       },
     },
     "arm-resource-service-versions-empty": {

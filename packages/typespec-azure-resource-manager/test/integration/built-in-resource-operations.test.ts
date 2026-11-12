@@ -6,7 +6,6 @@ import {
   getArmResourceOperationData,
   isProviderOperation,
   isResourceOperation,
-  resolveArmResources,
 } from "../../src/index.js";
 import { Tester } from "../tester.js";
 
@@ -139,15 +138,5 @@ it.each([
     expect(getArmResourceOperationData(program, operation)).toBeDefined();
     expect(isResourceOperation(program, operation)).toBe(true);
     expect(isProviderOperation(program, operation)).toBe(false);
-  }
-  const selected = resolveArmResources(program, { version: "2025-01-01" });
-  const model = selected.resources?.find((resource) => resource.type.name === "BuiltIn")?.type;
-  expect(model).toBeDefined();
-  expect(model === BuiltIn).toBe(false);
-  const operations = model!.namespace!.interfaces.get("BuiltInOperations")!.operations;
-  expect(operations.size).toBe(BuiltInOperations.operations.size);
-  for (const operation of operations.values()) {
-    expect(getArmResourceOperationData(program, operation)?.resourceModel === model).toBe(true);
-    expect(isResourceOperation(program, operation)).toBe(true);
   }
 });

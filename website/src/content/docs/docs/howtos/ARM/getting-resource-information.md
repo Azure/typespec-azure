@@ -132,13 +132,6 @@ also reflect versioned renames, type changes, optionality changes, and return-ty
 An unknown version or a version supplied for a transiently versioned service reports a diagnostic
 and returns an empty provider result.
 
-Resource operation decorators must use the selected resource model when replayed for a version.
-Custom decorators should accept resource models as decorator arguments rather than looking them up
-from the original program during replay. If an operation attempts to register against an original
-or another snapshot's resource, resolution reports
-`arm-resource-version-operation-association` and returns an empty provider instead of caching an
-inconsistent graph. A failed service selection also prevents a partial multi-service result.
-
 Reuse the same compiled `Program` when resolving several versions:
 
 ```ts

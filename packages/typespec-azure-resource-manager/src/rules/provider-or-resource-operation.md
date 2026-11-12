@@ -2,9 +2,8 @@ Every concrete ARM operation must be registered as either a provider operation o
 
 Prefer standard operation templates. They register the operation automatically, including provider actions, resource lifecycle operations, and extension resource operations. For a custom provider operation that cannot use a standard template, apply `@providerOperation`. For custom resource operations, apply the appropriate resource operation decorator, such as `@armResourceRead(Widget)`, using a registered resource model.
 
-The diagnostic distinguishes four registration problems:
+The diagnostic distinguishes three registration problems:
 
-- If an operation has both provider and resource operation metadata, it reports a mixed-registration warning, even if the associated resource is not registered. Remove `@providerOperation` from resource operations and register the resource; provider marking does not repair resource registration.
 - If an operation is outside an interface and is not marked with `@providerOperation` or `@armResourceCollectionAction`, it reports `Resource operations must be defined inside an interface`. Enclose resource operations in an interface so their resource operation decorators can register them. Collection actions are excluded from this interface-specific message, but still need valid provider or resource operation registration.
 - If the operation has no provider or resource operation registration, it recommends standard operation templates or the appropriate operation decorator.
 - If the operation has a resource operation registration but its resource model is not registered, it names that model: `The resource "Widget" for this operation is not a registered ARM resource. Use standard resource templates to create resources.` Declare the resource using a standard template such as `TrackedResource`, `ProxyResource`, or `ExtensionResource`, including its `ResourceNameParameter`. For built-in resources, use the registered wrapper template, such as `PrivateEndpointConnectionResource`.
@@ -64,25 +63,6 @@ model Widget is TrackedResource<{}> {
 interface Widgets {
   @action("restart")
   restart is ArmResourceActionSync<Widget, void, Widget>;
-}
-```
-
-### Mixed provider and resource registration
-
-#### ❌ Incorrect
-
-```typespec
-interface Widgets {
-  @providerOperation
-  get is ArmResourceRead<Widget>;
-}
-```
-
-#### ✅ Correct
-
-```typespec
-interface Widgets {
-  get is ArmResourceRead<Widget>;
 }
 ```
 

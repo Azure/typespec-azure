@@ -1,12 +1,6 @@
 import { t } from "@typespec/compiler/testing";
 import { describe, expect, it } from "vitest";
 import { getProviderOperation, isProviderOperation, isResourceOperation } from "../src/index.js";
-import {
-  getArmResourceOperationData,
-  getArmResourceOperationList,
-  setArmOperationIdentifier,
-  setArmResourceOperationData,
-} from "../src/operations.js";
 import { Tester } from "./tester.js";
 
 const service = `
@@ -83,29 +77,17 @@ describe("resource operations", () => {
       expect(isResourceOperation(program, valid)).toBe(true);
       expect(isResourceOperation(program, invalid)).toBe(false);
       expect(isProviderOperation(program, valid)).toBe(false);
-      expect(getArmResourceOperationData(program, valid)?.resourceModel).toBe(
-        program.resolveTypeReference("Microsoft.Test.Widget")[0],
-      );
     });
   }
 
-  for (const kind of [
-    "read",
-    "createOrUpdate",
-    "update",
-    "delete",
-    "list",
-    "action",
-    "checkExistence",
+  for (const decorator of [
+    'extensionResourceOperation(Extension.Subscription, Widget, "read")',
+    'builtInResourceOperation(Extension.Subscription, Widget, "read")',
+    'legacyResourceOperation(Widget, "read")',
+    'legacyExtensionResourceOperation(Widget, "read")',
   ]) {
-    for (const decorator of [
-      `extensionResourceOperation(Extension.Subscription, Widget, "${kind}")`,
-      `builtInResourceOperation(Extension.Subscription, Widget, "${kind}")`,
-      `legacyResourceOperation(Widget, "${kind}")`,
-      `legacyExtensionResourceOperation(Widget, "${kind}")`,
-    ]) {
-      it(`recognizes private registration through ${decorator}`, async () => {
-        const { program, valid, invalid } = await Tester.compile(t.code`
+    it(`recognizes private registration through ${decorator}`, async () => {
+      const { program, valid, invalid } = await Tester.compile(t.code`
         ${service}${resource}
         model NotAResource {}
         interface Custom {
@@ -117,67 +99,10 @@ describe("resource operations", () => {
           ${t.op("invalid")}(): void;
         }
       `);
-        expect(isResourceOperation(program, valid)).toBe(true);
-        expect(isResourceOperation(program, invalid)).toBe(false);
-        expect(getArmResourceOperationData(program, valid)?.resourceModel).toBe(
-          program.resolveTypeReference("Microsoft.Test.Widget")[0],
-        );
-      });
-    }
+      expect(isResourceOperation(program, valid)).toBe(true);
+      expect(isResourceOperation(program, invalid)).toBe(false);
+    });
   }
-
-  it("preserves the first association and all resource-keyed identifiers across metadata replacement", async () => {
-    const { program, first, second, method, raw } = await Tester.compile(t.code`
-      ${service}
-      model ${t.model("first")} is TrackedResource<{}> { ...ResourceNameParameter<first>; }
-      model ${t.model("second")} is ProxyResource<{}> { ...ResourceNameParameter<second>; }
-      interface Custom {
-        @route("/method")
-        @armResourceRead(first) @armResourceRead(second)
-        ${t.op("method")}(): void;
-        @route("/raw")
-        ${t.op("raw")}(): void;
-      }
-    `);
-    const data = getArmResourceOperationData(program, method)!;
-    expect([first, second]).toContain(data.resourceModel);
-    for (const model of [first, second]) {
-      expect(
-        [...getArmResourceOperationList(program, model)].some((id) => id.operation === method),
-      ).toBe(true);
-    }
-    const { resourceModel, ...replacement } = data;
-    setArmResourceOperationData(program, method, { ...replacement, name: "replacement" });
-    expect(getArmResourceOperationData(program, method)?.resourceModel).toBe(resourceModel);
-    expect(isResourceOperation(program, method)).toBe(true);
-    setArmResourceOperationData(program, raw, { ...data, operation: raw });
-    expect(isResourceOperation(program, raw)).toBe(false);
-    setArmOperationIdentifier(program, raw, first, { ...replacement, operation: raw });
-    expect(getArmResourceOperationData(program, raw)?.name).toBe(replacement.name);
-    expect(isResourceOperation(program, raw)).toBe(false);
-  });
-
-  it("distinguishes concrete generic instances and marker-only schemas", async () => {
-    const { program, text, integer, schema } = await Tester.compile(t.code`
-      ${service}
-      @Azure.ResourceManager.Private.genericResourceInternal
-      model Generic<T> { value: T; }
-      @Azure.ResourceManager.Private.azureResourceBase
-      model Schema {}
-      interface Custom {
-        @route("/text") @armResourceRead(Generic<string>) ${t.op("text")}(): void;
-        @route("/integer") @armResourceRead(Generic<int32>) ${t.op("integer")}(): void;
-        @route("/schema") @armResourceRead(Schema) ${t.op("schema")}(): void;
-      }
-    `);
-    expect(isResourceOperation(program, text)).toBe(true);
-    expect(isResourceOperation(program, integer)).toBe(true);
-    expect(
-      getArmResourceOperationData(program, text)?.resourceModel ===
-        getArmResourceOperationData(program, integer)?.resourceModel,
-    ).toBe(false);
-    expect(isResourceOperation(program, schema)).toBe(false);
-  });
 
   it("recognizes standard, extension, and legacy templates", async () => {
     const { program, Standard, Extensions, Legacy, LegacyExtensions } = await Tester.compile(t.code`

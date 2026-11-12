@@ -24,7 +24,7 @@ import {
   type Program,
   type Type,
 } from "@typespec/compiler";
-import { unsafe_Realm } from "@typespec/compiler/experimental";
+import { unsafe_mutateSubgraphWithNamespace, unsafe_Realm } from "@typespec/compiler/experimental";
 import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
@@ -65,7 +65,6 @@ import {
   isArmProviderNamespace,
   resolveProviderNamespace,
 } from "./namespace.js";
-import { projectArmResourceNamespace } from "./operation-association.js";
 import {
   type ArmLifecycleOperationKind,
   type ArmOperationIdentifier,
@@ -655,7 +654,7 @@ interface ArmResourceVersionSnapshot {
 
 const armResourceVersionSnapshots = new WeakMap<
   Program,
-  Map<Namespace, Map<string, ArmResourceVersionSnapshot | null>>
+  Map<Namespace, Map<string, ArmResourceVersionSnapshot>>
 >();
 interface StructuralResolvedResource extends Omit<ResolvedResource, "kind" | "parent" | "scope"> {
   kind: StructuralResourceKind;
@@ -843,7 +842,6 @@ function resolveArmResourceVersionContext(
     providerSnapshots.set(providerNamespace, versionSnapshots);
   }
   const cached = versionSnapshots.get(versionValue);
-  if (cached === null) return undefined;
   if (cached !== undefined) {
     return { program, ...cached };
   }
@@ -881,16 +879,24 @@ function resolveArmResourceVersionContext(
     return undefined;
   }
 
-  const resolvedSnapshot = projectArmResourceNamespace(
+  const projection = unsafe_mutateSubgraphWithNamespace(
     program,
+    [snapshot.mutator],
     providerNamespace,
-    snapshot.mutator,
-    versionValue,
   );
-  if (resolvedSnapshot === undefined) {
-    versionSnapshots.set(versionValue, null);
+  if (projection.realm === null || projection.type.kind !== "Namespace") {
+    reportDiagnostic(program, {
+      code: "arm-resource-version-projection-failed",
+      format: { version: versionValue },
+      target: providerNamespace,
+    });
     return undefined;
   }
+
+  const resolvedSnapshot = {
+    providerNamespace: projection.type,
+    realm: projection.realm,
+  };
   versionSnapshots.set(versionValue, resolvedSnapshot);
   return { program, ...resolvedSnapshot };
 }
