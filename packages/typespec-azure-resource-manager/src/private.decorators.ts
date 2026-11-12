@@ -77,6 +77,10 @@ import { getArmCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import {
+  checkOperationResourceAssociation,
+  checkOperationResourceOperands,
+} from "./operation-association.js";
+import {
   $armResourceAction,
   $armResourceCheckExistence,
   $armResourceCreateOrUpdate,
@@ -856,6 +860,13 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   ) {
     return;
   }
+  if (
+    !checkOperationResourceOperands(context.program, target, [
+      targetResourceType,
+      extensionResourceType,
+    ])
+  )
+    return;
   const resourceNameExpression: ResourceNameExpression =
     resourceName !== undefined && resourceName.length > 0
       ? { kind: "explicit", value: resourceName }
@@ -897,6 +908,13 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   ) {
     return;
   }
+  if (
+    !checkOperationResourceOperands(context.program, target, [
+      parentResourceType,
+      builtInResourceType,
+    ])
+  )
+    return;
   const resourceNameExpression: ResourceNameExpression =
     resourceName !== undefined && resourceName.length > 0
       ? { kind: "explicit", value: resourceName }
@@ -932,6 +950,8 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   ) {
     return;
   }
+  if (!checkOperationResourceAssociation(context.program, target, resourceType, operationType))
+    return;
   const resourceNameExpression: ResourceNameExpression =
     resourceName !== undefined && resourceName.length > 0
       ? { kind: "explicit", value: resourceName }
@@ -1003,6 +1023,8 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   ) {
     return;
   }
+  if (!checkOperationResourceAssociation(context.program, target, resourceType, operationType))
+    return;
   const resourceNameExpression: ResourceNameExpression =
     resourceName !== undefined && resourceName.length > 0
       ? { kind: "explicit", value: resourceName }

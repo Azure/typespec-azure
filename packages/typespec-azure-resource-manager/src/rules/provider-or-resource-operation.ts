@@ -23,6 +23,8 @@ export const providerOrResourceOperationRule = createRule({
       "ARM operations must be registered as provider or resource operations. Use standard templates such as ArmProviderActionSync, ArmResourceRead, or Extension.Read, or apply @providerOperation to a custom provider operation.",
     unregisteredResource: paramMessage`The resource "${"resourceName"}" for this operation is not a registered ARM resource. Use standard resource templates to create resources.`,
     missingInterface: "Resource operations must be defined inside an interface",
+    mixedRegistration:
+      "An operation cannot be marked as both a provider operation and a resource operation. Remove @providerOperation from resource operations and register the resource using a standard resource template.",
   },
   create(context) {
     return {
@@ -30,12 +32,15 @@ export const providerOrResourceOperationRule = createRule({
         if (
           !isTemplateDeclarationOrInstance(operation) &&
           !isTemplatedInterfaceOperation(operation) &&
-          !isInternalTypeSpec(context.program, operation) &&
-          !isProviderOperation(context.program, operation) &&
-          !isResourceOperation(context.program, operation)
+          !isInternalTypeSpec(context.program, operation)
         ) {
           const resourceOperation = getArmResourceOperationData(context.program, operation);
-          if (
+          const providerOperation = isProviderOperation(context.program, operation);
+          if (providerOperation && resourceOperation !== undefined) {
+            context.reportDiagnostic({ target: operation, messageId: "mixedRegistration" });
+          } else if (providerOperation || isResourceOperation(context.program, operation)) {
+            return;
+          } else if (
             operation.interface === undefined &&
             !isArmCollectionAction(context.program, operation)
           ) {

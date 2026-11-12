@@ -19,9 +19,12 @@ export const ArmStateKeys = {
   externalTypeRef: azureResourceManagerCreateStateSymbol("externalTypeRef"),
   armResourceOperationData: azureResourceManagerCreateStateSymbol("armResourceOperationData"),
   providerOperation: azureResourceManagerCreateStateSymbol("providerOperation"),
-  resourceOperationResource: azureResourceManagerCreateStateSymbol("resourceOperationResource"),
   resourceOperationList: azureResourceManagerCreateStateSymbol("resourceOperationList"),
   armResourceNameExpression: azureResourceManagerCreateStateSymbol("armResourceNameExpression"),
+  // Temporary selection-construction context; removed when projection/validation finishes.
+  armOperationProjectionContext: azureResourceManagerCreateStateSymbol(
+    "armOperationProjectionContext",
+  ),
 
   // resource.ts
   armResolvedResources: azureResourceManagerCreateStateSymbol("armResolvedResources"),
