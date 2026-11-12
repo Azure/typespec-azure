@@ -7,11 +7,11 @@ import { compositionOverInheritanceRule } from "./rules/composition-over-inherit
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { listOperationMissing200ResponseRule } from "./rules/list-operation-missing-200-response.js";
+import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
-import { noContinuationTokenRule } from "./rules/no-continuation-token.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
@@ -95,7 +95,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
-  noContinuationTokenRule,
+  listResponseEnvelopeRule,
   listOperationMissing200ResponseRule,
 ];
 

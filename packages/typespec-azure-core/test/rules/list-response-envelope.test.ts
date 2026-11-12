@@ -6,20 +6,20 @@ import {
   expectDiagnostics,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { noContinuationTokenRule } from "../../src/rules/no-continuation-token.js";
+import { listResponseEnvelopeRule } from "../../src/rules/list-response-envelope.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    noContinuationTokenRule,
+    listResponseEnvelopeRule,
     "@azure-tools/typespec-azure-core",
   );
 });
 
 const diagnostic = {
-  code: "@azure-tools/typespec-azure-core/no-continuation-token",
+  code: "@azure-tools/typespec-azure-core/list-response-envelope",
   severity: "warning",
   message: "Use @nextLink pagination instead of @continuationToken in Azure APIs.",
 } as const;
@@ -105,6 +105,20 @@ it("accepts next-link paging", async () => {
     .toBeValid();
 });
 
+it("does not apply ARM envelope restrictions to data-plane responses", async () => {
+  await tester
+    .expect(
+      `
+      @list op listWidgets(): {
+        @pageItems items: string[];
+        @nextLink more?: url;
+        totalCount: int32;
+      };
+    `,
+    )
+    .toBeValid();
+});
+
 it("does not infer decorators from property names", async () => {
   await tester
     .expect(
@@ -131,14 +145,14 @@ it.each([false, true])("supports property suppression: %s", async (suppress) => 
   const diagnostics = await Tester.diagnose(
     `
       model Options {
-        ${suppress ? '#suppress "@azure-tools/typespec-azure-core/no-continuation-token" "Preserve the published token-based paging contract."' : ""}
+        ${suppress ? '#suppress "@azure-tools/typespec-azure-core/list-response-envelope" "Preserve the published token-based paging contract."' : ""}
         @continuationToken token?: string;
       }
     `,
     {
       compilerOptions: {
         linterRuleSet: {
-          enable: { "@azure-tools/typespec-azure-core/no-continuation-token": true },
+          enable: { "@azure-tools/typespec-azure-core/list-response-envelope": true },
         },
       },
     },

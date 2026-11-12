@@ -1,3 +1,4 @@
+import { listResponseEnvelopeRule as coreListResponseEnvelopeRule } from "@azure-tools/typespec-azure-core";
 import {
   type Interface,
   type Model,
@@ -20,16 +21,19 @@ import { getArmProviderNamespace } from "../namespace.js";
 export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
   docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
-  description: "ARM list responses must use a value array and the standard nextLink envelope.",
+  description:
+    "ARM list responses must use a value array and the standard nextLink envelope instead of continuation tokens.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
+    ...coreListResponseEnvelopeRule.messages,
     default:
       "Collection GET response models must declare exactly the `value` and `nextLink` properties.",
     valueArray: "Paged ARM list responses must declare a 'value' property of array type.",
   },
   create(context) {
     return {
+      modelProperty: coreListResponseEnvelopeRule.create(context).modelProperty,
       operation: (operation) => {
         const [httpOperation] = getHttpOperation(context.program, operation);
         const collection =

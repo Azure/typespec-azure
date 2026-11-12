@@ -2,6 +2,10 @@ Azure APIs should use [next-link pagination](https://github.com/microsoft/api-gu
 
 This rule warns on uses of the TypeSpec `@continuationToken` decorator, including correctly paired request and response tokens. It is an Azure design guideline, not a check that the token annotations are paired. Generic TypeSpec supports token-based pagination.
 
+This is the shared paging-policy portion of `list-response-envelope`. It does not impose ARM-specific response property names or collection-path checks on data-plane APIs. Data-plane responses may use other item names and additional response properties.
+
+The `data-plane` ruleset enables this Azure Core rule. The `resource-manager` ruleset enables the [ARM `list-response-envelope` rule](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope/) instead, which reuses this policy and also validates ARM response envelopes. The core rule is disabled there to avoid duplicate token warnings.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -39,7 +43,9 @@ Place the directive on each annotated property that must retain the decorator. F
 ```tsp
 model LegacyPage {
   @pageItems value: Widget[];
-  #suppress "@azure-tools/typespec-azure-core/no-continuation-token" "Preserve the published token-based paging contract."
+  #suppress "@azure-tools/typespec-azure-core/list-response-envelope" "Preserve the published token-based paging contract."
   @continuationToken token?: string;
 }
 ```
+
+For ARM APIs using the combined ARM rule, use `@azure-tools/typespec-azure-resource-manager/list-response-envelope` in the suppression directive instead. When configuring rules individually, enable only the ARM variant rather than both variants.
