@@ -21,7 +21,15 @@ func (mc fakeCredential) GetToken(context.Context, policy.TokenRequestOptions) (
 }
 
 func TestValidKey(t *testing.T) {
-	t.Skip("API key credential is not supported")
+	client, err := unionauthgroup.NewUnionClientWithKeyCredential("http://localhost:3000", azcore.NewKeyCredential("valid-key"), &unionauthgroup.UnionClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			InsecureAllowCredentialWithHTTP: true,
+		},
+	})
+	require.NoError(t, err)
+	resp, err := client.ValidKey(context.Background(), nil)
+	require.NoError(t, err)
+	require.Zero(t, resp)
 }
 
 func TestValidToken(t *testing.T) {

@@ -50,6 +50,7 @@ function gofmt(source: string): string {
 // Base tester for most scenarios. Kept lean (no ARM) so the common case compiles
 // quickly; ARM libraries are heavy to load and would slow every scenario.
 const GoTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+  features: ["typeref"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
