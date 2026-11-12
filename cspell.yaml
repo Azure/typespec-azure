@@ -48,6 +48,7 @@ enableFiletypes:
   - tsp
   - typespec
 words:
+  - aeiou
   - allof
   - apim
   - apos
@@ -122,6 +123,7 @@ words:
   - stretchr
   - subscriptionid
   - tcgc
+  - teavm
   - tsmv
   - userrp
   - vnet

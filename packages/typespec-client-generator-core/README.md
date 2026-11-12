@@ -91,7 +91,9 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 
@@ -129,6 +131,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                             | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
 | [`@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-operation-group-name-conflict) | Operation group names should not conflict with type names in the same namespace.                                                                                    |
 | [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
+| [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
 
 ## Decorators
 
@@ -148,6 +151,7 @@ Available ruleSets:
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
 - [`@dynamicModel`](#@dynamicmodel)
+- [`@lroOperationId`](#@lrooperationid)
 - [`@lroStatusMetadata`](#@lrostatusmetadata)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
@@ -680,7 +684,7 @@ The operation to change location for.
 
 | Name   | Type                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client. Use `exact("name")` to preserve the exact casing of a string target in generated client code.                                                                                                                                                                                                                                                                                                                                                                                                              |
 | scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
@@ -725,6 +729,13 @@ interface ProductOperations {
   @clientLocation("ArchiveOperations")
   archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
 }
+```
+
+###### Move to a sub client with exact casing
+
+```typespec
+@clientLocation(exact("vMHost"), "javascript")
+op listVMHosts(): string[];
 ```
 
 ###### Move operation to root client
@@ -1047,6 +1058,30 @@ namespace PetStore {
 }
 ```
 
+#### `@lroOperationId`
+
+Identifies a server-issued long-running operation identifier exposed by a legacy service through
+either the status-monitor URI or its response body. This compatibility metadata does not drive
+polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+accessor and storage.
+
+```typespec
+@Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The operation identifier path parameter on the linked status-monitor operation, or
+a string-like property on its response model.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
 #### `@lroStatusMetadata`
 
 Marks a status-monitor model property as transient polling data that the SDK should expose to
@@ -1062,8 +1097,8 @@ response containing it arrives. Metadata remains exposed on failed or canceled t
 Emitters should keep these values current after each poll. Metadata is not part of the
 continuation token; after rehydration, the next poll populates it again.
 
-Multiple declarations on one property may use disjoint emitter scopes. Overlapping scopes
-are diagnosed once at declaration time.
+Multiple declarations use the standard TCGC scope rules, including overlapping scopes.
+Each selected property appears only once in the metadata collection.
 
 ```typespec
 @Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)

@@ -7,6 +7,7 @@
 
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
+import { isEventData } from "@typespec/events";
 import * as http from "@typespec/http";
 import * as go from "../codemodel/index.js";
 import * as naming from "../naming/naming.js";
@@ -28,12 +29,51 @@ export class TypeAdapter {
   private readonly types: Map<string, go.WireType>;
   private readonly constValues: Map<string, go.ConstantValue>;
 
+  // lazily built index of how each tcgc union type is used across the tcgc code model
+  private unionUsage?: Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>;
+
   constructor(ctx: tcgc.SdkContext, codeModel: go.CodeModel) {
     this.ctx = ctx;
     this.codeModel = codeModel;
     this.types = new Map<string, go.WireType>();
     this.constValues = new Map<string, go.ConstantValue>();
     this.fieldsMap = new Map<tcgc.SdkModelPropertyType, go.ModelField>();
+  }
+
+  /**
+   * returns the stream metadata for the specified union type.
+   *
+   * tcgc only exposes SdkStreamMetadata on HTTP bodies/responses, so the tcgc code
+   * model is indexed once and the metadata looked up by union type.
+   * @param sdkUnion the union type to look up
+   * @returns the stream metadata, or undefined if the union isn't the payload of a stream
+   */
+  getStreamMetadata(sdkUnion: tcgc.SdkUnionType): tcgc.SdkStreamMetadata | undefined {
+    return this.getUnionUsage().get(sdkUnion)?.streamMetadata;
+  }
+
+  /**
+   * returns the SSE metadata for the specified union type.
+   *
+   * tcgc only exposes SdkSseMetadata on HTTP bodies/responses, so the tcgc code
+   * model is indexed once and the metadata looked up by union type.
+   * @param sdkUnion the union type to look up
+   * @returns the SSE metadata, or undefined if the union isn't the event type of an SSE stream
+   */
+  getSseMetadata(sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType): tcgc.SdkSseMetadata | undefined {
+    return this.getUnionUsage().get(sdkUnion)?.sseMetadata;
+  }
+
+  /** returns the event union, including unions folded into enums by tcgc */
+  getSseUnionType(sdkType: tcgc.SdkType): go.UnionStruct {
+    if ((sdkType.kind !== "union" && sdkType.kind !== "enum") || !this.getSseMetadata(sdkType)) {
+      throw new AdapterError(
+        "InternalError",
+        `missing SSE union metadata for kind ${sdkType.kind}`,
+        sdkType.__raw?.node,
+      );
+    }
+    return this.getUnionStruct(sdkType, this.codeModel.options["slice-elements-byval"] ?? false);
   }
 
   /**
@@ -52,6 +92,7 @@ export class TypeAdapter {
    * converts all tcgc model/enum types to Go code model types
    */
   adaptTypes() {
+    const queryOnlyModels = this.getQueryOnlyModels();
     for (const enumType of this.ctx.sdkPackage.enums) {
       if ((enumType.usage & tcgc.UsageFlags.ApiVersionEnum) !== 0) {
         // skip enums that are used for API version
@@ -65,6 +106,9 @@ export class TypeAdapter {
       }
       const constType = this.getConstantType(enumType);
       this.getPkg().constants.push(constType);
+      if (this.getSseMetadata(enumType)) {
+        this.getPkg().unions.push(this.getSseUnionType(enumType));
+      }
     }
 
     for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
@@ -75,10 +119,10 @@ export class TypeAdapter {
       this.getPkg().unions.push(goUnion);
     }
 
-    // we must adapt all interface/model types first. this is because models can contain cyclic references
-    const modelTypes = new Array<ModelTypeSdkModelType>();
-    const ifaceTypes = new Array<InterfaceTypeSdkModelType>();
     for (const modelType of this.ctx.sdkPackage.models) {
+      if (queryOnlyModels.has(modelType)) {
+        continue;
+      }
       if (modelType.name.length === 0) {
         // tcgc creates some unnamed models for spread params.
         // we don't use these so just skip them.
@@ -106,52 +150,104 @@ export class TypeAdapter {
         continue;
       }
 
-      if (helpers.isPolymorphicRoot(modelType)) {
-        // this is a root discriminated type
-        const iface = this.getInterfaceType(modelType);
-        this.getPkg().interfaces.push(iface);
-        ifaceTypes.push({ go: iface, tcgc: modelType });
-      }
       // TODO: what's the equivalent of x-ms-external?
       const model = this.getModel(modelType);
-      modelTypes.push({ go: model, tcgc: modelType });
+      if (model.kind === "polymorphicModel" && helpers.isPolymorphicRoot(modelType)) {
+        this.getPkg().interfaces.push(model.interface);
+      }
+      this.getPkg().models.push(model);
     }
 
     // add the synthesized models from TCGC for paged results
-    const pagedResponses = this.getPagedResponses();
-    for (const pagedResponse of pagedResponses) {
+    for (const pagedResponse of this.getPagedResponses()) {
       // tsp allows custom paged responses, so we must check both the synthesized list and the models list
-      if (modelTypes.find((each) => each.tcgc.name === pagedResponse.name)) {
-        continue;
-      }
       const model = this.getModel(pagedResponse);
-      modelTypes.push({ go: model, tcgc: pagedResponse });
+      if (!this.getPkg().models.includes(model)) {
+        this.getPkg().models.push(model);
+      }
     }
+  }
 
-    // now that the interface/model types have been generated, we can populate the rootType and possibleTypes
-    for (const ifaceType of ifaceTypes) {
-      ifaceType.go.rootType = <go.PolymorphicModel>this.getModel(ifaceType.tcgc);
-      for (const subType of Object.values(ifaceType.tcgc.discriminatedSubtypes ?? {})) {
-        const possibleType = <go.PolymorphicModel>this.getModel(subType);
-        ifaceType.go.possibleTypes.push(possibleType);
+  /**
+   * Finds models used only by bundled query parameters so they aren't emitted as payload models.
+   * Rejects bundled query models also reachable from request or response bodies.
+   */
+  private getQueryOnlyModels(): Set<tcgc.SdkModelType> {
+    const queryTypes = new Set<tcgc.SdkType>();
+    const queryModels = new Set<tcgc.SdkModelType>();
+    const payloadTypes = new Set<tcgc.SdkType>();
+    const bodyTypes = new Set<tcgc.SdkType>();
+    const visitType = (type: tcgc.SdkType, types: Set<tcgc.SdkType>): void => {
+      if (types.has(type)) {
+        return;
+      }
+      types.add(type);
+      switch (type.kind) {
+        case "array":
+        case "dict":
+          visitType(type.valueType, types);
+          break;
+        case "nullable":
+          visitType(type.type, types);
+          break;
+        case "union":
+          type.variantTypes.forEach((variant) => visitType(variant, types));
+          break;
+        case "model":
+          type.properties.forEach((prop) => visitType(prop.type, types));
+          if (type.baseModel) {
+            visitType(type.baseModel, types);
+          }
+          if (type.additionalProperties) {
+            visitType(type.additionalProperties, types);
+          }
+          Object.values(type.discriminatedSubtypes ?? {}).forEach((subtype) =>
+            visitType(subtype, types),
+          );
+          break;
+      }
+    };
+    const visitClient = (client: tcgc.SdkClientType<tcgc.SdkHttpOperation>): void => {
+      for (const method of client.methods) {
+        for (const param of method.operation.parameters) {
+          const type = param.type.kind === "nullable" ? param.type.type : param.type;
+          if (param.kind === "query" && type.kind === "model") {
+            queryModels.add(type);
+          }
+          visitType(
+            type,
+            param.kind === "query" && type.kind === "model" ? queryTypes : payloadTypes,
+          );
+        }
+        if (method.operation.bodyParam) {
+          visitType(method.operation.bodyParam.type, bodyTypes);
+        }
+        for (const response of [
+          ...method.operation.responses.values(),
+          ...method.operation.exceptions.values(),
+        ]) {
+          if (response.type) {
+            visitType(response.type, bodyTypes);
+          }
+        }
+      }
+      client.children?.forEach(visitClient);
+    };
+    this.ctx.sdkPackage.clients.forEach(visitClient);
+    for (const model of queryModels) {
+      if (bodyTypes.has(model)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `model ${model.name} cannot be used for both bundled query parameters and request/response bodies`,
+          model.__raw?.node,
+        );
       }
     }
-
-    // now adapt model fields
-    for (const modelType of modelTypes) {
-      const content = aggregateProperties(this.ctx, modelType.tcgc);
-      for (const prop of content.props) {
-        const field = this.getModelField(prop, modelType.tcgc);
-        modelType.go.fields.push(field);
-      }
-      if (content.addlProps) {
-        const annotations = new go.ModelFieldAnnotations(false, false, true, false);
-        const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
-        const addlProps = new go.ModelField("AdditionalProperties", addlPropsType, "", annotations);
-        modelType.go.fields.push(addlProps);
-      }
-      this.getPkg().models.push(modelType.go);
-    }
+    return new Set(
+      this.ctx.sdkPackage.models.filter(
+        (model) => queryTypes.has(model) && !payloadTypes.has(model) && !bodyTypes.has(model),
+      ),
+    );
   }
 
   // returns the synthesized paged response types
@@ -193,11 +289,13 @@ export class TypeAdapter {
   // returns the Go code model type for the specified SDK type.
   // the operation is idempotent, so getting the same type multiple times
   // returns the same instance of the converted type.
+  // mapElementsByValue is reserved for URI parameters, not spread bodies.
   getWireType(
     type: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
     xmlItemsName?: string,
+    mapElementsByValue = false,
   ): Exclude<go.WireType, go.Ptr> {
     switch (type.kind) {
       case "boolean":
@@ -238,7 +336,7 @@ export class TypeAdapter {
             : this.codeModel.options["slice-elements-byval"] === true;
 
         const keyName = recursiveKeyName(
-          `array-${myElementTypeByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
+          `array-${myElementTypeByValue}-${mapElementsByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
           valueType,
           substituteDiscriminator,
         );
@@ -252,11 +350,14 @@ export class TypeAdapter {
           valueType,
           elementTypeByValue,
           substituteDiscriminator,
+          undefined,
+          mapElementsByValue,
         );
         switch (elementType.kind) {
           case "constantDef":
           case "constantValue":
           case "etag":
+          case "sseReader":
             throw new AdapterError(
               "UnsupportedTsp",
               `unsupported kind ${elementType.kind} for slice element type`,
@@ -307,9 +408,10 @@ export class TypeAdapter {
           type.valueType,
           elementTypeByValue,
           substituteDiscriminator,
+          mapElementsByValue,
         );
         const keyName = recursiveKeyName(
-          `dict${valueType.kind === "ptr" ? "-ptr" : ""}`,
+          `dict-${elementTypeByValue}-${mapElementsByValue}${valueType.kind === "ptr" ? "-ptr" : ""}`,
           type.valueType,
           substituteDiscriminator,
         );
@@ -340,6 +442,7 @@ export class TypeAdapter {
       }
       case "model":
         if (helpers.isPolymorphicRoot(type) && substituteDiscriminator) {
+          this.getModel(type);
           return this.getInterfaceType(type);
         } else if (
           helpers.isHttpFileType(type) ||
@@ -354,7 +457,13 @@ export class TypeAdapter {
         }
         return this.getModel(type);
       case "nullable":
-        return this.getWireType(type.type, elementTypeByValue, substituteDiscriminator);
+        return this.getWireType(
+          type.type,
+          elementTypeByValue,
+          substituteDiscriminator,
+          undefined,
+          mapElementsByValue,
+        );
       case "union":
         if (type.discriminatedOptions) {
           throw new AdapterError(
@@ -385,6 +494,22 @@ export class TypeAdapter {
     datetime = new go.Time(encoding, utc);
     this.types.set(keyName, datetime);
     return datetime;
+  }
+
+  /**
+   * returns the cached Go SSE reader type, creating it if needed
+   *
+   * @param eventType the union of possible events read from the stream
+   * @returns the Go code model type for a streaming.SSEReader of the event type
+   */
+  getSSEReader(eventType: go.UnionStruct): go.SSEReader {
+    const keyName = `sse-reader-${eventType.name}`;
+    let ser = this.types.get(keyName);
+    if (!ser) {
+      ser = new go.SSEReader(eventType);
+      this.types.set(keyName, ser);
+    }
+    return <go.SSEReader>ser;
   }
 
   // returns the Go code model type for an io.ReadSeekCloser
@@ -703,6 +828,7 @@ export class TypeAdapter {
     return <go.String>stringType;
   }
 
+  // Hierarchy metadata is populated by getModel after caching the root model.
   private getInterfaceType(model: tcgc.SdkModelType): go.Interface {
     if (model.name.length === 0) {
       throw new AdapterError("InternalError", "unnamed model", model.__raw?.node);
@@ -738,10 +864,10 @@ export class TypeAdapter {
       );
     }
     iface = new go.Interface(this.getPkg(), ifaceName, discriminatorField);
+    this.types.set(ifaceName, iface);
     if (model.baseModel && helpers.isPolymorphicRoot(model.baseModel)) {
       iface.parent = this.getInterfaceType(model.baseModel);
     }
-    this.types.set(ifaceName, iface);
     return iface;
   }
 
@@ -845,7 +971,34 @@ export class TypeAdapter {
       }
     }
 
+    // Cache the shell before following references back to this model or its hierarchy.
     this.types.set(modelName, modelType);
+    if (modelType.kind === "polymorphicModel" && helpers.isPolymorphicRoot(model)) {
+      modelType.interface.rootType = modelType;
+      for (const subType of Object.values(model.discriminatedSubtypes ?? {})) {
+        const possibleType = this.getModel(subType);
+        if (possibleType.kind !== "polymorphicModel") {
+          throw new AdapterError(
+            "InternalError",
+            `type ${subType.name} isn't a polymorphic subtype of ${model.name}`,
+            subType.__raw?.node,
+          );
+        }
+        modelType.interface.possibleTypes.push(possibleType);
+      }
+    }
+
+    const content = helpers.aggregateProperties(this.ctx, model);
+    for (const prop of content.props) {
+      modelType.fields.push(this.getModelField(prop, model));
+    }
+    if (content.addlProps) {
+      const annotations = new go.ModelFieldAnnotations(false, false, true, false);
+      const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
+      modelType.fields.push(
+        new go.ModelField("AdditionalProperties", addlPropsType, "", annotations),
+      );
+    }
     return modelType;
   }
 
@@ -1180,21 +1333,31 @@ export class TypeAdapter {
     sdkType: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
+    mapElementsByValue = false,
   ): go.MapValueType {
-    const valueType = this.getWireType(sdkType, elementTypeByValue, substituteDiscriminator);
+    const valueType = this.getWireType(
+      sdkType,
+      elementTypeByValue,
+      substituteDiscriminator,
+      undefined,
+      mapElementsByValue,
+    );
     switch (valueType.kind) {
       case "constantDef":
       case "constantValue":
       case "etag":
       case "multipartContent":
       case "literal":
+      case "sseReader":
         throw new AdapterError(
           "UnsupportedTsp",
           `unsupported kind ${valueType.kind} for map value type`,
           sdkType.__raw?.node,
         );
       default:
-        return helpers.isPtrType(valueType) ? this.getPtrType(valueType) : valueType;
+        return !mapElementsByValue && helpers.isPtrType(valueType)
+          ? this.getPtrType(valueType)
+          : valueType;
     }
   }
 
@@ -1253,19 +1416,31 @@ export class TypeAdapter {
     return sliceArray;
   }
 
-  private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {
+  private getUnionStruct(
+    sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType,
+    elementTypeByValue: boolean,
+  ): go.UnionStruct {
     if (sdkUnion.name.length === 0) {
       throw new AdapterError("InternalError", "unnamed union", sdkUnion.__raw?.node);
     }
 
-    const unionName = helpers.getEffectiveName(sdkUnion);
+    // Keep an enum's ordinary value representation separate from its event representation.
+    const unionName =
+      helpers.getEffectiveName(sdkUnion) + (sdkUnion.kind === "enum" ? "Event" : "");
     let goUnion = this.types.get(unionName);
     if (goUnion) {
       return <go.UnionStruct>goUnion;
     }
 
-    goUnion = new go.UnionStruct(this.getPkg(), unionName);
-    for (const variant of sdkUnion.variantTypes) {
+    goUnion = new go.UnionStruct(this.getPkg(), unionName, this.getUnionStructFlags(sdkUnion));
+    this.types.set(unionName, goUnion);
+    const sseMetadata = this.getSseMetadata(sdkUnion);
+    const variants =
+      sdkUnion.kind === "union"
+        ? sdkUnion.variantTypes
+        : sseMetadata!.events.map((event) => event.type);
+    const fieldNames = new Set<string>();
+    for (const [index, variant] of variants.entries()) {
       const type = this.getWireType(variant, elementTypeByValue, false);
       if (!go.isUnionVariantType(type)) {
         throw new AdapterError(
@@ -1276,7 +1451,17 @@ export class TypeAdapter {
       }
 
       const fieldType = helpers.isPtrType(type) ? this.getPtrType(type) : type;
-      goUnion.fields.push(new go.UnionField(recursiveVariantFieldName(fieldType), fieldType));
+      const baseName = recursiveVariantFieldName(fieldType);
+      let fieldName = baseName;
+      for (let suffix = 1; fieldNames.has(fieldName); suffix++) {
+        fieldName = `${baseName}${suffix}`;
+      }
+      fieldNames.add(fieldName);
+      const variantField = new go.UnionField(fieldName, fieldType);
+      if (sseMetadata) {
+        variantField.sse = this.getSseEvent(sdkUnion, sseMetadata, variant, index);
+      }
+      goUnion.fields.push(variantField);
     }
 
     goUnion.docs.summary = sdkUnion.summary;
@@ -1291,8 +1476,226 @@ export class TypeAdapter {
       }
     }
 
-    this.types.set(unionName, goUnion);
     return goUnion;
+  }
+
+  /**
+   * creates the SSE info for the specified union variant.
+   *
+   * @param sdkUnion the union containing the variant
+   * @param sseMetadata the SSE metadata for sdkUnion
+   * @param variant the variant to adapt
+   * @param variantIndex the index of variant within sdkUnion
+   * @returns the adapted SSE info
+   */
+  private getSseEvent(
+    sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType,
+    sseMetadata: tcgc.SdkSseMetadata,
+    variant: tcgc.SdkType,
+    variantIndex: number,
+  ): go.SseEvent {
+    // tcgc creates one event per union variant, in variant order. we still match on
+    // the underlying tsp type so we don't silently adapt the wrong event.
+    let event: tcgc.SdkSseEventMetadata | undefined = sseMetadata.events[variantIndex];
+    if (event?.type.__raw !== variant.__raw) {
+      event = sseMetadata.events.find((each) => each.type.__raw === variant.__raw);
+    }
+    if (!event) {
+      throw new AdapterError(
+        "InternalError",
+        `didn't find SSE event for variant ${variant.kind} of union ${sdkUnion.name}`,
+        variant.__raw?.node ?? sdkUnion.__raw?.node,
+      );
+    }
+
+    // the data field contains the payload, which is the complete event
+    // type unless the event type is an envelope
+    const sseEvent = new go.SseEvent(
+      getSseEventFormat(event.payloadContentType, event.payloadType),
+      event.isTerminalEvent,
+    );
+    // unnamed variants have no event field and are received as message events
+    sseEvent.name = event.eventType;
+
+    if (sseEvent.format === "Text" && !isTextPayloadType(event.payloadType)) {
+      throw new AdapterError(
+        "UnsupportedTsp",
+        `unsupported kind ${event.payloadType.kind} for text SSE event payload in union ${sdkUnion.name}`,
+        variant.__raw?.node ?? sdkUnion.__raw?.node,
+      );
+    }
+
+    if (event.isEventEnvelope) {
+      if (event.type.kind !== "model") {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${event.type.kind} for SSE event envelope in union ${sdkUnion.name}`,
+          variant.__raw?.node ?? sdkUnion.__raw?.node,
+        );
+      }
+
+      const payloadProp = event.type.properties.find(
+        (prop) => prop.__raw?.kind === "ModelProperty" && isEventData(this.ctx.program, prop.__raw),
+      );
+      if (!payloadProp) {
+        // the @data property can be nested within the envelope, which we don't support
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `didn't find the @data property on SSE event envelope ${event.type.name} in union ${sdkUnion.name}`,
+          event.type.__raw?.node ?? sdkUnion.__raw?.node,
+        );
+      }
+
+      // A recursive envelope's payload field might still be undergoing adaptation.
+      sseEvent.envelopeField =
+        this.fieldsMap.get(payloadProp) ?? this.getModelField(payloadProp, event.type);
+    }
+
+    return sseEvent;
+  }
+
+  /**
+   * determines whether a union is used as a sum type, an SSE event type, or both
+   *
+   * @param sdkUnion the union type to inspect
+   * @returns the flags describing the union's usage
+   */
+  private getUnionStructFlags(sdkUnion: tcgc.SdkUnionType | tcgc.SdkEnumType): go.UnionStructFlags {
+    const usage = this.getUnionUsage().get(sdkUnion);
+    const noFlags = <go.UnionStructFlags>0;
+    let usageFlags = noFlags;
+
+    if (usage?.sseMetadata) {
+      usageFlags |= go.UnionStructFlags.SseType;
+    }
+    if (usage?.isValueType && sdkUnion.kind === "union") {
+      usageFlags |= go.UnionStructFlags.SumType;
+    }
+
+    if (usageFlags === noFlags) {
+      // Explicit @usage can retain unions that have no method or model references.
+      usageFlags = go.UnionStructFlags.SumType;
+    }
+
+    return usageFlags;
+  }
+
+  /**
+   * builds (once) and returns the index of union usage info.
+   *
+   * the index is built by walking the client hierarchy and the models, as tcgc
+   * doesn't surface this info on SdkUnionType. it's keyed by tcgc union type,
+   * which is safe as tcgc caches the SdkUnionType created for a given tsp union,
+   * so instances are stable.
+   * @returns the union usage index for the tcgc code model
+   */
+  private getUnionUsage(): Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage> {
+    if (this.unionUsage) {
+      return this.unionUsage;
+    }
+
+    const index = new Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>();
+
+    const getUsage = function (sdkType?: tcgc.SdkType): UnionUsage | undefined {
+      if (sdkType?.kind !== "union" && sdkType?.kind !== "enum") {
+        return undefined;
+      }
+      let usage = index.get(sdkType);
+      if (!usage) {
+        usage = { isValueType: false };
+        index.set(sdkType, usage);
+      }
+      return usage;
+    };
+
+    // a stream's payload type is the union in the stream metadata. for SSE streams,
+    // the per-event info is in the adjacent SSE metadata.
+    const addStreamUsage = function (
+      streamMetadata?: tcgc.SdkStreamMetadata,
+      sseMetadata?: tcgc.SdkSseMetadata,
+    ): void {
+      const usage = getUsage(streamMetadata?.streamType);
+      if (!usage) {
+        return;
+      }
+      usage.streamMetadata ??= streamMetadata;
+      usage.sseMetadata ??= sseMetadata;
+    };
+
+    // anywhere else a union is referenced it's used as a value. the type can be
+    // nested within containers, e.g. a slice of unions.
+    const valueTypes = new Set<tcgc.SdkType>();
+    const recursiveAddValueTypeUsage = function (sdkType?: tcgc.SdkType): void {
+      if (!sdkType || valueTypes.has(sdkType)) {
+        return;
+      }
+      valueTypes.add(sdkType);
+      switch (sdkType.kind) {
+        case "array":
+          recursiveAddValueTypeUsage(sdkType.valueType);
+          break;
+        case "dict":
+          recursiveAddValueTypeUsage(sdkType.valueType);
+          break;
+        case "nullable":
+          recursiveAddValueTypeUsage(sdkType.type);
+          break;
+        case "union": {
+          const usage = getUsage(sdkType);
+          if (usage) {
+            usage.isValueType = true;
+          }
+          for (const variant of sdkType.variantTypes) {
+            recursiveAddValueTypeUsage(variant);
+          }
+          break;
+        }
+      }
+    };
+
+    const recursiveIndexClient = function (
+      sdkClient: tcgc.SdkClientType<tcgc.SdkHttpOperation>,
+    ): void {
+      for (const sdkMethod of sdkClient.methods) {
+        if (sdkMethod.response.streamMetadata) {
+          addStreamUsage(sdkMethod.response.streamMetadata, sdkMethod.response.sseMetadata);
+        } else {
+          recursiveAddValueTypeUsage(sdkMethod.response.type);
+        }
+
+        const bodyParam = sdkMethod.operation.bodyParam;
+        if (bodyParam?.streamMetadata) {
+          addStreamUsage(bodyParam.streamMetadata, bodyParam.sseMetadata);
+        }
+
+        for (const param of sdkMethod.parameters) {
+          recursiveAddValueTypeUsage(param.type);
+        }
+      }
+
+      if (sdkClient.children) {
+        for (const child of sdkClient.children) {
+          recursiveIndexClient(child);
+        }
+      }
+    };
+
+    for (const sdkClient of this.ctx.sdkPackage.clients) {
+      recursiveIndexClient(sdkClient);
+    }
+
+    // unions can also be referenced from model fields or additional properties, never appearing
+    // directly in a method signature
+    for (const sdkModel of this.ctx.sdkPackage.models) {
+      const { props, addlProps } = helpers.aggregateProperties(this.ctx, sdkModel);
+      recursiveAddValueTypeUsage(addlProps);
+      for (const property of props) {
+        recursiveAddValueTypeUsage(property.type);
+      }
+    }
+
+    this.unionUsage = index;
+    return index;
   }
 }
 
@@ -1410,50 +1813,61 @@ function recursiveVariantFieldName(type: go.WireType): string {
   }
 }
 
-interface ModelTypeSdkModelType {
-  go: go.Model | go.PolymorphicModel;
-  tcgc: tcgc.SdkModelType;
-}
-
-interface InterfaceTypeSdkModelType {
-  go: go.Interface;
-  tcgc: tcgc.SdkModelType;
-}
-
-// aggregate the properties from the provided type and its parent types.
-// this includes any inherited additional properties.
-function aggregateProperties(
-  sdkContext: tcgc.SdkContext,
-  model: tcgc.SdkModelType,
-): { props: Array<tcgc.SdkModelPropertyType>; addlProps?: tcgc.SdkType } {
-  const allProps = new Array<tcgc.SdkModelPropertyType>();
-  for (const prop of model.properties) {
-    if (tcgc.isHttpMetadata(sdkContext, prop)) {
-      continue;
-    }
-    allProps.push(prop);
+/**
+ * returns the format of an SSE event's data field.
+ *
+ * @param contentType the content type of the event payload, if specified
+ * @param payloadType the type of the event payload
+ * @returns the adapted format
+ */
+function getSseEventFormat(
+  contentType: string | undefined,
+  payloadType: tcgc.SdkType,
+): go.SseEventFormat {
+  if (contentType) {
+    return contentType.match(/json/i) ? "JSON" : "Text";
   }
 
-  let addlProps = model.additionalProperties;
-  let parent = model.baseModel;
-  while (parent) {
-    for (const parentProp of parent.properties) {
-      if (tcgc.isHttpMetadata(sdkContext, parentProp)) {
-        continue;
-      }
-      const exists = allProps.find((p) => p.name === parentProp.name);
-      if (exists) {
-        // don't add the duplicate. the TS compiler has better enforcement than OpenAPI
-        // to ensure that duplicate fields with different types aren't added.
-        continue;
-      }
-      allProps.push(parentProp);
-    }
-    // if we haven't found additional properties yet and the parent has it, use it
-    if (!addlProps && parent.additionalProperties) {
-      addlProps = parent.additionalProperties;
-    }
-    parent = parent.baseModel;
+  // tcgc leaves the content type unset when @Events.contentType isn't specified,
+  // so it's inferred from the payload type the same way the http lib does it.
+  switch (payloadType.kind) {
+    case "array":
+    case "dict":
+    case "model":
+    case "nullable":
+    case "union":
+      return "JSON";
+    default:
+      return "Text";
   }
-  return { props: allProps, addlProps: addlProps };
+}
+
+/**
+ * returns true if the SSE event payload type can be received as text,
+ * i.e. the data field is used verbatim.
+ *
+ * @param payloadType the type of the event payload
+ * @returns true if the payload is text
+ */
+function isTextPayloadType(payloadType: tcgc.SdkType): boolean {
+  switch (payloadType.kind) {
+    case "string":
+      return true;
+    case "constant":
+      return payloadType.valueType.kind === "string";
+    default:
+      return false;
+  }
+}
+
+/** how a tcgc union type is used across the tcgc code model */
+interface UnionUsage {
+  /** indicates the union is referenced as a value, e.g. a method parameter or model field */
+  isValueType: boolean;
+
+  /** the stream metadata, when the union is the payload type of a stream */
+  streamMetadata?: tcgc.SdkStreamMetadata;
+
+  /** the SSE metadata, when the union is the event type of an SSE stream */
+  sseMetadata?: tcgc.SdkSseMetadata;
 }

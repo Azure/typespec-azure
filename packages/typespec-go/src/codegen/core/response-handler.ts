@@ -17,7 +17,7 @@ import { ImportManager } from "./imports.js";
  * @returns the generated response handler code as a string.
  */
 export function createResponseHandler(
-  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod,
+  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod | go.SseMethod,
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
@@ -27,10 +27,12 @@ export function createResponseHandler(
 
   const resultVarName = "result";
   text += `${indent.get()}${resultVarName} := ${method.returns.name}{}\n`;
-  text += `${indent.get()}${helpers.buildIfBlock(indent, {
-    condition: "!runtime.HasStatusCode(resp, successCodes...)",
-    body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
-  })}\n`;
+  if (method.kind !== "sseMethod") {
+    text += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "!runtime.HasStatusCode(resp, successCodes...)",
+      body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
+    })}\n`;
+  }
 
   for (const header of method.returns.headers) {
     text += formatHeaderResponseValue(
@@ -112,6 +114,9 @@ export function createResponseHandler(
           indent,
         );
         break;
+      case "sseResult":
+        // The connector validates the response and transfers the body to the event reader.
+        break;
       default:
         result satisfies never;
     }
@@ -157,15 +162,16 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   } else if (go.isMap(type, "time")) {
-    const timeType = type.itemType.ptrType;
+    const timeType = go.unwrapPtr(type.itemType);
+    const elementPtr = type.itemType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
+    unmarshallerText += `${indent.get()}aux := map[string]${elementPtr}datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
-    unmarshallerText += `${indent.get()}cp := map[string]*time.Time{}\n`;
+    unmarshallerText += `${indent.get()}cp := map[string]${elementPtr}time.Time{}\n`;
     unmarshallerText += `${indent.get()}for k, v := range aux {\n`;
-    unmarshallerText += `${indent.push().get()}cp[k] = (*time.Time)(v)\n`;
+    unmarshallerText += `${indent.push().get()}cp[k] = (${elementPtr}time.Time)(v)\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
@@ -224,7 +230,7 @@ function generateResponseUnmarshaller(
 
 // use this to generate the code that will help process values returned in response headers
 function formatHeaderResponseValue(
-  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod,
+  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod | go.SseMethod,
   headerResp: go.HeaderScalarResponse | go.HeaderMapResponse,
   respObj: string,
   zeroResp: string,

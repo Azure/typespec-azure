@@ -7,6 +7,8 @@ import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents the client behavior as well as how to customize clients.
 
+For deployment-specific endpoints and OAuth settings in data-plane SDKs, see [Endpoint and OAuth Configurations](./14authentication.mdx).
+
 ## Default Behavior
 
 ### Basic Rules
@@ -2042,7 +2044,7 @@ You could define a single client that combines operations from multiple services
 7. **Operation Names**: Operations combined into the same generated client must have distinct client names for most languages. C# supports same-named operations with distinct signatures as overloads, so TCGC reports `duplicate-client-name-warning` instead of an error for C# operation-name collisions. Verify that the generated signatures form valid overloads and suppress the warning only when the collision is intentional; otherwise, use `@clientName` to resolve it.
 
 :::caution
-All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
+The combined client's endpoint, authentication, and service configuration catalog come from the first service in the `service` array. TCGC does not check the other services for matching settings; choose a first service whose settings work for the combined client.
 TCGC automatically merges sub clients with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
 :::
 
@@ -2400,7 +2402,7 @@ When combining multiple services, instead of auto-merging all sub clients at the
 The key is to **omit `autoMergeService`** (or set it to `false`) on the **root** client so it does NOT merge everything at the top level. Then, set `autoMergeService: true` on each **child** `@client` so that each child auto-populates from its own service. This creates a hierarchy where services remain separated under the root client.
 
 :::caution
-All services being merged must share the same endpoint and authentication method. If not, you will get a diagnostic error.
+The combined client's endpoint, authentication, and service configuration catalog come from the first service in the `service` array. TCGC does not check the other services for matching settings.
 :::
 
 <ClientTabs>
@@ -2561,7 +2563,7 @@ For maximum flexibility, you can fully customize how operations from different s
 In this approach, `autoMergeService` is **not set** (defaults to `false`) on any client — neither the root nor the children. Instead of auto-populating from services, each child `@client` explicitly declares its operations using `is` references (e.g., `opA is ServiceA.Operations.opA`). This gives you full control over which operations go where, including the ability to mix operations from different services into a single sub client.
 
 :::caution
-All services being merged must share the same endpoint and authentication method. If not, you will get a diagnostic error.
+The combined client's endpoint, authentication, and service configuration catalog come from the first service in the `service` array. TCGC does not check the other services for matching settings.
 :::
 
 :::note[Operation coverage validation]
