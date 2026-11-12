@@ -1,8 +1,14 @@
+import { getFriendlyName } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getLibraryName } from "../../src/public-utils.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
+import {
+  ArmTesterWithService,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("operation client projected name", async () => {
   async function helper(emitterName: string) {
@@ -207,6 +213,142 @@ it("model friendly name augmented", async () => {
   await helper("@azure-tools/typespec-java");
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
+});
+
+it.each([
+  ['"AIGateway", "go"', "AIGateway", "AiGateway"],
+  ['"Gateway"', "Gateway", "Gateway"],
+  ['exact("AI_gateway"), "go"', "AI_gateway", "AiGateway"],
+])("uses source client names in friendly names with %s", async (rename, goName, javaName) => {
+  const { program, Envelope, AiGateway } = await SimpleTester.compile(t.code`
+    @friendlyName("ResourceFriendlyName")
+    model ${t.model("AiGateway")} {}
+    @@clientName(AiGateway, ${rename});
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+
+    model ${t.model("Envelope")} {
+      result: ListResult<AiGateway>;
+    }
+  `);
+  const result = Envelope.properties.get("result")!.type;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+  });
+
+  strictEqual(getLibraryName(context, result), `${goName}ListResult`);
+  strictEqual(getLibraryName(context, result, "java"), `${javaName}ListResult`);
+  strictEqual(getFriendlyName(program, result), "AiGatewayListResult");
+  strictEqual(AiGateway.name, "AiGateway");
+});
+
+it.each([
+  ['@friendlyName("FixedResult")', "", "FixedResult"],
+  ["", '@@friendlyName(ListResult, "FixedResult");', "AIGatewayListResult"],
+  ['@clientName("CustomResult", "go")', "", "CustomResult"],
+])("respects template decorator precedence with %s %s", async (decorator, augment, expected) => {
+  const { program, Envelope } = await SimpleTester.compile(t.code`
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    ${decorator}
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+    ${augment}
+
+    model ${t.model("Envelope")} {
+      result: ListResult<AiGateway>;
+    }
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+  });
+  strictEqual(getLibraryName(context, Envelope.properties.get("result")!.type), expected);
+});
+
+it("preserves other friendly-name placeholders while replacing each source name", async () => {
+  const { program, Envelope } = await SimpleTester.compile(t.code`
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    @friendlyName("{name}{kind}{name}", T)
+    model Result<T> {}
+
+    model ${t.model("Envelope")} {
+      result: Result<AiGateway>;
+    }
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+  });
+  strictEqual(
+    getLibraryName(context, Envelope.properties.get("result")!.type),
+    "AIGatewayModelAIGateway",
+  );
+});
+
+it("ignores copied friendly names on named models", async () => {
+  const { program, Named, Literal, Sourced } = await SimpleTester.compile(t.code`
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {}
+    @@friendlyName(ListResult, "{name}AugmentedResult", AiGateway);
+
+    model ${t.model("Named")} is ListResult<AiGateway>;
+    model ${t.model("Literal")} is ListResult<AiGateway>;
+    @@friendlyName(Literal, "AiGatewayAugmentedResult");
+    model ${t.model("Sourced")} is ListResult<AiGateway>;
+    @@friendlyName(Sourced, "{name}CustomResult", AiGateway);
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+  });
+  strictEqual(getLibraryName(context, Named), "Named");
+  strictEqual(getLibraryName(context, Literal), "AiGatewayAugmentedResult");
+  strictEqual(getLibraryName(context, Sourced), "AIGatewayCustomResult");
+});
+
+it("renames ARM template models and their references for the selected language", async () => {
+  const { program } = await ArmTesterWithService.compile(`
+    model AiGateway is TrackedResource<AiGatewayProperties> {
+      ...ResourceNameParameter<AiGateway>;
+    }
+    model AiGatewayProperties {
+      description?: string;
+    }
+    @@clientName(AiGateway, "AIGateway", "go");
+
+    @armResourceOperations
+    interface AiGateways {
+      update is ArmTagsPatchSync<AiGateway>;
+      listBySubscription is ArmListBySubscription<AiGateway>;
+    }
+  `);
+
+  for (const [language, resourceName] of [
+    ["go", "AIGateway"],
+    ["java", "AiGateway"],
+  ]) {
+    const context = await createSdkContextForTester(program, {
+      emitterName: `@azure-tools/typespec-${language}`,
+    });
+    const models = context.sdkPackage.models;
+    const resource = models.find((x) => x.name === resourceName);
+    ok(resource);
+    ok(models.some((x) => x.name === `${resourceName}TagsUpdate`));
+    const listResult = models.find((x) => x.name === `${resourceName}ListResult`);
+    ok(listResult);
+    const value = listResult.properties.find((x) => x.name === "value");
+    ok(value?.type.kind === "array");
+    strictEqual(value.type.valueType, resource);
+  }
 });
 
 it("should return language specific name when both language specific name and friendly name exist", async () => {
