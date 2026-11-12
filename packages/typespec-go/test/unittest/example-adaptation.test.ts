@@ -5,6 +5,34 @@ import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
 describe("Example adaptation", () => {
+  it.each([false, true])(
+    "passes synthesized discriminated arguments by reference (legacy: %s)",
+    async (legacy) => {
+      const files = await emitGoFor(
+        `
+          @service namespace Test;
+          ${
+            legacy
+              ? '@discriminator("kind") model Pet { kind: string; } model Cat extends Pet { kind: "cat"; }'
+              : "model Cat { name: string; } @discriminated union Pet { cat: Cat }"
+          }
+          @route("/pets") @put op put(@body input: Pet): void;
+        `,
+        { "generate-samples": true },
+        {
+          "examples/put.json": JSON.stringify({
+            operationId: "put",
+            title: "put",
+            parameters: {},
+            responses: { "204": {} },
+          }),
+        },
+      );
+      const example = [...files].find(([name]) => name.endsWith("_example_test.go"))?.[1];
+      expect(example).toContain(`client.Put(ctx, &testmodule.${legacy ? "Pet" : "PetCat"}{`);
+    },
+  );
+
   it.each([false, true])("normalizes string-valued scalar examples (raw: %s)", async (raw) => {
     const value = { count: "42", enabled: " FALSE ", label: "42" };
     const input = raw ? { kind: "details", value } : { value };

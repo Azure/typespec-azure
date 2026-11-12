@@ -870,5 +870,11 @@ function getParamExampleValue(
     ).slice(1);
   }
   const fakeValue = generateFakeExample(param.type, param.name);
-  return getExampleValue(pkg, fakeValue, "\t", imports, param.type.kind !== "ptr").slice(1);
+  return getExampleValue(
+    pkg,
+    fakeValue,
+    "\t",
+    imports,
+    isParamByValue({ parameter: param, value: fakeValue }),
+  ).slice(1);
 }

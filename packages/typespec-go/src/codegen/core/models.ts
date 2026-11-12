@@ -815,6 +815,16 @@ function generateJSONMarshallerBody(
   if (addlProps) {
     marshaller += `${indent.get()}if ${receiver}.AdditionalProperties != nil {\n`;
     marshaller += `${indent.push().get()}for key, val := range ${receiver}.AdditionalProperties {\n`;
+    const discriminatorCheck = modelDef.Model.fields
+      .filter((field) => field.annotations.isDiscriminator)
+      .map((field) => `key == "${field.serializedName}"`)
+      .join(" || ");
+    if (discriminatorCheck) {
+      marshaller += `${indent.push().get()}if ${discriminatorCheck} {\n`;
+      marshaller += `${indent.push().get()}continue\n`;
+      marshaller += `${indent.pop().get()}}\n`;
+      indent.pop();
+    }
     if (go.isPtr(addlProps.itemType, "time") && addlProps.itemType.ptrType.utc) {
       // normalize utc datetimes before casting the (pointer) map value
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");

@@ -34,6 +34,19 @@ op putPetMap(@body body: Record<Pet>): void;
 @route("/pets/batches")
 op putPetBatches(@body body: Record<Pet[]>): void;
 
+model OpenCat extends Record<string> {
+  name: string;
+}
+
+@discriminated(#{ envelope: "none", discriminatorPropertyName: "petType" })
+union InlinePet {
+  cat: OpenCat,
+}
+
+@post
+@route("/pets/inline")
+op putInlinePet(@body body: InlinePet): void;
+
 /**
  * A typed scalar (text/plain) response. Exercised by the fake server's
  * text-body round-trip test and reused by the context-cancellation and

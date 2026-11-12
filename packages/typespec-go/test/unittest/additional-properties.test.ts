@@ -6,6 +6,30 @@ import { emitGoFor } from "./scenario-runner.js";
 
 describe("Union usage in JSON additional properties", () => {
   it.each([
+    { discriminator: "kind", legacy: false },
+    { discriminator: "petType", legacy: false },
+    { discriminator: "kind", legacy: true },
+  ])(
+    "protects the $discriminator discriminator from additional properties (legacy: $legacy)",
+    async ({ discriminator, legacy }) => {
+      const files = await emitGoFor(`
+        @service namespace Test;
+        ${
+          legacy
+            ? '@discriminator("kind") model Pet extends Record<string> { kind: string; } model Cat extends Pet { kind: "cat"; name: string; }'
+            : `model Cat extends Record<string> { name: string; }
+               @discriminated(#{ envelope: "none", discriminatorPropertyName: "${discriminator}" })
+               union Pet { cat: Cat }`
+        }
+        @route("/pets") @put op put(@body input: Pet): void;
+      `);
+      expect(files.get("zz_models_serde.go")).toContain(
+        `if key == "${discriminator}" {\n\t\t\t\tcontinue\n\t\t\t}`,
+      );
+    },
+  );
+
+  it.each([
     { type: "Pet", helper: "" },
     { type: "Pet[]", helper: "Array" },
     { type: "Record<Pet[]>", helper: "ArrayMap" },

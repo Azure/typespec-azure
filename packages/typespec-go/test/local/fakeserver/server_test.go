@@ -5,6 +5,7 @@ package fakeserver_test
 
 import (
 	"context"
+	"encoding/json"
 	"fakeserver"
 	"fakeserver/fake"
 	"io"
@@ -247,6 +248,20 @@ func TestIntEnumPathFake(t *testing.T) {
 			require.Equal(t, value, received, "int-enum path param did not round-trip")
 		})
 	}
+}
+
+func TestDiscriminatedAdditionalPropertiesMarshal(t *testing.T) {
+	value := fakeserver.InlinePetCat{
+		PetType: to.Ptr("ignored"),
+		Name:    to.Ptr("Whiskers"),
+		AdditionalProperties: map[string]*string{
+			"petType": to.Ptr("dog"),
+			"extra":   to.Ptr("preserved"),
+		},
+	}
+	raw, err := json.Marshal(value)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"petType":"cat","name":"Whiskers","extra":"preserved"}`, string(raw))
 }
 
 func TestDiscriminatedCollectionFake(t *testing.T) {
