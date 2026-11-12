@@ -13,6 +13,27 @@ using TypeSpec.Http;
 )
 namespace Emitter.FakeServer;
 
+model Cat {
+  name: string;
+}
+
+@discriminated
+union Pet {
+  cat: Cat,
+}
+
+@post
+@route("/pets/array")
+op putPets(@body body: Pet[]): void;
+
+@post
+@route("/pets/map")
+op putPetMap(@body body: Record<Pet>): void;
+
+@post
+@route("/pets/batches")
+op putPetBatches(@body body: Record<Pet[]>): void;
+
 /**
  * A typed scalar (text/plain) response. Exercised by the fake server's
  * text-body round-trip test and reused by the context-cancellation and

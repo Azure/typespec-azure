@@ -64,6 +64,9 @@ func unmarshalDiscriminatedBaseNoSubTypesClassification(rawMsg json.RawMessage) 
 	if err := json.Unmarshal(rawMsg, &m); err != nil {
 		return nil, err
 	}
+	if m == nil {
+		return nil, nil
+	}
 	var b DiscriminatedBaseNoSubTypesClassification
 	switch m["type"] {
 	default:

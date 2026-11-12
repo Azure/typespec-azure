@@ -15,6 +15,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/stretchr/testify/require"
 )
@@ -96,6 +97,30 @@ func TestDiscriminatedClientNullResponse(t *testing.T) {
 	customInline, err := inline.NewDiscriminatedNoEnvelopeCustomDiscriminatorClient().Get(context.Background(), nil)
 	require.NoError(t, err)
 	require.Nil(t, customInline.PetInlineWithCustomDiscriminatorClassification)
+}
+
+func TestDiscriminatedClientFakeNullRequest(t *testing.T) {
+	for _, payload := range []string{"null", "null\n", " \t null \r\n"} {
+		t.Run(payload, func(t *testing.T) {
+			called := false
+			srv := fake.DiscriminatedNoEnvelopeDefaultServer{
+				Put: func(ctx context.Context, input disriminatedgroup.PetInlineClassification, options *disriminatedgroup.DiscriminatedNoEnvelopeDefaultClientPutOptions) (resp azfake.Responder[disriminatedgroup.DiscriminatedNoEnvelopeDefaultClientPutResponse], errResp azfake.ErrorResponder) {
+					called = true
+					require.Nil(t, input)
+					resp.SetResponse(http.StatusOK, disriminatedgroup.DiscriminatedNoEnvelopeDefaultClientPutResponse{}, nil)
+					return
+				},
+			}
+			ctx := context.WithValue(context.Background(), runtime.CtxAPINameKey{}, "DiscriminatedNoEnvelopeDefaultClient.Put")
+			req, err := http.NewRequestWithContext(ctx, http.MethodPut, "http://localhost:3000/type/union/discriminated/no-envelope/default", strings.NewReader(payload))
+			require.NoError(t, err)
+			req.Header.Set("Content-Type", "application/json")
+			resp, err := fake.NewDiscriminatedNoEnvelopeDefaultServerTransport(&srv).Do(req)
+			require.NoError(t, err)
+			require.NoError(t, resp.Body.Close())
+			require.True(t, called)
+		})
+	}
 }
 
 func TestDiscriminatedVariantMarshal(t *testing.T) {

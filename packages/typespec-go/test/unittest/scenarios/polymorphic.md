@@ -256,6 +256,9 @@ func unmarshalPetClassification(rawMsg json.RawMessage) (PetClassification, erro
 	if err := json.Unmarshal(rawMsg, &m); err != nil {
 		return nil, err
 	}
+	if m == nil {
+		return nil, nil
+	}
 	var b PetClassification
 	switch m["kind"] {
 	case string(PetKindCat):

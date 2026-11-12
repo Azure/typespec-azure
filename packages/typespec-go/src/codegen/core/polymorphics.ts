@@ -29,8 +29,7 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
   }
 
   const scalars = new Set<string>();
-  const arrays = new Set<string>();
-  const maps = new Set<string>();
+  const collections = new Map<string, go.Slice | go.Map>();
 
   // we know there are polymorphic types but we don't know how they're used.
   // i.e. are they vanilla fields, elements in a slice, or values in a map.
@@ -40,22 +39,13 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
       case "interface":
         scalars.add(type.name);
         break;
-      case "map": {
-        const leafType = helpers.recursiveUnwrapMapSlice(type);
-        if (leafType.kind === "interface") {
-          scalars.add(leafType.name);
-          maps.add(leafType.name);
+      case "map":
+      case "slice":
+        if (helpers.recursiveUnwrapMapSlice(type).kind === "interface") {
+          collections.set(helpers.getDiscriminatorUnmarshallerName(type), type);
+          trackDiscriminator(type.itemType);
         }
         break;
-      }
-      case "slice": {
-        const leafType = helpers.recursiveUnwrapMapSlice(type);
-        if (leafType.kind === "interface") {
-          scalars.add(leafType.name);
-          arrays.add(leafType.name);
-        }
-        break;
-      }
     }
   };
 
@@ -94,7 +84,7 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
     }
   }
 
-  if (scalars.size === 0 && arrays.size === 0 && maps.size === 0) {
+  if (scalars.size === 0) {
     // this is a corner-case that can happen when all the discriminated types
     // are error types.  there's a bug in M4 that incorrectly annotates such
     // types as 'output', 'exception' in the usage however it's really just
@@ -128,6 +118,9 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
       text += `${indent.get()}if err := json.Unmarshal(rawMsg, &m); err != nil {\n`;
       text += `${indent.push().get()}return nil, err\n`;
       text += `${indent.pop().get()}}\n`;
+      text += `${indent.get()}if m == nil {\n`;
+      text += `${indent.push().get()}return nil, nil\n`;
+      text += `${indent.pop().get()}}\n`;
       text += `${indent.get()}var b ${prefix}${interfaceType.name}\n`;
       text += `${indent.get()}switch m["${interfaceType.discriminatorField}"] {\n`;
       for (const possibleType of interfaceType.possibleTypes) {
@@ -156,49 +149,33 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
       text += "}\n\n";
     }
 
-    // array unmarshaller
-    if (arrays.has(interfaceType.name)) {
-      text += `func unmarshal${interfaceType.name}Array(rawMsg json.RawMessage) ([]${prefix}${interfaceType.name}, error) {\n`;
+    for (const [name, type] of [...collections].sort(([a], [b]) => helpers.sortAscending(a, b))) {
+      if (helpers.recursiveUnwrapMapSlice(type) !== interfaceType) {
+        continue;
+      }
+      const typeName = go.getTypeDeclaration(type, pkg);
+      const isArray = type.kind === "slice";
+      const rawType = isArray ? "[]json.RawMessage" : "map[string]json.RawMessage";
+      const target = isArray ? "fArray" : "fMap";
+      const key = isArray ? "index" : "key";
+      text += `func ${name}(rawMsg json.RawMessage) (${typeName}, error) {\n`;
       text += `${indent.get()}if rawMsg == nil || string(rawMsg) == "null" {\n`;
       text += `${indent.push().get()}return nil, nil\n`;
       text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}var rawMessages []json.RawMessage\n`;
+      text += `${indent.get()}var rawMessages ${rawType}\n`;
       text += `${indent.get()}if err := json.Unmarshal(rawMsg, &rawMessages); err != nil {\n`;
       text += `${indent.push().get()}return nil, err\n`;
       text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}fArray := make([]${prefix}${interfaceType.name}, len(rawMessages))\n`;
-      text += `${indent.get()}for index, rawMessage := range rawMessages {\n`;
+      text += `${indent.get()}${target} := make(${typeName}, len(rawMessages))\n`;
+      text += `${indent.get()}for ${key}, rawMessage := range rawMessages {\n`;
       indent.push();
-      text += `${indent.get()}f, err := unmarshal${interfaceType.name}(rawMessage)\n`;
+      text += `${indent.get()}f, err := ${helpers.getDiscriminatorUnmarshallerName(type.itemType)}(rawMessage)\n`;
       text += `${indent.get()}if err != nil {\n`;
       text += `${indent.push().get()}return nil, err\n`;
       text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}fArray[index] = f\n`;
+      text += `${indent.get()}${target}[${key}] = f\n`;
       text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}return fArray, nil\n`;
-      text += "}\n\n";
-    }
-
-    // map unmarshaller
-    if (maps.has(interfaceType.name)) {
-      text += `func unmarshal${interfaceType.name}Map(rawMsg json.RawMessage) (map[string]${prefix}${interfaceType.name}, error) {\n`;
-      text += `${indent.get()}if rawMsg == nil || string(rawMsg) == "null" {\n`;
-      text += `${indent.push().get()}return nil, nil\n`;
-      text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}var rawMessages map[string]json.RawMessage\n`;
-      text += `${indent.get()}if err := json.Unmarshal(rawMsg, &rawMessages); err != nil {\n`;
-      text += `${indent.push().get()}return nil, err\n`;
-      text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}fMap := make(map[string]${prefix}${interfaceType.name}, len(rawMessages))\n`;
-      text += `${indent.get()}for key, rawMessage := range rawMessages {\n`;
-      indent.push();
-      text += `${indent.get()}f, err := unmarshal${interfaceType.name}(rawMessage)\n`;
-      text += `${indent.get()}if err != nil {\n`;
-      text += `${indent.push().get()}return nil, err\n`;
-      text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}fMap[key] = f\n`;
-      text += `${indent.pop().get()}}\n`;
-      text += `${indent.get()}return fMap, nil\n`;
+      text += `${indent.get()}return ${target}, nil\n`;
       text += "}\n\n";
     }
   }

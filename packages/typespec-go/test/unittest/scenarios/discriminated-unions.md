@@ -451,6 +451,9 @@ func unmarshalEnvelopedPetClassification(rawMsg json.RawMessage) (EnvelopedPetCl
 	if err := json.Unmarshal(rawMsg, &m); err != nil {
 		return nil, err
 	}
+	if m == nil {
+		return nil, nil
+	}
 	var b EnvelopedPetClassification
 	switch m["kind"] {
 	case "cat":
@@ -492,6 +495,9 @@ func unmarshalInlinePetClassification(rawMsg json.RawMessage) (InlinePetClassifi
 	var m map[string]any
 	if err := json.Unmarshal(rawMsg, &m); err != nil {
 		return nil, err
+	}
+	if m == nil {
+		return nil, nil
 	}
 	var b InlinePetClassification
 	switch m["petType"] {
@@ -548,6 +554,9 @@ func unmarshalInlinePetClassification(rawMsg json.RawMessage) (testmodule.Inline
 	var m map[string]any
 	if err := json.Unmarshal(rawMsg, &m); err != nil {
 		return nil, err
+	}
+	if m == nil {
+		return nil, nil
 	}
 	var b testmodule.InlinePetClassification
 	switch m["petType"] {
@@ -860,6 +869,9 @@ func unmarshalPetClassification(rawMsg json.RawMessage) (PetClassification, erro
 	var m map[string]any
 	if err := json.Unmarshal(rawMsg, &m); err != nil {
 		return nil, err
+	}
+	if m == nil {
+		return nil, nil
 	}
 	var b PetClassification
 	switch m["kind"] {

@@ -665,33 +665,38 @@ function dispatchForOperationBody(
       case "XML":
         if (bodyParam && !go.isLiteralParameter(bodyParam.style)) {
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/fake", "azfake");
-          switch (bodyParam.type.kind) {
-            case "encodedBytes":
-              content += `${indent.get()}body, err := server.UnmarshalRequestAsByteArray(req, runtime.Base64${bodyParam.type.encoding}Format)\n`;
-              content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-              break;
-            case "interface":
-              requiredHelpers.readRequestBody = true;
-              content += `${indent.get()}raw, err := readRequestBody(req)\n`;
-              content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-              content += `${indent.get()}body, err := unmarshal${bodyParam.type.name}(raw)\n`;
-              content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-              break;
-            case "rawJSON":
-              imports.add("io");
-              content += `${indent.get()}body, err := io.ReadAll(req.Body)\n`;
-              content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-              content += `${indent.get()}req.Body.Close()\n`;
-              break;
-            default: {
-              const bodyParamType = go.unwrapPtr(bodyParam.type);
-              let bodyTypeName = go.getTypeDeclaration(bodyParamType, pkg);
-              if (bodyParamType.kind === "time") {
-                imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-                bodyTypeName = `datetime.${bodyParamType.format}`;
+          if (
+            bodyParam.type.kind === "interface" ||
+            (bodyParam.bodyFormat === "JSON" &&
+              helpers.recursiveUnwrapMapSlice(bodyParam.type).kind === "interface")
+          ) {
+            requiredHelpers.readRequestBody = true;
+            content += `${indent.get()}raw, err := readRequestBody(req)\n`;
+            content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+            content += `${indent.get()}body, err := ${helpers.getDiscriminatorUnmarshallerName(bodyParam.type)}(raw)\n`;
+            content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+          } else {
+            switch (bodyParam.type.kind) {
+              case "encodedBytes":
+                content += `${indent.get()}body, err := server.UnmarshalRequestAsByteArray(req, runtime.Base64${bodyParam.type.encoding}Format)\n`;
+                content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+                break;
+              case "rawJSON":
+                imports.add("io");
+                content += `${indent.get()}body, err := io.ReadAll(req.Body)\n`;
+                content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+                content += `${indent.get()}req.Body.Close()\n`;
+                break;
+              default: {
+                const bodyParamType = go.unwrapPtr(bodyParam.type);
+                let bodyTypeName = go.getTypeDeclaration(bodyParamType, pkg);
+                if (bodyParamType.kind === "time") {
+                  imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+                  bodyTypeName = `datetime.${bodyParamType.format}`;
+                }
+                content += `${indent.get()}body, err := server.UnmarshalRequestAs${bodyParam.bodyFormat}[${bodyTypeName}](req)\n`;
+                content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
               }
-              content += `${indent.get()}body, err := server.UnmarshalRequestAs${bodyParam.bodyFormat}[${bodyTypeName}](req)\n`;
-              content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
             }
           }
         }

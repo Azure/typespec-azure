@@ -5,6 +5,27 @@ import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
 describe("Union usage in JSON additional properties", () => {
+  it.each([
+    { type: "Pet", helper: "" },
+    { type: "Pet[]", helper: "Array" },
+    { type: "Record<Pet[]>", helper: "ArrayMap" },
+  ])("decodes discriminated $type additional properties", async ({ type, helper }) => {
+    const files = await emitGoFor(`
+      @service namespace Test;
+      model Cat { name: string; }
+      @discriminated union Pet { cat: Cat }
+      model Container extends Record<${type}> { known: ${type}; }
+      @route("/properties") @get op getProperties(): Container;
+    `);
+    const serde = files.get("zz_models_serde.go")!;
+    expect(serde).toContain(`aux, err = unmarshalPetClassification${helper}(val)`);
+    expect(serde).toContain("c.AdditionalProperties[key] = aux");
+    expect(serde).not.toContain("err = json.Unmarshal(val, &aux)");
+    expect(files.get("zz_polymorphic_helpers.go")).toContain(
+      `func unmarshalPetClassification${helper}(`,
+    );
+  });
+
   it.each([false, true])(
     "preserves optional-field shape discrimination for JSON unions (also SSE: %s)",
     async (sse) => {
