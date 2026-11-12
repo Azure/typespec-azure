@@ -4,6 +4,7 @@ import {
   getDeserializeHeadersPrivateFunction,
   getDeserializePrivateFunction,
   getExpectedStatuses,
+  getLroOperationMetadataPrivateFunction,
   getOperationFunction,
   getOperationOptionsName,
   getSendPrivateFunction,
@@ -96,6 +97,13 @@ export function buildOperationFiles(
       }
       if (deserializeExceptionHeadersDeclaration) {
         functionsToAdd.push(deserializeExceptionHeadersDeclaration);
+      }
+      const lroOperationMetadataDeclaration = getLroOperationMetadataPrivateFunction(dpgContext, [
+        prefixes,
+        op,
+      ]);
+      if (lroOperationMetadataDeclaration) {
+        functionsToAdd.push(lroOperationMetadataDeclaration);
       }
 
       operationGroupFile.addFunctions(functionsToAdd);
@@ -237,11 +245,20 @@ export function buildLroDeserDetailMap(
           renamedDeserName = `_${newName}`;
         }
         existingNames.add(deserName);
+        const operationMetadataName = getLroOperationMetadataPrivateFunction(context, [
+          prefixes,
+          o,
+        ])?.name;
         return {
           path: `${o.operation.verb.toUpperCase()} ${o.operation.path}`,
           expectedStatusesExpression: getExpectedStatuses(o),
           deserName,
           renamedDeserName,
+          operationMetadataName,
+          renamedOperationMetadataName:
+            operationMetadataName && renamedDeserName
+              ? `${renamedDeserName.replace(/Deserialize/, "GetOperationMetadata")}`
+              : undefined,
         };
       }),
     );

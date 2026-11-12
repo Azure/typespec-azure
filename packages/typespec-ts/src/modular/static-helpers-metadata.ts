@@ -110,6 +110,11 @@ export const PollingHelpers = {
     name: "getLongRunningPoller",
     location: "pollingHelpers.ts",
   },
+  GetPathParameterFromUrl: {
+    kind: "function",
+    name: "getPathParameterFromUrl",
+    location: "pollingHelpers.ts",
+  },
 } as const;
 
 export const SimplePollerHelpers = {
