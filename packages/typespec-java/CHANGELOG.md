@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.48.6
+
+### Bug Fixes
+
+- [#5692](https://github.com/Azure/typespec-azure/pull/5692) Remove dependencies on deprecated autorest packages
+
+
 ## 0.48.5
 
 ### Bug Fixes

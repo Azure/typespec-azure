@@ -78,6 +78,13 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
@@ -165,6 +172,27 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps extensible enum default guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
+  it("keeps GET and DELETE request body guidance opt-in in both presets", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-request-body";
+    ok(AzureCoreLinter.rules.some((rule) => rule.name === "no-request-body"));
+    for (const rulesetName of ["resource-manager", "data-plane"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/rpc-operation-request-body"
+        ],
+        true,
+      );
+    }
+  });
+
   it("keeps private endpoint API completeness guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/private-endpoint-apis-missing";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
@@ -172,6 +200,13 @@ describe("expect all rules to be defined", () => {
       (candidate) => candidate.name === "private-endpoint-apis-missing",
     );
     ok(rule);
+  });
+
+  it("keeps missing error decorators in ARM all but out of the recommended preset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/require-error-decorator";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
   });
 
   it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
