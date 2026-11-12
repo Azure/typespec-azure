@@ -16,3 +16,24 @@ index f002da96..fae8d01b 100644
      }
  
      public static byte[] getJpgBytes() {
+diff --git a/tsp/experimental.tsp b/tsp/experimental.tsp
+--- a/tsp/experimental.tsp
++++ b/tsp/experimental.tsp
+@@ -48,7 +48,7 @@ union OpenChoice {
+   Two: "two",
+ }
+ 
+-@experimental(#{ emitterScope: "@typespec/http-client-java" })
++@experimental(#{ emitterScope: "@azure-tools/typespec-java" })
+ model Scoped {
+   value: string;
+ }
+@@ -62,7 +62,7 @@ model OtherEmitter {
+   value: string;
+ }
+ 
+-@experimental(#{ emitterScope: "!@typespec/http-client-java" })
++@experimental(#{ emitterScope: "!@azure-tools/typespec-java" })
+ model Excluded {
+   value: string;
+ }
