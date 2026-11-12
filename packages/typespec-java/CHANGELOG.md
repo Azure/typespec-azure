@@ -4,6 +4,8 @@
 
 ### Features
 
+- Support preview annotations for APIs marked with `@TypeSpec.HttpClient.experimental` through the `experimental-annotation` option ([microsoft/typespec#12409](https://github.com/microsoft/typespec/pull/12409)).
+- Support `@access(Access.internal)` for ARM operations, models, and enums ([microsoft/typespec#12488](https://github.com/microsoft/typespec/pull/12488)).
 - Prototype a TeaVM WebAssembly target for `@azure-tools/typespec-java` in the Azure playground, included by the normal build and PR previews. Building requires JDK 17; native CLI generation is unchanged.
 
 ### Bug Fixes
