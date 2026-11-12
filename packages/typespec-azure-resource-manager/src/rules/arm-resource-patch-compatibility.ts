@@ -8,6 +8,7 @@ import {
   getMinLengthAsNumeric,
   getMinValueAsNumeric,
   getMinValueExclusiveAsNumeric,
+  isNullType,
   Numeric,
   type ModelProperty,
   type Program,
@@ -127,5 +128,5 @@ export function createPatchPropertyCompatibility(
 }
 
 function valueType(type: Type): Type | undefined {
-  return type.kind === "Union" ? getSingleNonNullMember(type) : type;
+  return isNullType(type) ? undefined : type.kind === "Union" ? getSingleNonNullMember(type) : type;
 }

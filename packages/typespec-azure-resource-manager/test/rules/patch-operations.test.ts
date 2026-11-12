@@ -1071,8 +1071,8 @@ interface Widgets {
       await tester
         .expect(
           bodyPair(`
-        model PutBody { @maxLength(5) value?: string; }
-        model PatchBody { @maxLength(5) value?: string | null; }
+        model PutBody { @maxLength(5) value?: string; @maxLength(5) reset?: string; }
+        model PatchBody { @maxLength(5) value?: string | null; reset?: null; }
       `),
         )
         .toBeValid();
