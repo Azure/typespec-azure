@@ -40,7 +40,9 @@ func (cred configurationCredential) GetToken(ctx context.Context, options policy
 	if err != nil {
 		return azcore.AccessToken{}, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if resp.StatusCode != http.StatusOK {
 		return azcore.AccessToken{}, fmt.Errorf("token request failed: %s", resp.Status)
 	}
