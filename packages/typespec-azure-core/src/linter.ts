@@ -7,6 +7,7 @@ import { compositionOverInheritanceRule } from "./rules/composition-over-inherit
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { listOperationMissing200ResponseRule } from "./rules/list-operation-missing-200-response.js";
+import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
 import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
@@ -94,6 +95,7 @@ const rules = [
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
   noOpenapiClientExtensionsRule,
+  listResponseEnvelopeRule,
   listOperationMissing200ResponseRule,
 ];
 

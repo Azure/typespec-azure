@@ -143,6 +143,10 @@ export const $linter = defineLinter({
   rules,
   ruleSets: {
     all: {
+      disable: {
+        "@azure-tools/typespec-azure-core/list-response-envelope":
+          "The ARM list-response-envelope rule includes the shared paging policy.",
+      },
       enable: Object.fromEntries(
         rules.map((rule) => [
           `@azure-tools/typespec-azure-resource-manager/${rule.name}`,

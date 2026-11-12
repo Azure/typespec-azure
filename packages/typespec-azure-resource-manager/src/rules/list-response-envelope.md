@@ -2,12 +2,18 @@ ARM list responses must use a predictable envelope containing exactly an array-v
 `nextLink`. Additional top-level properties or a missing envelope property make generated clients
 and pagination tooling handle list operations inconsistently.
 
+This rule also reuses Azure Core's shared `list-response-envelope` paging policy: it warns on `@continuationToken` usage in request parameters and response properties, including correctly paired tokens. A request token is still reported when the response has a valid `value`/`nextLink` envelope. This is Azure policy, not a generic TypeSpec validity requirement.
+
+The `resource-manager` ruleset enables this combined rule, including the existing ARM envelope checks, and disables the core variant to avoid duplicate token diagnostics. The `data-plane` ruleset enables only the core variant, without ARM-specific envelope restrictions.
+
 ## Impact
 
-- **Area:** API
+- **Area:** API, SDK
 
 Collection response envelopes with other shapes violate the ARM RPC contract and can produce
 inconsistent generated client pagination behavior.
+
+Mixing a raw request token with a next-link response can also expose incompatible resume values in generated SDK APIs.
 
 The rule combines collection-path and paging-metadata checks under the existing
 `list-response-envelope` rule name. ARM-provider collection GET paths retain their
@@ -61,5 +67,15 @@ The combined native contract intentionally rejects a custom next-link property n
 
 ## Suppression
 
-Suppress this rule only when compatibility requirements prevent the response envelope from
-containing exactly `value` and `nextLink`.
+Suppress this rule only when compatibility requirements prevent the standard response envelope or require preserving token-based pagination. Keep valid paging annotations; removing `@continuationToken` merely to silence the warning can prevent SDKs from recognizing the actual service contract.
+
+Token diagnostics target annotated properties. Suppress each token property that must retain the decorator:
+
+```tsp
+model LegacyOptions {
+  #suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published token-based paging contract."
+  @continuationToken token?: string;
+}
+```
+
+Envelope diagnostics retain their existing response model/property targets. A property-level token suppression does not disable envelope validation.

@@ -91,7 +91,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
-    "@azure-tools/typespec-azure-resource-manager/list-response-envelope": false,
+    "@azure-tools/typespec-azure-resource-manager/list-response-envelope": true,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-collection": false,
     "@azure-tools/typespec-azure-resource-manager/use-interface": true,
     "@azure-tools/typespec-azure-resource-manager/use-application-json-content-type": false,
@@ -133,5 +133,9 @@ export default {
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
     "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
+  },
+  disable: {
+    "@azure-tools/typespec-azure-core/list-response-envelope":
+      "The ARM list-response-envelope rule includes the shared paging policy.",
   },
 } satisfies LinterRuleSet;

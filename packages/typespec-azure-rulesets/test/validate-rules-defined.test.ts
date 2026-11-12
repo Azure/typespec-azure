@@ -69,6 +69,19 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("enables shared paging guidance once per ruleset, including ARM envelope checks", () => {
+    const coreRule = "@azure-tools/typespec-azure-core/list-response-envelope";
+    const armRule = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[coreRule], true);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[armRule], undefined);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[coreRule], undefined);
+    ok($linter.ruleSets?.["resource-manager"].disable?.[coreRule]);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[armRule], true);
+    for (const linter of [AzureCoreLinter, ResourceManagerLinter]) {
+      ok(!linter.rules.some((rule) => rule.name === "no-continuation-token"));
+    }
+  });
+
   it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);

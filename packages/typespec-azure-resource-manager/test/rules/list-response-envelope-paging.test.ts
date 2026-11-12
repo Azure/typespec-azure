@@ -1,5 +1,10 @@
 import { Tester } from "#test/tester.js";
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  expectDiagnosticEmpty,
+  expectDiagnostics,
+  type LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { listResponseEnvelopeRule } from "../../src/rules/list-response-envelope.js";
 
@@ -17,6 +22,97 @@ const diagnostic = {
   code: "@azure-tools/typespec-azure-resource-manager/list-response-envelope",
   message: "Paged ARM list responses must declare a 'value' property of array type.",
 };
+
+const continuationTokenDiagnostic = {
+  code: "@azure-tools/typespec-azure-resource-manager/list-response-envelope",
+  severity: "warning",
+  message: "Use @nextLink pagination instead of @continuationToken in Azure APIs.",
+} as const;
+
+it("reports a request token even when the response has a valid next-link envelope", async () => {
+  await tester
+    .expect(
+      `
+      @get @list op listWidgets(@query @continuationToken token?: string): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+      };
+    `,
+    )
+    .toEmitDiagnostics([continuationTokenDiagnostic]);
+});
+
+it("reports paired tokens independently of a valid response envelope", async () => {
+  await tester
+    .expect(
+      `
+      @get @list op listWidgets(@query @continuationToken token?: string): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+        @header @continuationToken token?: string;
+      };
+    `,
+    )
+    .toEmitDiagnostics([continuationTokenDiagnostic, continuationTokenDiagnostic]);
+});
+
+it.each([false, true])("supports ARM property suppression: %s", async (suppress) => {
+  const diagnostics = await Tester.diagnose(
+    `
+      model Options {
+        ${suppress ? '#suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published token-based paging contract."' : ""}
+        @continuationToken token?: string;
+      }
+    `,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          enable: {
+            "@azure-tools/typespec-azure-core/list-response-envelope": false,
+            "@azure-tools/typespec-azure-resource-manager/list-response-envelope": true,
+          },
+        },
+      },
+    },
+  );
+  if (suppress) {
+    expectDiagnosticEmpty(diagnostics);
+  } else {
+    expectDiagnostics(diagnostics, [continuationTokenDiagnostic]);
+  }
+});
+
+it("avoids duplicate token warnings when ARM all follows core all", async () => {
+  const diagnostics = await Tester.diagnose(
+    `model Options { @continuationToken token?: string; }`,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          extends: [
+            "@azure-tools/typespec-azure-core/all",
+            "@azure-tools/typespec-azure-resource-manager/all",
+          ],
+        },
+      },
+    },
+  );
+  expectDiagnostics(
+    diagnostics.filter((diagnostic) => diagnostic.code.endsWith("/list-response-envelope")),
+    [continuationTokenDiagnostic],
+  );
+});
+
+it.each(["Azure.Core", "Azure.ResourceManager"])("ignores library tokens in %s", async (ns) => {
+  await tester
+    .expect(
+      `
+      namespace ${ns} {
+        model Options { @continuationToken token?: string; }
+      }
+    `,
+    )
+    .toBeValid();
+});
 
 const resource = `
   @armProviderNamespace
