@@ -182,7 +182,11 @@ export class ClientAdapter {
         case "noAuth":
           return AuthTypes.NoAuth;
         case "oauth2": {
-          constructable.constructors.push(this.createTokenCredentialCtor(goClient, cred));
+          const ctor = this.createTokenCredentialCtor(goClient, cred);
+          // OAuth2 variants share a TokenCredential constructor; cloud options select the audience.
+          if (!constructable.constructors.some((existing) => existing.name === ctor.name)) {
+            constructable.constructors.push(ctor);
+          }
           return AuthTypes.WithAuth;
         }
         default:
