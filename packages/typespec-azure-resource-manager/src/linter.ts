@@ -42,12 +42,14 @@ import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-pro
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResourceDuplicatesRule } from "./rules/no-resource-duplicates.js";
 import { noResourceNameConflictRule } from "./rules/no-resource-name-conflict.js";
+import { noResourceOperationConflictRule } from "./rules/no-resource-operation-conflict.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
+import { providerOrResourceOperationRule } from "./rules/provider-or-resource-operation.js";
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -133,9 +135,11 @@ const rules = [
   noQueryInPointOpRule,
   useResourcePathForPutRule,
   useScopeForExtensionRoutingRule,
+  providerOrResourceOperationRule,
   useScopePathStandardNameRule,
   noResourceNameConflictRule,
   noResourceDuplicatesRule,
+  noResourceOperationConflictRule,
   requireErrorDecoratorRule,
 ];
 

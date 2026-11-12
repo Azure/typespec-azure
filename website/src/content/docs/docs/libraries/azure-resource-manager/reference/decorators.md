@@ -448,6 +448,32 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+### `@providerOperation` {#@Azure.ResourceManager.providerOperation}
+
+Marks an operation as a provider operation rather than an operation on a resource.
+Standard provider action and operations list templates apply this decorator automatically.
+Use resource operation templates or decorators for operations on registered resource models.
+
+```typespec
+@Azure.ResourceManager.providerOperation
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+None
+
+#### Examples
+
+```typespec
+@providerOperation
+@get
+op getProviderInformation(): string;
+```
+
 ### `@resourceBaseType` {#@Azure.ResourceManager.resourceBaseType}
 
 This decorator sets the base type of the given resource, indicating where in the

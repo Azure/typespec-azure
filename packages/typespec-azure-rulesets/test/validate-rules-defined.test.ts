@@ -69,6 +69,16 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it.each(["provider-or-resource-operation", "no-resource-operation-conflict"])(
+    "keeps ARM operation registration guidance %s opt-in centrally",
+    (name) => {
+      const ruleName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+      strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+      strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+      strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    },
+  );
+
   it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);

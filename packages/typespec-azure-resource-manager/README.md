@@ -92,9 +92,11 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-resource-manager/no-query-in-point-op`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-in-point-op)                                           | Point operations must not declare query parameters beyond api-version.                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-resource-path-for-put)                                 | ARM PUT paths must end in resource type and resource name pairs.                                                                                                                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-scope-for-extension-routing/)                    | Require scope-based paths when explicitly enabled for RPaaS extension routing.                                                                                                                                                                        |
+| [`@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/provider-or-resource-operation)                       | Ensure every ARM operation is registered as a provider or resource operation.                                                                                                                                                                         |
 | [`@azure-tools/typespec-azure-resource-manager/use-scope-path-standard-name`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-scope-path-standard-name)                           | ARM scope paths must use the resourceGroupName and subscriptionId path parameters.                                                                                                                                                                    |
 | [`@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-name-conflict)                                 | ARM resources must have unique logical resource names.                                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/no-resource-duplicates`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-duplicates)                                       | ARM resource instances must resolve to a single resource per resource type and instance path.                                                                                                                                                         |
+| [`@azure-tools/typespec-azure-resource-manager/no-resource-operation-conflict`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-operation-conflict)                       | Prevent one resource operation from being registered with different resource models or operation kinds.                                                                                                                                               |
 | [`@azure-tools/typespec-azure-resource-manager/require-error-decorator`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/require-error-decorator)                                     | Require @error on 4xx and 5xx response models, except HEAD 404 responses.                                                                                                                                                                             |
 
 ## Decorators
@@ -121,6 +123,7 @@ Available ruleSets:
 - [`@featureFiles`](#@featurefiles)
 - [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
+- [`@providerOperation`](#@provideroperation)
 - [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
 - [`@singleton`](#@singleton)
@@ -567,6 +570,32 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
+
+#### `@providerOperation`
+
+Marks an operation as a provider operation rather than an operation on a resource.
+Standard provider action and operations list templates apply this decorator automatically.
+Use resource operation templates or decorators for operations on registered resource models.
+
+```typespec
+@Azure.ResourceManager.providerOperation
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+None
+
+##### Examples
+
+```typespec
+@providerOperation
+@get
+op getProviderInformation(): string;
+```
 
 #### `@resourceBaseType`
 

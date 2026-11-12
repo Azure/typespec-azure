@@ -98,7 +98,12 @@ const operationTypeArgIndexByDecorator: Record<GenericArmResourceDecorator, numb
 
 const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
   put: ["$armResourceCreateOrUpdate", ...genericArmResourceDecorators],
-  get: ["$armResourceRead", "$armResourceList", ...genericArmResourceDecorators],
+  get: [
+    "$armResourceRead",
+    "$armResourceList",
+    "$armResourceAction",
+    ...genericArmResourceDecorators,
+  ],
   patch: ["$armResourceUpdate", ...genericArmResourceDecorators],
   delete: ["$armResourceDelete", ...genericArmResourceDecorators],
   post: ["$armResourceAction", "$armResourceCollectionAction", ...genericArmResourceDecorators],
@@ -107,14 +112,14 @@ const resourceOperationDecorators: { [verb in HttpVerb]: string[] } = {
 
 // ARM operationType conventions:
 // - PUT => createOrUpdate
-// - GET => read or list
+// - GET => read, list, or action
 // - PATCH => update
 // - DELETE => delete
 // - POST => action
 // This map is used only for generic private decorators that encode operation type as an argument.
 const operationTypesByVerb: Partial<Record<HttpVerb, readonly string[]>> = {
   put: ["createOrUpdate"],
-  get: ["read", "list"],
+  get: ["read", "list", "action"],
   patch: ["update"],
   delete: ["delete"],
   post: ["action"],
