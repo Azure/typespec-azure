@@ -1,5 +1,67 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.74.0
+
+### Features
+
+- [#5927](https://github.com/Azure/typespec-azure/pull/5927) Add `propertySegments` to `SdkLroStatusMetadata` so emitters can locate selected metadata values relative to `pollingInfo.responseModel`, following the existing typed segment convention. Segments preserve SDK and wire names and reference the retained property after hierarchy reconciliation.
+- [#5782](https://github.com/Azure/typespec-azure/pull/5782) Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Active selections are validated during LRO processing; unused or out-of-scope annotations have no effect. Includes emitter scopes and representative Spector scenarios.
+- [#5677](https://github.com/Azure/typespec-azure/pull/5677) Add the scoped, property-level `@lroStatusMetadata` decorator with exact typed SDK metadata for auxiliary LRO status-monitor values and a latest-response lifecycle contract for poller or operation state, including failure and cancellation.
+  
+  Multiple declarations on one property may use disjoint emitter scopes; overlapping scopes are diagnosed once at declaration time.
+  
+  Access overrides now run after legacy hierarchy reconciliation and status metadata graph promotion, so overrides also apply to types materialized by those steps. This changes the processing order for all TCGC models, not only LROs.
+- [#5955](https://github.com/Azure/typespec-azure/pull/5955) Add `no-repeated-client-name` to warn when a common SDK method name repeats its owning subclient name, covering the SDK naming intent of `OperationIdNounVerb`. Renaming a shipped SDK method can break callers.
+- [#5591](https://github.com/Azure/typespec-azure/pull/5591) Add the `no-operation-group-name-conflict` lint rule to warn when an interface or
+  namespace containing operations has the same name as a type declared in its parent
+  namespace. Check common and language-specific names without constructing SDK clients.
+- [#5743](https://github.com/Azure/typespec-azure/pull/5743) Convert inline-discriminated unions with explicit nominal model hierarchies to polymorphic SDK models by default. Set `convertDiscriminatedUnionsToModels: false` in `createSdkContext` to preserve union representations. Ordinary unions and object-envelope unions retain their existing behavior.
+- [#5546](https://github.com/Azure/typespec-azure/pull/5546) Separate native LRO protocol analysis from client-result selection. Add `getLroProtocolMetadata` in `Azure.Core` with protocol facts grouped into required initial, polling, and completion objects alongside the top-level operation. Route TCGC result selection and native model usage through these facts, preserving all leaf field semantics, the flat `getLroMetadata` contract, and existing SDK result contracts.
+- [#5710](https://github.com/Azure/typespec-azure/pull/5710) Expose paired endpoint and OAuth configurations through `client.clientInitialization.serviceConfigurations` without changing existing HTTP-based client initialization. Each client reads the catalog declared on its first service, with the required `public` server first; SDK-namespace catalogs do not override it. Multi-service clients use the first service's endpoint, authentication, and configuration catalog without requiring equality across services.
+- [#5601](https://github.com/Azure/typespec-azure/pull/5601) Load unified YAML examples through the shared examples resolver and normalize them into the existing SDK example model, while preserving legacy JSON loading.
+- [#5648](https://github.com/Azure/typespec-azure/pull/5648) Expose a union's explicit `extends` constraint through `SdkUnionType.baseType`. The base type receives the union's usage, access, and serialization information. TCGC leaves `baseType` undefined when variants only happen to share a common ancestor.
+  
+  ```typespec
+  model PetBase {
+    name: string;
+  }
+  
+  model Cat extends PetBase {
+    meow: boolean;
+  }
+  
+  model Dog extends PetBase {
+    bark: boolean;
+  }
+  
+  union Pet extends PetBase {
+    cat: Cat,
+    dog: Dog,
+  }
+  ```
+- [#5734](https://github.com/Azure/typespec-azure/pull/5734) Infer enum value types from explicit scalar `extends` constraints on unions, preserving the declared scalar precision for known variants without changing whether the union is fixed or extensible.
+- [#5727](https://github.com/Azure/typespec-azure/pull/5727) Expose union variant names and SDK types through `SdkUnionType.variants`, an ordered `Map<string | symbol, SdkType>` matching the compiler's variant keys. Named variants use their declared string names, unnamed/default variants retain their compiler symbol keys, and synthesized variants use unique symbols. The existing `variantTypes` property retains the same type references and ordering.
+- [#5673](https://github.com/Azure/typespec-azure/pull/5673) Consolidate `use-create-for-put`, PATCH naming guidance, and DELETE naming guidance into the opt-in `use-correct-verb` lint rule. Common SDK method names must start with `create` for PUT, `update` for PATCH, and `delete` for DELETE, case-insensitively. Replace `use-create-for-put` in linter configuration and suppressions with `use-correct-verb`; enabling it also checks PATCH and DELETE. Renaming an already-shipped SDK method may be a breaking change.
+- [#5561](https://github.com/Azure/typespec-azure/pull/5561) Add the `use-union-hierarchy` linter rule to require non-string named unions to declare an `extends` constraint and model variants to inherit from the declared base and belong to only one model-based union hierarchy, enabled by the `client-sdk` ruleset. String unions do not require `extends`.
+
+### Bug Fixes
+
+- [#5965](https://github.com/Azure/typespec-azure/pull/5965) Support `exact()` in `@clientLocation` string targets to preserve operation group casing in generated clients. Exact and ordinary references to the same group share a single client.
+- [#5960](https://github.com/Azure/typespec-azure/pull/5960) Exclude array constraints from `use-union-hierarchy` model inheritance and ownership checks while retaining the explicit `extends` requirement and compiler array element validation.
+- [#5637](https://github.com/Azure/typespec-azure/pull/5637) Preserve the source service API version for operations moved across services with `@clientLocation`.
+- [#5872](https://github.com/Azure/typespec-azure/pull/5872) Preserve original enum values and expose JSON/XML `@encodedName` names in enum members' `serializationOptions`, including flattened enums and example matching, without changing spec discriminator tags.
+- [#5931](https://github.com/Azure/typespec-azure/pull/5931) Fix missing fields in query-object examples.
+- [#5874](https://github.com/Azure/typespec-azure/pull/5874) Fix `replaceResponseWithBytes` to expose raw response bytes instead of base64-encoded bytes while preserving the original HTTP response metadata.
+- [#5835](https://github.com/Azure/typespec-azure/pull/5835) Match unified YAML example operation keys case-insensitively, like legacy JSON examples, while retaining raw example envelopes. Append explicit YAML example IDs to SDK example file paths as `#id`.
+
+
+## 0.73.1
+
+### Features
+
+- [#5853](https://github.com/Azure/typespec-azure/pull/5853) Add the `@dynamicModel` decorator in Azure.ClientGenerator.Core to provide opt-in dynamic-model metadata for models or namespaces, with optional language scoping. Dynamic-model generation is currently supported only by the C# emitter; the shared decorator provides opt-in metadata pending emitter adoption and does not itself generate JSON Patch fields.
+
+
 ## 0.73.0
 
 ### Features

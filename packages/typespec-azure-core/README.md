@@ -35,6 +35,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/byos`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/byos)                                                                       | Use the BYOS pattern recommended for Azure Services.                                                                                                 |
 | [`@azure-tools/typespec-azure-core/casing-style`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/casing-style)                                                       | Ensure proper casing style.                                                                                                                          |
 | [`@azure-tools/typespec-azure-core/composition-over-inheritance`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/composition-over-inheritance)                       | Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`. |
+| [`@azure-tools/typespec-azure-core/use-known-enum-default`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-known-enum-default)                                   | Defaults for extensible enums should be one of their declared values.                                                                                |
 | [`@azure-tools/typespec-azure-core/no-boolean`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-boolean)                                                           | Boolean properties should use descriptive extensible enums when semantic values matter.                                                              |
 | [`@azure-tools/typespec-azure-core/known-encoding`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/known-encoding)                                                   | Check for supported encodings.                                                                                                                       |
 | [`@azure-tools/typespec-azure-core/long-running-polling-operation-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/long-running-polling-operation-required) | Long-running operations should have a linked polling operation.                                                                                      |
@@ -53,6 +54,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/no-unnamed-types`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-types)                                               | Azure services should not have anonymous models, union expressions, enum expressions, or scalar expressions. Define them as named declarations.      |
 | [`@azure-tools/typespec-azure-core/no-header-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-header-explode)                                             | It is recommended to serialize header parameter without explode: true                                                                                |
 | [`@azure-tools/typespec-azure-core/no-redundant-summary`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-redundant-summary)                                       | Summary must not repeat the documentation.                                                                                                           |
+| [`@azure-tools/typespec-azure-core/no-request-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-request-body)                                                 | GET and DELETE operations must not have a request body.                                                                                              |
 | [`@azure-tools/typespec-azure-core/no-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-format)                                                             | Azure services should not use the `@format` decorator.                                                                                               |
 | [`@azure-tools/typespec-azure-core/no-multiple-discriminator`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-multiple-discriminator)                             | Classes should have at most one discriminator.                                                                                                       |
 | [`@azure-tools/typespec-azure-core/no-rest-library-interfaces`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rest-library-interfaces)                           | Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.                                                        |
@@ -74,11 +76,13 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch)               | Ensure that operations with the same path use consistent path parameter names.                                                                       |
 | [`@azure-tools/typespec-azure-core/no-openapi-client-extensions`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi-client-extensions)                       | Azure specs should not use @typespec/openapi @extension to emit client-altering x-ms-* extensions                                                    |
 | [`@azure-tools/typespec-azure-core/no-continuation-token`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-continuation-token)                                     | Use next-link pagination instead of continuation tokens in Azure APIs.                                                                               |
+| [`@azure-tools/typespec-azure-core/list-operation-missing-200-response`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/list-operation-missing-200-response)         | List operations must define a 200 response.                                                                                                          |
 
 ## Decorators
 
 ### Azure.Core
 
+- [`@azureServiceConfigurations`](#@azureserviceconfigurations)
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
 - [`@lroCanceled`](#@lrocanceled)
@@ -94,6 +98,102 @@ Available ruleSets:
 - [`@previewVersion`](#@previewversion)
 - [`@uniqueItems`](#@uniqueitems)
 - [`@useFinalStateVia`](#@usefinalstatevia)
+
+#### `@azureServiceConfigurations`
+
+Pairs named HTTP server endpoints with OAuth authentication configurations.
+
+Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and exposes the combined OR of HTTP authentication requirements. Existing AND groups and credential alternatives are preserved.
+
+The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
+
+Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+
+OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+
+Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+
+```yaml
+kind: project
+features:
+  - typeref
+```
+
+```typespec
+@Azure.Core.azureServiceConfigurations(configurations: valueof Record<Azure.Core.AzureServiceConfiguration>)
+```
+
+##### Target
+
+The namespace using these configurations.
+`Namespace`
+
+##### Parameters
+
+| Name           | Type                                                   | Description                                    |
+| -------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| configurations | `valueof Record<Azure.Core.AzureServiceConfiguration>` | The named endpoint and authentication records. |
+
+##### Examples
+
+```typespec
+model PublicAuth is AadOauth2Auth<
+  ["https://api.loganalytics.io/.default"],
+  "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+>;
+model GovernmentAuth is AadOauth2Auth<
+  ["https://api.loganalytics.us/.default"],
+  "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{ endpoint: "https://api.loganalytics.io", authentication: typeref(PublicAuth) },
+  government: #{ endpoint: "https://api.loganalytics.us", authentication: typeref(GovernmentAuth) },
+};
+
+@service
+@azureServiceConfigurations(Configurations)
+namespace Logs {
+  @get op query(): string;
+}
+```
+
+###### Parameterized endpoint
+
+Declare endpoint parameters inline with `parameters: typeref({ ... })`, using the same property types and defaults as `@server`. Here, `account` is required and `region` defaults to `"westus"`.
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
+
+using TypeSpec.Http;
+using Azure.Core;
+
+model ServiceAuth is AadOauth2Auth<["https://example.com/.default"]>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{
+    endpoint: "https://{account}.{region}.example.com",
+    authentication: typeref(ServiceAuth),
+    parameters: typeref({
+      @doc("Account name.")
+      account: string,
+
+      @doc("Deployment region.")
+      region?: string = "westus",
+    }),
+    description: "Regional service endpoint",
+  },
+};
+
+@service
+@azureServiceConfigurations(Configurations)
+namespace RegionalService {
+  @get op read(): string;
+}
+```
 
 #### `@finalLocation`
 

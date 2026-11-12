@@ -8,10 +8,13 @@ import {
 } from "@typespec/compiler";
 
 import { getArmResource } from "../resource.js";
-import { getNamespaceName, getSourceModel } from "./utils.js";
+import { getNamespaceName, getSourceModel, getSourceProperty, hasSuppression } from "./utils.js";
+
+const ruleName = "arm-resource-invalid-envelope-property";
+const ruleCode = `@azure-tools/typespec-azure-resource-manager/${ruleName}`;
 
 export const armResourceEnvelopeProperties = createRule({
-  name: "arm-resource-invalid-envelope-property",
+  name: ruleName,
   docs: fileRef.fromPackageRoot("src/rules/arm-resource-invalid-envelope-property.md"),
   severity: "warning",
   description: "Check for invalid resource envelope properties.",
@@ -35,7 +38,7 @@ export const armResourceEnvelopeProperties = createRule({
               ) {
                 context.reportDiagnostic({
                   format: { propertyName: property.name },
-                  target: property,
+                  target: getDiagnosticTarget(model, property),
                 });
               }
             }
@@ -53,6 +56,15 @@ export const armResourceEnvelopeProperties = createRule({
       }
 
       return result;
+    }
+
+    function getDiagnosticTarget(model: Model, property: ModelProperty): Model | ModelProperty {
+      const sourceProperty = getSourceProperty(property);
+      if (hasSuppression(sourceProperty.node, ruleCode)) {
+        return sourceProperty;
+      }
+
+      return hasSuppression(model.node, ruleCode) ? model : property;
     }
   },
 });

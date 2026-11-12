@@ -1,5 +1,45 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.74.0
+
+### Features
+
+- [#5451](https://github.com/Azure/typespec-azure/pull/5451) Add the `use-standard-error` lint rule, promoting the LintDiff `LroErrorContent` check to help ARM APIs use consistent error responses. Operations other than HEAD must declare an `@error` response and use `Azure.ResourceManager.CommonTypes.ErrorResponse` for error payloads.
+  
+  Error bodies must use the standard model directly, including through aliases or an explicit `@body` property.
+- [#5638](https://github.com/Azure/typespec-azure/pull/5638) Add the opt-in `no-empty-post-response` lint rule requiring a response payload for synchronous ARM resource POST 200 responses.
+- [#5526](https://github.com/Azure/typespec-azure/pull/5526) Add the `no-repeated-path-info` lint rule to warn when ARM PUT resource properties repeat path or query parameter names, honoring JSON-encoded property names and including concrete operations inherited from generic interfaces.
+  
+  This complements `arm-resource-duplicate-property`, which checks duplication of resource envelope property names rather than URI parameter names.
+- [#5878](https://github.com/Azure/typespec-azure/pull/5878) Add the `no-resource-name-conflict` ARM linter rule to detect duplicate logical resource names across services. Keep the rule opt-in in the Azure `resource-manager` ruleset. Document explicit resource naming for standard operations, specific extensions, legacy templates, and different scopes.
+- [#5766](https://github.com/Azure/typespec-azure/pull/5766) Add the `private-endpoint-apis-missing` lint rule to require complete registered ARM private endpoint API sets.
+- [#5654](https://github.com/Azure/typespec-azure/pull/5654) Add the `resource-missing-read` lint rule requiring a read operation for ARM resources with create or update operations.
+- [#5681](https://github.com/Azure/typespec-azure/pull/5681) Add the `scope-path-segment-casing` lint rule to warn on noncanonical `subscriptions` and `resourceGroups` path segments.
+- [#5550](https://github.com/Azure/typespec-azure/pull/5550) Add the `use-resource-path-for-put` lint rule to check that ARM PUT paths end in resource type/name pairs.
+- [#5684](https://github.com/Azure/typespec-azure/pull/5684) Add the opt-in `use-scope-for-extension-routing` rule for managed RPaaS extension-routing contracts. The rule requires arbitrary-scope paths rather than hardcoded parent paths. ARM library `all` does not enable this RPaaS-specific policy; specific-parent extension paths remain supported for ordinary ARM contracts.
+- [#5859](https://github.com/Azure/typespec-azure/pull/5859) Add the `use-scope-path-standard-name` lint rule for standard ARM resource-group and subscription path parameter names.
+- [#5652](https://github.com/Azure/typespec-azure/pull/5652) Add the `lro-missing-polling-metadata` lint rule, consolidating `LroExtension` and `XMSLongRunningOperationProperty`. Require native polling metadata for PATCH and marked provider/collection POST operations returning `202`, and for PUT/PATCH/POST/DELETE operations whose `200`, `201`, `202`, or `204` responses contain `Location` or `Azure-AsyncOperation` headers.
+  
+  Use asynchronous ARM templates or preserve supported semantic LRO headers. Check concrete operations within explicit service namespaces, including nested namespaces, without a global fallback. Report once on the authored operation even when both checks apply, and resolve each eligible operation once across overlapping service declarations, including compliant operations.
+  
+  The rule is disabled in the central resource-manager ruleset and included in the ARM library's compiler-generated `all` ruleset.
+- [#5974](https://github.com/Azure/typespec-azure/pull/5974) Add `no-resource-duplicates` to warn when `resolveArmResources` returns distinct records with the same case-insensitive resource type and instance path, retaining path parameter names. Register the rule disabled in the central `resource-manager` ruleset pending fixes to existing service specifications; it is available through explicit enablement or the ARM library's `all` ruleset.
+- [#5502](https://github.com/Azure/typespec-azure/pull/5502) Add the `no-tags-on-proxy-resource` lint rule for detecting unsupported envelope tags on non-tracked ARM resources, with a removal code fix for directly declared envelope tags. Resource-specific properties bags are not checked. Document how to remove unsupported tags or use the `TrackedResource` template when ARM tags are required.
+- [#5431](https://github.com/Azure/typespec-azure/pull/5431) Add selected-version and multi-service views plus dependency-neutral logical name customization to `resolveArmResources`. Callers can select independent namespace/version references for services that share an ARM provider string and receive one combined provider result. Deferred naming formulas apply consumer model names to every model-derived part of a resource name while preserving explicit names and structural grouping; complete resource names can be overridden per occurrence, synthetic resources can be identified by default name or ARM instance path, and returned resource kinds are presented consistently as `Tracked` or `Proxy`. The existing no-options call continues to return the multi-version declaration view, with an ARM emitter how-to covering resource extraction, service/version discovery, selected versions, and TCGC client naming.
+- [#5892](https://github.com/Azure/typespec-azure/pull/5892) Extend `no-reserved-resource-property` to reject `systemData` in ARM resource properties bags, keeping system metadata in the resource envelope. This covers the direct resource-bag restriction from `SystemDataInPropertiesBag` and applies wherever the existing rule is enabled, including the recommended resource-manager ruleset.
+- [#5556](https://github.com/Azure/typespec-azure/pull/5556) Add the `use-standard-response-codes` ARM lint rule combining the Swagger `NoErrorCodeResponses` and `GetResponseCodes` checks. Concrete HTTP endpoints may only use `200`, `201`, `202`, `204`, and `default`, including operations without service or provider namespace metadata. GET operations inside services must include `200` and may only add `202` or `default`, with one warning per invalid GET operation.
+
+### Bug Fixes
+
+- [#5866](https://github.com/Azure/typespec-azure/pull/5866) Fix `no-response-body` to reject payloads on DELETE 200 responses and continue checking 202/204 bodies after a bodyless DELETE or POST 200 response.
+- [#5723](https://github.com/Azure/typespec-azure/pull/5723) Honor invalid envelope property suppressions on shared source properties and concrete resource consumers.
+- [#5976](https://github.com/Azure/typespec-azure/pull/5976) Fix `resolveArmResources` list association: match exact parent collections for all resources, subscription collections only for resource-group-scoped tracked resources, and explicit resource names across scopes. Attach matching lists to every eligible identity and retain unmatched lists in `providerOperations` without creating resources.
+- [#6000](https://github.com/Azure/typespec-azure/pull/6000) Revert the latest-version requirement in `arm-common-types-version`. Explicitly selected older ARM common-types versions are accepted again, while missing explicit version configuration still produces a warning.
+- [#5582](https://github.com/Azure/typespec-azure/pull/5582) Consolidate list response field names and array validation in `list-response-envelope`.
+  Require an array-valued `value` and the standard `nextLink` field, including inherited
+  properties and paged list actions. Remove the separate `list-response-value-array` rule.
+
+
 ## 0.73.0
 
 ### Features

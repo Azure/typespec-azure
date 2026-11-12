@@ -1,0 +1,17 @@
+$namespace: Azure.ResourceManager.Example
+Widgets.listByResourceGroup:
+  - id: list
+    title: List widgets
+    request:
+      path:
+        subscriptionId: "00000000-0000-0000-0000-000000000000"
+        resourceGroupName: test-rg
+    responses:
+      200:
+        body:
+          value:
+            - id: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Example/widgets/widget
+              name: widget
+              type: Microsoft.Example/widgets
+              properties:
+                description: sample widget

@@ -32,16 +32,12 @@ export class TypeAdapter {
   // lazily built index of how each tcgc union type is used across the tcgc code model
   private unionUsage?: Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>;
 
-  // SSE events with an envelope, pending resolution of their envelope field
-  private readonly pendingSseEnvelopes: Array<PendingSseEnvelope>;
-
   constructor(ctx: tcgc.SdkContext, codeModel: go.CodeModel) {
     this.ctx = ctx;
     this.codeModel = codeModel;
     this.types = new Map<string, go.WireType>();
     this.constValues = new Map<string, go.ConstantValue>();
     this.fieldsMap = new Map<tcgc.SdkModelPropertyType, go.ModelField>();
-    this.pendingSseEnvelopes = new Array<PendingSseEnvelope>();
   }
 
   /**
@@ -96,6 +92,7 @@ export class TypeAdapter {
    * converts all tcgc model/enum types to Go code model types
    */
   adaptTypes() {
+    const queryOnlyModels = this.getQueryOnlyModels();
     for (const enumType of this.ctx.sdkPackage.enums) {
       if ((enumType.usage & tcgc.UsageFlags.ApiVersionEnum) !== 0) {
         // skip enums that are used for API version
@@ -122,10 +119,10 @@ export class TypeAdapter {
       this.getPkg().unions.push(goUnion);
     }
 
-    // we must adapt all interface/model types first. this is because models can contain cyclic references
-    const modelTypes = new Array<ModelTypeSdkModelType>();
-    const ifaceTypes = new Array<InterfaceTypeSdkModelType>();
     for (const modelType of this.ctx.sdkPackage.models) {
+      if (queryOnlyModels.has(modelType)) {
+        continue;
+      }
       if (modelType.name.length === 0) {
         // tcgc creates some unnamed models for spread params.
         // we don't use these so just skip them.
@@ -153,54 +150,104 @@ export class TypeAdapter {
         continue;
       }
 
-      if (helpers.isPolymorphicRoot(modelType)) {
-        // this is a root discriminated type
-        const iface = this.getInterfaceType(modelType);
-        this.getPkg().interfaces.push(iface);
-        ifaceTypes.push({ go: iface, tcgc: modelType });
-      }
       // TODO: what's the equivalent of x-ms-external?
       const model = this.getModel(modelType);
-      modelTypes.push({ go: model, tcgc: modelType });
+      if (model.kind === "polymorphicModel" && helpers.isPolymorphicRoot(modelType)) {
+        this.getPkg().interfaces.push(model.interface);
+      }
+      this.getPkg().models.push(model);
     }
 
     // add the synthesized models from TCGC for paged results
-    const pagedResponses = this.getPagedResponses();
-    for (const pagedResponse of pagedResponses) {
+    for (const pagedResponse of this.getPagedResponses()) {
       // tsp allows custom paged responses, so we must check both the synthesized list and the models list
-      if (modelTypes.find((each) => each.tcgc.name === pagedResponse.name)) {
-        continue;
-      }
       const model = this.getModel(pagedResponse);
-      modelTypes.push({ go: model, tcgc: pagedResponse });
-    }
-
-    // now that the interface/model types have been generated, we can populate the rootType and possibleTypes
-    for (const ifaceType of ifaceTypes) {
-      ifaceType.go.rootType = <go.PolymorphicModel>this.getModel(ifaceType.tcgc);
-      for (const subType of Object.values(ifaceType.tcgc.discriminatedSubtypes ?? {})) {
-        const possibleType = <go.PolymorphicModel>this.getModel(subType);
-        ifaceType.go.possibleTypes.push(possibleType);
+      if (!this.getPkg().models.includes(model)) {
+        this.getPkg().models.push(model);
       }
     }
+  }
 
-    // now adapt model fields
-    for (const modelType of modelTypes) {
-      const content = aggregateProperties(this.ctx, modelType.tcgc);
-      for (const prop of content.props) {
-        const field = this.getModelField(prop, modelType.tcgc);
-        modelType.go.fields.push(field);
+  /**
+   * Finds models used only by bundled query parameters so they aren't emitted as payload models.
+   * Rejects bundled query models also reachable from request or response bodies.
+   */
+  private getQueryOnlyModels(): Set<tcgc.SdkModelType> {
+    const queryTypes = new Set<tcgc.SdkType>();
+    const queryModels = new Set<tcgc.SdkModelType>();
+    const payloadTypes = new Set<tcgc.SdkType>();
+    const bodyTypes = new Set<tcgc.SdkType>();
+    const visitType = (type: tcgc.SdkType, types: Set<tcgc.SdkType>): void => {
+      if (types.has(type)) {
+        return;
       }
-      if (content.addlProps) {
-        const annotations = new go.ModelFieldAnnotations(false, false, true, false);
-        const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
-        const addlProps = new go.ModelField("AdditionalProperties", addlPropsType, "", annotations);
-        modelType.go.fields.push(addlProps);
+      types.add(type);
+      switch (type.kind) {
+        case "array":
+        case "dict":
+          visitType(type.valueType, types);
+          break;
+        case "nullable":
+          visitType(type.type, types);
+          break;
+        case "union":
+          type.variantTypes.forEach((variant) => visitType(variant, types));
+          break;
+        case "model":
+          type.properties.forEach((prop) => visitType(prop.type, types));
+          if (type.baseModel) {
+            visitType(type.baseModel, types);
+          }
+          if (type.additionalProperties) {
+            visitType(type.additionalProperties, types);
+          }
+          Object.values(type.discriminatedSubtypes ?? {}).forEach((subtype) =>
+            visitType(subtype, types),
+          );
+          break;
       }
-      this.getPkg().models.push(modelType.go);
+    };
+    const visitClient = (client: tcgc.SdkClientType<tcgc.SdkHttpOperation>): void => {
+      for (const method of client.methods) {
+        for (const param of method.operation.parameters) {
+          const type = param.type.kind === "nullable" ? param.type.type : param.type;
+          if (param.kind === "query" && type.kind === "model") {
+            queryModels.add(type);
+          }
+          visitType(
+            type,
+            param.kind === "query" && type.kind === "model" ? queryTypes : payloadTypes,
+          );
+        }
+        if (method.operation.bodyParam) {
+          visitType(method.operation.bodyParam.type, bodyTypes);
+        }
+        for (const response of [
+          ...method.operation.responses.values(),
+          ...method.operation.exceptions.values(),
+        ]) {
+          if (response.type) {
+            visitType(response.type, bodyTypes);
+          }
+        }
+      }
+      client.children?.forEach(visitClient);
+    };
+    this.ctx.sdkPackage.clients.forEach(visitClient);
+    for (const model of queryModels) {
+      if (bodyTypes.has(model)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `model ${model.name} cannot be used for both bundled query parameters and request/response bodies`,
+          model.__raw?.node,
+        );
+      }
     }
-
-    this.resolveSseEnvelopeFields();
+    return new Set(
+      this.ctx.sdkPackage.models.filter(
+        (model) => queryTypes.has(model) && !payloadTypes.has(model) && !bodyTypes.has(model),
+      ),
+    );
   }
 
   // returns the synthesized paged response types
@@ -242,11 +289,13 @@ export class TypeAdapter {
   // returns the Go code model type for the specified SDK type.
   // the operation is idempotent, so getting the same type multiple times
   // returns the same instance of the converted type.
+  // mapElementsByValue is reserved for URI parameters, not spread bodies.
   getWireType(
     type: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
     xmlItemsName?: string,
+    mapElementsByValue = false,
   ): Exclude<go.WireType, go.Ptr> {
     switch (type.kind) {
       case "boolean":
@@ -287,7 +336,7 @@ export class TypeAdapter {
             : this.codeModel.options["slice-elements-byval"] === true;
 
         const keyName = recursiveKeyName(
-          `array-${myElementTypeByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
+          `array-${myElementTypeByValue}-${mapElementsByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
           valueType,
           substituteDiscriminator,
         );
@@ -301,6 +350,8 @@ export class TypeAdapter {
           valueType,
           elementTypeByValue,
           substituteDiscriminator,
+          undefined,
+          mapElementsByValue,
         );
         switch (elementType.kind) {
           case "constantDef":
@@ -357,9 +408,10 @@ export class TypeAdapter {
           type.valueType,
           elementTypeByValue,
           substituteDiscriminator,
+          mapElementsByValue,
         );
         const keyName = recursiveKeyName(
-          `dict${valueType.kind === "ptr" ? "-ptr" : ""}`,
+          `dict-${elementTypeByValue}-${mapElementsByValue}${valueType.kind === "ptr" ? "-ptr" : ""}`,
           type.valueType,
           substituteDiscriminator,
         );
@@ -390,6 +442,7 @@ export class TypeAdapter {
       }
       case "model":
         if (helpers.isPolymorphicRoot(type) && substituteDiscriminator) {
+          this.getModel(type);
           return this.getInterfaceType(type);
         } else if (
           helpers.isHttpFileType(type) ||
@@ -404,7 +457,13 @@ export class TypeAdapter {
         }
         return this.getModel(type);
       case "nullable":
-        return this.getWireType(type.type, elementTypeByValue, substituteDiscriminator);
+        return this.getWireType(
+          type.type,
+          elementTypeByValue,
+          substituteDiscriminator,
+          undefined,
+          mapElementsByValue,
+        );
       case "union":
         if (type.discriminatedOptions) {
           throw new AdapterError(
@@ -769,6 +828,7 @@ export class TypeAdapter {
     return <go.String>stringType;
   }
 
+  // Hierarchy metadata is populated by getModel after caching the root model.
   private getInterfaceType(model: tcgc.SdkModelType): go.Interface {
     if (model.name.length === 0) {
       throw new AdapterError("InternalError", "unnamed model", model.__raw?.node);
@@ -804,10 +864,10 @@ export class TypeAdapter {
       );
     }
     iface = new go.Interface(this.getPkg(), ifaceName, discriminatorField);
+    this.types.set(ifaceName, iface);
     if (model.baseModel && helpers.isPolymorphicRoot(model.baseModel)) {
       iface.parent = this.getInterfaceType(model.baseModel);
     }
-    this.types.set(ifaceName, iface);
     return iface;
   }
 
@@ -911,7 +971,34 @@ export class TypeAdapter {
       }
     }
 
+    // Cache the shell before following references back to this model or its hierarchy.
     this.types.set(modelName, modelType);
+    if (modelType.kind === "polymorphicModel" && helpers.isPolymorphicRoot(model)) {
+      modelType.interface.rootType = modelType;
+      for (const subType of Object.values(model.discriminatedSubtypes ?? {})) {
+        const possibleType = this.getModel(subType);
+        if (possibleType.kind !== "polymorphicModel") {
+          throw new AdapterError(
+            "InternalError",
+            `type ${subType.name} isn't a polymorphic subtype of ${model.name}`,
+            subType.__raw?.node,
+          );
+        }
+        modelType.interface.possibleTypes.push(possibleType);
+      }
+    }
+
+    const content = helpers.aggregateProperties(this.ctx, model);
+    for (const prop of content.props) {
+      modelType.fields.push(this.getModelField(prop, model));
+    }
+    if (content.addlProps) {
+      const annotations = new go.ModelFieldAnnotations(false, false, true, false);
+      const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
+      modelType.fields.push(
+        new go.ModelField("AdditionalProperties", addlPropsType, "", annotations),
+      );
+    }
     return modelType;
   }
 
@@ -1246,8 +1333,15 @@ export class TypeAdapter {
     sdkType: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
+    mapElementsByValue = false,
   ): go.MapValueType {
-    const valueType = this.getWireType(sdkType, elementTypeByValue, substituteDiscriminator);
+    const valueType = this.getWireType(
+      sdkType,
+      elementTypeByValue,
+      substituteDiscriminator,
+      undefined,
+      mapElementsByValue,
+    );
     switch (valueType.kind) {
       case "constantDef":
       case "constantValue":
@@ -1261,7 +1355,9 @@ export class TypeAdapter {
           sdkType.__raw?.node,
         );
       default:
-        return helpers.isPtrType(valueType) ? this.getPtrType(valueType) : valueType;
+        return !mapElementsByValue && helpers.isPtrType(valueType)
+          ? this.getPtrType(valueType)
+          : valueType;
     }
   }
 
@@ -1337,6 +1433,7 @@ export class TypeAdapter {
     }
 
     goUnion = new go.UnionStruct(this.getPkg(), unionName, this.getUnionStructFlags(sdkUnion));
+    this.types.set(unionName, goUnion);
     const sseMetadata = this.getSseMetadata(sdkUnion);
     const variants =
       sdkUnion.kind === "union"
@@ -1379,7 +1476,6 @@ export class TypeAdapter {
       }
     }
 
-    this.types.set(unionName, goUnion);
     return goUnion;
   }
 
@@ -1450,30 +1546,12 @@ export class TypeAdapter {
         );
       }
 
-      // model fields are adapted after the unions, so the field is resolved later
-      this.pendingSseEnvelopes.push({ sseEvent: sseEvent, payloadProp: payloadProp });
+      // A recursive envelope's payload field might still be undergoing adaptation.
+      sseEvent.envelopeField =
+        this.fieldsMap.get(payloadProp) ?? this.getModelField(payloadProp, event.type);
     }
 
     return sseEvent;
-  }
-
-  /**
-   * populates the envelope field for all SSE events adapted so far.
-   * must be called after all model fields have been adapted.
-   */
-  private resolveSseEnvelopeFields(): void {
-    for (const pending of this.pendingSseEnvelopes.splice(0)) {
-      const envelopeField = this.fieldsMap.get(pending.payloadProp);
-      if (!envelopeField) {
-        // the most likely explanation for this is lack of reference equality
-        throw new AdapterError(
-          "InternalError",
-          `missing SSE event envelope field ${pending.payloadProp.name}`,
-          pending.payloadProp.__raw?.node,
-        );
-      }
-      pending.sseEvent.envelopeField = envelopeField;
-    }
   }
 
   /**
@@ -1609,7 +1687,7 @@ export class TypeAdapter {
     // unions can also be referenced from model fields or additional properties, never appearing
     // directly in a method signature
     for (const sdkModel of this.ctx.sdkPackage.models) {
-      const { props, addlProps } = aggregateProperties(this.ctx, sdkModel);
+      const { props, addlProps } = helpers.aggregateProperties(this.ctx, sdkModel);
       recursiveAddValueTypeUsage(addlProps);
       for (const property of props) {
         recursiveAddValueTypeUsage(property.type);
@@ -1782,15 +1860,6 @@ function isTextPayloadType(payloadType: tcgc.SdkType): boolean {
   }
 }
 
-/** an SSE event envelope awaiting resolution of its payload field */
-interface PendingSseEnvelope {
-  /** the event with the envelope */
-  sseEvent: go.SseEvent;
-
-  /** the @data property within the envelope that receives the payload */
-  payloadProp: tcgc.SdkModelPropertyType;
-}
-
 /** how a tcgc union type is used across the tcgc code model */
 interface UnionUsage {
   /** indicates the union is referenced as a value, e.g. a method parameter or model field */
@@ -1801,52 +1870,4 @@ interface UnionUsage {
 
   /** the SSE metadata, when the union is the event type of an SSE stream */
   sseMetadata?: tcgc.SdkSseMetadata;
-}
-
-interface ModelTypeSdkModelType {
-  go: go.Model | go.PolymorphicModel;
-  tcgc: tcgc.SdkModelType;
-}
-
-interface InterfaceTypeSdkModelType {
-  go: go.Interface;
-  tcgc: tcgc.SdkModelType;
-}
-
-// aggregate the properties from the provided type and its parent types.
-// this includes any inherited additional properties.
-function aggregateProperties(
-  sdkContext: tcgc.SdkContext,
-  model: tcgc.SdkModelType,
-): { props: Array<tcgc.SdkModelPropertyType>; addlProps?: tcgc.SdkType } {
-  const allProps = new Array<tcgc.SdkModelPropertyType>();
-  for (const prop of model.properties) {
-    if (tcgc.isHttpMetadata(sdkContext, prop)) {
-      continue;
-    }
-    allProps.push(prop);
-  }
-
-  let addlProps = model.additionalProperties;
-  let parent = model.baseModel;
-  while (parent) {
-    for (const parentProp of parent.properties) {
-      if (tcgc.isHttpMetadata(sdkContext, parentProp)) {
-        continue;
-      }
-      const exists = allProps.find((p) => p.name === parentProp.name);
-      if (exists) {
-        // don't add the duplicate. the TS compiler has better enforcement than OpenAPI
-        // to ensure that duplicate fields with different types aren't added.
-        continue;
-      }
-      allProps.push(parentProp);
-    }
-    // if we haven't found additional properties yet and the parent has it, use it
-    if (!addlProps && parent.additionalProperties) {
-      addlProps = parent.additionalProperties;
-    }
-    parent = parent.baseModel;
-  }
-  return { props: allProps, addlProps: addlProps };
 }

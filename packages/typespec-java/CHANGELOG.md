@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.49.0
+
+### Features
+
+- Support preview annotations for APIs marked with `@TypeSpec.HttpClient.experimental` through the `experimental-annotation` option ([microsoft/typespec#12409](https://github.com/microsoft/typespec/pull/12409)).
+- Support `@access(Access.internal)` for ARM operations, models, and enums ([microsoft/typespec#12488](https://github.com/microsoft/typespec/pull/12488)).
+- Prototype a TeaVM WebAssembly target for `@azure-tools/typespec-java` in the Azure playground, included by the normal build and PR previews. Building requires JDK 17; native CLI generation is unchanged.
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `ccde4f5b0` to fix base64 encoding of byte-valued headers and query parameters ([microsoft/typespec#12540](https://github.com/microsoft/typespec/pull/12540)).
+
+
+## 0.48.6
+
+### Bug Fixes
+
+- Remove dependencies on deprecated autorest packages
+
+
 ## 0.48.5
 
 ### Bug Fixes
