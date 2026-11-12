@@ -651,6 +651,7 @@ export class ClientAdapter {
           naming,
         );
         setLROInfo(method, sdkMethod);
+        method.poller = this.adaptLROPoller(sdkMethod, goClient);
         break;
       case "lropaging":
         method = new go.LROPageableMethod(
@@ -662,6 +663,7 @@ export class ClientAdapter {
           naming,
         );
         setLROInfo(method, sdkMethod);
+        method.poller = this.adaptLROPoller(sdkMethod, goClient);
         applyPageableInfo = setPageableInfo(method, sdkMethod);
         break;
       default:
@@ -1873,6 +1875,134 @@ export class ClientAdapter {
 
   private getFullyQualifiedMethodName(method: go.MethodType): string {
     return `${method.receiver.type.name}.${method.name}`;
+  }
+
+  /**
+   * creates the generated poller type for LROs that expose status metadata or an operation ID.
+   *
+   * @param sdkMethod the LRO method
+   * @param goClient the client that contains the method
+   * @returns the poller type or undefined if the method uses *runtime.Poller[T]
+   */
+  private adaptLROPoller(
+    sdkMethod:
+      | tcgc.SdkLroPagingServiceMethod<tcgc.SdkHttpOperation>
+      | tcgc.SdkLroServiceMethod<tcgc.SdkHttpOperation>,
+    goClient: go.Client,
+  ): go.LROPoller | undefined {
+    const lroMetadata = sdkMethod.lroMetadata;
+    const statusMetadata = lroMetadata.statusMetadata ?? [];
+    const operationID = lroMetadata.operationId ?? [];
+    if (statusMetadata.length === 0 && operationID.length === 0) {
+      return undefined;
+    }
+
+    const prefix = this.ta.ctx.emitContext.options["single-client"] ? "" : goClient.name;
+    const baseName = ensureNameCase(
+      `${prefix}${helpers.getEffectiveName(sdkMethod, false)}`,
+      sdkMethod.access === "internal",
+    );
+    const poller: go.LROPoller = {
+      name: `${baseName}Poller`,
+      initialResponseIsStatus: false,
+      statusMetadata: [],
+    };
+
+    const sdkStatusModel =
+      lroMetadata.pollingStep.responseBody ?? lroMetadata.pollingInfo.responseModel;
+    const getStatusField = (property: tcgc.SdkModelPropertyType): go.ModelField => {
+      if (!poller.statusModel) {
+        const statusModel = this.ta.getWireType(sdkStatusModel, false, false);
+        if (statusModel.kind !== "model") {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `LRO status monitor ${sdkStatusModel.name} must be a non-polymorphic model to expose LRO metadata`,
+            sdkMethod.__raw?.node,
+          );
+        }
+        poller.statusModel = statusModel;
+        poller.initialResponseIsStatus = sdkMethod.operation.responses.some(
+          (response) => response.type === sdkStatusModel,
+        );
+      }
+      const field = poller.statusModel.fields.find(
+        (each) => each.serializedName === property.serializedName,
+      );
+      if (!field) {
+        throw new AdapterError(
+          "InternalError",
+          `didn't find field for LRO metadata property ${property.name} in ${poller.statusModel.name}`,
+          property.__raw?.node,
+        );
+      }
+      return field;
+    };
+
+    for (const metadata of statusMetadata) {
+      if (metadata.propertySegments.length !== 1) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          "nested LRO status metadata property segments are not supported",
+          metadata.property.__raw?.node,
+        );
+      }
+      poller.statusMetadata.push(getStatusField(metadata.propertySegments[0]));
+    }
+    if (poller.statusMetadata.length > 0) {
+      poller.statusMetadataName = `${baseName}StatusMetadata`;
+    }
+
+    for (const id of operationID) {
+      switch (id.kind) {
+        case "path": {
+          const statusStep = lroMetadata.statusMonitorStep;
+          const statusOp =
+            statusStep?.kind === "nextOperationReference"
+              ? statusStep.target.operation
+              : statusStep?.operation;
+          if (!statusOp) {
+            continue;
+          }
+          let source: go.LROPollingURLSource;
+          switch (id.source.location) {
+            case "ResponseHeader":
+              source = {
+                kind: "header",
+                name:
+                  sdkMethod.operation.responses
+                    .flatMap((response) => response.headers)
+                    .find((header) => header.__raw === id.source.property.__raw)?.serializedName ??
+                  id.source.property.serializedName,
+              };
+              break;
+            case "ResponseBody":
+              source = { kind: "body", name: id.source.property.serializedName };
+              break;
+            case "Self":
+              source = { kind: "self", name: "" };
+              break;
+          }
+          poller.operationIDPath = {
+            source,
+            httpPath: statusOp.path,
+            pathVariable: id.pathParameter.serializedName,
+          };
+          break;
+        }
+        case "property":
+          if (id.propertySegments.length !== 1) {
+            throw new AdapterError(
+              "UnsupportedTsp",
+              "nested LRO operation ID property segments are not supported",
+              id.property.__raw?.node,
+            );
+          }
+          poller.operationIDField = getStatusField(id.propertySegments[0]);
+          break;
+      }
+    }
+
+    return poller;
   }
 
   private adaptResponseEnvelope(

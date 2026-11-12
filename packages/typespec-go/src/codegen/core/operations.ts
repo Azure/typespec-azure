@@ -961,7 +961,9 @@ function generateReturnsInfo(method: go.MethodType, apiType: "api" | "op"): Arra
     case "lroPageableMethod":
       switch (apiType) {
         case "api":
-          if (method.kind === "lroPageableMethod") {
+          if (method.poller) {
+            returnType = `*${method.poller.name}`;
+          } else if (method.kind === "lroPageableMethod") {
             returnType = `*runtime.Poller[*runtime.Pager[${returnType}]]`;
           } else {
             returnType = `*runtime.Poller[${returnType}]`;
@@ -1042,8 +1044,14 @@ function generateLROBeginMethod(
     }
   }
 
+  const lroPoller = method.poller;
+  const injectSpans = options["inject-spans"] && !lroPoller;
+  if (lroPoller) {
+    imports.add("encoding/json");
+    text += generateObserveInitialResponse(method, lroPoller, indent);
+  }
   text += `${indent.get()}poller, err := runtime.NewPoller`;
-  if (finalStateVia === "" && pollerType === "nil" && !options["inject-spans"]) {
+  if (finalStateVia === "" && pollerType === "nil" && !injectSpans) {
     // the generic type param is redundant when it's also specified in the
     // options struct so we only include it when there's no options.
     text += pollerTypeParam;
@@ -1052,7 +1060,7 @@ function generateLROBeginMethod(
   if (
     finalStateVia === "" &&
     pollerType === "nil" &&
-    !options["inject-spans"] &&
+    !injectSpans &&
     !method.operationLocationResultPath
   ) {
     // no options
@@ -1070,19 +1078,31 @@ function generateLROBeginMethod(
     if (pollerType !== "nil") {
       text += `${indent.get()}Response: ${pollerType},\n`;
     }
-    if (options["inject-spans"]) {
+    if (injectSpans) {
       text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
     }
     indent.pop();
     text += `${indent.get()}})\n`;
   }
-  text += `${indent.get()}return poller, err\n`;
+  if (lroPoller) {
+    text += generateCustomPollerCreation(method, lroPoller, options, pollerType, "inner", indent);
+  } else {
+    text += `${indent.get()}return poller, err\n`;
+  }
   indent.pop();
   text += `${indent.get()}} else {\n`;
   indent.push();
 
   // creating the poller from resume token branch
 
+  if (lroPoller) {
+    text += generateCustomPollerCreation(method, lroPoller, options, pollerType, "resume", indent);
+    indent.pop();
+    text += `${indent.get()}}\n`;
+    text += "}\n\n";
+    text += generateLROPollerTypes(method, lroPoller, pollerTypeParam, imports);
+    return text;
+  }
   text += `${indent.get()}return runtime.NewPollerFromResumeToken`;
   if (pollerType === "nil" && !options["inject-spans"]) {
     text += pollerTypeParam;
@@ -1232,5 +1252,379 @@ function generateSseOperation(
 
   text += `${indent.get()}return client.internal.Pipeline().Do(req)\n`;
   text += "}\n\n"; // end func
+  return text;
+}
+
+/**
+ * returns the name of the polling handler type for the specified poller
+ *
+ * @param poller the generated poller type
+ * @returns the name of the polling handler type
+ */
+function getPollingHandlerName(poller: go.LROPoller): string {
+  return `${poller.name[0].toLowerCase()}${poller.name.substring(1)}Handler`;
+}
+
+/**
+ * creates the polling handler and populates it from the initial LRO response
+ *
+ * @param method the LRO method
+ * @param poller the generated poller type
+ * @param indent the indentation helper currently in scope
+ * @returns the text for the polling handler creation
+ */
+function generateObserveInitialResponse(
+  method: go.LROMethod | go.LROPageableMethod,
+  poller: go.LROPoller,
+  indent: helpers.Indentation,
+): string {
+  let text = `${indent.get()}handler := &${getPollingHandlerName(poller)}{pl: client.internal.Pipeline()}\n`;
+  if (poller.statusModel && poller.initialResponseIsStatus) {
+    text += `${indent.get()}handler.observe(resp)\n`;
+  }
+  const source = poller.operationIDPath?.source;
+  switch (source?.kind) {
+    case "header":
+      text += `${indent.get()}handler.pollingURL = resp.Header.Get("${source.name}")\n`;
+      break;
+    case "body":
+      text += `${indent.get()}if payload, err := runtime.Payload(resp); err == nil {\n`;
+      indent.push();
+      text += `${indent.get()}var body struct {\n`;
+      text += `${indent.push().get()}PollingURL string \`json:"${source.name}"\`\n`;
+      text += `${indent.pop().get()}}\n`;
+      text += `${indent.get()}if json.Unmarshal(payload, &body) == nil {\n`;
+      text += `${indent.push().get()}handler.pollingURL = body.PollingURL\n`;
+      text += `${indent.pop().get()}}\n`;
+      indent.pop();
+      text += `${indent.get()}}\n`;
+      break;
+    case "self":
+      text += `${indent.get()}handler.pollingURL = resp.Request.URL.String()\n`;
+      break;
+  }
+  if (method.kind === "lroPageableMethod") {
+    text += `${indent.get()}handler.response = &pager\n`;
+  }
+  return text;
+}
+
+/**
+ * creates the generated poller from a new LRO or a resume token
+ *
+ * @param method the LRO method
+ * @param poller the generated poller type
+ * @param options the emitter options
+ * @param pollerType the preconstructed response for the poller or "nil"
+ * @param from inner when wrapping the poller created from the initial response, resume when rehydrating
+ * @param indent the indentation helper currently in scope
+ * @returns the text for the poller creation
+ */
+function generateCustomPollerCreation(
+  method: go.LROMethod | go.LROPageableMethod,
+  poller: go.LROPoller,
+  options: go.Options,
+  pollerType: string,
+  from: "inner" | "resume",
+  indent: helpers.Indentation,
+): string {
+  const pollerTypeParam =
+    method.kind === "lroPageableMethod"
+      ? `[*runtime.Pager[${method.returns.name}]]`
+      : `[${method.returns.name}]`;
+  let text = "";
+  let pollerVar = "poller";
+  if (from === "inner") {
+    text += `${indent.get()}if err != nil {\n`;
+    text += `${indent.push().get()}return nil, err\n`;
+    text += `${indent.pop().get()}}\n`;
+    text += `${indent.get()}handler.inner = poller\n`;
+    pollerVar = "outer";
+    text += `${indent.get()}outer, err := runtime.NewPoller(resp, client.internal.Pipeline(), &runtime.NewPollerOptions${pollerTypeParam}{\n`;
+  } else {
+    text += `${indent.get()}handler := &${getPollingHandlerName(poller)}{pl: client.internal.Pipeline()`;
+    if (pollerType !== "nil") {
+      text += `, response: ${pollerType}`;
+    }
+    text += "}\n";
+    text += `${indent.get()}poller, err := runtime.NewPollerFromResumeToken(options.ResumeToken, client.internal.Pipeline(), &runtime.NewPollerFromResumeTokenOptions${pollerTypeParam}{\n`;
+  }
+  indent.push();
+  text += `${indent.get()}Handler: handler,\n`;
+  if (pollerType !== "nil") {
+    text += `${indent.get()}Response: ${pollerType},\n`;
+  }
+  if (options["inject-spans"]) {
+    text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
+  }
+  indent.pop();
+  text += `${indent.get()}})\n`;
+  text += `${indent.get()}if err != nil {\n`;
+  text += `${indent.push().get()}return nil, err\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}return &${poller.name}{Poller: ${pollerVar}, handler: handler}, nil\n`;
+  return text;
+}
+
+/**
+ * generates the poller, status metadata, and polling handler types for an LRO
+ * that exposes status metadata and/or an operation ID.
+ *
+ * @param method the LRO method
+ * @param poller the generated poller type
+ * @param pollerTypeParam the generic type parameter for the poller including square brackets
+ * @param imports the import manager currently in scope
+ * @returns the text for the types
+ */
+function generateLROPollerTypes(
+  method: go.LROMethod | go.LROPageableMethod,
+  poller: go.LROPoller,
+  pollerTypeParam: string,
+  imports: ImportManager,
+): string {
+  imports.add("context");
+  imports.add("net/http");
+  const handlerName = getPollingHandlerName(poller);
+  const resultType = pollerTypeParam.substring(1, pollerTypeParam.length - 1);
+  const methodName = `${method.receiver.type.name}.${method.name}`;
+  const indent = new helpers.Indentation();
+  let text = `// ${poller.name} is a [runtime.Poller] for the ${methodName} long-running operation.\n`;
+  text += `// It also provides LRO metadata from the service's status monitor.\n`;
+  text += `type ${poller.name} struct {\n`;
+  text += `${indent.get()}*runtime.Poller${pollerTypeParam}\n`;
+  text += `${indent.get()}handler *${handlerName}\n`;
+  text += "}\n\n";
+
+  if (poller.statusMetadataName) {
+    text += `// StatusMetadata returns the status metadata from the most recently received status monitor response,\n`;
+    text +=
+      "// including the initial, failed, and canceled responses. Fields are nil until a response containing\n";
+    text +=
+      "// them is received. The values are refreshed after each poll and aren't persisted in resume tokens,\n";
+    text += "// so they're empty after resuming until the next poll.\n";
+    text += `func (p *${poller.name}) StatusMetadata() ${poller.statusMetadataName} {\n`;
+    text += `${indent.get()}if p.handler == nil || p.handler.status == nil {\n`;
+    text += `${indent.push().get()}return ${poller.statusMetadataName}{}\n`;
+    text += `${indent.pop().get()}}\n`;
+    text += `${indent.get()}return ${poller.statusMetadataName}{\n`;
+    indent.push();
+    for (const field of poller.statusMetadata) {
+      text += `${indent.get()}${field.name}: p.handler.status.${field.name},\n`;
+    }
+    indent.pop();
+    text += `${indent.get()}}\n`;
+    text += "}\n\n";
+
+    text += `// ${poller.statusMetadataName} contains the status metadata for the ${methodName} long-running operation.\n`;
+    text += `type ${poller.statusMetadataName} struct {\n`;
+    let first = true;
+    for (const field of poller.statusMetadata) {
+      if (field.docs.summary || field.docs.description) {
+        if (!first) {
+          text += "\n";
+        }
+        text += helpers.formatDocComment(field.docs);
+      }
+      imports.addForType(field.type);
+      text += `${indent.get()}${field.name} ${go.getTypeDeclaration(field.type, method.receiver.type.pkg)}\n`;
+      first = false;
+    }
+    text += "}\n\n";
+  }
+
+  if (poller.operationIDPath || poller.operationIDField) {
+    text +=
+      "// OperationID returns the service-issued identifier for the long-running operation.\n";
+    text += "// The second return value is false when the identifier isn't available yet.\n";
+    text += `func (p *${poller.name}) OperationID() (string, bool) {\n`;
+    text += `${indent.get()}if p.handler == nil {\n`;
+    text += `${indent.push().get()}return "", false\n`;
+    text += `${indent.pop().get()}}\n`;
+    if (poller.operationIDPath) {
+      text += `${indent.get()}if id, ok := p.handler.pathOperationID(); ok {\n`;
+      text += `${indent.push().get()}return id, true\n`;
+      text += `${indent.pop().get()}}\n`;
+    }
+    if (poller.operationIDField) {
+      const field = poller.operationIDField;
+      if (go.getTypeDeclaration(field.type, method.receiver.type.pkg) !== "*string") {
+        throw new CodegenError(
+          "UnsupportedTsp",
+          `LRO operation ID field ${field.name} for ${methodName} must be a string`,
+        );
+      }
+      text += `${indent.get()}if p.handler.status != nil && p.handler.status.${field.name} != nil {\n`;
+      text += `${indent.push().get()}return *p.handler.status.${field.name}, true\n`;
+      text += `${indent.pop().get()}}\n`;
+    }
+    text += `${indent.get()}return "", false\n`;
+    text += "}\n\n";
+  }
+
+  const pageable = method.kind === "lroPageableMethod";
+  text += `// ${handlerName} wraps the standard polling handler to observe status monitor responses.\n`;
+  text += `type ${handlerName} struct {\n`;
+  text += `${indent.get()}inner *runtime.Poller${pollerTypeParam}\n`;
+  text += `${indent.get()}pl runtime.Pipeline\n`;
+  if (pageable) {
+    text += `${indent.get()}response *${resultType}\n`;
+  }
+  text += `${indent.get()}pollingURL string\n`;
+  if (poller.statusModel) {
+    text += `${indent.get()}status *${poller.statusModel.name}\n`;
+  }
+  text += "}\n\n";
+
+  text += `func (h *${handlerName}) Done() bool {\n`;
+  text += `${indent.get()}return h.inner.Done()\n`;
+  text += "}\n\n";
+
+  text += `func (h *${handlerName}) Poll(ctx context.Context) (*http.Response, error) {\n`;
+  text += `${indent.get()}resp, err := h.inner.Poll(ctx)\n`;
+  text += `${indent.get()}if resp != nil {\n`;
+  indent.push();
+  text += `${indent.get()}if h.pollingURL == "" && resp.Request != nil && resp.Request.URL != nil {\n`;
+  text += `${indent.push().get()}h.pollingURL = resp.Request.URL.String()\n`;
+  text += `${indent.pop().get()}}\n`;
+  if (poller.statusModel) {
+    text += `${indent.get()}h.observe(resp)\n`;
+  }
+  indent.pop();
+  text += `${indent.get()}}\n`;
+  text += `${indent.get()}return resp, err\n`;
+  text += "}\n\n";
+
+  text += `func (h *${handlerName}) Result(ctx context.Context, out *${resultType}) error {\n`;
+  text += `${indent.get()}res, err := h.inner.Result(ctx)\n`;
+  text += `${indent.get()}if err != nil {\n`;
+  text += `${indent.push().get()}return err\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}*out = res\n`;
+  text += `${indent.get()}return nil\n`;
+  text += "}\n\n";
+
+  // status metadata isn't persisted in the resume token
+  text += `func (h *${handlerName}) MarshalJSON() ([]byte, error) {\n`;
+  text += `${indent.get()}token, err := h.inner.ResumeToken()\n`;
+  text += `${indent.get()}if err != nil {\n`;
+  text += `${indent.push().get()}return nil, err\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}return json.Marshal(${handlerName}Token{Token: token, PollingURL: h.pollingURL})\n`;
+  text += "}\n\n";
+
+  text += `func (h *${handlerName}) UnmarshalJSON(data []byte) error {\n`;
+  text += `${indent.get()}var token ${handlerName}Token\n`;
+  text += `${indent.get()}if err := json.Unmarshal(data, &token); err != nil {\n`;
+  text += `${indent.push().get()}return err\n`;
+  text += `${indent.pop().get()}}\n`;
+  if (pageable) {
+    text += `${indent.get()}inner, err := runtime.NewPollerFromResumeToken(token.Token, h.pl, &runtime.NewPollerFromResumeTokenOptions${pollerTypeParam}{\n`;
+    text += `${indent.push().get()}Response: h.response,\n`;
+    text += `${indent.pop().get()}})\n`;
+  } else {
+    text += `${indent.get()}inner, err := runtime.NewPollerFromResumeToken${pollerTypeParam}(token.Token, h.pl, nil)\n`;
+  }
+  text += `${indent.get()}if err != nil {\n`;
+  text += `${indent.push().get()}return err\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}h.inner = inner\n`;
+  text += `${indent.get()}h.pollingURL = token.PollingURL\n`;
+  text += `${indent.get()}return nil\n`;
+  text += "}\n\n";
+
+  text += `type ${handlerName}Token struct {\n`;
+  text += `${indent.get()}Token string \`json:"token"\`\n`;
+  text += `${indent.get()}PollingURL string \`json:"pollingURL,omitempty"\`\n`;
+  text += "}\n\n";
+
+  if (poller.statusModel) {
+    text += `func (h *${handlerName}) observe(resp *http.Response) {\n`;
+    text += `${indent.get()}payload, err := runtime.Payload(resp)\n`;
+    text += `${indent.get()}if err != nil || len(payload) == 0 {\n`;
+    text += `${indent.push().get()}return\n`;
+    text += `${indent.pop().get()}}\n`;
+    text += `${indent.get()}var status ${poller.statusModel.name}\n`;
+    text += `${indent.get()}if err := json.Unmarshal(payload, &status); err != nil {\n`;
+    text += `${indent.push().get()}return\n`;
+    text += `${indent.pop().get()}}\n`;
+    text += `${indent.get()}h.status = &status\n`;
+    text += "}\n\n";
+  }
+
+  if (poller.operationIDPath) {
+    text += generatePathOperationID(handlerName, poller.operationIDPath, imports);
+  }
+  return text;
+}
+
+/**
+ * generates the method that reads the operation ID from the polling URL path
+ *
+ * @param handlerName the name of the polling handler type
+ * @param operationIDPath describes where the operation ID is in the polling URL path
+ * @param imports the import manager currently in scope
+ * @returns the text for the method
+ */
+function generatePathOperationID(
+  handlerName: string,
+  operationIDPath: go.LROOperationIDPath,
+  imports: ImportManager,
+): string {
+  imports.add("net/url");
+  imports.add("strings");
+  const template = operationIDPath.httpPath.split("?")[0].replace(/^\/+|\/+$/g, "");
+  const templateSegments = template.split("/");
+  const variable = new RegExp(`\\{[+#./;?&]?${operationIDPath.pathVariable}\\}`);
+  const index = templateSegments.findIndex((segment) => variable.test(segment));
+  if (index < 0) {
+    throw new CodegenError(
+      "InternalError",
+      `didn't find path variable ${operationIDPath.pathVariable} in ${operationIDPath.httpPath}`,
+    );
+  }
+  const [prefix, suffix] = templateSegments[index].split(variable);
+  if (/[{}]/.test(prefix) || /[{}]/.test(suffix)) {
+    throw new CodegenError(
+      "UnsupportedTsp",
+      `LRO operation ID path variable ${operationIDPath.pathVariable} must be the only variable in its path segment`,
+    );
+  }
+
+  const indent = new helpers.Indentation();
+  let text = `func (h *${handlerName}) pathOperationID() (string, bool) {\n`;
+  text += `${indent.get()}u, err := url.Parse(h.pollingURL)\n`;
+  text += `${indent.get()}if h.pollingURL == "" || err != nil {\n`;
+  text += `${indent.push().get()}return "", false\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}// the endpoint can contain a base path so match the template against the end of the path\n`;
+  text += `${indent.get()}segments := strings.Split(strings.Trim(u.EscapedPath(), "/"), "/")\n`;
+  text += `${indent.get()}if len(segments) < ${templateSegments.length} {\n`;
+  text += `${indent.push().get()}return "", false\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}segments = segments[len(segments)-${templateSegments.length}:]\n`;
+  const literals = new Array<string>();
+  for (let i = 0; i < templateSegments.length; ++i) {
+    if (!/[{}]/.test(templateSegments[i])) {
+      literals.push(`segments[${i}] != "${templateSegments[i]}"`);
+    }
+  }
+  if (literals.length > 0) {
+    text += `${indent.get()}if ${literals.join(" || ")} {\n`;
+    text += `${indent.push().get()}return "", false\n`;
+    text += `${indent.pop().get()}}\n`;
+  }
+  let value = `segments[${index}]`;
+  if (prefix || suffix) {
+    text += `${indent.get()}if !strings.HasPrefix(${value}, "${prefix}") || !strings.HasSuffix(${value}, "${suffix}") || len(${value}) <= ${prefix.length + suffix.length} {\n`;
+    text += `${indent.push().get()}return "", false\n`;
+    text += `${indent.pop().get()}}\n`;
+    value = `${value}[${prefix.length}:len(${value})-${suffix.length}]`;
+  }
+  text += `${indent.get()}id, err := url.PathUnescape(${value})\n`;
+  text += `${indent.get()}if id == "" || err != nil {\n`;
+  text += `${indent.push().get()}return "", false\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}return id, true\n`;
+  text += "}\n\n";
   return text;
 }
