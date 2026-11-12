@@ -92,7 +92,7 @@ jobs:
 
       - name: Setup language runtime
         if: matrix.mise-install-args
-        uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
+        uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
         with:
           version: "2026.10.19"
           install_args: ${{ matrix.mise-install-args }}

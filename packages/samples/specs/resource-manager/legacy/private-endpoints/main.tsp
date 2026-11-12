@@ -120,18 +120,21 @@ interface Dependents {
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
   getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
+  @armResourceCreateOrUpdate(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   createOrUpdatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync<
     Dependent,
     PrivateEndpointConnection,
     OptionalRequestBody = true
   >;
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-patch" "This legacy sample intentionally demonstrates a bodyless PATCH with PatchModel = void."
+  @armResourceUpdate(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
     Dependent,
     PrivateEndpointConnection,
     PatchModel = void
   >;
   deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
+  @armResourceList(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
     Dependent,
     PrivateEndpointConnection

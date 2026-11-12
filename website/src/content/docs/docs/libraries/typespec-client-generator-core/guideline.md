@@ -403,13 +403,51 @@ op begin is MyLongRunningOperation;
 
 Each active decorated direct or inherited property applies to every LRO that uses that status-monitor model. Decorate each property to expose several values; the decorator is property-level only. Nested properties are not scanned; decorate the direct property to expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`, and inclusion or negation on each property.
 
+Each entry also provides `propertySegments`, following the typed segment convention used by paging and LRO final results. The path is rooted at `pollingInfo.responseModel`, not the final result or HTTP response wrapper. Currently it contains a single segment identical to `property`, including for inherited properties; hierarchy reconciliation updates both to the retained SDK property. Segments carry SDK names in `name` and JSON wire names in `serializationOptions.json.name`. The path does not describe an arbitrary replacement model supplied by `@alternateType` through `pollingStep.responseBody`.
+
 Values come from the most recent status-monitor response the SDK has received, including the initial response when it contains the status-monitor model. Any value may be absent until a response containing it arrives. Metadata remains exposed on failed or canceled terminal responses, independently of whether a logical final result is available. Emitters expose these values on their idiomatic poller or operation object and should keep them current after each poll. Metadata is not part of the continuation token; after rehydration, it is populated again by the next poll.
 
 TCGC describes the selected properties, not runtime response values. Language emitters must implement this lifecycle and their public accessor shape; Spector HTTP scenarios alone do not demonstrate generated poller access or removal of SDK customizations. An emitter that already exposes a typed status-monitor response may satisfy this contract through its existing operation or poller API, provided it reflects the latest received response and remains accessible after failure or cancellation.
 
-Separate `@lroStatusMetadata` declarations on one property may use disjoint emitter scopes. Overlapping scopes, including an unscoped declaration combined with any other declaration, are diagnosed once at declaration time.
+Separate `@lroStatusMetadata` declarations on one property use the standard TCGC scope rules, including overlapping scopes. Each selected property appears only once in the metadata collection. Projected client-name conflicts are handled by the existing `duplicate-client-name` validation, not a separate LRO metadata diagnostic.
 
 Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
+
+#### Legacy LRO operation identity
+
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service that returns a server-issued identifier in its status-monitor URI, response body, or both:
+
+```typespec
+model OperationStatus {
+  @lroOperationId
+  id: string;
+
+  status: OperationState;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact `SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact `SdkModelPropertyType` for the status-monitor body. The path form is available from the initial response and must remain derivable after poller rehydration from the stored polling URL. The property form becomes available only after a status-monitor response is received.
+
+For `kind: "property"`, `propertySegments` gives the access path from `pollingInfo.responseModel` to the ID, following the segment representation used by paging metadata. Currently only direct or inherited properties are selectable, so the path is `[property]`; inheritance does not add a JSON nesting level. Each segment is the exact effective SDK property, carrying its client name and `serializationOptions.json.name` for emitters reading a typed model or raw JSON. An overridden base property is not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names and serialization metadata.
+
+TCGC validates active operation ID selections while processing each LRO. A selected response property must be string-like; invalid selections are diagnosed and omitted. Annotations on models not used by the LRO, or excluded by emitter scope or response visibility, have no effect.
+
+For example, after the body-only Translation scenario returns `{ id: "translation-123", status: "Running" }`, an emitter reads the selected `id` using `propertySegments` and exposes `"translation-123"` through its operation or poller accessor. No ID is available before that response in the body-only case. When both sources are selected, the URI-derived value is available first and the body value becomes available after polling. These scenarios supply HTTP fixtures; each emitter must implement and test the public accessor.
+
+This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no modeled polling operation cannot expose operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API, including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator. `@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret URI or a delete-until-gone resource name, is not an operation identifier.
 
 ### HTTP Operation Parameters Handling
 

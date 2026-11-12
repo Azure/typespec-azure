@@ -27,7 +27,7 @@ export const patchBodyMessages = {
   missingPatchBody: "The PATCH operation must have a request body.",
   emptyPatchBody: "The PATCH request body must contain at least one property.",
   missingProperty: paramMessage`The property '${"propertyName"}' in the PATCH body does not correspond to a property in the PUT body.`,
-  incompatibleProperty: paramMessage`The property '${"propertyName"}' in the PATCH body must have a type and constraints compatible with its corresponding PUT property.`,
+  incompatibleProperty: paramMessage`The property '${"propertyName"}' in the PATCH body must preserve the format and bounds of its corresponding PUT property.`,
 };
 
 export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMessages>) {
@@ -93,7 +93,7 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
               putProperties.set(property.jsonName, candidates);
             }
           }
-          const compatible = createPatchPropertyCompatibility(program, metadataInfo, patch, put);
+          const compatible = createPatchPropertyCompatibility(program);
           for (const patchProperty of patchProperties) {
             const candidates =
               !patchProperty.recursive &&

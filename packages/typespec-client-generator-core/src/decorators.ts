@@ -27,15 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { useStateMap } from "@typespec/compiler/utils";
-import {
-  getAuthentication,
-  getHttpOperation,
-  getServers,
-  isBody,
-  isBodyRoot,
-  isPathParam,
-} from "@typespec/http";
+import { getHttpOperation, isBody, isBodyRoot, isPathParam } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import type {
   AccessDecorator,
@@ -51,6 +43,7 @@ import type {
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   DynamicModelDecorator,
+  LroOperationIdDecorator,
   LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -89,9 +82,6 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  isSameAuth,
-  isSameServers,
-  isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -108,45 +98,45 @@ import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
-interface ScopedLroDecorator {
-  scope?: string;
-  target: DiagnosticTarget;
-}
-
 const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
-const [getLroStatusMetadataEntries, setLroStatusMetadataEntries] = useStateMap<
-  ModelProperty,
-  ScopedLroDecorator[]
->(lroStatusMetadataKey);
 
 export const $lroStatusMetadata: LroStatusMetadataDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  const entries = getLroStatusMetadataEntries(context.program, target) ?? [];
-  const normalizedScope = normalizeScope(scope);
-  if (entries.some((entry) => scopesOverlap(entry.scope, normalizedScope))) {
-    reportDiagnostic(context.program, {
-      code: "lro-status-metadata-duplicate",
-      format: { propertyName: target.name },
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-  setLroStatusMetadataEntries(context.program, target, [
-    ...entries,
-    { scope: normalizedScope, target: context.decoratorTarget },
-  ]);
+  setScopedDecoratorData(context, $lroStatusMetadata, lroStatusMetadataKey, target, true, scope);
 };
 
 export function getLroStatusMetadataDecorator(
   context: TCGCContext,
   target: ModelProperty,
-): ScopedLroDecorator | undefined {
-  return getLroStatusMetadataEntries(context.program, target)?.find(
-    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+): boolean | undefined {
+  return getScopedDecoratorData(context, lroStatusMetadataKey, target);
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(
+    context,
+    $lroOperationId,
+    lroOperationIdKey,
+    target,
+    { target: context.decoratorTarget },
+    scope,
   );
+};
+
+export function getLroOperationIdDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): { target: DiagnosticTarget } | undefined {
+  return getScopedDecoratorData(context, lroOperationIdKey, target);
 }
 
 /**
@@ -174,22 +164,6 @@ function getEffectiveScope(scope: string): EffectiveScope {
   return positives.length === 0
     ? { kind: "all-except", scopes: [] }
     : { kind: "only", scopes: positives };
-}
-
-function scopesOverlap(left: string | undefined, right: string | undefined): boolean {
-  const a = getEffectiveScope(left ?? "");
-  const b = getEffectiveScope(right ?? "");
-  if (a.kind === "only" && b.kind === "only") {
-    return a.scopes.some((scope) => b.scopes.includes(scope));
-  }
-  if (a.kind === "only") {
-    return a.scopes.some((scope) => !b.scopes.includes(scope));
-  }
-  if (b.kind === "only") {
-    return b.scopes.some((scope) => !a.scopes.includes(scope));
-  }
-  // Two finite exclusion lists always leave some emitter scopes in common.
-  return true;
 }
 
 function isSemanticallyEqualScope(left: string, right: string): boolean {
@@ -350,41 +324,6 @@ export const $client: ClientDecorator = (
       return;
     }
     services = serviceConfig.values;
-    // validate all services has same server definition
-    let servers = undefined;
-    let auth = undefined;
-    let isSame = true;
-    for (const svc of services) {
-      const currentServers = getServers(context.program, svc);
-      if (currentServers === undefined) continue;
-      if (servers === undefined) {
-        servers = currentServers;
-      } else {
-        isSame = isSameServers(servers, currentServers);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    for (const svc of services) {
-      const currentAuth = getAuthentication(context.program, svc);
-      if (currentAuth === undefined) continue;
-      if (auth === undefined) {
-        auth = currentAuth;
-      } else {
-        isSame = isSameAuth(auth, currentAuth);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    if (!isSame) {
-      reportDiagnostic(context.program, {
-        code: "inconsistent-multiple-service",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
     // For clients merging multiple services, ensure all services agree on the
     // version of any shared library dependency (e.g. ARM common-types).
     // Diverging versions cause TCGC to emit duplicated/diverged models.
