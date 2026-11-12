@@ -7,6 +7,7 @@ const root = resolve(__dirname, "..");
 
 const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
+  outputDir: resolve(root, "temp/e2e"),
   // Safety net for the occasional e2e flake in CI.
   retries: process.env.CI ? 1 : 0,
   webServer: {

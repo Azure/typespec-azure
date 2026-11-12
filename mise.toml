@@ -2,7 +2,7 @@
 python = "3.12"
 uv = "0.11.30"
 go = "1.27.3"
-java = "microsoft-11"
+java = "microsoft-17.0"
 maven = "3.9.16"
 node = "26"
 
