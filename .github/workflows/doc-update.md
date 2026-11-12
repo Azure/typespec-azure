@@ -14,6 +14,8 @@ on:
 
 engine:
   id: copilot
+  env:
+    COPILOT_TASK_WAIT_TIMEOUT_SECONDS: "1800"
 model: gpt-5.6-sol
 timeout-minutes: 120
 
