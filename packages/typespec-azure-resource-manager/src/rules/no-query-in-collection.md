@@ -4,7 +4,7 @@ The rule applies to operations marked `@list` regardless of their HTTP method or
 
 Assume `WidgetPage` is a list response with `@pageItems` metadata. The first example is a collection GET; the second is an operation marked `@list`.
 
-## Incorrect
+## ❌ Incorrect
 
 ### Collection GET
 
@@ -27,7 +27,7 @@ op listWidgets(
 op searchWidgets(@query continuationToken?: string): WidgetPage;
 ```
 
-## Correct
+## ✅ Correct
 
 ### Collection GET
 
