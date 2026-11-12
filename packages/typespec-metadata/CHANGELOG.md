@@ -1,5 +1,9 @@
 # @azure-tools/typespec-metadata
 
+## 0.4.2
+
+No changes, version bump only.
+
 ## 0.4.1
 
 ### Bug Fixes

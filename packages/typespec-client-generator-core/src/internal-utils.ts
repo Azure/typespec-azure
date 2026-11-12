@@ -1,5 +1,7 @@
 import {
+  type AzureServiceConfigurations,
   FinalStateValue,
+  getAzureServiceConfigurations,
   getEffectiveApiVersionOverride,
   isPreviewVersion,
   type LroMetadata,
@@ -42,14 +44,13 @@ import {
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  type Authentication,
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
+  getServers,
   type HttpOperation,
   type HttpOperationResponseContent,
   type HttpPayloadBody,
-  type HttpServer,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -1378,130 +1379,16 @@ export function getActualClientType(client: SdkClient): Namespace | Interface {
   return client.services[0];
 }
 
-export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
-  if (left.length !== right.length) {
-    return false;
-  }
-  for (let i = 0; i < left.length; i++) {
-    if (left[i].url !== right[i].url) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function isSameAuth(left: Authentication, right: Authentication): boolean {
-  if (left.options.length !== right.options.length) {
-    return false;
-  }
-  for (let i = 0; i < left.options.length; i++) {
-    if (left.options[i].schemes.length !== right.options[i].schemes.length) {
-      return false;
-    }
-    for (let j = 0; j < left.options[i].schemes.length; j++) {
-      const leftScheme = left.options[i].schemes[j];
-      const rightScheme = right.options[i].schemes[j];
-      if (leftScheme.type !== rightScheme.type) {
-        return false;
-      }
-      switch (leftScheme.type) {
-        case "http":
-          compilerAssert(rightScheme.type === "http", "Unexpected auth scheme type mismatch");
-          if (leftScheme.scheme !== rightScheme.scheme) {
-            return false;
-          }
-          break;
-        case "apiKey":
-          compilerAssert(rightScheme.type === "apiKey", "Unexpected auth scheme type mismatch");
-          if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
-            return false;
-          }
-          break;
-        case "oauth2":
-          compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
-          if (leftScheme.flows.length !== rightScheme.flows.length) {
-            return false;
-          }
-          for (let k = 0; k < leftScheme.flows.length; k++) {
-            const leftFlow = leftScheme.flows[k];
-            const rightFlow = rightScheme.flows[k];
-            if (leftFlow.type !== rightFlow.type) {
-              return false;
-            }
-            if (leftFlow.scopes.length !== rightFlow.scopes.length) {
-              return false;
-            }
-            for (let l = 0; l < leftFlow.scopes.length; l++) {
-              if (leftFlow.scopes[l].value !== rightFlow.scopes[l].value) {
-                return false;
-              }
-            }
-            switch (leftFlow.type) {
-              case "authorizationCode":
-                compilerAssert(
-                  rightFlow.type === "authorizationCode",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "clientCredentials":
-                compilerAssert(
-                  rightFlow.type === "clientCredentials",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "implicit":
-                compilerAssert(
-                  rightFlow.type === "implicit",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "password":
-                compilerAssert(
-                  rightFlow.type === "password",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-            }
-          }
-          break;
-        case "openIdConnect":
-          compilerAssert(
-            rightScheme.type === "openIdConnect",
-            "Unexpected auth scheme type mismatch",
-          );
-          if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
-            return false;
-          }
-          break;
-      }
-    }
-  }
-  return true;
+export function getClientServiceConfigurations(
+  context: TCGCContext,
+  client: SdkClient,
+): AzureServiceConfigurations | undefined {
+  const service = client.services[0];
+  const catalog = getAzureServiceConfigurations(context.program, service);
+  // Do not inherit a catalog whose server is not declared on this service.
+  return getServers(context.program, service)?.[0] === catalog?.configurations[0].server
+    ? catalog
+    : undefined;
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
