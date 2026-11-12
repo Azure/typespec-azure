@@ -200,6 +200,7 @@ export async function emitGoFor(
     { filePrefix },
   );
   await emitter.emit("tsp");
+  await emitter.emitCloudConfig();
   if (codeModel.options["generate-samples"]) {
     await emitter.emitExamples();
   }

@@ -44,6 +44,7 @@ describe("Client constructors", () => {
     expect(client.match(/func NewTestClient\(/g)).toHaveLength(1);
     expect(client).toContain("credential azcore.TokenCredential");
     expect(client).not.toContain("NewTestClientWithNoCredential");
+    expect(files.get("zz_cloud_config.go")).toContain('Audience: "https://public.example.com"');
   });
 
   it("preserves the unauthenticated constructor alongside multiple OAuth2 variants", async () => {
