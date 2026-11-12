@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
@@ -51,7 +51,7 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
         message:
-          "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+          "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @armResourceAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
@@ -106,6 +106,23 @@ it("doesn't emit diagnostic for operation templates", async () => {
 
       op ArmBodyProviderActionSync<T>(t: T, ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>): void;
     `,
+    )
+    .toBeValid();
+});
+
+it("allows a resource action to override its HTTP verb and return a paged GET result", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace namespace Microsoft.Foo;
+    model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+    @armResourceOperations interface Widgets {
+      @get @list
+      listRelated is ArmResourceActionSync<Widget, void, ResourceListResult<Widget>>;
+      @get @list @armResourceAction(Widget)
+      listCustom(...ResourceInstanceParameters<Widget>): ArmResponse<ResourceListResult<Widget>> | ErrorResponse;
+    }
+  `,
     )
     .toBeValid();
 });
@@ -166,6 +183,22 @@ describe("Private ARM resource decorators", () => {
       getLegacyExtension(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
     `);
     await tester.expect(content).toBeValid();
+  });
+
+  it.each([
+    'extensionResourceOperation(FooResource, BarResource, "action")',
+    'builtInResourceOperation(FooResource, BarResource, "action")',
+    'legacyResourceOperation(FooResource, "action")',
+    'legacyExtensionResourceOperation(FooResource, "action")',
+  ])("allows a paged GET action through @%s", async (decorator) => {
+    await tester
+      .expect(
+        buildPrivateDecoratorTestSpec(`
+      @${decorator} @get @list
+      listRelated(...ResourceInstanceParameters<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
+    `),
+      )
+      .toBeValid();
   });
 
   it("emits diagnostic when @extensionResourceOperation operationType doesn't match the HTTP verb", async () => {
@@ -295,7 +328,7 @@ describe("Provider operations", () => {
     await tester.expect(content).toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/use-operation-decorator",
       message:
-        "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
+        "Resource GET operation must be decorated with @armResourceRead or @armResourceList or @armResourceAction or @extensionResourceOperation or @legacyResourceOperation or @builtInResourceOperation or @legacyExtensionResourceOperation.",
     });
   });
 });

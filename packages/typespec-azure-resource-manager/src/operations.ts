@@ -115,22 +115,6 @@ export function getOriginalResourceOperationModels(program: Program): Map<Operat
   return result;
 }
 
-/** @internal */
-export function validateArmOperationKind(
-  program: Program,
-  operation: Operation,
-  kind: ArmOperationKind,
-): boolean {
-  const previous = getArmResourceOperationData(program, operation);
-  if (previous === undefined || previous.kind === kind) return true;
-  reportDiagnostic(program, {
-    code: "arm-resource-operation-kind-conflict",
-    target: operation,
-    format: { previousKind: previous.kind, kind },
-  });
-  return false;
-}
-
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
   httpOperation: HttpOperation;
@@ -172,6 +156,8 @@ interface ArmResourceOperationData {
   resourceModelName: string;
   resourceName?: string;
   resourceKind?: "legacy" | "legacy-extension";
+  /** @internal */
+  hasKindConflict?: boolean;
 }
 
 /** Identifying information for an arm operation */
@@ -313,6 +299,22 @@ export function addArmResourceOperation(
   resourceType: Model,
   operationData: ArmOperationIdentifier,
 ): void {
+  const previous = getArmResourceOperationData(program, operationData.operation);
+  if (previous !== undefined && previous.kind !== operationData.kind) {
+    const compatibility = getArmResourceOperations(program, resourceType);
+    if (previous.kind !== "list" && previous.kind !== "action" && previous.kind !== "other") {
+      const entry = compatibility.lifecycle[previous.kind];
+      if (entry?.operation === operationData.operation && entry.kind !== operationData.kind) {
+        delete compatibility.lifecycle[previous.kind];
+      }
+    }
+    for (const collection of [compatibility.lists, compatibility.actions]) {
+      const entry = collection[previous.name];
+      if (entry?.operation === operationData.operation && entry.kind !== operationData.kind) {
+        delete collection[previous.name];
+      }
+    }
+  }
   const operations = getArmResourceOperationList(program, resourceType);
   const identifier = setArmOperationIdentifier(program, operationData.operation, resourceType, {
     name: operationData.name,
@@ -338,12 +340,15 @@ export function setArmOperationIdentifier(
   data: ArmResourceOperationData,
 ): ArmResourceOperationData {
   const previous = getArmResourceOperationData(program, target);
+  const hasKindConflict =
+    previous?.hasKindConflict || (previous !== undefined && previous.kind !== data.kind);
   const record =
     previous === undefined
       ? { ...data }
       : Object.assign(previous, data, {
           resourceKind: data.resourceKind,
         });
+  if (hasKindConflict) record.hasKindConflict = true;
   setArmResourceOperationData(program, target, record);
   return record;
 }
@@ -354,7 +359,6 @@ export const $armResourceCheckExistence: ArmResourceCheckExistenceDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "checkExistence")) return;
   setResourceLifecycleOperation(context, target, resourceType, "checkExistence", resourceName);
 };
 
@@ -364,7 +368,6 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "read")) return;
   context.call($readsResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "read", resourceName);
 };
@@ -375,7 +378,6 @@ export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "createOrUpdate")) return;
   context.call($createsOrReplacesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate", resourceName);
 };
@@ -386,7 +388,6 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "update")) return;
   context.call($updatesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "update", resourceName);
 };
@@ -397,7 +398,6 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "delete")) return;
   context.call($deletesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "delete", resourceName);
 };
@@ -408,7 +408,6 @@ export const $armResourceList: ArmResourceListDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "list")) return;
   // Only register methods from non-templated interface types
   if (
     target.interface === undefined ||
@@ -540,7 +539,6 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   resourceType: Model,
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, "action")) return;
   const { program } = context;
 
   // Only register methods from non-templated interface types

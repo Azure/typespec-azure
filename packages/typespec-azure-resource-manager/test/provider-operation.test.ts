@@ -4,13 +4,13 @@ import {
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { t } from "@typespec/compiler/testing";
-import { getResourceOperation } from "@typespec/rest";
 import { ok } from "node:assert";
 import { describe, expect, it } from "vitest";
 import { getProviderOperation, isProviderOperation, isResourceOperation } from "../src/index.js";
 import {
   getArmResourceOperationData,
   getArmResourceOperationList,
+  getArmResourceOperations,
   getOriginalResourceOperationModels,
 } from "../src/operations.js";
 import { getArmResource } from "../src/private.decorators.js";
@@ -113,39 +113,54 @@ describe("resource operations", () => {
   }
 
   describe("operation registration consistency", () => {
-    it.each(["armResourceUpdate", "armResourceList", "armResourceAction"])(
-      "rejects @%s overriding a read before changing registration",
-      async (decorator) => {
-        const [{ program, operation }, diagnostics] = await Tester.compileAndDiagnose(t.code`
+    it.each([
+      ["armResourceUpdate", "armResourceRead", "update"],
+      ["armResourceList", "armResourceRead", "list"],
+      ["armResourceAction", "armResourceRead", "action"],
+      ["armResourceList", "armResourceAction", "list"],
+      ["armResourceAction", "armResourceList", "action"],
+    ])("lets @%s override @%s", async (decorator, previousDecorator, kind) => {
+      const [{ program, operation }, diagnostics] = await Tester.compileAndDiagnose(t.code`
             ${service}${resource}
             interface Custom {
               @route("/valid")
-              @${decorator}(Widget, "Rejected")
-              @armResourceRead(Widget, "Accepted")
+              @${decorator}(Widget, "Latest")
+              @${previousDecorator}(Widget, "Previous")
               ${t.op("operation")}(): void;
             }
           `);
-        expect(diagnostics).toMatchObject([
-          {
-            code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-kind-conflict",
-            severity: "error",
-          },
-        ]);
-        const model = operation.interface!.namespace!.models.get("Widget")!;
-        const identifiers = [...getArmResourceOperationList(program, model)];
-        expect(identifiers.length).toBe(1);
-        expect(identifiers[0]).toMatchObject({ kind: "read", resourceName: "Accepted" });
-        expect(getArmResourceOperationData(program, operation)).toMatchObject({
-          kind: "read",
-          resourceName: "Accepted",
-        });
-        expect(getResourceOperation(program, operation)?.operation).toBe("read");
-        expect(getResourceNameExpression(program, operation)).toEqual({
-          kind: "explicit",
-          value: "Accepted",
-        });
-      },
-    );
+      expect(diagnostics.map(({ code, message }) => ({ code, message }))).toEqual([]);
+      const model = operation.interface!.namespace!.models.get("Widget")!;
+      const identifiers = [...getArmResourceOperationList(program, model)];
+      expect(identifiers.length).toBe(1);
+      expect(identifiers[0]).toMatchObject({ kind, resourceName: "Latest" });
+      expect(getArmResourceOperationData(program, operation)).toMatchObject({
+        kind,
+        resourceName: "Latest",
+      });
+      const compatibility = getArmResourceOperations(program, model);
+      expect(compatibility.lifecycle.read).toBeUndefined();
+      if (kind !== "list") expect(compatibility.lists[operation.name]).toBeUndefined();
+      if (kind !== "action") expect(compatibility.actions[operation.name]).toBeUndefined();
+      expect(getResourceNameExpression(program, operation)).toEqual({
+        kind: "explicit",
+        value: "Latest",
+      });
+    });
+  });
+  it("keeps a paged GET action classified as an action", async () => {
+    const { program, operation } = await Tester.compile(t.code`
+      ${service}${resource}
+      @armResourceOperations interface Widgets {
+        @get @list
+        ${t.op("operation")} is ArmResourceActionSync<Widget, void, ResourceListResult<Widget>>;
+      }
+    `);
+    expect(getArmResourceOperationData(program, operation)?.kind).toBe("action");
+    const model = operation.interface!.namespace!.models.get("Widget")!;
+    const operations = getArmResourceOperations(program, model);
+    expect(operations.actions[operation.name]?.operation === operation).toBe(true);
+    expect(Object.keys(operations.lists)).toEqual([]);
   });
   for (const decorator of [
     "read",
@@ -198,28 +213,30 @@ describe("resource operations", () => {
   }
 
   it.each([
-    'extensionResourceOperation(Extension.Subscription, Widget, "update", "Rejected")',
-    'builtInResourceOperation(Extension.Subscription, Widget, "list", "Rejected")',
-    'legacyResourceOperation(Widget, "action", "Rejected")',
-    'legacyExtensionResourceOperation(Widget, "checkExistence", "Rejected")',
-  ])("rejects a private kind override before side effects: %s", async (decorator) => {
+    ['extensionResourceOperation(Extension.Subscription, Widget, "update", "Latest")', "update"],
+    ['builtInResourceOperation(Extension.Subscription, Widget, "list", "Latest")', "list"],
+    ['legacyResourceOperation(Widget, "action", "Latest")', "action"],
+    ['legacyExtensionResourceOperation(Widget, "checkExistence", "Latest")', "checkExistence"],
+  ])("allows a private kind override: %s", async (decorator, kind) => {
     const [{ program, operation }, diagnostics] = await Tester.compileAndDiagnose(t.code`
       ${service}${resource}
       interface Custom {
         @route("/valid")
         @Azure.ResourceManager.Private.${decorator}
-        @armResourceRead(Widget, "Accepted")
+        @armResourceRead(Widget, "Previous")
         ${t.op("operation")}(): void;
       }
     `);
-    expect(diagnostics.map(({ code }) => code)).toEqual([
-      "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-kind-conflict",
-    ]);
-    expect(getArmResourceOperationData(program, operation)?.resourceName).toBe("Accepted");
-    expect(getResourceOperation(program, operation)?.operation).toBe("read");
+    expect(diagnostics.map(({ code, message }) => ({ code, message }))).toEqual([]);
+    expect(getArmResourceOperationData(program, operation)).toMatchObject({
+      kind,
+      resourceName: "Latest",
+    });
+    const model = operation.interface!.namespace!.models.get("Widget")!;
+    expect(getArmResourceOperations(program, model).lifecycle.read).toBeUndefined();
     expect(getResourceNameExpression(program, operation)).toEqual({
       kind: "explicit",
-      value: "Accepted",
+      value: "Latest",
     });
   });
 
@@ -268,6 +285,53 @@ describe("resource operations", () => {
 });
 
 describe("resource registration version isolation", () => {
+  it.each([
+    ["armResourceAction", "armResourceList", "action"],
+    ["armResourceList", "armResourceAction", "list"],
+  ])("resolves the latest @%s registration across versions", async (outer, inner, kind) => {
+    const { program } = await Tester.compile(
+      `
+      @armProviderNamespace @versioned(Versions) namespace Microsoft.Test;
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01", v3: "2026-01-01" }
+      ${resource}
+      @armResourceOperations interface Widgets {
+        get is ArmResourceRead<Widget>;
+        #suppress "@azure-tools/typespec-azure-resource-manager/no-resource-operation-conflict" "Verify intentional last-registration-wins compatibility."
+        @get @list @${outer}(Widget) @${inner}(Widget)
+        related is ArmResourceActionSync<Widget, void, ResourceListResult<Widget>>;
+      }
+    `,
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: {
+              "@azure-tools/typespec-azure-resource-manager/no-resource-operation-conflict": true,
+            },
+          },
+        },
+      },
+    );
+    for (const version of [undefined, "2026-01-01", "2024-01-01", "2025-01-01", undefined]) {
+      const provider = resolveArmResources(
+        program,
+        version === undefined ? undefined : { version },
+      );
+      const operations = [
+        ...(provider.providerOperations ?? []),
+        ...(provider.resources ?? []).flatMap(({ operations }) => [
+          ...Object.values(operations.lifecycle).flatMap((entries) => entries ?? []),
+          ...operations.actions,
+          ...operations.lists,
+        ]),
+      ].filter(({ operation }) => operation.name === "related");
+      expect(operations.map(({ kind }) => kind)).toEqual([kind]);
+      expect(
+        provider.resources?.some(({ operations }) => operations.lifecycle.read?.length === 1),
+      ).toBe(true);
+    }
+    expect(program.diagnostics.map(({ code, message }) => ({ code, message }))).toEqual([]);
+  });
+
   it.each([
     ["2024-01-01", "2025-01-01", "2026-01-01"],
     ["2026-01-01", "2025-01-01", "2024-01-01"],

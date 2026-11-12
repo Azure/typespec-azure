@@ -42,7 +42,7 @@ import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-pro
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResourceDuplicatesRule } from "./rules/no-resource-duplicates.js";
 import { noResourceNameConflictRule } from "./rules/no-resource-name-conflict.js";
-import { noResourceOperationModelConflictRule } from "./rules/no-resource-operation-model-conflict.js";
+import { noResourceOperationConflictRule } from "./rules/no-resource-operation-conflict.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
@@ -139,7 +139,7 @@ const rules = [
   useScopePathStandardNameRule,
   noResourceNameConflictRule,
   noResourceDuplicatesRule,
-  noResourceOperationModelConflictRule,
+  noResourceOperationConflictRule,
   requireErrorDecoratorRule,
 ];
 

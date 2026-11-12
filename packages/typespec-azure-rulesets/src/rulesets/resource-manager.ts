@@ -97,7 +97,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/use-application-json-content-type": false,
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/provider-or-resource-operation": false,
-    "@azure-tools/typespec-azure-resource-manager/no-resource-operation-model-conflict": false,
+    "@azure-tools/typespec-azure-resource-manager/no-resource-operation-conflict": false,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-duplicates": false,

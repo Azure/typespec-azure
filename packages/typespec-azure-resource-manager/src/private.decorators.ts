@@ -89,7 +89,6 @@ import {
   armRenameListByOperationInternal,
   type ArmResourceOperation,
   getArmResourceOperations,
-  validateArmOperationKind,
 } from "./operations.js";
 import { type ResourceNameExpression, setResourceNameExpression } from "./resource-name.js";
 import {
@@ -843,7 +842,6 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -885,7 +883,6 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -921,7 +918,6 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||
@@ -983,7 +979,6 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
     "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
   resourceName?: string,
 ) => {
-  if (!validateArmOperationKind(context.program, target, operationType)) return;
   if (
     target.interface === undefined ||
     target.interface.node === undefined ||

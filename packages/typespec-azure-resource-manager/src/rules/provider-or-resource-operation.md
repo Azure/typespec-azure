@@ -67,7 +67,7 @@ interface Widgets {
 }
 ```
 
-Conflicting resource model arguments are checked separately by [`no-resource-operation-model-conflict`](../no-resource-operation-model-conflict/). Repeating the same resource registration with a different logical grouping is allowed. Both lint rules are disabled by default in the central `resource-manager` ruleset.
+Conflicting resource model arguments and ARM operation kinds are checked separately by [`no-resource-operation-conflict`](../no-resource-operation-conflict/). Repeating the same resource registration with a different logical grouping is allowed. Resource actions can use `@get` and `@list` without resource-list registration. Both lint rules are disabled by default in the central `resource-manager` ruleset.
 
 ## Impact
 

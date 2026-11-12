@@ -69,7 +69,7 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it.each(["provider-or-resource-operation", "no-resource-operation-model-conflict"])(
+  it.each(["provider-or-resource-operation", "no-resource-operation-conflict"])(
     "keeps ARM operation registration guidance %s opt-in centrally",
     (name) => {
       const ruleName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
