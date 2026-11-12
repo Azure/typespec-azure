@@ -50,6 +50,7 @@ import { operationsInterfaceMissingRule } from "./rules/operations-interface-mis
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { providerOrResourceOperationRule } from "./rules/provider-or-resource-operation.js";
+import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -139,6 +140,7 @@ const rules = [
   noResourceNameConflictRule,
   noResourceDuplicatesRule,
   noResourceOperationModelConflictRule,
+  requireErrorDecoratorRule,
 ];
 
 export const $linter = defineLinter({

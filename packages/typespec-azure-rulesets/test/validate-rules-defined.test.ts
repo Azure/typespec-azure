@@ -203,6 +203,13 @@ describe("expect all rules to be defined", () => {
     ok(rule);
   });
 
+  it("keeps missing error decorators in ARM all but out of the recommended preset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/require-error-decorator";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
+
   it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
     const name = "lro-missing-polling-metadata";
     strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);

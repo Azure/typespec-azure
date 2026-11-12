@@ -16,3 +16,18 @@ index f002da96..fae8d01b 100644
      }
  
      public static byte[] getJpgBytes() {
+diff --git a/tsp/experimental.tsp b/tsp/experimental.tsp
+--- a/tsp/experimental.tsp
++++ b/tsp/experimental.tsp
+@@ -51,4 +51,4 @@
+-@experimental(#{ emitterScope: "@typespec/http-client-java" })
++@experimental(#{ emitterScope: "@azure-tools/typespec-java" })
+ model Scoped {
+   value: string;
+ }
+@@ -65,4 +65,4 @@
+-@experimental(#{ emitterScope: "!@typespec/http-client-java" })
++@experimental(#{ emitterScope: "!@azure-tools/typespec-java" })
+ model Excluded {
+   value: string;
+ }
