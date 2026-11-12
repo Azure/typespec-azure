@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.49.0
+
+### Features
+
+- [#5988](https://github.com/Azure/typespec-azure/pull/5988) Prototype a TeaVM WebAssembly target for `@azure-tools/typespec-java` in the Azure playground, included by the normal build and PR previews. Building requires JDK 17; native CLI generation is unchanged.
+
+### Bug Fixes
+
+- [#6064](https://github.com/Azure/typespec-azure/pull/6064) Update the Java generator to TypeSpec core commit `ccde4f5b0` to fix base64 encoding of byte-valued headers and query parameters ([microsoft/typespec#12540](https://github.com/microsoft/typespec/pull/12540)).
+
+
 ## 0.48.6
 
 ### Bug Fixes
