@@ -20,6 +20,7 @@ enum Versions {
   @doc("The 2023-08-01 version.")
   `2023-08-01`,
 
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "This sample demonstrates private-link schema compatibility across older common-types versions."
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @doc("The 2023-11-01-preview version.")
   @Azure.Core.previewVersion
