@@ -106,6 +106,20 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("enables the strengthened documentation-required rule without a separate quality rule", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/documentation-required";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], true);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-core/no-uninformative-doc"
+        ],
+        undefined,
+      );
+    }
+    ok(!AzureCoreLinter.rules.some((rule) => rule.name === "no-uninformative-doc"));
+  });
+
   it("keeps repeated client-name guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/no-repeated-client-name";
     for (const rulesetName of ["client-sdk", "data-plane", "resource-manager"]) {
