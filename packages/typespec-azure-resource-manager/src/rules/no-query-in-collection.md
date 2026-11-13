@@ -1,13 +1,14 @@
-ARM collection GET operations may use only the standard `api-version` and `$filter` query parameters. Additional query parameters make list operations inconsistent across resource providers and introduce nonstandard method parameters in generated SDKs.
+ARM collection GET and list operations may use only the standard `api-version` and `$filter` query parameters. Additional query parameters make list operations inconsistent across resource providers and introduce nonstandard method parameters in generated SDKs.
 
-The rule applies to GET operations whose emitted ARM path identifies a resource collection. Query parameter names are case-sensitive, so `$FILTER` is not equivalent to `$filter`.
+The rule applies to operations marked `@list` regardless of their HTTP method or path, as well as GET operations whose emitted ARM path identifies a resource collection, even without `@list`. Query parameter names are case-sensitive, so `$FILTER` is not equivalent to `$filter`.
 
-## Incorrect
+Assume `WidgetPage` is a list response with `@pageItems` metadata. The first example is a collection GET; the second is an operation marked `@list`.
+
+## ❌ Incorrect
+
+### Collection GET
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
-
 @route("/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets")
 @get
 op listWidgets(
@@ -17,12 +18,20 @@ op listWidgets(
 ): void;
 ```
 
-## Correct
+### List operation
 
 ```tsp
-@armProviderNamespace
-namespace Microsoft.Contoso;
+@route("/widgets/search")
+@post
+@list
+op searchWidgets(@query continuationToken?: string): WidgetPage;
+```
 
+## ✅ Correct
+
+### Collection GET
+
+```tsp
 @route("/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets")
 @get
 op listWidgets(
@@ -30,6 +39,15 @@ op listWidgets(
   @query("api-version") apiVersion: string,
   @query("$filter") filter?: string,
 ): void;
+```
+
+### List operation
+
+```tsp
+@route("/widgets/search")
+@post
+@list
+op searchWidgets(@query("$filter") filter?: string): WidgetPage;
 ```
 
 ## LintDiff Equivalent

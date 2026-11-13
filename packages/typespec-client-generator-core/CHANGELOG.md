@@ -5,7 +5,6 @@
 ### Features
 
 - [#5927](https://github.com/Azure/typespec-azure/pull/5927) Add `propertySegments` to `SdkLroStatusMetadata` so emitters can locate selected metadata values relative to `pollingInfo.responseModel`, following the existing typed segment convention. Segments preserve SDK and wire names and reference the retained property after hierarchy reconciliation.
-- [#5853](https://github.com/Azure/typespec-azure/pull/5853) Add the `@dynamicModel` decorator in Azure.ClientGenerator.Core to provide opt-in dynamic-model metadata for models or namespaces, with optional language scoping. Dynamic-model generation is currently supported only by the C# emitter; the shared decorator provides opt-in metadata pending emitter adoption and does not itself generate JSON Patch fields.
 - [#5782](https://github.com/Azure/typespec-azure/pull/5782) Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Active selections are validated during LRO processing; unused or out-of-scope annotations have no effect. Includes emitter scopes and representative Spector scenarios.
 - [#5677](https://github.com/Azure/typespec-azure/pull/5677) Add the scoped, property-level `@lroStatusMetadata` decorator with exact typed SDK metadata for auxiliary LRO status-monitor values and a latest-response lifecycle contract for poller or operation state, including failure and cancellation.
   
@@ -54,6 +53,13 @@
 - [#5931](https://github.com/Azure/typespec-azure/pull/5931) Fix missing fields in query-object examples.
 - [#5874](https://github.com/Azure/typespec-azure/pull/5874) Fix `replaceResponseWithBytes` to expose raw response bytes instead of base64-encoded bytes while preserving the original HTTP response metadata.
 - [#5835](https://github.com/Azure/typespec-azure/pull/5835) Match unified YAML example operation keys case-insensitively, like legacy JSON examples, while retaining raw example envelopes. Append explicit YAML example IDs to SDK example file paths as `#id`.
+
+
+## 0.73.1
+
+### Features
+
+- [#5853](https://github.com/Azure/typespec-azure/pull/5853) Add the `@dynamicModel` decorator in Azure.ClientGenerator.Core to provide opt-in dynamic-model metadata for models or namespaces, with optional language scoping. Dynamic-model generation is currently supported only by the C# emitter; the shared decorator provides opt-in metadata pending emitter adoption and does not itself generate JSON Patch fields.
 
 
 ## 0.73.0
