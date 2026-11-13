@@ -1,4 +1,5 @@
 import {
+  $friendlyName,
   type Diagnostic,
   type Enum,
   type EnumMember,
@@ -20,6 +21,7 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { SyntaxKind, type TypeReferenceNode } from "@typespec/compiler/ast";
 import {
   type HttpOperation,
   Visibility,
@@ -226,7 +228,7 @@ export function getLibraryName(
   }
 
   // 2. check if there's a friendly name, if so return friendly name
-  const friendlyName = getFriendlyName(context.program, type);
+  const friendlyName = getClientFriendlyName(context, type, scope);
   if (friendlyName) return friendlyName;
 
   // 3. if type is derived from template and name is the same as template, add template parameters' name as suffix
@@ -256,6 +258,51 @@ export function getLibraryName(
   }
 
   return typeof type.name === "string" ? type.name : "";
+}
+
+function getClientFriendlyName(
+  context: TCGCContext,
+  type: Type,
+  scope?: string | typeof AllScopes,
+): string | undefined {
+  const friendlyName = getFriendlyName(context.program, type);
+  if (!friendlyName || !("decorators" in type)) return friendlyName;
+
+  const application = type.decorators.findLast((application) => {
+    if (application.decorator !== $friendlyName) return false;
+    // Match the compiler's filtering of friendly names copied by `model is` and `op is`.
+    if (type.kind === "Model" || type.kind === "Operation") {
+      const node = application.node;
+      if (node?.kind === SyntaxKind.DecoratorExpression && node.parent !== type.node) return false;
+      if (node?.kind === SyntaxKind.AugmentDecoratorStatement) {
+        const checker = context.program.checker as typeof context.program.checker & {
+          resolveTypeReference(node: TypeReferenceNode): [Type | undefined, readonly Diagnostic[]];
+        };
+        if (ignoreDiagnostics(checker.resolveTypeReference(node.targetType))?.node !== type.node) {
+          return false;
+        }
+      }
+    }
+    return true;
+  });
+  const format = application?.args[0]?.jsValue;
+  const source = application?.args[1]?.value;
+  if (
+    typeof format !== "string" ||
+    !format.includes("{name}") ||
+    source?.entityKind !== "Type" ||
+    !("name" in source)
+  ) {
+    return friendlyName;
+  }
+  const clientName = getClientNameOverride(context, source, scope);
+  if (!clientName) return friendlyName;
+
+  return format.replace(/{(\w+)}/g, (_, property: string) =>
+    property === "name"
+      ? normalizeExactName(clientName).name
+      : String(Reflect.get(source, property)),
+  );
 }
 
 /**
