@@ -53,6 +53,8 @@ export async function _annotationWithFalseDeserialize(
 
   return;
 }
+
+/** Performs the annotationWithFalse operation. */
 export async function annotationWithFalse(
   context: Client,
   param: string,

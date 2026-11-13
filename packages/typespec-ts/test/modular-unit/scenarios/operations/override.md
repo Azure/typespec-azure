@@ -84,6 +84,8 @@ export async function _getSecretOriginalDeserialize(result: PathUncheckedRespons
 
   return;
 }
+
+/** Performs the getSecretOriginal operation. */
 export async function getSecretOriginal(
   context: Client,
   secretName: string,
@@ -205,6 +207,8 @@ export async function _groupOriginalDeserialize(result: PathUncheckedResponse): 
 
   return;
 }
+
+/** Performs the groupOriginal operation. */
 export async function groupOriginal(
   context: Client,
   options: GroupParametersOptions,
@@ -320,6 +324,8 @@ export async function _removeOptionalOriginalDeserialize(
 
   return;
 }
+
+/** Performs the removeOptionalOriginal operation. */
 export async function removeOptionalOriginal(
   context: Client,
   param1: string,
@@ -436,6 +442,8 @@ export async function _changeOptionalityOriginalDeserialize(
 
   return;
 }
+
+/** Performs the changeOptionalityOriginal operation. */
 export async function changeOptionalityOriginal(
   context: Client,
   param1: string,

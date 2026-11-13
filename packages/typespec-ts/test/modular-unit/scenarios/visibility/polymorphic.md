@@ -235,6 +235,7 @@ export async function _createPetDeserialize(result: PathUncheckedResponse): Prom
   return petUnionDeserializer(result.body);
 }
 
+/** Performs the createPet operation. */
 export async function createPet(
   context: Client,
   body: PetCreateUnion,
@@ -266,6 +267,7 @@ export async function _createCatDeserialize(result: PathUncheckedResponse): Prom
   return catDeserializer(result.body);
 }
 
+/** Performs the createCat operation. */
 export async function createCat(
   context: Client,
   body: CatCreate,
@@ -506,6 +508,7 @@ export async function _createPetDeserialize(result: PathUncheckedResponse): Prom
   return petUnionDeserializer(result.body);
 }
 
+/** Performs the createPet operation. */
 export async function createPet(
   context: Client,
   body: PetCreateUnion,
@@ -537,6 +540,7 @@ export async function _createCatDeserialize(result: PathUncheckedResponse): Prom
   return catDeserializer(result.body);
 }
 
+/** Performs the createCat operation. */
 export async function createCat(
   context: Client,
   body: CatCreate,
@@ -678,6 +682,7 @@ export async function _createDerivedDeserialize(result: PathUncheckedResponse): 
   return derivedDeserializer(result.body);
 }
 
+/** Performs the createDerived operation. */
 export async function createDerived(
   context: Client,
   body: DerivedCreate,
@@ -850,6 +855,7 @@ export async function _createDerivedDeserialize(result: PathUncheckedResponse): 
   return derivedDeserializer(result.body);
 }
 
+/** Performs the createDerived operation. */
 export async function createDerived(
   context: Client,
   body: DerivedCreate,
@@ -1020,6 +1026,7 @@ export async function _createPetDeserialize(result: PathUncheckedResponse): Prom
   return petDeserializer(result.body);
 }
 
+/** Performs the createPet operation. */
 export async function createPet(
   context: Client,
   body: Pet,
@@ -1051,6 +1058,7 @@ export async function _createDogDeserialize(result: PathUncheckedResponse): Prom
   return dogDeserializer(result.body);
 }
 
+/** Performs the createDog operation. */
 export async function createDog(
   context: Client,
   body: Dog,
@@ -1082,6 +1090,7 @@ export async function _createCatDeserialize(result: PathUncheckedResponse): Prom
   return catDeserializer(result.body);
 }
 
+/** Performs the createCat operation. */
 export async function createCat(
   context: Client,
   body: CatCreate,

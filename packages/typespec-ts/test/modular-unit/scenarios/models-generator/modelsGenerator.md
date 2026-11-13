@@ -366,6 +366,8 @@ export async function _createStreamingDeserialize(result: PathUncheckedResponse)
 
   return;
 }
+
+/** Performs the createStreaming operation. */
 export async function createStreaming(
   context: Client,
   options: CreateStreamingOptionalParams = { requestOptions: {} },
@@ -469,6 +471,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -518,6 +522,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   prop: Date,
@@ -603,6 +609,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -688,6 +696,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -769,6 +779,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -841,6 +853,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -914,6 +928,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -991,6 +1007,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -1078,6 +1096,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -1166,6 +1186,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -1254,6 +1276,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Foo,
@@ -1437,6 +1461,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return catDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1545,6 +1571,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return catDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1683,6 +1711,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return psDogDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: PSDog,
@@ -1819,6 +1849,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return petUnionDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -1998,6 +2030,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<P
 
   return petUnionDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -2092,6 +2126,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<F
 
   return fooDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
@@ -2187,6 +2223,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   contentType: SchemaContentTypeValues,
@@ -2319,6 +2357,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   testHeader: "A" | "B",
@@ -2896,6 +2936,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<C
 
   return clientDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   body: Client_1,

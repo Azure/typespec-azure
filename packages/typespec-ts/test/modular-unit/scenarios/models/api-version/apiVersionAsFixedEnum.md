@@ -82,6 +82,8 @@ export async function _fooDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
+
+/** Performs the foo operation. */
 export async function foo(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
