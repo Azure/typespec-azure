@@ -1,5 +1,5 @@
-This diagnostic is issued when `@clientLroResult` cannot select a response body
-or the established result property from the operation's LRO protocol.
+This diagnostic is issued when `@clientLroResult` cannot select an envelope response
+or a supported direct property of the status-monitor envelope.
 
 ## Impact
 
@@ -9,13 +9,13 @@ or the established result property from the operation's LRO protocol.
 
 ## How to Fix
 
-Use a body returned by the existing LRO strategy or its direct status-monitor
-`@lroResult` property. Do not pass an unrelated replacement model, another
-response property, or a nested property.
+Use an envelope response returned by the existing LRO strategy or a direct property
+of its status-monitor envelope. Do not pass an unrelated replacement model or a
+nested property.
 
 Resource lifecycle operations return their resource or completion response by
-default. Selecting their established result property is supported for compatibility,
-but reports the suppressible `use-valid-client-lro-result` warning.
+default. Overriding that default with a status-monitor response or property reports
+the suppressible `use-valid-client-lro-result` warning.
 
 An ordinary operation or a legacy LRO marker without native protocol metadata is
 not a valid target. New optional/nullable projections are not supported without

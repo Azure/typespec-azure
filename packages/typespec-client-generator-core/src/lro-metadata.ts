@@ -7,6 +7,7 @@ import {
   createDiagnosticCollector,
   isUnknownType,
   isVoidType,
+  walkPropertiesInherited,
   type Diagnostic,
   type DiagnosticResult,
   type Model,
@@ -81,24 +82,6 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
   };
 }
 
-/** @internal */
-export function isLroProtocolResultProperty(
-  protocol: LroProtocolMetadata,
-  property: ModelProperty,
-): boolean {
-  const finalStep = protocol.completion.finalStep;
-  const resultProperty =
-    finalStep?.kind === "pollingSuccessProperty"
-      ? finalStep.target
-      : (protocol.polling.statusMonitorResult?.property ??
-        protocol.polling.pollingInfo.resultProperty);
-  if (resultProperty === undefined) return false;
-  return (
-    resultProperty === property ||
-    findRootSourceProperty(resultProperty) === findRootSourceProperty(property)
-  );
-}
-
 function createLroMetadata(
   protocol: LroProtocolMetadata,
   clientResult: LroClientResult,
@@ -119,6 +102,18 @@ export function getRawLroMetadata(program: Program, operation: Operation): LroMe
   return protocol ? createLroMetadata(protocol, resolveLroClientResult(protocol)) : undefined;
 }
 
+/** @internal */
+export function getLroEnvelopeProperty(
+  envelope: Model,
+  selection: ModelProperty,
+): ModelProperty | undefined {
+  return Array.from(walkPropertiesInherited(envelope)).find(
+    (property) =>
+      property === selection ||
+      findRootSourceProperty(property) === findRootSourceProperty(selection),
+  );
+}
+
 /** Resolves the effective client result without changing the LRO protocol metadata. */
 export function getClientLroMetadataWithDiagnostics(
   context: TCGCContext,
@@ -126,15 +121,15 @@ export function getClientLroMetadataWithDiagnostics(
 ): [LroMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const selection = getClientLroResult(context, operation);
+  const metadata = getRawLroMetadata(context.program, operation);
 
   // Keep the default TCGC result policy when no selection applies to the current emitter scope.
   if (!selection) {
-    return diagnostics.wrap(getRawLroMetadata(context.program, operation));
+    return diagnostics.wrap(metadata);
   }
 
   // A client result selection customizes a native LRO; it does not create LRO metadata.
-  const protocol = getLroProtocolMetadata(context.program, operation);
-  if (!protocol) {
+  if (!metadata) {
     diagnostics.add(
       createDiagnostic({
         code: "invalid-client-lro-result",
@@ -144,47 +139,24 @@ export function getClientLroMetadataWithDiagnostics(
     );
     return diagnostics.wrap(undefined);
   }
-  const clientResult = diagnostics.pipe(resolveClientLroResultSelection(protocol, selection));
+  const clientResult = diagnostics.pipe(resolveClientLroResultSelection(metadata, selection));
   // Continue SDK type construction with the default result after reporting an invalid selection.
-  return diagnostics.wrap(
-    createLroMetadata(protocol, clientResult ?? resolveLroClientResult(protocol)),
-  );
+  return diagnostics.wrap(clientResult ? { ...metadata, ...clientResult } : metadata);
 }
 
 function resolveClientLroResultSelection(
-  protocol: LroProtocolMetadata,
+  metadata: LroMetadata,
   selection: Model | ModelProperty,
 ): DiagnosticResult<LroClientResult | undefined> {
   const diagnostics = createDiagnosticCollector();
   if (selection.kind === "Model") {
-    // Accept only model identities used as response bodies by the existing completion protocol.
-    const responses: Model[] = [];
-    const finalStep = protocol.completion.finalStep;
-    if (
-      finalStep &&
-      (finalStep.kind === "finalOperationLink" || finalStep.kind === "finalOperationReference") &&
-      finalStep.responseModel.kind === "Model"
-    ) {
-      responses.push(finalStep.responseModel);
-    }
-
-    const resourceOperation = protocol.initial.resourceOperation;
-    if (resourceOperation?.operation === "delete") {
-      responses.push(protocol.polling.pollingInfo.responseModel);
-    } else if (resourceOperation) {
-      responses.push(protocol.initial.initialResponse, resourceOperation.resourceType);
-    } else {
-      responses.push(protocol.polling.pollingInfo.responseModel);
-    }
-
-    const response = responses.find((candidate) => candidate === selection);
-    if (!response) {
+    if (metadata.finalEnvelopeResult !== selection && metadata.envelopeResult !== selection) {
       diagnostics.add(
         createDiagnostic({
           code: "invalid-client-lro-result",
           target: selection,
           format: {
-            reason: "The selected model is not a response body available from the LRO protocol.",
+            reason: "The selected model is not an envelope response of the LRO.",
           },
         }),
       );
@@ -192,40 +164,47 @@ function resolveClientLroResultSelection(
     }
 
     return diagnostics.wrap({
-      logicalResult: response,
+      logicalResult: selection,
       logicalPath: undefined,
-      envelopeResult: protocol.polling.pollingInfo.responseModel,
-      finalResult: response,
-      finalEnvelopeResult: response,
+      envelopeResult: metadata.envelopeResult,
+      finalResult: selection,
+      finalEnvelopeResult: selection,
       finalResultPath: undefined,
     });
   }
 
-  const statusMonitorResult = protocol.polling.statusMonitorResult;
-  const finalStep = protocol.completion.finalStep;
-  const resultType =
-    finalStep?.kind === "pollingSuccessProperty"
-      ? finalStep.responseModel
-      : (statusMonitorResult?.type ?? protocol.polling.pollingInfo.resultProperty?.type);
-  // Accept only the direct protocol result property; arbitrary and nested paths are unsupported.
-  if (
-    !isLroProtocolResultProperty(protocol, selection) ||
-    !resultType ||
-    (resultType.kind !== "Model" && resultType.kind !== "Scalar" && !isUnknownType(resultType))
-  ) {
+  const envelopeProperty = getLroEnvelopeProperty(metadata.envelopeResult, selection);
+  if (!envelopeProperty) {
     diagnostics.add(
       createDiagnostic({
         code: "invalid-client-lro-result",
         target: selection,
         format: {
-          reason: "The selected property is not the LRO protocol's established result property.",
+          reason:
+            "The selected property is not a supported direct property of the LRO envelope response.",
         },
       }),
     );
     return diagnostics.wrap(undefined);
   }
-  const path = selection.name;
-  const envelope = protocol.polling.pollingInfo.responseModel;
+
+  const resultType = envelopeProperty.type;
+  if (resultType.kind !== "Model" && resultType.kind !== "Scalar" && !isUnknownType(resultType)) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "invalid-client-lro-result",
+        target: selection,
+        format: {
+          reason:
+            "The selected property is not a supported direct property of the LRO envelope response.",
+        },
+      }),
+    );
+    return diagnostics.wrap(undefined);
+  }
+
+  const path = envelopeProperty.name;
+  const envelope = metadata.envelopeResult;
   return diagnostics.wrap({
     logicalResult: resultType.kind === "Model" ? resultType : envelope,
     logicalPath: path,

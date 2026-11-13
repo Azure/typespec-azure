@@ -378,9 +378,9 @@ The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native C
 
 #### Customizing LRO Results
 
-TCGC applies `@clientLroResult` when calculating the SDK-facing result without changing polling, parameter binding, or required final requests. A model selection must be a polling, final-operation, final-location, or applicable resource response body already identified by the LRO protocol. A property selection must be the direct established status-monitor result property; unrelated and nested selections report `invalid-client-lro-result`. The decorator supports the existing language scopes and overrides.
+TCGC applies `@clientLroResult` when calculating the SDK-facing result without changing polling, parameter binding, or required final requests. A model selection must be the status-monitor response model or the response model containing the default final result. A property selection must be a direct property of the status-monitor model, including inherited properties, and have a model or scalar type, or `unknown`. The property does not need `@lroResult`. Unrelated and nested selections report `invalid-client-lro-result`. The decorator supports the existing language scopes and overrides.
 
-TCGC derives the default result from the discovered protocol. When the result is a complete response body, no status-monitor extraction path is retained. Selecting a resource operation's established result property is supported for existing SDK compatibility but reports the suppressible `use-valid-client-lro-result` warning.
+TCGC derives the default result from the discovered protocol. When the result is a complete response body, no status-monitor extraction path is retained. Overriding a resource operation's default result with its status-monitor response or a property of that response reports the suppressible `use-valid-client-lro-result` warning, which can be suppressed to preserve an existing SDK contract.
 
 `finalResponse.result` is the selected SDK type, `envelopeResult` is the response body containing it, and `resultSegments` identifies the selected direct property when one exists. The raw result paths likewise contain a name only for a direct property selection. Emitters must process `finalStep` independently because a required final request can return a different body from the selected result envelope.
 

@@ -1,7 +1,13 @@
-import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
-import { createRule, fileRef, paramMessage, type ModelProperty } from "@typespec/compiler";
+import {
+  createRule,
+  fileRef,
+  paramMessage,
+  type Model,
+  type ModelProperty,
+} from "@typespec/compiler";
+import { getResourceOperation } from "@typespec/rest";
 import { clientLroResultKey, negationScopesKey } from "../internal-utils.js";
-import { isLroProtocolResultProperty } from "../lro-metadata.js";
+import { getLroEnvelopeProperty, getRawLroMetadata } from "../lro-metadata.js";
 
 export const useValidClientLroResultRule = createRule({
   name: "use-valid-client-lro-result",
@@ -10,7 +16,8 @@ export const useValidClientLroResultRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result",
   docs: fileRef.fromPackageRoot("src/rules/use-valid-client-lro-result.md"),
   messages: {
-    default: paramMessage`Resource lifecycle LRO '${"operation"}' should return a resource response instead of the status-monitor result property '${"property"}'.`,
+    model: paramMessage`Resource lifecycle LRO '${"operation"}' should return its resource or completion response instead of the status-monitor response '${"model"}'.`,
+    property: paramMessage`Resource lifecycle LRO '${"operation"}' should return its resource or completion response instead of the status-monitor property '${"property"}'.`,
   },
   create(context) {
     return {
@@ -19,27 +26,54 @@ export const useValidClientLroResultRule = createRule({
         if (!scopedSelections) return;
 
         // Linter evaluation is emitter-independent; inspect all stored scopes and report once.
-        const selectedProperties = Reflect.ownKeys(scopedSelections)
+        const selections = Reflect.ownKeys(scopedSelections)
           .filter((scope) => scope !== negationScopesKey)
           .map((scope) => scopedSelections[scope])
-          .filter((selection): selection is ModelProperty => selection?.kind === "ModelProperty");
-        if (selectedProperties.length === 0) return;
+          .filter(
+            (selection): selection is Model | ModelProperty =>
+              selection?.kind === "Model" || selection?.kind === "ModelProperty",
+          );
+        if (selections.length === 0) return;
 
-        const protocol = getLroProtocolMetadata(context.program, operation);
-        if (!protocol?.initial.resourceOperation) return;
+        if (!getResourceOperation(context.program, operation)) return;
+        const metadata = getRawLroMetadata(context.program, operation);
+        if (!metadata) return;
 
-        const resultProperty = selectedProperties.find((selection) =>
-          isLroProtocolResultProperty(protocol, selection),
-        );
-        if (!resultProperty) return;
-
-        context.reportDiagnostic({
-          target: operation.node ?? operation,
-          format: {
-            operation: operation.name,
-            property: resultProperty.name,
-          },
-        });
+        for (const selection of selections) {
+          if (selection.kind === "Model") {
+            if (
+              selection === metadata.envelopeResult &&
+              (metadata.finalResult !== selection || metadata.finalResultPath !== undefined)
+            ) {
+              context.reportDiagnostic({
+                messageId: "model",
+                target: operation.node ?? operation,
+                format: {
+                  operation: operation.name,
+                  model: selection.name,
+                },
+              });
+              return;
+            }
+          } else {
+            const envelopeProperty = getLroEnvelopeProperty(metadata.envelopeResult, selection);
+            if (
+              envelopeProperty &&
+              (metadata.finalEnvelopeResult !== metadata.envelopeResult ||
+                metadata.finalResultPath !== envelopeProperty.name)
+            ) {
+              context.reportDiagnostic({
+                messageId: "property",
+                target: operation.node ?? operation,
+                format: {
+                  operation: operation.name,
+                  property: envelopeProperty.name,
+                },
+              });
+              return;
+            }
+          }
+        }
       },
     };
   },

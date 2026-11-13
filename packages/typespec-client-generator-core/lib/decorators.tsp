@@ -1344,24 +1344,27 @@ extern dec clientOption(
 );
 
 /**
- * Selects the client result of a long-running operation without changing its protocol.
- * A model selects a response body available from the LRO protocol. A property selects the
- * established status-monitor result while preserving its containing response as the envelope.
- * Resource lifecycle operations return their resource or completion response by default.
- * Selecting their status-monitor result property is supported only to preserve an existing SDK
- * contract and reports the `use-valid-client-lro-result` warning.
+ * Customizes the final result returned by generated clients for a long-running operation without
+ * changing the service protocol.
  *
- * See [LRO result customization](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
- * for supported selections.
+ * Pass the status-monitor or final response model to return the whole response body. Pass a direct
+ * property of the status-monitor model to return that property's value.
+ *
+ * See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
+ * for more information.
  *
  * @param target The long-running operation to customize.
- * @param result A response model, or the established status-monitor result property, belonging to the operation's LRO protocol.
- * @param scope Specifies the target language emitters. If omitted, applies to all language emitters.
+ * @param result The response model or status-monitor property to return from generated clients.
+ * @param scope Specifies the target language emitters.
  *
- * @example Return an action's whole status monitor in JavaScript and its payload in Python.
+ * @example Return an action's whole status monitor
  * ```typespec
- * @@clientLroResult(start, ActionStatus, "javascript");
- * @@clientLroResult(start, ActionStatus.result, "python");
+ * @@clientLroResult(start, ActionStatus);
+ * ```
+ *
+ * @example Return a property of an action's status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus.result);
  * ```
  */
 extern dec clientLroResult(

@@ -416,6 +416,8 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
   const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
+  // Client result customization does not change operation ID protocol metadata.
+  const nativeMetadata = rawMetadata;
   const operationIdSource = getStatusMonitorLink(statusMonitorStep);
   const pollingResponseBody = rawMetadata.pollingInfo.responseModel
     ? (diagnostics.pipe(
@@ -423,7 +425,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       ) as SdkModelType)
     : undefined;
   const operationId: SdkLroOperationIdMetadata[] = [];
-  for (const selection of diagnostics.pipe(resolveLroOperationId(context, rawMetadata))) {
+  for (const selection of diagnostics.pipe(resolveLroOperationId(context, nativeMetadata))) {
     if (selection.kind === "path") {
       const pathParameter = getStatusMonitorOperation(statusMonitorStep)?.parameters.find(
         (parameter): parameter is SdkPathParameter =>

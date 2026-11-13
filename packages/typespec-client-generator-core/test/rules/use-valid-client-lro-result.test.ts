@@ -20,6 +20,7 @@ const resourceLro = `
     @key id: string;
     @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
     @lroResult result: Payload;
+    secondary: Payload;
   }
 
   @get @route("/jobs/{id}") op read(@path id: string): Job;
@@ -45,6 +46,29 @@ const actionLro = `
   };
 `;
 
+const resourceLroWithSeparateStatusMonitor = `
+  @service namespace TestService;
+  alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
+
+  model Payload { value: string; }
+
+  @resource("widgets")
+  model Widget {
+    @key id: string;
+  }
+
+  model Status {
+    @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+    @lroResult result: Payload;
+  }
+
+  @get @route("/widgets/{id}") op read(@path id: string): Widget;
+  @get @route("/widgets/{id}/status") op poll(@path id: string): Status;
+
+  @pollingOperation(poll)
+  op start is Operations.LongRunningResourceCreateOrReplace<Widget>;
+`;
+
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
@@ -56,18 +80,33 @@ beforeEach(async () => {
 });
 
 describe("use-valid-client-lro-result", () => {
-  it("warns when a resource LRO selects its result property", async () => {
+  it("warns when a resource LRO selects a status-monitor property", async () => {
     await tester
       .expect(
         `
         ${resourceLro}
-        @@clientLroResult(start, Job.result);
+        @@clientLroResult(start, Job.secondary);
       `,
       )
       .toEmitDiagnostics({
         code: ruleCode,
         message:
-          "Resource lifecycle LRO 'start' should return a resource response instead of the status-monitor result property 'result'.",
+          "Resource lifecycle LRO 'start' should return its resource or completion response instead of the status-monitor property 'secondary'.",
+      });
+  });
+
+  it("warns when a resource LRO selects its separate status-monitor response", async () => {
+    await tester
+      .expect(
+        `
+        ${resourceLroWithSeparateStatusMonitor}
+        @@clientLroResult(start, Status);
+      `,
+      )
+      .toEmitDiagnostics({
+        code: ruleCode,
+        message:
+          "Resource lifecycle LRO 'start' should return its resource or completion response instead of the status-monitor response 'Status'.",
       });
   });
 
@@ -150,6 +189,18 @@ describe("use-valid-client-lro-result", () => {
         `
         ${actionLro}
         @@clientLroResult(start, Status);
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("ignores a property that is not part of the status-monitor envelope", async () => {
+    await tester
+      .expect(
+        `
+        ${resourceLro}
+        model Other { result: Payload; }
+        @@clientLroResult(start, Other.result);
       `,
       )
       .toBeValid();

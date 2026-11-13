@@ -66,7 +66,7 @@ describe("@clientLroResult", () => {
     strictEqual(raw.finalStep?.kind, "pollingSuccessProperty");
   });
 
-  it("selects the protocol result property with a coherent type and path", async () => {
+  it("selects a direct envelope property with a coherent type and path", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
       @@clientLroResult(start, Status.result);
@@ -210,7 +210,7 @@ describe("@clientLroResult", () => {
     }
   });
 
-  it("rejects selecting the established result model without its protocol property", async () => {
+  it("rejects selecting a result model that is not an LRO envelope", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
       @@clientLroResult(start, Payload);
@@ -219,7 +219,7 @@ describe("@clientLroResult", () => {
     expectDiagnostics(context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-client-lro-result",
       severity: "error",
-      message: /not a response body available from the LRO protocol/,
+      message: /not an envelope response of the LRO/,
     });
   });
 
@@ -296,23 +296,20 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("rejects selecting a separate status-monitor body for a resource PUT", async () => {
+  it("selects a separate status-monitor body for a resource PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${resourceService}
       @@clientLroResult(start, Status);
     `);
-    const unsupported = await createSdkContextForTester(program);
-    expectDiagnostics(unsupported.diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/invalid-client-lro-result",
-      severity: "error",
-    });
-    const method = unsupported.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+    const context = await createSdkContextForTester(program);
+    expectDiagnosticEmpty(context.diagnostics);
+    const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
     ok(method);
     strictEqual(method.kind, "lro");
     strictEqual(method.lroMetadata.finalStateVia, "original-uri");
     strictEqual(method.response.type?.kind, "model");
-    strictEqual(method.response.type.name, "Widget");
-    const pollingModel = unsupported.sdkPackage.models.find((m) => m.name === "Status");
+    strictEqual(method.response.type.name, "Status");
+    const pollingModel = context.sdkPackage.models.find((m) => m.name === "Status");
     ok(pollingModel);
     ok(pollingModel.usage & UsageFlags.LroPolling);
   });
@@ -589,9 +586,25 @@ describe("@clientLroResult", () => {
     },
   );
 
+  it("selects a non-result property of the status monitor", async () => {
+    const { program } = await AzureCoreTester.compile(`
+      ${monitorService}
+      @@clientLroResult(start, Status.secondary);
+    `);
+    const context = await createSdkContextForTester(program);
+    expectDiagnosticEmpty(context.diagnostics);
+    const method = context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.kind, "lro");
+    strictEqual(method.response.type?.kind, "model");
+    strictEqual(method.response.type.name, "Payload");
+    deepStrictEqual(
+      method.response.resultSegments?.map((property) => property.name),
+      ["secondary"],
+    );
+  });
+
   it.each([
-    ["nested result property", "", "Status.result::type.value"],
-    ["non-result response property", "", "Status.secondary"],
+    ["nested property", "", "Status.result::type.value"],
     ["unrelated property", "model Other { result: Payload; }", "Other.result"],
   ])("rejects %s", async (_, declarations, reference) => {
     const { program } = await AzureCoreTester.compile(`
