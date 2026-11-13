@@ -2,8 +2,6 @@ Resource lifecycle LROs should return their resource or completion response body
 
 This rule applies when `@clientLroResult` overrides the default result of a resource operation with its status-monitor response or one of its properties. Action and RPC LROs may select a status-monitor response or property without a warning.
 
-The rule is enabled by default in the `client-sdk` ruleset.
-
 These examples assume `start` is a resource lifecycle LRO whose `Job` polling response has a `result: Payload` property.
 
 ## New APIs
