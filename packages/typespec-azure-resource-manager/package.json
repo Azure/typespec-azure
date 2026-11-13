@@ -53,6 +53,7 @@
   },
   "files": [
     "lib/**/*.tsp",
+    "tspconfig.yaml",
     "dist/**",
     "!dist/test/**"
   ],
