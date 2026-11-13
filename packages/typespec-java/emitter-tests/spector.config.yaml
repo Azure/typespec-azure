@@ -31,6 +31,7 @@ specs:
   azure/client-generator-core/flatten-property: true
   azure/client-generator-core/hierarchy-building: true
   azure/client-generator-core/lro/metadata: true
+  azure/client-generator-core/lro/operation-id: true
   azure/client-generator-core/next-link-verb: true
   azure/client-generator-core/override: true
   azure/client-generator-core/response-replacement: true
