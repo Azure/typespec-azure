@@ -172,6 +172,14 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps ARM GET LRO guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-get-lro";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+      ok(!ruleset.enable?.[ruleName]);
+    }
+  });
+
   it("keeps extensible enum default guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
