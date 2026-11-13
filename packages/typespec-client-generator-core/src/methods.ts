@@ -416,8 +416,8 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
   const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
-  // Client result customization does not change operation ID protocol metadata.
-  const nativeMetadata = rawMetadata;
+  // Exclude the legacy fallback, which has no native LRO protocol.
+  const nativeMetadata = context.__clientLroMetadataCache.get(operation);
   const operationIdSource = getStatusMonitorLink(statusMonitorStep);
   const pollingResponseBody = rawMetadata.pollingInfo.responseModel
     ? (diagnostics.pipe(

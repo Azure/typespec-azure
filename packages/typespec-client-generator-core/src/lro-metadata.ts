@@ -32,6 +32,8 @@ type LroClientResult = Pick<
   | "finalResultPath"
 >;
 
+const rawLroMetadataCache = new WeakMap<Program, Map<Operation, LroMetadata | undefined>>();
+
 /**
  * Selects the client result without discovering or changing protocol facts.
  * Core keeps a separate compatibility policy for its combined metadata API.
@@ -97,8 +99,21 @@ function createLroMetadata(
 
 /** Raw LRO metadata only; the legacy @markAsLro fallback is handled separately. */
 export function getRawLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
+  let programCache = rawLroMetadataCache.get(program);
+  if (!programCache) {
+    programCache = new Map();
+    rawLroMetadataCache.set(program, programCache);
+  }
+  if (programCache.has(operation)) {
+    return programCache.get(operation);
+  }
+
   const protocol = getLroProtocolMetadata(program, operation);
-  return protocol ? createLroMetadata(protocol, resolveLroClientResult(protocol)) : undefined;
+  const metadata = protocol
+    ? createLroMetadata(protocol, resolveLroClientResult(protocol))
+    : undefined;
+  programCache.set(operation, metadata);
+  return metadata;
 }
 
 /** @internal */
