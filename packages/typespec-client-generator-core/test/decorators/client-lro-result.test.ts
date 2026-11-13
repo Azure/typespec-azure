@@ -1,5 +1,5 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { ArmTester, AzureCoreTester, createSdkContextForTester } from "../tester.js";
@@ -40,10 +40,10 @@ const resourceService = `
 `;
 
 describe("@clientLroResult", () => {
-  it("selects the completion envelope", async () => {
+  it("selects the status monitor", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
-      @@clientLroResult(start, Status, "python");
+      @@clientLroResult(start, Status);
     `);
     const context = await createSdkContextForTester(program);
     expectDiagnosticEmpty(context.diagnostics);
@@ -66,7 +66,7 @@ describe("@clientLroResult", () => {
     strictEqual(raw.finalStep?.kind, "pollingSuccessProperty");
   });
 
-  it("selects a direct envelope property with a coherent type and path", async () => {
+  it("selects a status-monitor property", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
       @@clientLroResult(start, Status.result);
@@ -137,57 +137,39 @@ describe("@clientLroResult", () => {
       `,
     },
   ])(
-    "selects a result property through a cloned polling model for $name",
+    "selects a cloned polling-model property for $name",
     async ({ tester, code, finalStateVia, finalStep }) => {
       const { program } = await tester.compile(`
         ${code}
-        @@clientLroResult(start, StandardStatus.result, "python");
+        @@clientLroResult(start, WidgetStatus.result);
       `);
-      const [selection, diagnostics] = program.resolveTypeReference(
-        "TestService.StandardStatus.result",
-      );
-      expectDiagnosticEmpty(diagnostics);
-      ok(selection?.kind === "ModelProperty");
 
-      for (const language of ["python", "java"]) {
-        const context = await createSdkContextForTester(program, {
-          emitterName: `@azure-tools/typespec-${language}`,
-        });
-        expectDiagnosticEmpty(context.diagnostics);
-        const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
-        ok(method);
-        strictEqual(method.kind, "lro");
-        const response = method.lroMetadata.finalResponse;
-        ok(response);
-        strictEqual(response.result.kind, "model");
-        strictEqual(response.result.name, "Widget");
-        strictEqual(response.envelopeResult.kind, "model");
-        strictEqual(
-          response.envelopeResult.name,
-          language === "python" ? "WidgetStatus" : "Widget",
-        );
-        strictEqual(method.response.type, response.result);
-        deepStrictEqual(
-          response.resultSegments?.map((property) => property.name),
-          language === "python" ? ["result"] : undefined,
-        );
-        strictEqual(
-          response.resultSegments?.[0].type,
-          language === "python" ? response.result : undefined,
-        );
-        deepStrictEqual(method.response.resultSegments, response.resultSegments);
-        const raw = method.lroMetadata.__raw;
-        strictEqual(raw.finalResultPath, language === "python" ? "result" : undefined);
-        strictEqual(method.lroMetadata.finalStateVia, finalStateVia);
-        strictEqual(raw.finalStep?.kind, finalStep);
-        const resultProperty = raw.pollingInfo.resultProperty;
-        ok(resultProperty);
-        notStrictEqual(resultProperty.model, selection.model);
-      }
+      const context = await createSdkContextForTester(program);
+      expectDiagnosticEmpty(context.diagnostics);
+      const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+      ok(method);
+      strictEqual(method.kind, "lro");
+      const response = method.lroMetadata.finalResponse;
+      ok(response);
+      strictEqual(response.result.kind, "model");
+      strictEqual(response.result.name, "Widget");
+      strictEqual(response.envelopeResult.kind, "model");
+      strictEqual(response.envelopeResult.name, "WidgetStatus");
+      strictEqual(method.response.type, response.result);
+      deepStrictEqual(
+        response.resultSegments?.map((property) => property.name),
+        ["result"],
+      );
+      strictEqual(response.resultSegments?.[0].type, response.result);
+      deepStrictEqual(method.response.resultSegments, response.resultSegments);
+      const raw = method.lroMetadata.__raw;
+      strictEqual(raw.finalResultPath, "result");
+      strictEqual(method.lroMetadata.finalStateVia, finalStateVia);
+      strictEqual(raw.finalStep?.kind, finalStep);
     },
   );
 
-  it("applies existing string, options-bag, exclusion, and override scopes", async () => {
+  it("selects the LRO result by language scope", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
       @@clientLroResult(start, Status, "!csharp");
@@ -210,7 +192,22 @@ describe("@clientLroResult", () => {
     }
   });
 
-  it("rejects selecting a result model that is not an LRO envelope", async () => {
+  it("ignores an out-of-scope selection", async () => {
+    const { program } = await AzureCoreTester.compile(`
+      @service namespace TestService;
+      model Widget { value: string; }
+      @get op read(): Widget;
+      @@clientLroResult(read, Widget, "python");
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-ts",
+    });
+    expectDiagnosticEmpty(context.diagnostics);
+    strictEqual(context.sdkPackage.clients[0].methods.length, 1);
+    strictEqual(context.sdkPackage.clients[0].methods[0].kind, "basic");
+  });
+
+  it("rejects a non-envelope model", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
       @@clientLroResult(start, Payload);
@@ -226,13 +223,13 @@ describe("@clientLroResult", () => {
   it.each([
     ["basic", ""],
     ["lro", "@Azure.ClientGenerator.Core.Legacy.markAsLro"],
-  ])("ignores an invalid selection and preserves the %s method", async (kind, decorator) => {
+  ])("rejects selection without an LRO protocol (%s)", async (kind, decorator) => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Widget { value: string; }
       ${decorator}
       @get op read(): Widget;
-      @@clientLroResult(read, Widget, "python");
+      @@clientLroResult(read, Widget);
     `);
     const context = await createSdkContextForTester(program);
     expectDiagnostics(context.diagnostics, {
@@ -242,16 +239,9 @@ describe("@clientLroResult", () => {
     });
     strictEqual(context.sdkPackage.clients[0].methods.length, 1);
     strictEqual(context.sdkPackage.clients[0].methods[0].kind, kind);
-
-    const javascript = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-ts",
-    });
-    expectDiagnosticEmpty(javascript.diagnostics);
-    strictEqual(javascript.sdkPackage.clients[0].methods.length, 1);
-    strictEqual(javascript.sdkPackage.clients[0].methods[0].kind, kind);
   });
 
-  it("selects the established original-URI PUT response", async () => {
+  it("selects the original-URI response", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${resourceService}
       @@clientLroResult(start, Widget);
@@ -271,7 +261,7 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("reports a missing original-URI GET once when a client result is selected", async () => {
+  it("does not duplicate missing-GET diagnostics", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Payload { value: string; }
@@ -296,7 +286,7 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("selects a separate status-monitor body for a resource PUT", async () => {
+  it("selects the status monitor for a resource PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${resourceService}
       @@clientLroResult(start, Status);
@@ -314,7 +304,7 @@ describe("@clientLroResult", () => {
     ok(pollingModel.usage & UsageFlags.LroPolling);
   });
 
-  it("selects the shared-model PUT completion response", async () => {
+  it("selects a shared resource and polling model", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
@@ -343,7 +333,7 @@ describe("@clientLroResult", () => {
     strictEqual(method.lroMetadata.finalResponse?.resultSegments, undefined);
   });
 
-  it("allows a resource PUT to preserve an existing result-property contract", async () => {
+  it("selects a result property for a resource PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
@@ -379,7 +369,7 @@ describe("@clientLroResult", () => {
     strictEqual(method.lroMetadata.__raw.finalResultPath, "result");
   });
 
-  it("selects an inherited protocol result property for a resource PUT", async () => {
+  it("selects an inherited result property", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
@@ -409,7 +399,7 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("selects a status-monitor result property for a custom PUT", async () => {
+  it("selects a result property for a custom PUT", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Widget { value: string; }
@@ -439,7 +429,7 @@ describe("@clientLroResult", () => {
   });
 
   it.each(["Widget", "Widget.value"])(
-    "validates %s against the required final-operation reference",
+    "validates final-operation selection: %s",
     async (selected) => {
       const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
@@ -485,7 +475,7 @@ describe("@clientLroResult", () => {
     },
   );
 
-  it("preserves a required final-operation response model outside the client scope", async () => {
+  it("retains a scoped-out final-operation model", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Artifact { value: string; }
@@ -528,7 +518,7 @@ describe("@clientLroResult", () => {
     ok(finalBody.usage & UsageFlags.LroFinalEnvelope);
   });
 
-  it("selects a declared final-location response", async () => {
+  it("selects a final-location response", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Details { value: string; }
@@ -556,10 +546,8 @@ describe("@clientLroResult", () => {
   it.each([
     ["Status", "Status", undefined],
     ["Status.result", "Payload", "result"],
-  ])(
-    "selects %s from the status monitor even when a final location is declared",
-    async (selected, resultName, path) => {
-      const { program } = await AzureCoreTester.compile(`
+  ])("selects %s with a final location", async (selected, resultName, path) => {
+    const { program } = await AzureCoreTester.compile(`
         @service namespace TestService;
         model Payload { value: string; }
         model Artifact { content: string; }
@@ -573,20 +561,19 @@ describe("@clientLroResult", () => {
         };
         @@clientLroResult(start, ${selected});
       `);
-      const context = await createSdkContextForTester(program);
-      expectDiagnosticEmpty(context.diagnostics);
-      const method = context.sdkPackage.clients[0].methods[0];
-      strictEqual(method.kind, "lro");
-      strictEqual(method.response.type?.kind, "model");
-      strictEqual(method.response.type.name, resultName);
-      deepStrictEqual(
-        method.response.resultSegments?.map((property) => property.name),
-        path ? [path] : undefined,
-      );
-    },
-  );
+    const context = await createSdkContextForTester(program);
+    expectDiagnosticEmpty(context.diagnostics);
+    const method = context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.kind, "lro");
+    strictEqual(method.response.type?.kind, "model");
+    strictEqual(method.response.type.name, resultName);
+    deepStrictEqual(
+      method.response.resultSegments?.map((property) => property.name),
+      path ? [path] : undefined,
+    );
+  });
 
-  it("selects a non-result property of the status monitor", async () => {
+  it("selects a property without @lroResult", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
       @@clientLroResult(start, Status.secondary);
@@ -606,6 +593,7 @@ describe("@clientLroResult", () => {
   it.each([
     ["nested property", "", "Status.result::type.value"],
     ["unrelated property", "model Other { result: Payload; }", "Other.result"],
+    ["copied property", "model Other is Status;", "Other.result"],
   ])("rejects %s", async (_, declarations, reference) => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
@@ -619,7 +607,7 @@ describe("@clientLroResult", () => {
     });
   });
 
-  it("selects a scalar protocol result property", async () => {
+  it("selects a scalar result property", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Status {
@@ -642,7 +630,7 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("applies a selector inherited from an instantiated operation template", async () => {
+  it("applies selection from an operation template", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Status {
@@ -663,7 +651,7 @@ describe("@clientLroResult", () => {
     strictEqual(method.response.type.name, "Status");
   });
 
-  it("maps the selected property into each version", async () => {
+  it("handles a renamed result property", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service @versioned(Versions) namespace TestService;
       enum Versions { v1, v2 }
@@ -696,7 +684,7 @@ describe("@clientLroResult", () => {
     }
   });
 
-  it("errors when the selected property is absent in the requested version", async () => {
+  it("rejects a property missing from the API version", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service @versioned(Versions) namespace TestService;
       enum Versions { v1, v2 }
@@ -720,7 +708,7 @@ describe("@clientLroResult", () => {
     strictEqual(context.sdkPackage.clients[0].methods[0].kind, "lro");
   });
 
-  it("preserves the existing optional polling success-property contract", async () => {
+  it("selects an optional result property", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Payload { value: string; }
@@ -745,7 +733,7 @@ describe("@clientLroResult", () => {
     );
   });
 
-  it("selects the status monitor for an action with no result property", async () => {
+  it("selects the status monitor without a result property", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service namespace TestService;
       model Status {

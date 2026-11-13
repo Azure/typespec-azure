@@ -20,7 +20,6 @@ import {
 } from "@typespec/compiler";
 import { getClientLroResult } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
-import { findRootSourceProperty } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
 type LroClientResult = Pick<
@@ -107,11 +106,7 @@ export function getLroEnvelopeProperty(
   envelope: Model,
   selection: ModelProperty,
 ): ModelProperty | undefined {
-  return Array.from(walkPropertiesInherited(envelope)).find(
-    (property) =>
-      property === selection ||
-      findRootSourceProperty(property) === findRootSourceProperty(selection),
-  );
+  return Array.from(walkPropertiesInherited(envelope)).find((property) => property === selection);
 }
 
 /** Resolves the effective client result without changing the LRO protocol metadata. */
