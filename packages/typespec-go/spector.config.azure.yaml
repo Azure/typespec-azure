@@ -62,6 +62,7 @@ specs:
   "azure/example/basic": { options: { module: examplebasicgroup } }
   "azure/payload/pageable": { options: { module: pageablegroup } }
   "azure/resource-manager/common-properties": { options: { module: commonpropsgroup } }
+  "azure/resource-manager/example": { options: { module: armexamplegroup, generate-samples: true } }
   "azure/resource-manager/large-header": { options: { module: largeheadergroup } }
   "azure/resource-manager/management-group": { options: { module: managementgroupgroup } }
   "azure/resource-manager/non-resource": { options: { module: nonresourcegroup } }

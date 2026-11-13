@@ -155,6 +155,8 @@ pnpm tspcompile --filter=TestName
 
 The first run also syncs the Azure REST API specs into `temp/`. The generated Go fixtures are not committed (they are `.gitignore`d), so validate your change by running the Go tests and linter below rather than by diffing the fixtures.
 
+Spector and local specs use normal `tspconfig.yaml` discovery so examples are loaded from the spec's project root. Synced Azure REST API specs use a stub config to prevent upstream emitter options from affecting the fixtures.
+
 ### Diff the regenerated code
 
 Because the fixtures are not committed, a plain `git diff` won't show how your emitter change affects the generated Go. To review that impact, `pnpm diff-regen-code` regenerates the code twice — once from a **baseline** emitter and once from your working tree (**head**) — and renders the difference as a clickable HTML report plus a terminal summary. It wraps the language-agnostic [`emitter-diff`](https://github.com/microsoft/typespec/tree/main/eng/emitter-diff) tool that lives in the `core` submodule, running `pnpm tspcompile` in each tree and diffing `test/http-specs`, `test/azure-http-specs`, and `test/local`.
