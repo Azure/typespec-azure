@@ -43,6 +43,8 @@ specs:
   "azure/client-generator-core/exact-name": { options: { module: exactnamegroup } }
   "azure/client-generator-core/flatten-property": { options: { module: flattengroup } }
   "azure/client-generator-core/hierarchy-building": { options: { module: hierarchygroup } }
+  "azure/client-generator-core/lro/metadata": { options: { module: lrometadatagroup } }
+  "azure/client-generator-core/lro/operation-id": { options: { module: lrooperationidgroup } }
   "azure/client-generator-core/next-link-verb":
     { options: { module: nextlinkverbgroup, slice-elements-byval: true } }
   "azure/client-generator-core/override/client.tsp": { options: { module: overridegroup } }

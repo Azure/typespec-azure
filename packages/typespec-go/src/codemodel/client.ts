@@ -327,6 +327,64 @@ interface LROMethodBase extends HttpMethodBase {
   finalStateVia?: FinalStateVia;
 
   operationLocationResultPath?: string;
+
+  /**
+   * the generated poller type that exposes LRO status metadata and/or operation ID.
+   * when undefined, the method returns a *runtime.Poller[T].
+   */
+  poller?: LROPoller;
+}
+
+/** a generated poller type that exposes LRO metadata from the status monitor */
+export interface LROPoller {
+  /** the name of the poller type */
+  name: string;
+
+  /**
+   * the status-monitor model that's unmarshaled from initial (when applicable)
+   * and polling responses. undefined when no value is read from the response body.
+   */
+  statusModel?: type.Model;
+
+  /** indicates that the initial response body is the status-monitor model */
+  initialResponseIsStatus: boolean;
+
+  /** the status-monitor fields selected as status metadata, in order */
+  statusMetadata: Array<type.ModelField>;
+
+  /** the name of the status metadata type. undefined when statusMetadata is empty */
+  statusMetadataName?: string;
+
+  /** the operation ID read from the polling URL path */
+  operationIDPath?: LROOperationIDPath;
+
+  /** the status-monitor field containing the operation ID */
+  operationIDField?: type.ModelField;
+}
+
+/** where the initial response provides the polling URL */
+export interface LROPollingURLSource {
+  /**
+   * header - the response header with the name in name
+   * body - the top-level JSON property with the name in name
+   * self - the URL of the initial request
+   */
+  kind: "header" | "body" | "self";
+
+  /** the name of the header or JSON property. empty for self */
+  name: string;
+}
+
+/** describes how to read the operation ID from the polling URL path */
+export interface LROOperationIDPath {
+  /** where the initial response provides the polling URL */
+  source: LROPollingURLSource;
+
+  /** the HTTP path template of the status-monitor operation */
+  httpPath: string;
+
+  /** the name of the path template variable containing the operation ID */
+  pathVariable: string;
 }
 
 interface HttpMethodBase extends method.Method<Client, result.ResponseEnvelope> {
