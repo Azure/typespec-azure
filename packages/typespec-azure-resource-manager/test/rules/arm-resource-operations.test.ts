@@ -102,3 +102,112 @@ it("emits diagnostics if response type of list operation is different from resou
       message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
     });
 });
+
+it.each(["FooSummary[]", "BarResource[]", "string[]", "string"])(
+  "reports an invalid resource list value of %s",
+  async (valueType) => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        namespace Microsoft.Foo;
+
+        model FooResource is TrackedResource<{}> {
+          ...ResourceNameParameter<FooResource>;
+        }
+        model FooSummary { name: string; }
+        model BarResource is TrackedResource<{}> {
+          ...ResourceNameParameter<BarResource>;
+        }
+        model FooListResult { @pageItems items: FooResource[]; value: ${valueType}; }
+
+        @armResourceOperations
+        interface FooResources {
+          read is ArmResourceRead<FooResource>;
+          /*target*/list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+        }
+        `,
+      )
+      .toEmitDiagnostics((result) => ({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+        message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+        pos: result.pos.target.pos,
+      }));
+  },
+);
+
+it("accepts a resource list with an inherited value array", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model BaseList { @pageItems value: FooResource[]; }
+      model FooListResult extends BaseList {}
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("reports a resource list without a value array", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model FooListResult { @pageItems items: FooResource[]; }
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        /*target*/list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toEmitDiagnostics((result) => ({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+      pos: result.pos.target.pos,
+    }));
+});
+
+it("checks a 201 response when there is no 200 response", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model FooSummary { name: string; }
+      model FooListResult { @pageItems value: FooSummary[]; }
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        /*target*/list is ArmListBySubscription<FooResource, Response = ArmCreatedResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toEmitDiagnostics((result) => ({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+      pos: result.pos.target.pos,
+    }));
+});
