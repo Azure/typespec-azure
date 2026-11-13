@@ -3,9 +3,13 @@ import {
   type LinterRuleContext,
   type Model,
   type Operation,
+  type Program,
+  type Type,
   createRule,
   fileRef,
   getEffectiveModelType,
+  getProperty,
+  isArrayModelType,
   isErrorType,
   isType,
 } from "@typespec/compiler";
@@ -24,6 +28,7 @@ export const armResourceOperationsRule = createRule({
     default: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
   },
   create(context) {
+    const reported = new Set<Operation>();
     return {
       model: (model: Model) => {
         if (!isInternalTypeSpec(context.program, model)) {
@@ -34,11 +39,29 @@ export const armResourceOperationsRule = createRule({
             kinds
               .map((k) => resourceOperations.lifecycle[k])
               .forEach(
-                (op) => op && checkArmResourceOperationReturnType(context, model, op.operation),
+                (op) =>
+                  op && checkArmResourceOperationReturnType(context, model, op.operation, reported),
               );
             const lists = resourceOperations.lists;
             for (const key in lists) {
-              checkArmResourceOperationReturnType(context, model, lists[key].operation);
+              const { operation, httpOperation } = lists[key];
+              if (!isInternalTypeSpec(context.program, operation) && !reported.has(operation)) {
+                const response =
+                  httpOperation.responses.find((response) => response.statusCodes === 200) ??
+                  httpOperation.responses.find((response) => response.statusCodes === 201);
+                const invalid = response?.responses.some(({ body }) => {
+                  return (
+                    !body ||
+                    body.bodyKind !== "single" ||
+                    !isResourceListBody(context.program, body.type, model)
+                  );
+                });
+                if (invalid) {
+                  reported.add(operation);
+                  context.reportDiagnostic({ target: operation });
+                }
+              }
+              checkArmResourceOperationReturnType(context, model, operation, reported);
             }
           }
         }
@@ -47,12 +70,26 @@ export const armResourceOperationsRule = createRule({
   },
 });
 
+function isResourceListBody(program: Program, body: Type, resource: Model): boolean {
+  if (body.kind === "Union") {
+    return [...body.variants.values()].every((variant) =>
+      isResourceListBody(program, variant.type, resource),
+    );
+  }
+  if (body.kind !== "Model") return false;
+  const value = getProperty(body, "value")?.type;
+  if (value?.kind !== "Model" || !isArrayModelType(value)) return false;
+  const item = value.indexer.value;
+  return item.kind === "Model" && getEffectiveModelType(program, item) === resource;
+}
+
 function checkArmResourceOperationReturnType(
   context: LinterRuleContext<DiagnosticMessages>,
   model: Model,
   operation: Operation,
+  reported: Set<Operation>,
 ) {
-  if (!isInternalTypeSpec(context.program, operation)) {
+  if (!isInternalTypeSpec(context.program, operation) && !reported.has(operation)) {
     const returnType = operation.returnType;
     if (returnType.kind === "Model") {
       throwIfNotMatchingArmModel(context, operation, model, returnType);
@@ -93,9 +130,10 @@ function checkArmResourceOperationReturnType(
     modelCandidate: Model,
   ) {
     if (getArmResource(context.program, modelCandidate) !== undefined && modelCandidate !== model) {
-      context.reportDiagnostic({
-        target: operation,
-      });
+      if (!reported.has(operation)) {
+        reported.add(operation);
+        context.reportDiagnostic({ target: operation });
+      }
     }
   }
 }
