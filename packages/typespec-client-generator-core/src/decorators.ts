@@ -27,14 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import {
-  getAuthentication,
-  getHttpOperation,
-  getServers,
-  isBody,
-  isBodyRoot,
-  isPathParam,
-} from "@typespec/http";
+import { getHttpOperation, isBody, isBodyRoot, isPathParam } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import type {
   AccessDecorator,
@@ -89,8 +82,6 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  isSameAuth,
-  isSameServers,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -333,41 +324,6 @@ export const $client: ClientDecorator = (
       return;
     }
     services = serviceConfig.values;
-    // validate all services has same server definition
-    let servers = undefined;
-    let auth = undefined;
-    let isSame = true;
-    for (const svc of services) {
-      const currentServers = getServers(context.program, svc);
-      if (currentServers === undefined) continue;
-      if (servers === undefined) {
-        servers = currentServers;
-      } else {
-        isSame = isSameServers(servers, currentServers);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    for (const svc of services) {
-      const currentAuth = getAuthentication(context.program, svc);
-      if (currentAuth === undefined) continue;
-      if (auth === undefined) {
-        auth = currentAuth;
-      } else {
-        isSame = isSameAuth(auth, currentAuth);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    if (!isSame) {
-      reportDiagnostic(context.program, {
-        code: "inconsistent-multiple-service",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
     // For clients merging multiple services, ensure all services agree on the
     // version of any shared library dependency (e.g. ARM common-types).
     // Diverging versions cause TCGC to emit duplicated/diverged models.

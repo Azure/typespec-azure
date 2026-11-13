@@ -23,6 +23,7 @@ import {
   type SdkEnumType,
   type SdkHttpOperation,
   type SdkPathParameter,
+  type SdkServiceConfiguration,
   type SdkServiceOperation,
   type SdkUnionType,
   type TCGCContext,
@@ -32,6 +33,7 @@ import {
   createGeneratedName,
   getActualClientType,
   getClientDoc,
+  getClientServiceConfigurations,
   getTypeDecorators,
   getValueTypeValue,
   isSubscriptionId,
@@ -256,6 +258,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   }
   // Handle default client parameters (endpoint, credential, api version, subscription id)
   addDefaultClientParameters(context, sdkClientType);
+  const configurations = diagnostics.pipe(getSdkServiceConfigurations(context, sdkClientType));
+  if (configurations) sdkClientType.clientInitialization.serviceConfigurations = configurations;
 
   return diagnostics.wrap(sdkClientType);
 }
@@ -324,6 +328,36 @@ function addDefaultClientParameters<
     ...defaultClientParamters,
     ...client.clientInitialization.parameters,
   ];
+}
+
+function getSdkServiceConfigurations<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  client: SdkClientType<TServiceOperation>,
+): [SdkClientInitializationType["serviceConfigurations"], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const catalog = getClientServiceConfigurations(context, client.__raw);
+  if (!catalog) return diagnostics.wrap(undefined);
+  const configurations: SdkServiceConfiguration[] = [];
+  for (const configuration of catalog.configurations) {
+    const [endpoint] = diagnostics.pipe(
+      getEndpointTypeFromSingleServer(context, client, configuration.server),
+    );
+    configurations.push({
+      name: configuration.name,
+      endpoint: {
+        ...endpoint,
+        serverUrl: configuration.server.url,
+        templateArguments:
+          configuration.server.parameters.size === 0 ? [] : endpoint.templateArguments,
+      },
+      authentication: configuration.authentication,
+      credential: getSdkCredentialParameter(context, client, configuration.authentication),
+    });
+  }
+  return diagnostics.wrap({
+    defaultConfiguration: catalog.defaultConfiguration,
+    configurations,
+  });
 }
 
 function createSdkClientInitializationType<

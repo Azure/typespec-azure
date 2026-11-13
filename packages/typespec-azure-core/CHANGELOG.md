@@ -1,5 +1,32 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.74.0
+
+### Features
+
+- [#5710](https://github.com/Azure/typespec-azure/pull/5710) Add `@azureServiceConfigurations` to pair named endpoints with OAuth URLs and scopes, authored as value records with constrained `typeref(...)` references to authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature to use these references. Require a `public` default and preserve AND groups and credential alternatives.
+- [#5959](https://github.com/Azure/typespec-azure/pull/5959) Add the `list-operation-missing-200-response` lint rule to require an HTTP 200 response on operations marked with `@list`, including data-plane and POST operations.
+- [#5507](https://github.com/Azure/typespec-azure/pull/5507) Add the `no-redundant-summary` lint rule to warn when a declaration's summary repeats its documentation.
+- [#5986](https://github.com/Azure/typespec-azure/pull/5986) Add the `no-request-body` lint rule to report GET and DELETE operations with request bodies across data-plane and Azure Resource Manager APIs.
+  
+  ```tsp
+  @get
+  op read(@body filter: { name: string }): string; // warning: GET request body
+  
+  @delete
+  op remove(@body options: { force: boolean }): void; // warning: DELETE request body
+  ```
+- [#5782](https://github.com/Azure/typespec-azure/pull/5782) Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Active selections are validated during LRO processing; unused or out-of-scope annotations have no effect. Includes emitter scopes and representative Spector scenarios.
+- [#5546](https://github.com/Azure/typespec-azure/pull/5546) Separate native LRO protocol analysis from client-result selection. Add `getLroProtocolMetadata` in `Azure.Core` with protocol facts grouped into required initial, polling, and completion objects alongside the top-level operation. Route TCGC result selection and native model usage through these facts, preserving all leaf field semantics, the flat `getLroMetadata` contract, and existing SDK result contracts.
+- [#5973](https://github.com/Azure/typespec-azure/pull/5973) Add the `use-known-enum-default` linter rule to warn when an extensible enum's default is not one of its declared values.
+
+### Bug Fixes
+
+- [#5677](https://github.com/Azure/typespec-azure/pull/5677) Include the status monitor error property in LRO metadata resolved from an implicit polling location.
+- [#5975](https://github.com/Azure/typespec-azure/pull/5975) Fix `no-generic-numeric` to report generic numeric array elements and dictionary values, including nested combinations of arrays and records, and inline operation parameters such as query parameters.
+- [#5522](https://github.com/Azure/typespec-azure/pull/5522) Report nonempty anonymous request body models passed through templates with no-unnamed-types, while preserving authentication and other non-payload template configuration exemptions.
+
+
 ## 0.73.0
 
 ### Features

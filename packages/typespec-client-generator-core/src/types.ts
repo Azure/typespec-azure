@@ -103,6 +103,7 @@ import {
   filterPreviewVersion,
   getAvailableApiVersions,
   getClientDoc,
+  getClientServiceConfigurations,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
@@ -1546,10 +1547,11 @@ function getSdkCredentialType(
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClientType<SdkHttpOperation>,
+  authentication?: Authentication,
 ): SdkCredentialParameter | undefined {
   // Multiple services only deal with the first server config
   const service = client.__raw.services[0];
-  const auth = getAuthentication(context.program, service);
+  const auth = authentication ?? getAuthentication(context.program, service);
   if (!auth) return undefined;
   return {
     type: getSdkCredentialType(context, client, auth),
@@ -2831,23 +2833,25 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   const diagnostics = createDiagnosticCollector();
   const services = new Set<Namespace>();
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInClient(context, client)) {
-      // operations on a client
-      diagnostics.pipe(updateTypesFromOperation(context, operation));
-    }
-    for (const sc of listSubClients(context, client, true)) {
-      for (const operation of listOperationsInClient(context, sc)) {
-        // operations on sub clients
+    const clients = [client, ...listSubClients(context, client, true)];
+    for (const current of clients) {
+      for (const operation of listOperationsInClient(context, current)) {
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
     }
     // server parameters
-    // Multiple services only deal with the first server config
-    const servers = getServers(context.program, client.services[0]);
-    if (servers !== undefined && servers[0].parameters !== undefined) {
-      for (const param of servers[0].parameters.values()) {
-        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+    for (const current of clients) {
+      const catalog = getClientServiceConfigurations(context, current);
+      const servers = catalog
+        ? catalog.configurations.map((configuration) => configuration.server)
+        : current === client
+          ? getServers(context.program, current.services[0])?.slice(0, 1)
+          : undefined;
+      for (const server of servers ?? []) {
+        for (const param of server.parameters.values()) {
+          const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+        }
       }
     }
     client.services.map((s) => services.add(s));
