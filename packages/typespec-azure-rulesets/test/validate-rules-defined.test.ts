@@ -69,6 +69,15 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("enables TCGC scope validation only in the client-sdk ruleset", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/unsupported-scope";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], true);
+    for (const name of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[name].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[name].disable?.[ruleName], undefined);
+    }
+  });
+
   it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
