@@ -43,12 +43,22 @@ export function buildRestorePoller(
   });
 
   const clientNames = importClassicalClient(client, restorePollerFile);
-  const deserializeMap = importDeserializeHelpers(context, client, restorePollerFile);
+  const { deserializeMap, hasOperationMetadata } = importDeserializeHelpers(
+    context,
+    client,
+    restorePollerFile,
+  );
   const pathUncheckedReference = resolveReference(dependencies.PathUncheckedResponse);
   const pollerLikeReference = resolveReference(AzurePollingDependencies.PollerLike);
   const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
   const operationOptionsReference = resolveReference(dependencies.OperationOptions);
   const deserializeStateReference = resolveReference(AzurePollingDependencies.DeserializeState);
+  // Operations with LRO operation metadata expose it on a richer operation state, so let
+  // restored pollers keep the source operation's state type.
+  const stateTypeParameter = hasOperationMetadata
+    ? `, TState extends ${operationStateReference}<TResult> = ${operationStateReference}<TResult>`
+    : "";
+  const stateType = hasOperationMetadata ? "TState" : `${operationStateReference}<TResult>`;
   const restorePollerHelperContent = `
     export interface RestorePollerOptions<
       TResult,
@@ -69,14 +79,14 @@ export function buildRestorePoller(
      * useful when you want to create pollers on a different host or a poller
      * needs to be constructed after the original one is not in scope.
      */
-    export function restorePoller<TResponse extends ${pathUncheckedReference}, TResult>(
+    export function restorePoller<TResponse extends ${pathUncheckedReference}, TResult${stateTypeParameter}>(
       client: ${clientNames.join(" | ")},
       serializedState: string,
       sourceOperation: (
         ...args: any[]
-      ) => ${pollerLikeReference}<${operationStateReference}<TResult>, TResult>,
+      ) => ${pollerLikeReference}<${stateType}, TResult>,
       options?: RestorePollerOptions<TResult>
-    ): ${pollerLikeReference}<${operationStateReference}<TResult>, TResult> {
+    ): ${pollerLikeReference}<${stateType}, TResult> {
       const pollerConfig = ${deserializeStateReference}(serializedState).config;
       const { initialRequestUrl, requestMethod, metadata } = pollerConfig;
       if (!initialRequestUrl || !requestMethod) {
@@ -87,7 +97,7 @@ export function buildRestorePoller(
       const resourceLocationConfig = metadata?.["resourceLocationConfig"] as
         | ${resolveReference(AzurePollingDependencies.ResourceLocationConfig)}
         | undefined;
-      const { deserializer, expectedStatuses = [] } =
+      const { deserializer, expectedStatuses = []${hasOperationMetadata ? ", getOperationMetadata" : ""} } =
         getDeserializationHelper(initialRequestUrl, requestMethod) ?? {};
       const deserializeHelper = options?.processResponseBody ?? deserializer;
       if (!deserializeHelper) {
@@ -106,14 +116,22 @@ export function buildRestorePoller(
           resourceLocationConfig,
           restoreFrom: serializedState,
           initialRequestUrl,
-          apiVersion,
+          apiVersion,${hasOperationMetadata ? "\n          getOperationMetadata," : ""}
         }
-      );
+      )${hasOperationMetadata ? ` as ${pollerLikeReference}<TState, TResult>` : ""};
     }
     
     interface DeserializationHelper {
       deserializer: (result: PathUncheckedResponse) => Promise<any>;
-      expectedStatuses: string[];
+      expectedStatuses: string[];${
+        hasOperationMetadata
+          ? `
+      getOperationMetadata?: (
+        statusMonitorResponse: ${pathUncheckedReference} | undefined,
+        operationLocation: string | undefined
+      ) => Record<string, unknown>;`
+          : ""
+      }
     }
 
     const deserializeMap: Record<string, DeserializationHelper> = {
@@ -214,22 +232,38 @@ function importDeserializeHelpers(
   const deserializeMap: string[] = [];
   for (const [key, value] of deserializeDetails.entries()) {
     sourceFile.addImportDeclaration({
-      namedImports: value.map((detail) =>
+      namedImports: value.flatMap((detail) => [
         detail.renamedDeserName
           ? `${detail.deserName} as ${detail.renamedDeserName}`
           : detail.deserName,
-      ),
+        ...(detail.operationMetadataName
+          ? [
+              detail.renamedOperationMetadataName
+                ? `${detail.operationMetadataName} as ${detail.renamedOperationMetadataName}`
+                : detail.operationMetadataName,
+            ]
+          : []),
+      ]),
       moduleSpecifier: key,
     });
     value.forEach((detail) => {
+      const operationMetadataName =
+        detail.renamedOperationMetadataName ?? detail.operationMetadataName;
       deserializeMap.push(
         `"${detail.path}": { deserializer: ${
           detail.renamedDeserName ?? detail.deserName
-        }, expectedStatuses: ${detail.expectedStatusesExpression} }`,
+        }, expectedStatuses: ${detail.expectedStatusesExpression}${
+          operationMetadataName ? `, getOperationMetadata: ${operationMetadataName}` : ""
+        } }`,
       );
     });
   }
-  return deserializeMap;
+  return {
+    deserializeMap,
+    hasOperationMetadata: [...deserializeDetails.values()].some((details) =>
+      details.some((detail) => detail.operationMetadataName),
+    ),
+  };
 }
 
 function importClassicalClient(
