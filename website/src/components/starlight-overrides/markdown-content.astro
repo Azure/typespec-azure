@@ -1,0 +1,12 @@
+---
+import "@astrojs/starlight/style/markdown.css";
+
+const { entry } = Astro.locals.starlightRoute;
+---
+
+<div
+  class="sl-markdown-content"
+  data-pagefind-weight={entry.id.startsWith("docs/release-notes/") ? 0.5 : undefined}
+>
+  <slot />
+</div>
