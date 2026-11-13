@@ -155,8 +155,8 @@ export interface Interface {
   /** does this polymorphic type have a parent (e.g. SalmonClassification has parent FishClassification) */
   parent?: Interface;
 
-  /**  this is the "root" type in the list of polymorphic types (e.g. Fish for FishClassification) */
-  rootType: PolymorphicModel;
+  /** the base model, if this interface represents a model hierarchy rather than a union */
+  rootType?: PolymorphicModel;
 
   /** the package to which this type belongs */
   pkg: PackageContent;
@@ -942,9 +942,8 @@ export class ETag extends QualifiedType implements ETag {
 }
 
 export class Interface implements Interface {
-  // WireTypes and rootType are required. however, we have a chicken-and-egg
-  // problem as creating a PolymorphicType requires the necessary InterfaceType.
-  // so these fields MUST be populated after creating the InterfaceType.
+  // Creating a PolymorphicModel requires its Interface, so possibleTypes and
+  // the optional rootType are populated after creating the Interface.
   constructor(pkg: PackageContent, name: string, discriminatorField: string) {
     this.kind = "interface";
     this.name = name;

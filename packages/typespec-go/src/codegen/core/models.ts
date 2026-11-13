@@ -401,7 +401,10 @@ function generateModelDefs(
         }
         descriptionMods.push("CONSTANT");
       }
-      if ((fieldType.kind === "literal" || go.isSlice(fieldType, "literal")) && model.usage !== go.UsageFlags.Output) {
+      if (
+        (fieldType.kind === "literal" || go.isSlice(fieldType, "literal")) &&
+        model.usage !== go.UsageFlags.Output
+      ) {
         // add a comment with the const value for const properties that are sent over the wire
         if (field.docs.description) {
           field.docs.description += "\n";
@@ -553,7 +556,9 @@ function fieldNeedsXMLNestedModelMarshalling(
   field: go.ModelField,
 ): field is go.ModelField & { type: go.Model | go.Ptr<go.Model> } {
   const fieldType = go.unwrapPtr(field.type);
-  return fieldType.kind === "model" && !!fieldType.xmlName && field.serializedName !== fieldType.xmlName;
+  return (
+    fieldType.kind === "model" && !!fieldType.xmlName && field.serializedName !== fieldType.xmlName
+  );
 }
 
 // generates discriminator marker method
@@ -562,6 +567,15 @@ function generateDiscriminatorMarkerMethod(
   modelDef: ModelDef,
   indent: helpers.Indentation,
 ) {
+  if (!type.rootType) {
+    const interfaceMethod = `is${type.name}`;
+    modelDef.Methods.push({
+      name: interfaceMethod,
+      desc: "",
+      text: `func (*${modelDef.Model.name}) ${interfaceMethod}() {}\n\n`,
+    });
+    return;
+  }
   const typeName = type.rootType.name;
   const receiver = modelDef.receiverName();
   const interfaceMethod = `Get${typeName}`;
@@ -801,6 +815,16 @@ function generateJSONMarshallerBody(
   if (addlProps) {
     marshaller += `${indent.get()}if ${receiver}.AdditionalProperties != nil {\n`;
     marshaller += `${indent.push().get()}for key, val := range ${receiver}.AdditionalProperties {\n`;
+    const discriminatorCheck = modelDef.Model.fields
+      .filter((field) => field.annotations.isDiscriminator)
+      .map((field) => `key == "${field.serializedName}"`)
+      .join(" || ");
+    if (discriminatorCheck) {
+      marshaller += `${indent.push().get()}if ${discriminatorCheck} {\n`;
+      marshaller += `${indent.push().get()}continue\n`;
+      marshaller += `${indent.pop().get()}}\n`;
+      indent.pop();
+    }
     if (go.isPtr(addlProps.itemType, "time") && addlProps.itemType.ptrType.utc) {
       // normalize utc datetimes before casting the (pointer) map value
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
@@ -899,7 +923,11 @@ function generateJSONUnmarshallerBody(
       assignment = `(*time.Time)(${assignment})`;
     }
     addlPropsText += `${indent.push().get()}var aux ${auxType}\n`;
-    addlPropsText += `${indent.get()}err = json.Unmarshal(val, &aux)\n`;
+    if (helpers.recursiveUnwrapMapSlice(addlProps.itemType).kind === "interface") {
+      addlPropsText += `${indent.get()}aux, err = ${helpers.getDiscriminatorUnmarshallerName(addlProps.itemType)}(val)\n`;
+    } else {
+      addlPropsText += `${indent.get()}err = json.Unmarshal(val, &aux)\n`;
+    }
     addlPropsText += `${indent.get()}${receiver}.AdditionalProperties[key] = ${assignment}\n`;
     addlPropsText += `${indent.pop().get()}}\n`;
     addlPropsText += `${indent.get()}delete(rawMsg, key)\n`;
@@ -921,8 +949,8 @@ function generateJSONUnmarshallerBody(
       const fieldType = go.unwrapPtr(field.type);
       unmarshalBody += `${indent.get()}case "${field.serializedName}":\n`;
       indent.push(); // case body level
-      if (hasDiscriminatorInterface(fieldType)) {
-        unmarshalBody += generateDiscriminatorUnmarshaller(modelDef.Model, field, receiver, indent);
+      if (helpers.recursiveUnwrapMapSlice(fieldType).kind === "interface") {
+        unmarshalBody += `${indent.get()}${receiver}.${field.name}, err = ${helpers.getDiscriminatorUnmarshallerName(fieldType)}(val)\n`;
         needsErrCheck = true;
       } else if (fieldType.kind === "sliceArray") {
         unmarshalBody += `${indent.get()}err = unpopulateStringArray(val, "${field.name}", &${receiver}.${field.name}, "${getSliceArrayDelimiter(fieldType.delimiter)}")\n`;
@@ -1089,188 +1117,6 @@ function getSliceArrayDelimiter(delimiter: go.SliceArrayDelimiter): string {
   }
 }
 
-// returns true if item has a discriminator interface.
-// recursively called for arrays and dictionaries.
-function hasDiscriminatorInterface(item: go.WireType): boolean {
-  switch (item.kind) {
-    case "interface":
-      return true;
-    case "map":
-    case "slice":
-      return hasDiscriminatorInterface(item.itemType);
-    default:
-      return false;
-  }
-}
-
-// returns the text for unmarshalling a discriminated type
-function generateDiscriminatorUnmarshaller(
-  modelType: go.Model | go.PolymorphicModel,
-  field: go.ModelField,
-  receiver: string,
-  indent: helpers.Indentation,
-): string {
-  const propertyName = field.name;
-
-  // these are the simple, non-nested cases (e.g. InterfaceType, []InterfaceType, map[string]InterfaceType)
-  if (field.type.kind === "interface") {
-    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.name}(val)\n`;
-  } else if (go.isSlice(field.type, "interface")) {
-    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.itemType.name}Array(val)\n`;
-  } else if (go.isMap(field.type, "interface")) {
-    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.itemType.name}Map(val)\n`;
-  }
-
-  // nested case (e.g. [][]InterfaceType, map[string]map[string]InterfaceType etc)
-  // first, unmarshal the raw data
-  const rawTargetVar = `${field.serializedName}Raw`;
-  let text = `${indent.get()}var ${rawTargetVar} ${recursiveGetDiscriminatorTypeName(modelType, field.type, true)}\n`;
-  text += `${indent.get()}if err = json.Unmarshal(val, &${rawTargetVar}); err != nil {\n`;
-  text += `${indent.push().get()}return err\n`;
-  text += `${indent.pop().get()}}\n`;
-
-  // create a local instantiation of the final type
-  const finalTargetVar = field.serializedName;
-  let finalTargetCtor = recursiveGetDiscriminatorTypeName(modelType, field.type, false);
-  if (field.type.kind === "slice") {
-    finalTargetCtor = `make(${finalTargetCtor}, len(${rawTargetVar}))`;
-  } else {
-    // must be a dictionary
-    finalTargetCtor = `${finalTargetCtor}{}`;
-  }
-  text += `${indent.get()}${finalTargetVar} := ${finalTargetCtor}\n`;
-
-  // now populate the final type
-  text += recursivePopulateDiscriminator(
-    modelType,
-    field.type,
-    receiver,
-    rawTargetVar,
-    finalTargetVar,
-    indent,
-    1,
-  );
-
-  // finally, assign the final target to the property
-  text += `${indent.get()}${receiver}.${propertyName} = ${finalTargetVar}\n`;
-  return text;
-}
-
-// constructs the type name for a nested discriminated type
-// raw e.g. map[string]json.RawMessage, []json.RawMessage etc
-// !raw e.g. map[string]map[string]InterfaceType, [][]InterfaceType etc
-function recursiveGetDiscriminatorTypeName(
-  modelType: go.Model | go.PolymorphicModel,
-  item: go.WireType,
-  raw: boolean,
-): string {
-  // when raw is true, stop recursing at the level before the leaf schema
-  if (item.kind === "slice") {
-    if (!raw || item.itemType.kind !== "interface") {
-      return `[]${recursiveGetDiscriminatorTypeName(modelType, item.itemType, raw)}`;
-    }
-  } else if (item.kind === "map") {
-    if (!raw || item.itemType.kind !== "interface") {
-      return `map[string]${recursiveGetDiscriminatorTypeName(modelType, item.itemType, raw)}`;
-    }
-  }
-  if (raw) {
-    return "json.RawMessage";
-  }
-  return go.getTypeDeclaration(item, modelType.pkg);
-}
-
-/**
- * recursively constructs the text to populate a nested discriminator
- *
- * @param modelType the type that contains item
- * @param item the type for which to create the population
- * @param receiver the name of the receiver for the method to contain the expression
- * @param rawSrc contains the raw unmarshaled JSON source
- * @param dest the variable that will contain the result of the expression
- * @param indent the current indentation helper (level increases with each recursive call)
- * @param nesting the current level of nesting (increments with each recursive call)
- * @returns the text populating the discriminator
- */
-function recursivePopulateDiscriminator(
-  modelType: go.Model | go.PolymorphicModel,
-  item: go.WireType,
-  receiver: string,
-  rawSrc: string,
-  dest: string,
-  indent: helpers.Indentation,
-  nesting: number,
-): string {
-  let text = "";
-  let interfaceName = "";
-  let targetType = "";
-
-  if (item.kind === "slice") {
-    if (item.itemType.kind !== "interface") {
-      if (nesting > 1) {
-        // at nestling level 1, the destination var was already created in generateDiscriminatorUnmarshaller()
-        text += `${indent.get()}${dest} = make(${recursiveGetDiscriminatorTypeName(modelType, item, false)}, len(${rawSrc}))\n`;
-      }
-
-      text += `${indent.get()}for i${nesting} := range ${rawSrc} {\n`;
-      rawSrc = `${rawSrc}[i${nesting}]`; // source becomes each element in the source slice
-      dest = `${dest}[i${nesting}]`; // update destination to each element in the destination slice
-      indent.push();
-      text += recursivePopulateDiscriminator(
-        modelType,
-        item.itemType,
-        receiver,
-        rawSrc,
-        dest,
-        indent,
-        nesting + 1,
-      );
-      indent.pop();
-      text += `${indent.get()}}\n`;
-      return text;
-    }
-
-    // we're at leaf node - 1, so get the interface from the element's type
-    interfaceName = go.getTypeDeclaration(item.itemType, modelType.pkg);
-    targetType = "Array";
-  } else if (item.kind === "map") {
-    if (item.itemType.kind !== "interface") {
-      if (nesting > 1) {
-        // at nestling level 1, the destination var was already created in generateDiscriminatorUnmarshaller()
-        text += `${indent.get()}${dest} = ${recursiveGetDiscriminatorTypeName(modelType, item, false)}{}\n`;
-      }
-
-      text += `${indent.get()}for k${nesting}, v${nesting} := range ${rawSrc} {\n`;
-      rawSrc = `v${nesting}`; // source becomes the current value in the source map
-      dest = `${dest}[k${nesting}]`; // update destination to the destination map's value for the current key
-      indent.push();
-      text += recursivePopulateDiscriminator(
-        modelType,
-        item.itemType,
-        receiver,
-        rawSrc,
-        dest,
-        indent,
-        nesting + 1,
-      );
-      indent.pop();
-      text += `${indent.get()}}\n`;
-      return text;
-    }
-
-    // we're at leaf node - 1, so get the interface from the element's type
-    interfaceName = go.getTypeDeclaration(item.itemType, modelType.pkg);
-    targetType = "Map";
-  }
-
-  text += `${indent.get()}${dest}, err = unmarshal${interfaceName}${targetType}(${rawSrc})\n`;
-  text += `${indent.get()}if err != nil {\n`;
-  text += `${indent.push().get()}return fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`;
-  text += `${indent.pop().get()}}\n`;
-
-  return text;
-}
-
 /** returns the alias type name to use when aliasing a model type */
 function getXMLNestedModelAliasTypeName(type: go.Model | go.Ptr<go.Model>): string {
   const fieldType = go.unwrapPtr(type);
@@ -1324,7 +1170,8 @@ function generateXMLMarshaller(
     } else if (fieldNeedsXMLNestedModelMarshalling(field)) {
       text += `${indent.get()}${helpers.buildIfBlock(indent, {
         condition: `${receiver}.${field.name} != nil`,
-        body: (indent) => `${indent.get()}aux.${field.name} = (*${getXMLNestedModelAliasTypeName(field.type)})(${receiver}.${field.name})\n`,
+        body: (indent) =>
+          `${indent.get()}aux.${field.name} = (*${getXMLNestedModelAliasTypeName(field.type)})(${receiver}.${field.name})\n`,
       })}\n`;
     }
   }
@@ -1592,7 +1439,9 @@ function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): stri
     if (field.xmlKind !== "unwrappedList") {
       // start with the serialized name of the element, preferring xml name if available
       const unwrappedPtrType = go.unwrapPtr(field.type.itemType);
-      const inner = field.type.xmlName ? field.type.xmlName : go.hasXMLName(unwrappedPtrType) ?? go.getTypeDeclaration(unwrappedPtrType, pkg);
+      const inner = field.type.xmlName
+        ? field.type.xmlName
+        : (go.hasXMLName(unwrappedPtrType) ?? go.getTypeDeclaration(unwrappedPtrType, pkg));
       serialization += `>${inner}`;
     }
   }
@@ -1600,7 +1449,11 @@ function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): stri
 }
 
 /** expanded version of helpers.formatLiteralValue than handles slices */
-function formatLiteralValue(type: go.Literal | go.Slice<go.Literal<go.Constant | go.Scalar | go.String>>, pkg: go.PackageContent, withCast: boolean): string {
+function formatLiteralValue(
+  type: go.Literal | go.Slice<go.Literal<go.Constant | go.Scalar | go.String>>,
+  pkg: go.PackageContent,
+  withCast: boolean,
+): string {
   switch (type.kind) {
     case "literal":
       return helpers.formatLiteralValue(type, withCast);

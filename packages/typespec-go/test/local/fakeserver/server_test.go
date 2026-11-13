@@ -5,10 +5,13 @@ package fakeserver_test
 
 import (
 	"context"
+	"encoding/json"
 	"fakeserver"
 	"fakeserver/fake"
+	"io"
 	"math"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,6 +19,7 @@ import (
 
 	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/stretchr/testify/require"
 )
@@ -244,4 +248,82 @@ func TestIntEnumPathFake(t *testing.T) {
 			require.Equal(t, value, received, "int-enum path param did not round-trip")
 		})
 	}
+}
+
+func TestDiscriminatedAdditionalPropertiesMarshal(t *testing.T) {
+	value := fakeserver.InlinePetCat{
+		PetType: to.Ptr("ignored"),
+		Name:    to.Ptr("Whiskers"),
+		AdditionalProperties: map[string]*string{
+			"petType": to.Ptr("dog"),
+			"extra":   to.Ptr("preserved"),
+		},
+	}
+	raw, err := json.Marshal(value)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"petType":"cat","name":"Whiskers","extra":"preserved"}`, string(raw))
+}
+
+func TestDiscriminatedCollectionFake(t *testing.T) {
+	pet := &fakeserver.PetCat{
+		Kind:  to.Ptr("cat"),
+		Value: &fakeserver.Cat{Name: to.Ptr("Whiskers")},
+	}
+	var receivedPets []fakeserver.PetClassification
+	var receivedMap map[string]fakeserver.PetClassification
+	var receivedBatches map[string][]fakeserver.PetClassification
+	transport := fake.NewServerTransport(&fake.Server{
+		PutPets: func(_ context.Context, body []fakeserver.PetClassification, _ *fakeserver.ClientPutPetsOptions) (resp azfake.Responder[fakeserver.ClientPutPetsResponse], errResp azfake.ErrorResponder) {
+			receivedPets = body
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientPutPetsResponse{}, nil)
+			return
+		},
+		PutPetMap: func(_ context.Context, body map[string]fakeserver.PetClassification, _ *fakeserver.ClientPutPetMapOptions) (resp azfake.Responder[fakeserver.ClientPutPetMapResponse], errResp azfake.ErrorResponder) {
+			receivedMap = body
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientPutPetMapResponse{}, nil)
+			return
+		},
+		PutPetBatches: func(_ context.Context, body map[string][]fakeserver.PetClassification, _ *fakeserver.ClientPutPetBatchesOptions) (resp azfake.Responder[fakeserver.ClientPutPetBatchesResponse], errResp azfake.ErrorResponder) {
+			receivedBatches = body
+			resp.SetResponse(http.StatusNoContent, fakeserver.ClientPutPetBatchesResponse{}, nil)
+			return
+		},
+	})
+	client, err := fakeserver.NewClientWithNoCredential("https://fake.endpoint", &fakeserver.ClientOptions{
+		ClientOptions: policy.ClientOptions{Transport: transport},
+	})
+	require.NoError(t, err)
+
+	t.Run("array", func(t *testing.T) {
+		expected := []fakeserver.PetClassification{pet, nil}
+		_, err := client.PutPets(context.Background(), expected, nil)
+		require.NoError(t, err)
+		require.Equal(t, expected, receivedPets)
+	})
+	t.Run("map", func(t *testing.T) {
+		expected := map[string]fakeserver.PetClassification{"cat": pet, "null": nil}
+		_, err := client.PutPetMap(context.Background(), expected, nil)
+		require.NoError(t, err)
+		require.Equal(t, expected, receivedMap)
+	})
+	t.Run("nested", func(t *testing.T) {
+		expected := map[string][]fakeserver.PetClassification{"pets": {pet, nil}, "empty": {}, "null": nil}
+		_, err := client.PutPetBatches(context.Background(), expected, nil)
+		require.NoError(t, err)
+		require.Equal(t, expected, receivedBatches)
+	})
+	t.Run("invalid discriminator", func(t *testing.T) {
+		for _, raw := range []string{
+			`{"pets":[{"kind":"dog","value":{"name":"Rover"}}]}`,
+			`{"pets":[{"value":{"name":"Whiskers"}}]}`,
+		} {
+			receivedBatches = nil
+			ctx := context.WithValue(context.Background(), runtime.CtxAPINameKey{}, "Client.PutPetBatches")
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://fake.endpoint/pets/batches", io.NopCloser(strings.NewReader(raw)))
+			require.NoError(t, err)
+			_, err = transport.Do(req)
+			require.ErrorContains(t, err, "PetClassification")
+			require.Nil(t, receivedBatches)
+		}
+	})
 }
