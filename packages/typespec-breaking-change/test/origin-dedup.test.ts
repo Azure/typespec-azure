@@ -1,11 +1,14 @@
+import { getSourceLocation } from "@typespec/compiler";
 import { describe, expect, it } from "vitest";
 import { computeDiffs } from "../src/diff/diff-engine.js";
 import { resolveOrigin } from "../src/diff/origin.js";
+import { analyzeProgram } from "../src/pipeline/orchestrator.js";
 import { classifyDiffs } from "../src/pipeline/policy.js";
+import { resolveFindingLocation } from "../src/pipeline/resolve-location.js";
 import { createVersionedView, enumerateVersions } from "../src/pipeline/versions.js";
 import { applySuppressions } from "../src/suppression/suppression.js";
 import type { VersionedView } from "../src/types.js";
-import { Tester, TesterWithSuppressions } from "./test-host.js";
+import { Tester, TesterWithArm, TesterWithSuppressions } from "./test-host.js";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -142,95 +145,100 @@ describe("origin resolution (direct coverage)", () => {
     expect(resolveOrigin(extra)?.declarationPath).toBe("Outer.Inner.Widget.config");
   });
 
-  it("traces template-instantiated properties through sourceModels metadata", async () => {
-    const widgetProperties = {
-      kind: "Model",
-      name: "WidgetProperties",
-      namespace: {
-        name: "TestService",
-        namespace: undefined,
+  it.each([false, true])(
+    "traces TrackedResource properties through real ARM operations (spread: %s)",
+    async (spread) => {
+      const { program } = await TesterWithArm.compile(`
+        @armProviderNamespace
+        @service
+        @versioned(Versions)
+        namespace Microsoft.Widgets;
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          v1: "2024-01-01",
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          v2: "2025-01-01",
+        }
+        model Details {
+          @removed(Versions.v2) legacy?: string;
+        }
+        ${spread ? "model WidgetProperties { ...Details; }" : ""}
+        model Widget is TrackedResource<${spread ? "WidgetProperties" : "Details"}> {
+          ...ResourceNameParameter<Widget>;
+        }
+        @armResourceOperations
+        interface Widgets {
+          read is ArmResourceRead<Widget>;
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        }
+      `);
+      const result = analyzeProgram(program, { phase: "cross-version" });
+      expect(result.findings).toMatchObject([
+        {
+          diff: {
+            kind: "ResourcePropertyRemoved",
+            origin: { declarationPath: "Microsoft.Widgets.Details.legacy" },
+          },
+          phase: "cross-version",
+          severity: "error",
+          suppressed: false,
+        },
+      ]);
+      const [property, diagnostics] = program.resolveTypeReference(
+        "Microsoft.Widgets.Details.legacy",
+      );
+      expect(diagnostics).toEqual([]);
+      expect(property).toBeDefined();
+      const location = getSourceLocation(property!, { locateId: true });
+      expect(result.findings[0].diff.origin?.sourceLocation).toEqual(location);
+      expect(resolveFindingLocation(result.findings[0])).toEqual({
+        location,
+        sourceTraceLevel: "direct",
+      });
+    },
+    30_000,
+  );
+
+  it("traces parameters and responses through an Azure.Core operation template", async () => {
+    const { program } = await TesterWithSuppressions.compile(`
+      @service
+      @versioned(Versions)
+      namespace Widgets;
+      enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
+      model Parameters {
+        @removed(Versions.v2) @query legacy?: string;
+      }
+      model Result {
+        name: string;
+        @removed(Versions.v2) legacy?: string;
+      }
+      @route("/widgets") @get
+      op read is Azure.Core.RpcOperation<Parameters, Result>;
+    `);
+    const result = analyzeProgram(program, { phase: "cross-version" });
+    expect(result.findings).toMatchObject([
+      {
+        diff: {
+          kind: "RequestQueryParameterRemoved",
+          origin: { declarationPath: "Widgets.Parameters.legacy" },
+        },
       },
-      properties: new Map(),
-      sourceModels: [],
-    } as any;
-
-    const legacy = {
-      kind: "ModelProperty",
-      name: "legacy",
-      model: widgetProperties,
-      sourceProperty: undefined,
-    } as any;
-    widgetProperties.properties.set("legacy", legacy);
-
-    const instantiatedModel = {
-      kind: "Model",
-      name: "TrackedResourceProperties",
-      namespace: widgetProperties.namespace,
-      properties: new Map(),
-      sourceModels: [{ model: widgetProperties }],
-    } as any;
-
-    const projectedLegacy = {
-      kind: "ModelProperty",
-      name: "legacy",
-      model: instantiatedModel,
-      sourceProperty: undefined,
-    } as any;
-
-    expect(resolveOrigin(projectedLegacy)?.declarationPath).toBe(
-      "TestService.WidgetProperties.legacy",
-    );
-  });
-
-  it("traces nested template-instantiated properties through templateMapper args", async () => {
-    const widgetProperties = {
-      kind: "Model",
-      name: "WidgetProperties",
-      namespace: {
-        name: "TestService",
-        namespace: undefined,
+      {
+        diff: {
+          kind: "ResponsePropertyRemoved",
+          origin: { declarationPath: "Widgets.Result.legacy" },
+        },
       },
-      properties: new Map(),
-      sourceModels: [],
-    } as any;
-
-    const legacy = {
-      kind: "ModelProperty",
-      name: "legacy",
-      model: widgetProperties,
-      sourceProperty: undefined,
-    } as any;
-    widgetProperties.properties.set("legacy", legacy);
-
-    const resourceProperties = {
-      kind: "Model",
-      name: "ResourceProperties",
-      namespace: widgetProperties.namespace,
-      properties: new Map(),
-      sourceModels: [],
-      templateMapper: {
-        args: [widgetProperties],
-      },
-    } as any;
-
-    const trackedResource = {
-      kind: "Model",
-      name: "TrackedResource",
-      namespace: widgetProperties.namespace,
-      properties: new Map(),
-      sourceModels: [{ model: resourceProperties }],
-    } as any;
-
-    const projectedLegacy = {
-      kind: "ModelProperty",
-      name: "legacy",
-      model: trackedResource,
-      sourceProperty: undefined,
-    } as any;
-
-    expect(resolveOrigin(projectedLegacy)?.declarationPath).toBe(
-      "TestService.WidgetProperties.legacy",
-    );
+    ]);
+    for (const [index, declaration] of ["Parameters", "Result"].entries()) {
+      const [property, diagnostics] = program.resolveTypeReference(`Widgets.${declaration}.legacy`);
+      expect(diagnostics).toEqual([]);
+      expect(property).toBeDefined();
+      expect(resolveFindingLocation(result.findings[index])).toEqual({
+        location: getSourceLocation(property!, { locateId: true }),
+        sourceTraceLevel: "direct",
+      });
+    }
   });
 });
 

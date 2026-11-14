@@ -1,5 +1,7 @@
+import { getSourceLocation } from "@typespec/compiler";
 import { describe, expect, it } from "vitest";
 import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
+import { resolveFindingLocation } from "../src/pipeline/resolve-location.js";
 import { formatJsonReport } from "../src/reporting/reporter-json.js";
 import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
 import { Tester, TesterWithArm } from "./test-host.js";
@@ -288,19 +290,49 @@ describe("scenario validation: ARM end-to-end", () => {
       const { program } = await TesterWithArm.compile(CONTOSO_PR2);
       const result = analyzeProgram(program, { phase: "cross-version" });
 
-      const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
-
-      const typeChanged = errors.find((f) => f.diff.kind === "ResourcePropertyTypeChanged");
-      const removed = errors.find((f) => f.diff.kind === "ResourcePropertyRemoved");
-
-      expect(typeChanged).toBeDefined();
-      expect(removed).toBeDefined();
-
-      expect(typeChanged!.diff.identity.element).toContain("age");
-      expect(removed!.diff.identity.element).toContain("city");
-
-      expect(typeChanged!.versionPair.baseVersion).toBe("2021-11-01");
-      expect(typeChanged!.versionPair.headVersion).toBe("2025-01-01");
+      expect(result.findings).toMatchObject([
+        {
+          diff: {
+            kind: "ResourcePropertyTypeChanged",
+            identity: { element: "body.properties.properties.age" },
+            origin: { declarationPath: "Microsoft.Contoso.EmployeeProperties.age" },
+          },
+          severity: "error",
+          suppressed: false,
+          phase: "cross-version",
+          versionPair: {
+            baseVersion: "2021-11-01",
+            headVersion: "2025-01-01",
+            phase: "cross-version",
+          },
+        },
+        {
+          diff: {
+            kind: "ResourcePropertyRemoved",
+            identity: { element: "body.properties.properties.city" },
+            origin: { declarationPath: "Microsoft.Contoso.EmployeeProperties.city" },
+          },
+          severity: "error",
+          suppressed: false,
+          phase: "cross-version",
+          versionPair: {
+            baseVersion: "2021-11-01",
+            headVersion: "2025-01-01",
+            phase: "cross-version",
+          },
+        },
+      ]);
+      for (const [index, property] of ["age", "city"].entries()) {
+        const [target, diagnostics] = program.resolveTypeReference(
+          `Microsoft.Contoso.EmployeeProperties.${property}`,
+        );
+        expect(diagnostics).toEqual([]);
+        expect(target).toBeDefined();
+        expect(resolveFindingLocation(result.findings[index])).toEqual({
+          location: getSourceLocation(target!, { locateId: true }),
+          sourceTraceLevel: "direct",
+        });
+      }
     }, 30_000);
   });
   describe("Phase A: unversioned changes (PR #4 pattern)", () => {
@@ -312,19 +344,32 @@ describe("scenario validation: ARM end-to-end", () => {
         phase: "same-version",
       });
 
-      const errors = result.findings.filter((f) => f.severity === "error" && !f.suppressed);
-
-      const cityRemoved = errors.filter(
-        (f) =>
-          f.diff.kind === "ResourcePropertyRemoved" && f.diff.identity.element.includes("city"),
+      expect(result.findings).toMatchObject([
+        {
+          diff: {
+            kind: "ResourcePropertyRemoved",
+            identity: { element: "body.properties.properties.city" },
+            origin: { declarationPath: "Microsoft.Contoso.EmployeeProperties.city" },
+          },
+          severity: "error",
+          suppressed: false,
+          phase: "same-version",
+          versionPair: {
+            baseVersion: "2021-11-01",
+            headVersion: "2021-11-01",
+            phase: "same-version",
+          },
+        },
+      ]);
+      const [target, diagnostics] = headProgram.resolveTypeReference(
+        "Microsoft.Contoso.EmployeeProperties",
       );
-
-      expect(cityRemoved.length).toBeGreaterThanOrEqual(1);
-
-      for (const f of cityRemoved) {
-        expect(f.versionPair.baseVersion).toBe(f.versionPair.headVersion);
-        expect(f.phase).toBe("same-version");
-      }
+      expect(diagnostics).toEqual([]);
+      expect(target).toBeDefined();
+      expect(resolveFindingLocation(result.findings[0])).toEqual({
+        location: getSourceLocation(target!, { locateId: true }),
+        sourceTraceLevel: "parentModel",
+      });
     }, 30_000);
 
     it("reports both source declaration and wire identities for a resource property addition", async () => {

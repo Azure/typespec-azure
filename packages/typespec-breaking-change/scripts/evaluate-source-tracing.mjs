@@ -3,17 +3,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { computeDiffs } from "../dist/src/diff/diff-engine.js";
 import { analyzeBaseAndHead, analyzeProgram } from "../dist/src/pipeline/orchestrator.js";
-import { classifyDiffs } from "../dist/src/pipeline/policy.js";
-import {
-  resolveFindingLocation,
-  resolveHeadSourceLocations,
-} from "../dist/src/pipeline/resolve-location.js";
+import { resolveFindingLocation } from "../dist/src/pipeline/resolve-location.js";
 import {
   buildPhaseBPairs,
   createVersionedView,
   enumerateVersions,
 } from "../dist/src/pipeline/versions.js";
-import { applySuppressions } from "../dist/src/suppression/suppression.js";
 import {
   evaluationManifest,
   parseEvaluationArgs,
@@ -22,6 +17,7 @@ import {
 
 const TRACE_LEVELS = [
   "direct",
+  "ancestor",
   "origin",
   "base",
   "parentModel",
@@ -29,20 +25,6 @@ const TRACE_LEVELS = [
   "namespace",
   "unresolved",
 ];
-
-const REQUEST_RESPONSE_PAIRS = {
-  PropertyAdded: "ResourcePropertyAdded",
-  PropertyRemoved: "ResourcePropertyRemoved",
-  PropertyRenamed: "ResourcePropertyRenamed",
-  PropertyTypeChanged: "ResourcePropertyTypeChanged",
-  PropertyTypeNarrowed: "ResourcePropertyTypeNarrowed",
-  PropertyTypeWidened: "ResourcePropertyTypeWidened",
-  PropertyMadeRequired: "ResourcePropertyMadeRequired",
-  PropertyMadeOptional: "ResourcePropertyMadeOptional",
-};
-
-const mergeIdentityIds = new WeakMap();
-let nextMergeIdentityId = 0;
 
 async function main() {
   const options = parseEvaluationArgs(process.argv.slice(2));
@@ -122,13 +104,6 @@ async function evaluateSpec(spec) {
 
   const phaseA = analyzeBaseAndHead(program, program, { phase: "same-version" });
   const phaseB = await evaluatePhaseB(program);
-  const orchestratedPhaseB = analyzeProgram(program, { phase: "cross-version" });
-  if (phaseB.finalCount !== orchestratedPhaseB.findings.length) {
-    throw new Error(
-      `${spec.name}: replicated Phase B pipeline returned ${phaseB.finalCount} findings, ` +
-        `but analyzeProgram() returned ${orchestratedPhaseB.findings.length}.`,
-    );
-  }
 
   return {
     name: spec.name,
@@ -146,38 +121,26 @@ async function evaluateSpec(spec) {
 }
 
 async function evaluatePhaseB(program) {
-  const rawFindings = [];
-  const pairStats = [];
-
-  for (const service of enumerateVersions(program)) {
-    const pairs = buildPhaseBPairs(service.versions, service.versions);
-    for (const pair of pairs) {
-      const baseView = createVersionedView(program, service.service, pair.baseVersion);
-      const headView = createVersionedView(program, service.service, pair.headVersion);
-      const { diffs } = computeDiffs(baseView, headView);
-      const findings = classifyDiffs(diffs, pair.phase, pair).map((finding) => ({
-        ...finding,
-        serviceNamespace: headView.versionedNamespace ?? baseView.versionedNamespace,
-      }));
-      rawFindings.push(...findings);
-      pairStats.push({
-        baseVersion: pair.baseVersion,
-        headVersion: pair.headVersion,
-        rawFindings: findings.length,
-      });
-    }
-  }
-
-  const deduped = deduplicateBySourceType(rawFindings);
-  const merged = mergeRequestResponseToResource(deduped);
-  const collapsed = collapsePhaseADuplicates(merged);
-  const finalFindings = applySuppressions(collapsed, program);
-  resolveHeadSourceLocations(finalFindings, program);
+  const stageCounts = {};
+  const analysis = analyzeProgram(program, {
+    phase: "cross-version",
+    onStage: (stage, findings) => {
+      stageCounts[stage] = findings.length;
+    },
+  });
+  const pairStats = analysis.summary.versionComparisons.map((pair) => ({
+    serviceName: pair.serviceName,
+    baseVersion: pair.baseVersion,
+    headVersion: pair.headVersion,
+    rawFindings: pair.rawFindingCount ?? pair.findingCount,
+  }));
+  const finalFindings = analysis.findings;
 
   const traceCounts = Object.fromEntries(TRACE_LEVELS.map((level) => [level, 0]));
   const lowTraceFindings = [];
   let originCount = 0;
   let resolvedCount = 0;
+  const fallbackCategories = {};
 
   for (const finding of finalFindings) {
     if (finding.diff.origin) {
@@ -193,7 +156,7 @@ async function evaluatePhaseB(program) {
 
     if (sourceTraceLevel === "operation" || sourceTraceLevel === "namespace" || !resolved) {
       const reason = inferFallbackReason(finding, sourceTraceLevel);
-      lowTraceFindings.push({
+      const lowTraceFinding = {
         diffKind: finding.diff.kind,
         elementPath: finding.diff.identity.element,
         versionPair: `${finding.versionPair.baseVersion}->${finding.versionPair.headVersion}`,
@@ -207,17 +170,27 @@ async function evaluatePhaseB(program) {
         baseType: describeType(finding.diff.baseType),
         headType: describeType(finding.diff.headType),
         origin: finding.diff.origin?.declarationPath,
-      });
+      };
+      lowTraceFindings.push(lowTraceFinding);
+      const category = (fallbackCategories[reason.category] ??= { count: 0, examples: [] });
+      category.count++;
+      if (category.examples.length < 3) {
+        category.examples.push({
+          diffKind: lowTraceFinding.diffKind,
+          elementPath: lowTraceFinding.elementPath,
+          versionPair: lowTraceFinding.versionPair,
+          operation: lowTraceFinding.operation,
+          sourceTraceLevel,
+        });
+      }
     }
   }
 
-  const fallbackCategories = summarizeFallbackCategories(lowTraceFindings);
-
   return {
     pairStats,
-    rawCount: rawFindings.length,
-    dedupedCount: deduped.length,
-    mergedCount: merged.length,
+    rawCount: stageCounts.classified,
+    dedupedCount: stageCounts.deduplicated,
+    mergedCount: stageCounts["resource-merged"],
     finalCount: finalFindings.length,
     originCount,
     resolvedCount,
@@ -225,142 +198,6 @@ async function evaluatePhaseB(program) {
     lowTraceFindings,
     fallbackCategories,
   };
-}
-
-function deduplicateBySourceType(findings) {
-  const seenByNode = new Map();
-  const seenByString = new Set();
-  const result = [];
-
-  for (const finding of findings) {
-    const versionKey = `${finding.versionPair.baseVersion}|${finding.versionPair.headVersion}`;
-    const kindVersionKey = `${finding.diff.kind}|${versionKey}`;
-    const sourceType = finding.diff.headType ?? finding.diff.baseType;
-    const dedupKey = sourceType?.node ?? sourceType;
-
-    if (dedupKey) {
-      let kindSet = seenByNode.get(dedupKey);
-      if (!kindSet) {
-        kindSet = new Set();
-        seenByNode.set(dedupKey, kindSet);
-      }
-      if (kindSet.has(kindVersionKey)) {
-        continue;
-      }
-      kindSet.add(kindVersionKey);
-    } else {
-      const stringKey = `${finding.diff.kind}|${finding.diff.identity.element}|${versionKey}`;
-      if (seenByString.has(stringKey)) {
-        continue;
-      }
-      seenByString.add(stringKey);
-    }
-
-    result.push(finding);
-  }
-
-  return result;
-}
-
-function mergeRequestResponseToResource(findings) {
-  const result = [];
-  const consumed = new Set();
-  const responseIndex = new Map();
-
-  for (const finding of findings) {
-    if (!finding.diff.kind.startsWith("Response")) {
-      continue;
-    }
-
-    const suffix = getPropertySuffix(finding.diff.kind, "Response");
-    if (!suffix || !REQUEST_RESPONSE_PAIRS[suffix]) {
-      continue;
-    }
-
-    responseIndex.set(buildMergeKey(finding, suffix), finding);
-  }
-
-  for (const finding of findings) {
-    if (!finding.diff.kind.startsWith("Request")) {
-      continue;
-    }
-
-    const suffix = getPropertySuffix(finding.diff.kind, "Request");
-    if (!suffix || !REQUEST_RESPONSE_PAIRS[suffix]) {
-      continue;
-    }
-
-    const match = responseIndex.get(buildMergeKey(finding, suffix));
-    if (match && match.suppressed === finding.suppressed) {
-      consumed.add(finding);
-      consumed.add(match);
-      result.push({
-        ...finding,
-        diff: {
-          ...finding.diff,
-          kind: REQUEST_RESPONSE_PAIRS[suffix],
-        },
-        severity: "error",
-        rule: "resource-contract-change",
-      });
-    }
-  }
-
-  for (const finding of findings) {
-    if (!consumed.has(finding)) {
-      result.push(finding);
-    }
-  }
-
-  return result;
-}
-
-function collapsePhaseADuplicates(findings) {
-  const seen = new Set();
-  const result = [];
-
-  for (const finding of findings) {
-    if (finding.phase !== "same-version") {
-      result.push(finding);
-      continue;
-    }
-
-    const key = `${finding.diff.kind}|${finding.diff.identity.element}|${finding.suppressed}`;
-    if (seen.has(key)) {
-      continue;
-    }
-
-    seen.add(key);
-    result.push(finding);
-  }
-
-  return result;
-}
-
-function getPropertySuffix(kind, prefix) {
-  return kind.startsWith(prefix) ? kind.substring(prefix.length) : undefined;
-}
-
-function buildMergeKey(finding, suffix) {
-  const versionKey = `${finding.versionPair.baseVersion}|${finding.versionPair.headVersion}`;
-  const suppressedKey = finding.suppressed ? "s" : "u";
-  return `${getMergeIdentityKey(finding)}|${versionKey}|${suffix}|${suppressedKey}`;
-}
-
-function getMergeIdentityKey(finding) {
-  const sourceType = finding.diff.headType ?? finding.diff.baseType;
-  const mergeIdentity = sourceType?.node ?? sourceType;
-
-  if (mergeIdentity && typeof mergeIdentity === "object") {
-    let id = mergeIdentityIds.get(mergeIdentity);
-    if (id === undefined) {
-      id = nextMergeIdentityId++;
-      mergeIdentityIds.set(mergeIdentity, id);
-    }
-    return `node:${id}`;
-  }
-
-  return `path:${finding.diff.identity.element}`;
 }
 
 function inferFallbackReason(finding, sourceTraceLevel) {
@@ -400,30 +237,6 @@ function inferFallbackReason(finding, sourceTraceLevel) {
     category: "unresolved",
     why: "No direct, origin, base, parent-model, operation, or namespace source location could be resolved.",
   };
-}
-
-function summarizeFallbackCategories(lowTraceFindings) {
-  const categories = new Map();
-
-  for (const finding of lowTraceFindings) {
-    const category = categories.get(finding.category) ?? {
-      count: 0,
-      examples: [],
-    };
-    category.count++;
-    if (category.examples.length < 3) {
-      category.examples.push({
-        diffKind: finding.diffKind,
-        elementPath: finding.elementPath,
-        versionPair: finding.versionPair,
-        operation: finding.operation,
-        sourceTraceLevel: finding.sourceTraceLevel,
-      });
-    }
-    categories.set(finding.category, category);
-  }
-
-  return Object.fromEntries(categories);
 }
 
 function describeType(type) {
