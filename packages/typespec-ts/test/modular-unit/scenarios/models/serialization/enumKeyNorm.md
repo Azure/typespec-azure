@@ -63,8 +63,10 @@ model Foo {
   extensibleNumber: ExtensibleNumber;
 }
 op post(@body body: Foo): void;
-@@clientName(ExtensibleString.`-2.0`, "$DO_NOT_NORMALIZE$Item-1.0");
-@@clientName(ExtensibleString.`20`, "$DO_NOT_NORMALIZE$_20");
+#suppress "experimental-feature" "exact name test"
+@@clientName(ExtensibleString.`-2.0`, exact("Item-1.0"));
+#suppress "experimental-feature" "exact name test"
+@@clientName(ExtensibleString.`20`, exact("_20"));
 @@clientName(ExtensibleString.YES_OR_NO2, "Yes_Or_No2");
 @@clientName(Versions.`2024-07-01`, "StableVersion");
 ```
@@ -88,6 +90,7 @@ Generated Models.
  */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 /** model interface Foo */
 export interface Foo {
   extensibleString: ExtensibleString;
