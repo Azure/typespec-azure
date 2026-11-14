@@ -22,6 +22,9 @@ import {
   enumerateVersions,
 } from "./versions.js";
 
+export type AnalysisStage =
+  "classified" | "deduplicated" | "resource-merged" | "collapsed" | "complete";
+
 export interface AnalysisOptions {
   /** If provided, only analyze this specific service namespace. */
   serviceName?: string;
@@ -29,6 +32,8 @@ export interface AnalysisOptions {
   phase?: ComparisonPhase;
   /** Optional callback for progress logging (appears in CI logs). */
   log?: (message: string) => void;
+  /** Synchronous observation of the real pipeline. Callbacks must not mutate findings. */
+  onStage?: (stage: AnalysisStage, findings: readonly Finding[]) => void;
 }
 
 /**
@@ -85,12 +90,7 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
     }
   }
 
-  const dedupStart = Date.now();
-  const dedupedFindings = deduplicateBySourceType(allFindings);
-  timing.classifyMs += Date.now() - dedupStart;
-
-  const merged = mergeRequestResponseToResource(dedupedFindings);
-  const deduped = collapsePhaseADuplicates(merged);
+  const deduped = consolidateFindings(allFindings, timing, options?.onStage);
 
   const suppressStart = Date.now();
   let findings = applySuppressions(deduped, program);
@@ -101,6 +101,7 @@ export function analyzeProgram(program: Program, options?: AnalysisOptions): Ana
 
   resolveBaseSourceLocations(findings, program);
   resolveHeadSourceLocations(findings, program);
+  options?.onStage?.("complete", findings);
 
   timing.totalMs = Date.now() - totalStart;
 
@@ -235,12 +236,7 @@ export function analyzeBaseAndHead(
     }
   }
 
-  const dedupStart = Date.now();
-  const dedupedFindings = deduplicateBySourceType(allFindings);
-  timing.classifyMs += Date.now() - dedupStart;
-
-  const merged = mergeRequestResponseToResource(dedupedFindings);
-  const deduped = collapsePhaseADuplicates(merged);
+  const deduped = consolidateFindings(allFindings, timing, options?.onStage);
 
   // Build suppression comparison between base and head programs
   const suppressionComparison = compareSuppressions(baseProgram, headProgram);
@@ -257,6 +253,7 @@ export function analyzeBaseAndHead(
 
   resolveBaseSourceLocations(findings, baseProgram);
   resolveHeadSourceLocations(findings, headProgram);
+  options?.onStage?.("complete", findings);
 
   timing.totalMs = Date.now() - totalStart;
 
@@ -423,6 +420,23 @@ function summarizeComparisonFindings(
     findingCount,
     rawFindingCount: findingCount === findings.length ? undefined : findings.length,
   };
+}
+
+function consolidateFindings(
+  findings: Finding[],
+  timing: TimingInfo,
+  onStage?: AnalysisOptions["onStage"],
+): Finding[] {
+  onStage?.("classified", findings);
+  const dedupStart = Date.now();
+  const deduped = deduplicateBySourceType(findings);
+  timing.classifyMs += Date.now() - dedupStart;
+  onStage?.("deduplicated", deduped);
+  const merged = mergeRequestResponseToResource(deduped);
+  onStage?.("resource-merged", merged);
+  const collapsed = collapsePhaseADuplicates(merged);
+  onStage?.("collapsed", collapsed);
+  return collapsed;
 }
 
 function formatComparisonResult(findingCount: number, rawFindingCount?: number): string {
