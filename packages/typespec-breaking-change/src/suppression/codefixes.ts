@@ -1,54 +1,49 @@
+import { createAddDecoratorCodeFix, type CodeFix, type Program } from "@typespec/compiler";
+import { isOperationIdentity, type Finding } from "../types.js";
 import {
-  createAddDecoratorCodeFix,
-  type CodeFix,
-  type DiagnosticTarget,
-  type Type,
-} from "@typespec/compiler";
-import type { Finding } from "../types.js";
-import { resolveSuppressionTarget } from "./target.js";
+  composeFullIdentityPath,
+  resolveRemovedOperationTarget,
+  resolveSuppressionTarget,
+} from "./target.js";
 
 /**
- * Create a codefix that adds @approvedBreakingChange decorator to suppress a finding.
- *
- * Targets the origin declaration type when available (suppresses all uses of that declaration),
- * falling back to the head type (wire type where the change was detected).
+ * Create a phase-appropriate approval on a surviving source declaration.
  *
  * @param finding - The finding to create a codefix for
+ * @param program - Head program, required to locate a deleted operation's surviving parent
  * @returns A CodeFix, or undefined if no suitable target exists
  */
-export function createApproveBreakingChangeCodeFix(finding: Finding): CodeFix | undefined {
-  const suppressionTarget = resolveSuppressionTarget(finding);
-  const target = suppressionTarget.target ?? getCodefixTarget(finding);
-  if (!target) return undefined;
+export function createApproveBreakingChangeCodeFix(
+  finding: Finding,
+  program?: Program,
+): CodeFix | undefined {
+  // A same-version removal's origin belongs to the baseline, not the file being edited.
+  const suppressionTarget =
+    finding.phase === "same-version" && finding.diff.kind === "OperationRemoved"
+      ? program && resolveRemovedOperationTarget(finding, program)
+      : finding.phase === "same-version" && !finding.diff.headType
+        ? {
+            target: finding.diff.operationType,
+            path: isOperationIdentity(finding.diff.identity)
+              ? composeFullIdentityPath(finding.diff.identity)
+              : undefined,
+          }
+        : resolveSuppressionTarget(finding);
+  if (!suppressionTarget?.target) return undefined;
+  const target = suppressionTarget.target;
   const pathOption = suppressionTarget.path
-    ? `, path: "${escapeString(suppressionTarget.path)}"`
+    ? `, path: ${JSON.stringify(suppressionTarget.path)}`
     : "";
+  const crossVersion = finding.phase === "cross-version";
+  const decorator = crossVersion ? "approvedBreakingChange" : "approvedUnversionedChange";
+  const sinceOption = crossVersion
+    ? `, since: ${JSON.stringify(finding.versionPair.headVersion)}`
+    : "";
+  const args = [
+    JSON.stringify(`Approved: ${finding.diff.message}`),
+    `#{ kind: ${JSON.stringify(finding.diff.kind)}${pathOption}${sinceOption} }`,
+  ];
 
-  return createAddDecoratorCodeFix(target as DiagnosticTarget, "approvedBreakingChange", [
-    `"Approved: ${escapeString(finding.diff.message)}"`,
-    `#{ kind: "${escapeString(finding.diff.kind)}"${pathOption} }`,
-  ]);
-}
-
-/**
- * Get the best target node for the codefix decorator insertion.
- * Prefers origin type (named declaration) over wire type.
- */
-function getCodefixTarget(finding: Finding): Type | undefined {
-  // Prefer origin — it's the named declaration that "owns" the change
-  if (finding.diff.origin?.type) {
-    return finding.diff.origin.type;
-  }
-
-  // Fallback to head type (where the change is visible in the current spec)
-  if (finding.diff.headType) {
-    return finding.diff.headType;
-  }
-
-  // For removals, the base type might be all we have
-  return finding.diff.baseType;
-}
-
-function escapeString(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const fix = createAddDecoratorCodeFix(target, `Azure.Core.${decorator}`, args);
+  return { ...fix, label: `Approve this change with @Azure.Core.${decorator}` };
 }

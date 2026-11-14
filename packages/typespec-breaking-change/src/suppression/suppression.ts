@@ -7,7 +7,7 @@ import {
 import type { Program, Type } from "@typespec/compiler";
 import type { Finding } from "../types.js";
 import { isOperationIdentity } from "../types.js";
-import { composeFullIdentityPath } from "./target.js";
+import { composeFullIdentityPath, resolveRemovedOperationTarget } from "./target.js";
 
 /**
  * Scan the head program's unversioned suppression state map for Phase A
@@ -44,13 +44,25 @@ export function applySuppressions(findings: Finding[], program: Program): Findin
     const originType = finding.diff.origin?.type;
     if (originType) directTargets.add(originType);
 
-    const allSuppressions = collectSuppressions(finding, program, targetType);
+    const removedOperation =
+      finding.phase === "same-version" && finding.diff.kind === "OperationRemoved";
+    const removedTarget = removedOperation
+      ? resolveRemovedOperationTarget(finding, program)
+      : undefined;
+    if (removedOperation && !removedTarget?.target) return finding;
+
+    const allSuppressions = removedTarget?.target
+      ? findUnversionedSuppressions(program, removedTarget.target)
+      : collectSuppressions(finding, program, targetType);
 
     const match = allSuppressions.find(
       (suppression) =>
         matchesKind(suppression, finding) &&
         matchesVersion(suppression, finding) &&
-        matchesPathOrDirect(suppression, finding, directTargets),
+        (removedTarget
+          ? suppression.target === removedTarget.target &&
+            suppression.suppression.path === removedTarget.path
+          : matchesPathOrDirect(suppression, finding, directTargets)),
     );
 
     if (!match) {
