@@ -6,23 +6,18 @@ import { ArmTester, AzureCoreTester, createSdkContextForTester } from "../tester
 
 const monitorService = `
   @service namespace TestService;
+  alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
+  @resource("jobs") model Job { @key id: string; }
   model Item { name: string; }
   model Details { value: string; }
   model Payload { value: string; items: Item[]; details: Details; }
-  model Status {
-    @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
-    @lroResult result: Payload;
+  model Status is Azure.Core.Foundations.OperationStatus<Payload> {
     secondary: Payload;
-    token: string;
-    collection: Item[];
-    optionalValue?: string;
-    nullableValue: string | null;
-    @header requestId: string;
   }
-  @post @route("/jobs") op start(): {
-    @statusCode statusCode: 202;
-    @pollingLocation @header("Operation-Location") location: ResourceLocation<Status>;
-  };
+  @pollingOperation(poll)
+  op start is Operations.LongRunningResourceAction<Job, {}, Payload>;
+  @get @route("/jobs/operations/{operationId}")
+  op poll(@path operationId: string): Status;
 `;
 
 const resourceService = `
@@ -47,7 +42,8 @@ describe("@clientLroResult", () => {
     `);
     const context = await createSdkContextForTester(program);
     expectDiagnosticEmpty(context.diagnostics);
-    const method = context.sdkPackage.clients[0].methods[0];
+    const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+    ok(method);
     strictEqual(method.kind, "lro");
     const response = method.lroMetadata.finalResponse;
     ok(response);
@@ -73,7 +69,8 @@ describe("@clientLroResult", () => {
     `);
     const context = await createSdkContextForTester(program);
     expectDiagnosticEmpty(context.diagnostics);
-    const method = context.sdkPackage.clients[0].methods[0];
+    const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+    ok(method);
     strictEqual(method.kind, "lro");
     const response = method.lroMetadata.finalResponse;
     ok(response);
@@ -184,7 +181,8 @@ describe("@clientLroResult", () => {
         emitterName: `@azure-tools/typespec-${language}`,
       });
       expectDiagnosticEmpty(context.diagnostics);
-      const method = context.sdkPackage.clients[0].methods[0];
+      const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+      ok(method);
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type?.kind, "model");
       strictEqual(method.response.type.name, resultName);
@@ -580,7 +578,8 @@ describe("@clientLroResult", () => {
     `);
     const context = await createSdkContextForTester(program);
     expectDiagnosticEmpty(context.diagnostics);
-    const method = context.sdkPackage.clients[0].methods[0];
+    const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+    ok(method);
     strictEqual(method.kind, "lro");
     strictEqual(method.response.type?.kind, "model");
     strictEqual(method.response.type.name, "Payload");
@@ -591,7 +590,7 @@ describe("@clientLroResult", () => {
   });
 
   it.each([
-    ["nested property", "", "Status.result::type.value"],
+    ["nested property", "", "Status.secondary::type.value"],
     ["unrelated property", "model Other { result: Payload; }", "Other.result"],
     ["copied property", "model Other is Status;", "Other.result"],
   ])("rejects %s", async (_, declarations, reference) => {
