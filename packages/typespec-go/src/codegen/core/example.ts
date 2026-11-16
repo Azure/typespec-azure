@@ -145,7 +145,17 @@ export function generateExamples(
           }
           clientRef += `)`;
         } else {
-          exampleText += `${indent.get()}client, err := ${go.getPackageName(client.instance.constructors[0].pkg)}.${client.instance.constructors[0].name}(${clientParameters.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.type.kind !== "ptr").slice(1)).join(", ")}, cred, nil)\n`;
+          const ctor = client.instance.constructors[0];
+          const requiredCtorParamNames = new Set(
+            ctor.parameters
+              .filter((p) => p.kind !== "credentialParam" && go.isRequiredParameter(p.style))
+              .map((p) => p.name),
+          );
+          const renderedCtorArgs = clientParameters
+            .filter((p) => requiredCtorParamNames.has(p.parameter.name))
+            .map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.type.kind !== "ptr").slice(1));
+          renderedCtorArgs.push("cred", "nil");
+          exampleText += `${indent.get()}client, err := ${go.getPackageName(ctor.pkg)}.${ctor.name}(${renderedCtorArgs.join(", ")})\n`;
           exampleText += `${indent.get()}if err != nil {\n`;
           exampleText += `${indent.push().get()}log.Fatalf("failed to create client: %v", err)\n`;
           exampleText += `${indent.pop().get()}}\n`;

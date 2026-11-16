@@ -266,13 +266,16 @@ function generateConstructors(
     const ctorParams = new Array<string>();
     const paramDocs = new Array<string>();
 
-    // ctor params can also be present in the supplemental endpoint parameters
+    // ctor params can also be present in the supplemental or cloud endpoint parameters
     const consolidatedCtorParams = new Array<go.ClientParameter>();
+    const cloudEndpoint = client.instance.cloudEndpoint;
     if (client.instance.endpoint) {
       consolidatedCtorParams.push(client.instance.endpoint.parameter);
       if (client.instance.endpoint.supplemental) {
         consolidatedCtorParams.push(...client.instance.endpoint.supplemental.parameters);
       }
+    } else if (cloudEndpoint) {
+      consolidatedCtorParams.push(...cloudEndpoint.parameters);
     }
 
     for (const param of helpers.sortClientParameters(constructor.parameters, type)) {
@@ -331,7 +334,7 @@ function generateConstructors(
         }
       }
 
-      if (tokenAuth) {
+      if (tokenAuth || cloudEndpoint) {
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud");
         imports.add("fmt");
         imports.add("reflect");
@@ -341,8 +344,14 @@ function generateConstructors(
         bodyText += `${indent.get()}c, ok := options.Cloud.Services[ServiceName]\n`;
         bodyText += `${indent.get()}if !ok {\n`;
         bodyText += `${indent.push().get()}return nil, fmt.Errorf("provided Cloud field is missing configuration for %s", ServiceName)\n`;
-        bodyText += `${indent.pop().get()}} else if c.Audience == "" {\n`;
-        bodyText += `${indent.push().get()}return nil, fmt.Errorf("provided Cloud field is missing Audience for %s", ServiceName)\n`;
+        if (tokenAuth) {
+          bodyText += `${indent.pop().get()}} else if c.Audience == "" {\n`;
+          bodyText += `${indent.push().get()}return nil, fmt.Errorf("provided Cloud field is missing Audience for %s", ServiceName)\n`;
+        }
+        if (cloudEndpoint) {
+          bodyText += `${indent.pop().get()}} else if c.Endpoint == "" {\n`;
+          bodyText += `${indent.push().get()}return nil, fmt.Errorf("provided Cloud field is missing Endpoint for %s", ServiceName)\n`;
+        }
         bodyText += `${indent.pop().get()}}\n`;
       }
 
@@ -470,7 +479,7 @@ function generateConstructors(
         }
         ctorText += `${indent.get()}${param.name} := ${helpers.formatLiteralValue(param.style.defaultValue, false)}\n`;
         ctorText += `${indent.get()}if options.${name} != ${helpers.zeroValue(param)} {\n`;
-        ctorText += `${indent.push().get()}${param.name} = options.${name}\n`;
+        ctorText += `${indent.push().get()}${param.name} = ${go.isAPIVersionParameter(param) ? "" : "*"}options.${name}\n`;
         ctorText += `${indent.pop().get()}}\n`;
       }
     };
@@ -501,6 +510,14 @@ function generateConstructors(
       } else {
         // there are no params for the supplemental host, so just append it
         ctorText += `${indent.get()}${endpointParam.name} = runtime.JoinPaths(${endpointParam.name}, "${client.instance.endpoint.supplemental.path}")\n`;
+      }
+    } else if (cloudEndpoint) {
+      ctorText += `${indent.get()}${cloudEndpoint.parameter.name} := c.Endpoint\n`;
+      if (cloudEndpoint.parameters.length > 0) {
+        imports.add("strings");
+        for (const param of cloudEndpoint.parameters) {
+          ctorText += `${indent.get()}${cloudEndpoint.parameter.name} = strings.ReplaceAll(${cloudEndpoint.parameter.name}, "{${param.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
+        }
       }
     }
 

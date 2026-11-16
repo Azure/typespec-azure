@@ -51,6 +51,38 @@ export interface Client {
   parent?: Client;
 }
 
+/** well-known azcore cloud configuration identifiers */
+export type WellKnownCloudName = "AzureChina" | "AzureGovernment" | "AzurePublic";
+
+/** target cloud configuration in zz_cloud_config.go */
+export type ServiceConfigurationTarget =
+  | { kind: "wellKnown"; cloudName: WellKnownCloudName }
+  | { kind: "custom"; exportedVarName: string };
+
+/** paired endpoint and OAuth audience metadata for a named service configuration */
+export interface ServiceConfiguration {
+  /** authored configuration name (e.g. "public", "government") */
+  name: string;
+
+  /** target cloud configuration in zz_cloud_config.go */
+  target: ServiceConfigurationTarget;
+
+  /** OAuth2 resource/audience prefix (without scope suffix such as "/.default") */
+  audience: string;
+
+  /** cloud-bound endpoint URL or host template when the endpoint is provided by the cloud configuration */
+  endpoint?: string;
+}
+
+/** contains cloud-resolved client endpoint configuration */
+export interface CloudEndpoint {
+  /** the client struct field parameter that stores the resolved service endpoint */
+  parameter: param.URIParameter;
+
+  /** ephemeral URI template parameters substituted into c.Endpoint during construction */
+  parameters: Array<param.URIParameter>;
+}
+
 /** contains client endpoint configuration */
 export interface ClientEndpoint {
   /** the parameter that contains the service endpoint */
@@ -75,6 +107,12 @@ export interface Constructable {
 
   /** the client endpoint configuration */
   endpoint?: ClientEndpoint;
+
+  /** cloud-resolved endpoint configuration when serviceConfigurations supplies endpoints */
+  cloudEndpoint?: CloudEndpoint;
+
+  /** paired cloud service configurations from TCGC serviceConfigurations */
+  serviceConfigurations?: Array<ServiceConfiguration>;
 }
 
 /** the possible types used for the client options type */
@@ -416,6 +454,13 @@ export class Client implements Client {
 export class ClientEndpoint implements ClientEndpoint {
   constructor(parameter: param.URIParameter) {
     this.parameter = parameter;
+  }
+}
+
+export class CloudEndpoint implements CloudEndpoint {
+  constructor(parameter: param.URIParameter, parameters: Array<param.URIParameter> = []) {
+    this.parameter = parameter;
+    this.parameters = parameters;
   }
 }
 

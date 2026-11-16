@@ -20,18 +20,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type configurationCredential struct {
-	tokenURL string
-}
+type configurationCredential struct{}
 
-func (cred configurationCredential) GetToken(ctx context.Context, options policy.TokenRequestOptions) (azcore.AccessToken, error) {
+func (configurationCredential) GetToken(ctx context.Context, options policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	scope := strings.Join(options.Scopes, " ")
+	var tokenURL string
+	switch scope {
+	case "https://api.loganalytics.io/.default":
+		tokenURL = "http://localhost:3000/azure/core/authentication/configurations/oauth2/public/token"
+	case "https://api.loganalytics.us/.default":
+		tokenURL = "http://localhost:3000/azure/core/authentication/configurations/oauth2/government/token"
+	default:
+		return azcore.AccessToken{}, fmt.Errorf("unexpected OAuth2 scope: %q", scope)
+	}
 	form := url.Values{
 		"grant_type":    {"client_credentials"},
 		"client_id":     {"mock-client-id"},
 		"client_secret": {"mock-client-secret"},
-		"scope":         {strings.Join(options.Scopes, " ")},
+		"scope":         {scope},
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cred.tokenURL, strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, tokenURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		return azcore.AccessToken{}, err
 	}
@@ -63,10 +71,7 @@ func (cred configurationCredential) GetToken(ctx context.Context, options policy
 }
 
 func TestConfigurationsClient_DefaultConfiguration(t *testing.T) {
-	cred := configurationCredential{
-		tokenURL: "http://localhost:3000/azure/core/authentication/configurations/oauth2/public/token",
-	}
-	client, err := coreauthcfggroup.NewConfigurationsClient("http://localhost:3000/public", cred, &coreauthcfggroup.ConfigurationsClientOptions{
+	client, err := coreauthcfggroup.NewConfigurationsClient(configurationCredential{}, &coreauthcfggroup.ConfigurationsClientOptions{
 		ClientOptions: azcore.ClientOptions{
 			InsecureAllowCredentialWithHTTP: true,
 		},
@@ -79,19 +84,10 @@ func TestConfigurationsClient_DefaultConfiguration(t *testing.T) {
 }
 
 func TestConfigurationsClient_GovernmentConfiguration(t *testing.T) {
-	cred := configurationCredential{
-		tokenURL: "http://localhost:3000/azure/core/authentication/configurations/oauth2/government/token",
-	}
-	client, err := coreauthcfggroup.NewConfigurationsClient("http://localhost:3000/government", cred, &coreauthcfggroup.ConfigurationsClientOptions{
+	client, err := coreauthcfggroup.NewConfigurationsClient(configurationCredential{}, &coreauthcfggroup.ConfigurationsClientOptions{
 		ClientOptions: azcore.ClientOptions{
 			InsecureAllowCredentialWithHTTP: true,
-			Cloud: cloud.Configuration{
-				Services: map[cloud.ServiceName]cloud.ServiceConfiguration{
-					coreauthcfggroup.ServiceName: {
-						Audience: "https://api.loganalytics.us",
-					},
-				},
-			},
+			Cloud:                           cloud.AzureGovernment,
 		},
 	})
 	require.NoError(t, err)
@@ -99,4 +95,26 @@ func TestConfigurationsClient_GovernmentConfiguration(t *testing.T) {
 	resp, err := client.GovernmentConfiguration(context.Background(), nil)
 	require.NoError(t, err)
 	require.Zero(t, resp)
+}
+
+func TestConfigurationsClient_InvalidCloudConfiguration(t *testing.T) {
+	_, err := coreauthcfggroup.NewConfigurationsClient(configurationCredential{}, &coreauthcfggroup.ConfigurationsClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud: cloud.AzureChina,
+		},
+	})
+	require.ErrorContains(t, err, "missing configuration for coreauthcfggroup")
+
+	_, err = coreauthcfggroup.NewConfigurationsClient(configurationCredential{}, &coreauthcfggroup.ConfigurationsClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services: map[cloud.ServiceName]cloud.ServiceConfiguration{
+					coreauthcfggroup.ServiceName: {
+						Audience: "https://api.loganalytics.io",
+					},
+				},
+			},
+		},
+	})
+	require.ErrorContains(t, err, "missing Endpoint for coreauthcfggroup")
 }
