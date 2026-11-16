@@ -125,11 +125,16 @@ export function getClientLroMetadataWithDiagnostics(
   operation: Operation,
 ): [LroMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  if (context.__clientLroMetadataCache.has(operation)) {
+    return diagnostics.wrap(context.__clientLroMetadataCache.get(operation));
+  }
+
   const selection = getClientLroResult(context, operation);
   const metadata = getRawLroMetadata(context.program, operation);
 
   // Keep the default TCGC result policy when no selection applies to the current emitter scope.
   if (!selection) {
+    context.__clientLroMetadataCache.set(operation, metadata);
     return diagnostics.wrap(metadata);
   }
 
@@ -142,11 +147,14 @@ export function getClientLroMetadataWithDiagnostics(
         format: { reason: "@clientLroResult requires a discoverable LRO protocol." },
       }),
     );
+    context.__clientLroMetadataCache.set(operation, undefined);
     return diagnostics.wrap(undefined);
   }
   const clientResult = diagnostics.pipe(resolveClientLroResultSelection(metadata, selection));
   // Continue SDK type construction with the default result after reporting an invalid selection.
-  return diagnostics.wrap(clientResult ? { ...metadata, ...clientResult } : metadata);
+  const resolved = clientResult ? { ...metadata, ...clientResult } : metadata;
+  context.__clientLroMetadataCache.set(operation, resolved);
+  return diagnostics.wrap(resolved);
 }
 
 function resolveClientLroResultSelection(

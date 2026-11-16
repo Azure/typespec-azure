@@ -80,6 +80,7 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
 import { resolveLroOperationId } from "./lro-operation-id.js";
 import { getStatusMonitorLink } from "./lro-status-metadata.js";
 import {
@@ -416,8 +417,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
   const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
-  // Exclude the legacy fallback, which has no native LRO protocol.
-  const nativeMetadata = context.__clientLroMetadataCache.get(operation);
+  const nativeMetadata = getRawLroMetadata(context.program, operation);
   const operationIdSource = getStatusMonitorLink(statusMonitorStep);
   const pollingResponseBody = rawMetadata.pollingInfo.responseModel
     ? (diagnostics.pipe(

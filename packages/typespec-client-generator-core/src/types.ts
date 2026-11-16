@@ -2201,7 +2201,6 @@ function updateTypesFromOperation(
     popNamingContext(context);
 
     const lroMetaData = diagnostics.pipe(getClientLroMetadataWithDiagnostics(context, operation));
-    context.__clientLroMetadataCache.set(operation, lroMetaData);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
