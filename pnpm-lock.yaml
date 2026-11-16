@@ -544,7 +544,7 @@ overrides:
   happy-dom: 20.11.6
   yaml@>=2.0.0 <2.8.3: ^2.8.3
 
-packageExtensionsChecksum: sha256-hcvadM+VJpLUMniZQB2V94wn6/ia0AagJQWqGCRFSUc=
+packageExtensionsChecksum: sha256-k8BMbw+0DexibkZlVDtfLYVZMpJn+sViEOzdLFUHfzU=
 
 importers:
 
@@ -12374,6 +12374,7 @@ snapshots:
       '@babel/preset-typescript': 8.0.1(@babel/core@8.0.1)
       pathe: 2.0.3
       picocolors: 1.1.1
+      typescript: 7.0.2
     transitivePeerDependencies:
       - supports-color
 

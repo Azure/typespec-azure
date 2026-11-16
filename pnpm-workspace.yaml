@@ -19,7 +19,7 @@ pmOnFail: download
 verifyDepsBeforeRun: false
 
 packageExtensions:
-  "@alloy-js/cli@0.25.0":
+  "@alloy-js/cli@^0.26.0":
     dependencies:
       # Alloy resolves typescript/bin/tsc directly instead of using the workspace PATH.
       typescript: ~7.0.2
