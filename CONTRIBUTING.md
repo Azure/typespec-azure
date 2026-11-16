@@ -521,13 +521,13 @@ Process labels
 
 Misc labels
 
-| Name                | Color   | Description                                                      |
-| ------------------- | ------- | ---------------------------------------------------------------- |
-| `good first issue`  | #7057ff | Good for newcomers                                               |
-| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs               |
-| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows                    |
-| `auto-merge`        | #0e8a16 | Automatically merge the pull request after all requirements pass |
-| `lintdiff`          | #1d76db | Issues and pull requests related to lintdiff                     |
+| Name                 | Color   | Description                                                      |
+| -------------------- | ------- | ---------------------------------------------------------------- |
+| `good first issue`   | #7057ff | Good for newcomers                                               |
+| `int:azure-specs`    | #0e8a16 | Run integration tests against azure-rest-api-specs               |
+| `agentic-workflows`  | #000000 | Issues/PR created by github agentic workflows                    |
+| `auto-merge`         | #0e8a16 | Automatically merge the pull request after all requirements pass |
+| `lintdiff-migration` | #1d76db | Issues for Swagger lintdiff to TypeSpec lint rule migration      |
 
 #### external
 
