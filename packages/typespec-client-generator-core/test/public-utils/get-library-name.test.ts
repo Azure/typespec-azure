@@ -2,6 +2,7 @@ import { getFriendlyName } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { createTCGCContext } from "../../src/context.js";
 import { getLibraryName } from "../../src/public-utils.js";
 import {
   ArmTesterWithService,
@@ -245,6 +246,35 @@ it.each([
   strictEqual(AiGateway.name, "AiGateway");
 });
 
+it("can preserve source-based friendly names in a TCGC context", async () => {
+  const { program, Envelope, AiGateway } = await SimpleTester.compile(t.code`
+    @clientName("AIGateway", "go")
+    model ${t.model("AiGateway")} {}
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+
+    model ${t.model("Envelope")} {
+      result: ListResult<AiGateway>;
+    }
+  `);
+  const result = Envelope.properties.get("result")!.type;
+  const legacyContext = createTCGCContext(program, "@azure-tools/typespec-go", {
+    useClientNameForFriendlyNameSource: false,
+  });
+  const defaultContext = createTCGCContext(program, "@azure-tools/typespec-go");
+  const enabledContext = createTCGCContext(program, "@azure-tools/typespec-go", {
+    useClientNameForFriendlyNameSource: true,
+  });
+
+  strictEqual(getLibraryName(legacyContext, result), "AiGatewayListResult");
+  strictEqual(getLibraryName(legacyContext, AiGateway), "AIGateway");
+  strictEqual(getLibraryName(defaultContext, result), "AIGatewayListResult");
+  strictEqual(getLibraryName(enabledContext, result), "AIGatewayListResult");
+});
+
 it.each([
   ['@friendlyName("FixedResult")', "", "FixedResult"],
   ["", '@@friendlyName(ListResult, "FixedResult");', "AIGatewayListResult"],
@@ -315,8 +345,29 @@ it("ignores copied friendly names on named models", async () => {
   strictEqual(getLibraryName(context, Sourced), "AIGatewayCustomResult");
 });
 
-it("renames ARM template models and their references for the selected language", async () => {
-  const { program } = await ArmTesterWithService.compile(`
+it.each([
+  {
+    language: "go",
+    useClientNameForFriendlyNameSource: undefined,
+    resourceName: "AIGateway",
+    templateSourceName: "AIGateway",
+  },
+  {
+    language: "go",
+    useClientNameForFriendlyNameSource: false,
+    resourceName: "AIGateway",
+    templateSourceName: "AiGateway",
+  },
+  {
+    language: "java",
+    useClientNameForFriendlyNameSource: undefined,
+    resourceName: "AiGateway",
+    templateSourceName: "AiGateway",
+  },
+])(
+  "names ARM template models for $language using $templateSourceName",
+  async ({ language, useClientNameForFriendlyNameSource, resourceName, templateSourceName }) => {
+    const { program } = await ArmTesterWithService.compile(`
     model AiGateway is TrackedResource<AiGatewayProperties> {
       ...ResourceNameParameter<AiGateway>;
     }
@@ -332,24 +383,24 @@ it("renames ARM template models and their references for the selected language",
     }
   `);
 
-  for (const [language, resourceName] of [
-    ["go", "AIGateway"],
-    ["java", "AiGateway"],
-  ]) {
-    const context = await createSdkContextForTester(program, {
-      emitterName: `@azure-tools/typespec-${language}`,
-    });
+    const context = await createSdkContextForTester(
+      program,
+      {
+        emitterName: `@azure-tools/typespec-${language}`,
+      },
+      { useClientNameForFriendlyNameSource },
+    );
     const models = context.sdkPackage.models;
     const resource = models.find((x) => x.name === resourceName);
     ok(resource);
-    ok(models.some((x) => x.name === `${resourceName}TagsUpdate`));
-    const listResult = models.find((x) => x.name === `${resourceName}ListResult`);
+    ok(models.some((x) => x.name === `${templateSourceName}TagsUpdate`));
+    const listResult = models.find((x) => x.name === `${templateSourceName}ListResult`);
     ok(listResult);
     const value = listResult.properties.find((x) => x.name === "value");
     ok(value?.type.kind === "array");
     strictEqual(value.type.valueType, resource);
-  }
-});
+  },
+);
 
 it("should return language specific name when both language specific name and friendly name exist", async () => {
   async function helper(expected: string, emitterName: string) {

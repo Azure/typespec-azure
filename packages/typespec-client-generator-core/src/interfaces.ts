@@ -67,6 +67,8 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
   convertDiscriminatedUnionsToModels?: boolean;
+  /** Use source `@clientName` overrides in `@friendlyName` templates. Default: true. */
+  useClientNameForFriendlyNameSource?: boolean;
 
   __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;

@@ -104,6 +104,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
+  "use-client-name-for-friendly-name-source"?: boolean;
   "api-version"?: ApiVersionConfig;
   license?: {
     name: string;

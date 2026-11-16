@@ -266,7 +266,13 @@ function getClientFriendlyName(
   scope?: string | typeof AllScopes,
 ): string | undefined {
   const friendlyName = getFriendlyName(context.program, type);
-  if (!friendlyName || !("decorators" in type)) return friendlyName;
+  if (
+    context.useClientNameForFriendlyNameSource === false ||
+    !friendlyName ||
+    !("decorators" in type)
+  ) {
+    return friendlyName;
+  }
 
   const application = type.decorators.findLast((application) => {
     if (application.decorator !== $friendlyName) return false;

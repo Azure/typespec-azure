@@ -59,6 +59,80 @@ it("export TCGC output from emitter", async () => {
   strictEqual(codeModel["models"][0]["name"], "Test");
 });
 
+it("can preserve friendly names through service emitter options", async () => {
+  const { outputs } = await SimpleTester.emit(SdkTestLibrary.name, {
+    "emitter-name": "@azure-tools/typespec-go",
+    "use-client-name-for-friendly-name-source": false,
+  }).compile(`
+    @service
+    namespace TestService;
+
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+
+    @get op list(): ListResult<AiGateway>;
+  `);
+  const output = outputs["tcgc-output.yaml"];
+  ok(output);
+  const codeModel = parse(output);
+  ok(codeModel.models.some((model: { name: string }) => model.name === "AiGatewayListResult"));
+  ok(codeModel.models.some((model: { name: string }) => model.name === "AIGateway"));
+});
+
+it("lets service naming options override emitter defaults without affecting another context", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService;
+
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+
+    @get op list(): ListResult<AiGateway>;
+  `);
+  const legacyContext = await createSdkContextForTester(
+    program,
+    {
+      emitterName: "@azure-tools/typespec-go",
+      "use-client-name-for-friendly-name-source": false,
+    },
+    { useClientNameForFriendlyNameSource: true },
+  );
+  const enabledContext = await createSdkContextForTester(
+    program,
+    {
+      emitterName: "@azure-tools/typespec-go",
+      "use-client-name-for-friendly-name-source": true,
+    },
+    { useClientNameForFriendlyNameSource: false },
+  );
+  const defaultContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+  });
+
+  for (const [context, expected] of [
+    [legacyContext, "AiGatewayListResult"],
+    [enabledContext, "AIGatewayListResult"],
+    [defaultContext, "AIGatewayListResult"],
+  ] as const) {
+    strictEqual(
+      context.sdkPackage.models.find(
+        (model) => model.__raw?.kind === "Model" && model.__raw.name === "ListResult",
+      )?.name,
+      expected,
+    );
+  }
+});
+
 it("export HTTP authentication metadata from emitter", async () => {
   const { outputs } = await SimpleTester.emit(SdkTestLibrary.name).compile(
     `

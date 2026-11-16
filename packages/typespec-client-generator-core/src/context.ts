@@ -54,6 +54,8 @@ import { createDuplicateClientNameDiagnostic } from "./validations/diagnostics.j
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
+  /** Use source `@clientName` overrides in `@friendlyName` templates. Default: true. */
+  useClientNameForFriendlyNameSource?: boolean;
 }
 
 export function createTCGCContext(
@@ -72,6 +74,7 @@ export function createTCGCContext(
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
     convertDiscriminatedUnionsToModels: true,
+    useClientNameForFriendlyNameSource: options?.useClientNameForFriendlyNameSource ?? true,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
     __referencedTypeCache: new Map<
@@ -177,6 +180,8 @@ export interface CreateSdkContextOptions {
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
   /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
   convertDiscriminatedUnionsToModels?: boolean;
+  /** Use source `@clientName` overrides in `@friendlyName` templates. Default: true. Overridden by the `use-client-name-for-friendly-name-source` emitter option. */
+  useClientNameForFriendlyNameSource?: boolean;
 }
 
 export async function createSdkContext<
@@ -191,6 +196,11 @@ export async function createSdkContext<
   const tcgcContext = createTCGCContext(
     context.program,
     emitterName ?? context.options["emitter-name"],
+    {
+      useClientNameForFriendlyNameSource:
+        context.options["use-client-name-for-friendly-name-source"] ??
+        options?.useClientNameForFriendlyNameSource,
+    },
   );
   const generateProtocolMethods =
     context.options["generate-protocol-methods"] ?? tcgcContext.generateProtocolMethods;
