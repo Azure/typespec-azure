@@ -13,10 +13,9 @@ Use an envelope response returned by the existing LRO strategy or a direct prope
 of its status-monitor envelope. Do not pass an unrelated replacement model or a
 nested property.
 
-Resource lifecycle operations return their resource or completion response by
-default. Overriding that default with a status-monitor response or property reports
-the suppressible `use-valid-client-lro-result` warning.
+The selected property must have a model, scalar, or `unknown` type.
+
+Resource lifecycle operations return the resource body by default. When the LRO protocol specifies a final request, they return that request's response body. Overriding that default with a status-monitor response or property reports the suppressible `use-valid-client-lro-result` warning.
 
 An ordinary operation or a legacy LRO marker without native protocol metadata is
-not a valid target. New optional/nullable projections are not supported without
-a missing-value contract.
+not a valid target.
