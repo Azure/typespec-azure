@@ -62,6 +62,9 @@ jobs:
         run: |
           git checkout ${{ github.event.pull_request.base.sha }}
           git submodule update --init --recursive
+          # Remove ignored build outputs from the head build (e.g. sources copied from core)
+          # so they don't leak into the base build.
+          git clean -ffdX -- packages
 
       # The measure/compare scripts are added by this PR, so restore them from the PR
       # head after checking out the (possibly script-less) base commit.

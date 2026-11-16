@@ -13,7 +13,20 @@ async function main() {
   const core = await getCoreSourceRoot(coreRoot, packageRoot);
   try {
     const emitterRoot = join(core.root, "emitter");
-    await cp(join(emitterRoot, "src"), join(packageRoot, "src"), {
+    const destinationSrc = join(packageRoot, "src");
+    const isTrackedSrcFile = (path: string) =>
+      path === "options.ts" || /^diagnostics\/dpg-.*\.md$/.test(path);
+    await mkdir(destinationSrc, { recursive: true });
+    for (const entry of await readdir(destinationSrc, { recursive: true, withFileTypes: true })) {
+      const path = join(entry.parentPath, entry.name);
+      if (
+        entry.isFile() &&
+        !isTrackedSrcFile(relative(destinationSrc, path).replaceAll("\\", "/"))
+      ) {
+        await rm(path);
+      }
+    }
+    await cp(join(emitterRoot, "src"), destinationSrc, {
       recursive: true,
       force: true,
       filter: (source) => basename(source) !== "options.ts",
