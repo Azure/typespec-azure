@@ -172,6 +172,13 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps localized documentation link guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-localized-doc-links";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
+
   it("keeps extensible enum default guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
