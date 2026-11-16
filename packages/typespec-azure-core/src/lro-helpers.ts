@@ -42,6 +42,7 @@ import {
 
 import { getFinalLocationValue, isFinalLocation } from "./decorators/final-location.js";
 import { FinalOperationKey } from "./decorators/final-operation.js";
+import { getLroErrorResult } from "./decorators/lro-error-result.js";
 import { getLroResult } from "./decorators/lro-result.js";
 import {
   extractLroStates,
@@ -168,6 +169,11 @@ export interface NextOperationLink extends LogicalOperationStep {
   responseModel: Model;
   /** information on how to get the uri to the status monitor */
   target: OperationLink;
+  /**
+   * The explicitly linked polling operation, when the link was declared with
+   * `@pollingOperation`. Absent for an inferred or standalone polling location.
+   */
+  operation?: Operation;
 }
 
 /**
@@ -489,6 +495,22 @@ function createLroProtocolMetadata(
     }
   }
 
+  const pollingLink = context.pollingOperationLink?.link;
+  const statusMonitorStep =
+    context.statusMonitorStep?.kind === "nextOperationReference" && pollingLink
+      ? {
+          ...context.statusMonitorStep,
+          target: {
+            ...context.statusMonitorStep.target,
+            link: {
+              kind: "link" as const,
+              location: pollingLink.location,
+              property: pollingLink.property,
+            },
+          },
+        }
+      : context.statusMonitorStep;
+
   return {
     operation,
     initial: {
@@ -497,7 +519,7 @@ function createLroProtocolMetadata(
       isAction,
     },
     polling: {
-      statusMonitorStep: context.statusMonitorStep,
+      statusMonitorStep,
       pollingInfo: context.pollingStep,
       statusMonitorResult: context.statusMonitorResult,
     },
@@ -914,12 +936,15 @@ function getStatusMonitorInfo(
   const statusProperty = findLroStatusProperty(program, modelOrLink);
   if (statusProperty === undefined) return undefined;
   const successInfo = getTargetModelInformation(program, modelOrLink);
+  const errorProperty = ignoreDiagnostics(getLroErrorResult(program, modelOrLink, true));
   const lroStates = ignoreDiagnostics(extractLroStates(program, statusProperty));
   if (lroStates === undefined) return undefined;
   return {
     monitorType: modelOrLink,
     successType: successInfo !== undefined ? successInfo[0] : undefined,
     successProperty: successInfo !== undefined ? successInfo[1] : undefined,
+    errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
+    errorProperty,
     statusProperty: statusProperty,
     lroStates: lroStates,
   };

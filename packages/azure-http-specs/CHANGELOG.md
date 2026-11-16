@@ -1,5 +1,18 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.47
+
+### Features
+
+- [#5677](https://github.com/Azure/typespec-azure/pull/5677) Add Content Understanding and Language-shaped HTTP scenarios for typed LRO status metadata, including initial values, changing progress metadata, and auxiliary errors on failure.
+- [#5710](https://github.com/Azure/typespec-azure/pull/5710) Add Public and Government authentication configuration scenarios that require a local OAuth client-credentials exchange followed by a request to the paired service endpoint. Validate `grant_type`, `client_id`, `client_secret`, and cloud-specific `scope` values, and require the returned bearer token for the selected configuration.
+- [#5782](https://github.com/Azure/typespec-azure/pull/5782) Add `@lroOperationId` and `SdkLroServiceMetadata.operationId` for legacy services that expose server-issued operation identity through a linked status-monitor URI, its response body, or both. The ordered `SdkLroOperationIdMetadata` entries preserve the selected SDK parameter or effective response property, with `propertySegments` identifying the body access path, including inherited properties and `@hierarchyBuilding` replacements. Active selections are validated during LRO processing; unused or out-of-scope annotations have no effect. Includes emitter scopes and representative Spector scenarios.
+
+### Bug Fixes
+
+- [#5656](https://github.com/Azure/typespec-azure/pull/5656) Select ARM common types v5 for the common-properties Spector scenarios so inherited resource IDs use `armResourceIdentifier`.
+
+
 ## 0.1.0-alpha.46
 
 ### Features

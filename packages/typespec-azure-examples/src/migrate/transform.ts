@@ -41,8 +41,10 @@ export function transformExample(
   for (const [code, response] of Object.entries(doc.responses ?? {})) {
     const mapped: MigratedResponse = {};
     if (response && typeof response === "object") {
-      if (response.headers !== undefined) mapped.headers = response.headers;
-      if (response.body !== undefined) mapped.body = response.body;
+      for (const key of Object.keys(response)) {
+        if (key === "headers" && response.headers !== undefined) mapped.headers = response.headers;
+        if (key === "body" && response.body !== undefined) mapped.body = response.body;
+      }
     }
     responses[code] = mapped;
   }

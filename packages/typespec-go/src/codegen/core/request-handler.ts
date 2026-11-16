@@ -8,6 +8,8 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
+import { getPathExpansionStyle } from "./path-expansion.js";
+import { isRawQueryExpansion, preservedQueryExpansions } from "./query-expansion.js";
 
 /**
  * emits the request handler for the specified method.
@@ -30,14 +32,14 @@ export function createRequestHandler(
   }
 
   for (const param of method.parameters) {
-    if (param.location !== "method" || !go.isRequiredParameter(param.style)) {
+    if (param.location !== "method" || param.group || !go.isRequiredParameter(param.style)) {
       continue;
     }
     imports.addForType(param.type);
   }
 
   const returns = ["*policy.Request", "error"];
-  let text = `${helpers.comment(name, "// ")} creates the ${method.kind !== "nextPageMethod" && (go.isLROMethod(method)  || go.isPageableMethod(method)) ? method.naming.operationMethod : method.name} request.\n`;
+  let text = `${helpers.comment(name, "// ")} creates the ${method.kind !== "nextPageMethod" && (go.isLROMethod(method) || go.isPageableMethod(method)) ? method.naming.operationMethod : method.name} request.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(${helpers.getCreateRequestParametersSig(method)}) (${returns.join(", ")}) {\n`;
 
   // BEGIN create request
@@ -98,18 +100,45 @@ export function createRequestHandler(
   // so, if a path contains tokens but there are no path params, skip emitting the path.
   const pathStr = method.httpPath;
   const pathContainsParms = pathStr.includes("{");
+  // Collection and styled expansions must retain empty and dot segments.
+  // Ordinary scalar paths still need normalization after inserting ARM scopes.
+  const joinBeforeExpansion = methodParamGroups.pathParams.some(
+    (param) => param.kind !== "pathScalarParam" || param.pathStyle !== "simple",
+  );
+  const normalizeScalarsFirst =
+    joinBeforeExpansion &&
+    methodParamGroups.pathParams.some(
+      (param) => param.kind === "pathScalarParam" && param.pathStyle === "simple",
+    );
   let opEndpoint = hostParam;
   if (hasPathParams || (!pathContainsParms && pathStr.length > 1)) {
     // there are path params, or the path doesn't contain tokens and is not "/" so emit it
-    text += `${indent.get()}urlPath := "${method.httpPath}"\n`;
-    opEndpoint = `runtime.JoinPaths(${hostParam}, urlPath)`;
+    text +=
+      joinBeforeExpansion && !normalizeScalarsFirst
+        ? `${indent.get()}urlPath := runtime.JoinPaths(${hostParam}, "${method.httpPath}")\n`
+        : `${indent.get()}urlPath := "${method.httpPath}"\n`;
+    opEndpoint = joinBeforeExpansion ? "urlPath" : `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
   if (hasPathParams) {
     // swagger defines path params, emit path and replace tokens
     imports.add("strings");
-    // replace path parameters
-    for (const pp of methodParamGroups.pathParams) {
+    // Normalize scalar paths before inserting expansions whose segments must be preserved.
+    const pathParams = [...methodParamGroups.pathParams].sort(
+      (a, b) =>
+        Number(a.kind !== "pathScalarParam" || a.pathStyle !== "simple") -
+        Number(b.kind !== "pathScalarParam" || b.pathStyle !== "simple"),
+    );
+    let pathJoined = !normalizeScalarsFirst;
+    for (const pp of pathParams) {
+      if (
+        joinBeforeExpansion &&
+        !pathJoined &&
+        (pp.kind !== "pathScalarParam" || pp.pathStyle !== "simple")
+      ) {
+        text += `${indent.get()}urlPath = runtime.JoinPaths(${hostParam}, urlPath)\n`;
+        pathJoined = true;
+      }
       let paramValue: string;
       let optionalPathSep = false;
       if (pp.style === "literal") {
@@ -139,14 +168,14 @@ export function createRequestHandler(
           }
         }
 
-        paramValue = helpers.formatParamValue(pp, imports, indent);
+        paramValue = formatPathParamValue(pp, method.receiver.type.pkg, imports, indent);
 
         // for collection-based path params, we emit the empty check
         // after calling helpers.formatParamValue as that will have the
         // var name that contains the slice.
-        if (pp.kind === "pathCollectionParam") {
+        if (pp.kind === "pathCollectionParam" || pp.kind === "pathMapParam") {
           const paramName = helpers.getParamName(pp);
-          const joinedParamName = `${paramName}Param`;
+          const joinedParamName = helpers.getUniqueVarName(method.parameters, [`${pp.name}Param`]);
           text += `${indent.get()}${joinedParamName} := ${paramValue}\n`;
           imports.add("errors");
           text += `${indent.get()}if len(${joinedParamName}) == 0 {\n`;
@@ -171,24 +200,50 @@ export function createRequestHandler(
         paramValue = `optional${naming.capitalize(pp.name)}`;
         text += `${indent.get()}${paramValue} := ""\n`;
         text += emitParamGroupCheck(pp, indent);
-        text += `${indent.push().get()}${paramValue} = ${helpers.formatParamValue(pp, imports, indent)}\n`;
+        let optionalValue = formatPathParamValue(pp, method.receiver.type.pkg, imports, indent);
+        if (pp.kind === "pathScalarParam" && pp.pathStyle !== "simple") {
+          const { prefix } = getPathExpansionStyle(pp);
+          const escaped = emitPathEscape(pp, optionalValue, imports);
+          optionalValue =
+            pp.pathStyle === "matrix"
+              ? `expandPathMatrix(${JSON.stringify(prefix)}, ${escaped})`
+              : `${JSON.stringify(prefix)} + ${escaped}`;
+        }
+        text += `${indent.push().get()}${paramValue} = ${optionalValue}\n`;
         text += `${indent.pop().get()}}\n`;
 
         // there are two cases for optional path params.
         //  - /foo/bar/{optional}
         //  - /foo/bar{/optional}
         // for the second case, we need to include a forward slash
-        if (method.httpPath[method.httpPath.indexOf(`{${pp.pathSegment}}`) - 1] !== "/") {
+        if (
+          pp.kind === "pathScalarParam" &&
+          pp.pathStyle === "simple" &&
+          method.httpPath[method.httpPath.indexOf(`{${pp.pathSegment}}`) - 1] !== "/"
+        ) {
           optionalPathSep = true;
         }
       }
 
+      const { prefix } = getPathExpansionStyle(pp);
+      const optionalStyledScalar =
+        pp.kind === "pathScalarParam" &&
+        pp.pathStyle !== "simple" &&
+        (pp.style === "optional" || pp.style === "flag") &&
+        pp.location === "method";
       if (optionalPathSep) {
         text += `${indent.get()}if len(${paramValue}) > 0 {\n`;
         text += `${indent.push().get()}${paramValue} = "/"+${emitPathEscape(pp, paramValue, imports)}\n`;
         text += `${indent.pop().get()}}\n`;
-      } else {
+      } else if (!optionalStyledScalar) {
         paramValue = emitPathEscape(pp, paramValue, imports);
+      }
+
+      if (pp.kind === "pathScalarParam" && pp.pathStyle !== "simple" && !optionalStyledScalar) {
+        paramValue =
+          pp.pathStyle === "matrix"
+            ? `expandPathMatrix(${JSON.stringify(prefix)}, ${paramValue})`
+            : `${JSON.stringify(prefix)} + ${paramValue}`;
       }
 
       text += `${indent.get()}urlPath = strings.ReplaceAll(urlPath, "{${pp.pathSegment}}", ${paramValue})\n`;
@@ -207,13 +262,47 @@ export function createRequestHandler(
   // END create request
 
   // BEGIN add query parameters
-  const encodedParams = methodParamGroups.encodedQueryParams;
-  const unencodedParams = methodParamGroups.unencodedQueryParams;
+  const encodedParams = uniqueQueryExpansions(methodParamGroups.encodedQueryParams);
+  const unencodedParams = uniqueQueryExpansions(methodParamGroups.unencodedQueryParams);
+  const rawQueryParams = encodedParams.filter(isRawQueryExpansion);
+  const preservedParams = preservedQueryExpansions(method, rawQueryParams);
+  const rawQueryValues = helpers.getUniqueVarName(
+    method.parameters.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["rawQueryValues", "uriQueryValues"],
+  );
+  const queryErr = helpers.getUniqueVarName(
+    method.parameters.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["queryErr", "uriQueryErr"],
+  );
+  const queryURL = helpers.getUniqueVarName(
+    method.parameters.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["queryURL", "uriQueryURL"],
+  );
 
   // check for any params that require reinjection
   const reinjectedParams = new Array<go.QueryParameter>();
   if (forNextLinkPager && method.strategy?.kind === "nextLink") {
     reinjectedParams.push(...method.strategy.reinjectedParams);
+  }
+  const reinjectedExpansions = encodedParams.filter((param) =>
+    queryExpansionMembers(param, methodParamGroups.encodedQueryParams).some((member) =>
+      reinjectedParams.includes(member),
+    ),
+  );
+  if (forNextLinkPager && rawQueryParams.length > 0 && reinjectedExpansions.length === 0) {
+    imports.add("net/url");
+    const keys = rawQueryParams.map((param) =>
+      JSON.stringify(param.queryExpansion?.queryParameter ?? param.queryParameter),
+    );
+    text += `${indent.get()}if !firstPage {\n`;
+    text += `${indent.push().get()}${queryURL}, ${queryErr} := url.Parse(nextLink)\n`;
+    text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+    text += `${indent.get()}if ${queryURL}.RawQuery != "" {\n`;
+    text += `${indent.push().get()}var ${rawQueryValues} url.Values\n`;
+    text += `${indent.get()}${rawQueryValues}, ${queryErr} = preserveQueryExpansions(${queryURL}.RawQuery, ${keys.join(", ")})\n`;
+    text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+    text += `${indent.get()}req.Raw().URL.RawQuery = encodeQuery(req.Raw().URL.Query(), ${rawQueryValues})\n`;
+    text += `${indent.pop().get()}}\n${indent.pop().get()}}\n`;
   }
 
   // tracks if we're inside an "if firstPage {}" block so we can close it at the end
@@ -225,9 +314,9 @@ export function createRequestHandler(
     // default to "all" to cover the non-pager case.
     let forReinjection: "all" | "none" | "some" = "all";
     if (forNextLinkPager) {
-      if (reinjectedParams.length === 0) {
+      if (reinjectedExpansions.length === 0) {
         forReinjection = "none";
-      } else if (reinjectedParams.length < encodedParams.length) {
+      } else if (reinjectedExpansions.length < encodedParams.length) {
         forReinjection = "some";
       }
     }
@@ -240,52 +329,84 @@ export function createRequestHandler(
     }
 
     text += `${indent.get()}reqQP := req.Raw().URL.Query()\n`;
+    if (rawQueryParams.length > 0) {
+      imports.add("net/url");
+      text += `${indent.get()}${rawQueryValues} := url.Values{}\n`;
+      if (preservedParams.length > 0) {
+        const keys = preservedParams.map((param) =>
+          JSON.stringify(param.queryExpansion?.queryParameter ?? param.queryParameter),
+        );
+        let source = "req.Raw().URL.RawQuery";
+        if (forNextLinkPager && forReinjection !== "none") {
+          text += `${indent.get()}${queryURL} := req.Raw().URL\n`;
+          text += `${indent.get()}if !firstPage {\n`;
+          text += `${indent.push().get()}var ${queryErr} error\n`;
+          text += `${indent.get()}${queryURL}, ${queryErr} = url.Parse(nextLink)\n`;
+          text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+          text += `${indent.pop().get()}}\n`;
+          source = `${queryURL}.RawQuery`;
+        }
+        text += `${indent.get()}if ${source} != "" {\n`;
+        text += `${indent.push().get()}var ${queryErr} error\n`;
+        text += `${indent.get()}${rawQueryValues}, ${queryErr} = preserveQueryExpansions(${source}, ${keys.join(", ")})\n`;
+        text += `${indent.get()}if ${queryErr} != nil { return nil, ${queryErr} }\n`;
+        text += `${indent.pop().get()}}\n`;
+      }
+    }
 
     // this will accumulate any non-reinjected params code
     let nonReinjectedParamsText = "";
 
     // we emit all reinjected params in the loop, and collect the code for non-reinjected params
-    for (const qp of encodedParams.sort((a: go.QueryParameter, b: go.QueryParameter) => {
-      return helpers.sortAscending(a.queryParameter, b.queryParameter);
-    })) {
+    for (const qp of encodedParams.sort(sortQueryParams)) {
       let setter: string;
-      if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
+      if (qp.queryExpansion && !qp.queryExpansion.explode) {
+        setter = emitQueryExpansion(
+          qp.queryExpansion,
+          queryExpansionMembers(qp, methodParamGroups.encodedQueryParams),
+          imports,
+          indent,
+          false,
+          rawQueryValues,
+        );
+      } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "csv") {
+        const itemType = qp.type.itemType;
+        imports.addForType(itemType);
+        setter = `${rawQueryValues}.Set(${JSON.stringify(qp.queryParameter)}, expandQueryArray(${helpers.getParamName(qp)}, func(value ${go.getTypeDeclaration(itemType, method.receiver.type.pkg)}) string {\n`;
+        setter += `${indent.push().get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
+        setter += `${indent.pop().get()}}))`;
+      } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
         setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
-
-        // emit a type conversion for the qv based on the array's element type
-        let queryVal: string;
-        const arrayQP = qp.type;
-        switch (arrayQP.itemType.kind) {
-          case "constant":
-            switch (arrayQP.itemType.type) {
-              case "string":
-                queryVal = "string(qv)";
-                break;
-              default:
-                imports.add("fmt");
-                queryVal = 'fmt.Sprintf("%d", qv)';
-            }
-            break;
-          case "string":
-            queryVal = "qv";
-            break;
-          default:
-            imports.add("fmt");
-            queryVal = 'fmt.Sprintf("%v", qv)';
+        indent.push();
+        if (qp.type.itemType.kind === "ptr") {
+          setter += `${indent.get()}if qv == nil {\n`;
+          setter += `${indent.push().get()}continue\n`;
+          setter += `${indent.pop().get()}}\n`;
         }
-
-        setter += `${indent.push().get()}reqQP.Add("${qp.queryParameter}", ${queryVal})\n`;
+        setter += `${indent.get()}reqQP.Add("${qp.queryParameter}", ${helpers.formatValue("qv", qp.type.itemType, imports)})\n`;
         setter += `${indent.pop().get()}}`;
+      } else if (qp.kind === "queryMapParam") {
+        setter = emitQueryObject(
+          method.receiver.type.pkg,
+          qp,
+          imports,
+          indent,
+          false,
+          rawQueryValues,
+        );
       } else {
         // cannot initialize setter to this value as helpers.formatParamValue() can change imports
         setter = `reqQP.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
       }
 
-      const qpText = emitQueryParam(qp, imports, indent, setter);
+      const qpText =
+        qp.queryExpansion && !qp.queryExpansion.explode
+          ? setter
+          : emitQueryParam(qp, imports, indent, setter);
 
       // if we're not reinjecting any params, or this param is for reinjection
       // then emit it now, else collect it for the non-reinjected case.
-      if (forReinjection !== "some" || reinjectedParams.includes(qp)) {
+      if (forReinjection !== "some" || reinjectedExpansions.includes(qp)) {
         text += qpText;
       } else {
         nonReinjectedParamsText += qpText;
@@ -306,8 +427,12 @@ export function createRequestHandler(
     // thus not applicable for URIs. the correct URI encoding for SP is %20. note that literal '+'
     // characters are encoded by reqQP.Encode() as %2B so there's no risk of replacing them.
     // see https://www.rfc-editor.org/rfc/rfc3986 sections 2.1, 2.2, and 3.4
-    imports.add("strings");
-    text += `${indent.get()}req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")\n`;
+    if (rawQueryParams.length > 0) {
+      text += `${indent.get()}req.Raw().URL.RawQuery = encodeQuery(reqQP, ${rawQueryValues})\n`;
+    } else {
+      imports.add("strings");
+      text += `${indent.get()}req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")\n`;
+    }
 
     // don't close it yet if there are header/body params as those don't get reinjected
     const bodyParam = methodParamGroups.bodyParam;
@@ -334,14 +459,23 @@ export function createRequestHandler(
     } else {
       text += `${indent.get()}unencodedParams := []string{}\n`;
     }
-    for (const qp of unencodedParams.sort((a: go.QueryParameter, b: go.QueryParameter) => {
-      return helpers.sortAscending(a.queryParameter, b.queryParameter);
-    })) {
+    for (const qp of unencodedParams.sort(sortQueryParams)) {
       let setter: string;
-      if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
+      if (qp.queryExpansion && !qp.queryExpansion.explode) {
+        text += emitQueryExpansion(
+          qp.queryExpansion,
+          queryExpansionMembers(qp, methodParamGroups.unencodedQueryParams),
+          imports,
+          indent,
+          true,
+        );
+        continue;
+      } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
         setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
         setter += `${indent.push().get()}unencodedParams = append(unencodedParams, "${qp.queryParameter}="+qv)\n`;
         setter += `${indent.pop().get()}}`;
+      } else if (qp.kind === "queryMapParam") {
+        setter = emitQueryObject(method.receiver.type.pkg, qp, imports, indent, true);
       } else {
         setter = `unencodedParams = append(unencodedParams, "${qp.queryParameter}="+${helpers.formatParamValue(qp, imports, indent)})`;
       }
@@ -352,8 +486,11 @@ export function createRequestHandler(
   }
   // END add query parameters
 
-  if (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult") {
-    // skip auto-body downloading for binary stream responses
+  if (
+    method.kind === "sseMethod" ||
+    (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult")
+  ) {
+    // skip auto-body downloading for streaming responses
     text += `${indent.get()}runtime.SkipBodyDownload(req)\n`;
   }
 
@@ -482,7 +619,10 @@ function emitBody(
         }
         text += `${indent.get()}XMLName xml.Name \`xml:"${tagName}"\`\n`;
         const fieldName = naming.capitalize(bodyParam.name);
-        let tag = go.getTypeDeclaration(go.unwrapPtr(bodyParam.type.itemType), method.receiver.type.pkg);
+        let tag = go.getTypeDeclaration(
+          go.unwrapPtr(bodyParam.type.itemType),
+          method.receiver.type.pkg,
+        );
         if (bodyParam.type.itemType.kind === "model" && bodyParam.type.itemType.xmlName) {
           tag = bodyParam.type.itemType.xmlName;
         }
@@ -523,11 +663,12 @@ function emitBody(
         text += `${indent.get()}}\n`;
         body = "aux";
       } else if (go.isMap(bodyParam.type, "time")) {
-        const timeType = bodyParam.type.itemType.ptrType;
+        const timeType = go.unwrapPtr(bodyParam.type.itemType);
+        const elementPtr = bodyParam.type.itemType.kind === "ptr" ? "*" : "";
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        text += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
+        text += `${indent.get()}aux := map[string]${elementPtr}datetime.${timeType.format}{}\n`;
         text += `${indent.get()}for k, v := range ${body} {\n`;
-        if (timeType.utc) {
+        if (timeType.utc && elementPtr === "*") {
           text += `${indent.push().get()}if v != nil {\n`;
           text += `${indent.push().get()}utcTime := v.UTC()\n`;
           text += `${indent.get()}aux[k] = (*datetime.${timeType.format})(&utcTime)\n`;
@@ -536,7 +677,8 @@ function emitBody(
           text += `${indent.pop().get()}}\n`;
           indent.pop();
         } else {
-          text += `${indent.push().get()}aux[k] = (*datetime.${timeType.format})(v)\n`;
+          const utcCall = timeType.utc ? ".UTC()" : "";
+          text += `${indent.push().get()}aux[k] = (${elementPtr}datetime.${timeType.format})(v${utcCall})\n`;
           indent.pop();
         }
         text += `${indent.get()}}\n`;
@@ -745,6 +887,7 @@ function emitClientSideDefault(
       serializedName = param.headerName;
       break;
     case "queryCollectionParam":
+    case "queryMapParam":
     case "queryScalarParam":
       serializedName = param.queryParameter;
       break;
@@ -808,11 +951,112 @@ function emitHeaderSet(
  * @returns the code that escaped the param or the param
  */
 function emitPathEscape(pp: go.PathParameter, paramName: string, imports: ImportManager): string {
-  if (pp.isEncoded) {
+  // Collection components have already been escaped before adding URI-template delimiters.
+  if (pp.isEncoded && pp.kind === "pathScalarParam") {
     imports.add("net/url");
     return `url.PathEscape(${paramName})`;
   }
   return paramName;
+}
+
+/**
+ * Returns a Go expression that formats a path parameter for URI-template substitution.
+ * Collections use expansion helpers that escape components before inserting delimiters;
+ * scalar formatting leaves escaping to the caller.
+ */
+function formatPathParamValue(
+  param: go.PathParameter,
+  pkg: go.PackageContent,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  if (param.kind === "pathScalarParam") {
+    return helpers.formatParamValue(param, imports, indent);
+  }
+
+  const { prefix, separator } = getPathExpansionStyle(param);
+
+  const helper = param.kind === "pathMapParam" ? "expandPathMap" : "expandPathArray";
+  const explode = param.kind === "pathMapParam" ? `, ${param.explode}` : "";
+  const itemType = param.type.itemType;
+  imports.addForType(itemType);
+  let text = `${helper}(${helpers.getParamName(param)}, ${JSON.stringify(prefix)}, ${JSON.stringify(separator)}, ${param.isEncoded}${explode}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
+  indent.push();
+  text += `${indent.get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
+  text += `${indent.pop().get()}})`;
+  return text;
+}
+
+/** Emits Go code that collects and sorts map keys for deterministic expansion order. */
+function emitSortedMapKeys(
+  paramName: string,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  imports.add("sort");
+  let text = `${indent.get()}keys := make([]string, 0, len(${paramName}))\n`;
+  text += `${indent.get()}for key := range ${paramName} {\n`;
+  text += `${indent.push().get()}keys = append(keys, key)\n`;
+  text += `${indent.pop().get()}}\n`;
+  text += `${indent.get()}sort.Strings(keys)\n`;
+  return text;
+}
+
+/**
+ * Emits Go code that serializes a query map as exploded entries or a comma-delimited expansion.
+ * Escapes components before inserting delimiters unless unencoded output is requested.
+ */
+function emitQueryObject(
+  pkg: go.PackageContent,
+  param: go.QueryMapParameter,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+  unencoded = false,
+  rawQueryValues = "rawQueryValues",
+): string {
+  if (!unencoded && !param.explode && param.type.itemType.kind !== "ptr") {
+    const itemType = param.type.itemType;
+    imports.addForType(itemType);
+    let text = `${rawQueryValues}.Set(${JSON.stringify(param.queryParameter)}, expandQueryMap(${helpers.getParamName(param)}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
+    text += `${indent.push().get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
+    text += `${indent.pop().get()}}))`;
+    return text;
+  }
+  const set = (key: string, value: string): string =>
+    unencoded
+      ? `unencodedParams = append(unencodedParams, ${key} + "=" + ${value})`
+      : `reqQP.Set(${key}, ${value})`;
+  let text = "{\n";
+  indent.push();
+  const paramName = "values";
+  text += `${indent.get()}${paramName} := ${helpers.getParamName(param)}\n`;
+  if (!param.explode) {
+    text += `${indent.get()}parts := []string{}\n`;
+    imports.add("strings");
+  }
+  const append = (key: string, value: string): string =>
+    param.explode
+      ? set(key, value)
+      : `parts = append(parts, ${unencoded ? key : `escapeQueryComponent(${key})`}, ${unencoded ? value : `escapeQueryComponent(${value})`})`;
+  text += emitSortedMapKeys(paramName, imports, indent);
+  text += `${indent.get()}for _, key := range keys {\n`;
+  text += `${indent.push().get()}value := ${paramName}[key]\n`;
+  if (param.type.itemType.kind === "ptr") {
+    text += `${indent.get()}if value == nil {\n`;
+    text += `${indent.push().get()}continue\n`;
+    text += `${indent.pop().get()}}\n`;
+  }
+  text += `${indent.get()}${append("key", helpers.formatValue("value", param.type.itemType, imports))}\n`;
+  text += `${indent.pop().get()}}\n`;
+  if (!param.explode) {
+    text += `${indent.get()}${
+      unencoded
+        ? set(JSON.stringify(param.queryParameter), 'strings.Join(parts, ",")')
+        : `${rawQueryValues}.Set(${JSON.stringify(param.queryParameter)}, strings.Join(parts, ","))`
+    }\n`;
+  }
+  text += `${indent.pop().get()}}`;
+  return text;
 }
 
 /**
@@ -1016,4 +1260,104 @@ function isSliceOfTimeForMarshalling(type: go.Slice<go.Ptr<go.Time> | go.Time>):
       return false;
   }
   return false;
+}
+
+/** Compares query parameters by wire name, using the outer name for non-exploded bundles. */
+function sortQueryParams(a: go.QueryParameter, b: go.QueryParameter): number {
+  return helpers.sortAscending(
+    a.queryExpansion?.explode === false ? a.queryExpansion.queryParameter : a.queryParameter,
+    b.queryExpansion?.explode === false ? b.queryExpansion.queryParameter : b.queryParameter,
+  );
+}
+
+/**
+ * Selects one representative per non-exploded query bundle so each bundle is serialized once.
+ * Retains individual parameters and exploded bundle members.
+ */
+function uniqueQueryExpansions(params: Array<go.QueryParameter>): Array<go.QueryParameter> {
+  const seen = new Set<go.QueryExpansion>();
+  return params.filter((param) => {
+    if (!param.queryExpansion || param.queryExpansion.explode) {
+      return true;
+    }
+    if (seen.has(param.queryExpansion)) {
+      return false;
+    }
+    seen.add(param.queryExpansion);
+    return true;
+  });
+}
+
+/** Returns all members of a parameter's non-exploded query bundle, or just the parameter itself. */
+function queryExpansionMembers(
+  param: go.QueryParameter,
+  params: Array<go.QueryParameter>,
+): Array<go.QueryParameter> {
+  return param.queryExpansion && !param.queryExpansion.explode
+    ? params.filter((member) => member.queryExpansion === param.queryExpansion)
+    : [param];
+}
+
+/**
+ * Emits Go code that serializes a non-exploded query bundle as alternating field names and values.
+ * Respects member presence and client-side defaults, leaving existing values unchanged when no members are included.
+ */
+function emitQueryExpansion(
+  expansion: go.QueryExpansion,
+  params: Array<go.QueryParameter>,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+  unencoded = false,
+  rawQueryValues = "rawQueryValues",
+): string {
+  if (
+    !unencoded &&
+    params.every(
+      (param) => go.isRequiredParameter(param.style) || go.isLiteralParameter(param.style),
+    )
+  ) {
+    const args = params.flatMap((param) => [
+      JSON.stringify(param.queryParameter),
+      helpers.formatParamValue(param, imports, indent),
+    ]);
+    return `${indent.get()}setQueryExpansion(${rawQueryValues}, ${JSON.stringify(expansion.queryParameter)}${args.length > 0 ? `, ${args.join(", ")}` : ""})\n`;
+  }
+  if (unencoded) {
+    imports.add("strings");
+  }
+  const parts = helpers.getUniqueVarName(
+    params.map((param) => ({ name: helpers.getParamName(param).split(".")[0] })),
+    ["parts", "queryParts"],
+  );
+  let text = `${indent.get()}{\n`;
+  text += `${indent.push().get()}${parts} := []string{}\n`;
+  for (const param of params) {
+    const append = (value: string): string =>
+      `${parts} = append(${parts}, ${JSON.stringify(param.queryParameter)}, ${value})`;
+    if (go.isClientSideDefault(param.style)) {
+      text += emitClientSideDefault(
+        param,
+        param.style,
+        imports,
+        indent,
+        (_, value) => `${indent.get()}${append(value)}\n`,
+      );
+    } else {
+      text += emitQueryParam(
+        param,
+        imports,
+        indent,
+        append(helpers.formatParamValue(param, imports, indent)),
+      );
+    }
+  }
+  if (unencoded) {
+    text += `${indent.get()}if len(${parts}) > 0 {\n`;
+    text += `${indent.push().get()}unencodedParams = append(unencodedParams, ${JSON.stringify(expansion.queryParameter)}+"="+strings.Join(${parts}, ","))\n`;
+    text += `${indent.pop().get()}}\n`;
+  } else {
+    text += `${indent.get()}setQueryExpansion(${rawQueryValues}, ${JSON.stringify(expansion.queryParameter)}, ${parts}...)\n`;
+  }
+  text += `${indent.pop().get()}}\n`;
+  return text;
 }

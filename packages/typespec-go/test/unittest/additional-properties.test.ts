@@ -1,0 +1,137 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+
+import { describe, expect, it } from "vitest";
+import { emitGoFor } from "./scenario-runner.js";
+
+describe("Union usage in JSON additional properties", () => {
+  it.each([
+    { discriminator: "kind", legacy: false },
+    { discriminator: "petType", legacy: false },
+    { discriminator: "kind", legacy: true },
+  ])(
+    "protects the $discriminator discriminator from additional properties (legacy: $legacy)",
+    async ({ discriminator, legacy }) => {
+      const files = await emitGoFor(`
+        @service namespace Test;
+        ${
+          legacy
+            ? '@discriminator("kind") model Pet extends Record<string> { kind: string; } model Cat extends Pet { kind: "cat"; name: string; }'
+            : `model Cat extends Record<string> { name: string; }
+               @discriminated(#{ envelope: "none", discriminatorPropertyName: "${discriminator}" })
+               union Pet { cat: Cat }`
+        }
+        @route("/pets") @put op put(@body input: Pet): void;
+      `);
+      expect(files.get("zz_models_serde.go")).toContain(
+        `if key == "${discriminator}" {\n\t\t\t\tcontinue\n\t\t\t}`,
+      );
+    },
+  );
+
+  it.each([
+    { type: "Pet", helper: "" },
+    { type: "Pet[]", helper: "Array" },
+    { type: "Record<Pet[]>", helper: "ArrayMap" },
+  ])("decodes discriminated $type additional properties", async ({ type, helper }) => {
+    const files = await emitGoFor(`
+      @service namespace Test;
+      model Cat { name: string; }
+      @discriminated union Pet { cat: Cat }
+      model Container extends Record<${type}> { known: ${type}; }
+      @route("/properties") @get op getProperties(): Container;
+    `);
+    const serde = files.get("zz_models_serde.go")!;
+    expect(serde).toContain(`aux, err = unmarshalPetClassification${helper}(val)`);
+    expect(serde).toContain("c.AdditionalProperties[key] = aux");
+    expect(serde).not.toContain("err = json.Unmarshal(val, &aux)");
+    expect(files.get("zz_polymorphic_helpers.go")).toContain(
+      `func unmarshalPetClassification${helper}(`,
+    );
+  });
+
+  it.each([false, true])(
+    "preserves optional-field shape discrimination for JSON unions (also SSE: %s)",
+    async (sse) => {
+      const files = await emitGoFor(`
+        @service namespace Test;
+        model WidgetData1 { kind: "kind1"; start: utcDateTime; end?: utcDateTime; }
+        model WidgetData2 { kind: "kind1"; start: string; }
+        ${sse ? "@TypeSpec.Events.events" : ""}
+        union Value { WidgetData2, WidgetData1 }
+        model Container { name: string; ...Record<Value>; }
+        @route("/properties") @post op roundTrip(@body body: Container): Container;
+        ${sse ? '@route("/events") @get op receive(): TypeSpec.SSE.SSEStream<Value>;' : ""}
+      `);
+      const serde = files.get("zz_unions_serde.go")!;
+      const jsonDecoder = serde.slice(serde.indexOf("func (v *Value) UnmarshalJSON("));
+      expect(jsonDecoder).toContain('hasRequiredFields(rawMsg, "kind", "start", "end")');
+      expect(jsonDecoder).toContain('hasRequiredFields(rawMsg, "kind", "start")');
+      expect(jsonDecoder.indexOf("json.Unmarshal(data, &v.WidgetData1)")).toBeLessThan(
+        jsonDecoder.indexOf("json.Unmarshal(data, &v.WidgetData2)"),
+      );
+      if (sse) {
+        const eventDecoder = serde.slice(0, serde.indexOf("func (v Value) MarshalJSON("));
+        expect(eventDecoder).toContain('hasRequiredFields(rawMsg, "kind", "start")');
+        expect(eventDecoder).not.toContain('hasRequiredFields(rawMsg, "kind", "start", "end")');
+      }
+    },
+  );
+
+  it.each([
+    {
+      name: "multiple spread records",
+      models: `
+        model Container {
+          flag: boolean;
+          ...Record<string>;
+          ...Record<float32>;
+        }
+      `,
+    },
+    {
+      name: "spread union record",
+      models: `
+        union Value { string, float32 }
+        model Container { flag: boolean; ...Record<Value>; }
+      `,
+    },
+    {
+      name: "inherited union record",
+      models: `
+        union Value { string, float32 }
+        model Base extends Record<Value> { name: string; }
+        model Container extends Base { count: float32; }
+      `,
+    },
+    {
+      name: "unions nested in additional-property containers",
+      models: `
+        union Value { string, float32 }
+        model Container { flag: boolean; ...Record<Record<Value[]>>; }
+      `,
+    },
+  ])("emits JSON union serialization for $name", async ({ models }) => {
+    const files = await emitGoFor(`
+      @service namespace Test;
+      ${models}
+      @route("/properties") @post op roundTrip(@body body: Container): Container;
+    `);
+    const unions = files.get("zz_unions.go");
+    expect(unions).toBeDefined();
+    const unionName = unions?.match(/type (\w+) struct/)?.[1];
+    expect(unionName).toBeDefined();
+    expect(unions).toContain("String *string");
+    expect(unions).toContain("Float32 *float32");
+    expect(files.get("zz_models.go")).toMatch(
+      new RegExp(`AdditionalProperties map\\[string\\][^\\n]*\\*${unionName}`),
+    );
+    const serde = files.get("zz_unions_serde.go");
+    expect(serde).toMatch(new RegExp(`func \\(\\w+ ${unionName}\\) MarshalJSON\\(\\)`));
+    expect(serde).toMatch(
+      new RegExp(`func \\(\\w+ \\*${unionName}\\) UnmarshalJSON\\(data \\[\\]byte\\)`),
+    );
+    expect(serde).not.toContain("streaming.SSEFrame");
+    expect(files.get("zz_models_serde.go")).toContain("AdditionalProperties");
+  });
+});

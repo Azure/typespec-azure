@@ -88,6 +88,7 @@ ${x}
  * XML tester with XML library support
  */
 export const XmlTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -118,6 +119,7 @@ ${x}
  * Base tester for TCGC tests with Azure Core libraries loaded but no auto-imports/usings.
  */
 export const AzureCoreBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["typeref"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",

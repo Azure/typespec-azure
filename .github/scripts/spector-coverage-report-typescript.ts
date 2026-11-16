@@ -1,6 +1,7 @@
 import type { Octokit } from "@octokit/rest";
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 type GitHub = InstanceType<typeof Octokit>;
 type Issue = Awaited<ReturnType<GitHub["rest"]["issues"]["listForRepo"]>>["data"][number];
@@ -36,7 +37,7 @@ type ScenarioSource = {
   root: string;
   url: string;
   mockApis: Array<{
-    content: string;
+    scenarios: string[];
     directory: string;
   }>;
 };
@@ -127,7 +128,7 @@ export async function updateCoverageReport({
     notImplementedByPackage,
     previousGroups,
     getGroupState,
-    getGroupUrl: createGroupUrlResolver(loadScenarioSources(workspace)),
+    getGroupUrl: await createGroupUrlResolver(workspace),
   });
   let issueNumber: number;
   if (reportIssue) {
@@ -292,12 +293,12 @@ function readBacklogMatchers(workspace: string, core: Core): RegExp[] | undefine
   });
 }
 
-function loadScenarioSources(workspace: string): Map<string, ScenarioSource> {
+async function loadScenarioSources(workspace: string): Promise<Map<string, ScenarioSource>> {
   const sources = new Map<string, ScenarioSource>([
     [
       "@azure-tools/azure-http-specs",
       {
-        root: path.join(workspace, "packages/azure-http-specs/specs"),
+        root: path.join(workspace, "packages/azure-http-specs/dist/specs"),
         url: "https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs",
         mockApis: [],
       },
@@ -305,7 +306,7 @@ function loadScenarioSources(workspace: string): Map<string, ScenarioSource> {
     [
       "@typespec/http-specs",
       {
-        root: path.join(workspace, "core/packages/http-specs/specs"),
+        root: path.join(workspace, "core/packages/http-specs/dist/specs"),
         url: "https://github.com/microsoft/typespec/tree/main/packages/http-specs/specs",
         mockApis: [],
       },
@@ -313,25 +314,34 @@ function loadScenarioSources(workspace: string): Map<string, ScenarioSource> {
   ]);
 
   for (const source of sources.values()) {
-    source.mockApis = findMockApiFiles(source.root).map((file) => ({
-      content: fs.readFileSync(file, "utf8"),
-      directory: path.relative(source.root, path.dirname(file)).split(path.sep).join("/"),
-    }));
+    for (const file of findMockApiFiles(source.root)) {
+      const { Scenarios } = await import(pathToFileURL(file).href);
+      if (!isRecord(Scenarios)) {
+        throw new Error(`Mock API file does not export a Scenarios object: ${file}`);
+      }
+      source.mockApis.push({
+        scenarios: Object.keys(Scenarios),
+        directory: path.relative(source.root, path.dirname(file)).split(path.sep).join("/"),
+      });
+    }
   }
   return sources;
 }
 
-function createGroupUrlResolver(
-  sources: Map<string, ScenarioSource>,
-): (packageName: string, group: string) => string | undefined {
+export async function createGroupUrlResolver(
+  workspace: string,
+): Promise<(packageName: string, group: string) => string | undefined> {
+  const sources = await loadScenarioSources(workspace);
   return (packageName, group) => {
     const source = sources.get(packageName);
     if (!source) {
       return undefined;
     }
 
-    const registration = `Scenarios.${group}_`;
-    const match = source.mockApis.find(({ content }) => content.includes(registration));
+    const prefix = `${group}_`;
+    const match = source.mockApis.find(({ scenarios }) =>
+      scenarios.some((scenario) => scenario.startsWith(prefix)),
+    );
     return match ? `${source.url}/${match.directory}` : undefined;
   };
 }
@@ -722,7 +732,7 @@ function findMockApiFiles(root: string): string[] {
     const entryPath = path.join(root, entry.name);
     if (entry.isDirectory()) {
       files.push(...findMockApiFiles(entryPath));
-    } else if (entry.name === "mockapi.ts") {
+    } else if (entry.name === "mockapi.js") {
       files.push(entryPath);
     }
   }

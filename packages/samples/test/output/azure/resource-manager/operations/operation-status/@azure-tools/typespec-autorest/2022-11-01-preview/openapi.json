@@ -55,10 +55,10 @@
         "description": "Tenant+Location scope: GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/LocationParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/LocationParameter"
           },
           {
             "name": "operationId",
@@ -107,7 +107,7 @@
                   "readOnly": true
                 },
                 "error": {
-                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorDetail",
                   "description": "Errors that occurred if the operation ended with Canceled or Failed status",
                   "readOnly": true
                 }
@@ -121,7 +121,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -136,7 +136,7 @@
         "description": "Tenant scope: GET /providers/{ns}/operationStatuses/{operationId}",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "operationId",
@@ -185,7 +185,7 @@
                   "readOnly": true
                 },
                 "error": {
-                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorDetail",
                   "description": "Errors that occurred if the operation ended with Canceled or Failed status",
                   "readOnly": true
                 }
@@ -199,7 +199,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -214,20 +214,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -245,13 +245,13 @@
         "description": "Subscription+Location scope: GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/LocationParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/LocationParameter"
           },
           {
             "name": "operationId",
@@ -300,7 +300,7 @@
                   "readOnly": true
                 },
                 "error": {
-                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorDetail",
                   "description": "Errors that occurred if the operation ended with Canceled or Failed status",
                   "readOnly": true
                 }
@@ -314,7 +314,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -329,10 +329,10 @@
         "description": "Subscription scope: GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
             "name": "operationId",
@@ -381,7 +381,7 @@
                   "readOnly": true
                 },
                 "error": {
-                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorDetail",
+                  "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorDetail",
                   "description": "Errors that occurred if the operation ended with Canceled or Failed status",
                   "readOnly": true
                 }
@@ -395,7 +395,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }

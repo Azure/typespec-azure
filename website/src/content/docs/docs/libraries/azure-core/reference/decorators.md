@@ -8,6 +8,102 @@ llmstxt: true
 
 ## Azure.Core
 
+### `@azureServiceConfigurations` {#@Azure.Core.azureServiceConfigurations}
+
+Pairs named HTTP server endpoints with OAuth authentication configurations.
+
+Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and exposes the combined OR of HTTP authentication requirements. Existing AND groups and credential alternatives are preserved.
+
+The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
+
+Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+
+OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+
+Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+
+```yaml
+kind: project
+features:
+  - typeref
+```
+
+```typespec
+@Azure.Core.azureServiceConfigurations(configurations: valueof Record<Azure.Core.AzureServiceConfiguration>)
+```
+
+#### Target
+
+The namespace using these configurations.
+`Namespace`
+
+#### Parameters
+
+| Name           | Type                                                   | Description                                    |
+| -------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| configurations | `valueof Record<Azure.Core.AzureServiceConfiguration>` | The named endpoint and authentication records. |
+
+#### Examples
+
+```typespec
+model PublicAuth is AadOauth2Auth<
+  ["https://api.loganalytics.io/.default"],
+  "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+>;
+model GovernmentAuth is AadOauth2Auth<
+  ["https://api.loganalytics.us/.default"],
+  "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{ endpoint: "https://api.loganalytics.io", authentication: typeref(PublicAuth) },
+  government: #{ endpoint: "https://api.loganalytics.us", authentication: typeref(GovernmentAuth) },
+};
+
+@service
+@azureServiceConfigurations(Configurations)
+namespace Logs {
+  @get op query(): string;
+}
+```
+
+##### Parameterized endpoint
+
+Declare endpoint parameters inline with `parameters: typeref({ ... })`, using the same property types and defaults as `@server`. Here, `account` is required and `region` defaults to `"westus"`.
+
+```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
+
+using TypeSpec.Http;
+using Azure.Core;
+
+model ServiceAuth is AadOauth2Auth<["https://example.com/.default"]>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{
+    endpoint: "https://{account}.{region}.example.com",
+    authentication: typeref(ServiceAuth),
+    parameters: typeref({
+      @doc("Account name.")
+      account: string,
+
+      @doc("Deployment region.")
+      region?: string = "westus",
+    }),
+    description: "Regional service endpoint",
+  },
+};
+
+@service
+@azureServiceConfigurations(Configurations)
+namespace RegionalService {
+  @get op read(): string;
+}
+```
+
 ### `@finalLocation` {#@Azure.Core.finalLocation}
 
 Identifies a ModelProperty as containing the final location for the operation result.

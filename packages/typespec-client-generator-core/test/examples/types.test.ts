@@ -4,6 +4,33 @@ import { it } from "vitest";
 import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
+for (const responseType of ["Status", "Status.unspecified"]) {
+  it(`matches JSON examples against the wire value of ${responseType}`, async () => {
+    const instance = await SimpleTester.createInstance();
+    await instance.fs.addRealTypeSpecFile(
+      "./examples/getEncodedEnum.json",
+      `${__dirname}/example-types/getEncodedEnum.json`,
+    );
+    const { program } = await instance.compile(`
+      @service
+      namespace TestClient {
+        enum Status {
+          @encodedName("application/json", "unknown")
+          unspecified: 0,
+        }
+        op getEncodedEnum(): ${responseType};
+      }
+    `);
+    const context = await createSdkContextForTester(program);
+    const operation = context.sdkPackage.clients[0].methods[0].operation;
+    const body = operation.examples?.[0].responses[0].bodyValue;
+    ok(body);
+    strictEqual(body.kind, "string");
+    strictEqual(body.value, "unknown");
+    expectDiagnostics(context.diagnostics, []);
+  });
+}
+
 it("SdkStringExample", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(

@@ -1,5 +1,40 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.49.0
+
+### Features
+
+- Support preview annotations for APIs marked with `@TypeSpec.HttpClient.experimental` through the `experimental-annotation` option ([microsoft/typespec#12409](https://github.com/microsoft/typespec/pull/12409)).
+- Support `@access(Access.internal)` for ARM operations, models, and enums ([microsoft/typespec#12488](https://github.com/microsoft/typespec/pull/12488)).
+- Prototype a TeaVM WebAssembly target for `@azure-tools/typespec-java` in the Azure playground, included by the normal build and PR previews. Building requires JDK 17; native CLI generation is unchanged.
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `ccde4f5b0` to fix base64 encoding of byte-valued headers and query parameters ([microsoft/typespec#12540](https://github.com/microsoft/typespec/pull/12540)).
+
+
+## 0.48.6
+
+### Bug Fixes
+
+- Remove dependencies on deprecated autorest packages
+
+
+## 0.48.5
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `cba4987c6` to prevent service-defined YAML map keys, such as discriminator value `responses`, from being interpreted as code-model properties ([microsoft/typespec#12434](https://github.com/microsoft/typespec/pull/12434)).
+- Update the Java generator to TypeSpec core commit `6ba281975` to preserve resource ID parameters for ARM models shared across multiple routes ([microsoft/typespec#12443](https://github.com/microsoft/typespec/pull/12443)).
+
+
+## 0.48.4
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `d771b2957` to fix empty model packages in module-info ([microsoft/typespec#12429](https://github.com/microsoft/typespec/pull/12429)), discriminator key collisions ([microsoft/typespec#12428](https://github.com/microsoft/typespec/pull/12428)), ARM resource ID parsing ([microsoft/typespec#12373](https://github.com/microsoft/typespec/pull/12373)), and Create visibility handling ([microsoft/typespec#12378](https://github.com/microsoft/typespec/pull/12378)). Includes generator performance improvements ([microsoft/typespec#12346](https://github.com/microsoft/typespec/pull/12346)).
+
+
 ## 0.48.3
 
 ### Bug Fixes

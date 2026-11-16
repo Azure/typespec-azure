@@ -22,13 +22,13 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  Visibility,
   type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
   type HttpStatusCodeRange,
   type HttpVerb,
-  Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";
 
@@ -66,7 +66,9 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
+  convertDiscriminatedUnionsToModels?: boolean;
 
+  __discriminatedUnionModels?: Map<Union, Model>;
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
@@ -74,6 +76,10 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
+  __lroStatusMetadataCache: Map<
+    Operation,
+    { responseModel: SdkModelType; properties: SdkLroStatusMetadata[] }
+  >;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
@@ -118,6 +124,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /** Whether a string client location requires preserving the exact client name. */
+  isExactName?: boolean;
   services: Namespace[];
   /** The type associated with this client. If it is created from string client location, or is a merged client, this will be undefined. */
   type?: Namespace | Interface;
@@ -515,7 +523,10 @@ export interface SdkEnumValueType<
   name: string;
   /** Whether name should be used exactly as-is, without casing transformations. */
   isExactName: boolean;
+  /** Original enum member value, or its TypeSpec name when no value is specified. */
   value: string | number;
+  /** Protocol-specific encoded names. Unset protocols use `value`. */
+  serializationOptions?: SerializationOptions;
   enumType: SdkEnumType;
   valueType: TValueType;
   /** Unique ID for the current type. */
@@ -615,8 +626,21 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   isExactName: boolean;
   /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+  /** Paired deployment configurations from the first service; initialization parameters are unchanged. */
+  serviceConfigurations?: {
+    defaultConfiguration: string;
+    configurations: SdkServiceConfiguration[];
+  };
   /** How to initialize a client. */
   initializedBy: InitializedByFlags;
+}
+
+/** A deployment's endpoint and authentication, independent of native constructor shape. */
+export interface SdkServiceConfiguration {
+  name: string;
+  endpoint: SdkEndpointType;
+  authentication: Authentication;
+  credential?: SdkCredentialParameter;
 }
 
 /**
@@ -1212,6 +1236,57 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * Auxiliary status-monitor properties marked with `@lroStatusMetadata`, in deterministic
+   * direct-then-inherited model/property order. Emitters expose values from the latest received
+   * status-monitor response (including initial, failed, and canceled responses) on the poller or
+   * operation. Values may be absent until received and are refreshed after each poll, not persisted
+   * in continuation tokens; the next poll repopulates them after rehydration.
+   */
+  statusMetadata?: SdkLroStatusMetadata[];
+  /**
+   * Server-issued SDK long-running operation identifiers selected from the linked status-monitor
+   * operation, ordered by availability: polling URL path first, then status-monitor body property.
+   * This does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter.
+   */
+  operationId?: SdkLroOperationIdMetadata[];
+}
+
+export interface SdkLroStatusMetadata {
+  /**
+   * Exact effective property from `pollingInfo.responseModel`. The value is auxiliary operation
+   * state, not the LRO status, error, logical result, or a polling/final location.
+   */
+  property: SdkModelPropertyType;
+  /**
+   * Segments to get the selected value from `pollingInfo.responseModel`.
+   * Currently contains only `property`, including for inherited properties.
+   * Uses the effective SDK property after hierarchy reconciliation.
+   */
+  propertySegments: SdkModelPropertyType[];
+}
+
+export type SdkLroOperationIdMetadata =
+  SdkLroOperationIdPathMetadata | SdkLroOperationIdPropertyMetadata;
+
+export interface SdkLroOperationIdPathMetadata {
+  kind: "path";
+  /** Exact URI link from the status-monitor step. */
+  source: SdkOperationLink;
+  /** Exact path parameter selected from the linked status-monitor operation. */
+  pathParameter: SdkPathParameter;
+}
+
+export interface SdkLroOperationIdPropertyMetadata {
+  kind: "property";
+  /** Exact property selected from the status-monitor response model. */
+  property: SdkModelPropertyType;
+  /**
+   * Segments from `pollingInfo.responseModel` to the operation ID, using the same property
+   * objects as the response model. Currently `[property]`: only direct or inherited properties
+   * are selectable, and inheritance does not add a response-body segment.
+   */
+  propertySegments: SdkModelPropertyType[];
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {
@@ -1246,6 +1321,8 @@ export interface SdkNextOperationLink extends SdkLogicalOperationStep {
   kind: "nextOperationLink";
   responseModel: SdkModelType;
   target: SdkOperationLink;
+  /** Explicitly linked polling operation, when one was declared. */
+  operation?: SdkServiceOperation;
 }
 
 /**
@@ -1458,7 +1535,7 @@ interface SdkExampleBase {
   /** Unique example name within the operation. */
   name: string;
   doc: string;
-  /** Path to the source JSON or YAML file containing the example. */
+  /** Path to the source JSON or YAML file, with `#id` appended for YAML examples with an explicit ID. */
   filePath: string;
   rawExample: any;
 }

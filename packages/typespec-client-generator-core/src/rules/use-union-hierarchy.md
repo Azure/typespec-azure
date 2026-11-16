@@ -1,10 +1,10 @@
 Named unions must declare an `extends` constraint unless all their variants are
 assignable to `string`. Numeric, model, and other non-string unions require a
 constraint, including unions that mix strings with other types.
-For a model constraint such as `union Pet extends PetBase`, each model variant must
+For an object-model constraint such as `union Pet extends PetBase`, each model variant must
 be `PetBase` itself or inherit from that exact model, directly or transitively.
-A model can be a variant of only one union with a model `extends` constraint.
-Non-model constraints are not subject to the model inheritance or ownership checks.
+A model can be a variant of only one union with an object-model `extends` constraint.
+Non-model and array constraints are not subject to the model inheritance or ownership checks.
 The compiler checks structural assignability, but the union's `extends` clause
 does not create a model inheritance relationship.
 
@@ -68,6 +68,29 @@ union Priority extends int32 {
 }
 ```
 
+## Array unions
+
+Array unions still require an `extends` constraint, but their variants do not need nominal model inheritance or single-union ownership. The compiler checks array element assignability:
+
+```tsp
+model Named {
+  name: string;
+}
+model Cat extends Named {
+  meow: boolean;
+}
+model Dog extends Named {
+  bark: boolean;
+}
+
+union PetArrays extends Named[] {
+  cats: Cat[],
+  dogs: Dog[],
+}
+```
+
+Array alternatives may be reused across array-constrained unions. This exemption does not apply to dictionaries or indexed object models, and does not imply SDK emitter support or make `Cat[] | Dog[]` equivalent to `(Cat | Dog)[]`.
+
 ## String unions
 
 String unions do not have to use `extends`. This includes string literals,
@@ -88,7 +111,7 @@ Anonymous union expressions such as `Cat | null` also do not require `extends`.
 
 ## Keep model variants in one hierarchy
 
-Do not list the same model in multiple unions with model `extends` constraints:
+Do not list the same model in multiple unions with object-model `extends` constraints:
 
 ```tsp
 model PetBase {
@@ -125,7 +148,7 @@ single union hierarchy avoids incompatible SDK inheritance requirements.
 ## Suppression
 
 Do not suppress this rule. Declare an `extends` constraint for non-string named
-unions. When using a model constraint, use `model extends` to establish
+unions. When using an object-model constraint, use `model extends` to establish
 the required model hierarchy and keep each model variant in one such union.
 Suppression does not make an unsupported hierarchy representable in nominally
 typed SDKs.

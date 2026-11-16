@@ -18,8 +18,14 @@ export function getDirectSubtypes(type: SdkModelType) {
   if (!type.discriminatedSubtypes) {
     return [];
   }
-  // Filter out subtypes that extend from other discriminated subtypes (hierarchical inheritance)
-  return Object.values(type.discriminatedSubtypes).filter((subtype) => subtype.baseModel === type);
+  // Skip ordinary intermediate models, but preserve nested discriminator dispatch.
+  return Object.values(type.discriminatedSubtypes).filter((subtype) => {
+    let baseModel = subtype.baseModel;
+    while (baseModel && baseModel !== type && !baseModel.discriminatorProperty) {
+      baseModel = baseModel.baseModel;
+    }
+    return baseModel === type;
+  });
 }
 
 export function getAdditionalPropertiesType(type: SdkType | undefined): SdkType | undefined {

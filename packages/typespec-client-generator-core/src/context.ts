@@ -71,6 +71,7 @@ export function createTCGCContext(
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
+    convertDiscriminatedUnionsToModels: true,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
     __referencedTypeCache: new Map<
@@ -83,6 +84,7 @@ export function createTCGCContext(
     __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
+    __lroStatusMetadataCache: new Map(),
     __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),
     __clientApiVersionDefaultValueCache: new Map(),
@@ -173,6 +175,8 @@ export interface CreateSdkContextOptions {
   exportTCGCoutput?: boolean; // this flag is for emitter to export TCGC output as yaml file
   flattenUnionAsEnum?: boolean; // this flag is for emitter to decide whether tcgc should flatten union as enum
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
+  /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
+  convertDiscriminatedUnionsToModels?: boolean;
 }
 
 export async function createSdkContext<
@@ -238,6 +242,7 @@ export async function createSdkContext<
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
+    convertDiscriminatedUnionsToModels: options?.convertDiscriminatedUnionsToModels ?? true,
   };
 
   if (context.options["examples-dir"]) {

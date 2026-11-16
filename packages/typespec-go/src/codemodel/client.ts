@@ -187,7 +187,7 @@ export type FinalStateVia =
 export type HTTPMethod = "delete" | "get" | "head" | "patch" | "post" | "put";
 
 /** the possible method types */
-export type MethodType = LROMethod | LROPageableMethod | SyncMethod | PageableMethod;
+export type MethodType = LROMethod | LROPageableMethod | SseMethod | SyncMethod | PageableMethod;
 
 /** a long-running operation method */
 export interface LROMethod extends LROMethodBase {
@@ -286,6 +286,11 @@ export interface PageableStrategyNextLink {
 
   /** the custom method used to fetch the next link */
   method?: NextPageMethod;
+}
+
+/** a synchronous method that returns SSE */
+export interface SseMethod extends HttpMethodBase {
+  kind: "sseMethod";
 }
 
 /** narrows method to a LRO method type within the conditional block */
@@ -485,6 +490,20 @@ export class LROPageableMethod extends HttpMethodBase implements LROPageableMeth
     super(name, client, httpPath, httpMethod, statusCodes, naming);
     this.kind = "lroPageableMethod";
     this.nextLinkVerb = "get";
+  }
+}
+
+export class SseMethod extends HttpMethodBase implements SseMethod {
+  constructor(
+    name: string,
+    client: Client,
+    httpPath: string,
+    httpMethod: HTTPMethod,
+    statusCodes: Array<number>,
+    naming: MethodNaming,
+  ) {
+    super(name, client, httpPath, httpMethod, statusCodes, naming);
+    this.kind = "sseMethod";
   }
 }
 

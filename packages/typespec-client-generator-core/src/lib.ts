@@ -55,6 +55,14 @@ export const UnbrandedSdkEmitterOptions = {
         "When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
     },
   },
+  "use-client-name-for-friendly-name-source": {
+    "use-client-name-for-friendly-name-source": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.",
+    },
+  },
   "api-version": {
     "api-version": apiVersionSchema,
   },
@@ -105,6 +113,7 @@ const UnbrandedSdkEmitterOptionsInterfaceSchema: JSONSchemaType<UnbrandedSdkEmit
     properties: {
       ...UnbrandedSdkEmitterOptions["generate-protocol-methods"],
       ...UnbrandedSdkEmitterOptions["generate-convenience-methods"],
+      ...UnbrandedSdkEmitterOptions["use-client-name-for-friendly-name-source"],
       ...UnbrandedSdkEmitterOptions["api-version"],
       ...UnbrandedSdkEmitterOptions["license"],
     },
@@ -117,7 +126,7 @@ export const BrandedSdkEmitterOptions = {
       nullable: true,
       format: "absolute-path",
       description:
-        "Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.",
+        "Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.\n\n**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).",
     },
   },
   namespace: {
@@ -171,6 +180,20 @@ function doc(code: string) {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "union-model-discriminator-conflict": {
+      ...doc("union-model-discriminator-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' cannot be converted to a polymorphic SDK model because model '${"modelName"}' in its hierarchy uses @discriminator. Use @discriminated on the union without @discriminator on its model hierarchy, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
+    "union-model-conversion-conflict": {
+      ...doc("union-model-conversion-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Discriminated union '${"unionName"}' has conflicting discriminator metadata for its base model hierarchy. Use consistent discriminator properties and tag mappings, or set \`convertDiscriminatedUnionsToModels\` to \`false\` to retain union representations.`,
+      },
+    },
     "union-null": {
       ...doc("union-null"),
       severity: "warning",
@@ -197,6 +220,37 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
+      },
+    },
+    "lro-status-metadata-structural-property": {
+      ...doc("lro-status-metadata-structural-property"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@lroStatusMetadata cannot select the status monitor's ${"role"} property '${"propertyName"}'.`,
+      },
+    },
+    "lro-operation-id-invalid-target": {
+      ...doc("lro-operation-id-invalid-target"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId can only be applied to a path parameter of the linked status-monitor operation or a string-like property of its response model.",
+      },
+    },
+    "lro-operation-id-duplicate": {
+      ...doc("lro-operation-id-duplicate"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId selects more than one source of the same kind on the linked status-monitor operation in the active emitter scope.",
+      },
+    },
+    "lro-operation-id-missing-link": {
+      ...doc("lro-operation-id-missing-link"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId requires the linked status-monitor operation to be reached through a response header or URL-valued body property.",
       },
     },
     "conflicting-multipart-model-usage": {
@@ -528,13 +582,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "`@client` with multiple services is only allowed on `Namespace`.",
-      },
-    },
-    "inconsistent-multiple-service": {
-      ...doc("inconsistent-multiple-service"),
-      severity: "error",
-      messages: {
-        default: "All services must have the same server and auth definitions.",
       },
     },
     "inconsistent-multiple-service-dependency": {

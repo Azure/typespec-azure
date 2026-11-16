@@ -107,6 +107,16 @@ export class Emitter {
           await write(`${snakeClientFileName(op.name)}.go`, op.content);
         }
 
+        const pathExpansionHelpers = core.generatePathExpansionHelpers(pkg);
+        if (pathExpansionHelpers.length > 0) {
+          await write("path_helpers.go", pathExpansionHelpers);
+        }
+
+        const queryExpansionHelpers = core.generateQueryExpansionHelpers(pkg);
+        if (queryExpansionHelpers.length > 0) {
+          await write("query_helpers.go", queryExpansionHelpers);
+        }
+
         const models = core.generateModels(pkg, this.codeModel.options, emitter);
         if (models.models.length > 0) {
           await write("models.go", models.models);
@@ -159,6 +169,11 @@ export class Emitter {
             }
 
             await write("internal.go", serverContent.internals, fakePkg.kind);
+
+            const sseEncoders = fake.generateSseEncoders(fakePkg);
+            if (sseEncoders.length > 0) {
+              await write("sse_encoders.go", sseEncoders, fakePkg.kind);
+            }
 
             const polymorphics = core.generatePolymorphicHelpers(fakePkg);
             if (polymorphics.length > 0) {

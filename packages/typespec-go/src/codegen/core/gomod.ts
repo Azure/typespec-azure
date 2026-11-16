@@ -25,7 +25,7 @@ export function generateGoModFile(
 
   // here we specify the minimum version of azcore as required by the code generator.
   // the version can be overwritten by passing the --azcore-version switch during generation.
-  let version = "1.23.0";
+  let version = "1.24.0";
   if (options["azcore-version"]) {
     // when matching versions, we need to handle beta, non-beta, and pseudo versions
     // 1.2.3-beta.1, 1.2.3, 0.22.1-0.20220315231014-ed309e73db6b
@@ -38,7 +38,7 @@ export function generateGoModFile(
     version = options["azcore-version"];
   }
 
-  const minGoVersion = "go 1.25.0";
+  const minGoVersion = "go 1.26.0";
   const azcore = "github.com/Azure/azure-sdk-for-go/sdk/azcore v" + version;
   if (!existingGoMod) {
     // no preexisting go.mod file, generate the default one

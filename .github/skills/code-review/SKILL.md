@@ -178,7 +178,14 @@ for package selection, scaffolding, and registration.
 ### Rule documentation
 
 - Write for TypeSpec authors: explain the requirement, applicability, rationale, and correction.
-  Keep implementation details and agent instructions out of public rule pages.
+  Flag implementation-focused explanations that obscure what authors must do. Keep actionable
+  exceptions, but remove algorithm walkthroughs, exhaustive semantic edge-case catalogs, and
+  agent instructions from public rule pages; focused tests and necessary code comments are
+  the default home for implementation details, not a required new documentation file.
+- Check documented applicability and exceptions against the intended policy and relevant public
+  templates, not just the implementation under review. For migrated rules, consult the historical
+  rule before accepting scope claims; distinguish intentional native-policy changes from
+  accidental expansion. Flag mismatches rather than documenting unintended behavior as policy.
 - Edit `packages/<pkg>/src/rules/<rule-name>.md` and regenerate reference docs with the owning
   package's command; do not patch generated pages alone.
 
@@ -195,5 +202,9 @@ for package selection, scaffolding, and registration.
 
 ### Changelog entries
 
+- Check that entries concisely explain what the rule prevents or requires from a spec author's
+  perspective and identify the replaced LintDiff rule(s) when applicable. Retain author-visible
+  scope changes and actionable exceptions, not implementation mechanics, semantic edge-case
+  catalogs, or test inventories.
 - When reviewing a PR, check for redundant changelog entries. Ensure entries describe the
   final changes, not the PR's revision history or intermediate review-driven cleanup.
