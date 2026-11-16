@@ -54,27 +54,14 @@ export function filterResponseModels(
 }
 
 /**
- * Controls whether metadata helpers report diagnostics returned by HTTP resolution.
- */
-export interface MetadataDiagnosticsOptions {
-  /** Defaults to true. Direct diagnostics from HTTP resolution are not affected. */
-  reportDiagnostics?: boolean;
-}
-
-/**
  * Get the Http metadata for this operation
  * @param program The program being processed
  * @param operation The operation to get http metadata for
- * @param options Whether to report diagnostics returned by HTTP resolution
  * @returns An HttpOperation with http metadata.  May emit error diagnostics.
  */
-export function getHttpMetadata(
-  program: Program,
-  operation: Operation,
-  options?: MetadataDiagnosticsOptions,
-): HttpOperation {
+export function getHttpMetadata(program: Program, operation: Operation): HttpOperation {
   const [httpOperation, diagnostics] = getHttpOperation(program, operation);
-  if (options?.reportDiagnostics !== false && diagnostics.length > 0) {
+  if (diagnostics && diagnostics.length > 0) {
     program.reportDiagnostics(diagnostics);
   }
 
@@ -101,16 +88,14 @@ export function getOperationResponse(program: Program, operation: Operation): Mo
  * @param program The program being processed
  * @param operation The operation to retrieve matching response from
  * @param predicate The predicate function to apply to each model property of the responses
- * @param options Whether to report diagnostics returned by HTTP resolution
  * @returns The model and matching model property, or nothing if no matching models are found
  */
 export function getResultModelWithProperty(
   program: Program,
   operation: Operation,
   predicate: (prop: ModelProperty) => boolean,
-  options?: MetadataDiagnosticsOptions,
 ): [Model, ModelProperty] | undefined {
-  const httpOperation = getHttpMetadata(program, operation, options);
+  const httpOperation = getHttpMetadata(program, operation);
 
   const models = filterResponseModels(
     httpOperation,

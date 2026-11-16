@@ -4,7 +4,6 @@ import {
   getHttpMetadata,
   getResultModelWithProperty,
   getSuccessResponse,
-  type MetadataDiagnosticsOptions,
 } from "./utils.js";
 
 import {
@@ -27,6 +26,7 @@ import { $ } from "@typespec/compiler/typekit";
 import {
   getAllHttpServices,
   getHeaderFieldName,
+  getHttpOperation,
   getOperationVerb,
   type HttpOperation,
   isBody,
@@ -282,19 +282,10 @@ export interface LroProtocolMetadata {
     finalStep?: FinalOperationStep;
     /**
      * Whether a GET exists when original-uri was explicitly requested.
-     * Undefined means this validation was not applicable or was not requested.
+     * Undefined means this validation was not applicable.
      */
     originalUriHasGetOperation?: boolean;
   };
-}
-
-/** Options for resolving LRO protocol metadata. */
-export interface LroProtocolMetadataOptions extends MetadataDiagnosticsOptions {
-  /**
-   * Resolve a matching GET for an explicit original-uri final state. Defaults to true.
-   * When false, `originalUriHasGetOperation` is undefined.
-   */
-  resolveOriginalUriGetOperation?: boolean;
 }
 
 /**
@@ -346,21 +337,12 @@ export interface LroMetadata {
  *
  * @param program The program being processed
  * @param operation The operation to get Lwo Metadata for
- * @param options Whether to report diagnostics during metadata lookup
  * @returns LroMetadata for the operation is it is long-running,
  * or nothing if the operation is synchronous, or lro information
  * cannot be processed.
  */
-export function getLroMetadata(
-  program: Program,
-  operation: Operation,
-  options?: MetadataDiagnosticsOptions,
-): LroMetadata | undefined {
-  const protocol = getLroProtocolMetadata(
-    program,
-    operation,
-    options && { reportDiagnostics: options.reportDiagnostics },
-  );
+export function getLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
+  const protocol = getLroProtocolMetadata(program, operation);
   return protocol && resolveLegacyLroMetadata(protocol);
 }
 
@@ -369,17 +351,12 @@ export function getLroMetadata(
  * a client result or envelope. Returns undefined for operations without usable
  * LRO protocol information. Existing combined metadata is available through
  * {@link getLroMetadata}.
- * `reportDiagnostics: false` avoids re-reporting diagnostics owned by this
- * lookup; HTTP resolution may still directly report its own diagnostics.
- * `resolveOriginalUriGetOperation: false` skips the service-wide GET lookup
- * when callers only need protocol classification.
  */
 export function getLroProtocolMetadata(
   program: Program,
   operation: Operation,
-  options?: LroProtocolMetadataOptions,
 ): LroProtocolMetadata | undefined {
-  const context: LroContext | undefined = ensureContext(program, operation, options);
+  const context: LroContext | undefined = ensureContext(program, operation, undefined);
   if (context === undefined) return undefined;
   processFinalReference(program, operation, context);
   processFinalLink(program, operation, context);
@@ -409,8 +386,6 @@ export function getLroProtocolMetadata(
  * operation being processed.
  */
 interface LroContext {
-  reportDiagnostics: boolean;
-  resolveOriginalUriGetOperation: boolean;
   visitedModels: Set<Model>;
   visitedOperations: Set<Operation>;
   httpOperation: HttpOperation;
@@ -508,12 +483,11 @@ function createLroProtocolMetadata(
   let originalUriHasGetOperation: boolean | undefined;
   const finalStateOverride = getFinalStateOverride(program, operation);
   if (
-    context.resolveOriginalUriGetOperation &&
     finalState === FinalStateValue.originalUri &&
     finalStateOverride === FinalStateValue.originalUri
   ) {
     originalUriHasGetOperation = hasGetOperationAtSamePath(program, context.httpOperation);
-    if (!originalUriHasGetOperation && context.reportDiagnostics) {
+    if (!originalUriHasGetOperation) {
       reportDiagnostic(program, {
         code: "no-operation-at-original-uri",
         target: operation,
@@ -674,14 +648,17 @@ function createPollingStep(pollingData: StatusMonitorInfo): PollingOperationStep
 function ensureContext(
   program: Program,
   operation: Operation,
-  options?: LroProtocolMetadataOptions,
+  context: LroContext | undefined,
 ): LroContext | undefined {
-  const httpOperation = getHttpMetadata(program, operation, options);
+  if (context) return context;
+  const [httpOperation, diagnostics] = getHttpOperation(program, operation);
+  if (diagnostics !== undefined && diagnostics.length > 0) {
+    program.reportDiagnostics(diagnostics);
+  }
+
   const candidate = getSuccessResponse(program, httpOperation);
   if (candidate === undefined) return undefined;
   return {
-    reportDiagnostics: options?.reportDiagnostics !== false,
-    resolveOriginalUriGetOperation: options?.resolveOriginalUriGetOperation !== false,
     visitedModels: new Set<Model>(),
     visitedOperations: new Set<Operation>(),
     httpOperation: httpOperation,
@@ -764,12 +741,7 @@ function getFinalStateVia(
           }
       }
     } else {
-      finalState = getStatusFromLinkOrReference(
-        program,
-        operation,
-        context.finalStep.target,
-        context,
-      );
+      finalState = getStatusFromLinkOrReference(program, operation, context.finalStep.target);
     }
     return finalStateOverride || finalState;
   }
@@ -804,7 +776,6 @@ function getFinalStateVia(
         program,
         operation,
         context.statusMonitorStep?.target,
-        context,
       );
       if (context.finalStep === undefined && info.successProperty === undefined) {
         context.finalStep = { kind: "noPollingResult", responseModel: $(program).intrinsic.void };
@@ -875,7 +846,7 @@ function getPollingStep(
 
   switch (modelOrOperation.kind) {
     case "Operation":
-      const httpOperation = getHttpMetadata(program, modelOrOperation, context);
+      const httpOperation = getHttpMetadata(program, modelOrOperation);
       info = GetStatusMonitorInfoFromOperation(program, httpOperation);
       break;
     case "Model":
@@ -891,7 +862,6 @@ function getStatusFromLinkOrReference(
   program: Program,
   sourceOperation: Operation,
   target: OperationLink | OperationReference | ModelProperty,
-  context: LroContext,
 ): FinalStateValue {
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   switch (target.kind) {
@@ -910,7 +880,7 @@ function getStatusFromLinkOrReference(
     case "reference":
       {
         finalState = FinalStateValue.customOperationReference;
-        if (isMatchingGetOperation(program, sourceOperation, target.operation, context)) {
+        if (isMatchingGetOperation(program, sourceOperation, target.operation)) {
           finalState = FinalStateValue.originalUri;
         } else if (target.link !== undefined && target.link.location === "ResponseHeader") {
           finalState = getLroStatusFromHeaderProperty(program, target.link.property);
@@ -1108,10 +1078,9 @@ function isMatchingGetOperation(
   program: Program,
   sourceOperation: Operation,
   targetOperation: Operation,
-  context: LroContext,
 ): boolean {
-  const sourceHttp = getHttpMetadata(program, sourceOperation, context);
-  const targetHttp = getHttpMetadata(program, targetOperation, context);
+  const sourceHttp = getHttpMetadata(program, sourceOperation);
+  const targetHttp = getHttpMetadata(program, targetOperation);
   return sourceHttp.path === targetHttp.path && targetHttp.verb === "get";
 }
 
@@ -1142,11 +1111,8 @@ function processFinalLink(
   switch (modelOrOperation.kind) {
     case "Operation":
       {
-        const result = getResultModelWithProperty(
-          program,
-          modelOrOperation,
-          (prop) => isFinalLocation(program, prop),
-          context,
+        const result = getResultModelWithProperty(program, modelOrOperation, (prop) =>
+          isFinalLocation(program, prop),
         );
         if (result === undefined) return;
         const [model, property] = result;

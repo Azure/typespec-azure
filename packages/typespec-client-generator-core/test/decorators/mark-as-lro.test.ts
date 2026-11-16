@@ -1,12 +1,7 @@
-import {
-  FinalStateValue,
-  getLroMetadata,
-  isLroMarkedForEmitter,
-} from "@azure-tools/typespec-azure-core";
+import { FinalStateValue, getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { createTCGCContext, getMarkAsLro } from "../../src/index.js";
 import { UsageFlags } from "../../src/interfaces.js";
 import {
   ArmTesterWithService,
@@ -120,69 +115,6 @@ it("should apply @markAsLro with language scope", async () => {
   strictEqual(metadata.finalResponse?.envelopeResult, processingResponse);
   strictEqual(metadata.finalResponse?.result, processingResponse);
   ok(!metadata.finalResponse?.resultSegments);
-});
-
-it.each([
-  ["all emitters", "", true, true],
-  ["AutoRest", '("autorest")', true, false],
-  ["excluding AutoRest", '("!autorest")', false, true],
-  ["typed options", '(#{ scope: "autorest, python" })', true, true],
-])("publishes the %s marker using TCGC scope semantics", async (_, scope, autorest, python) => {
-  const { program } = await SimpleTester.compile(`
-    @service namespace TestService {
-      model Response { value: string; }
-      @Azure.ClientGenerator.Core.Legacy.markAsLro${scope}
-      @route("/marked") @post op marked(): Response;
-      @route("/plain") @post op plain(): Response;
-    }
-  `);
-  const service = program.getGlobalNamespaceType().namespaces.get("TestService")!;
-  const marked = service.operations.get("marked")!;
-  const plain = service.operations.get("plain")!;
-  for (const [emitter, expected] of [
-    ["@azure-tools/typespec-autorest", autorest],
-    ["@azure-tools/typespec-python", python],
-  ] as const) {
-    const context = createTCGCContext(program, emitter, { mutateNamespace: false });
-    strictEqual(isLroMarkedForEmitter(program, marked, emitter), expected);
-    strictEqual(isLroMarkedForEmitter(program, marked, emitter), getMarkAsLro(context, marked));
-    strictEqual(isLroMarkedForEmitter(program, plain, emitter), false);
-  }
-});
-
-it.each([
-  ["AutoRest", '("autorest")', undefined],
-  [
-    "Python",
-    '("python")',
-    "Synchronous PATCH operations must have only 200 and default responses.",
-  ],
-])("resolves the %s marker for the ARM rule without emission", async (_, scope, expected) => {
-  const [, diagnostics] = await ArmTesterWithService.compileAndDiagnose(
-    `
-      model Ok { @statusCode code: 200; @body value: string; }
-      model Accepted { @statusCode code: 202; }
-      @Azure.ClientGenerator.Core.Legacy.markAsLro${scope}
-      @route("/legacy") @patch op update(): Ok | Accepted | ErrorResponse;
-    `,
-    {
-      compilerOptions: {
-        noEmit: true,
-        linterRuleSet: {
-          enable: {
-            "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes": true,
-          },
-        },
-      },
-    },
-  );
-  const warnings = diagnostics.filter(
-    (diagnostic) =>
-      diagnostic.code ===
-      "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes",
-  );
-  strictEqual(warnings.length, expected === undefined ? 0 : 1);
-  strictEqual(warnings[0]?.message, expected);
 });
 
 it("should warn when @markAsLro is applied to operation not returning model", async () => {

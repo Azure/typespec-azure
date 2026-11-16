@@ -1,11 +1,25 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, it } from "vitest";
 import { armPatchResponseCodesRule } from "../../src/rules/arm-patch-response-codes.js";
 
 const code = "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes";
 const responses = `
   model Ok { @statusCode statusCode: 200; @body value: string; }
+  model Status {
+    @Azure.Core.lroStatus status: "Succeeded" | "Failed" | "Canceled" | "Running";
+  }
+  model Started {
+    @statusCode statusCode: 200;
+    @Azure.Core.pollingLocation @header("Operation-Location")
+    location: ResourceLocation<Status>;
+    @body value: string;
+  }
+  model AcceptedLro {
+    @statusCode statusCode: 202;
+    @Azure.Core.pollingLocation @header("Operation-Location")
+    location: ResourceLocation<Status>;
+  }
   model Accepted { @statusCode statusCode: 202; @header location?: string; }
   model AcceptedWithBody { @statusCode statusCode: 202; @body value: string; }
   model NoContent { @statusCode statusCode: 204; }
@@ -33,12 +47,8 @@ beforeAll(async () => {
 }, 60_000);
 
 describe("synchronous PATCH responses", () => {
-  it.each([
-    "",
-    '@extension("x-ms-long-running-operation", true)',
-    '@extension("x-ms-long-running-operation-options", #{})',
-  ])("reports an empty response set before LRO marker checks: %s", async (decorators) => {
-    await tester.expect(patch("Empty", `union Empty {}\n${decorators}`)).toEmitDiagnostics({
+  it("reports an empty response set", async () => {
+    await tester.expect(patch("Empty", "union Empty {}")).toEmitDiagnostics({
       code,
       message: "PATCH operations must have at least one response.",
     });
@@ -76,26 +86,24 @@ describe("synchronous PATCH responses", () => {
 });
 
 describe("long-running PATCH responses", () => {
-  const flag = '@extension("x-ms-long-running-operation", true)';
-
   it("accepts exactly 200, 202 without a body, and default", async () => {
-    await tester.expect(patch("Ok | Accepted | ErrorResponse", flag)).toBeValid();
+    await tester.expect(patch("Started | Accepted | ErrorResponse")).toBeValid();
   });
 
   it.each([
-    ["a missing 202", "Ok | ErrorResponse"],
-    ["a missing 200", "Accepted | ErrorResponse"],
-    ["a missing default", "Ok | Accepted"],
-    ["an extra response", "Ok | Accepted | NoContent | ErrorResponse"],
+    ["a missing 202", "Started | ErrorResponse"],
+    ["a missing 200", "AcceptedLro | ErrorResponse"],
+    ["a missing default", "Started | Accepted"],
+    ["an extra response", "Started | Accepted | NoContent | ErrorResponse"],
   ])("rejects %s with one response-set warning", async (_, returnType) => {
-    await tester.expect(patch(returnType, flag)).toEmitDiagnostics({
+    await tester.expect(patch(returnType)).toEmitDiagnostics({
       code,
       message: "Long-running PATCH operations must have only 200, 202, and default responses.",
     });
   });
 
   it("rejects a 202 body independently of the response set", async () => {
-    await tester.expect(patch("Ok | AcceptedWithBody | ErrorResponse", flag)).toEmitDiagnostics({
+    await tester.expect(patch("Started | AcceptedWithBody | ErrorResponse")).toEmitDiagnostics({
       code,
       message: "The 202 response of a long-running PATCH operation must not have a body.",
     });
@@ -103,7 +111,7 @@ describe("long-running PATCH responses", () => {
 
   it("rejects a body in one of multiple 202 response variants", async () => {
     await tester
-      .expect(patch("Ok | Accepted | AcceptedWithBody | ErrorResponse", flag))
+      .expect(patch("Started | Accepted | AcceptedWithBody | ErrorResponse"))
       .toEmitDiagnostics({
         code,
         message: "The 202 response of a long-running PATCH operation must not have a body.",
@@ -114,8 +122,13 @@ describe("long-running PATCH responses", () => {
     await tester
       .expect(
         patch(
-          "Both | ErrorResponse",
-          `model Both { @statusCode code: 200 | 202; @body value: string; }\n${flag}`,
+          "Started | Both | ErrorResponse",
+          `model Both {
+            @statusCode code: 200 | 202;
+            @Azure.Core.pollingLocation @header("Operation-Location")
+            location: ResourceLocation<Status>;
+            @body value: string;
+          }`,
         ),
       )
       .toEmitDiagnostics({
@@ -126,7 +139,7 @@ describe("long-running PATCH responses", () => {
 
   it("reports both an invalid response set and a 202 body", async () => {
     await tester
-      .expect(patch("Ok | AcceptedWithBody | NoContent | ErrorResponse", flag))
+      .expect(patch("Started | AcceptedWithBody | NoContent | ErrorResponse"))
       .toEmitDiagnostics([
         {
           code,
@@ -141,48 +154,21 @@ describe("long-running PATCH responses", () => {
 });
 
 describe("explicit OpenAPI LRO extensions", () => {
-  it.each(["false", '"yes"'])("treats a non-true marker %s as synchronous", async (marker) => {
+  it("does not treat an explicit flag alone as LRO metadata", async () => {
     await tester
-      .expect(patch("Ok | ErrorResponse", `@extension("x-ms-long-running-operation", ${marker})`))
+      .expect(patch("Ok | ErrorResponse", '@extension("x-ms-long-running-operation", true)'))
       .toBeValid();
   });
 
-  it("does not select a truthy non-boolean marker for the missing-202 rule", async () => {
+  it("uses synchronous response rules when only an explicit flag is present", async () => {
     await tester
       .expect(
-        patch("Ok | Accepted | ErrorResponse", '@extension("x-ms-long-running-operation", "yes")'),
+        patch("Ok | Accepted | ErrorResponse", '@extension("x-ms-long-running-operation", true)'),
       )
       .toEmitDiagnostics({
         code,
         message: "Synchronous PATCH operations must have only 200 and default responses.",
       });
-  });
-
-  it.each([
-    "",
-    '@extension("x-ms-long-running-operation", false)',
-    '@extension("x-ms-long-running-operation", "yes")',
-  ])("requires a boolean true marker when options are present: %s", async (marker) => {
-    await tester
-      .expect(
-        patch(
-          "Ok | Accepted | ErrorResponse",
-          `${marker}\n@extension("x-ms-long-running-operation-options", #{})`,
-        ),
-      )
-      .toEmitDiagnostics({
-        code,
-        message:
-          "PATCH operations with long-running options must set x-ms-long-running-operation to true.",
-      });
-  });
-
-  it("ignores false options when the marker is not true", async () => {
-    await tester
-      .expect(
-        patch("Ok | ErrorResponse", '@extension("x-ms-long-running-operation-options", false)'),
-      )
-      .toBeValid();
   });
 
   it("uses semantic polling metadata when there is no explicit marker", async () => {
@@ -208,7 +194,7 @@ describe("explicit OpenAPI LRO extensions", () => {
       });
   });
 
-  it("honors an explicit false marker overriding semantic LRO metadata", async () => {
+  it("uses LRO metadata even when an explicit flag is false", async () => {
     await tester
       .expect(
         `
@@ -223,11 +209,7 @@ describe("explicit OpenAPI LRO extensions", () => {
         }
       `,
       )
-      .toEmitDiagnostics({
-        code,
-        message:
-          "PATCH operations with long-running options must set x-ms-long-running-operation to true.",
-      });
+      .toBeValid();
   });
 });
 
@@ -299,80 +281,5 @@ describe("operation and service scope", () => {
         )
         .toBeValid();
     },
-  );
-});
-
-describe("compiler diagnostic preservation", () => {
-  it.each([
-    [
-      "structured file with an existing HTTP metadata rule",
-      "@typespec/http/http-file-structured",
-      `
-        @route("/widgets") @patch op update(): {
-          @statusCode code: 200;
-          @header("content-type") contentType: "application/json";
-          @body file: Http.File;
-        } | ErrorResponse;
-      `,
-      // The published rule already resolves this operation's HTTP metadata (#6084).
-      "@azure-tools/typespec-azure-resource-manager/no-response-body",
-    ],
-    [
-      "unused content type",
-      "@typespec/http/content-type-ignored",
-      `
-        @route("/widgets") @patch
-        op update(@header("content-type") contentType: "application/json"): {
-          @statusCode code: 200;
-          @body value: string;
-        } | ErrorResponse;
-      `,
-      undefined,
-    ],
-    [
-      "structured file on a GET during LRO metadata lookup",
-      "@typespec/http/http-file-structured",
-      `
-        model Status {
-          @Azure.Core.lroStatus status: "Succeeded" | "Failed" | "Canceled" | "Running";
-        }
-        @route("/widgets") @get op read(): {
-          @statusCode code: 200;
-          @header("content-type") contentType: "application/json";
-          @body file: Http.File;
-        } | ErrorResponse;
-        @Azure.Core.useFinalStateVia("original-uri")
-        @route("/widgets") @patch op update(): {
-          @statusCode code: 200;
-          @Azure.Core.pollingLocation @header("Operation-Location")
-          location: ResourceLocation<Status>;
-          @body value: string;
-        } | ErrorResponse;
-      `,
-      undefined,
-    ],
-  ])(
-    "does not duplicate the %s warning when enabled",
-    async (_, diagnosticCode, operation, existingRule) => {
-      const source = `@armProviderNamespace namespace Microsoft.Contoso; ${operation}`;
-      const compile = async (enabled: boolean) => {
-        const enable: Record<string, true> = {};
-        if (existingRule) enable[existingRule] = true;
-        if (enabled) enable[code] = true;
-        return (
-          await Tester.compileAndDiagnose(source, {
-            compilerOptions: { linterRuleSet: { enable } },
-          })
-        )[1];
-      };
-
-      const baseline = await compile(false);
-      const withRule = await compile(true);
-      const count = (diagnostics: typeof baseline) =>
-        diagnostics.filter((diagnostic) => diagnostic.code === diagnosticCode).length;
-      expect(count(baseline)).toBeGreaterThan(0);
-      expect(count(withRule)).toBe(count(baseline));
-    },
-    60_000,
   );
 });

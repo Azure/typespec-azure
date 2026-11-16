@@ -1,8 +1,6 @@
 Synchronous ARM PATCH operations must return exactly `200` and `default`. Long-running PATCH operations must return exactly `200`, `202`, and `default`, and the `202` response must not have a body. The rule checks operations in ARM provider services, including nested namespaces.
 
-An explicit `x-ms-long-running-operation` extension is considered long-running only when its value is the boolean `true`. Long-running options without that flag are invalid.
-
-The legacy `@Azure.ClientGenerator.Core.Legacy.markAsLro` marker is honored when it applies to AutoRest. Prefer native polling metadata for new operations.
+Like the ARM DELETE response-code rule, this rule identifies long-running operations using Azure Core LRO metadata. Prefer native polling metadata for new operations.
 
 ## Impact
 
@@ -24,9 +22,22 @@ op update(): ArmResponse<Widget>;
 ### Long-running update without a 202 response
 
 ```tsp
-@extension("x-ms-long-running-operation", true)
+model Status {
+  @Azure.Core.lroStatus status: "Succeeded" | "Failed" | "Canceled" | "Running";
+}
+
 @patch
-op update(): ArmResponse<Widget> | ErrorResponse;
+op update():
+  | {
+      @statusCode code: 200;
+
+      @Azure.Core.pollingLocation
+      @header("Operation-Location")
+      location: ResourceLocation<Status>;
+
+      @body value: Widget;
+    }
+  | ErrorResponse;
 ```
 
 ## ✅ Correct
@@ -52,6 +63,8 @@ interface Widgets {
 ## Limitations
 
 The rule inspects unprojected response types. If a response is added or removed in a particular API version, the unprojected result may not reflect every emitted version.
+
+An explicit `x-ms-long-running-operation` extension or legacy `@Azure.ClientGenerator.Core.Legacy.markAsLro` marker alone does not provide LRO metadata. AutoRest may emit a long-running flag for these operations while this rule treats them as synchronous. The rule does not validate `x-ms-long-running-operation-options`.
 
 HTTP metadata resolution can repeat existing compiler diagnostics, as tracked in [#6084](https://github.com/Azure/typespec-azure/issues/6084).
 
