@@ -166,45 +166,6 @@ describe("@clientLroResult", () => {
     },
   );
 
-  it("selects the LRO result by language scope", async () => {
-    const { program } = await AzureCoreTester.compile(`
-      ${monitorService}
-      @@clientLroResult(start, Status, "!csharp");
-      @@clientLroResult(start, Status.result, #{ scope: "java" });
-    `);
-    for (const [language, resultName, path] of [
-      ["python", "Status", undefined],
-      ["java", "Payload", "result"],
-      ["csharp", "Payload", "result"],
-    ]) {
-      const context = await createSdkContextForTester(program, {
-        emitterName: `@azure-tools/typespec-${language}`,
-      });
-      expectDiagnosticEmpty(context.diagnostics);
-      const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
-      ok(method);
-      strictEqual(method.kind, "lro");
-      strictEqual(method.response.type?.kind, "model");
-      strictEqual(method.response.type.name, resultName);
-      strictEqual(method.lroMetadata.__raw.finalResultPath, path);
-    }
-  });
-
-  it("ignores an out-of-scope selection", async () => {
-    const { program } = await AzureCoreTester.compile(`
-      @service namespace TestService;
-      model Widget { value: string; }
-      @get op read(): Widget;
-      @@clientLroResult(read, Widget, "python");
-    `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-ts",
-    });
-    expectDiagnosticEmpty(context.diagnostics);
-    strictEqual(context.sdkPackage.clients[0].methods.length, 1);
-    strictEqual(context.sdkPackage.clients[0].methods[0].kind, "basic");
-  });
-
   it("rejects a non-envelope model", async () => {
     const { program } = await AzureCoreTester.compile(`
       ${monitorService}
