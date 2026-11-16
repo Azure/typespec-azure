@@ -80,6 +80,17 @@ function getGenerationOptions(typeSpecFile: string): string[] {
       `${emitterName}.advanced-versioning=true`,
       `${emitterName}.generate-async-methods=true`,
       `${emitterName}.enable-sync-stack=false`,
+      `${emitterName}.client-side-validations=true`,
+    );
+  } else if (/tsp\/arm-internal\.tsp$/.test(normalized)) {
+    options.push(
+      `${emitterName}.generate-async-methods=true`,
+      `${emitterName}.advanced-versioning=true`,
+    );
+  } else if (/tsp\/experimental\.tsp$/.test(normalized)) {
+    options.push(
+      `${emitterName}.experimental-annotation=tsptest.experimental.annotations.Preview`,
+      `${emitterName}.customization-class=../../customization/src/main/java/ExperimentalCustomization.java`,
     );
   } else if (/tsp\/protocol-api-sync-over-async\.tsp$/.test(normalized)) {
     options.push(`${emitterName}.enable-sync-stack=false`);
@@ -106,12 +117,18 @@ function getGenerationOptions(typeSpecFile: string): string[] {
 }
 
 async function compile(typeSpecFile: string, options: string[], timeout: number): Promise<void> {
+  // Unified YAML discovery requires examples-dir to be unset, not an empty path.
+  const exampleOptions =
+    /azure[\\/]resource-manager[\\/]example[\\/]main\.tsp$/.test(typeSpecFile) ||
+    options.some((option) => option.startsWith(`${emitterName}.examples-dir=`))
+      ? []
+      : [`${emitterName}.examples-dir={project-root}/tsp/examples`];
   const arguments_ = [
     "exec",
     "tsp",
     "compile",
     typeSpecFile,
-    ...options.flatMap((option) => ["--option", option]),
+    ...[...exampleOptions, ...options].flatMap((option) => ["--option", option]),
     ...traceArguments,
   ];
   const command = `pnpm ${arguments_.join(" ")}`;
@@ -253,6 +270,15 @@ async function main() {
     specsRoot,
     { recursive: true, force: true },
   );
+  for (const entry of await readdir(specsRoot, { recursive: true, withFileTypes: true })) {
+    if (entry.isFile() && entry.name === "tspconfig.yaml") {
+      await rm(join(entry.parentPath, entry.name));
+    }
+  }
+  await cp(
+    join(specsRoot, "azure", "resource-manager", "example", "examples.yaml"),
+    join(emitterTestsRoot, "examples.yaml"),
+  );
 
   const planResult = await execa(
     "node",
@@ -271,6 +297,7 @@ async function main() {
     ),
   );
   await rm(specsRoot, { recursive: true, force: true });
+  await rm(join(emitterTestsRoot, "examples.yaml"), { force: true });
 
   const outputRoot = join(emitterTestsRoot, "tsp-output");
   for (const output of await readdir(outputRoot)) {

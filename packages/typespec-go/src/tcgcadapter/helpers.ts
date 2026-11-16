@@ -278,3 +278,41 @@ export function isHttpFileType(model: tcgc.SdkModelType): boolean {
     model.namespace.toLowerCase() === "typespec.http" && model.name.toLowerCase().startsWith("file")
   );
 }
+
+// aggregate the properties from the provided type and its parent types.
+// this includes any inherited additional properties.
+export function aggregateProperties(
+  sdkContext: tcgc.SdkContext,
+  model: tcgc.SdkModelType,
+): { props: Array<tcgc.SdkModelPropertyType>; addlProps?: tcgc.SdkType } {
+  const allProps = new Array<tcgc.SdkModelPropertyType>();
+  for (const prop of model.properties) {
+    if (tcgc.isHttpMetadata(sdkContext, prop)) {
+      continue;
+    }
+    allProps.push(prop);
+  }
+
+  let addlProps = model.additionalProperties;
+  let parent = model.baseModel;
+  while (parent) {
+    for (const parentProp of parent.properties) {
+      if (tcgc.isHttpMetadata(sdkContext, parentProp)) {
+        continue;
+      }
+      const exists = allProps.find((p) => p.name === parentProp.name);
+      if (exists) {
+        // don't add the duplicate. the TS compiler has better enforcement than OpenAPI
+        // to ensure that duplicate fields with different types aren't added.
+        continue;
+      }
+      allProps.push(parentProp);
+    }
+    // if we haven't found additional properties yet and the parent has it, use it
+    if (!addlProps && parent.additionalProperties) {
+      addlProps = parent.additionalProperties;
+    }
+    parent = parent.baseModel;
+  }
+  return { props: allProps, addlProps: addlProps };
+}

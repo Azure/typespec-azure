@@ -91,7 +91,9 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 
@@ -131,6 +133,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
 | [`@azure-tools/typespec-client-generator-core/use-valid-client-lro-result`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result)           | LRO client results should follow the operation's protocol result contract.                                                                                          |
 | [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
+| [`@azure-tools/typespec-client-generator-core/unsupported-scope`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/unsupported-scope)                               | Use supported scopes for TCGC decorators.                                                                                                                           |
 
 ## Decorators
 

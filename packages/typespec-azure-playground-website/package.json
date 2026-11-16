@@ -81,6 +81,7 @@
     "yaml": "catalog:"
   },
   "devDependencies": {
+    "@azure-tools/typespec-java": "workspace:^",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
