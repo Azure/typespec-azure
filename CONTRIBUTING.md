@@ -527,6 +527,7 @@ Misc labels
 | `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs               |
 | `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows                    |
 | `auto-merge`        | #0e8a16 | Automatically merge the pull request after all requirements pass |
+| `lintdiff`          | #1d76db | Issues and pull requests related to lintdiff                     |
 
 #### external
 
