@@ -47,6 +47,7 @@ specs:
   authentication/oauth2: true
   authentication/union: true
   authentication/noauth/union: true
+  azure/core/authentication/configurations: true
   special-headers/repeatability: true
   azure/core/traits: true
   type/model/empty: true

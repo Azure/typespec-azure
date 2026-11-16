@@ -22,6 +22,7 @@ import { partitionAndEmitExports } from "./build-subpath-index.js";
 import { AzureCoreDependencies } from "./external-dependencies.js";
 import { getClassicalClientName } from "./helpers/naming-helpers.js";
 import { isLroOnlyOperation } from "./helpers/operation-helpers.js";
+import { getClientServiceConfigurations } from "./helpers/service-configuration-helpers.js";
 import type { ModularEmitterOptions } from "./interfaces.js";
 import { CloudSettingHelpers, MultipartHelpers, PagingHelpers } from "./static-helpers-metadata.js";
 
@@ -74,7 +75,7 @@ function buildRootIndexImpl(
     return; // Skip exporting this client but continue with others
   }
 
-  exportClassicalClient(client, rootIndexFile, subfolder ?? "");
+  exportClassicalClient(client, rootIndexFile, subfolder ?? "", false, emitterOptions);
   exportSimplePollerLike(context, clientMap, rootIndexFile, project, srcPath, subfolder);
   exportRestoreHelpers(rootIndexFile, project, srcPath, clientName, subfolder, true);
   exportModels(emitterOptions, rootIndexFile, clientName);
@@ -277,15 +278,35 @@ function exportClassicalClient(
   indexFile: SourceFile,
   subfolder: string,
   isSubClient: boolean = false,
+  emitterOptions?: ModularEmitterOptions,
 ) {
   const clientName = getClassicalClientName(client);
+  const moduleSpecifier = `./${
+    subfolder && subfolder !== "" && !isSubClient ? subfolder + "/" : ""
+  }${normalizeName(clientName, NameType.File)}.js`;
+  const existingExports = getExistingExports(indexFile);
+  const serviceConfigs = getClientServiceConfigurations(client);
+  const valueExports = [clientName];
+  if (
+    serviceConfigs?.knownAudienceEnumName &&
+    emitterOptions?.options.addCredentials !== false &&
+    !existingExports.has(serviceConfigs.knownAudienceEnumName)
+  ) {
+    valueExports.push(serviceConfigs.knownAudienceEnumName);
+  }
   enqueueStatement(indexFile, {
     kind: StructureKind.ExportDeclaration,
-    namedExports: [clientName],
-    moduleSpecifier: `./${
-      subfolder && subfolder !== "" && !isSubClient ? subfolder + "/" : ""
-    }${normalizeName(clientName, NameType.File)}.js`,
+    namedExports: valueExports.filter((name) => !existingExports.has(name)),
+    moduleSpecifier,
   });
+  if (serviceConfigs && !existingExports.has(serviceConfigs.serviceConfigTypeName)) {
+    enqueueStatement(indexFile, {
+      kind: StructureKind.ExportDeclaration,
+      isTypeOnly: true,
+      namedExports: [serviceConfigs.serviceConfigTypeName],
+      moduleSpecifier,
+    });
+  }
 }
 
 export interface ExportModulesOptions {
@@ -426,7 +447,7 @@ function buildSubClientIndexFileImpl(
     return; // Skip exporting this client but continue with others
   }
 
-  exportClassicalClient(client, subClientIndexFile, subfolder ?? "", true);
+  exportClassicalClient(client, subClientIndexFile, subfolder ?? "", true, emitterOptions);
   exportSimplePollerLike(context, clientMap, subClientIndexFile, project, srcPath, subfolder);
   exportRestoreHelpers(subClientIndexFile, project, srcPath, clientName, subfolder);
   exportModules(subClientIndexFile, project, srcPath, clientName, "api", {
