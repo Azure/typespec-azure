@@ -401,6 +401,26 @@ function getExampleValue(
       }
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
+        const fieldExample = example.value[field];
+        if (
+          imports &&
+          (fieldExample.kind === "null" ||
+            (fieldExample.kind === "any" && fieldExample.value === null))
+        ) {
+          let nullType = goField.type;
+          if (nullType.kind === "interface") {
+            const concrete = generateFakeExample(nullType);
+            if (concrete.kind !== "model") {
+              throw new CodegenError("InternalError", "expected a concrete model for null example");
+            }
+            nullType = new go.Ptr(concrete.type);
+          }
+          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+          imports.addForType(nullType);
+          const nullTypeName = `${nullType.kind === "any" ? "*" : ""}${go.getTypeDeclaration(nullType, pkg)}`;
+          exampleText += `${indent}\t${field}: azcore.NullValue[${nullTypeName}](),\n`;
+          continue;
+        }
         const isFieldByValue = goField.type.kind !== "ptr";
         const isFieldPolymorphic = goField.type.kind === "interface";
         exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic).slice(indent.length + 1)},\n`;

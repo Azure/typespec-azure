@@ -6,6 +6,97 @@ import { emitGoFor } from "./scenario-runner.js";
 
 describe("Example adaptation", () => {
   it.each([false, true])(
+    "preserves explicit null request fields without changing response or collection nulls (raw: %s)",
+    async (raw) => {
+      const value = {
+        toolControls: null,
+        label: null,
+        items: null,
+        byName: null,
+        pet: null,
+        timestamp: null,
+        metadata: null,
+        entries: [null],
+        values: { cleared: null },
+      };
+      const input = raw ? { kind: "details", value } : { value };
+      const files = await emitGoFor(
+        `
+          @service namespace Test;
+          model ToolControls { enabled?: boolean; }
+          @discriminator("kind") model Pet { kind: string; }
+          model Cat extends Pet { kind: "cat"; }
+          model Details {
+            toolControls?: ToolControls | null;
+            label?: string | null;
+            items?: ToolControls[] | null;
+            byName?: Record<ToolControls> | null;
+            pet?: Pet | null;
+            timestamp?: utcDateTime | null;
+            metadata?: unknown;
+            entries: (ToolControls | null)[];
+            values: Record<ToolControls | null>;
+            omitted?: string | null;
+          }
+          ${raw ? "@discriminated union Input { details: Details }" : "model Input { value: Details; }"}
+          @route("/input") @patch
+          op update(@body input: Input): Input;
+        `,
+        { "generate-samples": true },
+        {
+          "examples/update.json": JSON.stringify({
+            operationId: "update",
+            title: "update",
+            parameters: { input },
+            responses: { "200": { body: input } },
+          }),
+        },
+      );
+      const example = [...files].find(([name]) => name.endsWith("_example_test.go"))?.[1];
+      expect(example).toBeDefined();
+      expect(example).toContain('"github.com/Azure/azure-sdk-for-go/sdk/azcore"');
+      expect(example).toContain('"time"');
+      for (const [field, type] of [
+        ["ToolControls", "*testmodule.ToolControls"],
+        ["Label", "*string"],
+        ["Items", "[]*testmodule.ToolControls"],
+        ["ByName", "map[string]*testmodule.ToolControls"],
+        ["Pet", "*testmodule.Pet"],
+        ["Timestamp", "*time.Time"],
+        ["Metadata", "*any"],
+      ]) {
+        expect(example).toContain(`${field}: azcore.NullValue[${type}]()`);
+        expect(example).toContain(`// \t\t\t${field}: nil`);
+      }
+      expect(example).toContain("Entries: []*testmodule.ToolControls{\n\t\t\t\tnil,");
+      expect(example).toContain('"cleared": nil');
+      expect(example).not.toContain("Omitted:");
+    },
+  );
+
+  it("keeps top-level null request parameters as nil", async () => {
+    const files = await emitGoFor(
+      `
+        @service namespace Test;
+        @route("/input") @put op put(@body input: string | null): void;
+      `,
+      { "generate-samples": true },
+      {
+        "examples/put.json": JSON.stringify({
+          operationId: "put",
+          title: "put",
+          parameters: { input: null },
+          responses: { "204": {} },
+        }),
+      },
+    );
+    const example = [...files].find(([name]) => name.endsWith("_example_test.go"))?.[1];
+    expect(example).toContain("client.Put(ctx, nil, nil)");
+    expect(example).not.toContain("azcore.NullValue");
+    expect(example).not.toContain('"github.com/Azure/azure-sdk-for-go/sdk/azcore"');
+  });
+
+  it.each([false, true])(
     "passes synthesized discriminated arguments by reference (legacy: %s)",
     async (legacy) => {
       const files = await emitGoFor(
@@ -149,7 +240,8 @@ describe("Example adaptation", () => {
       expect(example).toContain('Name: to.Ptr("second")');
       expect(example).toContain("Count: to.Ptr[int32](42)");
       expect(example).toContain("Enabled: to.Ptr(false)");
-      expect(example).toContain("Maybe: nil");
+      expect(example).toContain("Maybe: azcore.NullValue[*string]()");
+      expect(example).toContain("// \t\t\tMaybe: nil");
       expect(example).toContain(`Pet: &testmodule.${tag === "known" ? "Cat" : "Pet"}{`);
       expect(example).toContain(`Kind: to.Ptr("${tag}")`);
     },
