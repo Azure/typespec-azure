@@ -245,7 +245,7 @@ it("reports a mis-cased $FILTER query parameter", async () => {
     });
 });
 
-it("ignores library-provided query parameters", async () => {
+it("reports library-provided query parameters on the spread that brings them in", async () => {
   await tester
     .expect(
       `
@@ -257,12 +257,44 @@ it("ignores library-provided query parameters", async () => {
       op listWidgets(
         @path subscriptionId: string,
         @query("api-version") apiVersion: string,
-        ...Azure.Core.StandardListQueryParameters,
+        .../*params*/Azure.Core.StandardListQueryParameters,
       ): void;
       `,
     )
-    .toBeValid();
+    .toEmitDiagnostics((res) => expectedAt(res.pos.params.pos, ["top", "skip", "maxpagesize"]));
 });
+
+it("reports library-provided query parameters passed to an ARM list template", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+      model Widget is TrackedResource<{}> {
+        ...ResourceNameParameter<Widget>;
+      }
+
+      @armResourceOperations
+      interface Widgets {
+        listByResourceGroup is ArmResourceListByParent<
+          Widget,
+          Azure.ResourceManager.Foundations.BaseParameters<Widget> &
+            /*params*/Azure.Core.StandardListQueryParameters
+        >;
+      }
+      `,
+    )
+    .toEmitDiagnostics((res) => expectedAt(res.pos.params.pos, ["top", "skip", "maxpagesize"]));
+});
+
+function expectedAt(pos: number, names: string[]) {
+  return names.map((name) => ({
+    code: diagnosticCode,
+    message: `Query parameter '${name}' should be removed. Collection GET and list operations must not have query parameters other than api-version and $filter.`,
+    pos,
+  }));
+}
 
 it("checks operations in a child namespace of an ARM provider", async () => {
   await tester
