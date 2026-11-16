@@ -6,7 +6,7 @@ import {
   type ModelProperty,
 } from "@typespec/compiler";
 import { getResourceOperation } from "@typespec/rest";
-import { clientLroResultKey, negationScopesKey } from "../internal-utils.js";
+import { clientLroResultKey } from "../internal-utils.js";
 import { getLroEnvelopeProperty, getRawLroMetadata } from "../lro-metadata.js";
 
 export const useValidClientLroResultRule = createRule({
@@ -27,7 +27,6 @@ export const useValidClientLroResultRule = createRule({
 
         // Linter evaluation is emitter-independent; inspect all stored scopes and report once.
         const selections = Reflect.ownKeys(scopedSelections)
-          .filter((scope) => scope !== negationScopesKey)
           .map((scope) => scopedSelections[scope])
           .filter(
             (selection): selection is Model | ModelProperty =>
