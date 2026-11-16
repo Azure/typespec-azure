@@ -169,6 +169,11 @@ export interface NextOperationLink extends LogicalOperationStep {
   responseModel: Model;
   /** information on how to get the uri to the status monitor */
   target: OperationLink;
+  /**
+   * The explicitly linked polling operation, when the link was declared with
+   * `@pollingOperation`. Absent for an inferred or standalone polling location.
+   */
+  operation?: Operation;
 }
 
 /**
@@ -490,6 +495,22 @@ function createLroProtocolMetadata(
     }
   }
 
+  const pollingLink = context.pollingOperationLink?.link;
+  const statusMonitorStep =
+    context.statusMonitorStep?.kind === "nextOperationReference" && pollingLink
+      ? {
+          ...context.statusMonitorStep,
+          target: {
+            ...context.statusMonitorStep.target,
+            link: {
+              kind: "link" as const,
+              location: pollingLink.location,
+              property: pollingLink.property,
+            },
+          },
+        }
+      : context.statusMonitorStep;
+
   return {
     operation,
     initial: {
@@ -498,7 +519,7 @@ function createLroProtocolMetadata(
       isAction,
     },
     polling: {
-      statusMonitorStep: context.statusMonitorStep,
+      statusMonitorStep,
       pollingInfo: context.pollingStep,
       statusMonitorResult: context.statusMonitorResult,
     },

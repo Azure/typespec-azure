@@ -113,6 +113,77 @@ describe("invalid cases", () => {
       });
   });
 
+  describe("system data placement", () => {
+    const systemDataDiagnostic = {
+      code: ruleCode,
+      message:
+        'Property "systemData" is not allowed in the resource property bag. This property name is reserved for resource system metadata.',
+    };
+
+    it.each(["systemData", "SystemData", "SYSTEMDATA"])(
+      "rejects the immediate resource property %s",
+      async (name) => {
+        await tester
+          .expect(
+            `
+              @armProviderNamespace namespace Microsoft.Test;
+              model Widget is TrackedResource<WidgetProperties> {
+                ...ResourceNameParameter<Widget>;
+              }
+              model WidgetProperties {
+                @visibility(Lifecycle.Read)
+                ${name}?: { createdBy?: string; };
+              }
+              `,
+          )
+          .toEmitDiagnostics(systemDataDiagnostic);
+      },
+    );
+
+    it("checks inherited system data in the resource properties model", async () => {
+      await tester
+        .expect(
+          `
+            @armProviderNamespace namespace Microsoft.Test;
+            model Widget is TrackedResource<WidgetProperties> {
+              ...ResourceNameParameter<Widget>;
+            }
+            model BaseProperties { systemData?: string; }
+            model WidgetProperties extends BaseProperties {}
+            `,
+        )
+        .toEmitDiagnostics(systemDataDiagnostic);
+    });
+
+    it("accepts envelope metadata, embedded resource envelopes and nearby names", async () => {
+      await tester
+        .expect(
+          `
+            @armProviderNamespace namespace Microsoft.Test;
+            model Widget is TrackedResource<WidgetProperties> {
+              ...ResourceNameParameter<Widget>;
+            }
+            model WidgetProperties {
+              systemDataId?: string;
+              connections?: Connection[];
+              details?: { systemData?: { createdBy?: string; }; billingData?: string; };
+            }
+            model Connection {
+              id: string;
+              name?: string;
+              type?: string;
+              systemData?: { createdBy?: string; };
+              properties?: { description?: string; };
+            }
+            model NotAResource {
+              properties: { systemData?: string; };
+            }
+            `,
+        )
+        .toBeValid();
+    });
+  });
+
   it("emits a warning when a reserved property references a named model", async () => {
     await tester
       .expect(

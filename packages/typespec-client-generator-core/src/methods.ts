@@ -37,6 +37,7 @@ import {
   type SdkBuiltInType,
   type SdkClient,
   type SdkClientType,
+  type SdkLroOperationIdMetadata,
   type SdkLroPagingServiceMethod,
   type SdkLroServiceFinalResponse,
   type SdkLroServiceFinalStep,
@@ -52,6 +53,7 @@ import {
   type SdkOperationLink,
   type SdkOperationReference,
   type SdkPagingServiceMethod,
+  type SdkPathParameter,
   type SdkPollingOperationStep,
   type SdkPropertyMap,
   type SdkServiceMethod,
@@ -78,6 +80,9 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
+import { resolveLroOperationId } from "./lro-operation-id.js";
+import { getStatusMonitorLink } from "./lro-status-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -86,6 +91,7 @@ import {
 } from "./public-utils.js";
 import {
   getClientTypeWithDiagnostics,
+  getEffectiveSdkModelProperty,
   getSdkBuiltInType,
   getSdkModel,
   getSdkModelPropertyType,
@@ -409,6 +415,34 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
 
   const finalResponse = getFinalResponse();
   const statusMetadata = context.__lroStatusMetadataCache.get(operation)?.properties;
+  const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
+  const pollingInfo = getPollingInfo(context, rawMetadata.pollingInfo);
+  const nativeMetadata = getRawLroMetadata(context.program, operation);
+  const operationIdSource = getStatusMonitorLink(statusMonitorStep);
+  const pollingResponseBody = rawMetadata.pollingInfo.responseModel
+    ? (diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
+      ) as SdkModelType)
+    : undefined;
+  const operationId: SdkLroOperationIdMetadata[] = [];
+  for (const selection of diagnostics.pipe(resolveLroOperationId(context, nativeMetadata))) {
+    if (selection.kind === "path") {
+      const pathParameter = getStatusMonitorOperation(statusMonitorStep)?.parameters.find(
+        (parameter): parameter is SdkPathParameter =>
+          parameter.kind === "path" && parameter.__raw === selection.property,
+      );
+      if (pathParameter && operationIdSource) {
+        operationId.push({ kind: "path", source: operationIdSource, pathParameter });
+      }
+      continue;
+    }
+
+    if (!pollingResponseBody) continue;
+    const property = getEffectiveSdkModelProperty(pollingResponseBody, selection.property);
+    if (property) {
+      operationId.push({ kind: "property", property, propertySegments: [property] });
+    }
+  }
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -416,17 +450,13 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     finalResponse,
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
-      responseBody: rawMetadata.pollingInfo.responseModel
-        ? (diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
-          ) as SdkModelType)
-        : undefined,
+      responseBody: pollingResponseBody,
     },
     operation: diagnostics.pipe(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
     logicalResult: diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
-    statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
-    pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
+    statusMonitorStep,
+    pollingInfo,
     envelopeResult: diagnostics.pipe(
       getSdkModelWithDiagnostics(context, rawMetadata.envelopeResult),
     ),
@@ -434,7 +464,14 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
     ...(statusMetadata && statusMetadata.length > 0 ? { statusMetadata } : {}),
+    ...(operationId.length > 0 ? { operationId } : {}),
   });
+
+  function getStatusMonitorOperation(
+    step: SdkNextOperationLink | SdkNextOperationReference | undefined,
+  ): SdkServiceOperation | undefined {
+    return step?.kind === "nextOperationReference" ? step.target.operation : step?.operation;
+  }
 
   function getSdkLroServiceFinalStep(
     context: TCGCContext,
@@ -490,6 +527,13 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
           getSdkModelWithDiagnostics(context, statusMonitorStep.responseModel),
         ),
         target: getSdkOperationLink(context, statusMonitorStep.target),
+        ...(statusMonitorStep.operation
+          ? {
+              operation: ignoreDiagnostics(
+                getSdkBasicServiceMethod(context, statusMonitorStep.operation, client),
+              ).operation,
+            }
+          : {}),
       };
     }
     return {
