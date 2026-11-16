@@ -84,7 +84,7 @@ it("can preserve friendly names through service emitter options", async () => {
   ok(codeModel.models.some((model: { name: string }) => model.name === "AIGateway"));
 });
 
-it("lets service naming options override emitter defaults without affecting another context", async () => {
+it("isolates service naming options between contexts", async () => {
   const { program } = await SimpleTester.compile(`
     @service
     namespace TestService;
@@ -99,22 +99,14 @@ it("lets service naming options override emitter defaults without affecting anot
 
     @get op list(): ListResult<AiGateway>;
   `);
-  const legacyContext = await createSdkContextForTester(
-    program,
-    {
-      emitterName: "@azure-tools/typespec-go",
-      "use-client-name-for-friendly-name-source": false,
-    },
-    { useClientNameForFriendlyNameSource: true },
-  );
-  const enabledContext = await createSdkContextForTester(
-    program,
-    {
-      emitterName: "@azure-tools/typespec-go",
-      "use-client-name-for-friendly-name-source": true,
-    },
-    { useClientNameForFriendlyNameSource: false },
-  );
+  const legacyContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+    "use-client-name-for-friendly-name-source": false,
+  });
+  const enabledContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+    "use-client-name-for-friendly-name-source": true,
+  });
   const defaultContext = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-go",
   });

@@ -45,6 +45,7 @@ import type {
   SdkBodyParameter,
   SdkClient,
   SdkClientType,
+  SdkContext,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -62,6 +63,7 @@ import {
   AllScopes,
   type ContextNode,
   type TspLiteralType,
+  type UnbrandedSdkEmitterOptionsInterface,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
@@ -261,13 +263,14 @@ export function getLibraryName(
 }
 
 function getClientFriendlyName(
-  context: TCGCContext,
+  context: TCGCContext | SdkContext<UnbrandedSdkEmitterOptionsInterface>,
   type: Type,
   scope?: string | typeof AllScopes,
 ): string | undefined {
   const friendlyName = getFriendlyName(context.program, type);
   if (
-    context.useClientNameForFriendlyNameSource === false ||
+    ("emitContext" in context &&
+      context.emitContext.options["use-client-name-for-friendly-name-source"] === false) ||
     !friendlyName ||
     !("decorators" in type)
   ) {

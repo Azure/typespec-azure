@@ -246,7 +246,7 @@ it.each([
   strictEqual(AiGateway.name, "AiGateway");
 });
 
-it("can preserve source-based friendly names in a TCGC context", async () => {
+it("uses source client names by default in a TCGC context", async () => {
   const { program, Envelope, AiGateway } = await SimpleTester.compile(t.code`
     @clientName("AIGateway", "go")
     model ${t.model("AiGateway")} {}
@@ -261,18 +261,10 @@ it("can preserve source-based friendly names in a TCGC context", async () => {
     }
   `);
   const result = Envelope.properties.get("result")!.type;
-  const legacyContext = createTCGCContext(program, "@azure-tools/typespec-go", {
-    useClientNameForFriendlyNameSource: false,
-  });
-  const defaultContext = createTCGCContext(program, "@azure-tools/typespec-go");
-  const enabledContext = createTCGCContext(program, "@azure-tools/typespec-go", {
-    useClientNameForFriendlyNameSource: true,
-  });
+  const context = createTCGCContext(program, "@azure-tools/typespec-go");
 
-  strictEqual(getLibraryName(legacyContext, result), "AiGatewayListResult");
-  strictEqual(getLibraryName(legacyContext, AiGateway), "AIGateway");
-  strictEqual(getLibraryName(defaultContext, result), "AIGatewayListResult");
-  strictEqual(getLibraryName(enabledContext, result), "AIGatewayListResult");
+  strictEqual(getLibraryName(context, result), "AIGatewayListResult");
+  strictEqual(getLibraryName(context, AiGateway), "AIGateway");
 });
 
 it.each([
@@ -348,25 +340,25 @@ it("ignores copied friendly names on named models", async () => {
 it.each([
   {
     language: "go",
-    useClientNameForFriendlyNameSource: undefined,
+    useSourceClientNames: undefined,
     resourceName: "AIGateway",
     templateSourceName: "AIGateway",
   },
   {
     language: "go",
-    useClientNameForFriendlyNameSource: false,
+    useSourceClientNames: false,
     resourceName: "AIGateway",
     templateSourceName: "AiGateway",
   },
   {
     language: "java",
-    useClientNameForFriendlyNameSource: undefined,
+    useSourceClientNames: undefined,
     resourceName: "AiGateway",
     templateSourceName: "AiGateway",
   },
 ])(
   "names ARM template models for $language using $templateSourceName",
-  async ({ language, useClientNameForFriendlyNameSource, resourceName, templateSourceName }) => {
+  async ({ language, useSourceClientNames, resourceName, templateSourceName }) => {
     const { program } = await ArmTesterWithService.compile(`
     model AiGateway is TrackedResource<AiGatewayProperties> {
       ...ResourceNameParameter<AiGateway>;
@@ -383,13 +375,10 @@ it.each([
     }
   `);
 
-    const context = await createSdkContextForTester(
-      program,
-      {
-        emitterName: `@azure-tools/typespec-${language}`,
-      },
-      { useClientNameForFriendlyNameSource },
-    );
+    const context = await createSdkContextForTester(program, {
+      emitterName: `@azure-tools/typespec-${language}`,
+      "use-client-name-for-friendly-name-source": useSourceClientNames,
+    });
     const models = context.sdkPackage.models;
     const resource = models.find((x) => x.name === resourceName);
     ok(resource);
