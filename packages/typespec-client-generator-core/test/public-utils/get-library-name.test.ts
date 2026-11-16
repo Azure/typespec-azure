@@ -2,8 +2,10 @@ import { getFriendlyName } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { parse } from "yaml";
 import { createTCGCContext } from "../../src/context.js";
 import { getLibraryName } from "../../src/public-utils.js";
+import { SdkTestLibrary } from "../../src/testing/index.js";
 import {
   ArmTesterWithService,
   createSdkContextForTester,
@@ -265,6 +267,72 @@ it("uses source client names by default in a TCGC context", async () => {
 
   strictEqual(getLibraryName(context, result), "AIGatewayListResult");
   strictEqual(getLibraryName(context, AiGateway), "AIGateway");
+});
+
+it("can preserve friendly names through service emitter options", async () => {
+  const { outputs } = await SimpleTester.emit(SdkTestLibrary.name, {
+    "emitter-name": "@azure-tools/typespec-go",
+    "use-client-name-for-friendly-name-source": false,
+  }).compile(`
+    @service
+    namespace TestService;
+
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+
+    @get op list(): ListResult<AiGateway>;
+  `);
+  const output = outputs["tcgc-output.yaml"];
+  ok(output);
+  const codeModel = parse(output);
+  ok(codeModel.models.some((model: { name: string }) => model.name === "AiGatewayListResult"));
+  ok(codeModel.models.some((model: { name: string }) => model.name === "AIGateway"));
+});
+
+it("isolates service naming options between contexts", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace TestService;
+
+    @clientName("AIGateway", "go")
+    model AiGateway {}
+
+    @friendlyName("{name}ListResult", T)
+    model ListResult<T> {
+      value: T[];
+    }
+
+    @get op list(): ListResult<AiGateway>;
+  `);
+  const legacyContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+    "use-client-name-for-friendly-name-source": false,
+  });
+  const enabledContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+    "use-client-name-for-friendly-name-source": true,
+  });
+  const defaultContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-go",
+  });
+
+  for (const [context, expected] of [
+    [legacyContext, "AiGatewayListResult"],
+    [enabledContext, "AIGatewayListResult"],
+    [defaultContext, "AIGatewayListResult"],
+  ] as const) {
+    strictEqual(
+      context.sdkPackage.models.find(
+        (model) => model.__raw?.kind === "Model" && model.__raw.name === "ListResult",
+      )?.name,
+      expected,
+    );
+  }
 });
 
 it.each([
