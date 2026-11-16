@@ -282,4 +282,32 @@ describe("operation and service scope", () => {
         .toBeValid();
     },
   );
+
+  it.each([
+    [
+      "synchronous",
+      "ArmCustomPatchSync<Employee, Response = ArmResponse<Employee> | NoContent>",
+      "Synchronous PATCH operations must have only 200 and default responses.",
+    ],
+    [
+      "long-running",
+      'ArmCustomPatchAsync<Employee, Response = ArmAcceptedLroResponse<"Accepted", ArmLroLocationHeader<FinalResult = Employee>>>',
+      "Long-running PATCH operations must have only 200, 202, and default responses.",
+    ],
+  ])("reports an invalid %s ARM resource update", async (_, operation, message) => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace namespace Microsoft.Contoso;
+        model Employee is ProxyResource<{}> {
+          ...ResourceNameParameter<Employee>;
+        }
+        model NoContent { @statusCode code: 204; }
+        @armResourceOperations interface Employees {
+          update is ${operation};
+        }
+      `,
+      )
+      .toEmitDiagnostics({ code, message });
+  });
 });

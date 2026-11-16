@@ -24,11 +24,6 @@ const linters = {
   } satisfies DependingLinter,
 };
 
-const armAllOnlyRules = new Set([
-  // This rule is intentionally available through ARM's all ruleset only.
-  "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes",
-]);
-
 describe("expect all rules to be defined", () => {
   describe.each([
     ["data-plane", [linters.azureCore]],
@@ -41,9 +36,6 @@ describe("expect all rules to be defined", () => {
       const missing = [];
       for (const rule of linter.rules) {
         const fullName = `${name}/${rule.name}` as const;
-        if (rulesetName === "resource-manager" && armAllOnlyRules.has(fullName)) {
-          continue;
-        }
         if (ruleset.enable?.[fullName] === undefined && ruleset.disable?.[fullName] === undefined) {
           missing.push(fullName);
         }
@@ -228,11 +220,12 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("keeps ARM PATCH response guidance in ARM all but out of the curated ruleset", () => {
-    const name = "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes";
-    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[name], true);
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[name], undefined);
-    strictEqual($linter.ruleSets?.["resource-manager"].disable?.[name], undefined);
+  it("keeps ARM PATCH response guidance opt-in in the central ruleset", () => {
+    const ruleName =
+      "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
   });
 
   it("keeps combined ARM collection guidance opt-in and retires the old rule", () => {
