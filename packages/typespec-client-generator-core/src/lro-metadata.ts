@@ -83,20 +83,6 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
   };
 }
 
-function createLroMetadata(
-  protocol: LroProtocolMetadata,
-  clientResult: LroClientResult,
-): LroMetadata {
-  return {
-    operation: protocol.operation,
-    finalStateVia: protocol.completion.finalStateVia,
-    statusMonitorStep: protocol.polling.statusMonitorStep,
-    pollingInfo: protocol.polling.pollingInfo,
-    finalStep: protocol.completion.finalStep,
-    ...clientResult,
-  };
-}
-
 /** Raw LRO metadata only; the legacy @markAsLro fallback is handled separately. */
 export function getRawLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
   let programCache = rawLroMetadataCache.get(program);
@@ -109,9 +95,18 @@ export function getRawLroMetadata(program: Program, operation: Operation): LroMe
   }
 
   const protocol = getLroProtocolMetadata(program, operation);
-  const metadata = protocol
-    ? createLroMetadata(protocol, resolveLroClientResult(protocol))
-    : undefined;
+  if (!protocol) {
+    programCache.set(operation, undefined);
+    return undefined;
+  }
+  const metadata = {
+    operation: protocol.operation,
+    finalStateVia: protocol.completion.finalStateVia,
+    statusMonitorStep: protocol.polling.statusMonitorStep,
+    pollingInfo: protocol.polling.pollingInfo,
+    finalStep: protocol.completion.finalStep,
+    ...resolveLroClientResult(protocol),
+  };
   programCache.set(operation, metadata);
   return metadata;
 }
