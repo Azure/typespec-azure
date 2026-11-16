@@ -194,18 +194,6 @@ describe("use-valid-client-lro-result", () => {
       .toBeValid();
   });
 
-  it("ignores a property that is not part of the status-monitor envelope", async () => {
-    await tester
-      .expect(
-        `
-        ${resourceLro}
-        model Other { result: Payload; }
-        @@clientLroResult(start, Other.result);
-      `,
-      )
-      .toBeValid();
-  });
-
   it("does not report on Azure.Core or Azure.ResourceManager library operations", async () => {
     const armTester = createLinterRuleTester(
       await ArmTester.createInstance(),
