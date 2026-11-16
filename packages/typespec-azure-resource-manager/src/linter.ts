@@ -8,6 +8,7 @@ import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js
 import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
+import { armPatchResponseCodesRule } from "./rules/arm-patch-response-codes.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
 import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
@@ -77,6 +78,7 @@ const rules = [
   noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
+  armPatchResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,

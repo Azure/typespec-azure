@@ -1,9 +1,9 @@
-import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
 import { $ } from "@typespec/compiler/typekit";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { getLroProtocolMetadata } from "../src/index.js";
-import { getOperations } from "./test-host.js";
+import { getLroMetadata, getLroProtocolMetadata } from "../src/index.js";
+import { getOperations, TesterWithService } from "./test-host.js";
 
 it("retains required final requests and polling parameter bindings as protocol facts", async () => {
   const [operations, diagnostics, runner] = await getOperations(`
@@ -120,6 +120,15 @@ it.each([false, true])("reports explicit original-uri GET availability: %s", asy
   `);
   expectDiagnosticEmpty(diagnostics);
   const operation = operations.find((o) => o.operation.name === "start")!.operation;
+  const classification = getLroProtocolMetadata(runner.program, operation, {
+    reportDiagnostics: false,
+    resolveOriginalUriGetOperation: false,
+  });
+  ok(classification);
+  strictEqual(classification.completion.originalUriHasGetOperation, undefined);
+  strictEqual(classification.completion.finalStateVia, "original-uri");
+  expectDiagnosticEmpty(runner.program.diagnostics);
+
   const protocol = getLroProtocolMetadata(runner.program, operation);
   ok(protocol);
   strictEqual(protocol.completion.originalUriHasGetOperation, hasGet);
@@ -143,4 +152,59 @@ it("does not infer LRO protocol from an ordinary status-bearing response", async
   expectDiagnosticEmpty(diagnostics);
   strictEqual(getLroProtocolMetadata(runner.program, operations[0].operation), undefined);
   expectDiagnosticEmpty(runner.program.diagnostics);
+});
+
+it("does not re-report returned HTTP diagnostics for a quiet metadata lookup", async () => {
+  const [{ program, start }, diagnostics] = await TesterWithService.compileAndDiagnose(t.code`
+    @route("/jobs") @patch
+    op ${t.op("start")}(@header("content-type") contentType: "application/json"): {
+      @statusCode code: 200;
+      @body value: string;
+    };
+  `);
+  const warning = "@typespec/http/content-type-ignored";
+  const count = () =>
+    program.diagnostics.filter((diagnostic) => diagnostic.code === warning).length;
+  expectDiagnostics(diagnostics, { code: warning });
+  const baseline = count();
+  strictEqual(getLroMetadata(program, start, { reportDiagnostics: false }), undefined);
+  strictEqual(count(), baseline);
+  strictEqual(getLroMetadata(program, start), undefined);
+  ok(count() > baseline);
+});
+
+it("preserves LRO metadata and default reporting when lookup diagnostics are disabled", async () => {
+  const { program, start } = await TesterWithService.compile(t.code`
+    model Status {
+      @lroStatus status: "Succeeded" | "Failed" | "Canceled";
+      @lroResult result: string;
+    }
+    @useFinalStateVia("original-uri")
+    @route("/jobs") @patch op ${t.op("start")}(): {
+      @pollingLocation @header("Operation-Location") location: ResourceLocation<Status>;
+    };
+  `);
+  const classificationOptions = {
+    reportDiagnostics: false,
+    resolveOriginalUriGetOperation: false,
+  };
+  const classification = getLroProtocolMetadata(program, start, classificationOptions);
+  const protocol = getLroProtocolMetadata(program, start, { reportDiagnostics: false });
+  const legacy = getLroMetadata(program, start, classificationOptions);
+  ok(classification);
+  ok(protocol);
+  ok(legacy);
+  strictEqual(classification.completion.originalUriHasGetOperation, undefined);
+  strictEqual(protocol.completion.finalStateVia, legacy.finalStateVia);
+  strictEqual(protocol.completion.originalUriHasGetOperation, false);
+  strictEqual(legacy.finalResult, "void");
+  expectDiagnosticEmpty(program.diagnostics);
+
+  const normal = getLroProtocolMetadata(program, start);
+  ok(normal);
+  strictEqual(normal.completion.finalStateVia, protocol.completion.finalStateVia);
+  strictEqual(normal.completion.originalUriHasGetOperation, false);
+  expectDiagnostics(program.diagnostics, {
+    code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+  });
 });
