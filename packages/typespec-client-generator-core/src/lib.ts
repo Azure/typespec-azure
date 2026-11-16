@@ -55,6 +55,14 @@ export const UnbrandedSdkEmitterOptions = {
         "When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
     },
   },
+  "use-client-name-for-friendly-name-source": {
+    "use-client-name-for-friendly-name-source": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.",
+    },
+  },
   "api-version": {
     "api-version": apiVersionSchema,
   },
@@ -105,6 +113,7 @@ const UnbrandedSdkEmitterOptionsInterfaceSchema: JSONSchemaType<UnbrandedSdkEmit
     properties: {
       ...UnbrandedSdkEmitterOptions["generate-protocol-methods"],
       ...UnbrandedSdkEmitterOptions["generate-convenience-methods"],
+      ...UnbrandedSdkEmitterOptions["use-client-name-for-friendly-name-source"],
       ...UnbrandedSdkEmitterOptions["api-version"],
       ...UnbrandedSdkEmitterOptions["license"],
     },

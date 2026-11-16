@@ -60,6 +60,12 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
+### `use-client-name-for-friendly-name-source`
+
+**Type:** `boolean`
+
+Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.
+
 ### `api-version`
 
 **Type:** `string | object`
