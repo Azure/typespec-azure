@@ -1344,14 +1344,11 @@ extern dec clientOption(
 );
 
 /**
- * Customizes the final result returned by generated clients for a long-running operation without
- * changing the service protocol.
+ * Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
  *
- * Pass the status-monitor or final response model to return the whole response body. Pass a direct
- * property of the status-monitor model to return that property's value.
+ * Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
  *
- * See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results)
- * for more information.
+ * See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
  *
  * @param target The long-running operation to customize.
  * @param result The response model or status-monitor property to return from generated clients.

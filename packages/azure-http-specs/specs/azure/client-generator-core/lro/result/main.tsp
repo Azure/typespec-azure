@@ -59,8 +59,7 @@ op pollDefaultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVersionP
 
 @scenario
 @scenarioDoc("""
-  Verifies that a resource create-or-replace LRO returns the complete resource even when its
-  polling model defines an `@lroResult` property.
+  Verifies that a resource create-or-replace LRO returns the complete resource even when its polling model defines an `@lroResult` property.
   PUT /default/jobs/default with api-version=2022-12-01-preview and body {"status": "Running"}.
   Expect 201 with an Operation-Location pointing to /default/jobs/default/status.
   Poll until status is Succeeded, then GET /default/jobs/default with the same api-version.
@@ -81,8 +80,7 @@ op pollClientResultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVer
 #suppress "@azure-tools/typespec-client-generator-core/use-valid-client-lro-result" "Preserve the return type of an existing GA SDK."
 @scenario
 @scenarioDoc("""
-  Verifies that `@clientLroResult` can preserve an existing SDK contract that returns the
-  established result property of a resource LRO.
+  Verifies that `@clientLroResult` can preserve an existing SDK contract that returns the established result property of a resource LRO.
   PUT /client-result/jobs/client-result with api-version=2022-12-01-preview and body {"status": "Running"}.
   Expect 201 with an Operation-Location pointing to /client-result/jobs/client-result/status.
   Poll until status is Succeeded, then GET /client-result/jobs/client-result with the same api-version.
