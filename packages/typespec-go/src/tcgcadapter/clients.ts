@@ -639,8 +639,8 @@ export class ClientAdapter {
     switch (name.toLowerCase()) {
       case "public":
         return { kind: "wellKnown", cloudName: "AzurePublic" };
-      case "government":
       // cspell:ignore usgovernment
+      case "government":
       case "usgovernment":
         return { kind: "wellKnown", cloudName: "AzureGovernment" };
       case "china":
