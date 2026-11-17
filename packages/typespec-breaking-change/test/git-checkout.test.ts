@@ -1,5 +1,5 @@
 import { execFile } from "child_process";
-import { mkdtemp, mkdir, rm, writeFile } from "fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 import { promisify } from "util";
@@ -76,6 +76,27 @@ describe("git-checkout", () => {
     await expect(resolveCommitish("not-a-real-ref", repoRoot)).rejects.toThrow();
   });
 
+  it("preserves the cause when sparse checkout fails", async () => {
+    await expect(
+      checkoutRevision(baseSha, repoRoot, { sparsePaths: ["../outside"] }),
+    ).rejects.toMatchObject({ cause: expect.any(Error) });
+  });
+
+  it("uses head dependencies even when the baseline manifest differs", async () => {
+    const dependencyPath = join(repoRoot, "node_modules", "fixture");
+    await mkdir(dependencyPath, { recursive: true });
+    await writeFile(join(dependencyPath, "package.json"), '{"version":"2.0.0"}');
+    await writeFile(join(repoRoot, "package.json"), '{"dependencies":{"fixture":"2.0.0"}}');
+    const { worktreePath, cleanup } = await checkoutRevision(baseSha, repoRoot);
+    try {
+      const { readFile } = await import("fs/promises");
+      expect(
+        await readFile(join(worktreePath, "node_modules", "fixture", "package.json"), "utf8"),
+      ).toBe('{"version":"2.0.0"}');
+    } finally {
+      await cleanup();
+    }
+  });
   it("checks out a base revision into an isolated worktree without touching the caller's working tree", async () => {
     const specDir = join(repoRoot, "specification", "widget");
     const headContentPath = join(specDir, "main.tsp");
@@ -141,7 +162,9 @@ describe("git-checkout", () => {
     await writeFile(join(otherDir, "main.tsp"), "// other service\n");
     await execFileAsync("git", ["add", "."], { cwd: repoRoot });
     await execFileAsync("git", ["commit", "-m", "add other-service"], { cwd: repoRoot });
-    const sha = (await execFileAsync("git", ["rev-parse", "HEAD"], { cwd: repoRoot })).stdout.trim();
+    const sha = (
+      await execFileAsync("git", ["rev-parse", "HEAD"], { cwd: repoRoot })
+    ).stdout.trim();
 
     const { worktreePath, cleanup } = await checkoutRevision(sha, repoRoot, {
       sparsePaths: ["specification/widget"],
