@@ -209,6 +209,14 @@ describe("expect all rules to be defined", () => {
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
   });
 
+  it("keeps tracked resource operation guidance opt-in in the central ruleset", () => {
+    const ruleName =
+      "@azure-tools/typespec-azure-resource-manager/tracked-resource-missing-operations";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
+
   it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
     const name = "lro-missing-polling-metadata";
     strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);

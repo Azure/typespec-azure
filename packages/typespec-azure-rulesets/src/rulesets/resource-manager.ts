@@ -101,6 +101,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/no-resource-duplicates": false,
     "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict": false,
     "@azure-tools/typespec-azure-resource-manager/resource-missing-read": false,
+    "@azure-tools/typespec-azure-resource-manager/tracked-resource-missing-operations": false,
     "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
