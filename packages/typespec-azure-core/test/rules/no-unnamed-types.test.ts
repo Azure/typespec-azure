@@ -112,6 +112,101 @@ describe("response bodies", () => {
     code: "@azure-tools/typespec-azure-core/no-unnamed-types",
     message: "Anonymous model should be defined as a named model declaration.",
   };
+  const instanceDiagnostic = (name: string) => ({
+    code: diagnostic.code,
+    message: `Response model '${name}' should be defined as a named model declaration or a template with @friendlyName.`,
+  });
+
+  describe("concrete response model names", () => {
+    it.each([
+      ["", "Record<string>", "Record<string>"],
+      ["model Result<T> { value: T; @header etag: string; }", "Result<string>", "Result<string>"],
+      [
+        "model Result<T> { value: T; @statusCode status: 200; }",
+        "Result<string>",
+        "Result<string>",
+      ],
+      ["model Result<T> extends Record<T> {}", "Result<string>", "Result<string>"],
+      [
+        "model Result<T> { ...Record<T>; @header etag: string; }",
+        "Result<string>",
+        "Result<string>",
+      ],
+      ["alias Settings = Record<string>;", "Settings", "Record<string>"],
+      ["model Result<T> { value: T; }", "Result<string>", "Result<string>"],
+      [
+        "model Base { value: string; } model Result<T> extends Base {}",
+        "Result<string>",
+        "Result<string>",
+      ],
+      ['@friendlyName("") model Result<T> { value: T; }', "Result<string>", "Result<string>"],
+      [
+        "model Result<T> { value: T; } alias StringResult = Result<string>;",
+        "StringResult",
+        "Result<string>",
+      ],
+    ])("requires a concrete payload name: %s %s", async (declarations, response, name) => {
+      await tester
+        .expect(`${declarations} @get op /*target*/read(): ${response};`)
+        .toEmitDiagnostics((x) => ({ ...instanceDiagnostic(name), pos: x.pos.target.pos }));
+    });
+
+    it.each([
+      "model Settings is Record<string>; @get op read(): Settings;",
+      "model Result<T> { value: T; } model StringResult is Result<string>; @get op read(): StringResult;",
+      "model Result<T> { value: T; } model StringResult extends Result<string> { @header etag: string; } @get op read(): StringResult;",
+      "model Result<T> { value: T; } model StringResult is Result<string>; alias ReadResult = StringResult; @get op read(): ReadResult;",
+      '@friendlyName("{name}Result", T) model Result<T> { value: T; } model Widget { name: string; } @get op read(): Result<Widget>;',
+      '@friendlyName("{name}Result", T) model Result<T> { value: T; } model Widget { name: string; } alias ReadResult = Result<Widget>; @get op read(): ReadResult;',
+      "model Widget { name: string; } @get op read(): Page<Widget>;",
+      "model Empty<T> {} @get op read(): Empty<string>;",
+      "model Items<T> extends Array<T> {} @get op read(): Items<string>;",
+      "model Metadata<T> { @header etag: string; } @get op read(): Metadata<string>;",
+      "model Result<T> { value: T; } model Container { result: Result<string>; } @post op send(@body body: Result<string>): Container;",
+    ])("preserves compliant and out-of-scope uses: %s", async (code) => {
+      await tester.expect(code).toBeValid();
+    });
+
+    it.each(["body", "bodyRoot"])("checks an explicit @%s generic payload", async (body) => {
+      await tester
+        .expect(`@get op /*target*/read(): { @${body} body: Record<string> };`)
+        .toEmitDiagnostics((x) => ({
+          ...instanceDiagnostic("Record<string>"),
+          pos: x.pos.target.pos,
+        }));
+    });
+
+    it("does not mistake a named envelope for a named payload", async () => {
+      await tester
+        .expect(
+          `
+          model Result<T> { value: T; }
+          model Envelope<T> { @statusCode status: 200; @bodyRoot body: T; }
+          model NamedEnvelope is Envelope<Result<string>>;
+          @get op /*target*/read(): NamedEnvelope;
+        `,
+        )
+        .toEmitDiagnostics((x) => ({
+          ...instanceDiagnostic("Result<string>"),
+          pos: x.pos.target.pos,
+        }));
+    });
+
+    it("deduplicates one generic payload across response alternatives", async () => {
+      await tester
+        .expect(
+          `
+          @get op /*target*/read():
+            { @statusCode status: 200; @body body: Record<string>; } |
+            { @statusCode status: 201; @body body: Record<string>; };
+        `,
+        )
+        .toEmitDiagnostics((x) => ({
+          ...instanceDiagnostic("Record<string>"),
+          pos: x.pos.target.pos,
+        }));
+    });
+  });
 
   it.each([
     "@get op read(): /*target*/{ value: string };",
@@ -138,7 +233,6 @@ describe("response bodies", () => {
     "@get op read(): void;",
     "@get op read(): string;",
     "@get op read(): string[];",
-    "@get op read(): Record<string>;",
     "model Result { values: Record<{ value: string }> } @get op read(): Result;",
   ])("accepts named responses and bodies outside the rule's scope: %s", async (code) => {
     await tester.expect(code).toBeValid();
@@ -157,7 +251,7 @@ describe("response bodies", () => {
       .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
   });
 
-  it("accepts a named response inherited from a concrete interface template", async () => {
+  it("checks a generic response inherited from a concrete interface template", async () => {
     await tester
       .expect(
         `
@@ -165,10 +259,13 @@ describe("response bodies", () => {
         interface Templates<T> {
           @get @route("/widgets") read(): Result<T>;
         }
-        interface Widgets extends Templates<string> {}
+        interface /*target*/Widgets extends Templates<string> {}
         `,
       )
-      .toBeValid();
+      .toEmitDiagnostics((x) => ({
+        ...instanceDiagnostic("Result<string>"),
+        pos: x.pos.target.pos,
+      }));
   });
 
   describe("imported response templates", () => {
@@ -185,6 +282,9 @@ describe("response bodies", () => {
           namespace ResponseTemplates;
           model Result<T> { value: T; }
           @get op read<T>(): T;
+          interface Reads<T> {
+            @get @route("/widgets") read(): Result<T>;
+          }
         `,
       })
         .import("response-templates")
@@ -197,16 +297,28 @@ describe("response bodies", () => {
       );
     });
 
-    it("accepts a named generic response from a library operation template", async () => {
+    it("targets a project operation using a library generic response", async () => {
       await tester
-        .expect("op read is ResponseTemplates.read<ResponseTemplates.Result<string>>;")
-        .toBeValid();
+        .expect("op /*target*/read is ResponseTemplates.read<ResponseTemplates.Result<string>>;")
+        .toEmitDiagnostics((x) => ({
+          ...instanceDiagnostic("Result<string>"),
+          pos: x.pos.target.pos,
+        }));
     });
 
     it("reports an anonymous response passed to a library operation template", async () => {
       await tester
         .expect("op read is ResponseTemplates.read</*target*/{ value: string }>;")
         .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+    });
+
+    it("targets a project interface inheriting a library generic response", async () => {
+      await tester
+        .expect("interface /*target*/Widgets extends ResponseTemplates.Reads<string> {}")
+        .toEmitDiagnostics((x) => ({
+          ...instanceDiagnostic("Result<string>"),
+          pos: x.pos.target.pos,
+        }));
     });
   });
 
@@ -316,7 +428,7 @@ describe("response bodies", () => {
       {
         name: "non-model alternatives",
         declarations: "",
-        result: `${first} | string | string[] | Record<string> | null`,
+        result: `${first} | string | string[] | null`,
         targets: ["first"],
       },
     ])("$name", ({ declarations, result, targets, prefix }) => {

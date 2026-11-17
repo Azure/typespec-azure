@@ -3,6 +3,32 @@ import { createLinterRuleTester } from "@typespec/compiler/testing";
 import { it } from "vitest";
 import { Tester } from "../tester.js";
 
+it.each(["ArmResourceRead", "ArmListBySubscription"])(
+  "accepts standard %s payload names without naming the HTTP envelope",
+  async (operation) => {
+    const runner = await Tester.createInstance();
+    const tester = createLinterRuleTester(
+      runner,
+      $linter.rules!.find((rule) => rule.name === "no-unnamed-types")!,
+      "@azure-tools/typespec-azure-core",
+    );
+    await tester
+      .expect(
+        `
+      @service @armProviderNamespace("Microsoft.Contoso") namespace Microsoft.Contoso;
+      model WidgetProperties { name: string; }
+      model Widget is TrackedResource<WidgetProperties> {
+        ...ResourceNameParameter<Widget>;
+      }
+      @armResourceOperations interface Widgets {
+        read is ${operation}<Widget>;
+      }
+    `,
+      )
+      .toBeValid();
+  },
+);
+
 it.each([false, true])("checks customized ARM read responses; named payload: %s", async (named) => {
   const runner = await Tester.createInstance();
   const tester = createLinterRuleTester(
