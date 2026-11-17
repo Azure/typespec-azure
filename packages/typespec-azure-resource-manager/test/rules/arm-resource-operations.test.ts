@@ -93,7 +93,8 @@ it("emits diagnostics if response type of list operation is different from resou
 
         @armResourceOperations
         interface FooResources {
-          @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
+          read is ArmResourceRead<FooResource>;
+          listBySubscription is ArmListBySubscription<FooResource, Response = ArmResponse<ResourceListResult<BarResource>>>;
         }
       `,
     )
@@ -101,4 +102,234 @@ it("emits diagnostics if response type of list operation is different from resou
       code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
       message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
     });
+});
+
+it("checks lifecycle operations for the same resource at multiple scopes", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model BarResource is TrackedResource<{}> {
+        ...ResourceNameParameter<BarResource>;
+      }
+
+      interface ResourceGroupFoos {
+        @route("/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Foo/foos/{name}")
+        @get @armResourceRead(FooResource)
+        op read(@path sub: string, @path rg: string, @path name: string): ArmResponse<BarResource> | ErrorResponse;
+      }
+      interface SubscriptionFoos {
+        @route("/subscriptions/{sub}/providers/Microsoft.Foo/foos/{name}")
+        @get @armResourceRead(FooResource)
+        op read(@path sub: string, @path name: string): ArmResponse<BarResource> | ErrorResponse;
+      }
+      `,
+    )
+    .toEmitDiagnostics([
+      { code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" },
+      { code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" },
+    ]);
+});
+
+it("checks same-named resource lists at multiple scopes", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model FooSummary { name: string; }
+      model FooListResult { @pageItems value: FooSummary[]; }
+
+      interface ResourceGroupFoos {
+        @route("/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Foo/foos/{name}")
+        @get @armResourceRead(FooResource)
+        op read(@path sub: string, @path rg: string, @path name: string): FooResource;
+        @route("/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Foo/foos")
+        @get @armResourceList(FooResource)
+        op list(@path sub: string, @path rg: string): FooListResult;
+      }
+      interface SubscriptionFoos {
+        @route("/subscriptions/{sub}/providers/Microsoft.Foo/foos/{name}")
+        @get @armResourceRead(FooResource)
+        op read(@path sub: string, @path name: string): FooResource;
+        @route("/subscriptions/{sub}/providers/Microsoft.Foo/foos")
+        @get @armResourceList(FooResource)
+        op list(@path sub: string): FooListResult;
+      }
+      `,
+    )
+    .toEmitDiagnostics([
+      { code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" },
+      { code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" },
+    ]);
+});
+
+it("does not check list-only operations without a resolved resource identity", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model FooSummary { name: string; }
+      model FooListResult { @pageItems value: FooSummary[]; }
+
+      @armResourceOperations
+      interface FooResources {
+        list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("checks the existing resource return-type rule without a 200 or 201 list response", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model BarResource is TrackedResource<{}> {
+        ...ResourceNameParameter<BarResource>;
+      }
+      model AcceptedList<Resource extends Foundations.SimpleResource> {
+        @statusCode statusCode: 202;
+        @bodyRoot body: ResourceListResult<Resource>;
+      }
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        list is ArmListBySubscription<FooResource, Response = AcceptedList<BarResource>>;
+      }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+    });
+});
+
+it.each(["FooSummary[]", "BarResource[]", "string[]", "string"])(
+  "reports an invalid resource list value of %s",
+  async (valueType) => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        namespace Microsoft.Foo;
+
+        model FooResource is TrackedResource<{}> {
+          ...ResourceNameParameter<FooResource>;
+        }
+        model FooSummary { name: string; }
+        model BarResource is TrackedResource<{}> {
+          ...ResourceNameParameter<BarResource>;
+        }
+        model FooListResult { @pageItems items: FooResource[]; value: ${valueType}; }
+
+        @armResourceOperations
+        interface FooResources {
+          read is ArmResourceRead<FooResource>;
+          /*target*/list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+        }
+        `,
+      )
+      .toEmitDiagnostics((result) => ({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+        message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+        pos: result.pos.target.pos,
+      }));
+  },
+);
+
+it("accepts a resource list with an inherited value array", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model BaseList { @pageItems value: FooResource[]; }
+      model FooListResult extends BaseList {}
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toBeValid();
+});
+
+it("reports a resource list without a value array", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model FooListResult { @pageItems items: FooResource[]; }
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        /*target*/list is ArmListBySubscription<FooResource, Response = ArmResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toEmitDiagnostics((result) => ({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+      pos: result.pos.target.pos,
+    }));
+});
+
+it("checks a 201 response when there is no 200 response", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Foo;
+
+      model FooResource is TrackedResource<{}> {
+        ...ResourceNameParameter<FooResource>;
+      }
+      model FooSummary { name: string; }
+      model FooListResult { @pageItems value: FooSummary[]; }
+
+      @armResourceOperations
+      interface FooResources {
+        read is ArmResourceRead<FooResource>;
+        /*target*/list is ArmListBySubscription<FooResource, Response = ArmCreatedResponse<FooListResult>>;
+      }
+      `,
+    )
+    .toEmitDiagnostics((result) => ({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+      pos: result.pos.target.pos,
+    }));
 });
