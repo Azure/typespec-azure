@@ -1,4 +1,4 @@
-For a resource LRO, the model or property selected by `@clientLroResult` should have the resource type. A resource DELETE LRO should have no result.
+For a resource LRO, the model or property selected by `@clientLroResult` should have the resource type. Resource DELETE LROs should return no result and should not use `@clientLroResult` unless preserving an existing SDK contract.
 
 These examples assume `start` is a resource lifecycle LRO whose `Job` polling response has a `result: Payload` property.
 
