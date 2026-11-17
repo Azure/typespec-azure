@@ -238,4 +238,11 @@ describe("expect all rules to be defined", () => {
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
   });
+
+  it("keeps provider namespace casing guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/provider-namespace-pascal-case";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
 });
