@@ -300,7 +300,14 @@ function mergeParameterTypeExpressions(types: string[]): string {
 }
 
 function escapeTemplateLiteralChunk(text: string): string {
-  return text.replaceAll("\\", "\\\\").replaceAll("`", "\\`").replaceAll("${", "\\${");
+  return text
+    .replaceAll("\\", "\\\\")
+    .replaceAll("`", "\\`")
+    .replaceAll("${", "\\${")
+    .replaceAll("\r", "\\r")
+    .replaceAll("\n", "\\n")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
 }
 
 function escapeRegExp(text: string): string {
@@ -327,7 +334,7 @@ export function buildConfigurationEndpointExpression(
   }
 
   if (usedParamNames.length === 0) {
-    return `() => ${JSON.stringify(cfg.serverUrl)}`;
+    return `() => \`${escapeTemplateLiteralChunk(cfg.serverUrl)}\``;
   }
 
   const placeholderPattern = [...placeholderToParamName.keys()]
@@ -358,8 +365,11 @@ export function buildConfigurationEndpointExpression(
       tp.uniformDefault === undefined &&
       tp.perConfigDefaults.get(cfg.name) === undefined
     ) {
+      const errorMessage = escapeTemplateLiteralChunk(
+        `Required parameter "${paramName}" must be provided in options for serviceConfiguration "${cfg.name}".`,
+      );
       requiredChecks.push(
-        `if (${paramName} === undefined) { throw new Error(${JSON.stringify(`Required parameter "${paramName}" must be provided in options for serviceConfiguration "${cfg.name}".`)}); }`,
+        `if (${paramName} === undefined) { throw new Error(\`${errorMessage}\`); }`,
       );
     }
   }
