@@ -31,6 +31,7 @@ import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import {
+  buildConfigurationEndpointExpression,
   collectServiceConfigurationTemplateParams,
   getClientServiceConfigurations,
   type ResolvedServiceConfigurations,
@@ -77,6 +78,20 @@ export function buildClientContext(
     getClientContextPath(clientMap, emitterOptions),
   );
 
+  const classicalClientName = getClassicalClientName(client);
+  const serviceConfigs = getClientServiceConfigurations(client);
+  const mergedTemplateTypes =
+    serviceConfigs?.endpointMode === "templated"
+      ? new Map(
+          collectServiceConfigurationTemplateParams(
+            dpgContext,
+            serviceConfigs,
+            getClientParameterName,
+            getClientParameterTypeExpression,
+          ).map((tp) => [tp.paramName, tp.typeExpression]),
+        )
+      : undefined;
+
   // Get all client parameters (both required and optional) for the interface
   const requiredInterfaceProperties = getClientParameters(client, dpgContext, {
     onClientOnly: false,
@@ -87,9 +102,10 @@ export function buildClientContext(
       return clientParamName !== "endpointParam" && clientParamName !== "credential";
     })
     .map((p) => {
+      const clientParamName = getClientParameterName(p);
       return {
-        name: getClientParameterName(p),
-        type: getTypeExpression(dpgContext, p.type),
+        name: clientParamName,
+        type: mergedTemplateTypes?.get(clientParamName) ?? getTypeExpression(dpgContext, p.type),
         hasQuestionToken: false,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -112,9 +128,10 @@ export function buildClientContext(
       );
     })
     .map((p) => {
+      const clientParamName = getClientParameterName(p);
       return {
-        name: getClientParameterName(p),
-        type: getTypeExpression(dpgContext, p.type),
+        name: clientParamName,
+        type: mergedTemplateTypes?.get(clientParamName) ?? getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -128,8 +145,6 @@ export function buildClientContext(
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
   });
 
-  const classicalClientName = getClassicalClientName(client);
-  const serviceConfigs = getClientServiceConfigurations(client);
   const credentialsEnabled = emitterOptions.options.addCredentials !== false;
   if (serviceConfigs) {
     clientContextFile.addTypeAlias({
@@ -210,11 +225,15 @@ export function buildClientContext(
         getClientParameterTypeExpression,
       );
       for (const tp of templateParams) {
-        if (
-          tp.optional &&
-          !existingOptionNames.has(tp.paramName) &&
-          !requiredParams.some((rp) => rp.name === tp.paramName)
-        ) {
+        if (!tp.optional || requiredParams.some((rp) => rp.name === tp.paramName)) {
+          continue;
+        }
+        const existingProp = propertiesInOptions.find((prop) => prop.name === tp.paramName);
+        if (existingProp) {
+          if (tp.paramName.toLowerCase() !== "apiversion") {
+            existingProp.type = tp.typeExpression;
+          }
+        } else if (!existingOptionNames.has(tp.paramName)) {
           propertiesInOptions.push({
             name: tp.paramName,
             type: tp.typeExpression,
@@ -302,7 +321,16 @@ export function buildClientContext(
     client,
     serviceConfigs,
   );
-  const credentialParam = buildGetClientCredentialParam(client, emitterOptions, serviceConfigs);
+  const isKeyCredentialExpr =
+    serviceConfigs?.hasCustomHttpAuth && credentialsEnabled
+      ? resolveReference(dependencies.isKeyCredential)
+      : undefined;
+  const credentialParam = buildGetClientCredentialParam(
+    client,
+    emitterOptions,
+    serviceConfigs,
+    isKeyCredentialExpr,
+  );
 
   // Get api version param early so we can use its name when building options
   const apiVersionParam = getClientParameters(client, dpgContext).find((x) => x.isApiVersionParam);
@@ -331,18 +359,22 @@ export function buildClientContext(
   const { customHttpAuthHeaderName, customHttpAuthSharedKeyPrefix } = emitterOptions.options;
 
   if (serviceConfigs && serviceConfigs.hasCustomHttpAuth && credentialsEnabled) {
+    const credParam = client.clientInitialization.parameters.find(
+      (x): x is SdkCredentialParameter => x.kind === "credential",
+    );
+    const credVarName = credParam ? getClientParameterName(credParam) : "credential";
     factoryFunction.addStatements(`
       if (
         selectedConfiguration.customHttpAuthHeaderName &&
         selectedConfiguration.customHttpAuthSharedKeyPrefix &&
-        ${resolveReference(dependencies.isKeyCredential)}(credential)
+        ${resolveReference(dependencies.isKeyCredential)}(${credVarName})
       ) {
         const headerName = selectedConfiguration.customHttpAuthHeaderName;
         const keyPrefix = selectedConfiguration.customHttpAuthSharedKeyPrefix;
         clientContext.pipeline.addPolicy({
           name: "customKeyCredentialPolicy",
           sendRequest(request, next) {
-            request.headers.set(headerName, keyPrefix + " " + credential.key);
+            request.headers.set(headerName, keyPrefix + " " + ${credVarName}.key);
             return next(request);
           }
         });
@@ -498,6 +530,7 @@ function emitServiceConfigurationsLookup(
     typeFields.push("customHttpAuthSharedKeyPrefix?: string");
   }
 
+  const templateParamByName = new Map(templateParams.map((tp) => [tp.paramName, tp]));
   const entryObjectTexts = serviceConfigs.configurations.map((cfg) => {
     const props: string[] = [];
     if (serviceConfigs.endpointMode === "fixed") {
@@ -512,18 +545,9 @@ function emitServiceConfigurationsLookup(
           .filter((x): x is string => Boolean(x));
         props.push(`defaults: { ${defaultProps.join(", ")} }`);
       }
-      const usedParams = templateParams.filter((tp) => cfg.serverUrl.includes(`{${tp.rawName}}`));
-      if (usedParams.length === 0) {
-        props.push(`buildEndpoint: () => ${JSON.stringify(cfg.serverUrl)}`);
-      } else {
-        let templateLiteral = cfg.serverUrl.replace(/`/g, "\\`");
-        for (const tp of usedParams) {
-          templateLiteral = templateLiteral.replaceAll(`{${tp.rawName}}`, `\${${tp.paramName}}`);
-        }
-        props.push(
-          `buildEndpoint: ({ ${usedParams.map((tp) => tp.paramName).join(", ")} }) => \`${templateLiteral}\``,
-        );
-      }
+      props.push(
+        `buildEndpoint: ${buildConfigurationEndpointExpression(cfg, templateParamByName, getClientParameterName)}`,
+      );
     }
 
     if (credentialsEnabled && serviceConfigs.hasOAuth2) {

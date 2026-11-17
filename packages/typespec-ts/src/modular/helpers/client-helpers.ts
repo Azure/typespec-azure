@@ -22,6 +22,7 @@ import { getTypeExpression } from "../type-expressions/get-type-expression.js";
 import { getClassicalClientName } from "./naming-helpers.js";
 import {
   collectServiceConfigurationTemplateParams,
+  getClientServiceConfigurations,
   type ResolvedServiceConfigurations,
 } from "./service-configuration-helpers.js";
 import { isCredentialType } from "./type-helpers.js";
@@ -124,14 +125,28 @@ export function getClientParametersDeclaration(
     initializer: "{}",
   };
 
+  const serviceConfigs = getClientServiceConfigurations(client);
+  const mergedTemplateTypes =
+    serviceConfigs?.endpointMode === "templated"
+      ? new Map(
+          collectServiceConfigurationTemplateParams(
+            dpgContext,
+            serviceConfigs,
+            getClientParameterName,
+            getClientParameterTypeExpression,
+          ).map((tp) => [tp.paramName, tp.typeExpression]),
+        )
+      : undefined;
+
   const params: OptionalKind<ParameterDeclarationStructure>[] = [
     ...getClientParameters(client, dpgContext, options).map<
       OptionalKind<ParameterDeclarationStructure>
     >((p) => {
-      const typeExpression = getClientParameterTypeExpression(dpgContext, p);
-      const name = getClientParameterName(p);
+      const paramName = getClientParameterName(p);
+      const typeExpression =
+        mergedTemplateTypes?.get(paramName) ?? getClientParameterTypeExpression(dpgContext, p);
       return {
-        name,
+        name: paramName,
         type: typeExpression,
       };
     }),
@@ -341,15 +356,28 @@ export function buildGetClientCredentialParam(
   client: SdkClientType<SdkServiceOperation>,
   emitterOptions: ModularEmitterOptions,
   serviceConfigs?: ResolvedServiceConfigurations,
+  isKeyCredentialExpr?: string,
 ): string {
   if (
     emitterOptions.options.addCredentials !== false &&
     serviceConfigs &&
     serviceConfigs.hasCredentials
   ) {
-    return (
-      client.clientInitialization.parameters.find((x) => isCredentialType(x))?.name ?? "undefined"
-    );
+    const credParam = client.clientInitialization.parameters.find((x) => isCredentialType(x));
+    const credParamName = credParam ? getClientParameterName(credParam) : undefined;
+    if (!credParamName) {
+      return "undefined";
+    }
+    if (!serviceConfigs.hasOAuth2 && !serviceConfigs.hasApiKeyAuth) {
+      return "undefined";
+    }
+    if (serviceConfigs.hasCustomHttpAuth && isKeyCredentialExpr) {
+      const missingApiKeyGuard = serviceConfigs.hasApiKeyAuth
+        ? "!selectedConfiguration.apiKeyHeaderName && !options.credentials?.apiKeyHeaderName"
+        : "!options.credentials?.apiKeyHeaderName";
+      return `${isKeyCredentialExpr}(${credParamName}) && ${missingApiKeyGuard} ? undefined : ${credParamName}`;
+    }
+    return credParamName;
   }
   if (
     emitterOptions.options.addCredentials &&
