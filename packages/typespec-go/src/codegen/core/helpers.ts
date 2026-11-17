@@ -1023,6 +1023,23 @@ export function getBitSizeForNumber(
   }
 }
 
+/** returns the discriminator decoder name for an interface or a collection of interfaces */
+export function getDiscriminatorUnmarshallerName(type: go.WireType): string {
+  switch (type.kind) {
+    case "interface":
+      return `unmarshal${type.name}`;
+    case "slice":
+      return `${getDiscriminatorUnmarshallerName(type.itemType)}Array`;
+    case "map":
+      return `${getDiscriminatorUnmarshallerName(type.itemType)}Map`;
+    default:
+      throw new CodegenError(
+        "InternalError",
+        `unsupported discriminator decoder type ${type.kind}`,
+      );
+  }
+}
+
 // returns the underlying map/slice element/value type
 // if item isn't a map or slice, item is returned
 export function recursiveUnwrapMapSlice(item: go.WireType): go.WireType {
@@ -1093,7 +1110,9 @@ export function getSerDeFormat(
     type = recursiveUnwrapMapSlice(type);
     switch (type.kind) {
       case "interface":
-        recursiveWalkModelFields(type.rootType, serDeFormat);
+        if (type.rootType) {
+          recursiveWalkModelFields(type.rootType, serDeFormat);
+        }
         for (const possibleType of type.possibleTypes) {
           recursiveWalkModelFields(possibleType, serDeFormat);
         }
