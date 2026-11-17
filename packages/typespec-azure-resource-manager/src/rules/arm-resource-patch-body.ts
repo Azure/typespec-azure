@@ -20,14 +20,12 @@ import {
   type HttpOperation,
   type MetadataInfo,
 } from "@typespec/http";
-import { createPatchPropertyCompatibility } from "./arm-resource-patch-compatibility.js";
 import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
 export const patchBodyMessages = {
   missingPatchBody: "The PATCH operation must have a request body.",
   emptyPatchBody: "The PATCH request body must contain at least one property.",
   missingProperty: paramMessage`The property '${"propertyName"}' in the PATCH body does not correspond to a property in the PUT body.`,
-  incompatibleProperty: paramMessage`The property '${"propertyName"}' in the PATCH body must preserve the format and bounds of its corresponding PUT property.`,
 };
 
 export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMessages>) {
@@ -82,51 +80,35 @@ export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMes
             continue;
           }
           const putBody = put.parameters.body?.type;
-          const putProperties = new Map<string, LeafProperty[]>();
+          const putProperties = new Set<string>();
           if (putBody !== undefined && !isVoidType(putBody)) {
             if (put.parameters.body?.bodyKind !== "single" || !isObjectBody(putBody)) {
               continue;
             }
             for (const property of collectLeafProperties(program, putBody, put, metadataInfo)) {
-              const candidates = putProperties.get(property.jsonName) ?? [];
-              candidates.push(property);
-              putProperties.set(property.jsonName, candidates);
+              putProperties.add(property.jsonName);
             }
           }
-          const compatible = createPatchPropertyCompatibility(program);
           for (const patchProperty of patchProperties) {
-            const candidates =
+            const hasPutProperty =
               !patchProperty.recursive &&
               isObjectBody(patchProperty.property.type) &&
               putBody !== undefined
-                ? findPropertiesAtPath(
-                    program,
-                    putBody,
-                    patchProperty.jsonPath,
-                    put,
-                    metadataInfo,
-                  ).map((property) => ({ property, recursive: false }))
-                : (putProperties.get(patchProperty.jsonName) ?? []);
-            if (
-              candidates.some(
-                (candidate) =>
-                  (patchProperty.recursive && candidate.recursive) ||
-                  compatible(patchProperty.property, candidate.property),
-              )
-            ) {
+                ? findPropertiesAtPath(program, putBody, patchProperty.jsonPath, put, metadataInfo)
+                    .length > 0
+                : putProperties.has(patchProperty.jsonName);
+            if (hasPutProperty) {
               continue;
             }
-            const messageId = candidates.length > 0 ? "incompatibleProperty" : "missingProperty";
-            const reportKey = `${messageId}:${patchProperty.jsonName}`;
             const reportedNames = missingProperties.get(patchProperty.target) ?? new Set();
-            if (reportedNames.has(reportKey)) {
+            if (reportedNames.has(patchProperty.jsonName)) {
               continue;
             }
-            reportedNames.add(reportKey);
+            reportedNames.add(patchProperty.jsonName);
             missingProperties.set(patchProperty.target, reportedNames);
             context.reportDiagnostic({
               target: patchProperty.target,
-              messageId,
+              messageId: "missingProperty",
               format: { propertyName: patchProperty.jsonName },
             });
           }
