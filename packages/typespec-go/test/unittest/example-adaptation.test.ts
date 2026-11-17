@@ -5,6 +5,43 @@ import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
 describe("Example adaptation", () => {
+  it("preserves acronyms in generated example function suffixes", async () => {
+    const titles = [
+      [
+        "Creates a DocumentDB cluster with PremiumSSDv2 storage",
+        "createsADocumentDBClusterWithPremiumSSDv2Storage",
+      ],
+      [
+        "Updates a CosmosDB cluster with PremiumSSD storage",
+        "updatesACosmosDBClusterWithPremiumSSDStorage",
+      ],
+      ["Enables DataAPI with Entra ID", "enablesDataAPIWithEntraID"],
+    ];
+    const files = await emitGoFor(
+      `
+        @service namespace Test;
+        @route("/input") @put op put(): void;
+      `,
+      { "generate-samples": true },
+      Object.fromEntries(
+        titles.map(([title], index) => [
+          `examples/put-${index}.json`,
+          JSON.stringify({
+            operationId: "put",
+            title,
+            parameters: {},
+            responses: { "204": {} },
+          }),
+        ]),
+      ),
+    );
+    const example = [...files].find(([name]) => name.endsWith("_example_test.go"))?.[1];
+    expect(example).toBeDefined();
+    for (const [, suffix] of titles) {
+      expect(example).toContain(`_Put_${suffix}() {`);
+    }
+  });
+
   it.each([false, true])(
     "passes synthesized discriminated arguments by reference (legacy: %s)",
     async (legacy) => {
