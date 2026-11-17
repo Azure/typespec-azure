@@ -475,7 +475,7 @@ export class ClientAdapter {
     const defaultConfig = catalog.configurations[0];
     const usesCloudEndpoint = !isCallerSuppliedEndpoint(defaultConfig.endpoint);
 
-    // verify that all configurations use compatible endpoint modes and template arguments
+    // verify that all configurations use a consistent endpoint mode
     for (const config of catalog.configurations) {
       if (!isCallerSuppliedEndpoint(config.endpoint) !== usesCloudEndpoint) {
         throw new AdapterError(
@@ -483,39 +483,6 @@ export class ClientAdapter {
           "service configurations must consistently use either cloud endpoints or an explicit endpoint parameter",
           sdkClient.__raw.type,
         );
-      }
-      if (!usesCloudEndpoint && config.endpoint.serverUrl !== defaultConfig.endpoint.serverUrl) {
-        throw new AdapterError(
-          "UnsupportedTsp",
-          "caller-supplied endpoint service configurations must share the same endpoint template",
-          sdkClient.__raw.type,
-        );
-      }
-      if (
-        config.endpoint.templateArguments.length !== defaultConfig.endpoint.templateArguments.length
-      ) {
-        throw new AdapterError(
-          "UnsupportedTsp",
-          "service configurations must define matching endpoint parameters across clouds",
-          sdkClient.__raw.type,
-        );
-      }
-      for (let i = 0; i < defaultConfig.endpoint.templateArguments.length; ++i) {
-        const expectedArg = defaultConfig.endpoint.templateArguments[i];
-        const actualArg = config.endpoint.templateArguments[i];
-        if (
-          actualArg.name !== expectedArg.name ||
-          actualArg.serializedName !== expectedArg.serializedName ||
-          actualArg.optional !== expectedArg.optional ||
-          actualArg.clientDefaultValue !== expectedArg.clientDefaultValue ||
-          actualArg.type.kind !== expectedArg.type.kind
-        ) {
-          throw new AdapterError(
-            "UnsupportedTsp",
-            `service configuration "${config.name}" defines incompatible endpoint parameter "${actualArg.name}"`,
-            actualArg.__raw?.node ?? sdkClient.__raw.type,
-          );
-        }
       }
     }
 
@@ -673,6 +640,7 @@ export class ClientAdapter {
       case "public":
         return { kind: "wellKnown", cloudName: "AzurePublic" };
       case "government":
+      // cspell:ignore usgovernment
       case "usgovernment":
         return { kind: "wellKnown", cloudName: "AzureGovernment" };
       case "china":

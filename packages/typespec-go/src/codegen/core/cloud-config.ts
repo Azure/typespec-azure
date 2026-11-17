@@ -63,10 +63,15 @@ export function generateCloudConfig(module: go.Module, target: go.CodeModelType)
         }
       }
     }
-    for (const constructor of client.instance.constructors) {
-      for (const param of constructor.parameters) {
-        if (param.kind === "credentialParam" && param.type.kind === "tokenCredential") {
-          tokenCred = param.type;
+    if (!tokenCred) {
+      for (const constructor of client.instance.constructors) {
+        for (const param of constructor.parameters) {
+          if (param.kind === "credentialParam" && param.type.kind === "tokenCredential") {
+            tokenCred = param.type;
+            break;
+          }
+        }
+        if (tokenCred) {
           break;
         }
       }

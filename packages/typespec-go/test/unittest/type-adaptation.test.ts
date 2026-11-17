@@ -147,4 +147,38 @@ describe("Recursive type adaptation", () => {
       expect(polymorphics).toContain('case "cat":');
     },
   );
+
+  it("rejects service configurations with mismatched OAuth2 scope suffixes", async () => {
+    await expect(
+      emitGoFor(`
+        @service
+        @azureServiceConfigurations(Configurations)
+        namespace Test;
+
+        model PublicCustomScope is OAuth2Auth<[{
+          type: OAuth2FlowType.clientCredentials;
+          tokenUrl: "https://login.example.com/public/token";
+          scopes: ["https://public.example.com/.default"];
+        }]>;
+        model GovCustomScope is OAuth2Auth<[{
+          type: OAuth2FlowType.clientCredentials;
+          tokenUrl: "https://login.example.com/government/token";
+          scopes: ["https://government.example.com/user_impersonation"];
+        }]>;
+
+        const Configurations: Record<AzureServiceConfiguration> = #{
+          public: #{
+            endpoint: "https://public.example.com",
+            authentication: typeref(PublicCustomScope),
+          },
+          government: #{
+            endpoint: "https://government.example.com",
+            authentication: typeref(GovCustomScope),
+          },
+        };
+
+        @get op read(): void;
+      `),
+    ).rejects.toThrow(/uniform OAuth2 scope suffix/);
+  });
 });

@@ -250,6 +250,7 @@ function generateConstructors(
         // we use azcore.ClientOptions.APIVersion
         continue;
       }
+      imports.addForType(param.type);
       ctorText += helpers.formatDocCommentWithPrefix(naming.ensureNameCase(param.name), param.docs);
       if (go.isClientSideDefault(param.style)) {
         if (!param.docs.description && !param.docs.summary) {
@@ -257,7 +258,7 @@ function generateConstructors(
         }
         ctorText += `${indent.get()}${helpers.comment(`The default value is ${helpers.formatLiteralValue(param.style.defaultValue, false)}`, "// ")}.\n`;
       }
-      ctorText += `${indent.get()}${naming.ensureNameCase(param.name)} *${go.getTypeDeclaration(param.type, client.pkg)}\n`;
+      ctorText += `${indent.get()}${naming.ensureNameCase(param.name)} ${param.type.kind === "ptr" ? "" : "*"}${go.getTypeDeclaration(param.type, client.pkg)}\n`;
     }
     ctorText += "}\n\n";
   }
@@ -267,22 +268,12 @@ function generateConstructors(
     const paramDocs = new Array<string>();
 
     // ctor params can also be present in the supplemental or cloud endpoint parameters
-    const consolidatedCtorParams = new Array<go.ClientParameter>();
     const cloudEndpoint = client.instance.cloudEndpoint;
-    if (client.instance.endpoint) {
-      consolidatedCtorParams.push(client.instance.endpoint.parameter);
-      if (client.instance.endpoint.supplemental) {
-        consolidatedCtorParams.push(...client.instance.endpoint.supplemental.parameters);
-      }
-    } else if (cloudEndpoint) {
-      consolidatedCtorParams.push(...cloudEndpoint.parameters);
-    }
-
-    for (const param of helpers.sortClientParameters(constructor.parameters, type)) {
-      if (!consolidatedCtorParams.includes(param)) {
-        consolidatedCtorParams.push(param);
-      }
-    }
+    const consolidatedCtorParams = helpers.getConsolidatedCtorParams(
+      client.instance,
+      constructor,
+      type,
+    );
 
     for (const ctorParam of consolidatedCtorParams) {
       if (!go.isRequiredParameter(ctorParam.style)) {
@@ -496,6 +487,25 @@ function generateConstructors(
       emitClientSideDefaults(param);
     }
 
+    const emitEndpointTemplateReplacement = function (
+      targetVar: string,
+      param: go.URIParameter,
+    ): void {
+      if (!go.isRequiredParameter(param.style) && !go.isClientSideDefault(param.style)) {
+        const optionField = `options.${go.isAPIVersionParameter(param) ? "APIVersion" : naming.ensureNameCase(param.name)}`;
+        const formattedOption = go.isAPIVersionParameter(param)
+          ? optionField
+          : helpers.formatValue(optionField, param.type, imports);
+        ctorText += `${indent.get()}if ${optionField} != ${helpers.zeroValue(param)} {\n`;
+        ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${param.uriPathSegment}}", ${formattedOption})\n`;
+        ctorText += `${indent.pop().get()}} else {\n`;
+        ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${param.uriPathSegment}}", "")\n`;
+        ctorText += `${indent.pop().get()}}\n`;
+        return;
+      }
+      ctorText += `${indent.get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${param.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
+    };
+
     // construct the supplemental path and join it to the endpoint
     if (client.instance.endpoint?.supplemental) {
       // the endpoint param is always the first ctor param
@@ -504,7 +514,7 @@ function generateConstructors(
         imports.add("strings");
         ctorText += `${indent.get()}host := "${client.instance.endpoint.supplemental.path}"\n`;
         for (const param of client.instance.endpoint.supplemental.parameters) {
-          ctorText += `${indent.get()}host = strings.ReplaceAll(host, "{${param.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
+          emitEndpointTemplateReplacement("host", param);
         }
         ctorText += `${indent.get()}${endpointParam.name} = runtime.JoinPaths(${endpointParam.name}, host)\n`;
       } else {
@@ -516,7 +526,7 @@ function generateConstructors(
       if (cloudEndpoint.parameters.length > 0) {
         imports.add("strings");
         for (const param of cloudEndpoint.parameters) {
-          ctorText += `${indent.get()}${cloudEndpoint.parameter.name} = strings.ReplaceAll(${cloudEndpoint.parameter.name}, "{${param.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
+          emitEndpointTemplateReplacement(cloudEndpoint.parameter.name, param);
         }
       }
     }

@@ -211,6 +211,33 @@ export function sortClientParameters(
   return params;
 }
 
+/**
+ * returns all client constructor parameters in declaration order, including
+ * endpoint, supplemental host, and cloud host template parameters.
+ */
+export function getConsolidatedCtorParams(
+  constructable: go.Constructable,
+  constructor: go.Constructor,
+  type: go.CodeModelType,
+): Array<go.ClientParameter> {
+  const consolidatedCtorParams = new Array<go.ClientParameter>();
+  if (constructable.endpoint) {
+    consolidatedCtorParams.push(constructable.endpoint.parameter);
+    if (constructable.endpoint.supplemental) {
+      consolidatedCtorParams.push(...constructable.endpoint.supplemental.parameters);
+    }
+  } else if (constructable.cloudEndpoint) {
+    consolidatedCtorParams.push(...constructable.cloudEndpoint.parameters);
+  }
+
+  for (const param of sortClientParameters([...constructor.parameters], type)) {
+    if (!consolidatedCtorParams.includes(param)) {
+      consolidatedCtorParams.push(param);
+    }
+  }
+  return consolidatedCtorParams;
+}
+
 // returns the parameters for the internal request creator method.
 // e.g. "i int, s string"
 export function getCreateRequestParametersSig(method: go.MethodType | go.NextPageMethod): string {

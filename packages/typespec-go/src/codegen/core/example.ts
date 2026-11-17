@@ -146,15 +146,30 @@ export function generateExamples(
           clientRef += `)`;
         } else {
           const ctor = client.instance.constructors[0];
-          const requiredCtorParamNames = new Set(
-            ctor.parameters
-              .filter((p) => p.kind !== "credentialParam" && go.isRequiredParameter(p.style))
-              .map((p) => p.name),
+          const consolidatedCtorParams = helpers.getConsolidatedCtorParams(
+            client.instance,
+            ctor,
+            target,
           );
-          const renderedCtorArgs = clientParameters
-            .filter((p) => requiredCtorParamNames.has(p.parameter.name))
-            .map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.type.kind !== "ptr").slice(1));
-          renderedCtorArgs.push("cred", "nil");
+          const renderedCtorArgs = new Array<string>();
+          for (const ctorParam of consolidatedCtorParams) {
+            if (!go.isRequiredParameter(ctorParam.style)) {
+              continue;
+            }
+            if (ctorParam.kind === "credentialParam") {
+              renderedCtorArgs.push("cred");
+              continue;
+            }
+            const existingParam =
+              clientParameters.find((p) => p.parameter.name === ctorParam.name) ??
+              example.parameters.find((p) => p.parameter.name === ctorParam.name);
+            const value =
+              existingParam?.value ?? generateFakeExample(ctorParam.type, ctorParam.name);
+            renderedCtorArgs.push(
+              getExampleValue(pkg, value, "\t", imports, ctorParam.type.kind !== "ptr").slice(1),
+            );
+          }
+          renderedCtorArgs.push("nil");
           exampleText += `${indent.get()}client, err := ${go.getPackageName(ctor.pkg)}.${ctor.name}(${renderedCtorArgs.join(", ")})\n`;
           exampleText += `${indent.get()}if err != nil {\n`;
           exampleText += `${indent.push().get()}log.Fatalf("failed to create client: %v", err)\n`;
