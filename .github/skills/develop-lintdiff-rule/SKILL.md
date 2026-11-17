@@ -746,12 +746,15 @@ diff or required no production rule change.
 #### Use the shared four-section report plus NOTES
 
 Follow the [migration report contract](../analyze-swagger-typespec-lint-gap/SKILL.md#migration-note):
-conclusion and scope; actual coverage; function-level coverage; count differences;
-then NOTES. Name and hyperlink the original Swagger linter, state the
-evidence-backed conclusion briefly, and distinguish diagnostic totals from
-project counts. Keep only differing projects/diagnostic groups in the difference
-section. Put technical context in NOTES and code-backed examples under directly
-linked appendix groups; do not add a standalone fifth examples/actions section.
+scope; coverage; count differences; function-level coverage; then concise NOTES.
+Name and hyperlink the original Swagger linter and original migration PR when
+available. Count only diagnostic occurrences in the original rules' assessed
+scope, including captured corresponding suppressions; preserve unfiltered
+totals and exclusions in linked evidence. Reconcile the complete raw-count gap,
+including multiplicity and overlapping owning diagnostics. Present analysis and
+proposed actions rather than a blanket verdict. Keep technical detail and
+code-backed examples under directly linked appendix groups; do not add a
+standalone fifth examples/actions section or duplicate evidence in NOTES.
 Separate representation corner cases from missing core behavior; a targeted
 stress-test percentage is not production coverage.
 
