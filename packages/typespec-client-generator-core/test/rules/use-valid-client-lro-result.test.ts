@@ -60,6 +60,7 @@ const resourceLroWithSeparateStatusMonitor = `
   model Status {
     @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
     @lroResult result: Payload;
+    resource: Widget;
   }
 
   @get @route("/widgets/{id}") op read(@path id: string): Widget;
@@ -91,7 +92,7 @@ describe("use-valid-client-lro-result", () => {
       .toEmitDiagnostics({
         code: ruleCode,
         message:
-          "Resource lifecycle LRO 'start' should return its resource or completion response instead of the status-monitor property 'secondary'.",
+          "@clientLroResult on resource LRO 'start' selects 'TestService.Payload' instead of 'TestService.Job'.",
       });
   });
 
@@ -106,8 +107,44 @@ describe("use-valid-client-lro-result", () => {
       .toEmitDiagnostics({
         code: ruleCode,
         message:
-          "Resource lifecycle LRO 'start' should return its resource or completion response instead of the status-monitor response 'Status'.",
+          "@clientLroResult on resource LRO 'start' selects 'TestService.Status' instead of 'TestService.Widget'.",
       });
+  });
+
+  it("warns when a resource DELETE LRO selects the resource", async () => {
+    await tester
+      .expect(
+        `
+        ${resourceLroWithSeparateStatusMonitor}
+
+        @delete
+        @route("/widgets/{id}")
+        @deletesResource(Widget)
+        @pollingOperation(poll)
+        op remove(@path id: string): {
+          @statusCode statusCode: 202;
+          @pollingLocation @header("Operation-Location") location: ResourceLocation<Status>;
+        };
+
+        @@clientLroResult(remove, Status.resource);
+      `,
+      )
+      .toEmitDiagnostics({
+        code: ruleCode,
+        message:
+          "@clientLroResult on resource LRO 'remove' selects 'TestService.Widget' instead of 'void'.",
+      });
+  });
+
+  it("accepts a selected property containing the resource", async () => {
+    await tester
+      .expect(
+        `
+        ${resourceLroWithSeparateStatusMonitor}
+        @@clientLroResult(start, Status.resource);
+      `,
+      )
+      .toBeValid();
   });
 
   it("reports one warning when several scopes select the result property", async () => {

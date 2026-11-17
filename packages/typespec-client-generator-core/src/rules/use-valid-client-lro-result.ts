@@ -1,13 +1,14 @@
 import {
   createRule,
   fileRef,
+  getTypeName,
   paramMessage,
   type Model,
   type ModelProperty,
 } from "@typespec/compiler";
 import { getResourceOperation } from "@typespec/rest";
 import { clientLroResultKey } from "../internal-utils.js";
-import { getLroEnvelopeProperty, getRawLroMetadata } from "../lro-metadata.js";
+import { getRawLroMetadata, resolveClientLroResultSelection } from "../lro-metadata.js";
 
 export const useValidClientLroResultRule = createRule({
   name: "use-valid-client-lro-result",
@@ -16,8 +17,7 @@ export const useValidClientLroResultRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result",
   docs: fileRef.fromPackageRoot("src/rules/use-valid-client-lro-result.md"),
   messages: {
-    model: paramMessage`Resource lifecycle LRO '${"operation"}' should return its resource or completion response instead of the status-monitor response '${"model"}'.`,
-    property: paramMessage`Resource lifecycle LRO '${"operation"}' should return its resource or completion response instead of the status-monitor property '${"property"}'.`,
+    default: paramMessage`@clientLroResult on resource LRO '${"operation"}' selects '${"actual"}' instead of '${"expected"}'.`,
   },
   create(context) {
     return {
@@ -34,44 +34,29 @@ export const useValidClientLroResultRule = createRule({
           );
         if (selections.length === 0) return;
 
-        if (!getResourceOperation(context.program, operation)) return;
+        const resourceOperation = getResourceOperation(context.program, operation);
+        if (!resourceOperation) return;
         const metadata = getRawLroMetadata(context.program, operation);
         if (!metadata) return;
+        const expectedResult =
+          resourceOperation.operation === "delete" ? "void" : resourceOperation.resourceType;
 
         for (const selection of selections) {
-          if (selection.kind === "Model") {
-            if (
-              selection === metadata.envelopeResult &&
-              (metadata.finalResult !== selection || metadata.finalResultPath !== undefined)
-            ) {
-              context.reportDiagnostic({
-                messageId: "model",
-                target: operation.node ?? operation,
-                format: {
-                  operation: operation.name,
-                  model: selection.name,
-                },
-              });
-              return;
-            }
-          } else {
-            const envelopeProperty = getLroEnvelopeProperty(metadata.envelopeResult, selection);
-            if (
-              envelopeProperty &&
-              (metadata.finalEnvelopeResult !== metadata.envelopeResult ||
-                metadata.finalResultPath !== envelopeProperty.name)
-            ) {
-              context.reportDiagnostic({
-                messageId: "property",
-                target: operation.node ?? operation,
-                format: {
-                  operation: operation.name,
-                  property: envelopeProperty.name,
-                },
-              });
-              return;
-            }
+          // Invalid envelope or property selections are reported by invalid-client-lro-result.
+          const [clientResult] = resolveClientLroResultSelection(metadata, selection);
+          if (!clientResult || clientResult.finalResult === expectedResult) {
+            continue;
           }
+
+          context.reportDiagnostic({
+            target: operation.node ?? operation,
+            format: {
+              operation: operation.name,
+              actual: getTypeName(clientResult.finalResult),
+              expected: expectedResult === "void" ? expectedResult : getTypeName(expectedResult),
+            },
+          });
+          return;
         }
       },
     };

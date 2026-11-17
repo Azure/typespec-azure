@@ -1,6 +1,4 @@
-Resource lifecycle LROs should return their resource or completion response body. Selecting a status-monitor response or property changes the generated SDK method's return type and should only be used to preserve an existing SDK contract.
-
-This rule applies when `@clientLroResult` overrides the default result of a resource operation with its status-monitor response or one of its properties. Action and RPC LROs may select a status-monitor response or property without a warning.
+For a resource LRO, the model or property selected by `@clientLroResult` should have the resource type. A resource DELETE LRO should have no result.
 
 These examples assume `start` is a resource lifecycle LRO whose `Job` polling response has a `result: Payload` property.
 

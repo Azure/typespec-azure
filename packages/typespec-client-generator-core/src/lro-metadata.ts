@@ -111,14 +111,6 @@ export function getRawLroMetadata(program: Program, operation: Operation): LroMe
   return metadata;
 }
 
-/** @internal */
-export function getLroEnvelopeProperty(
-  envelope: Model,
-  selection: ModelProperty,
-): ModelProperty | undefined {
-  return Array.from(walkPropertiesInherited(envelope)).find((property) => property === selection);
-}
-
 /** Resolves the effective client result without changing the LRO protocol metadata. */
 export function getClientLroMetadataWithDiagnostics(
   context: TCGCContext,
@@ -157,10 +149,11 @@ export function getClientLroMetadataWithDiagnostics(
   return diagnostics.wrap(resolved);
 }
 
-function resolveClientLroResultSelection(
+/** @internal */
+export function resolveClientLroResultSelection(
   metadata: LroMetadata,
   selection: Model | ModelProperty,
-): DiagnosticResult<LroClientResult | undefined> {
+): DiagnosticResult<(LroClientResult & { finalResult: Model | Scalar | UnknownType }) | undefined> {
   const diagnostics = createDiagnosticCollector();
   if (selection.kind === "Model") {
     if (metadata.finalEnvelopeResult !== selection && metadata.envelopeResult !== selection) {
@@ -186,7 +179,9 @@ function resolveClientLroResultSelection(
     });
   }
 
-  const envelopeProperty = getLroEnvelopeProperty(metadata.envelopeResult, selection);
+  const envelopeProperty = Array.from(walkPropertiesInherited(metadata.envelopeResult)).find(
+    (property) => property === selection,
+  );
   if (!envelopeProperty) {
     diagnostics.add(
       createDiagnostic({
