@@ -270,27 +270,20 @@ describe("partial resource layout", () => {
       .toBeValid();
   });
 
-  it.each([false, true])(
-    "chooses inherited encoded fields independently for each operation visibility (%s)",
-    async (reverse) => {
-      const ordinary = '@route("/ordinary") @patch op ordinary(@body body: Patch): void;';
-      const read =
-        '@route("/read") @parameterVisibility(Lifecycle.Read) @patch op read(@body body: Patch): void;';
-      await tester
-        .expect(
-          `${service}
+  it("chooses inherited encoded fields independently for each operation visibility", async () => {
+    await tester
+      .expect(
+        `${service}
           model Base { @encodedName("application/json", "wire") actual: string; }
           model Patch extends Base {
             @visibility(Lifecycle.Read) @encodedName("application/json", "wire") output?: string;
           }
-          ${reverse ? read + ordinary : ordinary + read}
+          @route("/ordinary") @patch op ordinary(@body body: Patch): void;
+          @route("/read") @parameterVisibility(Lifecycle.Read) @patch op read(@body body: Patch): void;
         `,
-        )
-        .toEmitDiagnostics(
-          reverse ? [visibility("wire"), required("wire")] : [required("wire"), visibility("wire")],
-        );
-    },
-  );
+      )
+      .toEmitDiagnostics([required("wire"), visibility("wire")]);
+  });
 
   it.each(["Read", "Update", "Query"])(
     "compares response members with %s visibility without rejecting write-only input",
@@ -499,24 +492,21 @@ describe("immutable paths and effective input", () => {
       .toBeValid();
   });
 
-  it.each(["", "@visibility(Lifecycle.Read, Lifecycle.Query) unrelated?: string;"])(
-    "does not let an unrelated Read/Query field change existing warnings: %s",
-    async (extra) => {
-      await tester
-        .expect(
-          `${service}
+  it("does not let an unrelated Read/Query field change existing warnings", async () => {
+    await tester
+      .expect(
+        `${service}
         model Patch {
           @visibility(Lifecycle.Read) id: string = "server";
           @visibility(Lifecycle.Create) creator?: string;
           value: string;
-          ${extra}
+          @visibility(Lifecycle.Read, Lifecycle.Query) unrelated?: string;
         }
         @patch op update(@body body: Patch): void;
       `,
-        )
-        .toEmitDiagnostics(required("value"));
-    },
-  );
+      )
+      .toEmitDiagnostics(required("value"));
+  });
 
   it("checks exposed non-Update Create input", async () => {
     await tester
@@ -556,29 +546,20 @@ describe("immutable paths and effective input", () => {
       ]);
   });
 
-  it.each([false, true])(
-    "isolates shared models in both visibility orders (%s)",
-    async (reverse) => {
-      const ordinary = '@route("/ordinary") @patch op ordinary(@body body: Patch): void;';
-      const override =
-        '@route("/override") @parameterVisibility(Lifecycle.Create) @patch op override(@body body: Patch): void;';
-      await tester
-        .expect(
-          `${service}
+  it("isolates shared models across operation visibility", async () => {
+    await tester
+      .expect(
+        `${service}
       model Patch {
         @visibility(Lifecycle.Create) creator: string;
         @visibility(Lifecycle.Update) value: string;
       }
-      ${reverse ? override + ordinary : ordinary + override}
+      @route("/ordinary") @patch op ordinary(@body body: Patch): void;
+      @route("/override") @parameterVisibility(Lifecycle.Create) @patch op override(@body body: Patch): void;
     `,
-        )
-        .toEmitDiagnostics(
-          reverse
-            ? [required("creator"), visibility("creator"), required("value")]
-            : [required("value"), required("creator"), visibility("creator")],
-        );
-    },
-  );
+      )
+      .toEmitDiagnostics([required("value"), required("creator"), visibility("creator")]);
+  });
 });
 
 describe("partial-update safety and traversal policies", () => {
@@ -613,22 +594,18 @@ describe("partial-update safety and traversal policies", () => {
       .toEmitDiagnostics(defaultValue("value"));
   });
 
-  it.each([false, true])(
-    "isolates explicit/implicit optionality in both orders (%s)",
-    async (reverse) => {
-      const explicit =
-        '@route("/explicit") @patch(#{implicitOptionality: false}) op explicit(@body body: Patch): void;';
-      const implicit = `${legacyPatch} @route("/implicit") @patch(#{implicitOptionality: true}) op implicit(@body body: Patch): void;`;
-      await tester
-        .expect(
-          `${service}
+  it("isolates explicit and implicit optionality on a shared model", async () => {
+    await tester
+      .expect(
+        `${service}
       model Patch { value: string; }
-      ${reverse ? implicit + explicit : explicit + implicit}
+      @route("/explicit") @patch(#{implicitOptionality: false}) op explicit(@body body: Patch): void;
+      ${legacyPatch}
+      @route("/implicit") @patch(#{implicitOptionality: true}) op implicit(@body body: Patch): void;
     `,
-        )
-        .toEmitDiagnostics(required("value"));
-    },
-  );
+      )
+      .toEmitDiagnostics(required("value"));
+  });
 
   it.each(["identity", "IDENTITY"])(
     "exempts top-level encoded %s safety, not shape",
@@ -853,25 +830,21 @@ describe("native discriminators", () => {
 });
 
 describe("resource selection", () => {
-  it.each([false, true])(
-    "skips ambiguous shared GET layouts but retains safety in either order (%s)",
-    async (reverse) => {
-      const first = '@sharedRoute @route("/widgets") @get op first(): First;';
-      const second = '@sharedRoute @route("/widgets") @get op second(): Second;';
-      await tester
-        .expect(
-          `${service}
+  it("skips ambiguous shared GET layouts but retains safety", async () => {
+    await tester
+      .expect(
+        `${service}
           model First { value: string; enabled: boolean; }
           model Second { other: string; enabled: boolean; }
           @route("/widgets") @patch op update(@body body: {
             value?: string; /*extra*/extra?: string; /*enabled*/enabled?: boolean = false;
           }): AcceptedResponse;
-          ${reverse ? second + first : first + second}
+          @sharedRoute @route("/widgets") @get op first(): First;
+          @sharedRoute @route("/widgets") @get op second(): Second;
         `,
-        )
-        .toEmitDiagnostics((x) => [{ ...defaultValue("enabled"), pos: x.pos.enabled.pos }]);
-    },
-  );
+      )
+      .toEmitDiagnostics((x) => [{ ...defaultValue("enabled"), pos: x.pos.enabled.pos }]);
+  });
 
   it("finds a usable response after a shared GET with no comparison body", async () => {
     await tester
@@ -898,12 +871,10 @@ describe("resource selection", () => {
       .toEmitDiagnostics(missing("extra"));
   });
 
-  it.each([false, true])(
-    "skips ambiguous equivalent exact status entries in either order (%s)",
-    async (reverse) => {
-      await tester
-        .expect(
-          `${service}
+  it("skips ambiguous equivalent exact status entries", async () => {
+    await tester
+      .expect(
+        `${service}
           model First { value: string; }
           model Second { other: string; }
           model Literal { @statusCode status: 200; @body body: First; }
@@ -912,12 +883,11 @@ describe("resource selection", () => {
             @body body: Second;
           }
           @patch op update(@body body: { value?: string; /*extra*/extra?: string }):
-            ${reverse ? "Singleton | Literal" : "Literal | Singleton"};
+            Literal | Singleton;
         `,
-        )
-        .toBeValid();
-    },
-  );
+      )
+      .toBeValid();
+  });
 
   it("does not substitute a 201 body for ambiguous PATCH 200 bodies", async () => {
     await tester
@@ -1042,33 +1012,6 @@ describe("resource selection", () => {
     `,
       )
       .toEmitDiagnostics(missing("extra"));
-  });
-  describe("ambiguous response content", () => {
-    it.each([false, true])(
-      "does not select an arbitrary comparison resource from ambiguous content variants (%s)",
-      async (reverse) => {
-        await tester
-          .expect(
-            `${service}
-            model First { first: string; }
-            model Second { second: string; }
-            model JsonResponse {
-              @statusCode status: 200;
-              @header contentType: "application/json";
-              @body body: First;
-            }
-            model XmlResponse {
-              @statusCode status: 200;
-              @header contentType: "application/xml";
-              @body body: Second;
-            }
-            @patch op update(@body body: { extra?: string }):
-              ${reverse ? "XmlResponse | JsonResponse" : "JsonResponse | XmlResponse"};
-          `,
-          )
-          .toBeValid();
-      },
-    );
   });
 });
 

@@ -13,33 +13,9 @@ Required fields inside replacement array elements are allowed. The top-level `id
 
 ## Incorrect example
 
-This request exposes immutable `location`, requires `properties` and `displayName`, adds an unknown property, and supplies a default:
+Given a `Widget` resource with `displayName` and `description` in its `properties` model, this request exposes immutable `location`, requires `properties` and `displayName`, adds an unknown property, and supplies a default:
 
 ```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-core";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Http;
-using Rest;
-using Azure.ResourceManager;
-
-@armProviderNamespace
-@service
-namespace Microsoft.Example;
-
-model Widget
-  is TrackedResource<{
-    displayName: string;
-    description?: string;
-  }> {
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-}
-
 model UnsafeWidgetPatch {
   location?: string;
   properties: {
@@ -60,35 +36,22 @@ interface Widgets {
 Use an explicit update model with optional, default-free resource properties:
 
 ```tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@azure-tools/typespec-azure-core";
-import "@azure-tools/typespec-azure-resource-manager";
+model WidgetProperties {
+  displayName: string;
+  description?: string;
+}
 
-using Http;
-using Rest;
-using Azure.ResourceManager;
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
 
-@armProviderNamespace
-@service
-namespace Microsoft.Example;
-
-model Widget
-  is TrackedResource<{
-    displayName: string;
-    description?: string;
-  }> {
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
+model WidgetPatchProperties {
+  displayName?: string;
+  description?: string;
 }
 
 model WidgetPatch {
-  properties?: {
-    displayName?: string;
-    description?: string;
-  };
+  properties?: WidgetPatchProperties;
 }
 
 @armResourceOperations
