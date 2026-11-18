@@ -4,14 +4,23 @@ import {
   type LroProtocolMetadata,
 } from "@azure-tools/typespec-azure-core";
 import {
+  createDiagnosticCollector,
+  isUnknownType,
   isVoidType,
+  walkPropertiesInherited,
+  type Diagnostic,
+  type DiagnosticResult,
   type Model,
+  type ModelProperty,
   type Operation,
   type Program,
   type Scalar,
   type UnknownType,
   type VoidType,
 } from "@typespec/compiler";
+import { getClientLroResult } from "./decorators.js";
+import type { TCGCContext } from "./interfaces.js";
+import { createDiagnostic } from "./lib.js";
 
 type LroClientResult = Pick<
   LroMetadata,
@@ -33,6 +42,7 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
   const { finalStep, originalUriHasGetOperation } = protocol.completion;
   const { pollingInfo, statusMonitorResult } = protocol.polling;
   const { initialResponse, resourceOperation, isAction } = protocol.initial;
+  let resultPath: string | undefined;
   let model: Model | Scalar | UnknownType | VoidType | "void" =
     isAction || resourceOperation?.operation === "delete"
       ? pollingInfo.responseModel
@@ -45,6 +55,8 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
       resourceOperation?.operation !== "createOrReplace")
   ) {
     model = finalStep.responseModel;
+    // finalResultPath is valid only when finalResult comes from pollingSuccessProperty.
+    resultPath = finalStep.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
   } else if (resourceOperation?.operation === "createOrReplace") {
     model = resourceOperation.resourceType;
   } else if (statusMonitorResult) {
@@ -55,20 +67,19 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
   let finalResult: Model | Scalar | UnknownType | "void" =
     model === "void" || isVoidType(model) ? "void" : model;
   let finalEnvelopeResult = finalResult;
-  if (finalStep?.kind === "pollingSuccessProperty") {
+  if (resultPath !== undefined) {
     finalEnvelopeResult = pollingInfo.responseModel;
   } else if (finalStep?.kind === "noPollingResult") {
     finalResult = "void";
     finalEnvelopeResult = "void";
   }
-  const path = finalStep?.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
   return {
     logicalResult: model !== "void" && model.kind === "Model" ? model : pollingInfo.responseModel,
-    logicalPath: path,
+    logicalPath: resultPath,
     envelopeResult: pollingInfo.responseModel,
     finalResult,
     finalEnvelopeResult,
-    finalResultPath: path,
+    finalResultPath: resultPath,
   };
 }
 
@@ -98,4 +109,116 @@ export function getRawLroMetadata(program: Program, operation: Operation): LroMe
   };
   programCache.set(operation, metadata);
   return metadata;
+}
+
+/** Resolves the effective client result without changing the LRO protocol metadata. */
+export function getClientLroMetadataWithDiagnostics(
+  context: TCGCContext,
+  operation: Operation,
+): [LroMetadata | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (context.__clientLroMetadataCache.has(operation)) {
+    return diagnostics.wrap(context.__clientLroMetadataCache.get(operation));
+  }
+
+  const selection = getClientLroResult(context, operation);
+  const metadata = getRawLroMetadata(context.program, operation);
+
+  // Keep the default TCGC result policy when no selection applies to the current emitter scope.
+  if (!selection) {
+    context.__clientLroMetadataCache.set(operation, metadata);
+    return diagnostics.wrap(metadata);
+  }
+
+  // A client result selection customizes a native LRO; it does not create LRO metadata.
+  if (!metadata) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "invalid-client-lro-result",
+        target: selection,
+        format: { reason: "@clientLroResult requires a discoverable LRO protocol." },
+      }),
+    );
+    context.__clientLroMetadataCache.set(operation, undefined);
+    return diagnostics.wrap(undefined);
+  }
+  const clientResult = diagnostics.pipe(resolveClientLroResultSelection(metadata, selection));
+  // Continue SDK type construction with the default result after reporting an invalid selection.
+  const resolved = clientResult ? { ...metadata, ...clientResult } : metadata;
+  context.__clientLroMetadataCache.set(operation, resolved);
+  return diagnostics.wrap(resolved);
+}
+
+/** @internal */
+export function resolveClientLroResultSelection(
+  metadata: LroMetadata,
+  selection: Model | ModelProperty,
+): DiagnosticResult<(LroClientResult & { finalResult: Model | Scalar | UnknownType }) | undefined> {
+  const diagnostics = createDiagnosticCollector();
+  if (selection.kind === "Model") {
+    if (metadata.finalEnvelopeResult !== selection && metadata.envelopeResult !== selection) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "invalid-client-lro-result",
+          target: selection,
+          format: {
+            reason: "The selected model is not an envelope response of the LRO.",
+          },
+        }),
+      );
+      return diagnostics.wrap(undefined);
+    }
+
+    return diagnostics.wrap({
+      logicalResult: selection,
+      logicalPath: undefined,
+      envelopeResult: metadata.envelopeResult,
+      finalResult: selection,
+      finalEnvelopeResult: selection,
+      finalResultPath: undefined,
+    });
+  }
+
+  const envelopeProperty = Array.from(walkPropertiesInherited(metadata.envelopeResult)).find(
+    (property) => property === selection,
+  );
+  if (!envelopeProperty) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "invalid-client-lro-result",
+        target: selection,
+        format: {
+          reason:
+            "The selected property is not a supported direct property of the LRO envelope response.",
+        },
+      }),
+    );
+    return diagnostics.wrap(undefined);
+  }
+
+  const resultType = envelopeProperty.type;
+  if (resultType.kind !== "Model" && resultType.kind !== "Scalar" && !isUnknownType(resultType)) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "invalid-client-lro-result",
+        target: selection,
+        format: {
+          reason:
+            "The selected property is not a supported direct property of the LRO envelope response.",
+        },
+      }),
+    );
+    return diagnostics.wrap(undefined);
+  }
+
+  const path = envelopeProperty.name;
+  const envelope = metadata.envelopeResult;
+  return diagnostics.wrap({
+    logicalResult: resultType.kind === "Model" ? resultType : envelope,
+    logicalPath: path,
+    envelopeResult: envelope,
+    finalResult: resultType,
+    finalEnvelopeResult: envelope,
+    finalResultPath: path,
+  });
 }
