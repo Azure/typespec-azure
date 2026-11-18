@@ -268,7 +268,8 @@ function generateConstructors(
     const paramDocs = new Array<string>();
 
     // ctor params can also be present in the supplemental or cloud endpoint parameters
-    const cloudEndpoint = client.instance.cloudEndpoint;
+    const serviceConfigurations = client.instance.serviceConfigurations;
+    const cloudEndpoint = serviceConfigurations?.cloudEndpoint;
     const consolidatedCtorParams = helpers.getConsolidatedCtorParams(
       client.instance,
       constructor,
@@ -490,6 +491,7 @@ function generateConstructors(
     const emitEndpointTemplateReplacement = function (
       targetVar: string,
       param: go.URIParameter,
+      uriPathSegment: string = param.uriPathSegment,
     ): void {
       if (!go.isRequiredParameter(param.style) && !go.isClientSideDefault(param.style)) {
         const optionField = `options.${go.isAPIVersionParameter(param) ? "APIVersion" : naming.ensureNameCase(param.name)}`;
@@ -497,19 +499,18 @@ function generateConstructors(
           ? optionField
           : helpers.formatValue(optionField, param.type, imports);
         ctorText += `${indent.get()}if ${optionField} != ${helpers.zeroValue(param)} {\n`;
-        ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${param.uriPathSegment}}", ${formattedOption})\n`;
+        ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${uriPathSegment}}", ${formattedOption})\n`;
         ctorText += `${indent.pop().get()}} else {\n`;
-        ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${param.uriPathSegment}}", "")\n`;
+        ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${uriPathSegment}}", "")\n`;
         ctorText += `${indent.pop().get()}}\n`;
         return;
       }
-      ctorText += `${indent.get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${param.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
+      ctorText += `${indent.get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
     };
 
     // construct the supplemental path and join it to the endpoint
     if (client.instance.endpoint?.supplemental) {
-      // the endpoint param is always the first ctor param
-      const endpointParam = client.instance.constructors[0].parameters[0];
+      const endpointParam = client.instance.endpoint.parameter;
       if (client.instance.endpoint.supplemental.parameters.length > 0) {
         imports.add("strings");
         ctorText += `${indent.get()}host := "${client.instance.endpoint.supplemental.path}"\n`;
@@ -522,11 +523,101 @@ function generateConstructors(
         ctorText += `${indent.get()}${endpointParam.name} = runtime.JoinPaths(${endpointParam.name}, "${client.instance.endpoint.supplemental.path}")\n`;
       }
     } else if (cloudEndpoint) {
-      ctorText += `${indent.get()}${cloudEndpoint.parameter.name} := c.Endpoint\n`;
+      const targetVar = cloudEndpoint.parameter.name;
+      ctorText += `${indent.get()}${targetVar} := c.Endpoint\n`;
       if (cloudEndpoint.parameters.length > 0) {
         imports.add("strings");
-        for (const param of cloudEndpoint.parameters) {
-          emitEndpointTemplateReplacement(cloudEndpoint.parameter.name, param);
+        const entries = serviceConfigurations?.entries ?? [];
+        const hasUniformBindings =
+          entries.length > 0 &&
+          entries.every((entry) => {
+            if (entry.templateBindings?.length !== cloudEndpoint.parameters.length) {
+              return false;
+            }
+            return entry.templateBindings.every((binding, idx) => {
+              const param = cloudEndpoint.parameters[idx];
+              if (
+                binding.parameter !== param ||
+                binding.uriPathSegment !== param.uriPathSegment ||
+                binding.required !== go.isRequiredParameter(param.style)
+              ) {
+                return false;
+              }
+              if (go.isClientSideDefault(param.style)) {
+                return (
+                  binding.defaultValue !== undefined &&
+                  helpers.formatLiteralValue(binding.defaultValue, true) ===
+                    helpers.formatLiteralValue(param.style.defaultValue, true)
+                );
+              }
+              return binding.defaultValue === undefined;
+            });
+          });
+
+        if (hasUniformBindings) {
+          for (const param of cloudEndpoint.parameters) {
+            emitEndpointTemplateReplacement(targetVar, param);
+          }
+        } else {
+          const endpointSet = new Set(entries.map((entry) => entry.endpoint));
+          const uniqueEndpoints = endpointSet.size === entries.length;
+          ctorText += `${indent.get()}switch${uniqueEndpoints ? " c.Endpoint" : ""} {\n`;
+          for (const entry of entries) {
+            const caseExpr = uniqueEndpoints
+              ? `"${entry.endpoint}"`
+              : `c.Endpoint == "${entry.endpoint}" && c.Audience == "${entry.audience}"`;
+            ctorText += `${indent.get()}case ${caseExpr}:\n`;
+            if (entry.templateBindings && entry.templateBindings.length > 0) {
+              indent.push();
+              for (const binding of entry.templateBindings) {
+                const param = binding.parameter;
+                if (go.isRequiredParameter(param.style) || go.isClientSideDefault(param.style)) {
+                  ctorText += `${indent.get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${binding.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
+                  continue;
+                }
+                const optionField = `options.${go.isAPIVersionParameter(param) ? "APIVersion" : naming.ensureNameCase(param.name)}`;
+                const formattedOption = go.isAPIVersionParameter(param)
+                  ? optionField
+                  : helpers.formatValue(optionField, param.type, imports);
+                if (binding.required) {
+                  imports.add("errors");
+                  ctorText += `${indent.get()}if ${optionField} == ${helpers.zeroValue(param)} {\n`;
+                  ctorText += `${indent.push().get()}return nil, errors.New("${optionField} is required for the selected cloud configuration")\n`;
+                  ctorText += `${indent.pop().get()}}\n`;
+                  ctorText += `${indent.get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${binding.uriPathSegment}}", ${formattedOption})\n`;
+                } else {
+                  const fallbackValue = binding.defaultValue
+                    ? helpers.formatValue(
+                        helpers.formatLiteralValue(binding.defaultValue, false),
+                        go.unwrapPtr(param.type),
+                        imports,
+                      )
+                    : '""';
+                  ctorText += `${indent.get()}if ${optionField} != ${helpers.zeroValue(param)} {\n`;
+                  ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${binding.uriPathSegment}}", ${formattedOption})\n`;
+                  ctorText += `${indent.pop().get()}} else {\n`;
+                  ctorText += `${indent.push().get()}${targetVar} = strings.ReplaceAll(${targetVar}, "{${binding.uriPathSegment}}", ${fallbackValue})\n`;
+                  ctorText += `${indent.pop().get()}}\n`;
+                }
+              }
+              indent.pop();
+            }
+          }
+          ctorText += `${indent.get()}default:\n`;
+          indent.push();
+          const emittedDefaultSegments = new Set<string>();
+          for (const entry of entries) {
+            for (const binding of entry.templateBindings ?? []) {
+              const key = `${binding.parameter.name}:${binding.uriPathSegment}`;
+              if (emittedDefaultSegments.has(key)) {
+                continue;
+              }
+              emittedDefaultSegments.add(key);
+              emitEndpointTemplateReplacement(targetVar, binding.parameter, binding.uriPathSegment);
+            }
+          }
+          indent.pop();
+          ctorText += `${indent.get()}}\n`;
         }
       }
     }

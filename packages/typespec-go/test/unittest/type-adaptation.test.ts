@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
+import { execFileSync } from "child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
+import os from "os";
+import path from "path";
 import { describe, expect, it } from "vitest";
 import { emitGoFor } from "./scenario-runner.js";
 
@@ -180,5 +184,341 @@ describe("Recursive type adaptation", () => {
         @get op read(): void;
       `),
     ).rejects.toThrow(/uniform OAuth2 scope suffix/);
+  });
+
+  it("rejects caller-supplied endpoint service configurations with mismatched templates across clouds", async () => {
+    await expect(
+      emitGoFor(`
+        @service
+        @azureServiceConfigurations(Configurations)
+        namespace Test;
+
+        model PublicAuth is OAuth2Auth<[{
+          type: OAuth2FlowType.clientCredentials;
+          tokenUrl: "https://login.example.com/public/token";
+          scopes: ["https://public.example.com/.default"];
+        }]>;
+        model GovAuth is OAuth2Auth<[{
+          type: OAuth2FlowType.clientCredentials;
+          tokenUrl: "https://login.example.com/government/token";
+          scopes: ["https://government.example.com/.default"];
+        }]>;
+
+        const Configurations: Record<AzureServiceConfiguration> = #{
+          public: #{
+            endpoint: "{endpoint}",
+            parameters: typeref({ endpoint: url }),
+            authentication: typeref(PublicAuth),
+          },
+          government: #{
+            endpoint: "{endpoint}/v2",
+            parameters: typeref({ endpoint: url }),
+            authentication: typeref(GovAuth),
+          },
+        };
+
+        @get op read(): void;
+      `),
+    ).rejects.toThrow(
+      /caller-supplied endpoint service configurations must use an identical endpoint template and parameters across clouds/,
+    );
+  });
+
+  it("rejects cloud endpoint template parameters with conflicting wire types across clouds", async () => {
+    await expect(
+      emitGoFor(`
+        @service
+        @azureServiceConfigurations(Configurations)
+        namespace Test;
+
+        model PublicAuth is OAuth2Auth<[{
+          type: OAuth2FlowType.clientCredentials;
+          tokenUrl: "https://login.example.com/public/token";
+          scopes: ["https://public.example.com/.default"];
+        }]>;
+        model GovAuth is OAuth2Auth<[{
+          type: OAuth2FlowType.clientCredentials;
+          tokenUrl: "https://login.example.com/government/token";
+          scopes: ["https://government.example.com/.default"];
+        }]>;
+
+        const Configurations: Record<AzureServiceConfiguration> = #{
+          public: #{
+            endpoint: "https://{port}.public.example.com",
+            parameters: typeref({ port: string }),
+            authentication: typeref(PublicAuth),
+          },
+          government: #{
+            endpoint: "https://{port}.government.example.us",
+            parameters: typeref({ port: int32 }),
+            authentication: typeref(GovAuth),
+          },
+        };
+
+        @get op read(): void;
+      `),
+    ).rejects.toThrow(/cloud endpoint parameter "port" has conflicting definitions/);
+  });
+
+  it("compiles and executes generated Go clients for colliding template names, per-cloud defaults, cloud-only placeholders, and token supplemental endpoints", async () => {
+    const templateModDir = path.resolve(import.meta.dirname, "../local/containingmod");
+    const goMod = readFileSync(path.join(templateModDir, "go.mod"), "utf8")
+      .replace(/^module\s+\S+/m, "module testmodule")
+      .replace(/^\s*github\.com\/stretchr\/testify\s+\S+\r?\n/m, "");
+    const goSum = readFileSync(path.join(templateModDir, "go.sum"), "utf8");
+
+    const runGoTest = (files: Map<string, string>, testSource: string): void => {
+      const tmpDir = mkdtempSync(path.join(os.tmpdir(), "tsp-go-svccfg-"));
+      try {
+        writeFileSync(path.join(tmpDir, "go.mod"), goMod, "utf8");
+        writeFileSync(path.join(tmpDir, "go.sum"), goSum, "utf8");
+        for (const [relPath, content] of files) {
+          const fullPath = path.join(tmpDir, relPath);
+          mkdirSync(path.dirname(fullPath), { recursive: true });
+          writeFileSync(fullPath, content, "utf8");
+        }
+        writeFileSync(path.join(tmpDir, "client_compile_test.go"), testSource, "utf8");
+        execFileSync("go", ["test", "-mod=mod", "./..."], {
+          cwd: tmpDir,
+          encoding: "utf8",
+          stdio: "pipe",
+        });
+      } finally {
+        rmSync(tmpDir, { recursive: true, force: true });
+      }
+    };
+
+    const cloudFiles = await emitGoFor(`
+      @service
+      @azureServiceConfigurations(Configurations)
+      namespace Test;
+
+      model PublicAuth is OAuth2Auth<[{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/public/token";
+        scopes: ["https://public.example.com/.default"];
+      }]>;
+      model SovereignAuth is OAuth2Auth<[{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/sovereign/token";
+        scopes: ["https://sovereign.example.org/.default"];
+      }]>;
+      model GovernmentAuth is OAuth2Auth<[{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/government/token";
+        scopes: ["https://government.example.us/.default"];
+      }]>;
+
+      const Configurations: Record<AzureServiceConfiguration> = #{
+        public: #{
+          endpoint: "https://{endpoint}.{hostEndpoint}.{region}.public.example.com",
+          parameters: typeref({
+            endpoint: string,
+            hostEndpoint: string,
+            region?: string = "eastus",
+          }),
+          authentication: typeref(PublicAuth),
+        },
+        sovereign_cloud: #{
+          endpoint: "https://{endpoint}.{hostEndpoint}.{region}.sovereign.example.org",
+          parameters: typeref({
+            endpoint: string,
+            hostEndpoint: string,
+            region?: string = "sovereigneast",
+          }),
+          authentication: typeref(SovereignAuth),
+        },
+        government: #{
+          endpoint: "https://{endpoint}.{hostEndpoint}.{govInstance}.government.example.us",
+          parameters: typeref({
+            endpoint: string,
+            hostEndpoint: string,
+            govInstance: string,
+          }),
+          authentication: typeref(GovernmentAuth),
+        },
+      };
+
+      @route("/ping")
+      @get op ping(): void;
+    `);
+
+    runGoTest(
+      cloudFiles,
+      `package testmodule_test
+
+import (
+	"context"
+	"net/http"
+	"strings"
+	"testing"
+	"testmodule"
+	"time"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+)
+
+type captureCred struct {
+	scopes []string
+}
+
+func (c *captureCred) GetToken(_ context.Context, opts policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	c.scopes = append([]string(nil), opts.Scopes...)
+	return azcore.AccessToken{Token: "tok", ExpiresOn: time.Now().Add(time.Hour)}, nil
+}
+
+type captureTransport struct {
+	lastURL string
+}
+
+func (t *captureTransport) Do(req *http.Request) (*http.Response, error) {
+	t.lastURL = req.URL.String()
+	return &http.Response{
+		StatusCode: http.StatusNoContent,
+		Body:       http.NoBody,
+		Request:    req,
+	}, nil
+}
+
+func TestCloudConfigurationsEndpointResolution(t *testing.T) {
+	cred := &captureCred{}
+	tr := &captureTransport{}
+
+	pubClient, err := testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+		ClientOptions: azcore.ClientOptions{Transport: tr},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, err = pubClient.Ping(context.Background(), nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if tr.lastURL != "https://acct.edge.eastus.public.example.com/ping" {
+		t.Fatalf("got URL %q", tr.lastURL)
+	}
+	if len(cred.scopes) != 1 || cred.scopes[0] != "https://public.example.com/.default" {
+		t.Fatalf("got scopes %v", cred.scopes)
+	}
+
+	sovClient, err := testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud:     testmodule.CloudSovereignCloud,
+			Transport: tr,
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, err = sovClient.Ping(context.Background(), nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if tr.lastURL != "https://acct.edge.sovereigneast.sovereign.example.org/ping" {
+		t.Fatalf("got URL %q", tr.lastURL)
+	}
+	if len(cred.scopes) != 1 || cred.scopes[0] != "https://sovereign.example.org/.default" {
+		t.Fatalf("got scopes %v", cred.scopes)
+	}
+
+	_, err = testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud:     cloud.AzureGovernment,
+			Transport: tr,
+		},
+	})
+	if err == nil || !strings.Contains(err.Error(), "options.GovInstance is required") {
+		t.Fatalf("expected missing GovInstance error, got %v", err)
+	}
+
+	govClient, err := testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Cloud:     cloud.AzureGovernment,
+			Transport: tr,
+		},
+		GovInstance: to.Ptr("dod"),
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, err = govClient.Ping(context.Background(), nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if tr.lastURL != "https://acct.edge.dod.government.example.us/ping" {
+		t.Fatalf("got URL %q", tr.lastURL)
+	}
+	if len(cred.scopes) != 1 || cred.scopes[0] != "https://government.example.us/.default" {
+		t.Fatalf("got scopes %v", cred.scopes)
+	}
+}
+`,
+    );
+
+    const supplementalTokenFiles = await emitGoFor(`
+      @service
+      @server("{endpoint}/v1", "Versioned endpoint", { endpoint: url })
+      @useAuth(OAuth2Auth<[{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/token";
+        scopes: ["https://api.example.com/.default"];
+      }]>)
+      namespace Test;
+
+      @route("/items")
+      @get op list(): void;
+    `);
+
+    runGoTest(
+      supplementalTokenFiles,
+      `package testmodule_test
+
+import (
+	"context"
+	"net/http"
+	"testing"
+	"testmodule"
+	"time"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+)
+
+type staticCred struct{}
+
+func (staticCred) GetToken(_ context.Context, _ policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	return azcore.AccessToken{Token: "tok", ExpiresOn: time.Now().Add(time.Hour)}, nil
+}
+
+type recordTransport struct {
+	lastURL string
+}
+
+func (t *recordTransport) Do(req *http.Request) (*http.Response, error) {
+	t.lastURL = req.URL.String()
+	return &http.Response{
+		StatusCode: http.StatusNoContent,
+		Body:       http.NoBody,
+		Request:    req,
+	}, nil
+}
+
+func TestSupplementalEndpointWithTokenAuth(t *testing.T) {
+	tr := &recordTransport{}
+	client, err := testmodule.NewTestClient("https://custom.example.com", staticCred{}, &testmodule.TestClientOptions{
+		ClientOptions: azcore.ClientOptions{Transport: tr},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, err = client.List(context.Background(), nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if tr.lastURL != "https://custom.example.com/v1/items" {
+		t.Fatalf("got URL %q", tr.lastURL)
+	}
+}
+`,
+    );
   });
 });

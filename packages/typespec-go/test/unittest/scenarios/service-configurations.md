@@ -273,7 +273,7 @@ const Configurations: Record<AzureServiceConfiguration> = #{
     authentication: typeref(PublicAuth),
   },
   government: #{
-    endpoint: "{endpoint}/v2",
+    endpoint: "{endpoint}",
     parameters: typeref({
       endpoint: url,
     }),
@@ -517,8 +517,6 @@ type TestClient struct {
 // TestClientOptions contains the optional values for creating a [TestClient].
 type TestClientOptions struct {
 	azcore.ClientOptions
-
-	// The default value is "eastus".
 	Region *string
 	Suffix *string
 }
@@ -551,17 +549,44 @@ func NewTestClient(account string, credential azcore.TokenCredential, options *T
 	if err != nil {
 		return nil, err
 	}
-	region := "eastus"
-	if options.Region != nil {
-		region = *options.Region
-	}
 	endpoint := c.Endpoint
-	endpoint = strings.ReplaceAll(endpoint, "{account}", account)
-	endpoint = strings.ReplaceAll(endpoint, "{region}", region)
-	if options.Suffix != nil {
-		endpoint = strings.ReplaceAll(endpoint, "{suffix}", *options.Suffix)
-	} else {
-		endpoint = strings.ReplaceAll(endpoint, "{suffix}", "")
+	switch c.Endpoint {
+	case "https://{account}.{region}{suffix}.public.example.com":
+		endpoint = strings.ReplaceAll(endpoint, "{account}", account)
+		if options.Region != nil {
+			endpoint = strings.ReplaceAll(endpoint, "{region}", *options.Region)
+		} else {
+			endpoint = strings.ReplaceAll(endpoint, "{region}", "eastus")
+		}
+		if options.Suffix != nil {
+			endpoint = strings.ReplaceAll(endpoint, "{suffix}", *options.Suffix)
+		} else {
+			endpoint = strings.ReplaceAll(endpoint, "{suffix}", "")
+		}
+	case "https://{account}.{region}{suffix}.sovereign.example.org":
+		endpoint = strings.ReplaceAll(endpoint, "{account}", account)
+		if options.Region != nil {
+			endpoint = strings.ReplaceAll(endpoint, "{region}", *options.Region)
+		} else {
+			endpoint = strings.ReplaceAll(endpoint, "{region}", "sovereigneast")
+		}
+		if options.Suffix != nil {
+			endpoint = strings.ReplaceAll(endpoint, "{suffix}", *options.Suffix)
+		} else {
+			endpoint = strings.ReplaceAll(endpoint, "{suffix}", "")
+		}
+	default:
+		endpoint = strings.ReplaceAll(endpoint, "{account}", account)
+		if options.Region != nil {
+			endpoint = strings.ReplaceAll(endpoint, "{region}", *options.Region)
+		} else {
+			endpoint = strings.ReplaceAll(endpoint, "{region}", "")
+		}
+		if options.Suffix != nil {
+			endpoint = strings.ReplaceAll(endpoint, "{suffix}", *options.Suffix)
+		} else {
+			endpoint = strings.ReplaceAll(endpoint, "{suffix}", "")
+		}
 	}
 	client := &TestClient{
 		endpoint: endpoint,
@@ -833,6 +858,299 @@ func NewTestClientWithNoCredential(endpoint string, options *TestClientOptions) 
 	if err != nil {
 		return nil, err
 	}
+	client := &TestClient{
+		endpoint: endpoint,
+		internal: cl,
+	}
+	return client, nil
+}
+
+// Read -
+// If the operation fails it returns an *azcore.ResponseError type.
+//   - options - TestClientReadOptions contains the optional parameters for the TestClient.Read method.
+func (client *TestClient) Read(ctx context.Context, options *TestClientReadOptions) (TestClientReadResponse, error) {
+	var err error
+	req, err := client.readCreateRequest(ctx, options)
+	if err != nil {
+		return TestClientReadResponse{}, err
+	}
+	httpResp, err := client.internal.Pipeline().Do(req)
+	if err != nil {
+		return TestClientReadResponse{}, err
+	}
+	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
+		return TestClientReadResponse{}, runtime.NewResponseError(httpResp)
+	}
+	return TestClientReadResponse{}, nil
+}
+
+// readCreateRequest creates the Read request.
+func (client *TestClient) readCreateRequest(ctx context.Context, _ *TestClientReadOptions) (*policy.Request, error) {
+	req, err := runtime.NewRequest(ctx, http.MethodGet, client.endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+```
+
+# Cloud host templates with cloud-specific placeholders and colliding endpoint parameter names
+
+## TypeSpec
+
+```tsp
+@service
+@azureServiceConfigurations(Configurations)
+namespace Test;
+
+model PublicAuth
+  is OAuth2Auth<[
+    {
+      type: OAuth2FlowType.clientCredentials;
+      tokenUrl: "https://login.example.com/public/token";
+      scopes: ["https://public.example.com/.default"];
+    }
+  ]>;
+
+model GovernmentAuth
+  is OAuth2Auth<[
+    {
+      type: OAuth2FlowType.clientCredentials;
+      tokenUrl: "https://login.example.com/government/token";
+      scopes: ["https://government.example.us/.default"];
+    }
+  ]>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  public: #{
+    endpoint: "https://{endpoint}.{hostEndpoint}.public.example.com",
+    parameters: typeref({
+      endpoint: string,
+      hostEndpoint: string,
+    }),
+    authentication: typeref(PublicAuth),
+  },
+  government: #{
+    endpoint: "https://{endpoint}.{hostEndpoint}.{govInstance}.government.example.us",
+    parameters: typeref({
+      endpoint: string,
+      hostEndpoint: string,
+      govInstance: string,
+    }),
+    authentication: typeref(GovernmentAuth),
+  },
+};
+
+@get op read(): void;
+```
+
+## Generated client
+
+```go test_client
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// Code generated by Microsoft (R) Go Code Generator. DO NOT EDIT.
+
+package testmodule
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
+	"net/http"
+	"reflect"
+	"strings"
+)
+
+// TestClient contains the methods for the Test group.
+// Don't use this type directly, use NewTestClient() instead.
+type TestClient struct {
+	internal      *azcore.Client
+	hostEndpoint1 string
+}
+
+// TestClientOptions contains the optional values for creating a [TestClient].
+type TestClientOptions struct {
+	azcore.ClientOptions
+	GovInstance *string
+}
+
+// NewTestClient creates a new instance of TestClient with the specified values.
+//   - credential - used to authorize requests. Usually a credential from azidentity.
+//   - options - Contains optional client configuration. Pass nil to accept the default values.
+func NewTestClient(endpoint string, hostEndpoint string, credential azcore.TokenCredential, options *TestClientOptions) (*TestClient, error) {
+	if options == nil {
+		options = &TestClientOptions{}
+	}
+	if reflect.ValueOf(options.Cloud).IsZero() {
+		options.Cloud = cloud.AzurePublic
+	}
+	c, ok := options.Cloud.Services[ServiceName]
+	if !ok {
+		return nil, fmt.Errorf("provided Cloud field is missing configuration for %s", ServiceName)
+	} else if c.Audience == "" {
+		return nil, fmt.Errorf("provided Cloud field is missing Audience for %s", ServiceName)
+	} else if c.Endpoint == "" {
+		return nil, fmt.Errorf("provided Cloud field is missing Endpoint for %s", ServiceName)
+	}
+	cl, err := azcore.NewClient(moduleName, moduleVersion, runtime.PipelineOptions{
+		PerCall: []policy.Policy{
+			runtime.NewBearerTokenPolicy(credential, []string{c.Audience + "/.default"}, &policy.BearerTokenOptions{
+				InsecureAllowCredentialWithHTTP: options.InsecureAllowCredentialWithHTTP,
+			}),
+		},
+	}, &options.ClientOptions)
+	if err != nil {
+		return nil, err
+	}
+	hostEndpoint1 := c.Endpoint
+	switch c.Endpoint {
+	case "https://{endpoint}.{hostEndpoint}.public.example.com":
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{endpoint}", endpoint)
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{hostEndpoint}", hostEndpoint)
+	case "https://{endpoint}.{hostEndpoint}.{govInstance}.government.example.us":
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{endpoint}", endpoint)
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{hostEndpoint}", hostEndpoint)
+		if options.GovInstance == nil {
+			return nil, errors.New("options.GovInstance is required for the selected cloud configuration")
+		}
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{govInstance}", *options.GovInstance)
+	default:
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{endpoint}", endpoint)
+		hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{hostEndpoint}", hostEndpoint)
+		if options.GovInstance != nil {
+			hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{govInstance}", *options.GovInstance)
+		} else {
+			hostEndpoint1 = strings.ReplaceAll(hostEndpoint1, "{govInstance}", "")
+		}
+	}
+	client := &TestClient{
+		hostEndpoint1: hostEndpoint1,
+		internal:      cl,
+	}
+	return client, nil
+}
+
+// Read -
+// If the operation fails it returns an *azcore.ResponseError type.
+//   - options - TestClientReadOptions contains the optional parameters for the TestClient.Read method.
+func (client *TestClient) Read(ctx context.Context, options *TestClientReadOptions) (TestClientReadResponse, error) {
+	var err error
+	req, err := client.readCreateRequest(ctx, options)
+	if err != nil {
+		return TestClientReadResponse{}, err
+	}
+	httpResp, err := client.internal.Pipeline().Do(req)
+	if err != nil {
+		return TestClientReadResponse{}, err
+	}
+	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
+		return TestClientReadResponse{}, runtime.NewResponseError(httpResp)
+	}
+	return TestClientReadResponse{}, nil
+}
+
+// readCreateRequest creates the Read request.
+func (client *TestClient) readCreateRequest(ctx context.Context, _ *TestClientReadOptions) (*policy.Request, error) {
+	req, err := runtime.NewRequest(ctx, http.MethodGet, client.hostEndpoint1)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+```
+
+# Token-authenticated client with supplemental server path joins onto endpoint parameter
+
+## TypeSpec
+
+```tsp
+@service
+@server(
+  "{endpoint}/v1",
+  "Versioned service endpoint",
+  {
+    endpoint: url,
+  }
+)
+@useAuth(
+  OAuth2Auth<[
+    {
+      type: OAuth2FlowType.clientCredentials,
+      tokenUrl: "https://login.example.com/token",
+      scopes: ["https://api.example.com/.default"],
+    }
+  ]>
+)
+namespace Test;
+
+@get op read(): void;
+```
+
+## Generated client
+
+```go test_client
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// Code generated by Microsoft (R) Go Code Generator. DO NOT EDIT.
+
+package testmodule
+
+import (
+	"context"
+	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
+	"net/http"
+	"reflect"
+)
+
+// TestClient contains the methods for the Test group.
+// Don't use this type directly, use NewTestClient() instead.
+type TestClient struct {
+	internal *azcore.Client
+	endpoint string
+}
+
+// TestClientOptions contains the optional values for creating a [TestClient].
+type TestClientOptions struct {
+	azcore.ClientOptions
+}
+
+// NewTestClient creates a new instance of TestClient with the specified values.
+//   - endpoint - Service host
+//   - credential - used to authorize requests. Usually a credential from azidentity.
+//   - options - Contains optional client configuration. Pass nil to accept the default values.
+func NewTestClient(endpoint string, credential azcore.TokenCredential, options *TestClientOptions) (*TestClient, error) {
+	if options == nil {
+		options = &TestClientOptions{}
+	}
+	if reflect.ValueOf(options.Cloud).IsZero() {
+		options.Cloud = cloud.AzurePublic
+	}
+	c, ok := options.Cloud.Services[ServiceName]
+	if !ok {
+		return nil, fmt.Errorf("provided Cloud field is missing configuration for %s", ServiceName)
+	} else if c.Audience == "" {
+		return nil, fmt.Errorf("provided Cloud field is missing Audience for %s", ServiceName)
+	}
+	cl, err := azcore.NewClient(moduleName, moduleVersion, runtime.PipelineOptions{
+		PerCall: []policy.Policy{
+			runtime.NewBearerTokenPolicy(credential, []string{c.Audience + "/.default"}, &policy.BearerTokenOptions{
+				InsecureAllowCredentialWithHTTP: options.InsecureAllowCredentialWithHTTP,
+			}),
+		},
+	}, &options.ClientOptions)
+	if err != nil {
+		return nil, err
+	}
+	endpoint = runtime.JoinPaths(endpoint, "v1")
 	client := &TestClient{
 		endpoint: endpoint,
 		internal: cl,

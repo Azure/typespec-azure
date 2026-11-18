@@ -226,8 +226,8 @@ export function getConsolidatedCtorParams(
     if (constructable.endpoint.supplemental) {
       consolidatedCtorParams.push(...constructable.endpoint.supplemental.parameters);
     }
-  } else if (constructable.cloudEndpoint) {
-    consolidatedCtorParams.push(...constructable.cloudEndpoint.parameters);
+  } else if (constructable.serviceConfigurations?.cloudEndpoint) {
+    consolidatedCtorParams.push(...constructable.serviceConfigurations.cloudEndpoint.parameters);
   }
 
   for (const param of sortClientParameters([...constructor.parameters], type)) {

@@ -31,11 +31,12 @@ export function generateCloudConfig(module: go.Module, target: go.CodeModelType)
     if (client.instance?.kind !== "constructable") {
       continue;
     }
-    if (client.instance.cloudEndpoint) {
+    const serviceConfigurations = client.instance.serviceConfigurations;
+    if (serviceConfigurations?.cloudEndpoint) {
       hasCloudEndpoint = true;
     }
-    if (client.instance.serviceConfigurations) {
-      for (const entry of client.instance.serviceConfigurations) {
+    if (serviceConfigurations) {
+      for (const entry of serviceConfigurations.entries) {
         if (entry.target.kind === "wellKnown") {
           const existing = wellKnownClouds.get(entry.target.cloudName);
           if (

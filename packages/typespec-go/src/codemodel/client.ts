@@ -59,6 +59,21 @@ export type ServiceConfigurationTarget =
   | { kind: "wellKnown"; cloudName: WellKnownCloudName }
   | { kind: "custom"; exportedVarName: string };
 
+/** binds an adapted cloud endpoint template parameter to a placeholder in a specific service configuration */
+export interface CloudEndpointParameterBinding {
+  /** the merged URI parameter on the constructor or client options */
+  parameter: param.URIParameter;
+
+  /** the placeholder segment name in this configuration's endpoint URL (without braces) */
+  uriPathSegment: string;
+
+  /** whether this placeholder is required without a default when this configuration is selected */
+  required: boolean;
+
+  /** configuration-specific default value when this configuration defines a clientDefaultValue */
+  defaultValue?: type.Literal;
+}
+
 /** paired endpoint and OAuth audience metadata for a named service configuration */
 export interface ServiceConfiguration {
   /** authored configuration name (e.g. "public", "government") */
@@ -72,6 +87,9 @@ export interface ServiceConfiguration {
 
   /** cloud-bound endpoint URL or host template when the endpoint is provided by the cloud configuration */
   endpoint?: string;
+
+  /** per-configuration template placeholder bindings when endpoint contains URI placeholders */
+  templateBindings?: Array<CloudEndpointParameterBinding>;
 }
 
 /** contains cloud-resolved client endpoint configuration */
@@ -81,6 +99,15 @@ export interface CloudEndpoint {
 
   /** ephemeral URI template parameters substituted into c.Endpoint during construction */
   parameters: Array<param.URIParameter>;
+}
+
+/** contains paired cloud service configurations and optional cloud-resolved endpoint metadata */
+export interface ServiceConfigurations {
+  /** paired cloud service configurations from TCGC serviceConfigurations */
+  entries: Array<ServiceConfiguration>;
+
+  /** cloud-resolved endpoint configuration when serviceConfigurations supplies endpoints */
+  cloudEndpoint?: CloudEndpoint;
 }
 
 /** contains client endpoint configuration */
@@ -108,11 +135,8 @@ export interface Constructable {
   /** the client endpoint configuration */
   endpoint?: ClientEndpoint;
 
-  /** cloud-resolved endpoint configuration when serviceConfigurations supplies endpoints */
-  cloudEndpoint?: CloudEndpoint;
-
   /** paired cloud service configurations from TCGC serviceConfigurations */
-  serviceConfigurations?: Array<ServiceConfiguration>;
+  serviceConfigurations?: ServiceConfigurations;
 }
 
 /** the possible types used for the client options type */
@@ -461,6 +485,13 @@ export class CloudEndpoint implements CloudEndpoint {
   constructor(parameter: param.URIParameter, parameters: Array<param.URIParameter> = []) {
     this.parameter = parameter;
     this.parameters = parameters;
+  }
+}
+
+export class ServiceConfigurations implements ServiceConfigurations {
+  constructor(entries: Array<ServiceConfiguration>, cloudEndpoint?: CloudEndpoint) {
+    this.entries = entries;
+    this.cloudEndpoint = cloudEndpoint;
   }
 }
 
