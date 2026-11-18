@@ -8,6 +8,15 @@ the legacy three-resource procedure below. Keep the shared coordinator/folder
 resolution, physical containment, ownership, dependency-layer fingerprints,
 readiness persistence and invalidation requirements in this file.
 
+Before public baseline discovery or fork provisioning, check the recorded
+corpus. Explicit private `RPSaaSMaster` tasks follow the
+[private corpus contract](../analyze-native-lint-coverage/private-corpus.md).
+Its source, allowlist/all-version population, private baseline and private
+evidence binding override the public defaults below. Verify tooling support and
+private access/storage before dependency setup; never silently use public data
+or latest-only selection. Keep the same containment, isolation and readiness
+checks, recording corpus identities as additional invalidation keys.
+
 Prepare three persistent worktrees: one canonical-main-based native publisher,
 the selected immutable specs runtime, and one combined coverage/evidence
 checkout with its separately verified fork publisher. Do not provision a fourth

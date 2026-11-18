@@ -71,6 +71,14 @@ and a history-preserving handoff, never fresh retry budgets.
 
 ## Prepare one native publisher and separate evidence
 
+Select the corpus before publication or baseline setup. Explicit
+`RPSaaSMaster` requests use the
+[private corpus contract](../analyze-native-lint-coverage/private-corpus.md),
+which overrides public specs/evidence destinations and latest-version defaults
+below. Native implementation branches still start from canonical `main`.
+Persist the corpus/allowlist/version identities in every phase and review
+handoff. Private-only evidence never belongs on the public native PR.
+
 Follow [preparation](preparation.md#native-first-preparation) and
 [publication](app-session-execution.md#native-first-publication). Verify the
 whole input and both publication roles before costly setup. Use three persistent
