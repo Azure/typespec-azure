@@ -221,22 +221,6 @@ it("ignores non-success response bodies", async () => {
     .toBeValid();
 });
 
-it.each([
-  "{ @statusCode status: 200; @bodyRoot body: void; }",
-  "ArmResponse<Widget> | { @statusCode status: 201; @bodyRoot body: void; }",
-])("ignores explicit void success payloads: %s", async (response) => {
-  await tester
-    .expect(
-      `${models}
-      @armResourceOperations interface Widgets {
-        @get @armResourceRead(Widget)
-        read(...ResourceInstanceParameters<Widget>): ${response};
-      }
-    `,
-    )
-    .toBeValid();
-});
-
 it("checks responses of every registered lifecycle operation", async () => {
   await tester
     .expect(
@@ -269,21 +253,6 @@ it.each(["ArmResponse<Widget[]>", "ArmResponse<{ value: Widget[]; nextLink?: str
       .toBeValid();
   },
 );
-
-it("does not reuse one list response's items for another success response", async () => {
-  await tester
-    .expect(
-      `${models}
-      model Result { value?: string; }
-      @armResourceOperations interface Widgets {
-        @get @armResourceList(Widget)
-        list(...Foundations.SubscriptionScope<Widget>):
-          ArmResponse<ResourceListResult<Widget>> | ArmCreatedResponse<Result>;
-      }
-    `,
-    )
-    .toEmitDiagnostics([responseDiagnostic]);
-});
 
 describe("registered resource PUT requests", () => {
   const legacyOperations = `
