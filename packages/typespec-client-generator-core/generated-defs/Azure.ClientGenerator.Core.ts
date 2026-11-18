@@ -37,6 +37,49 @@ export interface DecoratorOptions {
 }
 
 /**
+ * Marks a status-monitor model property as transient polling data that the SDK should expose to
+ * callers while the long-running operation is in progress, for scenarios like reporting progress,
+ * usage, or job statistics. Emitters whose operations return only the final result, such as Python
+ * and JavaScript, would otherwise need handwritten code to surface these values; marked properties
+ * appear on the emitter's idiomatic poller or operation object instead. The property does not affect
+ * polling, status evaluation, errors, or final-result extraction.
+ *
+ * Values come from the most recent status-monitor response the SDK has received, including the
+ * initial response when it contains the status-monitor model. Any value may be absent until a
+ * response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+ * Emitters should keep these values current after each poll. Metadata is not part of the
+ * continuation token; after rehydration, the next poll populates it again.
+ *
+ * Multiple declarations use the standard TCGC scope rules, including overlapping scopes.
+ * Each selected property appears only once in the metadata collection.
+ *
+ * @param target The status-monitor model property.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Identifies a server-issued long-running operation identifier exposed by a legacy service through
+ * either the status-monitor URI or its response body. This compatibility metadata does not drive
+ * polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+ * with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+ * accessor and storage.
+ *
+ * @param target The operation identifier path parameter on the linked status-monitor operation, or
+ * a string-like property on its response model.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -574,6 +617,37 @@ export type UseSystemTextJsonConverterDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+ * A dynamic model represents updates as JSON Patch operations rather than a replacement of the full model.
+ * In C# generation, a marked model exposes patch-aware properties and a `JsonPatch`-backed `Patch` API.
+ * This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
+ *
+ * @param target The model or namespace to mark as dynamic.
+ * @param scope Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning.
+ * @example Mark a model as dynamic
+ * ```typespec
+ * @dynamicModel("csharp")
+ * model Pet {
+ *   name: string;
+ * }
+ * ```
+ * @example Mark a namespace for C# dynamic-model metadata
+ * ```typespec
+ * @dynamicModel("csharp")
+ * namespace PetStore {
+ *   model Pet {
+ *     name: string;
+ *   }
+ * }
+ * ```
+ */
+export type DynamicModelDecorator = (
+  context: DecoratorContext,
+  target: Model | Namespace,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Allows customization of how clients are initialized in the generated SDK.
  * By default, the root client is initialized independently, while sub clients are initialized through their parent client.
  * Initialization parameters typically include endpoint, credential, and API version.
@@ -974,7 +1048,7 @@ export type ResponseAsBoolDecorator = (
  * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  *
  * @param source The operation to change location for.
- * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
+ * @param target The target `Namespace`, `Interface` or a string which can indicate the client. Use `exact("name")` to preserve the exact casing of a string target in generated client code.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -1020,6 +1094,11 @@ export type ResponseAsBoolDecorator = (
  *   @clientLocation("ArchiveOperations")
  *   archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
  * }
+ * ```
+ * @example Move to a sub client with exact casing
+ * ```typespec
+ * @clientLocation(exact("vMHost"), "javascript")
+ * op listVMHosts(): string[];
  * ```
  * @example Move operation to root client
  * ```typespec
@@ -1153,7 +1232,35 @@ export type ClientOptionDecorator = (
   scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
+ *
+ * Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
+ *
+ * See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
+ *
+ * @param target The long-running operation to customize.
+ * @param result The response model or status-monitor property to return from generated clients.
+ * @param scope Specifies the target language emitters.
+ * @example Return an action's whole status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus);
+ * ```
+ * @example Return a property of an action's status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus.result);
+ * ```
+ */
+export type ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureClientGeneratorCoreDecorators = {
+  lroStatusMetadata: LroStatusMetadataDecorator;
+  lroOperationId: LroOperationIdDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;
@@ -1163,6 +1270,7 @@ export type AzureClientGeneratorCoreDecorators = {
   access: AccessDecorator;
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
+  dynamicModel: DynamicModelDecorator;
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
   clientNamespace: ClientNamespaceDecorator;
@@ -1175,6 +1283,7 @@ export type AzureClientGeneratorCoreDecorators = {
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
   clientOption: ClientOptionDecorator;
+  clientLroResult: ClientLroResultDecorator;
 };
 
 /**
@@ -1340,7 +1449,7 @@ export type ReplaceResponseWithBytesFunctionImplementation = (
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
  *
- * Use this with `@clientName` when you want the name to be used exactly as specified,
+ * Use this with `@clientName` or a string target in `@clientLocation` when you want the name to be used exactly as specified,
  * without any automatic casing conversion.
  *
  * @param name The exact name to use in generated client code.

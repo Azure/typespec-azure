@@ -194,23 +194,22 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 | ListBySubscription | `listBySubscription is ArmListBySubscriptionScope<ResourceType>` |
 | ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`            |
 
+These templates model pageable list operations and default to `ArmResponse<ResourceListResult<Resource>>`. Use `ResourceListResult<T>`, the standard ARM page model, for the paging response when it fits the contract instead of hand-defining an operation or page envelope. If a custom page model is unavoidable, keep exactly one `@nextLink` property in each page model.
+
 The `ArmListBySubscriptionScope` template is used for listing a resource directly at the subscription
 scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
 Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.
 
-#### Adding standard `$top`, `$filter`, and `$skip` query parameters
+#### Adding the standard `$filter` query parameter
 
-Pass ARM's standard list query parameters through the `Parameters` template argument instead of
-defining custom `@query("$top")`, `@query("$filter")`, or `@query("$skip")` properties yourself.
-Compose the reusable ARM parameter models for the options your operation supports.
+ARM collection GET operations may use only the standard `api-version` and `$filter` query
+parameters. Pass `ArmFilterParameter` through the `Parameters` template argument instead of
+defining a custom `@query("$filter")` property.
 
 ```typespec
 @armResourceOperations
 interface Employees {
-  listBySubscription is ArmListBySubscription<
-    Employee,
-    Parameters = ArmTopParameter & ArmFilterParameter & ArmSkipParameter
-  >;
+  listBySubscription is ArmListBySubscription<Employee, Parameters = ArmFilterParameter>;
 }
 ```
 

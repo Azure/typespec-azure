@@ -207,7 +207,7 @@ function isClientForOtherScopeOnly(
   return getScopedDecoratorData(tcgcContext, clientKey, container, scope) === undefined;
 }
 
-function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {
+export function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {
   const languageScopes = new Set<string | typeof AllScopes>();
   const impacted = [...program.stateMap(clientNameKey).values()];
   impacted.push(...program.stateMap(clientLocationKey).values());

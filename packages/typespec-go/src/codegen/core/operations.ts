@@ -183,11 +183,15 @@ export function generateOperations(
         // generate Begin method
         opText += generateLROBeginMethod(method, options, imports, indent);
       }
+
       opText += generateOperation(method, options, imports, indent);
+
+      if (method.kind === "sseMethod") {
+        opText += generateSseOperation(method, imports, indent);
+      }
+
       opText += createRequestHandler(azureARM, method, imports, indent);
-      if (needsResponseHandler(method) && method.kind !== "lroMethod") {
-        // we don't emit the response handler for vanilla LROs as the Poller[T]
-        // handles that. we do need it for pageable LROs though.
+      if (method.kind !== "lroMethod" && needsResponseHandler(method)) {
         opText += createResponseHandler(method, imports, indent);
       }
       if (
@@ -752,12 +756,14 @@ function generateOperation(
     // existing behavior and makes the docs look better overall.
     text += `// ${methodName} -\n`;
   }
+
   text += respErrDoc;
   if (!go.isLROMethod(method)) {
     for (const param of helpers.getMethodParameters(method)) {
       text += helpers.formatCommentAsBulletItem(param.name, param.docs);
     }
   }
+
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${methodName}(${params}) (${returns.join(", ")}) {\n`;
   if (method.kind === "pageableMethod") {
     text += `${indent.get()}return `;
@@ -765,18 +771,14 @@ function generateOperation(
     text += "}\n\n";
     return text;
   }
+
   text += `${indent.get()}var err error\n`;
-  let operationName = `"${method.receiver.type.name}.${method.name}"`;
-  if (options["generate-fakes"] && options["inject-spans"]) {
-    text += `${indent.get()}const operationName = ${operationName}\n`;
-    operationName = "operationName";
-  }
-  if (options["generate-fakes"]) {
-    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, ${operationName})\n`;
-  }
-  if (options["inject-spans"]) {
-    text += `${indent.get()}ctx, endSpan := runtime.StartSpan(ctx, ${operationName}, client.internal.Tracer(), nil)\n`;
-    text += `${indent.get()}defer func() { endSpan(err) }()\n`;
+  text += emitFakeAndSpanSupport(method, options, indent);
+
+  if (method.kind === "sseMethod") {
+    text += emitSseBody(method, imports, indent);
+    text += "}\n\n";
+    return text;
   }
 
   const reqParams = helpers.getCreateRequestParameters(
@@ -844,9 +846,47 @@ function generateOperation(
   return text;
 }
 
-// returns true if the method requires a response handler.
-// this is used to unmarshal the response body, parse response headers, or both.
+/**
+ * creates the context setup for fake server dispatch and tracing when enabled
+ *
+ * @param method the method for which to emit the setup
+ * @param options the emitter options
+ * @param indent the indentation helper currently in scope
+ * @returns the text for the context setup
+ */
+function emitFakeAndSpanSupport(
+  method: go.MethodType,
+  options: go.Options,
+  indent: helpers.Indentation,
+): string {
+  let text = "";
+  let operationName = `"${method.receiver.type.name}.${method.name}"`;
+  if (options["generate-fakes"] && options["inject-spans"]) {
+    text += `${indent.get()}const operationName = ${operationName}\n`;
+    operationName = "operationName";
+  }
+  if (options["generate-fakes"]) {
+    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, ${operationName})\n`;
+  }
+  if (options["inject-spans"]) {
+    text += `${indent.get()}ctx, endSpan := runtime.StartSpan(ctx, ${operationName}, client.internal.Tracer(), nil)\n`;
+    text += `${indent.get()}defer func() { endSpan(err) }()\n`;
+  }
+  return text;
+}
+
+/**
+ * narrows method to an applicable method kind that requires a response handler
+ * within the control block. note that some method kinds never require one.
+ *
+ * @param method the method to inspect
+ * @returns true if the method requires a response handler
+ */
 function needsResponseHandler(method: go.MethodType): boolean {
+  if (method.kind === "lroMethod") {
+    return false;
+  }
+
   switch (method.returns.result?.kind) {
     case "anyResult":
     case "modelResult":
@@ -870,7 +910,7 @@ function getAPIParametersSig(
   method: go.ClientAccessor | go.MethodType,
   imports: ImportManager,
 ): string {
-  const params = new Array<string>();
+  let params = new Array<string>();
   if (method.kind === "clientAccessor") {
     // client accessor params don't have a concept
     // of optionality nor do they contain literals
@@ -879,21 +919,34 @@ function getAPIParametersSig(
       params.push(`${param.name} ${go.getTypeDeclaration(param.type, method.receiver.type.pkg)}`);
     }
   } else {
-    const methodParams = helpers.getMethodParameters(method);
-    if (method.kind !== "pageableMethod") {
-      imports.add("context");
-      params.push("ctx context.Context");
-    }
-    for (const methodParam of methodParams) {
-      if (methodParam.kind !== "paramGroup") {
-        imports.addForType(methodParam.type);
-      }
-      params.push(
-        `${methodParam.name} ${helpers.formatParameterTypeName(method.receiver.type.pkg, methodParam)}`,
-      );
-    }
+    params = getAPIParameters(method, imports);
   }
   return params.join(", ");
+}
+
+/**
+ * creates the public method parameter declarations, including context when applicable
+ *
+ * @param method the method for which to create the declarations
+ * @param imports the import manager currently in scope
+ * @returns the ordered parameter declarations
+ */
+function getAPIParameters(method: go.MethodType, imports: ImportManager): Array<string> {
+  const params = new Array<string>();
+  const methodParams = helpers.getMethodParameters(method);
+  if (method.kind !== "pageableMethod") {
+    imports.add("context");
+    params.push("ctx context.Context");
+  }
+  for (const methodParam of methodParams) {
+    if (methodParam.kind !== "paramGroup") {
+      imports.addForType(methodParam.type);
+    }
+    params.push(
+      `${methodParam.name} ${helpers.formatParameterTypeName(method.receiver.type.pkg, methodParam)}`,
+    );
+  }
+  return params;
 }
 
 // returns the return signature where each entry is the type name
@@ -1053,5 +1106,131 @@ function generateLROBeginMethod(
   text += `${indent.get()}}\n`;
 
   text += "}\n\n";
+  return text;
+}
+
+/**
+ * creates the SSE method body that opens a reconnectable reader and returns initial headers
+ *
+ * @param method the SSE method for which to emit the body
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the text for the method body
+ */
+function emitSseBody(
+  method: go.SseMethod,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  const lastEventID = getSseLastEventID(method);
+  const usedNames = new Set(helpers.getMethodParameters(method).map((param) => param.name));
+  const variableName = (base: string): string => {
+    let name = base;
+    let suffix = 0;
+    while (usedNames.has(name)) {
+      name = `${base}${++suffix}`;
+    }
+    usedNames.add(name);
+    return name;
+  };
+  const optionsCopy = variableName("connectionOptions");
+  const connect = variableName("connect");
+  const cursor = variableName("lastEventID");
+  const reader = variableName("reader");
+  const initialResponse = variableName("initialResponse");
+  const result = variableName("result");
+  const hasHeaders = method.returns.headers.length > 0;
+  const optionsName = method.optionalParamsGroup.name;
+  let body = `${indent.get()}${optionsCopy} := ${method.optionalParamsGroup.groupName}{}\n`;
+  body += `${indent.get()}${helpers.buildIfBlock(indent, {
+    condition: `${optionsName} != nil`,
+    body: (indent) => `${indent.get()}${optionsCopy} = *${optionsName}\n`,
+  })}\n`;
+  if (hasHeaders) {
+    body += `${indent.get()}var ${initialResponse} *http.Response\n`;
+  }
+  imports.add("io");
+  body += `${indent.get()}${connect} := func(ctx context.Context, ${cursor} string) (io.ReadCloser, error) {\n`;
+  body += `${indent.push().get()}${optionsCopy}.${lastEventID.name} = ${cursor}\n`;
+  body += `${indent.get()}httpResp, respErr := client.${method.naming.operationMethod}(${helpers.getCreateRequestParameters(method, undefined, `&${optionsCopy}`)})\n`;
+  if (hasHeaders) {
+    body += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: `${initialResponse} == nil`,
+      body: (indent) => `${indent.get()}${initialResponse} = httpResp\n`,
+    })}\n`;
+  }
+  body += `${indent.get()}return runtime.SSEResponse(httpResp, respErr, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
+  body += `${indent.pop().get()}}\n`;
+  imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
+  if (!method.returns.result || method.returns.result.kind !== "sseResult") {
+    throw new Error("missing result");
+  }
+  body += `${indent.get()}${reader}, err := streaming.NewSSEReader(ctx, ${connect}, streaming.SSEHandler[${go.getTypeDeclaration(method.returns.result.type.eventType, method.receiver.type.pkg)}]{\n`;
+  body += `${indent.push().get()}Decode: decode${method.returns.result.type.eventType.name},\n`;
+  body += `${indent.pop().get()}}, &streaming.SSEReaderOptions{LastEventID: ${optionsCopy}.${lastEventID.name}})\n`;
+  body += `${indent.get()}${helpers.buildErrCheck(indent, "err", getZeroReturnValue(method, false))}\n`;
+  if (hasHeaders) {
+    body += `${indent.get()}${result}, err := client.${method.naming.responseMethod}(${initialResponse})\n`;
+    body += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "err != nil",
+      body: (indent) =>
+        `${indent.get()}_ = ${reader}.Close()\n${indent.get()}return ${getZeroReturnValue(method, false)}, err\n`,
+    })}\n`;
+    body += `${indent.get()}${result}.Stream = ${reader}\n`;
+    body += `${indent.get()}return ${result}, nil\n`;
+  } else {
+    body += `${indent.get()}return ${method.returns.name}{Stream: ${reader}}, nil\n`;
+  }
+  return body;
+}
+
+/**
+ * returns the last event ID option used to resume an SSE stream
+ *
+ * @param method the SSE method to inspect
+ * @returns the last event ID parameter
+ * @throws CodegenError if the method is missing the required option
+ */
+function getSseLastEventID(method: go.SseMethod): go.SseLastEventIDParameter {
+  const lastEventID = method.optionalParamsGroup.params.find(
+    (param) => param.kind === "sseLastEventIDParam",
+  );
+  if (!lastEventID) {
+    throw new CodegenError("InternalError", "missing SSE last event ID option");
+  }
+  return lastEventID;
+}
+
+/**
+ * creates the internal method that sends a single SSE connection request
+ *
+ * @param method the SSE method for which to emit the operation
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the text for the connection method
+ */
+function generateSseOperation(
+  method: go.SseMethod,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  const params = getAPIParameters(method, imports);
+
+  let text = `// ${method.naming.operationMethod} opens a connection for the ${method.name} stream.\n`;
+  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${method.naming.operationMethod}(${params.join(", ")}) (*http.Response, error) {\n`;
+
+  text += `${indent.get()}req, err := client.${method.naming.requestMethod}(${helpers.getCreateRequestParameters(method)})\n`;
+  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+
+  const lastEventID = getSseLastEventID(method);
+  const optionsName = method.optionalParamsGroup.name;
+  text += `${indent.get()}${helpers.buildIfBlock(indent, {
+    condition: `${optionsName} != nil && ${optionsName}.${lastEventID.name} != ""`,
+    body: (indent) =>
+      `${indent.get()}req.Raw().Header.Set("Last-Event-ID", ${optionsName}.${lastEventID.name})\n`,
+  })}\n`;
+
+  text += `${indent.get()}return client.internal.Pipeline().Do(req)\n`;
+  text += "}\n\n"; // end func
   return text;
 }

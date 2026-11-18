@@ -16,7 +16,8 @@ export type Result =
   | HeadAsBooleanResult
   | ModelResult
   | MonomorphicResult
-  | PolymorphicResult;
+  | PolymorphicResult
+  | SseResult;
 
 /** for endpoints that return a different schema based on the HTTP status code */
 export interface AnyResult {
@@ -215,6 +216,20 @@ export interface ResponseEnvelope {
   method: client.MethodType;
 }
 
+/** used for methods that return server-side events */
+export interface SseResult {
+  kind: "sseResult";
+
+  /** the name of the field within the response envelope */
+  fieldName: string;
+
+  /** the result field type */
+  type: type.SSEReader;
+
+  /** any docs for the result */
+  docs: type.Docs;
+}
+
 /** indicates the wire format for response bodies */
 export type ResultFormat = "JSON" | "XML" | "Text";
 
@@ -325,5 +340,14 @@ export class ResponseEnvelope implements ResponseEnvelope {
     this.headers = new Array<HeaderScalarResponse | HeaderMapResponse>();
     this.method = forMethod;
     this.name = name;
+  }
+}
+
+export class SseResult implements SseResult {
+  constructor(fieldName: string, type: type.SSEReader) {
+    this.kind = "sseResult";
+    this.fieldName = fieldName;
+    this.type = type;
+    this.docs = {};
   }
 }

@@ -1,4 +1,14 @@
-import { type Model, type Scalar, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  type ModelProperty,
+  type Scalar,
+  createRule,
+  fileRef,
+  isArrayModelType,
+  isRecordModelType,
+  paramMessage,
+} from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 const disallowList = new Set(["integer", "numeric", "float", "decimal"]);
 const alternatives = new Map([
@@ -20,19 +30,35 @@ export const noGenericNumericRule = createRule({
   },
   create(context) {
     return {
-      model: (model: Model) => {
-        for (const [_, prop] of model.properties) {
-          if (prop.type.kind === "Scalar") {
-            if (disallowList.has(prop.type.name)) {
-              context.reportDiagnostic({
-                target: prop,
-                format: {
-                  name: prop.type.name,
-                  alternative: alternatives.get(prop.type.name)!,
-                },
-              });
-            }
-          }
+      modelProperty: (prop: ModelProperty) => {
+        const modelNode = prop.model?.node;
+        // Copied operation parameters are checked at their source declarations.
+        if (
+          prop.sourceProperty &&
+          modelNode?.parent?.kind === SyntaxKind.OperationSignatureDeclaration &&
+          modelNode.parent.parameters === modelNode
+        ) {
+          return;
+        }
+
+        let type = prop.type;
+        const visited = new Set<Model>();
+        while (
+          type.kind === "Model" &&
+          (isArrayModelType(type) || isRecordModelType(type)) &&
+          !visited.has(type)
+        ) {
+          visited.add(type);
+          type = type.indexer.value;
+        }
+        if (type.kind === "Scalar" && disallowList.has(type.name)) {
+          context.reportDiagnostic({
+            target: prop,
+            format: {
+              name: type.name,
+              alternative: alternatives.get(type.name)!,
+            },
+          });
         }
       },
       scalar: (scalar: Scalar) => {

@@ -40,7 +40,7 @@ export const useUnionHierarchyRule = createRule({
       },
       unionVariant(variant) {
         const base = variant.union.baseType;
-        if (base?.kind !== "Model" || variant.type.kind !== "Model") {
+        if (base?.kind !== "Model" || typekit.array.is(base) || variant.type.kind !== "Model") {
           return;
         }
 

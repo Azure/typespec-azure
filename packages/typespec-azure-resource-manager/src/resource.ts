@@ -913,6 +913,7 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): S
 
   // We haven't generated the full resource details yet
   const resources: StructuralResolvedResource[] = [];
+  const unmatchedLists = new Map<Operation, ArmResourceOperation>();
   for (const resource of listArmResources(program, realm)) {
     if (
       realm !== undefined &&
@@ -920,7 +921,11 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): S
     ) {
       continue;
     }
-    const operations = resolveArmResourceOperations(program, resource.typespecType);
+    const { resources: operations, unmatchedLists: resourceLists } =
+      resolveResourceOperationsWithLists(program, resource.typespecType);
+    for (const list of resourceLists) {
+      unmatchedLists.set(list.operation, list);
+    }
     const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
     for (const op of operations) {
       const fullResource: StructuralResolvedResource = {
@@ -949,16 +954,23 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): S
   // Add the unmarked operations
   const resolved: StructuralProvider = {
     resources: resources,
-    providerOperations: getUnassociatedOperationsForContainer(program, providerNamespace).filter(
-      (op) => !isArmResourceOperation(program, op.operation),
-    ),
+    providerOperations: [
+      ...getUnassociatedOperationsForContainer(program, providerNamespace),
+      ...[...unmatchedLists.values()].filter(
+        (list) =>
+          isTypeDeclaredInNamespace(list.operation, providerNamespace) &&
+          !resources.some((resource) =>
+            resource.operations.lists.some((operation) => operation.operation === list.operation),
+          ),
+      ),
+    ],
   };
 
   programProviders.set(providerNamespace, resolved);
   return resolved;
 }
 
-function isTypeDeclaredInNamespace(type: Model, namespace: Namespace): boolean {
+function isTypeDeclaredInNamespace(type: Model | Operation, namespace: Namespace): boolean {
   let current = type.namespace;
   while (current !== undefined) {
     if (current === namespace) return true;
@@ -1342,11 +1354,6 @@ function normalizePathForResourceIdentity(path: string): string {
     .join("/");
 }
 
-function trimScopePrefix(path: string): string {
-  const scopePrefix = getScopePrefix(path);
-  return scopePrefix === "" ? path : path.slice(scopePrefix.length);
-}
-
 function isResourceIdentityOperation(kind: ArmOperationKind): boolean {
   return kind === "read" || kind === "createOrUpdate";
 }
@@ -1468,96 +1475,28 @@ function parseKnownProviderlessResourcePath(
   return undefined;
 }
 
-function isListOperationPrefixMatch(
-  operation: ArmResourceOperation,
+function isListOperationMatch(
+  candidate: ArmResourceOperationCandidate,
   resource: ResolvedResourceOperations,
+  isTracked: boolean,
 ): boolean {
-  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
+  if (candidate.resourceNameIsExplicit) {
+    return (
+      candidate.armOperation.resourceName?.toLowerCase() === resource.resourceName.toLowerCase()
+    );
+  }
+
+  const operationPath = normalizePathForResourceIdentity(candidate.armOperation.path);
   const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
-  return resourcePath.startsWith(`${operationPath}/`);
-}
+  const collectionPath = resourcePath.slice(0, resourcePath.lastIndexOf("/"));
+  if (operationPath === collectionPath) return true;
 
-function isListOperationResourceTypeMatch(
-  operation: ArmResourceOperation,
-  resource: ResolvedResourceOperations,
-): boolean {
-  const operationPath = normalizePathForResourceIdentity(operation.httpOperation.path);
-  const resourcePath = normalizePathForResourceIdentity(resource.resourceInstancePath);
-  return isSameResourceTypePath(operationPath, resourcePath);
-}
-
-function getListMatchDistance(
-  operation: ArmResourceOperation,
-  resource: ResolvedResourceOperations,
-): number {
-  const operationPath = trimScopePrefix(
-    normalizePathForResourceIdentity(operation.httpOperation.path),
-  );
-  const resourcePath = trimScopePrefix(
-    normalizePathForResourceIdentity(resource.resourceInstancePath),
-  );
-  return resourcePath.length - operationPath.length;
-}
-
-function isSameResourceTypePath(leftPath: string, rightPath: string): boolean {
-  const left = parseArmResourceCollectionPath(leftPath);
-  const right = parseArmResourceInstancePath(rightPath)?.resourceType;
-  if (left === undefined || right === undefined) return false;
+  const resourceGroupScope = "/subscriptions/{}/resourcegroups/{}";
   return (
-    left.provider.toLowerCase() === right.provider.toLowerCase() &&
-    left.types.map((x) => x.toLowerCase()).join("/") ===
-      right.types.map((x) => x.toLowerCase()).join("/")
+    isTracked &&
+    getScopePrefix(resourcePath) === resourceGroupScope &&
+    operationPath === collectionPath.replace(resourceGroupScope, "/subscriptions/{}")
   );
-}
-
-function parseArmResourceCollectionPath(path: string): ResourceType | undefined {
-  const segments = path.split("/").filter((s) => s.length > 0);
-  const providerIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
-  if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
-
-  const provider = segments[providerIndex + 1];
-  if (isVariableSegment(provider)) return undefined;
-
-  const resourceSegments = segments.slice(providerIndex + 2);
-  if (resourceSegments.length === 0) return undefined;
-
-  const types: string[] = [];
-  for (let i = 0; i < resourceSegments.length; i += 2) {
-    const typeSegment = resourceSegments[i];
-    if (typeSegment === undefined || isVariableSegment(typeSegment)) return undefined;
-    types.push(typeSegment);
-  }
-
-  return { provider, types };
-}
-
-function getBestListOperationTarget(
-  operation: ArmResourceOperation,
-  resources: Iterable<ResolvedResourceOperations>,
-): ResolvedResourceOperations | undefined {
-  let best: ResolvedResourceOperations | undefined;
-  let bestDistance = Number.POSITIVE_INFINITY;
-  for (const resource of resources) {
-    if (!isListOperationPrefixMatch(operation, resource)) continue;
-    const distance = getListMatchDistance(operation, resource);
-    if (distance < bestDistance) {
-      best = resource;
-      bestDistance = distance;
-    }
-  }
-  if (best !== undefined) return best;
-
-  // TODO: https://github.com/Azure/typespec-azure/issues/5080
-  // Define the complete rule for associating list operations with detected resources.
-  // Some ARM resources expose list operations at scopes different from the resource identity,
-  // e.g. a resource-group-scoped resource can have subscription- or tenant-level list operations.
-  // Direct prefix matching handles list-by-parent paths; concrete provider/type equality handles
-  // cross-scope list paths without letting list operations create resource identities.
-  for (const resource of resources) {
-    if (isListOperationResourceTypeMatch(operation, resource)) return resource;
-  }
-
-  return undefined;
 }
 
 function isActionOperationMatch(
@@ -1799,7 +1738,16 @@ export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
 ): ResolvedResourceOperations[] {
+  return resolveResourceOperationsWithLists(program, resourceType).resources;
+}
+
+function resolveResourceOperationsWithLists(
+  program: Program,
+  resourceType: Model,
+): { resources: ResolvedResourceOperations[]; unmatchedLists: ArmResourceOperation[] } {
   const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
+  const unmatchedLists: ArmResourceOperation[] = [];
+  const isTracked = getArmResource(program, resourceType)?.kind === "Tracked";
   const candidates = [...getArmResourceOperationList(program, resourceType)]
     .map((operation) => resolveArmResourceOperationCandidate(program, resourceType, operation))
     .filter((operation) => operation !== undefined);
@@ -1838,11 +1786,16 @@ export function resolveArmResourceOperations(
   for (const candidate of candidates) {
     if (isResourceIdentityOperation(candidate.armOperation.kind)) continue;
     if (candidate.armOperation.kind === "list") {
-      const target = getBestListOperationTarget(candidate.armOperation, resolvedOperations);
-      if (target !== undefined) {
-        tryAddLifecycleOperation(target.resourceType, candidate.armOperation, target);
+      let matched = false;
+      for (const target of resolvedOperations) {
+        if (isListOperationMatch(candidate, target, isTracked)) {
+          tryAddLifecycleOperation(target.resourceType, candidate.armOperation, target);
+          matched = true;
+        }
       }
-      // TODO: Define how non-prefix list paths should map to detected resource identities.
+      if (!matched) {
+        unmatchedLists.push(candidate.armOperation);
+      }
       continue;
     }
     for (const resolvedOp of resolvedOperations) {
@@ -1850,7 +1803,7 @@ export function resolveArmResourceOperations(
     }
   }
 
-  return [...resolvedOperations.values()].toSorted((a, b) => {
+  const resources = [...resolvedOperations.values()].toSorted((a, b) => {
     // Sort by provider, type, then instance path
     if (a.resourceType.types.length < b.resourceType.types.length) return -1;
     if (a.resourceType.types.length > b.resourceType.types.length) return 1;
@@ -1862,6 +1815,7 @@ export function resolveArmResourceOperations(
     if (a.resourceInstancePath.toLowerCase() > b.resourceInstancePath.toLowerCase()) return 1;
     return 0;
   });
+  return { resources, unmatchedLists };
 }
 
 interface ArmResourceOperationCandidate {
