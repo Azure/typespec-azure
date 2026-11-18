@@ -161,6 +161,22 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     return result![0]!.getFunctionOrThrow(name!).getText();
   },
 
+  "(ts|typescript) restorePoller": async (tsp, _, namedUnknownArgs) => {
+    const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
+    const result = await emitModularOperationsFromTypeSpec(tsp, {
+      ...configs,
+      withRestorePoller: true,
+    });
+    const restorePoller = result?.[0]?.getProject().getSourceFileOrThrow("restorePollerHelpers.ts");
+    return [
+      restorePoller!.getFunctionOrThrow("restorePoller").getText(),
+      restorePoller!
+        .getVariableDeclarationOrThrow("deserializeMap")
+        .getVariableStatementOrThrow()
+        .getText(),
+    ].join("\n\n");
+  },
+
   "(ts|typescript) samples": async (tsp, _, namedUnknownArgs) => {
     if (!namedUnknownArgs || !namedUnknownArgs["examples"]) {
       throw new Error(`Expected 'examples' to be passed in as an argument`);

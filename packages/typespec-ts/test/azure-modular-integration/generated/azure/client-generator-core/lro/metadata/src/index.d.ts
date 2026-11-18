@@ -9,12 +9,36 @@ import { Pipeline } from '@azure/core-rest-pipeline';
 import { PollerLike } from '@azure/core-lro';
 import { RestError } from '@azure/core-rest-pipeline';
 
+export declare interface AnalyzeJobOperationState extends OperationState_2<LanguageJobResult> {
+    readonly jobId?: string;
+    readonly displayName?: string;
+    readonly statistics?: JobStatistics;
+    readonly errors?: JobItemError[];
+    readonly createdDateTime?: Date;
+    readonly lastUpdatedDateTime?: Date;
+    readonly expirationDateTime?: Date;
+}
+
 export declare interface AnalyzeJobOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
 
+export declare interface AnalyzeJobWithFailureOperationState extends OperationState_2<LanguageJobResult> {
+    readonly jobId?: string;
+    readonly displayName?: string;
+    readonly statistics?: JobStatistics;
+    readonly errors?: JobItemError[];
+    readonly createdDateTime?: Date;
+    readonly lastUpdatedDateTime?: Date;
+    readonly expirationDateTime?: Date;
+}
+
 export declare interface AnalyzeJobWithFailureOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
+}
+
+export declare interface AnalyzeWithUsageOperationState extends OperationState_2<ContentAnalysisResult> {
+    readonly usage?: UsageDetails;
 }
 
 export declare interface AnalyzeWithUsageOptionalParams extends OperationOptions {
@@ -80,28 +104,10 @@ export declare class MetadataClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: MetadataClientOptionalParams);
-    analyzeJobWithFailure(options?: AnalyzeJobWithFailureOptionalParams): PollerLike<OperationState_2<LanguageJobResult> & {
-        readonly jobId?: string;
-        readonly displayName?: string;
-        readonly statistics?: JobStatistics;
-        readonly errors?: JobItemError[];
-        readonly createdDateTime?: Date;
-        readonly lastUpdatedDateTime?: Date;
-        readonly expirationDateTime?: Date;
-    }, LanguageJobResult>;
-    analyzeJob(options?: AnalyzeJobOptionalParams): PollerLike<OperationState_2<LanguageJobResult> & {
-        readonly jobId?: string;
-        readonly displayName?: string;
-        readonly statistics?: JobStatistics;
-        readonly errors?: JobItemError[];
-        readonly createdDateTime?: Date;
-        readonly lastUpdatedDateTime?: Date;
-        readonly expirationDateTime?: Date;
-    }, LanguageJobResult>;
+    analyzeJobWithFailure(options?: AnalyzeJobWithFailureOptionalParams): PollerLike<AnalyzeJobWithFailureOperationState, LanguageJobResult>;
+    analyzeJob(options?: AnalyzeJobOptionalParams): PollerLike<AnalyzeJobOperationState, LanguageJobResult>;
     getLanguageJobStatus(jobId: string, options?: GetLanguageJobStatusOptionalParams): Promise<LanguageJobStatus>;
-    analyzeWithUsage(analyzerId: string, options?: AnalyzeWithUsageOptionalParams): PollerLike<OperationState_2<ContentAnalysisResult> & {
-        readonly usage?: UsageDetails;
-    }, ContentAnalysisResult>;
+    analyzeWithUsage(analyzerId: string, options?: AnalyzeWithUsageOptionalParams): PollerLike<AnalyzeWithUsageOperationState, ContentAnalysisResult>;
     getContentAnalysisStatus(operationId: string, options?: GetContentAnalysisStatusOptionalParams): Promise<ContentAnalysisStatus>;
 }
 

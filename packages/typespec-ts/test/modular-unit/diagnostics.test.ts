@@ -15,6 +15,33 @@ import {
 describe("Diagnostic reporting tests", () => {
   afterAll(clearCompileCache);
 
+  it("reports unsupported reserved expansions in LRO operation ID paths", async () => {
+    await expect(
+      emitModularOperationsFromTypeSpec(
+        `
+        import "@typespec/http";
+        import "@azure-tools/typespec-azure-core";
+        import "@azure-tools/typespec-client-generator-core";
+        using TypeSpec.Http;
+        using Azure.Core;
+        using Azure.ClientGenerator.Core;
+        @service namespace ReservedLro;
+        model Result { value: string; }
+        model Monitor { status: Azure.Core.Foundations.OperationState; result?: Result; }
+        @route("/jobs/{+id}") @get op getStatus(@lroOperationId @path id: string): Monitor;
+        @route("/jobs") @post @pollingOperation(getStatus)
+        op start(): Azure.Core.Foundations.AcceptedResponse &
+          Azure.Core.Foundations.LongRunningStatusLocation<Monitor>;
+        `,
+        { withRawContent: true },
+      ),
+    ).rejects.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "@azure-tools/typespec-ts/invalid-lro-operation-id-path" }),
+      ]),
+    );
+  });
+
   it("should not crash when emitter encounters error conditions", async () => {
     // This test verifies that the main files compile and load without syntax errors
     // The actual diagnostic behavior is tested implicitly through other unit tests

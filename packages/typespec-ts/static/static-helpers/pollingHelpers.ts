@@ -38,6 +38,8 @@ export interface GetLongRunningPollerOptions<TResponse> {
    * The api-version of the LRO
    */
   apiVersion?: string;
+  /** Initial response status codes whose bodies use the status-monitor model. */
+  initialResponseStatusMonitorStatuses?: string[];
   /**
    * Extracts the operation metadata exposed on the operation state from the latest
    * status-monitor response and the current polling URL.
@@ -70,7 +72,10 @@ export function getLongRunningPoller<TResponse extends PathUncheckedResponse, TR
       }
       initialResponse = await getInitialResponse();
       const lroResponse = getLroResponse(initialResponse, expectedStatuses);
-      if (getOperationMetadata && isObjectBody(initialResponse.body)) {
+      if (
+        getOperationMetadata &&
+        options.initialResponseStatusMonitorStatuses?.includes(initialResponse.status)
+      ) {
         statusMonitorResponse = initialResponse;
       }
       return lroResponse;
@@ -164,10 +169,13 @@ export function getLongRunningPoller<TResponse extends PathUncheckedResponse, TR
     }
   }
   const getBaseOperationState = Object.getOwnPropertyDescriptor(lroPoller, "operationState")?.get;
+  if (!getBaseOperationState) {
+    return lroPoller;
+  }
   const pollerWithMetadata = lroPoller;
   Object.defineProperty(pollerWithMetadata, "operationState", {
     get: () => {
-      const state = getBaseOperationState?.call(pollerWithMetadata) as
+      const state = getBaseOperationState.call(pollerWithMetadata) as
         OperationState<TResult> | undefined;
       attachOperationMetadata(state);
       return state;
@@ -224,9 +232,6 @@ function getOperationLocation(state: unknown): string | undefined {
     ?.operationLocation;
 }
 
-function isObjectBody(body: unknown): boolean {
-  return typeof body === "object" && body !== null && !Array.isArray(body);
-}
 /**
  * Converts a Rest Client response to a response that the LRO implementation understands
  * @param response - a rest client http response

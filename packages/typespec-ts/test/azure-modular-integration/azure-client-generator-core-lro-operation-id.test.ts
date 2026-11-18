@@ -1,3 +1,4 @@
+import { createHttpHeaders } from "@azure/core-rest-pipeline";
 import { assert, beforeEach, describe, it } from "vitest";
 import {
   OperationIdClient,
@@ -57,5 +58,38 @@ describe("Azure ClientGenerator Core LRO operation ID", () => {
     const result = await poller.pollUntilDone();
     assert.strictEqual(result.translatedCharacters, 84);
     assert.strictEqual(poller.operationState?.operationId, "translation-456");
+  });
+
+  it("uses a different body ID after polling instead of a non-monitor initial body", async () => {
+    const pollingUrl =
+      "http://localhost:3002/azure/client-generator-core/lro/operation-id/translations/operations/path-id?api-version=1";
+    const urls: string[] = [];
+    const customClient = new OperationIdClient({
+      endpoint: "http://localhost:3002",
+      allowInsecureConnection: true,
+      httpClient: {
+        async sendRequest(request) {
+          urls.push(request.url);
+          const initial = request.method === "POST";
+          return {
+            request,
+            status: initial ? 202 : 200,
+            headers: createHttpHeaders({
+              "content-type": "application/json",
+              ...(initial ? { "operation-location": pollingUrl } : {}),
+            }),
+            bodyAsText: JSON.stringify(
+              initial ? { id: "resource-id" } : { status: "Running", id: "body-id" },
+            ),
+          };
+        },
+      },
+    });
+    const poller = customClient.startTranslationWithPath({ updateIntervalInMs: 0 });
+    await poller.submitted();
+    assert.strictEqual(poller.operationState?.operationId, "path-id");
+    await poller.poll();
+    assert.strictEqual(poller.operationState?.operationId, "body-id");
+    assert.strictEqual(urls[1], pollingUrl);
   });
 });

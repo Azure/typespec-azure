@@ -1,4 +1,5 @@
 import { assert, beforeEach, describe, it } from "vitest";
+import { MetadataClient as CompatibilityMetadataClient } from "./generated/azure/client-generator-core/lro/metadata-compat/src/index.js";
 import {
   MetadataClient,
   restorePoller,
@@ -98,5 +99,17 @@ describe("Azure ClientGenerator Core LRO status metadata", () => {
     const result = await restored.pollUntilDone();
     assert.deepEqual(result.documents, ["document-1", "document-2", "document-3"]);
     assert.deepEqual(restored.operationState?.statistics, { total: 3, succeeded: 3, failed: 0 });
+  });
+
+  it("exposes typed live metadata through compatibility begin methods", async () => {
+    const compatClient = new CompatibilityMetadataClient({
+      endpoint: "http://localhost:3002",
+      allowInsecureConnection: true,
+    });
+    const poller = await compatClient.beginAnalyzeJob({ updateIntervalInMs: 0 });
+    assert.strictEqual(poller.getOperationState().jobId, "job-success");
+    const result = await poller.pollUntilDone();
+    assert.deepEqual(result.documents, ["document-1", "document-2", "document-3"]);
+    assert.deepEqual(poller.getOperationState().statistics, { total: 3, succeeded: 3, failed: 0 });
   });
 });

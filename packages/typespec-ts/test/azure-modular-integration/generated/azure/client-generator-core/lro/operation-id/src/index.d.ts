@@ -8,6 +8,10 @@ import { Pipeline } from '@azure/core-rest-pipeline';
 import { PollerLike } from '@azure/core-lro';
 import { RestError } from '@azure/core-rest-pipeline';
 
+export declare interface AnalyzeOperationState extends OperationState_2<DocumentAnalysisResult> {
+    readonly operationId?: string;
+}
+
 export declare interface AnalyzeOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
@@ -40,17 +44,11 @@ export declare class OperationIdClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: OperationIdClientOptionalParams);
-    startTranslationWithPath(options?: StartTranslationWithPathOptionalParams): PollerLike<OperationState_2<TranslationResult> & {
-        readonly operationId?: string;
-    }, TranslationResult>;
+    startTranslationWithPath(options?: StartTranslationWithPathOptionalParams): PollerLike<StartTranslationWithPathOperationState, TranslationResult>;
     getTranslationWithPathStatus(operationId: string, options?: GetTranslationWithPathStatusOptionalParams): Promise<TranslationWithPathStatus>;
-    startTranslation(options?: StartTranslationOptionalParams): PollerLike<OperationState_2<TranslationResult> & {
-        readonly operationId?: string;
-    }, TranslationResult>;
+    startTranslation(options?: StartTranslationOptionalParams): PollerLike<StartTranslationOperationState, TranslationResult>;
     getTranslationStatus(options?: GetTranslationStatusOptionalParams): Promise<TranslationStatus>;
-    analyze(modelId: string, options?: AnalyzeOptionalParams): PollerLike<OperationState_2<DocumentAnalysisResult> & {
-        readonly operationId?: string;
-    }, DocumentAnalysisResult>;
+    analyze(modelId: string, options?: AnalyzeOptionalParams): PollerLike<AnalyzeOperationState, DocumentAnalysisResult>;
     getDocumentAnalysisStatus(modelId: string, resultId: string, options?: GetDocumentAnalysisStatusOptionalParams): Promise<DocumentAnalysisStatus>;
 }
 
@@ -70,8 +68,16 @@ export declare interface RestorePollerOptions<TResult, TResponse extends PathUnc
     processResponseBody?: (result: TResponse) => Promise<TResult>;
 }
 
+export declare interface StartTranslationOperationState extends OperationState_2<TranslationResult> {
+    readonly operationId?: string;
+}
+
 export declare interface StartTranslationOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
+}
+
+export declare interface StartTranslationWithPathOperationState extends OperationState_2<TranslationResult> {
+    readonly operationId?: string;
 }
 
 export declare interface StartTranslationWithPathOptionalParams extends OperationOptions {

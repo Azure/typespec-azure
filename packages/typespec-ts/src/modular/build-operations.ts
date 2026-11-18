@@ -4,10 +4,11 @@ import {
   getDeserializeHeadersPrivateFunction,
   getDeserializePrivateFunction,
   getExpectedStatuses,
-  getLroOperationMetadataPrivateFunction,
+  getLroOperationMetadataDeclarations,
   getOperationFunction,
   getOperationOptionsName,
   getSendPrivateFunction,
+  hasLroOperationMetadata,
   isLroAndPagingOperation,
   isLroOnlyOperation,
 } from "./helpers/operation-helpers.js";
@@ -98,12 +99,17 @@ export function buildOperationFiles(
       if (deserializeExceptionHeadersDeclaration) {
         functionsToAdd.push(deserializeExceptionHeadersDeclaration);
       }
-      const lroOperationMetadataDeclaration = getLroOperationMetadataPrivateFunction(dpgContext, [
+      const lroOperationMetadataDeclarations = getLroOperationMetadataDeclarations(dpgContext, [
         prefixes,
         op,
       ]);
-      if (lroOperationMetadataDeclaration) {
-        functionsToAdd.push(lroOperationMetadataDeclaration);
+      if (lroOperationMetadataDeclarations) {
+        functionsToAdd.push(lroOperationMetadataDeclarations.extractor);
+        addDeclaration(
+          operationGroupFile,
+          lroOperationMetadataDeclarations.state,
+          refkey(op, "lroOperationState"),
+        );
       }
 
       operationGroupFile.addFunctions(functionsToAdd);
@@ -245,10 +251,9 @@ export function buildLroDeserDetailMap(
           renamedDeserName = `_${newName}`;
         }
         existingNames.add(deserName);
-        const operationMetadataName = getLroOperationMetadataPrivateFunction(context, [
-          prefixes,
-          o,
-        ])?.name;
+        const operationMetadataName = hasLroOperationMetadata(o)
+          ? `_${name}GetOperationMetadata`
+          : undefined;
         return {
           path: `${o.operation.verb.toUpperCase()} ${o.operation.path}`,
           expectedStatusesExpression: getExpectedStatuses(o),
@@ -257,7 +262,10 @@ export function buildLroDeserDetailMap(
           operationMetadataName,
           renamedOperationMetadataName:
             operationMetadataName && renamedDeserName
-              ? `${renamedDeserName.replace(/Deserialize/, "GetOperationMetadata")}`
+              ? `_${name}GetOperationMetadata${normalizeName(
+                  operationFileName.split("/").slice(0, -1).join("_"),
+                  NameType.Interface,
+                )}`
               : undefined,
         };
       }),

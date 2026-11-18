@@ -219,7 +219,7 @@ function generateMethod(
       docs: [`@deprecated use ${methodName} instead`],
       name: beginName,
       kind: StructureKind.Method,
-      returnType: `Promise<${simplePollerLikeReference}<${operationStateReference}<${returnType}>, ${returnType}>>`,
+      returnType: `Promise<${simplePollerLikeReference}<${declaration.lroOperationStateType ?? `${operationStateReference}<${returnType}>`}, ${returnType}>>`,
       parameters: methodParams,
       statements: `const poller = ${declarationRefKey}(${methodParamStr});
                   await poller.submitted();
