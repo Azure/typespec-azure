@@ -13,9 +13,15 @@ import { SyntaxKind } from "@typespec/compiler/ast";
  * Get the namespace name for a target type.
  */
 function getTargetNamespace(target: Type): string {
-  const shortRef = buildShortRef(target);
-  const fqn = buildFqn(target);
-  return fqn.endsWith(`.${shortRef}`) ? fqn.slice(0, -shortRef.length - 1) : "";
+  const namespace =
+    target.kind === "ModelProperty"
+      ? target.model?.namespace
+      : target.kind === "UnionVariant"
+        ? target.union.namespace
+        : "namespace" in target
+          ? target.namespace
+          : undefined;
+  return namespace ? getTypeName(namespace, { printable: true }) : "";
 }
 
 /**
@@ -23,10 +29,9 @@ function getTargetNamespace(target: Type): string {
  * Used for same-file augment decorators where the namespace is already in scope.
  */
 function buildShortRef(target: Type): string {
-  if (target.kind === "UnionVariant" && typeof target.name === "string") {
-    return `${getTypeName(target.union, { nameOnly: true, printable: true })}.${target.name}`;
-  }
-  return getTypeName(target, { nameOnly: true, printable: true });
+  const fqn = buildFqn(target);
+  const namespace = getTargetNamespace(target);
+  return namespace && fqn.startsWith(`${namespace}.`) ? fqn.slice(namespace.length + 1) : fqn;
 }
 
 /**

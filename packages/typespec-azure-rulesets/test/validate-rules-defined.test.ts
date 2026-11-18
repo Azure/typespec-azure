@@ -56,6 +56,7 @@ describe("expect all rules to be defined", () => {
     ok(ruleset);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-url-suffix"]);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-model-suffix"]);
+    ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-use-bool-prefix"]);
     strictEqual(
       ruleset.enable?.["@azure-tools/typespec-client-generator-core/get-operation-name"],
       false,
