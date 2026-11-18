@@ -110,17 +110,20 @@ before selecting specs or installing dependencies. Record its metadata commit
 and immutable descriptor/archive identity. Select the canonical candidate base
 once, but prepare specs at the descriptor's frozen `source.commit`, not the
 metadata commit or a newly fetched specs tip. Missing/corrupt/incompatible
-shared data blocks migration; only a separately requested producer refresh
-runs the Swagger suite. Changing validator IDs alone does not invalidate the
-all-production-ARM observation baseline. Never
+shared data blocks migration; consumers never run the Swagger suite. The
+separate baseline producer refreshes once per monthly TypeSpec release cycle;
+an out-of-cycle refresh requires explicit authorization and evidence of
+material incompatibility or unresolved baseline validity. Changing validator
+IDs alone does not invalidate the all-production-ARM observation baseline. Never
 substitute arbitrary latest compiler packages: use the candidate's compatible
 closure and actual core gitlink. Verify prerequisite layers before installing;
 install only missing/invalid dependencies or changed manifests.
 
 Apply the [monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
-new native branches use current canonical main, but coverage reuses the same
-specs commit throughout the dependency-upgrade cycle. New PRs or source SHAs
-alone do not justify baseline refresh. Assume current-main compiler and libraries
+new native branches use current canonical main, while one separately published
+baseline is refreshed at the start of each monthly TypeSpec release cycle and
+reused for coverage throughout that cycle. New PRs or source SHAs alone do not
+justify another refresh within the cycle. Assume current-main compiler and libraries
 remain backward-compatible with the frozen specs, and explicitly use the supported
 `--baseline-policy frozen-reference` with `--baseline-run`. Keep saved Swagger
 diagnostics and run fresh native diagnostics over the full frozen population.
@@ -289,7 +292,8 @@ success. General many-to-many analysis requires a separate design.
 Follow the [coverage lifecycle](../analyze-native-lint-coverage/SKILL.md#baseline-lifecycle)
 and [evidence contract](evidence.md). Discover/pin shared completed data first,
 reuse it across rules, and reserve fresh source selection/Swagger execution for
-an explicitly requested separate producer refresh into a new immutable baseline.
+the scheduled monthly producer or explicitly authorized out-of-cycle producer
+to publish a new immutable baseline.
 Keep shared input read-only and each parallel candidate's writable specs runtime
 separate. Separate frozen
 emitter/Swagger inputs from changed native artifacts. Specs SHA equality alone

@@ -63,10 +63,11 @@ diagnostics. Retain both runtime contexts and investigate actual failures and
 gaps; runtime-version differences or a strict closure mismatch alone do not block
 this historical comparison. Missing/corrupt/incompatible source or population data
 is a prerequisite blocker, never permission to generate Swagger per rule.
-Only an explicitly requested separate producer refresh resolves new specs
-sources and runs Swagger validators. Keep immutable baseline data read-only;
-parallel candidates require separate writable specs runtimes to prevent
-injected-package races. Representative preflight uses lightweight controls;
+Only the separate monthly release producer or an explicitly authorized
+out-of-cycle producer resolves new specs sources and runs Swagger validators.
+Keep immutable baseline data read-only; parallel candidates require separate
+writable specs runtimes to prevent injected-package races. Representative
+preflight uses lightweight controls;
 the full saved-population readout and full compatible native run remain required.
 Full baseline reuse with `--filter`/`--limit` is not supported.
 Verify candidate core gitlink and compatible package closure. Do not repeatedly
