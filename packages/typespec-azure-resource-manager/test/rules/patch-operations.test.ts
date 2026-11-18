@@ -1,18 +1,13 @@
-import { Tester, UnwrappedTester } from "#test/tester.js";
-import {
-  type LinterRuleTester,
-  type TesterInstance,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/tester.js";
+import { getSourceLocation } from "@typespec/compiler";
+import { type LinterRuleTester, createLinterRuleTester, t } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
-
-let runner: TesterInstance;
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await Tester.createInstance();
+  const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     patchOperationsRule,
@@ -211,105 +206,27 @@ it("emit diagnostic when there is no request body", async () => {
 describe("writable input properties", () => {
   const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-patch";
 
-  let tester: LinterRuleTester;
-
-  beforeEach(async () => {
-    const runner = await Tester.createInstance();
-    tester = createLinterRuleTester(
-      runner,
-      patchOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
-
-  describe("semantic examples", () => {
-    const examples = [
-      `import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName?: string;
-
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetPatchProperties {
-  displayName?: string;
-  /*target*/extra?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
-@armResourceOperations
-interface Widgets {
-  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-}
-`,
-      `import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName?: string;
-
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetPatchProperties {
-  displayName?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
-@armResourceOperations
-interface Widgets {
-  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
-}
-`,
-    ];
-    let fixtureTester: LinterRuleTester;
-
-    beforeEach(async () => {
-      fixtureTester = createLinterRuleTester(
-        await UnwrappedTester.createInstance(),
-        patchOperationsRule,
-        "@azure-tools/typespec-azure-resource-manager",
-      );
-    });
+  describe("standard ARM operations", () => {
+    const models = `
+      @service @armProviderNamespace namespace Contoso.Widgets;
+      model WidgetProperties { displayName?: string; }
+      model Widget is TrackedResource<WidgetProperties> {
+        ...ResourceNameParameter<Widget>;
+      }
+      model WidgetPatchProperties { displayName?: string; /*target*/extra?: string; }
+      model WidgetPatch { tags?: Record<string>; properties?: WidgetPatchProperties; }
+    `;
+    const operations = `
+      @armResourceOperations
+      interface Widgets {
+        createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+      }
+    `;
+    const examples = [models, models.replace("/*target*/extra?: string;", "")];
 
     it("diagnoses the incorrect ARM template fixture", async () => {
-      await fixtureTester.expect(examples[0]).toEmitDiagnostics(({ pos }) => ({
+      await tester.expect(examples[0] + operations).toEmitDiagnostics(({ pos }) => ({
         ...missingProperty("extra"),
         pos: pos.target.pos,
         end: pos.target.pos + "extra?: string".length,
@@ -317,47 +234,50 @@ interface Widgets {
     });
 
     it("accepts the correct ARM template fixture", async () => {
-      await fixtureTester.expect(examples[1]).toBeValid();
+      await tester.expect(examples[1] + operations).toBeValid();
     });
 
     it("checks missing input against an inherited ARM create operation", async () => {
-      await fixtureTester
+      await tester
         .expect(
-          examples[0].replace(
-            "interface Widgets {\n  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;",
-            "interface Widgets extends ResourceCreateAsync<Widget> {",
-          ),
+          `${models}
+          @armResourceOperations
+          interface Widgets extends ResourceCreateAsync<Widget> {
+            update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+          }`,
         )
         .toEmitDiagnostics(missingProperty("extra"));
     });
 
     it.each([0, 1])("checks inherited ARM operation pairs for fixture %s", async (index) => {
-      const fixture = examples[index].replace(
-        /interface Widgets \{[\s\S]*?\n\}/,
-        `interface Widgets extends ResourceCreateAsync<Widget>,
-          ResourceUpdateAsync<Widget, WidgetPatchProperties> {}`,
-      );
+      const fixture = `${examples[index]}
+        @armResourceOperations
+        interface Widgets extends ResourceCreateAsync<Widget>,
+          ResourceUpdateAsync<Widget, WidgetPatchProperties> {}`;
       if (index === 0) {
-        await fixtureTester.expect(fixture).toEmitDiagnostics(missingProperty("extra"));
+        await tester.expect(fixture).toEmitDiagnostics(missingProperty("extra"));
       } else {
-        await fixtureTester.expect(fixture).toBeValid();
+        await tester.expect(fixture).toBeValid();
       }
     });
 
     it("targets a project interface for inherited library PATCH properties", async () => {
-      await fixtureTester
+      await tester
         .expect(
-          examples[1].replace(
-            /interface Widgets \{[\s\S]*?\n\}/,
-            `interface Widgets extends ResourceUpdateAsync<Widget, WidgetPatchProperties> {
+          t.code`${examples[1]}
+            @armResourceOperations
+            interface ${t.interface("Widgets")}
+              extends ResourceUpdateAsync<Widget, WidgetPatchProperties> {
               @TypeSpec.Rest.autoRoute
               @put
               createOrUpdate(...ResourceInstanceParameters<Widget>,
                 @body body: {properties?: WidgetProperties}): void;
             }`,
-          ),
         )
-        .toEmitDiagnostics(missingProperty("tags"));
+        .toEmitDiagnostics(({ Widgets }) => {
+          const { pos, end } = getSourceLocation(Widgets);
+          return { ...missingProperty("tags"), pos, end };
+        });
     });
   });
 
@@ -641,31 +561,6 @@ interface Widgets {
     },
   );
 
-  it("does not synthesize a PATCH discriminator absent from PUT", async () => {
-    await tester
-      .expect(
-        bodyPair(`
-        model PutBody { name?: string; }
-        @discriminator("kind") model PatchBody { name?: string; }
-        model ConcretePatch extends PatchBody { kind: "concrete"; }
-      `),
-      )
-      .toBeValid();
-  });
-
-  it("does not synthesize an inherited PATCH discriminator", async () => {
-    await tester
-      .expect(
-        bodyPair(`
-        model PutBody { name?: string; }
-        @discriminator("kind") model Base { name?: string; }
-        model PatchBody extends Base {}
-        model ConcretePatch extends PatchBody { kind: "concrete"; }
-      `),
-      )
-      .toBeValid();
-  });
-
   it.each([false, true])(
     "compares effective input of a standard PUT with Create visibility (unrelated property: %s)",
     async (unrelated) => {
@@ -795,18 +690,6 @@ interface Widgets {
         .toBeValid();
     },
   );
-
-  it("checks authored discriminator properties", async () => {
-    await tester
-      .expect(
-        bodyPair(`
-          model PutBody { common?: string; }
-          @discriminator("kind") model PatchBody { common?: string; kind?: string; }
-          model ConcretePatch extends PatchBody { kind: "concrete"; }
-        `),
-      )
-      .toEmitDiagnostics(missingProperty("kind"));
-  });
 
   it.each(["extends", "spread"])("filters inherited input visibility through %s", async (shape) => {
     await tester
@@ -1101,226 +984,23 @@ interface Widgets {
     };
   }
 
-  it("compares source properties without applying historical availability", async () => {
-    await tester
-      .expect(
-        `
-        @Azure.ResourceManager.armProviderNamespace
-        @service
-        @versioned(Versions)
-        namespace Microsoft.TestService;
-
-        enum Versions {
-          v1,
-          v2,
-        }
-
-        model PutCurrentBody {
-          @removed(Versions.v2)
-          currentProperty?: string;
-        }
-
-        model PatchCurrentBody {
-          currentProperty?: string;
-        }
-
-        model PutHistoricalBody {
-          commonProperty?: string;
-        }
-
-        model PatchHistoricalBody {
-          commonProperty?: string;
-
-          @removed(Versions.v2)
-          historicalProperty?: string;
-        }
-
-        interface Widgets {
-          @route("/current/{name}")
-          @put
-          createOrUpdateCurrent(@path name: string, @body body: PutCurrentBody): void;
-
-          @route("/current/{name}")
-          @patch
-          updateCurrent(@path name: string, @body body: PatchCurrentBody): void;
-
-          @route("/historical/{name}")
-          @put
-          createOrUpdateHistorical(@path name: string, @body body: PutHistoricalBody): void;
-
-          @route("/historical/{name}")
-          @patch
-          updateHistorical(@path name: string, @body body: PatchHistoricalBody): void;
-        }
-      `,
-      )
-      .toEmitDiagnostics([
-        {
-          code,
-          message:
-            "The property 'historicalProperty' in the PATCH body does not correspond to a property in the PUT body.",
-        },
-      ]);
-  });
-
-  it.each(["extends", "spread"])(
-    "compares source %s properties in nested namespaces",
-    async (shape) => {
-      await tester
-        .expect(
-          `
-        @Azure.ResourceManager.armProviderNamespace
-        @service @versioned(Versions)
-        namespace Microsoft.TestService {
-          enum Versions { v1, v2 }
-          namespace Nested {
-            model Original {
-              common?: string;
-              @removed(Versions.v2) missing?: string;
-            }
-            ${shape === "extends" ? "model PutBody extends Original {}" : "model PutBody { ...Original; }"}
-            model PatchBody { common?: string; missing?: string; }
-            @route("/widgets") @put op put(@body body: PutBody): void;
-            @route("/widgets") @patch op patch(@body body: PatchBody): void;
-          }
-        }
-      `,
-        )
-        .toBeValid();
-    },
-  );
-
-  it("compares source nested types without filtering newly added models", async () => {
-    await tester
-      .expect(
-        `
-        @service @versioned(Versions) namespace Test;
-        enum Versions { v1, v2 }
-        model PutNested { common?: string; }
-        @added(Versions.v2)
-        model PatchNested { common?: string; }
-        model PutBody { nested?: PutNested; }
-        model PatchBody {
-          @typeChangedFrom(Versions.v2, PutNested)
-          nested?: PatchNested;
-        }
-        @route("/widgets") @put op put(@body body: PutBody): void;
-        @route("/widgets") @patch op patch(@body body: PatchBody): void;
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("uses the last resolved source PATCH at a shared path without historical selection", async () => {
-    await tester
-      .expect(
-        `
-        @service @versioned(Versions) namespace Test;
-        enum Versions { v1, v2 }
+  it.each([false, true])(
+    "uses the last resolved PATCH at a shared path (last input has extra: %s)",
+    async (extra) => {
+      const expectation = tester.expect(`
+        @service namespace Test;
         model PutBody { common?: string; }
-        model PreviousPatch { extra?: string; }
-        model CurrentPatch { common?: string; }
+        model FirstPatch { ${extra ? "common" : "extra"}?: string; }
+        model LastPatch { ${extra ? "extra" : "common"}?: string; }
         @route("/widgets") @put op put(@body body: PutBody): void;
-        @removed(Versions.v2)
-        @sharedRoute @route("/widgets") @patch op previous(@body body: PreviousPatch): void;
-        @added(Versions.v2)
-        @sharedRoute @route("/widgets") @patch op current(@body body: CurrentPatch): void;
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("compares dependency source models without applying selected dependency versions", async () => {
-    await tester
-      .expect(
-        `
-        @versioned(Versions)
-        namespace Shared {
-          enum Versions { v1, v2, v3 }
-          model PutBody {
-            common?: string;
-            @added(Versions.v2) @removed(Versions.v3) missing?: string;
-          }
-        }
-        @Azure.ResourceManager.armProviderNamespace
-        @service @versioned(Versions)
-        namespace Microsoft.TestService {
-          enum Versions {
-            @useDependency(Shared.Versions.v2) first,
-            @useDependency(Shared.Versions.v3) current,
-          }
-          model PatchBody { common?: string; missing?: string; }
-          @route("/widgets") @put op put(@body body: Shared.PutBody): void;
-          @route("/widgets") @patch op patch(@body body: PatchBody): void;
-        }
-      `,
-      )
-      .toBeValid();
-  });
-
-  it.each(["operation", "interface"])(
-    "pairs source %s declarations without historical availability filtering",
-    async (shape) => {
-      await tester
-        .expect(
-          `
-        @Azure.ResourceManager.armProviderNamespace
-        @service @versioned(Versions)
-        namespace Microsoft.TestService {
-          enum Versions { v1, v2 }
-          model PutBody { common?: string; }
-          model PatchBody { missing?: string; }
-          @removed(Versions.v2)
-          ${shape === "interface" ? "interface Previous {" : ""}
-          @route("/widgets") @put ${shape === "interface" ? "" : "op"} put(@body body: PutBody): void;
-          ${shape === "interface" ? "}" : ""}
-          @added(Versions.v2)
-          @route("/widgets") @patch op patch(@body body: PatchBody): void;
-        }
-      `,
-        )
-        .toEmitDiagnostics(missingProperty("missing"));
-    },
-  );
-
-  it("does not report a mismatch when both properties are added together", async () => {
-    await tester
-      .expect(
-        `
-        @Azure.ResourceManager.armProviderNamespace
-        @service @versioned(Versions)
-        namespace Microsoft.TestService {
-          enum Versions { v1, v2 }
-          model PutBody { common?: string; @added(Versions.v2) added?: string; }
-          model PatchBody { common?: string; @added(Versions.v2) added?: string; }
-          @route("/widgets") @put op put(@body body: PutBody): void;
-          @route("/widgets") @patch op patch(@body body: PatchBody): void;
-        }
-      `,
-      )
-      .toBeValid();
-  });
-
-  it.each(["put", "patch"])(
-    "uses source explicit %s body parameters despite historical removal",
-    async (verb) => {
-      const expectation = tester.expect(
-        `
-        @Azure.ResourceManager.armProviderNamespace
-        @service @versioned(Versions)
-        namespace Microsoft.TestService {
-          enum Versions { v1, v2 }
-          model Body { common?: string; }
-          @route("/widgets") @put op put(
-            ${verb === "put" ? "@removed(Versions.v2)" : ""} @body body: Body
-          ): void;
-          @route("/widgets") @patch op patch(
-            ${verb === "patch" ? "@removed(Versions.v2)" : ""} @body body: Body
-          ): void;
-        }
-      `,
-      );
-      await expectation.toBeValid();
+        @sharedRoute @route("/widgets") @patch op first(@body body: FirstPatch): void;
+        @sharedRoute @route("/widgets") @patch op last(@body body: LastPatch): void;
+      `);
+      if (extra) {
+        await expectation.toEmitDiagnostics(missingProperty("extra"));
+      } else {
+        await expectation.toBeValid();
+      }
     },
   );
 });

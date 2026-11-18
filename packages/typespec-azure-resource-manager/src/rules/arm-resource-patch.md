@@ -1,61 +1,50 @@
-The request body of a PATCH must be a model with a subset of the resource properties. The PATCH body must not contain properties that do not exist on the resource.
+The request body of a resource PATCH must be a model containing only properties that exist on the resource. If the resource has a `tags` property, include it in PATCH input too.
 
 When a PUT shares the PATCH endpoint, the PATCH must have a nonempty object body whose writable JSON property names correspond to PUT input. PATCH may omit PUT properties and make properties optional.
 
-The paired-endpoint check compares property names, not value compatibility. Types, formats, string lengths, item counts, numeric bounds, enum values, encodings and array/dictionary contents are not compared. Descriptions and default values need not match. A clean lint result does not prove that every PATCH value is accepted by PUT.
+Only writable input properties count, including nested and inherited properties and their JSON names. A property hidden from PUT input cannot satisfy PATCH correspondence, even if it exists on the resource model. Expose it in PUT input or remove it from PATCH input.
 
-Nested and inherited properties, encoded JSON names and each operation's request visibility are included. Operations inherited into project interfaces are also checked, with library-defined findings targeted at the project interface. A shared resource property hidden from PUT input by `@parameterVisibility(Lifecycle.Create)` cannot satisfy PATCH correspondence. Expose it in PUT input or remove it from PATCH input. A nonempty PATCH body cannot correspond to an absent or void PUT body. Unsupported or ambiguous body types are not treated as empty objects.
+This check compares names, not types or value constraints. A clean result does not guarantee that PUT accepts every value allowed by PATCH.
 
-An object whose children are not writable in PATCH is matched with the PUT property at the same JSON payload position. Its container must still be valid PUT input; an unrelated same-named property does not satisfy this check.
-
-The check uses source models, not individual API-version shapes. Version-specific additions, removals, renames and type changes are not evaluated; version-dependent mismatches may therefore be missed or reported incorrectly. Shared version-aware lint evaluation is tracked in [#5875](https://github.com/Azure/typespec-azure/issues/5875).
+API-version-specific shapes are not evaluated, so version-dependent mismatches may be missed or reported incorrectly. See [#5875](https://github.com/Azure/typespec-azure/issues/5875).
 
 ## Impact
 
 - **Area:** API
 
-Inconsistent PATCH properties violate the RPC contract.
+Unexpected PATCH properties can expose inputs that cannot be created or stored through PUT.
+
+## Example resource
+
+Import `@typespec/http` and `@azure-tools/typespec-azure-resource-manager`, with `using TypeSpec.Http;` and `using Azure.ResourceManager;`. In a namespace annotated with `@service` and `@armProviderNamespace`, combine this shared resource with either the incorrect or correct interface below.
+
+```tsp
+model Widget
+  is TrackedResource<{
+    displayName?: string;
+  }> {
+  ...ResourceNameParameter<Widget>;
+}
+```
 
 ## ❌ Incorrect
 
 `extra` is writable in PATCH but does not exist in PUT input.
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName?: string;
-
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetPatchProperties {
-  displayName?: string;
-  extra?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
 @armResourceOperations
 interface Widgets {
   createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+  update is ArmCustomPatchSync<
+    Widget,
+    PatchModel = {
+      tags?: Record<string>;
+      properties?: {
+        displayName?: string;
+        extra?: string;
+      };
+    }
+  >;
 }
 ```
 
@@ -64,40 +53,18 @@ interface Widgets {
 Remove the extra property so that every PATCH input property exists in PUT input.
 
 ```tsp
-import "@typespec/http";
-import "@azure-tools/typespec-azure-resource-manager";
-
-using TypeSpec.Http;
-using Azure.ResourceManager;
-
-@service
-@armProviderNamespace
-namespace Contoso.Widgets;
-
-model WidgetProperties {
-  displayName?: string;
-
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
-}
-
-model Widget is TrackedResource<WidgetProperties> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetPatchProperties {
-  displayName?: string;
-}
-
-model WidgetPatch {
-  tags?: Record<string>;
-  properties?: WidgetPatchProperties;
-}
-
 @armResourceOperations
 interface Widgets {
   createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+  update is ArmCustomPatchSync<
+    Widget,
+    PatchModel = {
+      tags?: Record<string>;
+      properties?: {
+        displayName?: string;
+      };
+    }
+  >;
 }
 ```
 
