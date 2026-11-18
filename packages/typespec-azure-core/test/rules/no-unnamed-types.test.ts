@@ -167,6 +167,56 @@ describe("response bodies", () => {
       await tester.expect(code).toBeValid();
     });
 
+    it.each([
+      "Azure.Core.ResourceOperationStatus<Widget>",
+      "Azure.Core.Foundations.OperationStatus<Widget>",
+    ])("accepts a named generic response declared by Azure Core: %s", async (response) => {
+      await tester
+        .expect(`model Widget { name: string; } @get op read(): ${response};`)
+        .toBeValid();
+    });
+
+    it("accepts an alias to a named generic response declared by Azure Core", async () => {
+      await tester
+        .expect(
+          `
+          model Widget { name: string; }
+          alias ReadStatus = Azure.Core.ResourceOperationStatus<Widget>;
+          @get op read(): ReadStatus;
+        `,
+        )
+        .toBeValid();
+    });
+
+    it.each([
+      [
+        "model ProjectStatus<T> is Azure.Core.Foundations.OperationStatus<T>; @get op /*target*/read(): ProjectStatus<string>;",
+        "ProjectStatus<string>",
+      ],
+      [
+        "namespace Azure.Core.Spoof { model OperationStatus<T> { value: T; } } @get op /*target*/read(): Azure.Core.Spoof.OperationStatus<string>;",
+        "OperationStatus<string>",
+      ],
+    ])("does not trust project-authored generic responses: %s", async (code, name) => {
+      await tester.expect(code).toEmitDiagnostics((x) => ({
+        ...instanceDiagnostic(name),
+        pos: x.pos.target.pos,
+      }));
+    });
+
+    it.each([
+      [
+        "@get op /*target*/read(): Azure.Core.Foundations.ResourceBody<Record<string>>;",
+        instanceDiagnostic("Record<string>"),
+      ],
+      [
+        "@get op read(): Azure.Core.Foundations.ResourceBody</*target*/{ value: string }>;",
+        diagnostic,
+      ],
+    ])("checks a standard envelope's actual payload: %s", async (code, expected) => {
+      await tester.expect(code).toEmitDiagnostics((x) => ({ ...expected, pos: x.pos.target.pos }));
+    });
+
     it.each(["body", "bodyRoot"])("checks an explicit @%s generic payload", async (body) => {
       await tester
         .expect(`@get op /*target*/read(): { @${body} body: Record<string> };`)
@@ -272,6 +322,7 @@ describe("response bodies", () => {
     beforeEach(async () => {
       const runner = await Tester.files({
         "node_modules/response-templates/package.json": JSON.stringify({
+          name: "response-templates",
           exports: {
             ".": { typespec: "./main.tsp" },
           },
@@ -332,6 +383,20 @@ describe("response bodies", () => {
   it.each(["body", "bodyRoot"])("reports an explicit @%s body once", async (decorator) => {
     await tester
       .expect(`@get op read(): { @${decorator} body: /*target*/{ value: string } };`)
+      .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+  });
+
+  it("reports an anonymous template argument used as an envelope body", async () => {
+    await tester
+      .expect(
+        `
+        model Envelope<T> {
+          @statusCode status: 200;
+          @bodyRoot body: T;
+        }
+        @get op read(): Envelope</*target*/{ value: string }>;
+        `,
+      )
       .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
   });
 
@@ -872,16 +937,20 @@ describe("models", () => {
         .toBeValid();
     });
 
-    it("does not change template response-body exemptions", async () => {
+    it("reports an anonymous template argument used as a response body", async () => {
       await tester
         .expect(
           `
           @service namespace TestService;
           model Response<T> { @body body: T; }
-          @get op read(): Response<{ name: string; }>;
+          @get op read(): Response</*target*/{ name: string; }>;
           `,
         )
-        .toBeValid();
+        .toEmitDiagnostics((x) => ({
+          code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+          message: "Anonymous model should be defined as a named model declaration.",
+          pos: x.pos.target.pos,
+        }));
     });
 
     it("does not flag an HTTP envelope passed to bodyRoot", async () => {

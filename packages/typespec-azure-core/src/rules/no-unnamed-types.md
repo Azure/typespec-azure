@@ -2,6 +2,8 @@ Azure services should not define anonymous models, union expressions, enum expre
 
 Model response payloads must have a concrete model declaration or, for generic model instances, an explicit `@friendlyName`. A template declaration's name alone does not name its concrete instances. An alias does not introduce a model declaration, although an alias to an already named payload remains valid.
 
+Named generic response models declared by `@azure-tools/typespec-azure-core` or `@azure-tools/typespec-azure-resource-manager` are also accepted. These libraries provide reusable standard response models, including operation-status payloads. This exception is based on the declaring package recorded by the compiler, not the model's namespace or display name. Project-authored generic models, including models derived from standard models or placed in an Azure namespace, still require a concrete declaration or explicit nonempty `@friendlyName`.
+
 ## Impact
 
 - **Area:** SDK, API
@@ -169,6 +171,7 @@ The following patterns are **not** flagged:
 - Status code unions (e.g. `@statusCode _: 200 | 400`)
 - Content-type header unions (e.g. `@header contentType: "application/json" | "text/plain"`)
 - HTTP response metadata and envelopes themselves; their actual payloads are still checked
+- Named generic response models declared by the Azure Core and Azure Resource Manager libraries; aliases to those models remain accepted
 - Anonymous models used as template arguments outside actual request or response bodies, such as OAuth2 flow configuration
 - Library declarations themselves; project operations using library response templates are still checked
 - Unions where all non-null variants are scalars (e.g. `string | int32`)

@@ -132,17 +132,20 @@ export const noUnnamedTypesRule = createRule({
                   unnamedInstances.add(original);
                 }
               }
+              if (
+                content.body.property &&
+                needsModelName(program, bodyType) &&
+                isInsideTemplateArgument(bodyType)
+              ) {
+                invalidModels.add(bodyType);
+                continue;
+              }
               const effectiveType = getEffectiveModelType(
                 program,
                 bodyType,
                 (property) => !isHeader(program, property) && !isStatusCode(program, property),
               );
-              // Explicit anonymous bodies are already checked as property types.
-              if (
-                content.body.property ||
-                bodyType.properties.size === 0 ||
-                effectiveType.name !== ""
-              ) {
+              if (bodyType.properties.size === 0 || effectiveType.name !== "") {
                 continue;
               }
               for (const responseType of getOriginalModels(bodyType, originals)) {
@@ -222,6 +225,14 @@ function needsModelName(program: Program, type: Type): type is Model {
 
 function needsConcreteResponseName(program: Program, model: Model): boolean {
   if (model.name === "" || !isTemplateInstance(model) || getFriendlyName(program, model)) {
+    return false;
+  }
+  const location = getLocationContext(program, model);
+  if (
+    location.type === "library" &&
+    (location.metadata.name === "@azure-tools/typespec-azure-core" ||
+      location.metadata.name === "@azure-tools/typespec-azure-resource-manager")
+  ) {
     return false;
   }
   for (let current: Model | undefined = model; current; current = current.baseModel) {
