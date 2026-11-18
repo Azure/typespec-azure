@@ -402,22 +402,21 @@ function getExampleValue(
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
         const fieldExample = example.value[field];
+        // imports is only provided for request examples; response comments keep nil.
         if (
           imports &&
           (fieldExample.kind === "null" ||
             (fieldExample.kind === "any" && fieldExample.value === null))
         ) {
-          let nullType = goField.type;
-          if (nullType.kind === "interface") {
-            const concrete = generateFakeExample(nullType);
-            if (concrete.kind !== "model") {
-              throw new CodegenError("InternalError", "expected a concrete model for null example");
-            }
-            nullType = new go.Ptr(concrete.type);
-          }
+          // NullValue[T] requires a concrete pointer, slice, or map type.
+          const nullType =
+            goField.type.kind === "interface"
+              ? new go.Ptr(getConcreteInterfaceModel(goField.type))
+              : goField.type;
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
           imports.addForType(nullType);
-          const nullTypeName = `${nullType.kind === "any" ? "*" : ""}${go.getTypeDeclaration(nullType, pkg)}`;
+          const nullTypeName =
+            nullType.kind === "any" ? "*any" : go.getTypeDeclaration(nullType, pkg);
           exampleText += `${indent}\t${field}: azcore.NullValue[${nullTypeName}](),\n`;
           continue;
         }
@@ -801,16 +800,19 @@ function generateFakeExample(goType: go.Type, name?: string): go.ExampleType {
     case "map":
       // return an empty map example for map types
       return new go.DictionaryExample(goType);
-    case "interface": {
-      const model = goType.rootType ?? goType.possibleTypes[0];
-      if (!model) {
-        throw new CodegenError("InternalError", `no concrete type for interface ${goType.name}`);
-      }
-      return new go.StructExample(model);
-    }
+    case "interface":
+      return new go.StructExample(getConcreteInterfaceModel(goType));
     default:
       throw new CodegenError("InternalError", `unhandled fake example kind ${goType.kind}`);
   }
+}
+
+function getConcreteInterfaceModel(goType: go.Interface): go.PolymorphicModel {
+  const model = goType.rootType ?? goType.possibleTypes[0];
+  if (!model) {
+    throw new CodegenError("InternalError", `no concrete type for interface ${goType.name}`);
+  }
+  return model;
 }
 
 function escapeString(str: string): string {
