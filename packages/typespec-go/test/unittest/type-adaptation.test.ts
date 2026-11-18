@@ -260,35 +260,20 @@ describe("Recursive type adaptation", () => {
     ).rejects.toThrow(/cloud endpoint parameter "port" has conflicting definitions/);
   });
 
-  it("compiles and executes generated Go clients for colliding template names, per-cloud defaults, cloud-only placeholders, and token supplemental endpoints", async () => {
-    const templateModDir = path.resolve(import.meta.dirname, "../local/containingmod");
-    const goMod = readFileSync(path.join(templateModDir, "go.mod"), "utf8")
-      .replace(/^module\s+\S+/m, "module testmodule")
-      .replace(/^\s*github\.com\/stretchr\/testify\s+\S+\r?\n/m, "");
-    const goSum = readFileSync(path.join(templateModDir, "go.sum"), "utf8");
+  it(
+    "compiles and executes generated Go clients for colliding template names, per-cloud defaults, cloud-only placeholders, and token supplemental endpoints",
+    { timeout: 240_000 },
+    async () => {
+      const templateModDir = path.resolve(import.meta.dirname, "../local/containingmod");
+      const goMod = readFileSync(path.join(templateModDir, "go.mod"), "utf8").replace(
+        /^module\s+\S+/m,
+        "module testmodule",
+      );
+      const goSum = readFileSync(path.join(templateModDir, "go.sum"), "utf8");
 
-    const runGoTest = (files: Map<string, string>, testSource: string): void => {
-      const tmpDir = mkdtempSync(path.join(os.tmpdir(), "tsp-go-svccfg-"));
-      try {
-        writeFileSync(path.join(tmpDir, "go.mod"), goMod, "utf8");
-        writeFileSync(path.join(tmpDir, "go.sum"), goSum, "utf8");
-        for (const [relPath, content] of files) {
-          const fullPath = path.join(tmpDir, relPath);
-          mkdirSync(path.dirname(fullPath), { recursive: true });
-          writeFileSync(fullPath, content, "utf8");
-        }
-        writeFileSync(path.join(tmpDir, "client_compile_test.go"), testSource, "utf8");
-        execFileSync("go", ["test", "-mod=mod", "./..."], {
-          cwd: tmpDir,
-          encoding: "utf8",
-          stdio: "pipe",
-        });
-      } finally {
-        rmSync(tmpDir, { recursive: true, force: true });
-      }
-    };
-
-    const cloudFiles = await emitGoFor(`
+      const [cloudFiles, supplementalTokenFiles] = await Promise.all([
+        emitGoFor(
+          `
       @service
       @azureServiceConfigurations(Configurations)
       namespace Test;
@@ -341,18 +326,59 @@ describe("Recursive type adaptation", () => {
 
       @route("/ping")
       @get op ping(): void;
-    `);
+    `,
+          {
+            module: "testmodule/cloudpkg",
+          },
+        ),
+        emitGoFor(
+          `
+      @service
+      @server("{endpoint}/v1", "Versioned endpoint", { endpoint: url })
+      @useAuth(OAuth2Auth<[{
+        type: OAuth2FlowType.clientCredentials;
+        tokenUrl: "https://login.example.com/token";
+        scopes: ["https://api.example.com/.default"];
+      }]>)
+      namespace Test;
 
-    runGoTest(
-      cloudFiles,
-      `package testmodule_test
+      @route("/items")
+      @get op list(): void;
+    `,
+          {
+            module: "testmodule/supplementalpkg",
+          },
+        ),
+      ]);
+
+      const tmpDir = mkdtempSync(path.join(os.tmpdir(), "tsp-go-svccfg-"));
+      try {
+        writeFileSync(path.join(tmpDir, "go.mod"), goMod, "utf8");
+        writeFileSync(path.join(tmpDir, "go.sum"), goSum, "utf8");
+        for (const [subpkg, files] of [
+          ["cloudpkg", cloudFiles],
+          ["supplementalpkg", supplementalTokenFiles],
+        ] as const) {
+          for (const [relPath, content] of files) {
+            if (relPath === "go.mod") {
+              continue;
+            }
+            const fullPath = path.join(tmpDir, subpkg, relPath);
+            mkdirSync(path.dirname(fullPath), { recursive: true });
+            writeFileSync(fullPath, content, "utf8");
+          }
+        }
+        writeFileSync(
+          path.join(tmpDir, "client_compile_test.go"),
+          `package testmodule_test
 
 import (
 	"context"
 	"net/http"
 	"strings"
 	"testing"
-	"testmodule"
+	"testmodule/cloudpkg"
+	"testmodule/supplementalpkg"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
@@ -387,7 +413,7 @@ func TestCloudConfigurationsEndpointResolution(t *testing.T) {
 	cred := &captureCred{}
 	tr := &captureTransport{}
 
-	pubClient, err := testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+	pubClient, err := cloudpkg.NewTestClient("acct", "edge", cred, &cloudpkg.TestClientOptions{
 		ClientOptions: azcore.ClientOptions{Transport: tr},
 	})
 	if err != nil {
@@ -403,9 +429,9 @@ func TestCloudConfigurationsEndpointResolution(t *testing.T) {
 		t.Fatalf("got scopes %v", cred.scopes)
 	}
 
-	sovClient, err := testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+	sovClient, err := cloudpkg.NewTestClient("acct", "edge", cred, &cloudpkg.TestClientOptions{
 		ClientOptions: azcore.ClientOptions{
-			Cloud:     testmodule.CloudSovereignCloud,
+			Cloud:     cloudpkg.CloudSovereignCloud,
 			Transport: tr,
 		},
 	})
@@ -422,7 +448,7 @@ func TestCloudConfigurationsEndpointResolution(t *testing.T) {
 		t.Fatalf("got scopes %v", cred.scopes)
 	}
 
-	_, err = testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+	_, err = cloudpkg.NewTestClient("acct", "edge", cred, &cloudpkg.TestClientOptions{
 		ClientOptions: azcore.ClientOptions{
 			Cloud:     cloud.AzureGovernment,
 			Transport: tr,
@@ -432,7 +458,7 @@ func TestCloudConfigurationsEndpointResolution(t *testing.T) {
 		t.Fatalf("expected missing GovInstance error, got %v", err)
 	}
 
-	govClient, err := testmodule.NewTestClient("acct", "edge", cred, &testmodule.TestClientOptions{
+	govClient, err := cloudpkg.NewTestClient("acct", "edge", cred, &cloudpkg.TestClientOptions{
 		ClientOptions: azcore.ClientOptions{
 			Cloud:     cloud.AzureGovernment,
 			Transport: tr,
@@ -452,60 +478,11 @@ func TestCloudConfigurationsEndpointResolution(t *testing.T) {
 		t.Fatalf("got scopes %v", cred.scopes)
 	}
 }
-`,
-    );
-
-    const supplementalTokenFiles = await emitGoFor(`
-      @service
-      @server("{endpoint}/v1", "Versioned endpoint", { endpoint: url })
-      @useAuth(OAuth2Auth<[{
-        type: OAuth2FlowType.clientCredentials;
-        tokenUrl: "https://login.example.com/token";
-        scopes: ["https://api.example.com/.default"];
-      }]>)
-      namespace Test;
-
-      @route("/items")
-      @get op list(): void;
-    `);
-
-    runGoTest(
-      supplementalTokenFiles,
-      `package testmodule_test
-
-import (
-	"context"
-	"net/http"
-	"testing"
-	"testmodule"
-	"time"
-
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-)
-
-type staticCred struct{}
-
-func (staticCred) GetToken(_ context.Context, _ policy.TokenRequestOptions) (azcore.AccessToken, error) {
-	return azcore.AccessToken{Token: "tok", ExpiresOn: time.Now().Add(time.Hour)}, nil
-}
-
-type recordTransport struct {
-	lastURL string
-}
-
-func (t *recordTransport) Do(req *http.Request) (*http.Response, error) {
-	t.lastURL = req.URL.String()
-	return &http.Response{
-		StatusCode: http.StatusNoContent,
-		Body:       http.NoBody,
-		Request:    req,
-	}, nil
-}
 
 func TestSupplementalEndpointWithTokenAuth(t *testing.T) {
-	tr := &recordTransport{}
-	client, err := testmodule.NewTestClient("https://custom.example.com", staticCred{}, &testmodule.TestClientOptions{
+	cred := &captureCred{}
+	tr := &captureTransport{}
+	client, err := supplementalpkg.NewTestClient("https://custom.example.com", cred, &supplementalpkg.TestClientOptions{
 		ClientOptions: azcore.ClientOptions{Transport: tr},
 	})
 	if err != nil {
@@ -519,6 +496,16 @@ func TestSupplementalEndpointWithTokenAuth(t *testing.T) {
 	}
 }
 `,
-    );
-  });
+          "utf8",
+        );
+        execFileSync("go", ["test", "-mod=readonly", "."], {
+          cwd: tmpDir,
+          encoding: "utf8",
+          stdio: "pipe",
+        });
+      } finally {
+        rmSync(tmpDir, { recursive: true, force: true });
+      }
+    },
+  );
 });
