@@ -242,19 +242,16 @@ export class TypeAdapter {
    */
   private getLroStatusTypes(): Set<tcgc.SdkType> {
     const types = new Set<tcgc.SdkType>();
+    if (!this.ctx.emitContext.options["lro-metadata-pollers"]) {
+      return types;
+    }
     const visitClient = (client: tcgc.SdkClientType<tcgc.SdkHttpOperation>): void => {
       for (const method of client.methods) {
         if (method.kind !== "lro" && method.kind !== "lropaging") {
           continue;
         }
-        const statusModel =
-          method.lroMetadata.pollingStep.responseBody ??
-          method.lroMetadata.pollingInfo.responseModel;
-        if (
-          statusModel &&
-          (method.lroMetadata.statusMetadata ||
-            method.lroMetadata.operationId?.some((id) => id.kind === "property"))
-        ) {
+        const statusModel = getLroStatusModel(method);
+        if (statusModel) {
           visitType(statusModel, types);
         }
       }
@@ -1825,6 +1822,21 @@ export class TypeAdapter {
     this.unionUsage = index;
     return index;
   }
+}
+
+export function getLroStatusModel(
+  method:
+    | tcgc.SdkLroPagingServiceMethod<tcgc.SdkHttpOperation>
+    | tcgc.SdkLroServiceMethod<tcgc.SdkHttpOperation>,
+): tcgc.SdkModelType | undefined {
+  const metadata = method.lroMetadata;
+  if (
+    !metadata.statusMetadata?.length &&
+    !metadata.operationId?.some((id) => id.kind === "property")
+  ) {
+    return undefined;
+  }
+  return metadata.pollingStep.responseBody ?? metadata.pollingInfo.responseModel;
 }
 
 /**

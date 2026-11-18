@@ -366,12 +366,10 @@ export interface LROPoller {
 export interface LROPollingURLSource {
   /**
    * header - the response header with the name in name
-   * body - the top-level JSON property with the name in name
-   * self - the URL of the initial request
    */
-  kind: "header" | "body" | "self";
+  kind: "header";
 
-  /** the name of the header or JSON property. empty for self */
+  /** the name of the response header */
   name: string;
 }
 

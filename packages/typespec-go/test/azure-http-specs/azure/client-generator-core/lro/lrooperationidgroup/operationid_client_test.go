@@ -6,6 +6,7 @@ package lrooperationidgroup_test
 import (
 	"context"
 	"lrooperationidgroup"
+	"os"
 	"testing"
 	"time"
 
@@ -14,7 +15,11 @@ import (
 )
 
 func newOperationIDClient(t *testing.T) *lrooperationidgroup.OperationIDClient {
-	client, err := lrooperationidgroup.NewOperationIDClientWithNoCredential("http://localhost:3000", nil)
+	endpoint := os.Getenv("SPECTOR_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "http://localhost:3000"
+	}
+	client, err := lrooperationidgroup.NewOperationIDClientWithNoCredential(endpoint, nil)
 	require.NoError(t, err)
 	return client
 }
@@ -49,7 +54,11 @@ func TestOperationIDClient_BeginAnalyze_ResumeToken(t *testing.T) {
 
 	poller, err = client.BeginAnalyze(context.Background(), "document-1", &lrooperationidgroup.OperationIDClientBeginAnalyzeOptions{ResumeToken: token})
 	require.NoError(t, err)
-	// the polling URL is persisted in the resume token
+	// Standard azcore tokens don't expose the polling URL to the wrapper.
+	_, ok := poller.OperationID()
+	require.False(t, ok)
+	_, err = poller.Poll(context.Background())
+	require.NoError(t, err)
 	id, ok := poller.OperationID()
 	requireOperationID(t, "analysis-123", id, ok)
 
@@ -86,6 +95,11 @@ func TestOperationIDClient_BeginStartTranslationWithPath(t *testing.T) {
 	poller, err := client.BeginStartTranslationWithPath(context.Background(), nil)
 	require.NoError(t, err)
 	id, ok := poller.OperationID()
+	requireOperationID(t, "translation-456", id, ok)
+
+	_, err = poller.Poll(context.Background())
+	require.NoError(t, err)
+	id, ok = poller.OperationID()
 	requireOperationID(t, "translation-456", id, ok)
 
 	resp, err := poller.PollUntilDone(context.Background(), &runtime.PollUntilDoneOptions{Frequency: time.Second})

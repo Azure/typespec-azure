@@ -41,6 +41,7 @@ op startJob(): global.Azure.Core.Foundations.AcceptedResponse &
 
 ```yaml
 generate-fakes: false
+lro-metadata-pollers: true
 ```
 
 ## The begin method returns a poller exposing status metadata and the operation ID
@@ -54,7 +55,6 @@ package testmodule
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
@@ -101,8 +101,9 @@ func (client *LroClient) BeginStartJob(ctx context.Context, options *LroClientBe
 		if err != nil {
 			return nil, err
 		}
-		handler := &lroClientStartJobPollerHandler{pl: client.internal.Pipeline()}
-		handler.pollingURL = resp.Header.Get("Operation-Location")
+		handler := &lroClientStartJobPollerHandler{}
+		pollingURL := resp.Header.Get("Operation-Location")
+		handler.pollingURL.Store(&pollingURL)
 		poller, err := runtime.NewPoller[LroClientStartJobResponse](resp, client.internal.Pipeline(), &runtime.NewPollerOptions[LroClientStartJobResponse]{
 			OperationLocationResultPath: "result",
 		})
@@ -118,147 +119,19 @@ func (client *LroClient) BeginStartJob(ctx context.Context, options *LroClientBe
 		}
 		return &LroClientStartJobPoller{Poller: outer, handler: handler}, nil
 	} else {
-		handler := &lroClientStartJobPollerHandler{pl: client.internal.Pipeline()}
-		poller, err := runtime.NewPollerFromResumeToken(options.ResumeToken, client.internal.Pipeline(), &runtime.NewPollerFromResumeTokenOptions[LroClientStartJobResponse]{
+		poller, err := runtime.NewPollerFromResumeToken[LroClientStartJobResponse](options.ResumeToken, client.internal.Pipeline(), &runtime.NewPollerFromResumeTokenOptions[LroClientStartJobResponse]{})
+		if err != nil {
+			return nil, err
+		}
+		handler := &lroClientStartJobPollerHandler{inner: poller}
+		outer, err := runtime.NewPoller(nil, client.internal.Pipeline(), &runtime.NewPollerOptions[LroClientStartJobResponse]{
 			Handler: handler,
 		})
 		if err != nil {
 			return nil, err
 		}
-		return &LroClientStartJobPoller{Poller: poller, handler: handler}, nil
+		return &LroClientStartJobPoller{Poller: outer, handler: handler}, nil
 	}
-}
-
-// LroClientStartJobPoller is a [runtime.Poller] for the LroClient.BeginStartJob long-running operation.
-// It also provides LRO metadata from the service's status monitor.
-type LroClientStartJobPoller struct {
-	*runtime.Poller[LroClientStartJobResponse]
-	handler *lroClientStartJobPollerHandler
-}
-
-// StatusMetadata returns the status metadata from the most recently received status monitor response,
-// including the initial, failed, and canceled responses. Fields are nil until a response containing
-// them is received. The values are refreshed after each poll and aren't persisted in resume tokens,
-// so they're empty after resuming until the next poll.
-func (p *LroClientStartJobPoller) StatusMetadata() LroClientStartJobStatusMetadata {
-	if p.handler == nil || p.handler.status == nil {
-		return LroClientStartJobStatusMetadata{}
-	}
-	return LroClientStartJobStatusMetadata{
-		PercentComplete: p.handler.status.PercentComplete,
-	}
-}
-
-// LroClientStartJobStatusMetadata contains the status metadata for the LroClient.BeginStartJob long-running operation.
-type LroClientStartJobStatusMetadata struct {
-	PercentComplete *int32
-}
-
-// OperationID returns the service-issued identifier for the long-running operation.
-// The second return value is false when the identifier isn't available yet.
-func (p *LroClientStartJobPoller) OperationID() (string, bool) {
-	if p.handler == nil {
-		return "", false
-	}
-	if id, ok := p.handler.pathOperationID(); ok {
-		return id, true
-	}
-	if p.handler.status != nil && p.handler.status.ID != nil {
-		return *p.handler.status.ID, true
-	}
-	return "", false
-}
-
-// lroClientStartJobPollerHandler wraps the standard polling handler to observe status monitor responses.
-type lroClientStartJobPollerHandler struct {
-	inner      *runtime.Poller[LroClientStartJobResponse]
-	pl         runtime.Pipeline
-	pollingURL string
-	status     *JobStatus
-}
-
-func (h *lroClientStartJobPollerHandler) Done() bool {
-	return h.inner.Done()
-}
-
-func (h *lroClientStartJobPollerHandler) Poll(ctx context.Context) (*http.Response, error) {
-	resp, err := h.inner.Poll(ctx)
-	if resp != nil {
-		if h.pollingURL == "" && resp.Request != nil && resp.Request.URL != nil {
-			h.pollingURL = resp.Request.URL.String()
-		}
-		h.observe(resp)
-	}
-	return resp, err
-}
-
-func (h *lroClientStartJobPollerHandler) Result(ctx context.Context, out *LroClientStartJobResponse) error {
-	res, err := h.inner.Result(ctx)
-	if err != nil {
-		return err
-	}
-	*out = res
-	return nil
-}
-
-func (h *lroClientStartJobPollerHandler) MarshalJSON() ([]byte, error) {
-	token, err := h.inner.ResumeToken()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(lroClientStartJobPollerHandlerToken{Token: token, PollingURL: h.pollingURL})
-}
-
-func (h *lroClientStartJobPollerHandler) UnmarshalJSON(data []byte) error {
-	var token lroClientStartJobPollerHandlerToken
-	if err := json.Unmarshal(data, &token); err != nil {
-		return err
-	}
-	inner, err := runtime.NewPollerFromResumeToken[LroClientStartJobResponse](token.Token, h.pl, nil)
-	if err != nil {
-		return err
-	}
-	h.inner = inner
-	h.pollingURL = token.PollingURL
-	return nil
-}
-
-type lroClientStartJobPollerHandlerToken struct {
-	Token      string `json:"token"`
-	PollingURL string `json:"pollingURL,omitempty"`
-}
-
-func (h *lroClientStartJobPollerHandler) observe(resp *http.Response) {
-	payload, err := runtime.Payload(resp)
-	if err != nil || len(payload) == 0 {
-		return
-	}
-	var status JobStatus
-	if err := json.Unmarshal(payload, &status); err != nil {
-		return
-	}
-	h.status = &status
-}
-
-func (h *lroClientStartJobPollerHandler) pathOperationID() (string, bool) {
-	u, err := url.Parse(h.pollingURL)
-	if h.pollingURL == "" || err != nil {
-		return "", false
-	}
-	// the endpoint can contain a base path so match the template against the end of the path
-	segments := strings.Split(strings.Trim(u.EscapedPath(), "/"), "/")
-	if len(segments) < 3 {
-		return "", false
-	}
-	segments = segments[len(segments)-3:]
-	if segments[0] != "jobs" || segments[1] != "operations" {
-		return "", false
-	}
-	id, err := url.PathUnescape(segments[2])
-	if id == "" || err != nil {
-		return "", false
-	}
-	return id, true
 }
 
 // startJob -
@@ -330,5 +203,166 @@ func (client *LroClient) getJobStatusHandleResponse(resp *http.Response, success
 		return LroClientGetJobStatusResponse{}, err
 	}
 	return result, nil
+}
+```
+
+## The response types expose the status metadata and operation ID
+
+```go responses
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// Code generated by Microsoft (R) Go Code Generator. DO NOT EDIT.
+
+package testmodule
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync/atomic"
+)
+
+// LroClientGetJobStatusResponse contains the response from method LroClient.GetJobStatus.
+type LroClientGetJobStatusResponse struct {
+	JobStatus
+}
+
+// LroClientStartJobResponse contains the response from method LroClient.BeginStartJob.
+type LroClientStartJobResponse struct {
+	JobResult
+}
+
+// LroClientStartJobPoller is a [runtime.Poller] for the LroClient.BeginStartJob long-running operation.
+// It also provides LRO metadata from the service's status monitor.
+type LroClientStartJobPoller struct {
+	*runtime.Poller[LroClientStartJobResponse]
+	handler *lroClientStartJobPollerHandler
+}
+
+// ResumeToken returns an azcore-compatible token for resuming the operation.
+func (p *LroClientStartJobPoller) ResumeToken() (string, error) {
+	return p.handler.inner.ResumeToken()
+}
+
+// StatusMetadata returns the status metadata from the most recently received status monitor response,
+// including the initial, failed, and canceled responses. Fields are nil until a response containing
+// them is received. The values are refreshed after each poll and aren't persisted in resume tokens,
+// so they're empty after resuming until the next poll.
+// StatusMetadata is safe to call concurrently with polling.
+func (p *LroClientStartJobPoller) StatusMetadata() LroClientStartJobStatusMetadata {
+	if p == nil || p.handler == nil {
+		return LroClientStartJobStatusMetadata{}
+	}
+	status := p.handler.status.Load()
+	if status == nil {
+		return LroClientStartJobStatusMetadata{}
+	}
+	return LroClientStartJobStatusMetadata{
+		PercentComplete: status.PercentComplete,
+	}
+}
+
+// LroClientStartJobStatusMetadata contains the status metadata for the LroClient.BeginStartJob long-running operation.
+type LroClientStartJobStatusMetadata struct {
+	PercentComplete *int32
+}
+
+// OperationID returns the service-issued identifier for the long-running operation.
+// The second return value is false when the identifier isn't available yet.
+// A status-body ID takes precedence over a polling-URL ID. After resuming, the
+// polling URL becomes available after the next poll. OperationID is safe to call concurrently with polling.
+func (p *LroClientStartJobPoller) OperationID() (string, bool) {
+	if p == nil || p.handler == nil {
+		return "", false
+	}
+	if status := p.handler.status.Load(); status != nil && status.ID != nil {
+		return *status.ID, true
+	}
+	if id, ok := p.handler.pathOperationID(); ok {
+		return id, true
+	}
+	return "", false
+}
+
+// lroClientStartJobPollerHandler wraps the standard polling handler to observe status monitor responses.
+type lroClientStartJobPollerHandler struct {
+	inner      *runtime.Poller[LroClientStartJobResponse]
+	pollingURL atomic.Pointer[string]
+	status     atomic.Pointer[JobStatus]
+}
+
+func (h *lroClientStartJobPollerHandler) Done() bool {
+	return h.inner.Done()
+}
+
+func (h *lroClientStartJobPollerHandler) Poll(ctx context.Context) (*http.Response, error) {
+	resp, err := h.inner.Poll(ctx)
+	if resp != nil {
+		if current := h.pollingURL.Load(); (current == nil || *current == "") && resp.Request != nil && resp.Request.URL != nil {
+			pollingURL := resp.Request.URL.String()
+			h.pollingURL.Store(&pollingURL)
+		}
+		if observeErr := h.observe(resp); observeErr != nil && err == nil {
+			err = observeErr
+		}
+	}
+	return resp, err
+}
+
+func (h *lroClientStartJobPollerHandler) Result(ctx context.Context, out *LroClientStartJobResponse) error {
+	res, err := h.inner.Result(ctx)
+	if err != nil {
+		return err
+	}
+	*out = res
+	return nil
+}
+
+func (h *lroClientStartJobPollerHandler) observe(resp *http.Response) error {
+	payload, err := runtime.Payload(resp)
+	if err != nil {
+		return fmt.Errorf("failed to read status metadata: %w", err)
+	}
+	if len(payload) == 0 {
+		return nil
+	}
+	var status JobStatus
+	if err := json.Unmarshal(payload, &status); err != nil {
+		return fmt.Errorf("failed to decode status metadata: %w", err)
+	}
+	h.status.Store(&status)
+	return nil
+}
+
+func (h *lroClientStartJobPollerHandler) pathOperationID() (string, bool) {
+	pollingURL := h.pollingURL.Load()
+	if pollingURL == nil || *pollingURL == "" {
+		return "", false
+	}
+	u, err := url.Parse(*pollingURL)
+	if err != nil {
+		return "", false
+	}
+	// the endpoint can contain a base path so match the template against the end of the path
+	segments := strings.Split(strings.Trim(u.EscapedPath(), "/"), "/")
+	if len(segments) < 3 {
+		return "", false
+	}
+	segments = segments[len(segments)-3:]
+	for i := range segments {
+		segments[i], err = url.PathUnescape(segments[i])
+		if err != nil {
+			return "", false
+		}
+	}
+	if segments[0] != "jobs" || segments[1] != "operations" || len(segments[2]) <= len("")+len("") {
+		return "", false
+	}
+	id := segments[2][len("") : len(segments[2])-len("")]
+	return id, true
 }
 ```

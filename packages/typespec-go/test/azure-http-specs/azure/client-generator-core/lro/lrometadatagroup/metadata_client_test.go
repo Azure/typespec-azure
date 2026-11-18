@@ -6,6 +6,7 @@ package lrometadatagroup_test
 import (
 	"context"
 	"lrometadatagroup"
+	"os"
 	"testing"
 	"time"
 
@@ -16,7 +17,11 @@ import (
 )
 
 func newMetadataClient(t *testing.T) *lrometadatagroup.MetadataClient {
-	client, err := lrometadatagroup.NewMetadataClientWithNoCredential("http://localhost:3000", nil)
+	endpoint := os.Getenv("SPECTOR_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "http://localhost:3000"
+	}
+	client, err := lrometadatagroup.NewMetadataClientWithNoCredential(endpoint, nil)
 	require.NoError(t, err)
 	return client
 }

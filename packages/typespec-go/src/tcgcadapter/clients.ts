@@ -18,7 +18,7 @@ import {
 } from "../naming/naming.js";
 import { AdapterError } from "./errors.js";
 import * as helpers from "./helpers.js";
-import { TypeAdapter } from "./types.js";
+import { getLroStatusModel, TypeAdapter } from "./types.js";
 
 /**
  * used to convert tcgc clients and their methods to Go code model types
@@ -66,6 +66,33 @@ export class ClientAdapter {
     if (this.parameterGroups.size > 0) {
       for (const paramGroup of this.parameterGroups.values()) {
         this.ta.getPkg().paramGroups.push(this.adaptParameterGroup(paramGroup));
+      }
+    }
+    const pkg = this.ta.getPkg();
+    const names = new Set([
+      ...pkg.models.map((type) => type.name),
+      ...pkg.constants.map((type) => type.name),
+      ...pkg.interfaces.map((type) => type.name),
+      ...pkg.unions.map((type) => type.name),
+      ...pkg.clients.map((type) => type.name),
+      ...pkg.paramGroups.map((type) => type.name),
+      ...pkg.responseEnvelopes.map((type) => type.name),
+    ]);
+    for (const client of pkg.clients) {
+      for (const method of client.methods) {
+        if (!go.isLROMethod(method) || !method.poller) {
+          continue;
+        }
+        for (const name of [method.poller.name, method.poller.statusMetadataName]) {
+          if (!name) continue;
+          if (names.has(name)) {
+            throw new AdapterError(
+              "NameCollision",
+              `generated LRO metadata type ${name} collides with an existing type`,
+            );
+          }
+          names.add(name);
+        }
       }
     }
   }
@@ -1894,6 +1921,9 @@ export class ClientAdapter {
       | tcgc.SdkLroServiceMethod<tcgc.SdkHttpOperation>,
     goClient: go.Client,
   ): go.LROPoller | undefined {
+    if (!this.ta.ctx.emitContext.options["lro-metadata-pollers"]) {
+      return undefined;
+    }
     const lroMetadata = sdkMethod.lroMetadata;
     const statusMetadata = lroMetadata.statusMetadata ?? [];
     const operationID = lroMetadata.operationId ?? [];
@@ -1912,10 +1942,16 @@ export class ClientAdapter {
       statusMetadata: [],
     };
 
-    const sdkStatusModel =
-      lroMetadata.pollingStep.responseBody ?? lroMetadata.pollingInfo.responseModel;
+    const sdkStatusModel = getLroStatusModel(sdkMethod);
     const getStatusField = (property: tcgc.SdkModelPropertyType): go.ModelField => {
       if (!poller.statusModel) {
+        if (!sdkStatusModel) {
+          throw new AdapterError(
+            "InternalError",
+            "missing LRO status monitor model",
+            sdkMethod.__raw?.node,
+          );
+        }
         const statusModel = this.ta.getWireType(sdkStatusModel, false, false);
         if (statusModel.kind !== "model") {
           throw new AdapterError(
@@ -1959,13 +1995,32 @@ export class ClientAdapter {
     for (const id of operationID) {
       switch (id.kind) {
         case "path": {
+          if (poller.operationIDPath) {
+            break;
+          }
           const statusStep = lroMetadata.statusMonitorStep;
           const statusOp =
             statusStep?.kind === "nextOperationReference"
               ? statusStep.target.operation
               : statusStep?.operation;
           if (!statusOp) {
-            continue;
+            throw new AdapterError(
+              "InternalError",
+              "missing LRO status monitor operation for operation ID",
+              sdkMethod.__raw?.node,
+            );
+          }
+          if (
+            !statusOp.parameters.some(
+              (param) =>
+                param.kind === "path" && param.serializedName === id.pathParameter.serializedName,
+            )
+          ) {
+            throw new AdapterError(
+              "InternalError",
+              `missing LRO operation ID path parameter ${id.pathParameter.serializedName}`,
+              sdkMethod.__raw?.node,
+            );
           }
           let source: go.LROPollingURLSource;
           switch (id.source.location) {
@@ -1980,20 +2035,24 @@ export class ClientAdapter {
               };
               break;
             case "ResponseBody":
-              source = { kind: "body", name: id.source.property.serializedName };
-              break;
             case "Self":
-              source = { kind: "self", name: "" };
-              break;
+              throw new AdapterError(
+                "UnsupportedTsp",
+                "LRO polling URLs in response bodies are not supported by the azcore poller",
+                id.source.property.__raw?.node,
+              );
           }
           poller.operationIDPath = {
             source,
-            httpPath: statusOp.path,
+            httpPath: statusOp.uriTemplate,
             pathVariable: id.pathParameter.serializedName,
           };
           break;
         }
         case "property":
+          if (poller.operationIDField) {
+            break;
+          }
           if (id.propertySegments.length !== 1) {
             throw new AdapterError(
               "UnsupportedTsp",

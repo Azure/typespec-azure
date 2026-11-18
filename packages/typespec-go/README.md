@@ -96,6 +96,12 @@ When true, HEAD requests will return a boolean value based on the HTTP status co
 
 Enables generation of spans for distributed tracing. The default is false.
 
+### `lro-metadata-pollers`
+
+**Type:** `boolean`
+
+When true, LROs with `@lroStatusMetadata` or `@lroOperationId` return a generated poller wrapper. Enabling this changes the public `Begin` method return type and may break existing SDK consumers. Status metadata and polling URL IDs are available again after the next poll when resuming. Polling URLs supplied in response bodies are not supported. The default is false.
+
 ### `module`
 
 **Type:** `string`

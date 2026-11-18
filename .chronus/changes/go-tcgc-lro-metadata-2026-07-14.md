@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-go"
 ---
 
-Long-running operations that use `@lroStatusMetadata` or `@lroOperationId` now return a per-operation poller type that embeds `*runtime.Poller[T]`. It adds a `StatusMetadata()` method with the selected properties from the latest status monitor response and an `OperationID()` method that reads the ID from the polling URL or the status monitor body. Both work after the poller is resumed from a resume token.
+The `lro-metadata-pollers` emitter option enables access to `@lroStatusMetadata` and `@lroOperationId` on generated pollers. Enabling it changes the return type of `Begin` methods for annotated operations and can break existing Go SDK consumers. A body operation ID takes precedence over a polling URL ID after it is received. Status metadata is empty after resuming until the next poll; operation IDs from a polling URL are also available after the next poll. Status-monitor models and their reachable types may gain output deserialization support.
