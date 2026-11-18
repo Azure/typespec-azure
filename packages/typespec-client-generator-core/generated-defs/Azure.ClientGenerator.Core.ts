@@ -1232,6 +1232,32 @@ export type ClientOptionDecorator = (
   scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
+ *
+ * Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
+ *
+ * See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
+ *
+ * @param target The long-running operation to customize.
+ * @param result The response model or status-monitor property to return from generated clients.
+ * @param scope Specifies the target language emitters.
+ * @example Return an action's whole status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus);
+ * ```
+ * @example Return a property of an action's status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus.result);
+ * ```
+ */
+export type ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureClientGeneratorCoreDecorators = {
   lroStatusMetadata: LroStatusMetadataDecorator;
   lroOperationId: LroOperationIdDecorator;
@@ -1257,6 +1283,7 @@ export type AzureClientGeneratorCoreDecorators = {
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
   clientOption: ClientOptionDecorator;
+  clientLroResult: ClientLroResultDecorator;
 };
 
 /**
