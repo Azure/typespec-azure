@@ -8,29 +8,30 @@ contract. Keep publication identities distinct from the native code owner.
 
 Native-first consumers discover the shared Swagger baseline before specs setup;
 follow the [consumer/producer contract](../analyze-native-lint-coverage/shared-baseline.md).
-The initial publication uses the verified `msyyc/azure-rest-api-specs` fork,
-branch `evidence/shared-swagger-baseline`, with `.lintdiff-baselines\current.json`
-and immutable `.lintdiff-baselines\swagger-arm-20261026-2cd3c5dd\baseline.json`.
-Pin the fetched metadata commit and version descriptor before reading data.
-The metadata branch is derived from frozen source, but its new metadata commit
-is not the tested source commit. Runtimes use descriptor `source.commit`.
+The verified `msyyc/azure-rest-api-specs` fork publishes discovery on
+`evidence/shared-swagger-baseline`. Read `.lintdiff-baselines\current.json`,
+resolve its `baselineId` to the immutable
+`.lintdiff-baselines\<baselineId>\baseline.json`, and pin both at one metadata
+commit. That metadata commit is not the tested source commit; runtimes use the
+selected descriptor's `source.commit`.
 
-The large archive belongs to the same specs repository's release
-`swagger-lint-baseline-20261026-2cd3c5dd`, asset
-`swagger-arm-20261026-2cd3c5dd.tar.gz`. Record descriptor SHA-256, archive size/hash,
-baseline identity, source preservation tuple and verified download receipt.
-Archive root retains `manifest.json`, `baseline.json`, `dataset\**`; do not
-commit the unpacked large dataset to Git. The unchanged source preservation ref
-`evidence/long-running-operations-options-validator-20261022-source` remains
-separate from metadata discovery and runtime injection.
+Resolve the release, asset name, size/hash, baseline identity and source
+preservation repository/ref from that same descriptor and record a verified
+download receipt. Archive root retains `manifest.json`, `baseline.json`,
+`dataset\**`; do not commit the unpacked large dataset to Git. The prior
+`swagger-arm-20261026-2cd3c5dd` descriptor and its release asset remain
+historical and immutable. Source preservation is a separate ref from metadata
+discovery and runtime injection.
 
 Shared Swagger-only completion is not native completion. Native execution,
 full population, controls, investigations, independent local reviews and A/B
 checkpoints remain required. Changing a validator selector alone does not
-require a refresh. Missing/incompatible publication blocks consumers with an
-exact prerequisite; only an explicitly requested producer runs the Swagger
-suite. Refresh appends new immutable assets and advances discovery only after
-verification, retaining prior versions. Legacy flow stays unchanged.
+require an extra refresh within a cycle. Missing/incompatible publication blocks
+consumers with an exact prerequisite; the separate producer runs the Swagger
+suite once per monthly TypeSpec release cycle, or out of cycle only with
+explicit authorization and material incompatibility/validity evidence. Refresh
+appends new immutable assets and advances discovery only after verification,
+retaining prior versions. Legacy flow stays unchanged.
 
 Staging-only ARM/common Spectral data can be published as a separately authorized
 [immutable supplement](../analyze-native-lint-coverage/shared-baseline.md#staging-only-diagnostic-supplements).
