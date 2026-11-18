@@ -1276,8 +1276,8 @@ function generateObserveInitialResponse(
 ): string {
   let text = `${indent.get()}handler := &${getPollingHandlerName(poller)}{}\n`;
   if (poller.statusModel && poller.initialResponseIsStatus) {
-    text += `${indent.get()}if err := handler.observe(resp); err != nil {\n`;
-    text += `${indent.push().get()}return nil, err\n`;
+    text += `${indent.get()}if observeErr := handler.observe(resp); observeErr != nil {\n`;
+    text += `${indent.push().get()}return nil, observeErr\n`;
     text += `${indent.pop().get()}}\n`;
   }
   const source = poller.operationIDPath?.source;

@@ -21,10 +21,14 @@ func TestStatusMetadataConcurrentRead(t *testing.T) {
 		if r.Method == http.MethodPost {
 			w.Header().Set("Operation-Location", server.URL+"/jobs/1")
 			w.WriteHeader(http.StatusAccepted)
-			fmt.Fprint(w, `{"status":"Running","jobId":"1"}`)
+			if _, err := fmt.Fprint(w, `{"status":"Running","jobId":"1"}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 			return
 		}
-		fmt.Fprint(w, `{"status":"Running","jobId":"1","statistics":{"total":3,"succeeded":1,"failed":0}}`)
+		if _, err := fmt.Fprint(w, `{"status":"Running","jobId":"1","statistics":{"total":3,"succeeded":1,"failed":0}}`); err != nil {
+			t.Errorf("write response: %v", err)
+		}
 	}))
 	defer server.Close()
 	client, err := lrometadatagroup.NewMetadataClientWithNoCredential(server.URL, nil)
@@ -60,17 +64,25 @@ func TestStatusMetadataRefreshAndDecodeError(t *testing.T) {
 		if r.Method == http.MethodPost {
 			w.Header().Set("Operation-Location", server.URL+"/jobs/1")
 			w.WriteHeader(http.StatusAccepted)
-			fmt.Fprint(w, `{"status":"Running","jobId":"1"}`)
+			if _, err := fmt.Fprint(w, `{"status":"Running","jobId":"1"}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 			return
 		}
 		polls++
 		switch polls {
 		case 1:
-			fmt.Fprint(w, `{"status":"Running","statistics":{"total":3,"succeeded":1,"failed":0}}`)
+			if _, err := fmt.Fprint(w, `{"status":"Running","statistics":{"total":3,"succeeded":1,"failed":0}}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 		case 2:
-			fmt.Fprint(w, `{"status":"Running"}`)
+			if _, err := fmt.Fprint(w, `{"status":"Running"}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 		default:
-			fmt.Fprint(w, `{"status":"Running","statistics":"not an object"}`)
+			if _, err := fmt.Fprint(w, `{"status":"Running","statistics":"not an object"}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 		}
 	}))
 	defer server.Close()
@@ -97,10 +109,14 @@ func TestStatusMetadataOnCancellation(t *testing.T) {
 		if r.Method == http.MethodPost {
 			w.Header().Set("Operation-Location", server.URL+"/jobs/1")
 			w.WriteHeader(http.StatusAccepted)
-			fmt.Fprint(w, `{"status":"Running","jobId":"1"}`)
+			if _, err := fmt.Fprint(w, `{"status":"Running","jobId":"1"}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 			return
 		}
-		fmt.Fprint(w, `{"status":"Canceled","jobId":"1","statistics":{"total":3,"succeeded":1,"failed":2}}`)
+		if _, err := fmt.Fprint(w, `{"status":"Canceled","jobId":"1","statistics":{"total":3,"succeeded":1,"failed":2}}`); err != nil {
+			t.Errorf("write response: %v", err)
+		}
 	}))
 	defer server.Close()
 	client, err := lrometadatagroup.NewMetadataClientWithNoCredential(server.URL, nil)

@@ -29,7 +29,9 @@ func TestOperationIDPathBodyAndStandardResumeToken(t *testing.T) {
 			http.Error(w, "unexpected polling URL", http.StatusBadRequest)
 			return
 		}
-		fmt.Fprint(w, `{"status":"Running","id":"body-id"}`)
+		if _, err := fmt.Fprint(w, `{"status":"Running","id":"body-id"}`); err != nil {
+			t.Errorf("write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -73,7 +75,9 @@ func TestOperationIDConcurrentRead(t *testing.T) {
 			w.WriteHeader(http.StatusAccepted)
 			return
 		}
-		fmt.Fprint(w, `{"status":"Running","id":"body-id"}`)
+		if _, err := fmt.Fprint(w, `{"status":"Running","id":"body-id"}`); err != nil {
+			t.Errorf("write response: %v", err)
+		}
 	}))
 	defer server.Close()
 	client, err := lrooperationidgroup.NewOperationIDClientWithNoCredential(server.URL, nil)

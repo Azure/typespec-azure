@@ -22,11 +22,17 @@ func TestPageableMetadataResume(t *testing.T) {
 		switch r.URL.Path {
 		case "/jobs":
 			w.Header().Set("Operation-Location", server.URL+"/status")
-			fmt.Fprint(w, `{}`)
+			if _, err := fmt.Fprint(w, `{}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 		case "/status":
-			fmt.Fprintf(w, `{"status":"Succeeded","progress":100,"result":{"items":[{"value":"first"}],"next":%q}}`, server.URL+"/page2")
+			if _, err := fmt.Fprintf(w, `{"status":"Succeeded","progress":100,"result":{"items":[{"value":"first"}],"next":%q}}`, server.URL+"/page2"); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 		case "/page2":
-			fmt.Fprint(w, `{"items":[{"value":"second"}]}`)
+			if _, err := fmt.Fprint(w, `{"items":[{"value":"second"}]}`); err != nil {
+				t.Errorf("write response: %v", err)
+			}
 		default:
 			http.NotFound(w, r)
 		}
