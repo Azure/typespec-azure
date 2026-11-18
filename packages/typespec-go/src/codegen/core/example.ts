@@ -253,11 +253,13 @@ export function generateExamples(
               "",
               undefined,
               (header.header as any).byValue,
+              false,
+              false,
             )
               .split("\n")
               .join(`\n${indent.get()}// \t`)},\n`;
           }
-          exampleText += `${indent.get()}// \t${(example.responseEnvelope.result.type as go.Model).name}: ${getExampleValue(pkg, example.responseEnvelope.result!, "", undefined, true).split("\n").join(`\n${indent.get()}// \t`)},\n`;
+          exampleText += `${indent.get()}// \t${(example.responseEnvelope.result.type as go.Model).name}: ${getExampleValue(pkg, example.responseEnvelope.result!, "", undefined, true, false, false).split("\n").join(`\n${indent.get()}// \t`)},\n`;
           exampleText += `${indent.get()}// }\n`;
           exampleText += `${indent.pop().get()}}\n`;
         } else if (example.responseEnvelope) {
@@ -275,6 +277,8 @@ export function generateExamples(
               "",
               undefined,
               (header.header as any).byValue,
+              false,
+              false,
             )
               .split("\n")
               .join(`\n${indent.get()}// \t`)},\n`;
@@ -292,7 +296,7 @@ export function generateExamples(
               resultFieldName = method.returns.result.type.name;
               resultByValue = false;
             }
-            exampleText += `${indent.get()}// \t${resultFieldName}: ${getExampleValue(pkg, example.responseEnvelope.result, "", undefined, resultByValue).split("\n").join(`\n${indent.get()}// \t`)},\n`;
+            exampleText += `${indent.get()}// \t${resultFieldName}: ${getExampleValue(pkg, example.responseEnvelope.result, "", undefined, resultByValue, false, false).split("\n").join(`\n${indent.get()}// \t`)},\n`;
           }
           exampleText += `${indent.get()}// }\n`;
         }
@@ -319,6 +323,7 @@ function getExampleValue(
   imports?: ImportManager,
   byValue: boolean = false,
   inArray: boolean = false,
+  isRequest: boolean = true,
 ): string {
   switch (example.kind) {
     case "string": {
@@ -378,7 +383,7 @@ function getExampleValue(
       const isElementPolymorphic = example.type.itemType.kind === "interface";
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       for (const element of example.value) {
-        exampleText += `${getExampleValue(pkg, element, indent + "\t", imports, isElementByValue && !isElementPolymorphic, !isElementPolymorphic)},\n`;
+        exampleText += `${getExampleValue(pkg, element, indent + "\t", imports, isElementByValue && !isElementPolymorphic, !isElementPolymorphic, isRequest)},\n`;
       }
       exampleText += `${indent}}`;
       return exampleText;
@@ -389,7 +394,7 @@ function getExampleValue(
       const isValueByValue = example.type.itemType.kind !== "ptr";
       const isValuePolymorphic = example.type.itemType.kind === "interface";
       for (const key in example.value) {
-        exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic).slice(indent.length + 1)},\n`;
+        exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic, false, isRequest).slice(indent.length + 1)},\n`;
       }
       exampleText += `${indent}}`;
       return exampleText;
@@ -402,19 +407,14 @@ function getExampleValue(
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
         const fieldExample = example.value[field];
-        // imports is only provided for request examples; response comments keep nil.
-        if (
-          imports &&
-          (fieldExample.kind === "null" ||
-            (fieldExample.kind === "any" && fieldExample.value === null))
-        ) {
+        if (isRequest && fieldExample.kind === "null") {
           // NullValue[T] requires a concrete pointer, slice, or map type.
           const nullType =
             goField.type.kind === "interface"
               ? new go.Ptr(getConcreteInterfaceModel(goField.type))
               : goField.type;
-          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
-          imports.addForType(nullType);
+          imports?.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+          imports?.addForType(nullType);
           const nullTypeName =
             nullType.kind === "any" ? "*any" : go.getTypeDeclaration(nullType, pkg);
           exampleText += `${indent}\t${field}: azcore.NullValue[${nullTypeName}](),\n`;
@@ -422,7 +422,7 @@ function getExampleValue(
         }
         const isFieldByValue = goField.type.kind !== "ptr";
         const isFieldPolymorphic = goField.type.kind === "interface";
-        exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic).slice(indent.length + 1)},\n`;
+        exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic, false, isRequest).slice(indent.length + 1)},\n`;
       }
       if (example.additionalProperties) {
         const additionalPropertiesField = example.type.fields.find((f) =>
@@ -434,7 +434,7 @@ function getExampleValue(
           additionalPropertiesField.type.itemType.kind === "interface";
         exampleText += `${indent}\t${additionalPropertiesField.name}: ${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
-          exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
+          exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic, false, isRequest).slice(indent.length + 1)},\n`;
         }
         exampleText += `${indent}},\n`;
       }

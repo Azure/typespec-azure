@@ -2685,7 +2685,7 @@ export class ClientAdapter {
     switch (goType.kind) {
       case "any":
         if (exampleType.kind === "unknown" || exampleType.kind === "raw") {
-          return new go.AnyExample(value);
+          return value === null ? new go.NullExample(goType) : new go.AnyExample(value);
         }
         break;
       case "constant":
