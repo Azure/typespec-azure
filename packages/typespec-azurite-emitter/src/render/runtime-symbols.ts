@@ -11,6 +11,9 @@ const runtimeExports = [
 
 export type RuntimeSymbols = ReturnType<typeof createRuntimeSymbols>;
 
+/** Registers the Azurite-owned module's exports for Alloy reference resolution.
+ * The synthetic package version is not a dependency or a descriptor format version.
+ */
 export function createRuntimeSymbols(runtimeImport: string) {
   return ts.createPackage({
     name: runtimeImport,

@@ -12,6 +12,7 @@ import type { RuntimeSymbols } from "./runtime-symbols.js";
 export function renderSerialization(_serverModel: ServerModel, runtimeSymbols: RuntimeSymbols) {
   return (
     <GeneratedSourceFile path="serialization.ts">
+      {/* Keep this value import extensionless for Azurite's ts-node runtime. */}
       {code`
         import { serviceMetadata } from "./metadata";
 

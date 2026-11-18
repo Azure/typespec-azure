@@ -1,6 +1,6 @@
 import type { JSONSchemaType } from "@typespec/compiler";
 
-export interface AzuritePilotEmitterOptions {
+export interface AzuriteEmitterOptions {
   /**
    * Relative path (within the emitter output dir) where generated artifacts are written.
    */
@@ -13,12 +13,12 @@ export interface AzuritePilotEmitterOptions {
   runtimeImport?: string;
 }
 
-export interface NormalizedAzuritePilotEmitterOptions {
+export interface NormalizedAzuriteEmitterOptions {
   outputDir: string;
   runtimeImport: string;
 }
 
-export const azuritePilotEmitterOptionsSchema: JSONSchemaType<AzuritePilotEmitterOptions> = {
+export const azuriteEmitterOptionsSchema: JSONSchemaType<AzuriteEmitterOptions> = {
   type: "object",
   additionalProperties: false,
   properties: {
@@ -28,8 +28,8 @@ export const azuritePilotEmitterOptionsSchema: JSONSchemaType<AzuritePilotEmitte
 };
 
 export function normalizeOptions(
-  rawOptions: AzuritePilotEmitterOptions | undefined,
-): NormalizedAzuritePilotEmitterOptions {
+  rawOptions: AzuriteEmitterOptions | undefined,
+): NormalizedAzuriteEmitterOptions {
   return {
     outputDir: rawOptions?.outputDir?.trim() || ".",
     runtimeImport: rawOptions?.runtimeImport?.trim() || "../runtime/serializationRuntime",

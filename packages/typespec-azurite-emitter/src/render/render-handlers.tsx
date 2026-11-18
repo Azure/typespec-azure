@@ -8,7 +8,12 @@ import { contextRefkey, operationParametersRefkey, operationResponseRefkey } fro
 export function renderHandlers(serverModel: ServerModel) {
   return (
     <GeneratedSourceFile path="handlers.ts">
-      <ef.InterfaceDeclaration export name="Context" refkey={contextRefkey}>
+      <ef.InterfaceDeclaration
+        export
+        name="Context"
+        refkey={contextRefkey}
+        doc="Common request context passed to handlers. The Azurite runtime supplies any additional service-specific context."
+      >
         <ts.InterfaceMember readonly name="contextId" type={code`string`} />
         {code`;`}
       </ef.InterfaceDeclaration>
@@ -19,11 +24,13 @@ export function renderHandlers(serverModel: ServerModel) {
 }
 
 export function ServiceHandlerInterface(props: { serverModel: ServerModel }) {
+  const namePolicy = ts.createTSNamePolicy();
   return (
     <ef.InterfaceDeclaration export name="IServiceHandler">
       <For each={props.serverModel.operations} semicolon line enderPunctuation>
         {(op) => {
-          const methodName = op.name[0].toLowerCase() + op.name.slice(1);
+          // Use the collision-qualified declaration stem, not the wire/dispatch name.
+          const methodName = namePolicy.getName(op.typeName, "interface-member");
           return (
             <ts.InterfaceMethod
               name={methodName}

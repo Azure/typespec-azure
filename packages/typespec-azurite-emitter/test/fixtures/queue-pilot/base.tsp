@@ -1,4 +1,5 @@
 import "@typespec/http";
+import "@typespec/xml";
 
 using Http;
 
@@ -23,6 +24,7 @@ namespace QueuePilot {
   }
 
   model SignedIdentifiers {
+    @Xml.unwrapped
     items: SignedIdentifier[];
   }
 
@@ -36,6 +38,8 @@ namespace QueuePilot {
 
   model QueueProperties {
     /** Name of the queue. */
+    @Xml.attribute
+    @Xml.name("Name")
     name: string;
 
     /** Arbitrary emulator-defined metadata values for the queue. */
@@ -50,13 +54,19 @@ namespace QueuePilot {
     messageText: string;
   }
 
+  @Xml.name("QueueMessagesList")
   model QueueMessageList {
+    @Xml.unwrapped
     messages: QueueMessage[];
   }
 
   @route("/{queueName}")
   @put
-  op createQueue(@path queueName: string, @body metadata: QueueMetadata): {
+  op createQueue(
+    @path queueName: string,
+    @header contentType: "application/xml",
+    @body metadata: QueueMetadata,
+  ): {
     @statusCode statusCode: 201;
     @header("x-ms-request-id") requestId: string;
   };
@@ -65,6 +75,7 @@ namespace QueuePilot {
   @get
   op getQueueProperties(@path queueName: string): {
     @statusCode statusCode: 200;
+    @header contentType: "application/xml";
     @header("x-ms-approximate-messages-count") approximateMessagesCount: int32;
     @body properties: QueueProperties;
   };
@@ -84,12 +95,17 @@ namespace QueuePilot {
     ...VisibilityTimeoutParameter,
   ): {
     @statusCode statusCode: 200;
+    @header contentType: "application/xml";
     @body messages: QueueMessageList;
   };
 
   @route("/{queueName}?comp=acl")
   @put
-  op setAccessPolicy(@path queueName: string, @body queueAcl: SignedIdentifiers): {
+  op setAccessPolicy(
+    @path queueName: string,
+    @header contentType: "application/xml",
+    @body queueAcl: SignedIdentifiers,
+  ): {
     @statusCode statusCode: 204;
   };
 }

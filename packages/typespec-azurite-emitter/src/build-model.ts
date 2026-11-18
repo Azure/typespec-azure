@@ -1,39 +1,55 @@
 import * as ts from "@alloy-js/typescript";
 import {
   $doc,
-  type DecoratorContext,
+  type DiagnosticTarget,
   type Model,
   type ModelProperty,
+  type Scalar,
   type Type,
 } from "@typespec/compiler";
 import {
-  getAllHttpServices,
   type HttpOperation,
   type HttpOperationParameter,
   type HttpOperationResponse,
   type HttpPayloadBody,
+  type HttpService,
 } from "@typespec/http";
 import "@typespec/http/experimental/typekit";
 import { isAttribute, isUnwrapped } from "@typespec/xml";
 import type { AzuriteEmitterContext } from "./context.js";
+import { isOptional } from "./decorators.js";
 import { createDiagnostic } from "./lib.js";
 import type {
+  ServerDataModel,
   ServerLiteralQueryParameter,
   ServerModel,
   ServerModelProperty,
   ServerNumericConstraints,
   ServerOperation,
   ServerOperationParameter,
-  ServerParameterLocation,
   ServerRequestBody,
   ServerResponse,
   ServerResponseHeader,
-  ServerSkippedOperation,
   ServerTypeRef,
 } from "./model.js";
 import { getName, hasNameOverride } from "./utils.js";
 
 const tsNamePolicy = ts.createTSNamePolicy();
+
+class UnsupportedTypeError extends Error {
+  constructor(
+    message: string,
+    readonly target: DiagnosticTarget,
+  ) {
+    super(message);
+  }
+}
+
+interface ModelBuilderContext extends AzuriteEmitterContext {
+  modelRegistry: Map<string, ServerDataModel & { source: Model }>;
+  anonymousModelNamesByType: WeakMap<Model, string>;
+  nextAnonymousModelId: number;
+}
 
 function getTypeName(name: string): string {
   return tsNamePolicy.getName(name, "type");
@@ -68,41 +84,49 @@ interface OperationNameCandidate {
  * compiled program. This is the "transform" phase: it walks `@typespec/http` metadata and
  * TypeSpec model types and produces a simplified, render-ready representation.
  *
- * Operations the transform phase can't represent are skipped with a reason in
- * `skippedOperations`.
+ * Unsupported wire shapes produce a diagnostic rather than a partial model.
  */
 export function buildServerModel(
-  context: AzuriteEmitterContext,
-  service = getAllHttpServices(context.program)[0][0],
+  emitterContext: AzuriteEmitterContext,
+  service: HttpService,
 ): ServerModel {
+  const context: ModelBuilderContext = {
+    ...emitterContext,
+    modelRegistry: new Map(),
+    anonymousModelNamesByType: new WeakMap(),
+    nextAnonymousModelId: 1,
+  };
+  const serviceName = getName(context, service.namespace, service.namespace.name);
   const operations: ServerOperation[] = [];
-  const skippedOperations: ServerSkippedOperation[] = [];
-  const operationNames = planOperationNames(context, service?.operations ?? []);
-  for (const op of service?.operations ?? []) {
-    try {
+  const operationNames = planOperationNames(context, service.operations);
+  try {
+    for (const op of service.operations) {
       const names = operationNames.get(op);
       if (names === undefined) continue;
       const built = buildOperation(context, names.runtimeName, names.typeName, op);
       operations.push(built);
-    } catch (error) {
-      skippedOperations.push({
-        name: getName(context, op.operation, getTypeName(op.operation.name)),
-        reason: error instanceof Error ? error.message : String(error),
-        target: op.operation,
-      });
     }
+  } catch (error) {
+    if (!(error instanceof UnsupportedTypeError)) throw error;
+    context.diagnostics.push(
+      createDiagnostic({
+        code: "unsupported-type",
+        format: { message: error.message },
+        target: error.target,
+      }),
+    );
+    return { serviceName, operations: [], models: [] };
   }
 
   return {
-    serviceName: service ? getName(context, service.namespace, service.namespace.name) : "Service",
+    serviceName,
     operations,
     models: [...context.modelRegistry.values()],
-    skippedOperations,
   };
 }
 
 function buildOperation(
-  context: AzuriteEmitterContext,
+  context: ModelBuilderContext,
   name: string,
   typeName: string,
   op: HttpOperation,
@@ -112,6 +136,13 @@ function buildOperation(
   const requestBody = op.parameters.body
     ? buildRequestBody(context, op.parameters.body)
     : undefined;
+
+  if (requestBody && parameters.some((p) => p.name === "body")) {
+    throw new UnsupportedTypeError(
+      "parameter 'body' conflicts with the request body",
+      op.operation,
+    );
+  }
 
   const responses = op.responses.map((r) => buildResponse(context, r));
   const route = splitRoutePath(op.path);
@@ -300,25 +331,32 @@ function splitRoutePath(path: string): {
 }
 
 function buildParameter(
-  context: AzuriteEmitterContext,
+  context: ModelBuilderContext,
   param: HttpOperationParameter,
 ): BuiltOperationParameter {
-  const location: ServerParameterLocation =
-    param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
-  const type = isHeaderCollection(param.name)
+  if (param.type === "cookie") {
+    throw new UnsupportedTypeError(
+      `cookie parameter '${param.name}' is not supported`,
+      param.param,
+    );
+  }
+  const collectionPrefix = param.type === "header" ? getCollectionPrefix(param.name) : undefined;
+  const type = collectionPrefix
     ? getHeaderCollectionTypeMetadata(context)
     : getTypeMetadata(context, param.param.type, param.param);
   return {
     name: getName(context, param.param, param.param.name),
     wireName: param.name,
-    location,
+    location: param.type,
+    collectionPrefix,
     type: type.runtime,
     declarationType: type.declaration,
-    optional: param.param.optional,
+    optional: isOptional(context.program, param.param),
   };
 }
 
-function buildRequestBody(context: AzuriteEmitterContext, body: HttpPayloadBody): BuiltRequestBody {
+function buildRequestBody(context: ModelBuilderContext, body: HttpPayloadBody): BuiltRequestBody {
+  checkBodyKind(body);
   const type = getTypeMetadata(context, body.type, body.property ?? body.type);
   return {
     type: type.runtime,
@@ -328,36 +366,67 @@ function buildRequestBody(context: AzuriteEmitterContext, body: HttpPayloadBody)
   };
 }
 
+function checkBodyKind(body: HttpPayloadBody): void {
+  if (body.bodyKind !== "single") {
+    throw new UnsupportedTypeError(
+      `${body.bodyKind} bodies are not supported`,
+      body.property ?? body.type,
+    );
+  }
+}
+
 function buildResponse(
-  context: AzuriteEmitterContext,
+  context: ModelBuilderContext,
   response: HttpOperationResponse,
 ): BuiltResponse {
-  const content = response.responses[0];
+  const statusCode = response.statusCodes;
+  if (typeof statusCode === "object") {
+    const statusProperty = response.responses[0]?.properties.find((p) => p.kind === "statusCode");
+    throw new UnsupportedTypeError(
+      `response status range ${statusCode.start}-${statusCode.end} is not supported`,
+      statusProperty?.property ?? response.type,
+    );
+  }
+  if (response.responses.length > 1) {
+    throw new UnsupportedTypeError(
+      `multiple response variants for status ${statusCode} are not supported`,
+      response.type,
+    );
+  }
+  const [content] = response.responses;
+  const body = content?.body;
+  // Default bodies bypass buildRequestBody because Queue error middleware serializes them.
+  if (body && statusCode === "*") checkBodyKind(body);
+  if (body && body.contentTypes.length > 1) {
+    throw new UnsupportedTypeError(
+      `multiple response content types for status ${statusCode} are not supported: ${body.contentTypes.join(", ")}`,
+      body.contentTypeProperty ?? response.type,
+    );
+  }
   const headers: BuiltResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
-    const type = isHeaderCollection(headerWireName)
+    const collectionPrefix = getCollectionPrefix(headerWireName);
+    const type = collectionPrefix
       ? getHeaderCollectionTypeMetadata(context)
       : getTypeMetadata(context, prop.type, prop);
     headers.push({
       name: getName(context, prop, prop.name),
       wireName: headerWireName,
+      collectionPrefix,
       type: type.runtime,
       declarationType: type.declaration,
-      optional: prop.optional,
+      optional: isOptional(context.program, prop),
     });
   }
   return {
-    statusCode: typeof response.statusCodes === "number" ? response.statusCodes : "*",
+    statusCode,
     headers,
-    body:
-      content?.body && response.statusCodes !== "*"
-        ? buildRequestBody(context, content.body)
-        : undefined,
+    body: body && statusCode !== "*" ? buildRequestBody(context, body) : undefined,
   };
 }
 
-function isHeaderCollection(wireName: string): boolean {
-  return wireName.toLowerCase() === "x-ms-meta";
+function getCollectionPrefix(wireName: string): string | undefined {
+  return wireName.toLowerCase() === "x-ms-meta" ? "x-ms-meta-" : undefined;
 }
 
 function getHeaderCollectionTypeMetadata(context: AzuriteEmitterContext): TypeMetadata {
@@ -399,33 +468,62 @@ function stripResponseHeader(header: BuiltResponseHeader): ServerResponseHeader 
 }
 
 function getTypeMetadata(
-  context: AzuriteEmitterContext,
+  context: ModelBuilderContext,
   type: Type,
   constraintTarget: Type = type,
+  wireProperty = constraintTarget.kind === "ModelProperty" ? constraintTarget : undefined,
 ): TypeMetadata {
   const tk = context.tk;
   switch (type.kind) {
-    case "Scalar":
+    case "Scalar": {
       const scalarName = type.name || "<anonymous>";
+      if (tk.scalar.extendsUtcDateTime(type) || tk.scalar.extendsOffsetDateTime(type)) {
+        let encoding = wireProperty
+          ? tk.modelProperty.getEncoding(wireProperty)?.encoding
+          : undefined;
+        // getEncoding does not walk base scalars.
+        for (
+          let scalar: Scalar | undefined = type;
+          encoding === undefined && scalar;
+          scalar = scalar.baseScalar
+        ) {
+          encoding = tk.scalar.getEncoding(scalar)?.encoding;
+        }
+        encoding ??=
+          wireProperty && tk.modelProperty.isHttpHeader(wireProperty) ? "rfc7231" : "rfc3339";
+        if (
+          encoding !== "rfc3339" &&
+          encoding !== "rfc3339-fixed-width" &&
+          encoding !== "rfc7231" &&
+          encoding !== "unixTimestamp"
+        ) {
+          throw new UnsupportedTypeError(
+            `unsupported datetime encoding ${encoding}`,
+            wireProperty ?? type,
+          );
+        }
+        return {
+          runtime: { kind: "datetime", encoding },
+          declaration: encoding === "unixTimestamp" ? tk.builtin.safeInt : tk.builtin.string,
+        };
+      }
+      if (tk.scalar.extendsPlainDate(type)) {
+        return { runtime: { kind: "datetime", encoding: "date" }, declaration: tk.builtin.string };
+      }
+      if (tk.scalar.extendsPlainTime(type)) {
+        return { runtime: { kind: "datetime", encoding: "time" }, declaration: tk.builtin.string };
+      }
       if (tk.scalar.extendsNumeric(type))
         return {
           runtime: numericTypeRef(context, constraintTarget),
           declaration: type,
         };
       if (tk.scalar.extendsString(type)) return { runtime: { kind: "string" }, declaration: type };
-      if (
-        tk.scalar.extendsUtcDateTime(type) ||
-        tk.scalar.extendsOffsetDateTime(type) ||
-        tk.scalar.extendsPlainDate(type) ||
-        tk.scalar.extendsPlainTime(type)
-      ) {
-        return { runtime: { kind: "datetime" }, declaration: tk.builtin.string };
-      }
       if (tk.scalar.extendsBoolean(type))
         return { runtime: { kind: "boolean" }, declaration: type };
-      throw new Error(`unsupported scalar ${scalarName}`);
+      throw new UnsupportedTypeError(`unsupported scalar ${scalarName}`, constraintTarget);
+    }
     case "Boolean":
-      return { runtime: { kind: "literal", value: type.value }, declaration: type };
     case "String":
       return { runtime: { kind: "literal", value: type.value }, declaration: type };
     case "Number": {
@@ -436,21 +534,51 @@ function getTypeMetadata(
         value = undefined;
       }
       if (value === undefined || value === null || !Number.isFinite(value)) {
-        throw new Error("numeric literal cannot be represented as a JavaScript number");
+        throw new UnsupportedTypeError(
+          "numeric literal cannot be represented as a JavaScript number",
+          constraintTarget,
+        );
       }
       return {
         runtime: { kind: "literal", value },
         declaration: type,
       };
     }
-    case "Enum": {
-      // TypeSpec string enums are represented on the wire as strings; generated TypeScript
-      // declarations keep them as string because Azurite handlers do not need enum objects.
-      return { runtime: { kind: "string" }, declaration: tk.builtin.string };
+    case "EnumMember": {
+      const value = type.value ?? type.name;
+      if (typeof value !== "string") {
+        throw new UnsupportedTypeError(
+          `unsupported numeric enum member ${type.enum.name}.${type.name}`,
+          type,
+        );
+      }
+      return { runtime: { kind: "literal", value }, declaration: tk.literal.createString(value) };
+    }
+    case "Enum":
+    case "Union": {
+      const members =
+        type.kind === "Enum"
+          ? [...type.members.values()]
+          : [...type.variants.values()].map((v) => v.type);
+      if (members.length === 0) {
+        throw new UnsupportedTypeError(`unsupported empty ${type.kind.toLowerCase()}`, type);
+      }
+      const variants = members.map((member) =>
+        getTypeMetadata(context, member, member, wireProperty),
+      );
+      return {
+        runtime: { kind: "union", variants: variants.map((v) => v.runtime) },
+        declaration: tk.union.create(variants.map((v) => v.declaration)),
+      };
     }
     case "Model": {
       if (tk.array.is(type)) {
-        const element = getTypeMetadata(context, tk.array.getElementType(type));
+        const element = getTypeMetadata(
+          context,
+          tk.array.getElementType(type),
+          undefined,
+          wireProperty,
+        );
         return {
           runtime: { kind: "array", element: element.runtime },
           declaration: tk.array.create(element.declaration),
@@ -472,34 +600,42 @@ function getTypeMetadata(
             : type,
       };
     }
-    case "Union": {
-      const variants = [...type.variants.values()].map(
-        (variant) => getTypeMetadata(context, variant.type).runtime,
-      );
-      return { runtime: { kind: "union", variants }, declaration: tk.intrinsic.any };
+    case "Intrinsic": {
+      if (type.name === "null") {
+        return { runtime: { kind: "literal", value: null }, declaration: type };
+      }
+      throw new UnsupportedTypeError(`unsupported intrinsic ${type.name}`, constraintTarget);
     }
     default:
-      throw new Error(`unsupported TypeSpec type kind ${type.kind}`);
+      throw new UnsupportedTypeError(
+        `unsupported TypeSpec type kind ${type.kind}`,
+        constraintTarget,
+      );
   }
 }
 
-function registerModel(context: AzuriteEmitterContext, model: Model): ServerTypeRef {
+function registerModel(context: ModelBuilderContext, model: Model): ServerTypeRef {
   const tk = context.tk;
   const name = resolveModelName(context, model);
-  if (!context.modelRegistry.has(name)) {
+  const existing = context.modelRegistry.get(name);
+  if (existing && existing.source !== model) {
+    throw new UnsupportedTypeError(`distinct models share the generated name '${name}'`, model);
+  }
+  if (!existing) {
     const declarationModel = createDeclarationModel(context, name, model);
-    // Insert a placeholder first to guard against infinite recursion on cyclic models.
-    context.modelRegistry.set(name, { name, wireName: name, properties: [], declarationModel });
-    const properties = [...tk.model.getProperties(model).values()].map((prop) =>
-      buildModelProperty(context, prop, declarationModel),
-    );
+    const properties: ServerDataModel["properties"] = [];
+    // Register the identity before walking properties so recursive references resolve.
     context.modelRegistry.set(name, {
+      source: model,
       name,
       wireName: context.tk.type.getEncodedName(model, "application/xml"),
       properties,
       declarationModel,
       doc: getDocHelper(context, model),
     });
+    for (const prop of tk.model.getProperties(model).values()) {
+      properties.push(buildModelProperty(context, prop, declarationModel));
+    }
   }
   return { kind: "model", name };
 }
@@ -510,10 +646,8 @@ function registerModel(context: AzuriteEmitterContext, model: Model): ServerType
  * keyed by *object identity* so that two structurally-different anonymous models never clobber
  * each other under the same cache key.
  */
-function resolveModelName(context: AzuriteEmitterContext, model: Model): string {
-  if (model.name) return getName(context, model, getTypeName(model.name));
-  const existingNamedModel = findStructurallyEquivalentNamedModel(context, model);
-  if (existingNamedModel) return existingNamedModel;
+function resolveModelName(context: ModelBuilderContext, model: Model): string {
+  if (model.name) return getTypeName(getName(context, model, model.name));
   // Anonymous TypeSpec models all have an empty name, so identity is the only stable cache key.
   const existing = context.anonymousModelNamesByType.get(model);
   if (existing) return existing;
@@ -529,41 +663,8 @@ function anonymousModelName(id: number): string {
   return id === 1 ? "AnonymousModel" : `AnonymousModel${id}`;
 }
 
-function findStructurallyEquivalentNamedModel(
-  context: AzuriteEmitterContext,
-  model: Model,
-): string | undefined {
-  const tk = context.tk;
-  const anonymousProperties = [...tk.model.getProperties(model).values()];
-  for (const candidate of context.modelRegistry.values()) {
-    if (candidate.name.startsWith("AnonymousModel")) continue;
-    if (candidate.properties.length !== anonymousProperties.length) continue;
-    const candidateProperties = new Map(candidate.properties.map((prop) => [prop.name, prop]));
-    let matches = true;
-    for (const prop of anonymousProperties) {
-      const name = getName(context, prop, prop.name);
-      const candidateProp = candidateProperties.get(name);
-      if (
-        candidateProp === undefined ||
-        candidateProp.optional !== prop.optional ||
-        candidateProp.wireName !== context.tk.type.getEncodedName(prop, "application/xml")
-      ) {
-        matches = false;
-        break;
-      }
-      const typeRef = getTypeMetadata(context, prop.type).runtime;
-      if (JSON.stringify(candidateProp.type) !== JSON.stringify(typeRef)) {
-        matches = false;
-        break;
-      }
-    }
-    if (matches) return candidate.name;
-  }
-  return undefined;
-}
-
 function buildModelProperty(
-  context: AzuriteEmitterContext,
+  context: ModelBuilderContext,
   prop: ModelProperty,
   declarationModel: Model,
 ): ServerModelProperty {
@@ -573,7 +674,7 @@ function buildModelProperty(
     name: getName(context, prop, prop.name),
     wireName: context.tk.type.getEncodedName(prop, "application/xml"),
     type: type.runtime,
-    optional: prop.optional,
+    optional: isOptional(context.program, prop),
     xmlAttribute: isAttribute(context.program, prop),
     xmlUnwrapped: isUnwrapped(context.program, prop),
     doc: getDocHelper(context, prop),
@@ -586,13 +687,13 @@ function createDeclarationModel(
   sourceModel: Model,
 ): Model {
   const tk = context.tk;
-  const model = tk.model.create({
+  const doc = getDocHelper(context, sourceModel);
+  return tk.model.create({
     name,
     properties: {},
     expression: false,
+    decorators: doc ? [[$doc, doc]] : [],
   });
-  applyDoc(context, model, getDocHelper(context, sourceModel));
-  return model;
 }
 
 function createDeclarationProperty(
@@ -605,12 +706,19 @@ function createDeclarationProperty(
   const property = tk.modelProperty.create({
     name: getName(context, source, source.name),
     type: type.declaration,
-    optional: source.optional,
+    optional: isOptional(context.program, source),
     defaultValue: source.defaultValue,
   });
   property.model = declarationModel;
   declarationModel.properties.set(property.name, property);
-  applyDoc(context, property, getDocHelper(context, source));
+  const doc = getDocHelper(context, source);
+  if (doc) {
+    property.decorators.push({
+      decorator: $doc,
+      args: [{ value: tk.literal.createString(doc), jsValue: doc }],
+    });
+    tk.type.finishType(property);
+  }
   return property;
 }
 
@@ -626,8 +734,8 @@ function createOperationParametersModel(
     name: `${operationName}Parameters`,
     properties: {},
     expression: false,
+    decorators: doc ? [[$doc, doc]] : [],
   });
-  applyDoc(context, model, doc);
 
   for (const parameter of parameters) {
     const property = tk.modelProperty.create({
@@ -735,13 +843,6 @@ function createResponseHeadersModel(
   }
 
   return model;
-}
-
-function applyDoc(context: AzuriteEmitterContext, target: Type, doc: string | undefined): void {
-  if (!doc) return;
-  // Typekit can read docs but does not expose a public setter; use the public @doc
-  // decorator so emitter-framework typed declarations can infer copied docs.
-  $doc({ program: context.program } as DecoratorContext, target, doc);
 }
 
 function getDocHelper(context: AzuriteEmitterContext, target: Type): string | undefined {

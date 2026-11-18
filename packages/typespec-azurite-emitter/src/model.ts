@@ -1,4 +1,4 @@
-import type { DiagnosticTarget, Model, Union } from "@typespec/compiler";
+import type { DateTimeKnownEncoding, Model, Union } from "@typespec/compiler";
 
 export interface ServerNumericConstraints {
   readonly min?: number;
@@ -11,13 +11,13 @@ export type ServerTypeRef =
   | { kind: "string" }
   | { kind: "number"; constraints?: ServerNumericConstraints }
   | { kind: "boolean" }
-  | { kind: "datetime" }
+  | { kind: "datetime"; encoding: DateTimeKnownEncoding | "rfc3339-fixed-width" | "date" | "time" }
   | { kind: "unknown" }
   | { kind: "model"; name: string }
   | { kind: "array"; element: ServerTypeRef }
   | { kind: "record"; element: ServerTypeRef }
   | { kind: "union"; variants: readonly ServerTypeRef[] }
-  | { kind: "literal"; value: string | number | boolean };
+  | { kind: "literal"; value: string | number | boolean | null };
 
 export interface ServerModelProperty {
   readonly name: string;
@@ -45,6 +45,7 @@ export interface ServerOperationParameter {
   /** The wire name (e.g. the query-string key or header name), which may differ from `name`. */
   readonly wireName: string;
   readonly location: ServerParameterLocation;
+  readonly collectionPrefix?: string;
   readonly type: ServerTypeRef;
   readonly optional: boolean;
 }
@@ -58,6 +59,7 @@ export interface ServerRequestBody {
 export interface ServerResponseHeader {
   readonly name: string;
   readonly wireName: string;
+  readonly collectionPrefix?: string;
   readonly type: ServerTypeRef;
   readonly optional: boolean;
 }
@@ -99,11 +101,4 @@ export interface ServerModel {
   readonly serviceName: string;
   readonly operations: ServerOperation[];
   readonly models: ServerDataModel[];
-  readonly skippedOperations: readonly ServerSkippedOperation[];
-}
-
-export interface ServerSkippedOperation {
-  readonly name: string;
-  readonly reason: string;
-  readonly target: DiagnosticTarget;
 }

@@ -6,7 +6,6 @@ import type { Program } from "@typespec/compiler";
 import { Output } from "@typespec/emitter-framework";
 import * as ef from "@typespec/emitter-framework/typescript";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildServerModel } from "../src/build-model.js";
 import type { ServerModel } from "../src/model.js";
 import { GeneratedSourceFile } from "../src/render/generated-source-file.js";
 import {
@@ -22,7 +21,7 @@ import { renderModels } from "../src/render/render-models.js";
 import { renderOperations } from "../src/render/render-operations.js";
 import { renderSerialization } from "../src/render/render-serialization.js";
 import { createRuntimeSymbols } from "../src/render/runtime-symbols.js";
-import { ApiTester, createTestAzuriteContext } from "./tester.js";
+import { ApiTester, buildTestServerModel, createTestAzuriteContext } from "./tester.js";
 
 let testProgram: Program;
 let sampleServerModel: ServerModel;
@@ -84,7 +83,7 @@ beforeAll(async () => {
     `,
   });
   testProgram = program;
-  const builtModel = buildServerModel(createTestAzuriteContext(program));
+  const builtModel = buildTestServerModel(createTestAzuriteContext(program));
   sampleServerModel = {
     ...builtModel,
     models: builtModel.models.filter((model) =>
@@ -397,7 +396,7 @@ describe("renderMetadata", () => {
         import { CreateQueueMetadata, DeleteQueueMetadata } from "./operations";
 
         export type { OperationMetadata, ServiceMetadata } from "../runtime/serializationRuntime";
-        export const serviceMetadata: ServiceMetadata = defineServiceMetadata({ operations: [CreateQueueMetadata, DeleteQueueMetadata], xmlModels: [QueueMetadataXmlMetadata, QueueMessageXmlMetadata] });
+        export const serviceMetadata: ServiceMetadata = defineServiceMetadata({ descriptorVersion: 2, operations: [CreateQueueMetadata, DeleteQueueMetadata], xmlModels: [QueueMetadataXmlMetadata, QueueMessageXmlMetadata] });
 
         export const operations: readonly OperationMetadata[] = serviceMetadata.operations;
       `,

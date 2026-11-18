@@ -14,5 +14,10 @@ export type {
   ServerResponseHeader,
   ServerTypeRef,
 } from "./model.js";
-export type { AzuritePilotEmitterOptions } from "./options.js";
+export type { AzuriteEmitterOptions } from "./options.js";
 export { renderHandlers, renderMetadata, renderModels, renderOperations } from "./render/index.js";
+export type {
+  OperationDescriptor,
+  OperationTypeDescriptor,
+  XmlModelDescriptor,
+} from "./render/render-metadata.js";

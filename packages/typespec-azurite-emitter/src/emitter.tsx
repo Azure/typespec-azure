@@ -4,25 +4,23 @@ import { getAllHttpServices } from "@typespec/http";
 import { buildServerModel } from "./build-model.js";
 import { createAzuriteEmitterContext } from "./context.js";
 import { reportDiagnostic } from "./lib.js";
-import type { AzuritePilotEmitterOptions } from "./options.js";
+import type { AzuriteEmitterOptions } from "./options.js";
 import { normalizeOptions } from "./options.js";
 import { AzuriteEmitterOutput } from "./render/index.js";
 
 /**
  * Emitter entry point: builds the intermediate server model (transform phase) and renders
- * it into the three generated artifacts (render phase).
+ * it into the generated artifacts (render phase).
  */
-export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>): Promise<void> {
+export async function $onEmit(context: EmitContext<AzuriteEmitterOptions>): Promise<void> {
   const options = normalizeOptions(context.options);
   const azuriteContext = createAzuriteEmitterContext(context.program, options);
   const { program } = azuriteContext;
 
   const [services, httpDiagnostics] = getAllHttpServices(program);
-  if (httpDiagnostics.length > 0) {
-    program.reportDiagnostics(httpDiagnostics);
-    return;
-  }
-  if (services.length === 0 || services[0].operations.length === 0) {
+  // @typespec/http reports these diagnostics during validation.
+  if (httpDiagnostics.some((diagnostic) => diagnostic.severity === "error")) return;
+  if (services.length === 0) {
     reportDiagnostic(program, { code: "no-service-found", target: NoTarget });
     return;
   }
@@ -30,20 +28,14 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
     reportDiagnostic(program, { code: "multiple-services", target: NoTarget });
     return;
   }
+  if (services[0].operations.length === 0) {
+    reportDiagnostic(program, { code: "no-operations", target: services[0].namespace });
+    return;
+  }
 
   const serverModel = buildServerModel(azuriteContext, services[0]);
   if (azuriteContext.diagnostics.length > 0) {
     program.reportDiagnostics(azuriteContext.diagnostics);
-    return;
-  }
-  if (serverModel.skippedOperations.length > 0) {
-    for (const skipped of serverModel.skippedOperations) {
-      reportDiagnostic(program, {
-        code: "skipped-operation",
-        format: { name: skipped.name, reason: skipped.reason },
-        target: skipped.target,
-      });
-    }
     return;
   }
 

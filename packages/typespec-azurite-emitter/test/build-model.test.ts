@@ -1,10 +1,10 @@
 import { $ } from "@typespec/compiler/typekit";
 import { getAllHttpServices } from "@typespec/http";
 import { describe, expect, it } from "vitest";
-import { buildServerModel } from "../src/build-model.js";
 import { operationDescriptorValue } from "../src/render/render-metadata.js";
 import {
   ApiTester,
+  buildTestServerModel,
   createTestAzuriteContext,
   loadQueuePilotFixture,
   readFixture,
@@ -13,7 +13,7 @@ import {
 describe("buildServerModel", () => {
   it("builds one operation per HTTP operation with the right verb and path", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const names = serverModel.operations.map((op) => op.name).sort();
     expect(names).toEqual([
@@ -42,7 +42,7 @@ describe("buildServerModel", () => {
 
   it("captures path and query parameters with their wire names and optionality", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const listMessages = serverModel.operations.find((op) => op.name === "ListMessages")!;
     const byName = Object.fromEntries(listMessages.parameters.map((p) => [p.name, p]));
@@ -62,18 +62,18 @@ describe("buildServerModel", () => {
 
   it("captures the request body type and content types", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const createQueue = serverModel.operations.find((op) => op.name === "Queue_Create")!;
     expect(createQueue.requestBody).toMatchObject({
       type: { kind: "model", name: "QueueMetadata" },
-      contentTypes: ["application/json"],
+      contentTypes: ["application/xml"],
     });
   });
 
   it("captures response status codes, headers and bodies", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const createQueue = serverModel.operations.find((op) => op.name === "Queue_Create")!;
     expect(createQueue.responses).toHaveLength(1);
@@ -91,7 +91,10 @@ describe("buildServerModel", () => {
       wireName: "x-ms-approximate-messages-count",
       type: { kind: "number" },
     });
-    expect(response.body).toMatchObject({ type: { kind: "model", name: "QueueProperties" } });
+    expect(response.body).toMatchObject({
+      type: { kind: "model", name: "QueueProperties" },
+      contentTypes: ["application/xml"],
+    });
   });
 
   it("types x-ms-meta header collections as string-or-string-array records", async () => {
@@ -105,13 +108,13 @@ describe("buildServerModel", () => {
 
         @route("/queues")
         @put
-        op create(@header("x-ms-meta") metadata?: string): {
+        op create(@header("X-MS-Meta") metadata?: string, @query("x-ms-meta") tag?: string): {
           @statusCode statusCode: 201;
           @header("x-ms-meta") metadata?: string;
         };
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const create = serverModel.operations[0];
     const descriptor = operationDescriptorValue(create);
@@ -123,13 +126,15 @@ describe("buildServerModel", () => {
       },
     });
     expect(create.responses[0].headers[0].type).toEqual(create.parameters[0].type);
+    expect(create.parameters[1].type).toEqual({ kind: "string" });
+    expect(descriptor[3][1][5]).toBeUndefined();
     expect(descriptor[3][0][5]).toBe("x-ms-meta-");
     expect(descriptor[5][0][1]?.[0][3]).toBe("x-ms-meta-");
   });
 
   it("registers transitively referenced models with their properties", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const modelNames = serverModel.models.map((m) => m.name).sort();
     expect(modelNames).toEqual([
@@ -150,14 +155,14 @@ describe("buildServerModel", () => {
 
   it("does not emit anonymous declarations for the Queue fixture", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     expect(serverModel.models.some((model) => model.name.startsWith("AnonymousModel"))).toBe(false);
   });
 
   it("resolves array-of-model types for nested list bodies", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const list = serverModel.models.find((m) => m.name === "QueueMessageList")!;
     expect(list.properties[0]).toMatchObject({
@@ -168,7 +173,7 @@ describe("buildServerModel", () => {
 
   it("applies azurite.tsp overlay changes for Queue swagger customizations", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const accessPolicy = serverModel.models.find((m) => m.name === "AccessPolicy")!;
     const accessPolicyProps = Object.fromEntries(accessPolicy.properties.map((p) => [p.name, p]));
@@ -192,7 +197,7 @@ describe("buildServerModel", () => {
       "base.tsp": readFixture("base.tsp"),
     });
 
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
     const listMessages = serverModel.operations.find((op) => op.name === "ListMessages")!;
     const visibilityTimeout = listMessages.parameters.find(
       (parameter) => parameter.name === "visibilityTimeout",
@@ -205,7 +210,7 @@ describe("buildServerModel", () => {
 
   it("uses TCGC @clientName operation overrides when present", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     expect(serverModel.operations.some((op) => op.name === "Queue_Create")).toBe(true);
     expect(serverModel.operations.some((op) => op.name === "CreateQueue")).toBe(false);
@@ -245,7 +250,7 @@ describe("buildServerModel", () => {
         };
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const item = serverModel.models.find((m) => m.name === "GeneratedItem")!;
     expect(item).toBeDefined();
@@ -275,7 +280,7 @@ describe("buildServerModel", () => {
         op getItem(): Item;
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const item = serverModel.models.find((m) => m.name === "Item")!;
     const tags = item.properties.find((p) => p.name === "tags")!;
@@ -303,7 +308,7 @@ describe("buildServerModel", () => {
         op getB(): { @statusCode statusCode: 200; message: string };
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const anonymousModels = serverModel.models.filter((m) => m.name.startsWith("AnonymousModel"));
     expect(anonymousModels.length).toBeGreaterThanOrEqual(2);
@@ -331,7 +336,7 @@ describe("buildServerModel", () => {
         };
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const anonymousModels = serverModel.models.filter((m) => m.name.startsWith("AnonymousModel"));
     expect(anonymousModels).toHaveLength(1);
@@ -364,8 +369,8 @@ describe("buildServerModel", () => {
       `,
     });
 
-    const first = buildServerModel(createTestAzuriteContext(program));
-    const second = buildServerModel(createTestAzuriteContext(program));
+    const first = buildTestServerModel(createTestAzuriteContext(program));
+    const second = buildTestServerModel(createTestAzuriteContext(program));
 
     expect(first.models.map((model) => model.name)).toEqual(["AnonymousModel"]);
     expect(second.models.map((model) => model.name)).toEqual(["AnonymousModel"]);
@@ -395,7 +400,7 @@ describe("buildServerModel", () => {
         op getNode(): Node;
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const node = serverModel.models.find((model) => model.name === "Node")!;
     const child = node.properties.find((prop) => prop.name === "child")!;
@@ -433,7 +438,7 @@ describe("buildServerModel", () => {
         } | StorageError;
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const getItem = serverModel.operations.find((op) => op.name === "GetItem")!;
     const defaultResponse = getItem.responses.find((response) => response.statusCode === "*")!;
@@ -441,7 +446,7 @@ describe("buildServerModel", () => {
     expect(serverModel.models.some((model) => model.name.startsWith("AnonymousModel"))).toBe(false);
   });
 
-  it("reuses an already-registered named model for an equivalent anonymous model expression", async () => {
+  it("keeps a named model separate from an anonymous model with the same properties", async () => {
     const { program } = await ApiTester.compile({
       "main.tsp": `
         import "@typespec/http";
@@ -464,11 +469,11 @@ describe("buildServerModel", () => {
         };
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const createItem = serverModel.operations.find((op) => op.name === "CreateItem")!;
-    expect(createItem.responses[0].body?.type).toEqual({ kind: "model", name: "Item" });
-    expect(serverModel.models.map((model) => model.name)).toEqual(["Item"]);
+    expect(createItem.responses[0].body?.type).toEqual({ kind: "model", name: "AnonymousModel" });
+    expect(serverModel.models.map((model) => model.name)).toEqual(["Item", "AnonymousModel"]);
   });
 
   it("qualifies all colliding inferred runtime operation names across interfaces", async () => {
@@ -492,7 +497,7 @@ describe("buildServerModel", () => {
       `,
     });
     const context = createTestAzuriteContext(program);
-    const serverModel = buildServerModel(context);
+    const serverModel = buildTestServerModel(context);
 
     const names = serverModel.operations.map((op) => op.name);
     const typeNames = serverModel.operations.map((op) => op.typeName);
@@ -536,7 +541,7 @@ describe("buildServerModel", () => {
       `,
     });
     const context = createTestAzuriteContext(program);
-    const serverModel = buildServerModel(context);
+    const serverModel = buildTestServerModel(context);
 
     expect(serverModel.operations).toEqual([]);
     expect(context.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
@@ -572,7 +577,7 @@ describe("buildServerModel", () => {
       `,
     });
     const context = createTestAzuriteContext(program);
-    const serverModel = buildServerModel(context);
+    const serverModel = buildTestServerModel(context);
 
     expect(context.diagnostics).toEqual([]);
     expect(serverModel.operations.map((op) => op.name)).toEqual(["get_url", "getUrl"]);
@@ -601,7 +606,7 @@ describe("buildServerModel", () => {
       `,
     });
     const context = createTestAzuriteContext(program);
-    const serverModel = buildServerModel(context);
+    const serverModel = buildTestServerModel(context);
 
     expect(serverModel.operations).toEqual([]);
     expect(context.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
@@ -628,7 +633,7 @@ describe("buildServerModel", () => {
       `,
     });
     const context = createTestAzuriteContext(program);
-    const serverModel = buildServerModel(context);
+    const serverModel = buildTestServerModel(context);
 
     expect(serverModel.operations).toEqual([]);
     expect(context.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
@@ -667,10 +672,14 @@ describe("buildServerModel", () => {
         import "./azurite.tsp";
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const serverModel = buildTestServerModel(createTestAzuriteContext(program));
 
     const options = serverModel.models.find((m) => m.name === "Options")!;
     const visibilityTimeout = options.properties.find((p) => p.name === "visibilityTimeout")!;
     expect(visibilityTimeout.optional).toBe(true);
+    const [[service]] = getAllHttpServices(program);
+    expect(
+      service.namespace.models.get("Options")!.properties.get("visibilityTimeout")!.optional,
+    ).toBe(false);
   });
 });

@@ -15,12 +15,12 @@ import type { RuntimeSymbols } from "./runtime-symbols.js";
 export type OperationTypeDescriptor =
   | "string"
   | "boolean"
-  | "datetime"
+  | readonly ["datetime", Extract<ServerTypeRef, { kind: "datetime" }>["encoding"]]
   | "unknown"
   | "number"
   | readonly ["number", NumericConstraintDescriptor]
   | readonly ["model", string]
-  | readonly ["literal", string | number | boolean]
+  | readonly ["literal", string | number | boolean | null]
   | readonly ["array", OperationTypeDescriptor]
   | readonly ["record", OperationTypeDescriptor]
   | readonly ["union", readonly OperationTypeDescriptor[]];
@@ -52,6 +52,7 @@ export type OperationResponseDescriptor = readonly [
   statusCode: number | "*",
   headers?: readonly OperationResponseHeaderDescriptor[],
   bodyType?: OperationTypeDescriptor,
+  contentType?: string,
 ];
 
 export type OperationRequestBodyDescriptor = readonly [
@@ -84,7 +85,9 @@ export type XmlModelDescriptor = readonly [
   properties: readonly XmlPropertyDescriptor[],
 ];
 
-export type NamedXmlModelDescriptor = readonly [name: string, descriptor: XmlModelDescriptor];
+// The original tuple format was unversioned. Bump when changing how a runtime
+// interprets these descriptors so the companion can reject mismatches.
+const descriptorVersion = 2;
 
 /** Renders the service-level metadata aggregator without restating descriptor literals. */
 export function renderMetadata(
@@ -96,18 +99,28 @@ export function renderMetadata(
   const operationMetadataNames = serverModel.operations.map(operationMetadataConstName);
   return (
     <GeneratedSourceFile path="metadata.ts">
-      {code`
-        import { ${modelMetadataNames.join(", ")} } from "./models";
-        import { ${operationMetadataNames.join(", ")} } from "./operations";
-
-        export type { OperationMetadata, ServiceMetadata } from ${JSON.stringify(runtimeImport)};
-      `}
+      {/* Alloy's modulePath rewrites local .ts imports to .js. Azurite runs
+          the generated sources with ts-node, so value imports must stay extensionless. */}
+      {modelMetadataNames.length > 0 && (
+        <>
+          {code`import { ${modelMetadataNames.join(", ")} } from "./models";`}
+          <hbr />
+        </>
+      )}
+      {operationMetadataNames.length > 0 && (
+        <>
+          {code`import { ${operationMetadataNames.join(", ")} } from "./operations";`}
+          <hbr />
+        </>
+      )}
+      <hbr />
+      {code`export type { OperationMetadata, ServiceMetadata } from ${JSON.stringify(runtimeImport)};`}
       <hbr />
       {code`export const serviceMetadata: `}
       <ts.Reference refkey={runtimeSymbols.ServiceMetadata} type />
       {code` = `}
       <ts.Reference refkey={runtimeSymbols.defineServiceMetadata} />
-      {code`({ operations: [${operationMetadataNames.join(", ")}], xmlModels: [${modelMetadataNames.join(", ")}] });
+      {code`({ descriptorVersion: ${descriptorVersion}, operations: [${operationMetadataNames.join(", ")}], xmlModels: [${modelMetadataNames.join(", ")}] });
 
       export const operations: readonly `}
       <ts.Reference refkey={runtimeSymbols.OperationMetadata} type />
@@ -117,55 +130,68 @@ export function renderMetadata(
 }
 
 export function operationDescriptorValue(op: ServerOperation): OperationDescriptor {
-  return withoutTrailingUndefined([
+  return [
     op.name,
     op.verb,
     op.rawPath,
     op.parameters.map(parameterDescriptorValue),
     op.requestBody === undefined ? undefined : requestBodyDescriptorValue(op.requestBody),
     op.responses.map(responseDescriptorValue),
-    op.interfaceName,
-  ]);
+    ...optionalSlot(op.interfaceName),
+  ];
 }
 
 export function operationMetadataConstName(op: ServerOperation): string {
   return `${op.typeName}Metadata`;
 }
 
-function requestBodyDescriptorValue(requestBody: NonNullable<ServerOperation["requestBody"]>) {
-  return withoutTrailingUndefined([
+function requestBodyDescriptorValue(
+  requestBody: NonNullable<ServerOperation["requestBody"]>,
+): OperationRequestBodyDescriptor {
+  return [
     operationTypeDescriptorValue(requestBody.type),
     requestBody.contentTypes,
-    isDefaultBodyPath(requestBody.parameterPath) ? undefined : requestBody.parameterPath,
-  ]) as unknown as OperationRequestBodyDescriptor;
+    ...optionalSlot(requestBody.parameterPath === "body" ? undefined : requestBody.parameterPath),
+  ];
 }
 
-function parameterDescriptorValue(parameter: ServerOperation["parameters"][number]) {
-  return withoutTrailingUndefined([
+function parameterDescriptorValue(
+  parameter: ServerOperation["parameters"][number],
+): OperationParameterDescriptor {
+  const required = parameter.optional ? undefined : true;
+  return [
     parameter.name,
     parameter.wireName,
     parameter.location,
     operationTypeDescriptorValue(parameter.type),
-    parameter.optional ? undefined : true,
-    getHeaderCollectionPrefix(parameter.wireName),
-  ]) as unknown as OperationParameterDescriptor;
+    ...(parameter.collectionPrefix === undefined
+      ? optionalSlot(required)
+      : ([required, parameter.collectionPrefix] as const)),
+  ];
 }
 
 function responseDescriptorValue(response: ServerResponse): OperationResponseDescriptor {
-  return withoutTrailingUndefined([
+  const headers =
+    response.headers.length === 0 ? undefined : response.headers.map(responseHeaderDescriptorValue);
+  if (!response.body) return [response.statusCode, ...optionalSlot(headers)];
+  const contentType = response.body.contentTypes[0];
+  return [
     response.statusCode,
-    response.headers.length === 0 ? undefined : response.headers.map(responseHeaderDescriptorValue),
-    response.body === undefined ? undefined : operationTypeDescriptorValue(response.body.type),
-  ]);
+    headers,
+    operationTypeDescriptorValue(response.body.type),
+    ...optionalSlot(contentType === "application/xml" ? undefined : contentType),
+  ];
 }
 
-function responseHeaderDescriptorValue(header: ServerResponseHeader) {
-  return withoutTrailingUndefined([
+function responseHeaderDescriptorValue(
+  header: ServerResponseHeader,
+): OperationResponseHeaderDescriptor {
+  return [
     header.name,
     header.wireName,
     operationTypeDescriptorValue(header.type),
-    getHeaderCollectionPrefix(header.wireName),
-  ]) as unknown as OperationResponseHeaderDescriptor;
+    ...optionalSlot(header.collectionPrefix),
+  ];
 }
 
 export function operationTypeDescriptorValue(type: ServerTypeRef): OperationTypeDescriptor {
@@ -184,8 +210,9 @@ export function operationTypeDescriptorValue(type: ServerTypeRef): OperationType
       return type.constraints === undefined
         ? "number"
         : ["number", numericConstraintDescriptorValue(type.constraints)];
-    case "boolean":
     case "datetime":
+      return ["datetime", type.encoding];
+    case "boolean":
     case "string":
     case "unknown":
       return type.kind;
@@ -217,32 +244,17 @@ export function modelXmlMetadataConstName(model: ServerDataModel): string {
 export function xmlPropertyMetadataValue(
   prop: ServerDataModel["properties"][number],
   models: readonly ServerDataModel[],
-) {
+): XmlPropertyDescriptor {
   const itemName = getArrayItemName(prop.type, prop.wireName, models);
-  return withoutTrailingUndefined([
-    prop.name,
-    prop.wireName,
-    operationTypeDescriptorValue(prop.type),
-    prop.xmlAttribute ? "attribute" : prop.xmlUnwrapped ? "unwrapped" : undefined,
-    itemName,
-    prop.optional ? undefined : true,
-  ]) as unknown as XmlPropertyDescriptor;
+  const mode = prop.xmlAttribute ? "attribute" : prop.xmlUnwrapped ? "unwrapped" : undefined;
+  const base = [prop.name, prop.wireName, operationTypeDescriptorValue(prop.type)] as const;
+  if (!prop.optional) return [...base, mode, itemName, true];
+  if (itemName !== undefined) return [...base, mode, itemName];
+  return [...base, ...optionalSlot(mode)];
 }
 
-function getHeaderCollectionPrefix(wireName: string): string | undefined {
-  return wireName.toLowerCase() === "x-ms-meta" ? "x-ms-meta-" : undefined;
-}
-
-function isDefaultBodyPath(path: string | readonly string[]): boolean {
-  return path === "body";
-}
-
-function withoutTrailingUndefined<T extends readonly unknown[]>(items: T): T {
-  const trimmed = [...items];
-  while (trimmed.length > 0 && trimmed[trimmed.length - 1] === undefined) {
-    trimmed.pop();
-  }
-  return trimmed as unknown as T;
+function optionalSlot<const T>(value: T | undefined): [] | [T] {
+  return value === undefined ? [] : [value];
 }
 
 function withoutUndefinedProperties<T extends Record<string, unknown>>(value: T): T {

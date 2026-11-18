@@ -1,8 +1,9 @@
 import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
-import { azuritePilotEmitterOptionsSchema } from "./options.js";
+import { azuriteEmitterOptionsSchema } from "./options.js";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azurite-emitter",
+  state: { optional: { description: "Properties made optional by an Azurite overlay." } },
   diagnostics: {
     "no-service-found": {
       severity: "error",
@@ -24,10 +25,10 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Unsupported TypeSpec wire type: ${"message"}`,
       },
     },
-    "skipped-operation": {
+    "no-operations": {
       severity: "error",
       messages: {
-        default: paramMessage`Operation ${"name"} could not be emitted: ${"reason"}`,
+        default: "The HTTP service has no operations to emit.",
       },
     },
     "operation-name-collision": {
@@ -38,7 +39,7 @@ export const $lib = createTypeSpecLibrary({
     },
   },
   emitter: {
-    options: azuritePilotEmitterOptionsSchema,
+    options: azuriteEmitterOptionsSchema,
   },
 });
 
