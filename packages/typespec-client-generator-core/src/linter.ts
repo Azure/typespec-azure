@@ -8,6 +8,7 @@ import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-nam
 import { noRepeatedClientNameRule } from "./rules/no-repeated-client-name.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
+import { unsupportedScopeRule } from "./rules/unsupported-scope.js";
 import { useCorrectVerbRule } from "./rules/use-correct-verb.js";
 import { useUnionHierarchyRule } from "./rules/use-union-hierarchy.js";
 
@@ -23,6 +24,7 @@ const rules = [
   useUnionHierarchyRule,
   noRepeatedClientNameRule,
   csharpUseBoolPrefixRule,
+  unsupportedScopeRule,
 ];
 
 const csharpRules = [

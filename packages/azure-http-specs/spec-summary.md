@@ -1518,6 +1518,18 @@ Verifies that an API-version override on a child client replaces the default ser
 The client call takes no API-version argument and must send the overridden query parameter
 `api-version=2022-10-01` instead of the service version `2025-01-01`.
 
+### Azure_Core_Authentication_Configurations_defaultConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/default`
+
+Supply no configuration or endpoint override. The required public default is not the first declared configuration. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.io/.default to /azure/core/authentication/configurations/oauth2/public/token. Use the returned access_token as a Bearer token for /public/azure/core/authentication/configurations/default and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
+
+### Azure_Core_Authentication_Configurations_governmentConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/government`
+
+Select government without overriding the endpoint. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.us/.default to /azure/core/authentication/configurations/oauth2/government/token. Use the returned access_token as a Bearer token for /government/azure/core/authentication/configurations/government and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
+
 ### Azure_Core_Basic_createOrReplace
 
 - Endpoint: `get /azure/core/basic`
@@ -2514,6 +2526,15 @@ Expected response body:
   }
 }
 ```
+
+### Azure_ResourceManager_Example
+
+- Endpoint: `get https://management.azure.com`
+
+Generate management-plane sample code using the unified YAML example at examples.yaml.
+Do not set "examples-dir"; the scenario-local tspconfig.yaml enables discovery.
+Expected sample provenance: examples.yaml#list.
+List widgets in resource group test-rg, returning one widget named widget.
 
 ### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
 

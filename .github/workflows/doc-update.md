@@ -14,7 +14,9 @@ on:
 
 engine:
   id: copilot
-model: gpt-5.6-sol
+  env:
+    COPILOT_TASK_WAIT_TIMEOUT_SECONDS: "1800"
+model: gpt-6.1-sol
 timeout-minutes: 120
 
 permissions:
@@ -31,7 +33,7 @@ runtimes:
   python:
     version: "3.12"
   go:
-    version: "1.25"
+    version: "1.27"
   java:
     version: "21"
   dotnet:

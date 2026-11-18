@@ -42,3 +42,9 @@ model Pet {
 ## Suppression
 
 Suppression is acceptable when a valid format is used. Prefer standard types (which apply the correct wire format automatically), or `@encode` when a non-standard format such as base64url is required.
+
+## LintDiff Equivalent
+
+This rule provides authoring-policy coverage related to the Swagger linter rule [ValidFormats](https://github.com/Azure/azure-openapi-validator/blob/main/docs/valid-formats.md). It warns on unknown formats supplied through `@format`, but also on recognized formats such as `uuid`, because authors should prefer semantic types.
+
+It is not a one-to-one replacement for the Swagger format allowlist: it does not validate formats produced automatically by emitters from built-in scalar types. Encoding names are checked separately by `known-encoding`.

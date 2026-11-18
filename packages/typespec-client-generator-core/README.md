@@ -60,6 +60,12 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
+### `use-client-name-for-friendly-name-source`
+
+**Type:** `boolean`
+
+Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.
+
 ### `api-version`
 
 **Type:** `string | object`
@@ -91,7 +97,9 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 
@@ -131,6 +139,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
 | [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
 | [`@azure-tools/typespec-client-generator-core/csharp-use-bool-prefix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-bool-prefix)                     | Boolean properties and parameters should start with a verb and read affirmatively for C# SDKs.                                                                      |
+| [`@azure-tools/typespec-client-generator-core/unsupported-scope`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/unsupported-scope)                               | Use supported scopes for TCGC decorators.                                                                                                                           |
 
 ## Decorators
 
@@ -683,7 +692,7 @@ The operation to change location for.
 
 | Name   | Type                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client. Use `exact("name")` to preserve the exact casing of a string target in generated client code.                                                                                                                                                                                                                                                                                                                                                                                                              |
 | scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
@@ -728,6 +737,13 @@ interface ProductOperations {
   @clientLocation("ArchiveOperations")
   archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
 }
+```
+
+###### Move to a sub client with exact casing
+
+```typespec
+@clientLocation(exact("vMHost"), "javascript")
+op listVMHosts(): string[];
 ```
 
 ###### Move operation to root client
