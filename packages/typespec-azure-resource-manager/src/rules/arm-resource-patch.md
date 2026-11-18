@@ -6,8 +6,6 @@ Only writable input properties count, including nested and inherited properties 
 
 This check compares names, not types or value constraints. A clean result does not guarantee that PUT accepts every value allowed by PATCH.
 
-API-version-specific shapes are not evaluated, so version-dependent mismatches may be missed or reported incorrectly. See [#5875](https://github.com/Azure/typespec-azure/issues/5875).
-
 ## Impact
 
 - **Area:** API
