@@ -1023,6 +1023,23 @@ export function getBitSizeForNumber(
   }
 }
 
+/** returns the discriminator decoder name for an interface or a collection of interfaces */
+export function getDiscriminatorUnmarshallerName(type: go.WireType): string {
+  switch (type.kind) {
+    case "interface":
+      return `unmarshal${type.name}`;
+    case "slice":
+      return `${getDiscriminatorUnmarshallerName(type.itemType)}Array`;
+    case "map":
+      return `${getDiscriminatorUnmarshallerName(type.itemType)}Map`;
+    default:
+      throw new CodegenError(
+        "InternalError",
+        `unsupported discriminator decoder type ${type.kind}`,
+      );
+  }
+}
+
 // returns the underlying map/slice element/value type
 // if item isn't a map or slice, item is returned
 export function recursiveUnwrapMapSlice(item: go.WireType): go.WireType {
@@ -1093,7 +1110,9 @@ export function getSerDeFormat(
     type = recursiveUnwrapMapSlice(type);
     switch (type.kind) {
       case "interface":
-        recursiveWalkModelFields(type.rootType, serDeFormat);
+        if (type.rootType) {
+          recursiveWalkModelFields(type.rootType, serDeFormat);
+        }
         for (const possibleType of type.possibleTypes) {
           recursiveWalkModelFields(possibleType, serDeFormat);
         }
@@ -1640,7 +1659,7 @@ function deconstruct(identifier: string | Array<string>): Array<string> {
     .replace(/(\d+)([a-z|A-Z]+)/g, "$1 $2")
     .replace(/\b([A-Z]+)([A-Z])([a-z])/, "$1 $2$3")
     .split(/[\W|_]+/)
-    .map((each) => each.toLowerCase());
+    .filter((each) => each.length > 0);
 }
 
 function fixLeadingNumber(identifier: Array<string>): Array<string> {
@@ -1658,9 +1677,9 @@ export function camelCase(identifier: string | Array<string>): string {
     case 0:
       return "";
     case 1:
-      return naming.uncapitalize(identifier[0]);
+      return identifier[0].toLowerCase();
   }
-  return `${naming.uncapitalize(identifier[0])}${pascalCase(identifier.slice(1))}`;
+  return `${identifier[0].toLowerCase()}${pascalCase(identifier.slice(1))}`;
 }
 
 function pascalCase(identifier: string | Array<string>): string {

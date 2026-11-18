@@ -64,6 +64,10 @@ describe("expect all rules to be defined", () => {
       ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-correct-verb"],
       false,
     );
+    strictEqual(
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-valid-client-lro-result"],
+      true,
+    );
     ok(
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );
@@ -79,6 +83,15 @@ describe("expect all rules to be defined", () => {
     strictEqual($linter.ruleSets?.["resource-manager"].enable?.[armRule], true);
     for (const linter of [AzureCoreLinter, ResourceManagerLinter]) {
       ok(!linter.rules.some((rule) => rule.name === "no-continuation-token"));
+    }
+  });
+
+  it("enables TCGC scope validation only in the client-sdk ruleset", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/unsupported-scope";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], true);
+    for (const name of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[name].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[name].disable?.[ruleName], undefined);
     }
   });
 
@@ -222,6 +235,19 @@ describe("expect all rules to be defined", () => {
       ],
       false,
     );
+  });
+
+  it("enables combined ARM collection guidance and retires the old rule", () => {
+    const name = "list-response-envelope";
+    const fullName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+    const retired = "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable";
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[fullName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[fullName], true);
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "list-operation-missing-pageable"),
+    );
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[retired], undefined);
   });
 
   it("keeps ARM resource-group path guidance opt-in", () => {
