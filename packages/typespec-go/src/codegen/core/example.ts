@@ -395,6 +395,8 @@ function getExampleValue(
       return exampleText;
     }
     case "model": {
+      // Response comments omit imports and keep nil instead of azcore.NullValue.
+      const isRequest = imports !== undefined;
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       if (inArray) {
         exampleText = `${indent}{\n`;
@@ -402,19 +404,17 @@ function getExampleValue(
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
         const fieldExample = example.value[field];
-        // imports is only provided for request examples; response comments keep nil.
-        if (
-          imports &&
-          (fieldExample.kind === "null" ||
-            (fieldExample.kind === "any" && fieldExample.value === null))
-        ) {
+        const isNullField =
+          fieldExample.kind === "null" ||
+          (fieldExample.kind === "any" && fieldExample.value === null);
+        if (isRequest && isNullField) {
           // NullValue[T] requires a concrete pointer, slice, or map type.
           const nullType =
             goField.type.kind === "interface"
               ? new go.Ptr(getConcreteInterfaceModel(goField.type))
               : goField.type;
-          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
-          imports.addForType(nullType);
+          imports?.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+          imports?.addForType(nullType);
           const nullTypeName =
             nullType.kind === "any" ? "*any" : go.getTypeDeclaration(nullType, pkg);
           exampleText += `${indent}\t${field}: azcore.NullValue[${nullTypeName}](),\n`;
