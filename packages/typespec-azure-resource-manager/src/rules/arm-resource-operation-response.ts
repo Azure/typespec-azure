@@ -111,19 +111,19 @@ export const armResourceOperationsRule = createRule({
             continue;
           }
           checkedPuts.add(operation);
-          for (const status of [200, 201]) {
-            const bodies = httpOperation.responses
-              .filter((response) => containsStatusCode(response.statusCodes, status))
-              .flatMap((response) =>
-                response.responses.flatMap(({ body }) =>
-                  body && !isVoidType(body.type) ? [body] : [],
-                ),
-              );
-            if (bodies.length === 0) continue;
-            if (bodies.some((body) => !isResourceModel(program, body.type))) {
-              context.reportDiagnostic({ target: operation, messageId: "nonResourceResponse" });
-            }
-            break;
+          const bodies = httpOperation.responses
+            .filter(
+              (response) =>
+                containsStatusCode(response.statusCodes, 200) ||
+                containsStatusCode(response.statusCodes, 201),
+            )
+            .flatMap((response) =>
+              response.responses.flatMap(({ body }) =>
+                body && !isVoidType(body.type) ? [body] : [],
+              ),
+            );
+          if (bodies.some((body) => !isResourceModel(program, body.type))) {
+            context.reportDiagnostic({ target: operation, messageId: "nonResourceResponse" });
           }
         }
       },
