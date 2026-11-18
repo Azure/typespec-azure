@@ -267,7 +267,7 @@ function emitType(context: SdkContext, type: SdkType, sourceFile: SourceFile) {
       type,
       isExtensibleEnum(context, type),
     );
-    if (enumType.name.startsWith("_")) {
+    if (enumType.name.startsWith("_") && !type.isExactName) {
       // skip enum generation for internal enums
       return;
     }
@@ -875,6 +875,15 @@ export function normalizeModelName(
       : "";
   const modelName = normalizeSdkName(type, nameType, { shouldGuard: true });
   return `${internalModelPrefix}${namespacePrefix}${modelName}${unionSuffix}`;
+}
+
+export function getExactModelNames(context: SdkContext): Set<string> {
+  const exactTypes = [
+    ...context.sdkPackage.models,
+    ...context.sdkPackage.enums,
+    ...context.sdkPackage.unions,
+  ].filter((type) => type.isExactName);
+  return new Set(exactTypes.map((type) => normalizeModelName(context, type)));
 }
 
 function buildModelPolymorphicType(context: SdkContext, type: SdkModelType) {

@@ -18,6 +18,7 @@ export interface buildSubpathIndexFileOptions {
   exportIndex?: boolean;
   interfaceOnly?: boolean;
   recursive?: boolean;
+  exactNames?: Set<string>;
 }
 
 export function buildSubpathIndexFile(
@@ -95,7 +96,7 @@ function buildSubpathIndexFileImpl(
 
       let filteredDeclarations = [...file.getExportedDeclarations().entries()].filter(
         (exDeclaration) => {
-          if (exDeclaration[0].startsWith("_")) {
+          if (exDeclaration[0].startsWith("_") && !options.exactNames?.has(exDeclaration[0])) {
             return false;
           }
           return exDeclaration[1].some((ex) => {

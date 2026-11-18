@@ -1,4 +1,4 @@
-# Exact names for models, properties, enum members, operations, and parameters
+# only: Exact names for models, properties, enum members, operations, and parameters
 
 Exact client names should be emitted without applying the TypeScript emitter's normal
 name normalization.
@@ -6,6 +6,7 @@ name normalization.
 ## TypeSpec
 
 ```tsp
+@clientName(exact("_PrefixOriEnum"))
 union OriginalEnum {
   string,
 
@@ -116,7 +117,7 @@ export interface my_model {
   "property-name": string;
   "123": string;
   'property"name': string;
-  originalEnum: OriginalEnum;
+  originalEnum: _PrefixOriEnum;
 }
 ```
 
@@ -127,9 +128,9 @@ export interface Date {
 }
 ```
 
-```ts models enum KnownOriginalEnum
-/** Known values of {@link OriginalEnum} that the service accepts. */
-export enum KnownOriginalEnum {
+```ts models enum Known_PrefixOriEnum
+/** Known values of {@link _PrefixOriEnum} that the service accepts. */
+export enum Known_PrefixOriEnum {
   /** original */
   enum_value = "original",
   /** punctuated */
