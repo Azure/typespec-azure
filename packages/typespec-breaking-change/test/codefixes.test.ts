@@ -99,7 +99,7 @@ describe("codefixes", () => {
     ]);
   });
 
-  it("places removal approvals on a surviving head operation, not a deleted base property", async () => {
+  it("places property-removal approvals on the exact surviving model", async () => {
     const source = `
       @service @versioned(Versions) namespace TestService;
       enum Versions { v1: "2024-01-01" }
@@ -114,7 +114,101 @@ describe("codefixes", () => {
     expect(result.findings).toHaveLength(1);
     const updated = await applyApproval(head, result.findings[0]);
     expect(updated).not.toContain("legacy?:");
-    expect(updated).toContain('path: "responses.200.body.properties.legacy"');
+    expect(updated).toContain('path: "legacy"');
+    expect(updated).not.toContain("responses.200.body.properties.legacy");
+    const { program: approved } = await editedSourceTester.compile(updated);
+    expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
+      { suppressed: true },
+    ]);
+  });
+
+  it("does not match a removal approval on an unrelated model", async () => {
+    const baseSource = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      model Widget { name: string; legacy?: string; }
+      model Gadget { id: string; }
+      @get @route("/widgets") op read(): Widget;
+    `;
+    const headSource = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      model Widget { name: string; }
+      @approvedUnversionedChange("unrelated", #{ path: "legacy" })
+      model Gadget { id: string; }
+      @get @route("/widgets") op read(): Widget;
+    `;
+    const { program: base } = await TesterWithSuppressions.compile(baseSource);
+    const { program: head } = await TesterWithSuppressions.compile(headSource);
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+
+    expect(result.findings).toMatchObject([{ suppressed: false }]);
+  });
+
+  it("places enum-member removal approvals on the surviving enum", async () => {
+    const source = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      enum Status { Ready, Legacy }
+      model Widget { status: Status; }
+      @get @route("/widgets") op read(): Widget;
+    `;
+    const { program: base } = await TesterWithSuppressions.compile(source);
+    const { program: head } = await TesterWithSuppressions.compile(
+      source.replace("Ready, Legacy", "Ready"),
+    );
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+    const finding = result.findings.find((item) => item.diff.kind === "EnumerationMemberRemoved");
+    expect(finding).toBeDefined();
+
+    const updated = await applyApproval(head, finding!);
+    expect(updated).toContain('path: "Legacy"');
+    const { program: approved } = await editedSourceTester.compile(updated);
+    expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
+      { diff: { kind: "EnumerationMemberRemoved" }, suppressed: true },
+    ]);
+  });
+
+  it("places named union-variant removal approvals on the surviving union", async () => {
+    const source = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      union Status { Ready: "ready", Legacy: "legacy" }
+      model Widget { status: Status; }
+      @get @route("/widgets") op read(): Widget;
+    `;
+    const { program: base } = await TesterWithSuppressions.compile(source);
+    const { program: head } = await TesterWithSuppressions.compile(
+      source.replace(', Legacy: "legacy"', ""),
+    );
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+    const finding = result.findings.find((item) => item.diff.baseType?.kind === "UnionVariant");
+    expect(finding).toBeDefined();
+
+    const updated = await applyApproval(head, finding!);
+    expect(updated).toContain('path: "Legacy"');
+    const { program: approved } = await editedSourceTester.compile(updated);
+    expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
+      { diff: { baseType: { kind: "UnionVariant" } }, suppressed: true },
+    ]);
+  });
+
+  it("falls back to the surviving operation when a removed property has no named model", async () => {
+    const source = `
+      @service @versioned(Versions) namespace TestService;
+      enum Versions { v1: "2024-01-01" }
+      @post @route("/widgets")
+      op create(@body body: { name: string; legacy?: string; }): void;
+    `;
+    const { program: base } = await TesterWithSuppressions.compile(source);
+    const { program: head } = await TesterWithSuppressions.compile(
+      source.replace("legacy?: string;", ""),
+    );
+    const result = analyzeBaseAndHead(base, head, { phase: "same-version" });
+    expect(result.findings).toHaveLength(1);
+
+    const updated = await applyApproval(head, result.findings[0]);
+    expect(updated).toContain('path: "request.body.properties.legacy"');
     const { program: approved } = await editedSourceTester.compile(updated);
     expect(analyzeBaseAndHead(base, approved, { phase: "same-version" }).findings).toMatchObject([
       { suppressed: true },

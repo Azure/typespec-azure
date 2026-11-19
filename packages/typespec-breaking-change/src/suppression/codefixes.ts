@@ -2,7 +2,8 @@ import { createAddDecoratorCodeFix, type CodeFix, type Program } from "@typespec
 import { isOperationIdentity, type Finding } from "../types.js";
 import {
   composeFullIdentityPath,
-  resolveRemovedOperationTarget,
+  isSameVersionRemoval,
+  resolveSameVersionRemovalTarget,
   resolveSuppressionTarget,
 } from "./target.js";
 
@@ -18,17 +19,27 @@ export function createApproveBreakingChangeCodeFix(
   program?: Program,
 ): CodeFix | undefined {
   // A same-version removal's origin belongs to the baseline, not the file being edited.
-  const suppressionTarget =
-    finding.phase === "same-version" && finding.diff.kind === "OperationRemoved"
-      ? program && resolveRemovedOperationTarget(finding, program)
-      : finding.phase === "same-version" && !finding.diff.headType
+  const sameVersionRemoval = isSameVersionRemoval(finding);
+  const suppressionTarget = sameVersionRemoval
+    ? ((program ? resolveSameVersionRemovalTarget(finding, program) : undefined) ??
+      (finding.diff.kind !== "OperationRemoved" &&
+      finding.diff.operationType &&
+      isOperationIdentity(finding.diff.identity)
         ? {
             target: finding.diff.operationType,
-            path: isOperationIdentity(finding.diff.identity)
-              ? composeFullIdentityPath(finding.diff.identity)
-              : undefined,
+            path: composeFullIdentityPath(finding.diff.identity),
+            scope: "operation" as const,
           }
-        : resolveSuppressionTarget(finding);
+        : undefined))
+    : finding.phase === "same-version" && !finding.diff.headType
+      ? {
+          target: finding.diff.operationType,
+          path: isOperationIdentity(finding.diff.identity)
+            ? composeFullIdentityPath(finding.diff.identity)
+            : undefined,
+          scope: "operation" as const,
+        }
+      : resolveSuppressionTarget(finding);
   if (!suppressionTarget?.target) return undefined;
   const target = suppressionTarget.target;
   const pathOption = suppressionTarget.path
