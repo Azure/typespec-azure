@@ -120,7 +120,6 @@ interface Dependents {
   list is ArmResourceListByParent<Dependent>;
   getNsp is NspConfigurationOperations.Read<Dependent>;
   #suppress "@azure-tools/typespec-azure-resource-manager/legacy-type-usage" "Using legacy type as a sample"
-  #suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "This sample intentionally preserves the legacy single-page operation without paging metadata."
   listNsps is NspConfigurationOperations.ListSinglePageByParent<Dependent>;
 }
 

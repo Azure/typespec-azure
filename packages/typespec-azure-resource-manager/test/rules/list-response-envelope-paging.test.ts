@@ -37,7 +37,8 @@ const invalidEnvelope = {
 const continuationTokenDiagnostic = {
   code: "@azure-tools/typespec-azure-resource-manager/list-response-envelope",
   severity: "warning",
-  message: "Use @nextLink pagination instead of @continuationToken in Azure APIs.",
+  message:
+    "This list operation has a request @continuationToken but no response @continuationToken. Review the SDK paging contract: when the response uses @nextLink, the pager may resume with a URL rather than the raw request token.",
 } as const;
 
 it("reports a request token even when the response has a valid next-link envelope", async () => {
@@ -53,7 +54,7 @@ it("reports a request token even when the response has a valid next-link envelop
     .toEmitDiagnostics([continuationTokenDiagnostic]);
 });
 
-it("reports paired tokens independently of a valid response envelope", async () => {
+it("accepts paired tokens with a valid response envelope", async () => {
   await tester
     .expect(
       `
@@ -64,10 +65,10 @@ it("reports paired tokens independently of a valid response envelope", async () 
       };
     `,
     )
-    .toEmitDiagnostics([continuationTokenDiagnostic, continuationTokenDiagnostic]);
+    .toBeValid();
 });
 
-it("reports missing collection classification and token usage independently", async () => {
+it("only reports collection classification for an operation without @list", async () => {
   await tester
     .expect(
       `
@@ -78,14 +79,13 @@ it("reports missing collection classification and token usage independently", as
       };
     `,
     )
-    .toEmitDiagnostics([missingList, continuationTokenDiagnostic]);
+    .toEmitDiagnostics([missingList]);
 });
 
-it("keeps paging metadata validation when a request token is suppressed", async () => {
+it("reports request-only tokens and missing paging metadata independently", async () => {
   const diagnostics = await Tester.diagnose(
     `
       @get @list op widgets(
-        #suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published request token."
         @query @continuationToken token?: string
       ): {
         @pageItems value: string[];
@@ -102,16 +102,17 @@ it("keeps paging metadata validation when a request token is suppressed", async 
       },
     },
   );
-  expectDiagnostics(diagnostics, [pagingMetadata]);
+  expectDiagnostics(diagnostics, [continuationTokenDiagnostic, pagingMetadata]);
 });
 
-it.each([false, true])("supports ARM property suppression: %s", async (suppress) => {
+it.each([false, true])("supports ARM operation suppression: %s", async (suppress) => {
   const diagnostics = await Tester.diagnose(
     `
-      model Options {
-        ${suppress ? '#suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published token-based paging contract."' : ""}
-        @continuationToken token?: string;
-      }
+      ${suppress ? '#suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published paging contract."' : ""}
+      @get @list op listWidgets(@query @continuationToken token?: string): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+      };
     `,
     {
       compilerOptions: {
@@ -133,7 +134,10 @@ it.each([false, true])("supports ARM property suppression: %s", async (suppress)
 
 it("avoids duplicate token warnings when ARM all follows core all", async () => {
   const diagnostics = await Tester.diagnose(
-    `model Options { @continuationToken token?: string; }`,
+    `@get @list op listWidgets(@query @continuationToken token?: string): {
+      @pageItems value: string[];
+      @nextLink nextLink?: url;
+    };`,
     {
       compilerOptions: {
         linterRuleSet: {
@@ -156,7 +160,10 @@ it.each(["Azure.Core", "Azure.ResourceManager"])("ignores library tokens in %s",
     .expect(
       `
       namespace ${ns} {
-        model Options { @continuationToken token?: string; }
+        @get @list op listWidgets(@query @continuationToken token?: string): {
+          @pageItems value: string[];
+          @nextLink nextLink?: url;
+        };
       }
     `,
     )

@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Consolidate warnings for `@continuationToken` usage under `list-response-envelope`. The shared Azure Core policy recommends `@nextLink` pagination, including for paired tokens, and the ARM rule combines that policy with its existing response-envelope checks.
+Add a focused `list-response-envelope` warning for `@list` operations with a request `@continuationToken` but no response `@continuationToken`, including responses using `@nextLink`. Paired tokens remain allowed. The opt-in ARM rule includes the same warning alongside its existing envelope checks.

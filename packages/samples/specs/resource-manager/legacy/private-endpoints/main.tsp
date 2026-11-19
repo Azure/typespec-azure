@@ -133,7 +133,6 @@ interface Dependents {
     PatchModel = void
   >;
   deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
-  #suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "This sample intentionally preserves the legacy single-page operation without paging metadata."
   @armResourceList(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
     Dependent,

@@ -21,95 +21,97 @@ beforeEach(async () => {
 const diagnostic = {
   code: "@azure-tools/typespec-azure-core/list-response-envelope",
   severity: "warning",
-  message: "Use @nextLink pagination instead of @continuationToken in Azure APIs.",
+  message:
+    "This list operation has a request @continuationToken but no response @continuationToken. Review the SDK paging contract: when the response uses @nextLink, the pager may resume with a URL rather than the raw request token.",
 } as const;
 
-it.each(["query", "header"])("warns on paired %s continuation tokens", async (location) => {
-  await tester
-    .expect(
-      `
-      @list op listWidgets(@${location} @continuationToken token?: string): {
-        @pageItems value: string[];
-        @continuationToken token?: string;
-      };
-    `,
-    )
-    .toEmitDiagnostics([diagnostic, diagnostic]);
-});
+it.each(["", "@nextLink nextLink?: url;"])(
+  "warns on a request-only token with response navigation %j",
+  async (navigation) => {
+    await tester
+      .expect(
+        `
+        @list op listWidgets(@query @continuationToken token?: string): {
+          @pageItems value: string[];
+          ${navigation}
+        };
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  },
+);
 
-it("warns on a response header token", async () => {
+it.each(["@header @continuationToken token?: string", "...Token", "@body options: Token"])(
+  "finds request tokens in %s",
+  async (parameters) => {
+    await tester
+      .expect(
+        `
+        model BaseToken { @continuationToken token?: string; }
+        model Token extends BaseToken {}
+        @list op listWidgets(${parameters}): {
+          @pageItems value: string[];
+          @nextLink nextLink?: url;
+        };
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  },
+);
+
+it("warns once for ResourceList with a list query parameter trait", async () => {
   await tester
     .expect(
       `
-      model ResponseHeaders { @header @continuationToken token?: string; }
+      using Azure.Core.Traits;
+      @resource("widgets") model Widget { @key id: string; }
+      alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
+      op listWidgets is Operations.ResourceList<Widget, ListQueryParametersTrait<{
+        @query @continuationToken continuationToken?: string;
+      }>>;
     `,
     )
     .toEmitDiagnostics([diagnostic]);
 });
 
-it("warns on a token without requiring a paging operation", async () => {
-  await tester
-    .expect(
-      `
-      op read(@query @continuationToken token?: string): string;
-    `,
-    )
-    .toEmitDiagnostics([diagnostic]);
-});
-
-it("warns on a nested token", async () => {
-  await tester
-    .expect(
-      `
-      model Response {
-        metadata: { @continuationToken token?: string; };
-      }
-    `,
-    )
-    .toEmitDiagnostics([diagnostic]);
-});
-
-it("warns on an inherited token at its declaration", async () => {
+it.each([
+  "@continuationToken token?: string;",
+  "@header @continuationToken token?: string;",
+  "metadata: { @continuationToken token?: string | null; };",
+  "...Token;",
+  "@continuationToken token?: string; @nextLink nextLink?: url;",
+])("accepts a paired response token in %s", async (response) => {
   await tester
     .expect(
       `
       model Token { @continuationToken token?: string; }
-      model Response extends Token { value: string[]; }
-    `,
-    )
-    .toEmitDiagnostics([diagnostic]);
-});
-
-it.each(["...Token", "...TokenCopy"])("warns on token usage through %s", async (spread) => {
-  await tester
-    .expect(
-      `
-      model Token { @continuationToken token?: string; }
-      model TokenCopy is Token;
-      op read(${spread}): string;
-    `,
-    )
-    .toEmitDiagnostics([diagnostic, diagnostic, diagnostic]);
-});
-
-it("accepts next-link paging", async () => {
-  await tester
-    .expect(
-      `
-      @list op listWidgets(): {
+      @list op listWidgets(@query @continuationToken token?: string): {
         @pageItems value: string[];
-        @nextLink nextLink?: url;
+        ${response}
       };
     `,
     )
     .toBeValid();
 });
 
-it("does not apply ARM envelope restrictions to data-plane responses", async () => {
+it("finds an inherited response token alongside an error response", async () => {
   await tester
     .expect(
       `
-      @list op listWidgets(): {
+      model Token { @continuationToken token?: string; }
+      model WidgetPage extends Token { @pageItems value: string[]; }
+      @error model Error { message: string; }
+      @list op listWidgets(@query @continuationToken token?: string): WidgetPage | Error;
+    `,
+    )
+    .toBeValid();
+});
+
+it("accepts next-link paging without a token annotation or ARM envelope names", async () => {
+  await tester
+    .expect(
+      `
+      @list op listWidgets(@query continuationToken?: string): {
         @pageItems items: string[];
         @nextLink more?: url;
         totalCount: int32;
@@ -119,11 +121,28 @@ it("does not apply ARM envelope restrictions to data-plane responses", async () 
     .toBeValid();
 });
 
-it("does not infer decorators from property names", async () => {
+it("does not enforce the inverse mismatch", async () => {
   await tester
     .expect(
       `
-      model Options { continuationToken?: string; skipToken?: string; }
+      @list op listWidgets(): {
+        @pageItems value: string[];
+        @continuationToken token?: string;
+      };
+    `,
+    )
+    .toBeValid();
+});
+
+it("ignores unmarked operations and unused annotated models", async () => {
+  await tester
+    .expect(
+      `
+      model Options { @continuationToken token?: string; }
+      op read(@query @continuationToken token?: string): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+      };
     `,
     )
     .toBeValid();
@@ -134,20 +153,57 @@ it.each(["Azure.Core", "Azure.ResourceManager"])("ignores library types in %s", 
     .expect(
       `
       namespace ${ns} {
-        model Options { @continuationToken token?: string; }
+        @list op listWidgets(@continuationToken token?: string): {
+          @pageItems value: string[];
+        };
       }
     `,
     )
     .toBeValid();
 });
 
-it.each([false, true])("supports property suppression: %s", async (suppress) => {
+it("checks concrete operations rather than template declarations", async () => {
+  await tester
+    .expect(
+      `
+      @list op ListWidgets<T>(@continuationToken token?: string): {
+        @pageItems value: T[];
+      };
+      interface Lists<T> {
+        @list listWidgets(@continuationToken token?: string): {
+          @pageItems value: T[];
+        };
+      }
+      @route("/strings") op listStrings is ListWidgets<string>;
+      interface StringLists extends Lists<string> {}
+    `,
+    )
+    .toEmitDiagnostics([diagnostic, diagnostic]);
+});
+
+it("reports one warning per operation rather than per repeated decorator", async () => {
+  await tester
+    .expect(
+      `
+      @list op listWidgets(
+        @query @continuationToken @continuationToken token?: string
+      ): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+      };
+    `,
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
+
+it.each([false, true])("supports operation suppression: %s", async (suppress) => {
   const diagnostics = await Tester.diagnose(
     `
-      model Options {
-        ${suppress ? '#suppress "@azure-tools/typespec-azure-core/list-response-envelope" "Preserve the published token-based paging contract."' : ""}
-        @continuationToken token?: string;
-      }
+      ${suppress ? '#suppress "@azure-tools/typespec-azure-core/list-response-envelope" "Preserve the published API contract."' : ""}
+      @list op listWidgets(@query @continuationToken token?: string): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+      };
     `,
     {
       compilerOptions: {

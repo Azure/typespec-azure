@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Enable the Azure Core `list-response-envelope` rule in the `data-plane` ruleset and the combined ARM `list-response-envelope` rule in the `resource-manager` ruleset. Both warn on `@continuationToken`; the ARM ruleset also enables the previously opt-in collection classification, paging metadata, and response-envelope checks. The core variant is disabled in the ARM ruleset to avoid duplicate token warnings.
+Enable the focused Azure Core `list-response-envelope` warning in both the `data-plane` and `resource-manager` rulesets. It flags request-only `@continuationToken` annotations on `@list` operations without banning paired-token paging. The broader ARM collection and response-envelope checks remain opt-in.

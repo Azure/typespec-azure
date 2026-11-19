@@ -118,7 +118,6 @@ interface Dependents {
   list is ArmResourceListByParent<Dependent>;
   getPrivateLink is PrivateLinkOperations.Read<Dependent>;
   #suppress "@azure-tools/typespec-azure-resource-manager/legacy-type-usage" "Using legacy type as a sample"
-  #suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "This sample intentionally preserves the legacy single-page operation without paging metadata."
   listPrivateLinks is PrivateLinkOperations.ListSinglePageByParent<Dependent>;
 }
 

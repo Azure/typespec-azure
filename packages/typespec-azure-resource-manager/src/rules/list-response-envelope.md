@@ -1,8 +1,8 @@
 ARM collection operations must use a predictable response envelope and TypeSpec paging metadata. Prefer the standard ARM list operation templates.
 
-This rule also reuses Azure Core's shared `list-response-envelope` paging policy: it warns on `@continuationToken` usage in request parameters and response properties, including correctly paired tokens. A request token is still reported when the response has a valid `value`/`nextLink` envelope. This is Azure policy, not a generic TypeSpec validity requirement.
+This rule also reuses Azure Core's focused `list-response-envelope` warning: a `@list` operation with a request `@continuationToken` but no response `@continuationToken` needs SDK contract review. This includes next-link responses, which are valid generic TypeSpec but may expose URL-valued pager continuation values alongside a raw token parameter. Paired tokens do not trigger this warning; the opt-in ARM envelope and metadata requirements still apply independently.
 
-The `resource-manager` ruleset enables this combined rule, including the existing ARM envelope checks, and disables the core variant to avoid duplicate token diagnostics. The `data-plane` ruleset enables only the core variant, without ARM-specific envelope restrictions.
+Both the `data-plane` and `resource-manager` rulesets enable only the focused Azure Core variant. This combined ARM rule remains opt-in and is included in ARM `all`. When enabling it explicitly, disable the core variant to avoid duplicate warnings. ARM `all` does this when extended after core presets.
 
 ## Impact
 
@@ -12,7 +12,7 @@ The rule checks project `@list` operations, including operations inherited by pr
 
 Mixing a raw request token with a next-link response can also expose incompatible resume values in generated SDK APIs.
 
-The rule uses five diagnostic message types: continuation-token usage, missing `@list`, invalid `value` array, paging metadata/name issues, and invalid response envelopes. Independent operation and response defects can produce multiple diagnostics. Envelope diagnostics target the response model and cover missing or extra properties.
+The rule uses five diagnostic message types: request-only continuation tokens, missing `@list`, invalid `value` array, paging metadata/name issues, and invalid response envelopes. Independent operation and response defects can produce multiple diagnostics. Envelope diagnostics target the response model and cover missing or extra properties.
 
 The TypeSpec names of paging properties must match their JSON wire names: AutoRest uses the TypeSpec names in emitted paging metadata. For a 200 envelope, name those properties `value` and `nextLink` in TypeSpec as well as JSON; `@encodedName` cannot be used to give differently named paging properties those JSON names.
 
@@ -76,19 +76,21 @@ The rule combines [GetCollectionOnlyHasValueAndNextLink](https://github.com/Azur
 
 ## Migration
 
-The `list-operation-missing-pageable` rule ID has been retired. Replace it with `list-response-envelope` in linter configurations and suppressions, reviewing each suppression because the combined rule also checks envelope shape and continuation-token usage. The combined rule is enabled in `@azure-tools/typespec-azure-rulesets/resource-manager` and is also part of the ARM library's `all` ruleset.
+The `list-operation-missing-pageable` rule ID has been retired. Replace it with `list-response-envelope` in linter configurations and suppressions, reviewing each suppression because the combined rule also checks envelope shape and request-only continuation tokens. The combined rule remains disabled by default in `@azure-tools/typespec-azure-rulesets/resource-manager` and remains part of the ARM library's `all` ruleset.
 
 ## Suppression
 
-Suppress this rule only when compatibility requirements prevent the standard response envelope or paging metadata, or require preserving token-based pagination. Keep valid paging annotations; removing `@continuationToken` merely to silence the warning can prevent SDKs from recognizing the actual service contract.
+Suppress this rule only when compatibility requirements prevent the standard response envelope or paging metadata, or require preserving a request-only token contract. Keep valid paging annotations; removing `@continuationToken` merely to silence the warning can prevent SDKs from recognizing the actual service contract.
 
-Token diagnostics target annotated properties. Suppress each token property that must retain the decorator:
+Token diagnostics target the operation. For the default central rulesets, suppress the core variant as described in its documentation. If opting into this combined ARM rule, use the ARM rule ID:
 
 ```tsp
-model LegacyOptions {
-  #suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published token-based paging contract."
-  @continuationToken token?: string;
-}
+#suppress "@azure-tools/typespec-azure-resource-manager/list-response-envelope" "Preserve the published request-token contract; pager resume values are documented separately."
+@list
+op listWidgets(@query @continuationToken token?: string): {
+  @pageItems value: Widget[];
+  @nextLink nextLink?: url;
+};
 ```
 
-Envelope diagnostics retain their existing response model/property targets. A property-level token suppression does not disable envelope validation.
+Envelope diagnostics retain their response model/property targets. Review all findings before suppressing the combined rule, since its messages share a rule ID.

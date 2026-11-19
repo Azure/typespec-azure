@@ -1,22 +1,22 @@
-Azure APIs should use [next-link pagination](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#collections-include-nextlink-for-more-results) instead of raw continuation tokens. Return an absolute URL marked `@nextLink` that includes all query parameters required to retrieve the next page.
+This rule warns when a `@list` operation has a request property marked `@continuationToken` but no response property marked `@continuationToken`. It uses the compiler's paging metadata, including inherited and nested properties, and reports once on the operation rather than on every token annotation.
 
-This rule warns on uses of the TypeSpec `@continuationToken` decorator, including correctly paired request and response tokens. It is an Azure design guideline, not a check that the token annotations are paired. Generic TypeSpec supports token-based pagination.
+The warning also applies when the response has `@nextLink`. That is valid generic TypeSpec: the URL can contain the token. The Azure SDK concern is that the method may accept a raw token while the pager exposes a next-link URL as its continuation value. Review the generated SDK and service contract rather than treating this as a compiler error.
 
-This is the shared paging-policy portion of `list-response-envelope`. It does not impose ARM-specific response property names or collection-path checks on data-plane APIs. Data-plane responses may use other item names and additional response properties.
+This is not a blanket ban on token-based pagination. Paired request/response tokens are allowed, including alongside `@nextLink`. Response-only tokens, unused annotated models, and operations without `@list` are outside this check. The rule does not infer annotations from property names.
 
-The `data-plane` ruleset enables this Azure Core rule. The `resource-manager` ruleset enables the [ARM `list-response-envelope` rule](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope/) instead, which reuses this policy and also validates ARM response envelopes. The core rule is disabled there to avoid duplicate token warnings.
+Both the `data-plane` and `resource-manager` rulesets enable this focused Azure Core rule. The broader [ARM `list-response-envelope` rule](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope/) reuses the check but keeps its additional collection and response-envelope restrictions opt-in. If enabling the combined ARM rule explicitly, disable the core variant to avoid duplicate warnings; ARM `all` does this when extended after core presets.
 
-#### ❌ Incorrect
+#### ❌ Request-only token requiring review
 
 ```tsp
 @list
 op listWidgets(@query @continuationToken token?: string): {
   @pageItems value: Widget[];
-  @continuationToken token?: string;
+  @nextLink nextLink?: url;
 };
 ```
 
-#### ✅ Correct
+#### ✅ Next-link contract without a separate raw token parameter
 
 ```tsp
 @list
@@ -26,26 +26,37 @@ op listWidgets(): {
 };
 ```
 
-These examples assume `TypeSpec.Http` is in scope and a `Widget` model is defined. Opaque tokens inside the next-link URL are allowed. The rule does not infer paging behavior from property names such as `continuationToken` or `skipToken`.
+Azure guidelines [prefer next-link pagination](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#collections-include-nextlink-for-more-results). The URL may contain opaque token query parameters. Remove a separate public request parameter only when compatible with the service and SDK contract.
+
+#### ✅ Paired token contract
+
+```tsp
+@list
+op listWidgets(@query @continuationToken token?: string): {
+  @pageItems value: Widget[];
+  @continuationToken token?: string;
+};
+```
+
+Only annotate a response token if the service actually returns one. These examples assume `TypeSpec.Http` is in scope and a `Widget` model is defined.
 
 ## Impact
 
-- **Area:** API, SDK
+- **Area:** SDK
 
-Raw token pagination deviates from Azure's standard next-link contract. Mixing a raw token parameter with a next-link response can also expose incompatible resume values in generated SDK APIs: the method parameter accepts a raw token, while the pager resumes using the next-link URL.
+A request-only raw token can coexist with a URL-valued pager continuation token. Callers may pass the pager's value to a method parameter expecting a different format. The warning identifies this potential SDK usability issue, not an invalid HTTP paging protocol.
 
 ## Suppression
 
-Suppression is acceptable for established APIs that must preserve token-based pagination for compatibility. Keep the actual service contract and valid paging annotations; removing only `@continuationToken` can prevent SDKs from recognizing token-based paging and is not a migration to next-link pagination.
-
-Place the directive on each annotated property that must retain the decorator. For new APIs, use `@nextLink` and avoid exposing a redundant raw token parameter.
+Suppress the warning on the operation when compatibility requires the existing contract or SDK review confirms that its resume behavior is intentional. Do not remove only the decorator to silence the warning: the ordinary method parameter remains, and SDKs may lose useful paging metadata. Do not invent a response token that the service does not return.
 
 ```tsp
-model LegacyPage {
+#suppress "@azure-tools/typespec-azure-core/list-response-envelope" "Preserve the published request-token contract; pager resume values are documented separately."
+@list
+op listWidgets(@query @continuationToken token?: string): {
   @pageItems value: Widget[];
-  #suppress "@azure-tools/typespec-azure-core/list-response-envelope" "Preserve the published token-based paging contract."
-  @continuationToken token?: string;
-}
+  @nextLink nextLink?: url;
+};
 ```
 
-For ARM APIs using the combined ARM rule, use `@azure-tools/typespec-azure-resource-manager/list-response-envelope` in the suppression directive instead. When configuring rules individually, enable only the ARM variant rather than both variants.
+When opting into the combined ARM rule, use `@azure-tools/typespec-azure-resource-manager/list-response-envelope` instead.

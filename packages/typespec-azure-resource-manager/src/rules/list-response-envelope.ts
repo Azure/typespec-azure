@@ -36,7 +36,7 @@ export const listResponseEnvelopeRule = createRule({
   name: "list-response-envelope",
   docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
   description:
-    "ARM list operations must declare next-link paging metadata and use the standard response envelope instead of continuation tokens.",
+    "ARM list operations must declare paging metadata, use the standard response envelope, and review request-only continuation tokens.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
@@ -51,9 +51,10 @@ export const listResponseEnvelopeRule = createRule({
   create(context) {
     const program = context.program;
     const metadata = createMetadataInfo(program);
+    const coreOperation = coreListResponseEnvelopeRule.create(context).operation;
     return {
-      modelProperty: coreListResponseEnvelopeRule.create(context).modelProperty,
       operation: (operation) => {
+        coreOperation?.(operation);
         if (shouldSkipOperation(program, operation)) return;
 
         const [httpOperation] = getHttpOperation(program, operation);

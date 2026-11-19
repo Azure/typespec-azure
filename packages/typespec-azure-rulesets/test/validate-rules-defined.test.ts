@@ -73,14 +73,14 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("enables shared paging guidance once per ruleset, including ARM envelope checks", () => {
+  it("enables focused paging guidance in both rulesets without enabling ARM envelope checks", () => {
     const coreRule = "@azure-tools/typespec-azure-core/list-response-envelope";
     const armRule = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[coreRule], true);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[armRule], undefined);
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[coreRule], undefined);
-    ok($linter.ruleSets?.["resource-manager"].disable?.[coreRule]);
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[armRule], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[coreRule], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].disable?.[coreRule], undefined);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[armRule], false);
     for (const linter of [AzureCoreLinter, ResourceManagerLinter]) {
       ok(!linter.rules.some((rule) => rule.name === "no-continuation-token"));
     }
@@ -237,13 +237,13 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("enables combined ARM collection guidance and retires the old rule", () => {
+  it("keeps combined ARM collection guidance opt-in and retires the old rule", () => {
     const name = "list-response-envelope";
     const fullName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
     const retired = "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable";
     strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
     strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[fullName], true);
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[fullName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[fullName], false);
     ok(
       !ResourceManagerLinter.rules.some((rule) => rule.name === "list-operation-missing-pageable"),
     );
