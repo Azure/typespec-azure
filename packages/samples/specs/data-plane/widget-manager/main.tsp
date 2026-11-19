@@ -39,19 +39,19 @@ enum Versions {
 union WidgetColor {
   string,
 
-  @doc("Black")
+  @doc("The widget is black.")
   Black: "Black",
 
-  @doc("White")
+  @doc("The widget is white.")
   White: "White",
 
-  @doc("Red")
+  @doc("The widget is red.")
   Red: "Red",
 
-  @doc("Green")
+  @doc("The widget is green.")
   Green: "Green",
 
-  @doc("Blue")
+  @doc("The widget is blue.")
   Blue: "Blue",
 }
 

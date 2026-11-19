@@ -1,18 +1,22 @@
-Enums, models, operations, and their members/properties should have documentation. Use doc comments (`/** */`) to provide descriptions.
+Enums, models, operations, and their members/properties should have meaningful documentation. Use doc comments (`/** */`) or `@doc` to provide descriptions.
+
+Explicit descriptions must not be empty, whitespace-only, the placeholder `description`, or a repetition of the name they describe. Name comparisons ignore surrounding whitespace, periods, and case.
+
+- Ordinary properties use their authored names, regardless of serialization names.
+- Operations are compared with their authored names and effective HTTP verbs. HTTP parameters and multipart parts use their HTTP names, falling back to the property name for unnamed parts.
+- Enum members and named union variants use their names; unnamed string variants use their values. HTTP status-code properties are exempt from name comparisons.
+
+Namespaces, interfaces, and scalars do not require documentation, but explicitly supplied blank descriptions are checked. Explicit documentation on inline properties and declarations exempt from missing-documentation requirements is also checked. Uninstantiated template documentation unavailable from the compiler is not checked.
 
 ## Impact
 
 - **Area:** API, SDK
 
-Missing documentation produces poor SDK reference docs and API documentation.
-
-## LintDiff Equivalent
-
-This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md).
+Missing or uninformative documentation produces poor SDK reference docs and API documentation.
 
 #### ❌ Incorrect
 
-Model without documentation:
+Missing documentation:
 
 ```tsp
 model Pet {
@@ -20,19 +24,21 @@ model Pet {
 }
 ```
 
-Operation without documentation:
+Descriptions that only repeat the authored names:
 
 ```tsp
-op read(): void;
+/** Widget */
+model Widget {
+  /** Name */
+  name: string;
+}
 ```
 
-Enum without documentation:
+An explicitly blank description:
 
 ```tsp
-enum PetKind {
-  Cat,
-  Dog,
-}
+@doc(" \t")
+scalar Label extends string;
 ```
 
 #### ✅ Correct
@@ -55,12 +61,15 @@ enum PetKind {
   /** A dog. */
   Dog,
 }
+
+/** A display label shown to users. */
+scalar Label extends string;
 ```
 
 :::note
-Version enums and discriminator enums/unions are exempt from this rule as they are considered self-documenting.
+Version enums and discriminator enums/unions are exempt from missing-documentation requirements as they are considered self-documenting. Explicit descriptions on these declarations are still checked for blank or uninformative content.
 :::
 
 ## Suppression
 
-Do not suppress. Add a `/** */` doc comment or an `@doc` decorator.
+Do not suppress. Add a meaningful `/** */` doc comment or an `@doc` decorator.

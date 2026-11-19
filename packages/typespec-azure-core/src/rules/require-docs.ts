@@ -1,4 +1,12 @@
 import {
+  createRule,
+  fileRef,
+  getDiscriminatedTypes,
+  getDiscriminator,
+  getDoc,
+  ignoreDiagnostics,
+  isArrayModelType,
+  paramMessage,
   type Discriminator,
   type Enum,
   type Model,
@@ -7,13 +15,15 @@ import {
   type Program,
   type Union,
   type UnionVariant,
-  createRule,
-  fileRef,
-  getDiscriminatedTypes,
-  getDiscriminator,
-  getDoc,
-  paramMessage,
 } from "@typespec/compiler";
+import {
+  getHeaderFieldName,
+  getHttpOperation,
+  getHttpPart,
+  getPathParamName,
+  getQueryParamName,
+  isStatusCode,
+} from "@typespec/http";
 import { getVersionsForEnum } from "@typespec/versioning";
 import {
   isExcludedCoreType,
@@ -22,6 +32,47 @@ import {
   isTemplatedInterfaceOperation,
   isTemplatedOperationSignature,
 } from "./utils.js";
+
+type DocumentationTarget = Parameters<typeof getDoc>[1];
+
+function normalizeDocumentation(value: string): string {
+  return value.trim().replace(/\./g, "").toLowerCase();
+}
+
+function getDocumentationName(
+  program: Program,
+  target: DocumentationTarget,
+  doc: string,
+): string | undefined {
+  switch (target.kind) {
+    case "UnionVariant":
+      return typeof target.name === "string"
+        ? target.name
+        : target.type.kind === "String"
+          ? target.type.value
+          : undefined;
+    case "Operation":
+      if (normalizeDocumentation(doc) === normalizeDocumentation(target.name)) {
+        return target.name;
+      }
+      // HTTP validation owns resolution diagnostics; this rule only checks documentation.
+      return ignoreDiagnostics(getHttpOperation(program, target)).verb;
+    case "ModelProperty": {
+      const httpName =
+        getPathParamName(program, target) ??
+        getQueryParamName(program, target) ??
+        getHeaderFieldName(program, target);
+      if (httpName !== undefined) return httpName;
+      const partType =
+        target.type.kind === "Model" && isArrayModelType(target.type)
+          ? target.type.indexer.value
+          : target.type;
+      return getHttpPart(program, partType)?.options.name ?? target.name;
+    }
+    default:
+      return "name" in target && typeof target.name === "string" ? target.name : undefined;
+  }
+}
 
 /** Versioning enums are self-documenting and don't need separate documentation. */
 function isExcludedVersionEnum(program: Program, enumObj: Enum): boolean {
@@ -85,16 +136,64 @@ function getVariantName(variant: UnionVariant): string | undefined {
 export const requireDocumentation = createRule({
   name: "documentation-required",
   docs: fileRef.fromPackageRoot("src/rules/documentation-required.md"),
-  description: "Require documentation over enums, models, and operations.",
+  description: "Require meaningful documentation over enums, models, and operations.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required",
   messages: {
     default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
+    empty: "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+    uninformative: paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
   },
   create(context) {
     const discTypes = getDiscriminatedTypes(context.program);
+    const needsDocumentation = (target: DocumentationTarget) => {
+      return getDoc(context.program, target) === undefined;
+    };
+    const checkDocumentation = (target: DocumentationTarget) => {
+      const doc = getDoc(context.program, target);
+      if (doc === undefined) return;
+      if (doc.trim().length === 0) {
+        context.reportDiagnostic({ target, messageId: "empty" });
+        return;
+      }
+      if (
+        target.kind === "Namespace" ||
+        target.kind === "Interface" ||
+        (target.kind === "ModelProperty" && isStatusCode(context.program, target))
+      )
+        return;
+      if (
+        (target.kind === "Model" ||
+          target.kind === "Scalar" ||
+          target.kind === "Enum" ||
+          target.kind === "EnumMember" ||
+          target.kind === "Union") &&
+        !target.name
+      )
+        return;
+      const normalizedDoc = normalizeDocumentation(doc);
+      if (normalizedDoc.length === 0) return;
+      const name = getDocumentationName(context.program, target, doc);
+      if (
+        normalizedDoc === "description" ||
+        (name !== undefined && normalizedDoc === normalizeDocumentation(name))
+      ) {
+        context.reportDiagnostic({
+          target,
+          messageId: "uninformative",
+          format: { name: name ?? "description", description: doc },
+        });
+      }
+    };
     return {
+      namespace: checkDocumentation,
+      interface: checkDocumentation,
+      scalar: checkDocumentation,
+      modelProperty: checkDocumentation,
+      unionVariant: checkDocumentation,
+      enumMember: checkDocumentation,
       enum: (enumObj: Enum) => {
+        checkDocumentation(enumObj);
         // version enums and enum members are considered intrinsically self-documenting
         if (isExcludedVersionEnum(context.program, enumObj)) {
           return;
@@ -102,14 +201,14 @@ export const requireDocumentation = createRule({
         if (isExcludedDiscriminator(context.program, enumObj, discTypes)) {
           return;
         }
-        if (!getDoc(context.program, enumObj) && !isExcludedCoreType(context.program, enumObj)) {
+        if (!isExcludedCoreType(context.program, enumObj) && needsDocumentation(enumObj)) {
           context.reportDiagnostic({
             target: enumObj,
             format: { kind: enumObj.kind, name: enumObj.name },
           });
         }
         for (const member of enumObj.members.values()) {
-          if (!getDoc(context.program, member)) {
+          if (needsDocumentation(member)) {
             context.reportDiagnostic({
               target: member,
               format: { kind: member.kind, name: member.name },
@@ -118,6 +217,7 @@ export const requireDocumentation = createRule({
         }
       },
       operation: (operation: Operation) => {
+        checkDocumentation(operation);
         // Don't pay attention to operations on templated interfaces that
         // haven't been filled in with parameters yet
         if (
@@ -125,7 +225,7 @@ export const requireDocumentation = createRule({
           !isTemplatedOperationSignature(operation) &&
           !isExcludedCoreType(context.program, operation)
         ) {
-          if (!getDoc(context.program, operation)) {
+          if (needsDocumentation(operation)) {
             context.reportDiagnostic({
               target: operation,
               format: { kind: operation.kind, name: operation.name },
@@ -133,7 +233,7 @@ export const requireDocumentation = createRule({
           }
 
           for (const param of operation.parameters.properties.values()) {
-            if (!getDoc(context.program, param)) {
+            if (needsDocumentation(param)) {
               context.reportDiagnostic({
                 target: param,
                 format: { kind: param.kind, name: param.name },
@@ -143,6 +243,7 @@ export const requireDocumentation = createRule({
         }
       },
       model: (model: Model) => {
+        checkDocumentation(model);
         // it's by design that the `getDoc` function can't get the `doc` for template declaration type.
         if (
           !isTemplateDeclarationType(model) &&
@@ -150,7 +251,7 @@ export const requireDocumentation = createRule({
           !isExcludedCoreType(context.program, model) &&
           model.name !== "object"
         ) {
-          if (!getDoc(context.program, model)) {
+          if (needsDocumentation(model)) {
             context.reportDiagnostic({
               target: model,
               format: { kind: model.kind, name: model.name },
@@ -161,7 +262,7 @@ export const requireDocumentation = createRule({
             if (isExcludedDiscriminator(context.program, prop, discTypes)) {
               return;
             }
-            if (!getDoc(context.program, prop)) {
+            if (needsDocumentation(prop)) {
               context.reportDiagnostic({
                 target: prop,
                 format: { kind: prop.kind, name: prop.name },
@@ -171,10 +272,11 @@ export const requireDocumentation = createRule({
         }
       },
       union: (union: Union) => {
+        checkDocumentation(union);
         if (isExcludedDiscriminator(context.program, union, discTypes)) {
           return;
         }
-        if (!getDoc(context.program, union) && !isExcludedCoreType(context.program, union)) {
+        if (!isExcludedCoreType(context.program, union) && needsDocumentation(union)) {
           const name = getUnionName(union);
           if (name !== undefined) {
             context.reportDiagnostic({
@@ -184,7 +286,7 @@ export const requireDocumentation = createRule({
           }
         }
         for (const variant of union.variants.values()) {
-          if (!getDoc(context.program, variant)) {
+          if (needsDocumentation(variant)) {
             // symbols don't need documentation
             const variantName = getVariantName(variant);
             if (variantName !== undefined) {
