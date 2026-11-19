@@ -177,7 +177,7 @@ export function generateExamples(
         const methodOptionalParameters = example.optionalParamsGroup.filter(
           (p) => p.parameter.location === "method",
         );
-        const checkResponse = example.responseEnvelope !== undefined;
+        const checkResponse = example.responseEnvelope !== undefined || method.kind === "sseMethod";
 
         let methodOptionalParametersText = "nil";
         if (methodOptionalParameters.length > 0) {
@@ -205,10 +205,16 @@ export function generateExamples(
             exampleText += `${indent.pop().get()}}\n`;
             break;
           case "method":
+          case "sseMethod":
             exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${method.name}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
+            if (method.kind === "sseMethod") {
+              exampleText += `${indent.get()}defer func() {\n`;
+              exampleText += `${indent.push().get()}_ = res.Stream.Close()\n`;
+              exampleText += `${indent.pop().get()}}()\n`;
+            }
             break;
           case "pageableMethod":
             exampleText += `${indent.get()}pager := ${clientRef}.${method.name}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
@@ -365,6 +371,7 @@ function getExampleValue(
     case "any":
       return jsonToGo(example.value, indent);
     case "array": {
+      imports?.addForType(example.type);
       const isElementByValue = example.type.itemType.kind !== "ptr";
       // if polymorphic, need to add type name in array, so inArray will be set to false
       // if other case, no need to add type name in array, so inArray will be set to true
@@ -377,6 +384,7 @@ function getExampleValue(
       return exampleText;
     }
     case "dictionary": {
+      imports?.addForType(example.type);
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       const isValueByValue = example.type.itemType.kind !== "ptr";
       const isValuePolymorphic = example.type.itemType.kind === "interface";
@@ -387,12 +395,31 @@ function getExampleValue(
       return exampleText;
     }
     case "model": {
+      // Response comments omit imports and keep nil instead of azcore.NullValue.
+      const isRequest = imports !== undefined;
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       if (inArray) {
         exampleText = `${indent}{\n`;
       }
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
+        const fieldExample = example.value[field];
+        const isNullField =
+          fieldExample.kind === "null" ||
+          (fieldExample.kind === "any" && fieldExample.value === null);
+        if (isRequest && isNullField) {
+          // NullValue[T] requires a concrete pointer, slice, or map type.
+          const nullType =
+            goField.type.kind === "interface"
+              ? new go.Ptr(getConcreteInterfaceModel(goField.type))
+              : goField.type;
+          imports?.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+          imports?.addForType(nullType);
+          const nullTypeName =
+            nullType.kind === "any" ? "*any" : go.getTypeDeclaration(nullType, pkg);
+          exampleText += `${indent}\t${field}: azcore.NullValue[${nullTypeName}](),\n`;
+          continue;
+        }
         const isFieldByValue = goField.type.kind !== "ptr";
         const isFieldPolymorphic = goField.type.kind === "interface";
         exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic).slice(indent.length + 1)},\n`;
@@ -405,7 +432,7 @@ function getExampleValue(
           additionalPropertiesField.type.itemType.kind !== "ptr";
         const isAdditionalPropertiesPolymorphic =
           additionalPropertiesField.type.itemType.kind === "interface";
-        exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(isAdditionalPropertiesFieldByValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
+        exampleText += `${indent}\t${additionalPropertiesField.name}: ${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
           exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
         }
@@ -774,11 +801,18 @@ function generateFakeExample(goType: go.Type, name?: string): go.ExampleType {
       // return an empty map example for map types
       return new go.DictionaryExample(goType);
     case "interface":
-      // for interface types, use the root type (which is a PolymorphicModel) to create an example
-      return new go.StructExample(goType.rootType);
+      return new go.StructExample(getConcreteInterfaceModel(goType));
     default:
       throw new CodegenError("InternalError", `unhandled fake example kind ${goType.kind}`);
   }
+}
+
+function getConcreteInterfaceModel(goType: go.Interface): go.PolymorphicModel {
+  const model = goType.rootType ?? goType.possibleTypes[0];
+  if (!model) {
+    throw new CodegenError("InternalError", `no concrete type for interface ${goType.name}`);
+  }
+  return model;
 }
 
 function escapeString(str: string): string {
@@ -815,8 +849,25 @@ function isParamByValue(p: go.ParameterExample): boolean {
  */
 function shouldRenderParam(param: go.MethodParameter, example: go.MethodExample): boolean {
   if (go.isLiteralParameter(param.style)) return false;
-  if (example.parameters.find((p) => p.parameter.name === param.name)) return true;
+  if (findParamExample(param, example)) return true;
   return go.isRequiredParameter(param.style);
+}
+
+/**
+ * Finds a parameter's example by identity, or by group identity and field name for required groups.
+ * Shared groups retain the first operation's field objects, so later operations need the fallback.
+ */
+function findParamExample(
+  param: go.MethodParameter,
+  example: go.MethodExample,
+): go.ParameterExample | undefined {
+  return example.parameters.find(
+    (p) =>
+      p.parameter === param ||
+      (param.group?.required &&
+        p.parameter.group === param.group &&
+        p.parameter.name === param.name),
+  );
 }
 
 /**
@@ -830,7 +881,7 @@ function getParamExampleValue(
   example: go.MethodExample,
   imports: ImportManager,
 ): string {
-  const paramExample = example.parameters.find((p) => p.parameter.name === param.name);
+  const paramExample = findParamExample(param, example);
   if (paramExample) {
     return getExampleValue(
       pkg,
@@ -841,5 +892,11 @@ function getParamExampleValue(
     ).slice(1);
   }
   const fakeValue = generateFakeExample(param.type, param.name);
-  return getExampleValue(pkg, fakeValue, "\t", imports, param.type.kind !== "ptr").slice(1);
+  return getExampleValue(
+    pkg,
+    fakeValue,
+    "\t",
+    imports,
+    isParamByValue({ parameter: param, value: fakeValue }),
+  ).slice(1);
 }

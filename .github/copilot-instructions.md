@@ -39,6 +39,7 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 - Repo use `@chronus/chronus` for changelogs
 - Use `pnpm change add` to add a change description for the touched packages
 - Types of changes are described in `.chronus/config.yaml`
+- In change descriptions, wrap every code identifier in backticks: decorators (`@clientName`), functions (`getLroMetadata`), types and models (`SdkModelType`), properties, diagnostic codes, emitter options and package names. Keep the description to a few sentences about the user-visible change, not the implementation steps.
 
 ## Branch and PR Workflow
 
@@ -46,6 +47,14 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 - When creating worktrees (which clone the repo), always clone recursively with `--recurse-submodules` and run `git submodule update --init` if the `core/` submodule is missing or not at the correct commit. See [CONTRIBUTING.md - Cloning recursively](https://github.com/Azure/typespec-azure/blob/main/CONTRIBUTING.md#cloning-recursively) for details.
 - A new clone or worktree also needs `mise trust` (and `mise install` if tools are missing) before `pnpm` and other tools will work — see [Development Environment (mise)](#development-environment-mise).
 - When pushing changes and creating pull requests, push to your personal fork and open PRs against the main Azure fork's `main` branch.
+
+## Reuse Existing Code
+
+- Before adding a helper, cache, traversal, diagnostic or piece of state, search the package for how existing features already do it and follow that pattern. Extend existing code rather than writing a parallel implementation.
+- Keep diffs minimal: no unrelated edits, renames or refactors in files you only need to touch lightly.
+- Don't export internal helpers that are only used in one file, wrap a single call in a new helper, or pass helper functions in as parameters when the function can be imported directly.
+- Follow the format of neighboring files (for example other diagnostic docs), and don't hard-wrap lines in Markdown docs.
+- See [TCGC instructions](./instructions/tcgc.instructions.md) for TCGC-specific conventions.
 
 ## Available Task Instructions
 

@@ -46,10 +46,11 @@ specs:
   "azure/client-generator-core/next-link-verb":
     { options: { module: nextlinkverbgroup, slice-elements-byval: true } }
   "azure/client-generator-core/override/client.tsp": { options: { module: overridegroup } }
-  # Disabled until all language emitters support response replacement.
-  "azure/client-generator-core/response-replacement/client.tsp": false
+  "azure/client-generator-core/response-replacement/client.tsp":
+    { options: { module: responsereplacementgroup } }
   "azure/client-generator-core/response-as-bool": { options: { module: headasboolgroup } }
   "azure/client-generator-core/usage": { options: { module: coreusagegroup } }
+  "azure/core/authentication/configurations": { options: { module: coreauthcfggroup } }
   "azure/core/api-version-override": { options: { module: apiversionoverridegroup } }
   "azure/core/basic": { options: { module: basicgroup } }
   "azure/core/lro/rpc": { options: { module: lrorpcgroup } }
@@ -61,6 +62,7 @@ specs:
   "azure/example/basic": { options: { module: examplebasicgroup } }
   "azure/payload/pageable": { options: { module: pageablegroup } }
   "azure/resource-manager/common-properties": { options: { module: commonpropsgroup } }
+  "azure/resource-manager/example": { options: { module: armexamplegroup, generate-samples: true } }
   "azure/resource-manager/large-header": { options: { module: largeheadergroup } }
   "azure/resource-manager/management-group": { options: { module: managementgroupgroup } }
   "azure/resource-manager/non-resource": { options: { module: nonresourcegroup } }

@@ -812,13 +812,13 @@ function getSdkModelExample(
     while (modelQueue.length > 0) {
       const model = modelQueue.pop()!;
       for (const property of model.properties) {
-        // for query/path/cookie/header parameters, they should have been handled in parameters.
-        if (
-          property.kind === "property" &&
-          property.serializationOptions.json?.name &&
-          !properties.has(property.serializationOptions.json.name)
-        ) {
-          properties.set(property.serializationOptions.json.name, property);
+        if (property.kind !== "property") {
+          continue;
+        }
+        const name =
+          property.serializationOptions.json?.name ?? property.__raw?.name ?? property.name;
+        if (!properties.has(name)) {
+          properties.set(name, property);
         }
       }
       if (model.additionalProperties && additionalPropertiesType === undefined) {

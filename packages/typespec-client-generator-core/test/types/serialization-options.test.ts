@@ -6,6 +6,7 @@ import type {
   SdkModelType,
   SdkServiceMethod,
 } from "../../src/interfaces.js";
+import { UsageFlags } from "../../src/interfaces.js";
 import {
   createSdkContextForTester,
   SimpleTesterWithService,
@@ -61,6 +62,59 @@ it("json serialization with @encodedName", async () => {
   strictEqual(models[0].properties[0].kind, "property");
   strictEqual(models[0].properties[0].serializationOptions.json?.name, "newId");
 });
+
+it.each(["filter", "filter*"])("query object {%s} serialization options", async (expansion) => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseFilter {
+      @encodedName("application/json", "display-name") name: string;
+    }
+    model Filter extends BaseFilter {
+      @clientName("total") count: int32;
+      @encodedName("application/xml", "xmlEnabled") enabled: boolean;
+    }
+    @route("/items{?${expansion}}")
+    op test(filter?: Filter): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const model = method.parameters[0].type;
+  strictEqual(model.kind, "model");
+  strictEqual(model.usage, UsageFlags.Input);
+  strictEqual(model.serializationOptions.json, undefined);
+  strictEqual(model.serializationOptions.xml, undefined);
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].name, "total");
+  strictEqual(model.properties[0].serializationOptions.json, undefined);
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.json, undefined);
+  strictEqual(model.properties[1].serializationOptions.xml?.name, "xmlEnabled");
+  ok(model.baseModel);
+  strictEqual(model.baseModel.properties[0].kind, "property");
+  strictEqual(model.baseModel.properties[0].serializationOptions.json?.name, "display-name");
+});
+
+it.each(["query", "path", "header", "cookie"])(
+  "%s parameter preserves explicit serialization options",
+  async (location) => {
+    const { program } = await SimpleTesterWithService.compile(`
+      enum Choice {
+        @encodedName("application/json", "json-active") active: "active",
+        @encodedName("application/xml", "xml-inactive") inactive: "inactive",
+      }
+      @route("${location === "path" ? "/items/{value}" : "/items"}")
+      op test(@${location} value: Choice): void;
+    `);
+    const context = await createSdkContextForTester(program);
+    const method = getServiceMethodOfClient(context.sdkPackage);
+    const type = method.parameters[0].type;
+    strictEqual(type.kind, "enum");
+    strictEqual(type.usage, UsageFlags.Input);
+    strictEqual(type.values[0].serializationOptions?.json?.name, "json-active");
+    strictEqual(type.values[0].serializationOptions?.xml, undefined);
+    strictEqual(type.values[1].serializationOptions?.json, undefined);
+    strictEqual(type.values[1].serializationOptions?.xml?.name, "xml-inactive");
+  },
+);
 
 it("@attribute", async function () {
   const { program } = await XmlTesterWithBuiltInService.compile(`
