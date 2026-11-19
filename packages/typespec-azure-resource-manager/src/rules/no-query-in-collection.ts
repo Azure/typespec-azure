@@ -1,4 +1,4 @@
-import { createRule, fileRef, isList, paramMessage } from "@typespec/compiler";
+import { createRule, fileRef, isList, paramMessage, typeTarget } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isApiVersionParameterName, isCollectionPath } from "./utils.js";
 
@@ -13,7 +13,8 @@ export const noQueryInCollectionRule = createRule({
     default: paramMessage`Query parameter '${"name"}' should be removed. Collection GET and list operations must not have query parameters other than api-version and $filter.`,
   },
   create(context) {
-    const reportedParameters = new Set<object>();
+    // Parameter names already reported at each location.
+    const reported = new Map<object, Set<string>>();
 
     return {
       operation: (operation) => {
@@ -26,18 +27,25 @@ export const noQueryInCollectionRule = createRule({
         }
 
         for (const parameter of httpOperation.parameters.properties) {
-          const parameterSource = parameter.property.node ?? parameter.property;
-          if (
-            parameter.kind !== "query" ||
-            isAllowedQueryParameter(parameter.options.name) ||
-            reportedParameters.has(parameterSource)
-          ) {
+          if (parameter.kind !== "query" || isAllowedQueryParameter(parameter.options.name)) {
             continue;
           }
-          reportedParameters.add(parameterSource);
+          // Locate the parameter from this operation: a library parameter is reported on the spread,
+          // `is` reference or template argument that brings it in, a project one on its declaration.
+          const fromOperation = typeTarget(context.program, operation, "parameters").property(
+            parameter.property.name,
+          );
+          const target =
+            fromOperation?.type === parameter.property ? fromOperation : parameter.property;
+          const location = target.node ?? parameter.property;
+          const names = reported.get(location) ?? new Set<string>();
+          if (names.has(parameter.property.name)) {
+            continue;
+          }
+          reported.set(location, names.add(parameter.property.name));
 
           context.reportDiagnostic({
-            target: parameter.property,
+            target,
             format: {
               name: parameter.options.name,
             },

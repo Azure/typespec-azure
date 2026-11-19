@@ -2,6 +2,8 @@ ARM collection GET and list operations may use only the standard `api-version` a
 
 The rule applies to operations marked `@list` regardless of their HTTP method or path, as well as GET operations whose emitted ARM path identifies a resource collection, even without `@list`. Query parameter names are case-sensitive, so `$FILTER` is not equivalent to `$filter`.
 
+Query parameters declared in a library, such as `Azure.Core.StandardListQueryParameters`, are reported on the spread, intersection operand or template argument that adds them to the operation.
+
 Assume `WidgetPage` is a list response with `@pageItems` metadata. The first example is a collection GET; the second is an operation marked `@list`.
 
 ## ❌ Incorrect
