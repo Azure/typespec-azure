@@ -540,6 +540,7 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
     isAction || resourceOperation?.operation === "delete"
       ? pollingInfo.responseModel
       : initialResponse;
+  let resultPath: string | undefined;
   if (
     finalStep &&
     finalStep.kind !== "noPollingResult" &&
@@ -547,6 +548,7 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
       resourceOperation?.operation !== "createOrReplace")
   ) {
     model = finalStep.responseModel;
+    resultPath = finalStep.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
   } else if (resourceOperation?.operation === "createOrReplace") {
     model = resourceOperation.resourceType;
   } else if (statusMonitorResult) {
@@ -554,13 +556,10 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
   }
   if (originalUriHasGetOperation === false) model = "void";
 
-  const logicalPathName =
-    finalStep?.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
-
   let finalResult: Model | Scalar | UnknownType | "void" =
     model === "void" || isVoidType(model) ? "void" : model;
   let finalEnvelopeResult = finalResult;
-  if (finalStep?.kind === "pollingSuccessProperty") {
+  if (resultPath !== undefined) {
     finalEnvelopeResult = pollingInfo.responseModel;
   } else if (finalStep?.kind === "noPollingResult") {
     finalResult = "void";
@@ -574,10 +573,10 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
     pollingInfo,
     finalStep,
     envelopeResult: pollingInfo.responseModel,
-    logicalPath: logicalPathName,
+    logicalPath: resultPath,
     finalResult: finalResult,
     finalEnvelopeResult: finalEnvelopeResult,
-    finalResultPath: logicalPathName,
+    finalResultPath: resultPath,
   };
 }
 

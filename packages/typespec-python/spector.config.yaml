@@ -32,6 +32,7 @@ specs:
   "azure/client-generator-core/exact-name": true
   "azure/client-generator-core/flatten-property": true
   "azure/client-generator-core/hierarchy-building": true
+  "azure/client-generator-core/lro/result": true
   "azure/client-generator-core/next-link-verb": true
   "azure/client-generator-core/override": true
   # Disabled until all language emitters support response replacement.

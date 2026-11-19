@@ -1659,7 +1659,7 @@ function deconstruct(identifier: string | Array<string>): Array<string> {
     .replace(/(\d+)([a-z|A-Z]+)/g, "$1 $2")
     .replace(/\b([A-Z]+)([A-Z])([a-z])/, "$1 $2$3")
     .split(/[\W|_]+/)
-    .map((each) => each.toLowerCase());
+    .filter((each) => each.length > 0);
 }
 
 function fixLeadingNumber(identifier: Array<string>): Array<string> {
@@ -1677,9 +1677,9 @@ export function camelCase(identifier: string | Array<string>): string {
     case 0:
       return "";
     case 1:
-      return naming.uncapitalize(identifier[0]);
+      return identifier[0].toLowerCase();
   }
-  return `${naming.uncapitalize(identifier[0])}${pascalCase(identifier.slice(1))}`;
+  return `${identifier[0].toLowerCase()}${pascalCase(identifier.slice(1))}`;
 }
 
 function pascalCase(identifier: string | Array<string>): string {
