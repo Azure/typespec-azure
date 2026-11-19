@@ -14,7 +14,7 @@ type StatusMonitorLinkStep<TLink> =
   | { kind: "nextOperationLink"; target: TLink }
   | { kind: "nextOperationReference"; target: { link?: TLink } };
 
-function getStatusMonitorLink<TLink>(
+export function getStatusMonitorLink<TLink>(
   statusMonitorStep: StatusMonitorLinkStep<TLink> | undefined,
 ): TLink | undefined {
   return statusMonitorStep?.kind === "nextOperationLink"

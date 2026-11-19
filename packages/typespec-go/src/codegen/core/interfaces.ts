@@ -22,12 +22,16 @@ export function generateInterfaces(pkg: go.PackageContent): string {
   let text = helpers.contentPreamble(pkg);
 
   for (const iface of pkg.interfaces) {
-    const methodName = `Get${iface.rootType.name}`;
+    const methodName = iface.rootType ? `Get${iface.rootType.name}` : `is${iface.name}`;
     text += `// ${iface.name} provides polymorphic access to related types.\n`;
-    text += `// Call the interface's ${methodName}() method to access the common type.\n`;
+    if (iface.rootType) {
+      text += `// Call the interface's ${methodName}() method to access the common type.\n`;
+    }
     text += "// Use a type switch to determine the concrete type.  The possible types are:\n";
     const possibleTypeNames = new Array<string>();
-    possibleTypeNames.push(`*${iface.rootType.name}`);
+    if (iface.rootType) {
+      possibleTypeNames.push(`*${iface.rootType.name}`);
+    }
     for (const possibleType of iface.possibleTypes) {
       possibleTypeNames.push(`*${possibleType.name}`);
     }
@@ -37,8 +41,12 @@ export function generateInterfaces(pkg: go.PackageContent): string {
     if (iface.parent) {
       text += `${indent.get()}${iface.parent.name}\n`;
     }
-    text += `${indent.get()}// ${methodName} returns the ${iface.rootType.name} content of the underlying type.\n`;
-    text += `${indent.get()}${methodName}() *${iface.rootType.name}\n`;
+    if (iface.rootType) {
+      text += `${indent.get()}// ${methodName} returns the ${iface.rootType.name} content of the underlying type.\n`;
+      text += `${indent.get()}${methodName}() *${iface.rootType.name}\n`;
+    } else {
+      text += `${indent.get()}${methodName}()\n`;
+    }
     text += "}\n\n";
   }
   return text;

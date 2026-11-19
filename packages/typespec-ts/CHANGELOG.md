@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.58.1
+
+### Bug Fixes
+
+- [#5833](https://github.com/Azure/typespec-azure/pull/5833) Preserve discriminated union variants inherited through intermediate models when generating union types and serializers.
+
+
 ## 0.58.0
 
 ### Features

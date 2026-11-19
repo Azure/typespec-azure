@@ -33,4 +33,7 @@ model ResourceProperties {
 
 ## Suppression
 
-Suppress per the RPC guidelines; otherwise define a provisioning state property with `Succeeded`, `Failed`, and `Canceled` states.
+Read-only resources (resources without a PUT or PATCH operation) do not require a
+`provisioningState` property. For other resources, suppress per the RPC guidelines;
+otherwise define a provisioning state property with `Succeeded`, `Failed`, and
+`Canceled` states.

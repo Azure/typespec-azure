@@ -218,7 +218,8 @@ interface GenericOps
       {
         ...Extension.ExtensionProviderNamespace<Employee>,
         ...KeysOf<Employee>,
-      }
+      },
+      ResourceName = "GenericResourceEmployee"
     > {}
 
 /**
