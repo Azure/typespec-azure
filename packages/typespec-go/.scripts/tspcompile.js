@@ -19,9 +19,9 @@ const azureServiceSpecs = syncAzureRestApiSpecs() + "/";
 
 const compiler = pkgRoot + "node_modules/@typespec/compiler/cmd/tsp.js";
 
-// Stub tspconfig used for every compile so that upstream tspconfig.yaml files
-// (e.g. those shipped with azure-rest-api-specs) don't bleed emitter options
-// from azure-sdk-for-go into our regenerated test fixtures.
+// Stub tspconfig for synced REST API specs so their upstream options don't
+// bleed into our fixtures. Spector and local specs use normal config discovery
+// to preserve the project root used for loading examples.
 const stubConfig = pkgRoot + ".scripts/tspconfig.yaml";
 
 // Spec selection lives in the opt-in `spector.config.*.yaml` files (see
@@ -226,7 +226,8 @@ function generate(moduleName, input, outputDir, perTestOptions) {
     // VS Code can attach (via the "Attach to Default Port" launch config) and bind
     // breakpoints before the short-lived emitter runs.
     const nodeArgs = debug ? "--inspect-brk=9229 " : "";
-    const command = `node ${nodeArgs}${compiler} compile ${input} --emit=${emitter} --config=${stubConfig} ${options.join(" ")}`;
+    const configArg = input.startsWith(azureServiceSpecs) ? `--config=${stubConfig} ` : "";
+    const command = `node ${nodeArgs}${compiler} compile ${input} --emit=${emitter} ${configArg}${options.join(" ")}`;
     if (switches.includes("--verbose")) {
       console.log(command);
     }

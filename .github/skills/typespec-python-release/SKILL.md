@@ -11,7 +11,7 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
 
 - Run every command from the repository root.
 - Release only `@azure-tools/typespec-python`.
-- Use the task branch supplied by the environment when available. Do not require a particular branch name or ask the user to choose one.
+- Use a release PR source branch matching `publish/python-*`, such as `publish/python-release-{MM-DD}`. Choose an unused name without asking the user.
 - Do not delete or overwrite an existing branch.
 - Use any available authenticated integration to publish the branch and create the pull request; do not assume GitHub CLI is installed or authenticated.
 
@@ -19,17 +19,18 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
 
 ### 1. Prepare the Repository and Task Branch
 
-1. If the environment has already supplied a task branch (for example, a cloud agent branch), work on that branch and skip the cleanup and checkout sequence below. Preserve existing task changes.
-2. Otherwise, clean the repository and update `main` with this exact sequence:
+1. If the environment has already supplied a task branch (for example, a cloud agent branch), preserve its commits and uncommitted changes. Reuse it only if its name matches `publish/python-*`; otherwise, create a new branch at the current commit with an unused name matching that pattern.
+2. Otherwise, verify the worktree is clean and fetch the latest `main` from the remote for `Azure/typespec-azure`:
 
    ```bash
-   git reset HEAD && git checkout . && git clean -fd && git checkout origin/main && git pull origin main
+   git status --short
+   git fetch origin main
    ```
 
-   This intentionally discards all uncommitted tracked and untracked files. Run it only when the user has asked to start the release workflow.
+   The example assumes that remote is named `origin`; use its actual name. Do not discard existing changes.
 
-3. If no task branch was supplied, create a new branch from the clean, updated `origin/main` checkout. Choose an unused branch name without asking the user; do not delete or overwrite existing local or remote branches.
-4. Record the actual task branch name for publishing and PR verification:
+3. If no task branch was supplied, create a new branch from the fetched `main` using an unused name matching `publish/python-*`. Prefer `publish/python-release-{MM-DD}` using the current date; append a unique suffix if that name already exists locally or remotely. Do not delete or overwrite existing branches.
+4. Record the actual release branch name for publishing and PR verification, and confirm it matches `publish/python-*`:
 
    ```bash
    release_branch=$(git branch --show-current)
@@ -131,9 +132,9 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
    git commit -m "[python] release <version>"
    ```
 
-3. Publish the actual task branch using an available authenticated mechanism, such as Git, an MCP integration, or the cloud agent's publishing workflow. Use a personal fork when required by repository permissions. Do not assume the remote is named `origin` or the branch follows a particular naming convention.
-4. Create a pull request against `Azure/typespec-azure`, targeting `main` from the published task branch, with the exact title `[python] release <version>` and an empty body. Choose an available authenticated tool or integration; GitHub CLI is optional. If publishing or PR creation is unavailable, stop and report the blocker so the user can finish.
-5. Verify the created pull request's repository, base and head branches, exact title, empty body, and inclusion of the new `internal` change file using the available integration.
+3. Publish the actual release branch using an available authenticated mechanism, such as Git, an MCP integration, or the cloud agent's publishing workflow. Use a personal fork when required by repository permissions. Do not assume the remote is named `origin`; preserve the `publish/python-*` branch name when publishing.
+4. Create a pull request against `Azure/typespec-azure`, targeting `main` from the published `publish/python-*` branch, with the exact title `[python] release <version>` and an empty body. Choose an available authenticated tool or integration; GitHub CLI is optional. If publishing or PR creation is unavailable, stop and report the blocker so the user can finish.
+5. Verify the created pull request's repository, base branch, head branch matching `publish/python-*`, exact title, empty body, and inclusion of the new `internal` change file using the available integration.
 
 ### 6. Review and Improve the Process
 

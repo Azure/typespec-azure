@@ -81,3 +81,7 @@ op createWidget is RpcOperation<
 ## Suppression
 
 Suppress only when required to match an existing API; otherwise model the request body with the standard patterns.
+
+## Related rule
+
+[`no-request-body`](./no-request-body.md) checks GET and DELETE request bodies regardless of operation template. This rule retains its existing `RpcOperation`-specific behavior; enabling both rules can produce both diagnostics for the same operation.

@@ -1,5 +1,18 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.74.0
+
+### Features
+
+- [#5878](https://github.com/Azure/typespec-azure/pull/5878) Add the `no-resource-name-conflict` ARM linter rule to detect duplicate logical resource names across services. Keep the rule opt-in in the Azure `resource-manager` ruleset. Document explicit resource naming for standard operations, specific extensions, legacy templates, and different scopes.
+- [#5974](https://github.com/Azure/typespec-azure/pull/5974) Add `no-resource-duplicates` to warn when `resolveArmResources` returns distinct records with the same case-insensitive resource type and instance path, retaining path parameter names. Register the rule disabled in the central `resource-manager` ruleset pending fixes to existing service specifications; it is available through explicit enablement or the ARM library's `all` ruleset.
+- [#5561](https://github.com/Azure/typespec-azure/pull/5561) Add the `use-union-hierarchy` linter rule to require non-string named unions to declare an `extends` constraint and model variants to inherit from the declared base and belong to only one model-based union hierarchy, enabled by the `client-sdk` ruleset. String unions do not require `extends`.
+
+### Bug Fixes
+
+- [#5883](https://github.com/Azure/typespec-azure/pull/5883) Enable `no-query-in-post` and `use-model-request-body` by default in the `resource-manager` ruleset.
+
+
 ## 0.73.0
 
 No changes, version bump only.

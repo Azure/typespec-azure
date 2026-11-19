@@ -63,6 +63,23 @@ export type LroStatusMetadataDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Identifies a server-issued long-running operation identifier exposed by a legacy service through
+ * either the status-monitor URI or its response body. This compatibility metadata does not drive
+ * polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+ * with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+ * accessor and storage.
+ *
+ * @param target The operation identifier path parameter on the linked status-monitor operation, or
+ * a string-like property on its response model.
+ * @param scope Specifies the target language emitters.
+ */
+export type LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -1031,7 +1048,7 @@ export type ResponseAsBoolDecorator = (
  * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  *
  * @param source The operation to change location for.
- * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
+ * @param target The target `Namespace`, `Interface` or a string which can indicate the client. Use `exact("name")` to preserve the exact casing of a string target in generated client code.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -1077,6 +1094,11 @@ export type ResponseAsBoolDecorator = (
  *   @clientLocation("ArchiveOperations")
  *   archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
  * }
+ * ```
+ * @example Move to a sub client with exact casing
+ * ```typespec
+ * @clientLocation(exact("vMHost"), "javascript")
+ * op listVMHosts(): string[];
  * ```
  * @example Move operation to root client
  * ```typespec
@@ -1210,8 +1232,35 @@ export type ClientOptionDecorator = (
   scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
+ *
+ * Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
+ *
+ * See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
+ *
+ * @param target The long-running operation to customize.
+ * @param result The response model or status-monitor property to return from generated clients.
+ * @param scope Specifies the target language emitters.
+ * @example Return an action's whole status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus);
+ * ```
+ * @example Return a property of an action's status monitor
+ * ```typespec
+ * @@clientLroResult(start, ActionStatus.result);
+ * ```
+ */
+export type ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: DecoratorOptions | string,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureClientGeneratorCoreDecorators = {
   lroStatusMetadata: LroStatusMetadataDecorator;
+  lroOperationId: LroOperationIdDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
   protocolAPI: ProtocolAPIDecorator;
@@ -1234,6 +1283,7 @@ export type AzureClientGeneratorCoreDecorators = {
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
   clientOption: ClientOptionDecorator;
+  clientLroResult: ClientLroResultDecorator;
 };
 
 /**
@@ -1399,7 +1449,7 @@ export type ReplaceResponseWithBytesFunctionImplementation = (
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
  *
- * Use this with `@clientName` when you want the name to be used exactly as specified,
+ * Use this with `@clientName` or a string target in `@clientLocation` when you want the name to be used exactly as specified,
  * without any automatic casing conversion.
  *
  * @param name The exact name to use in generated client code.

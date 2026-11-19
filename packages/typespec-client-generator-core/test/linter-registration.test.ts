@@ -18,3 +18,13 @@ it("registers only the combined verb rule without enabling it for C#", () => {
     ],
   ).toBeUndefined();
 });
+
+it("registers repeated client-name guidance without enabling it for C#", () => {
+  const name = "no-repeated-client-name";
+  expect($linter.rules.filter((rule) => rule.name === name)).toHaveLength(1);
+  expect(
+    $linter.ruleSets?.["best-practices:csharp"].enable?.[
+      `@azure-tools/typespec-client-generator-core/${name}`
+    ],
+  ).toBeUndefined();
+});
