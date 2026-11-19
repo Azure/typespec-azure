@@ -1,4 +1,4 @@
-# only: Exact names for models, properties, enum members, operations, and parameters
+# Exact names for models, properties, enum members, operations, and parameters
 
 Exact client names should be emitted without applying the TypeScript emitter's normal
 name normalization.
