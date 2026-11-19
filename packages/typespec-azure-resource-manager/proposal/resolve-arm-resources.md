@@ -139,7 +139,7 @@ Each `ResolvedResource` describes one concrete ARM resource path in the provider
 | `providerNamespace`    | The ARM provider namespace that owns this resolved resource. For extension resources, this is the extension provider namespace, not necessarily the namespace of the target resource.                                      |
 | `resourceType`         | The ARM resource type split into provider and type segments. For `Microsoft.Foo/widgets/extensions`, `provider` is `Microsoft.Foo` and `types` is `["widgets", "extensions"]`.                                             |
 | `resourceName`         | The logical resource name used by operation grouping and downstream emitters. This may come from the resource model name, a template-provided `ResourceName`, or operation metadata.                                       |
-| `resourceInstancePath` | The canonical instance path for this resource in this version, including scope, provider namespace, type segments, and name segments. List operations should resolve to the same instance path as item operations.         |
+| `resourceInstancePath` | The canonical instance path for this resource in this version, including scope, provider namespace, type segments, and name segments. List association does not change this identity or the list operation's request path. |
 | `operations`           | Resource lifecycle, list, and action operations grouped by operation kind. These are the operations that directly operate on this resource path.                                                                           |
 | `parent`               | A reference to the parent resource when this resource is a child resource. The parent should be resolved from the path after the full resource set is known.                                                               |
 | `scope`                | The scope where this resource exists. This can be a well-known ARM scope string or a structured reference to another resource used as the extension target.                                                                |
@@ -212,12 +212,25 @@ For each ARM resource detail returned by `listArmResources(program)`:
    - The canonical path is also what later steps use to attach remaining operations and resolve parent/scope relationships.
 8. Append other lifecycle, list, and action operations to the detected resource.
    - Append lifecycle operations when the operation's normalized instance path matches the detected resource identity.
-   - Append list operations when the operation's normalized request path is a prefix of a detected resource identity. If multiple resources match, attach to the closest one.
-   - Non-prefix list paths need a separate design and should not create resource identities.
+   - Append list operations using the list association rules below. Lists never create resource identities.
    - Append action operations when the operation's normalized path is under the detected resource instance path or collection path.
    - Keep protocol correctness as linting, not detection. The expected HTTP verb for each lifecycle kind should be enforced by a linter, not by the resolver.
    - Operations that cannot be associated with any detected resource should remain available for the provider-level operation pass.
 9. If a candidate model has neither `Read` nor `CreateOrUpdate`, it should not become a resolved resource. A linter or design-rule diagnostic can decide whether that is invalid.
+
+#### List operation association
+
+Resolve list associations independently for every detected identity of the registered resource model:
+
+1. A nonempty explicit resource name supplied through `@armResourceList` or an operation template selects identities with that logical name, regardless of scope. This overrides automatic path matching; an unmatched explicit name does not fall back to a path match. Empty or omitted name parameters retain automatic matching.
+2. Without an explicit name, every resource kind accepts its immediate parent collection: the normalized identity path with only its final resource-name segment removed. An ancestor collection does not match a deeper child or auxiliary resource.
+3. Resource-group-scoped tracked resources additionally accept the corresponding subscription collection, formed by removing the resource-group scope segment from their parent collection path. This preserves the concrete provider, complete resource-type path, and any parent identities. Matching only the final type segment is insufficient. Other resource kinds do not automatically match across scopes.
+4. Attach the list to every matching identity, including equivalent-path records produced by mixed standard and legacy templates. This does not merge identities with different logical names.
+5. Preserve unmatched registered lists in `providerOperations`, once per operation, with their list metadata. A matched list does not also appear as a provider operation.
+
+Extension resource occurrences at tenant, subscription, resource group, management group, service group, and external-resource scopes each match their own parent collections. Provider/type suffix equality alone does not associate lists across extension targets or scopes. Variable providers or resource-type segments cannot establish concrete cross-scope matches; supported generic parent paths and explicit-name overrides do not require guessing a concrete resource type.
+
+These rules use structural metadata and original logical names before consumer naming callbacks run. Names used for grouping never change HTTP paths or ARM resource types.
 
 #### Normalized resource identity comparison
 

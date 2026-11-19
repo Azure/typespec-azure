@@ -27,14 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import {
-  getAuthentication,
-  getHttpOperation,
-  getServers,
-  isBody,
-  isBodyRoot,
-  isPathParam,
-} from "@typespec/http";
+import { getHttpOperation, isBody, isBodyRoot, isPathParam } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import type {
   AccessDecorator,
@@ -44,12 +37,14 @@ import type {
   ClientDecorator,
   ClientDocDecorator,
   ClientInitializationDecorator,
+  ClientLroResultDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   DynamicModelDecorator,
+  LroOperationIdDecorator,
   LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -82,14 +77,14 @@ import {
   AllScopes,
   clientKey,
   clientLocationKey,
+  clientLroResultKey,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  isSameAuth,
-  isSameServers,
+  isClientInitializationOptionsBag,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -121,6 +116,30 @@ export function getLroStatusMetadataDecorator(
   target: ModelProperty,
 ): boolean | undefined {
   return getScopedDecoratorData(context, lroStatusMetadataKey, target);
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(
+    context,
+    $lroOperationId,
+    lroOperationIdKey,
+    target,
+    { target: context.decoratorTarget },
+    scope,
+  );
+};
+
+export function getLroOperationIdDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): { target: DiagnosticTarget } | undefined {
+  return getScopedDecoratorData(context, lroOperationIdKey, target);
 }
 
 /**
@@ -308,41 +327,6 @@ export const $client: ClientDecorator = (
       return;
     }
     services = serviceConfig.values;
-    // validate all services has same server definition
-    let servers = undefined;
-    let auth = undefined;
-    let isSame = true;
-    for (const svc of services) {
-      const currentServers = getServers(context.program, svc);
-      if (currentServers === undefined) continue;
-      if (servers === undefined) {
-        servers = currentServers;
-      } else {
-        isSame = isSameServers(servers, currentServers);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    for (const svc of services) {
-      const currentAuth = getAuthentication(context.program, svc);
-      if (currentAuth === undefined) continue;
-      if (auth === undefined) {
-        auth = currentAuth;
-      } else {
-        isSame = isSameAuth(auth, currentAuth);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    if (!isSame) {
-      reportDiagnostic(context.program, {
-        code: "inconsistent-multiple-service",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
     // For clients merging multiple services, ensure all services agree on the
     // version of any shared library dependency (e.g. ARM common-types).
     // Diverging versions cause TCGC to emit duplicated/diverged models.
@@ -1266,71 +1250,6 @@ export const $dynamicModel: DynamicModelDecorator = (
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
 /**
- * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
- * client-parameters model is passed directly as the second argument.
- *
- * Detection is based on model provenance rather than the model name alone:
- * - The structural options `parameters` and `initializedBy` are declared only on
- *   `ClientInitializationOptions`, so their presence unambiguously identifies the options bag
- *   (this covers the common inline literal form `{ parameters: ..., scope: ... }`).
- * - A *named* model that explicitly derives from `ClientInitializationOptions` through its
- *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
- *   ClientInitializationOptions { scope: "csharp"; }`).
- *
- * The provenance check follows `baseModel` (`extends`) as well as `sourceModel`/`sourceModels`
- * (`model is`, `PickProperties`/`OmitProperties` and other spread-based transformations), so a named
- * model derived from `ClientInitializationOptions` through any of those is still recognized.
- *
- * Anonymous model expressions are intentionally excluded from the provenance check: the compiler links
- * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
- * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
- * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
- * client-parameters model keeps its `scope` property a real client parameter, preserving backward
- * compatibility for that previously supported form.
- */
-function isClientInitializationOptionsBag(options: Type): boolean {
-  if (options.kind !== "Model") {
-    return false;
-  }
-  if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
-    return true;
-  }
-  if (options.name === "") {
-    return false;
-  }
-  return derivesFromClientInitializationOptions(options);
-}
-
-/**
- * Whether a model is `ClientInitializationOptions` (from `Azure.ClientGenerator.Core`) or derives
- * from it through any combination of `extends` (`baseModel`) and `model is` / spread provenance
- * (`sourceModel`/`sourceModels`).
- */
-function derivesFromClientInitializationOptions(model: Model): boolean {
-  const visited = new Set<Model>();
-  const stack: (Model | undefined)[] = [model];
-  while (stack.length > 0) {
-    const current = stack.pop();
-    if (current === undefined || visited.has(current)) {
-      continue;
-    }
-    visited.add(current);
-    if (
-      current.name === "ClientInitializationOptions" &&
-      current.namespace !== undefined &&
-      getNamespaceFullName(current.namespace) === "Azure.ClientGenerator.Core"
-    ) {
-      return true;
-    }
-    stack.push(current.baseModel, current.sourceModel);
-    for (const source of current.sourceModels) {
-      stack.push(source.model);
-    }
-  }
-  return false;
-}
-
-/**
  * Resolve the nearest effective option property of an options bag by name, walking the `extends`
  * (`baseModel`) inheritance chain so that a property declared on a base model is honored even when the
  * leaf model only adds other properties (e.g. `model Final extends Base { parameters: Params }`).
@@ -1775,6 +1694,23 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
 
 export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
   return getScopedDecoratorData(context, responseAsBoolKey, target);
+}
+
+export const $clientLroResult: ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(context, $clientLroResult, clientLroResultKey, target, result, scope);
+};
+
+/** Gets the LRO result selected for the current language scope. @internal */
+export function getClientLroResult(
+  context: TCGCContext,
+  target: Operation,
+): Model | ModelProperty | undefined {
+  return getScopedDecoratorData(context, clientLroResultKey, target);
 }
 
 const clientDocKey = createStateSymbol("clientDoc");

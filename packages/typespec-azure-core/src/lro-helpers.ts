@@ -169,6 +169,11 @@ export interface NextOperationLink extends LogicalOperationStep {
   responseModel: Model;
   /** information on how to get the uri to the status monitor */
   target: OperationLink;
+  /**
+   * The explicitly linked polling operation, when the link was declared with
+   * `@pollingOperation`. Absent for an inferred or standalone polling location.
+   */
+  operation?: Operation;
 }
 
 /**
@@ -490,6 +495,22 @@ function createLroProtocolMetadata(
     }
   }
 
+  const pollingLink = context.pollingOperationLink?.link;
+  const statusMonitorStep =
+    context.statusMonitorStep?.kind === "nextOperationReference" && pollingLink
+      ? {
+          ...context.statusMonitorStep,
+          target: {
+            ...context.statusMonitorStep.target,
+            link: {
+              kind: "link" as const,
+              location: pollingLink.location,
+              property: pollingLink.property,
+            },
+          },
+        }
+      : context.statusMonitorStep;
+
   return {
     operation,
     initial: {
@@ -498,7 +519,7 @@ function createLroProtocolMetadata(
       isAction,
     },
     polling: {
-      statusMonitorStep: context.statusMonitorStep,
+      statusMonitorStep,
       pollingInfo: context.pollingStep,
       statusMonitorResult: context.statusMonitorResult,
     },
@@ -519,6 +540,7 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
     isAction || resourceOperation?.operation === "delete"
       ? pollingInfo.responseModel
       : initialResponse;
+  let resultPath: string | undefined;
   if (
     finalStep &&
     finalStep.kind !== "noPollingResult" &&
@@ -526,6 +548,7 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
       resourceOperation?.operation !== "createOrReplace")
   ) {
     model = finalStep.responseModel;
+    resultPath = finalStep.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
   } else if (resourceOperation?.operation === "createOrReplace") {
     model = resourceOperation.resourceType;
   } else if (statusMonitorResult) {
@@ -533,13 +556,10 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
   }
   if (originalUriHasGetOperation === false) model = "void";
 
-  const logicalPathName =
-    finalStep?.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
-
   let finalResult: Model | Scalar | UnknownType | "void" =
     model === "void" || isVoidType(model) ? "void" : model;
   let finalEnvelopeResult = finalResult;
-  if (finalStep?.kind === "pollingSuccessProperty") {
+  if (resultPath !== undefined) {
     finalEnvelopeResult = pollingInfo.responseModel;
   } else if (finalStep?.kind === "noPollingResult") {
     finalResult = "void";
@@ -553,10 +573,10 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
     pollingInfo,
     finalStep,
     envelopeResult: pollingInfo.responseModel,
-    logicalPath: logicalPathName,
+    logicalPath: resultPath,
     finalResult: finalResult,
     finalEnvelopeResult: finalEnvelopeResult,
-    finalResultPath: logicalPathName,
+    finalResultPath: resultPath,
   };
 }
 

@@ -17,7 +17,6 @@ namespace Microsoft.ContosoProviderHub;
 /** Contoso API versions */
 enum Versions {
   /** 2021-10-01-preview version */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "Preserve older common-types schemas for this grandfathered API sample."
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @previewVersion
   `2021-10-01-preview`,
@@ -121,17 +120,20 @@ interface Dependents {
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
   getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
+  @armResourceCreateOrUpdate(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   createOrUpdatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync<
     Dependent,
     PrivateEndpointConnection,
     OptionalRequestBody = true
   >;
+  @armResourceUpdate(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
     Dependent,
     PrivateEndpointConnection,
     PatchModel = void
   >;
   deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
+  @armResourceList(PrivateEndpointConnection, "DependentPrivateEndpointConnection")
   listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
     Dependent,
     PrivateEndpointConnection

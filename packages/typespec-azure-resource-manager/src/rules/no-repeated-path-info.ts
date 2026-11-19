@@ -1,0 +1,82 @@
+import type { Model } from "@typespec/compiler";
+import {
+  createRule,
+  fileRef,
+  getProperty,
+  isTemplateDeclarationOrInstance,
+  paramMessage,
+} from "@typespec/compiler";
+import { getHttpOperation } from "@typespec/http";
+import { walkJsonProperties } from "./model-utils.js";
+import { isTemplatedInterfaceOperation } from "./utils.js";
+
+export const noRepeatedPathInfoRule = createRule({
+  name: "no-repeated-path-info",
+  docs: fileRef.fromPackageRoot("src/rules/no-repeated-path-info.md"),
+  description:
+    "ARM PUT request bodies must not repeat path or query parameters in the resource properties bag.",
+  severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-repeated-path-info",
+  messages: {
+    default: paramMessage`Request body property '${"name"}' repeats information already carried in the path or query.`,
+  },
+  create(context) {
+    return {
+      operation: (operation) => {
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          isTemplatedInterfaceOperation(operation)
+        ) {
+          return;
+        }
+
+        const [httpOperation] = getHttpOperation(context.program, operation);
+        if (httpOperation.verb !== "put") {
+          return;
+        }
+
+        const repeatedNames = new Set(
+          httpOperation.parameters.parameters
+            .filter((parameter) => parameter.type === "path" || parameter.type === "query")
+            .map((parameter) => parameter.name),
+        );
+        if (repeatedNames.size === 0) {
+          return;
+        }
+
+        const body = httpOperation.parameters.body;
+        if (body === undefined || body.bodyKind !== "single" || body.type.kind !== "Model") {
+          return;
+        }
+
+        const propertiesModel = getPropertiesModel(body.type);
+        if (propertiesModel === undefined) {
+          return;
+        }
+
+        const reportedNames = new Set<string>();
+        for (const [name, property] of walkJsonProperties(context.program, propertiesModel)) {
+          if (!repeatedNames.has(name)) {
+            continue;
+          }
+          if (reportedNames.has(name)) {
+            continue;
+          }
+          reportedNames.add(name);
+
+          context.reportDiagnostic({
+            target: property,
+            format: {
+              name,
+            },
+          });
+        }
+      },
+    };
+  },
+});
+
+function getPropertiesModel(model: Model): Model | undefined {
+  const property = getProperty(model, "properties");
+  return property?.type.kind === "Model" ? property.type : undefined;
+}
