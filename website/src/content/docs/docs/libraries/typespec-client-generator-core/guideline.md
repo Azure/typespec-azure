@@ -372,9 +372,17 @@ Azure.Core remains responsible for polling links, parameter bindings, terminal s
 
 `lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
 
-The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` retain their existing shapes. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result-type defaults are preserved, but inconsistent resource PUT result/envelope/path combinations are corrected.
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
+
+#### Customizing LRO Results
+
+TCGC applies `@clientLroResult` when calculating the SDK-facing result without changing polling, parameter binding, or required final requests. A model selection must be the status-monitor response model or the response model containing the default final result. A property selection must be a direct property of the status-monitor model, including inherited properties, and have a model or scalar type, or `unknown`. The property does not need `@lroResult`. Unrelated and nested selections report `invalid-client-lro-result`. The decorator supports the existing language scopes and overrides.
+
+TCGC derives the default result from the discovered protocol. When the result is a complete response body, no status-monitor extraction path is retained. Selecting a non-resource result on a resource LRO (or any result on a resource DELETE LRO) reports the suppressible `use-valid-client-lro-result` warning, which can be suppressed to preserve an existing SDK contract.
+
+`finalResponse.result` is the selected SDK type, `finalResponse.envelopeResult` is the response body containing it, and `resultSegments` identifies the selected direct property when one exists. The raw result paths likewise contain a name only for a direct property selection. Emitters must process `finalStep` independently because a required final request can return a different body from the selected result envelope.
 
 #### LRO status metadata
 
@@ -412,6 +420,42 @@ TCGC describes the selected properties, not runtime response values. Language em
 Separate `@lroStatusMetadata` declarations on one property use the standard TCGC scope rules, including overlapping scopes. Each selected property appears only once in the metadata collection. Projected client-name conflicts are handled by the existing `duplicate-client-name` validation, not a separate LRO metadata diagnostic.
 
 Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
+
+#### Legacy LRO operation identity
+
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service that returns a server-issued identifier in its status-monitor URI, response body, or both:
+
+```typespec
+model OperationStatus {
+  @lroOperationId
+  id: string;
+
+  status: OperationState;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact `SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact `SdkModelPropertyType` for the status-monitor body. The path form is available from the initial response and must remain derivable after poller rehydration from the stored polling URL. The property form becomes available only after a status-monitor response is received.
+
+For `kind: "property"`, `propertySegments` gives the access path from `pollingInfo.responseModel` to the ID, following the segment representation used by paging metadata. Currently only direct or inherited properties are selectable, so the path is `[property]`; inheritance does not add a JSON nesting level. Each segment is the exact effective SDK property, carrying its client name and `serializationOptions.json.name` for emitters reading a typed model or raw JSON. An overridden base property is not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names and serialization metadata.
+
+TCGC validates active operation ID selections while processing each LRO. A selected response property must be string-like; invalid selections are diagnosed and omitted. Annotations on models not used by the LRO, or excluded by emitter scope or response visibility, have no effect.
+
+For example, after the body-only Translation scenario returns `{ id: "translation-123", status: "Running" }`, an emitter reads the selected `id` using `propertySegments` and exposes `"translation-123"` through its operation or poller accessor. No ID is available before that response in the body-only case. When both sources are selected, the URI-derived value is available first and the body value becomes available after polling. These scenarios supply HTTP fixtures; each emitter must implement and test the public accessor.
+
+This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no modeled polling operation cannot expose operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API, including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator. `@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret URI or a delete-until-gone resource name, is not an operation identifier.
 
 ### HTTP Operation Parameters Handling
 

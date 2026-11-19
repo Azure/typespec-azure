@@ -4,6 +4,11 @@ export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
 export * from "./decorators.js";
+export {
+  getAzureServiceConfigurations,
+  type AzureServiceConfiguration,
+  type AzureServiceConfigurations,
+} from "./decorators/azure-service-configurations.js";
 export { extractLroStates } from "./decorators/lro-status.js";
 export {
   getOperationLinks,

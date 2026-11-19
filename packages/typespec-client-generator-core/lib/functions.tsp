@@ -171,7 +171,7 @@ extern fn replaceResponseWithBytes(operation: Reflection.Operation): Reflection.
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
  *
- * Use this with `@clientName` when you want the name to be used exactly as specified,
+ * Use this with `@clientName` or a string target in `@clientLocation` when you want the name to be used exactly as specified,
  * without any automatic casing conversion.
  *
  * @param name The exact name to use in generated client code.

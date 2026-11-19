@@ -18,6 +18,7 @@ import { getVersioningMutators } from "@typespec/versioning";
 import { strictEqual } from "assert";
 
 export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["typeref"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
