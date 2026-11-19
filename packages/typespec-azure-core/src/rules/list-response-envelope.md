@@ -1,4 +1,4 @@
-This rule warns when a `@list` operation has a request property marked `@continuationToken` but no response property marked `@continuationToken`. It uses the compiler's paging metadata, including inherited and nested properties, and reports once on the operation rather than on every token annotation.
+This rule warns when a `@list` operation has a request property marked `@continuationToken` but no response property marked `@continuationToken`. It includes inherited and nested properties and reports once on the defining operation, even when multiple interfaces inherit it.
 
 The warning also applies when the response has `@nextLink`. That is valid generic TypeSpec: the URL can contain the token. The Azure SDK concern is that the method may accept a raw token while the pager exposes a next-link URL as its continuation value. Review the generated SDK and service contract rather than treating this as a compiler error.
 

@@ -4,6 +4,7 @@ import {
   getPagingOperation,
   isList,
   isTemplateDeclarationOrInstance,
+  type Operation,
 } from "@typespec/compiler";
 import { isExcludedCoreType, isTemplatedInterfaceOperation } from "./utils.js";
 
@@ -18,9 +19,12 @@ export const listResponseEnvelopeRule = createRule({
       "This list operation has a request @continuationToken but no response @continuationToken. Review the SDK paging contract: when the response uses @nextLink, the pager may resume with a URL rather than the raw request token.",
   },
   create(context) {
+    const reported = new Set<Operation | Operation["node"]>();
     return {
       operation(operation) {
+        const source = operation.node ?? operation;
         if (
+          reported.has(source) ||
           !isList(context.program, operation) ||
           isTemplateDeclarationOrInstance(operation) ||
           isTemplatedInterfaceOperation(operation) ||
@@ -31,6 +35,7 @@ export const listResponseEnvelopeRule = createRule({
         const [paging] = getPagingOperation(context.program, operation);
         if (paging?.input.continuationToken && !paging.output.continuationToken) {
           context.reportDiagnostic({ target: operation, messageId: "continuationToken" });
+          reported.add(source);
         }
       },
     };

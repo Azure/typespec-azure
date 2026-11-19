@@ -196,6 +196,54 @@ it("reports one warning per operation rather than per repeated decorator", async
     .toEmitDiagnostics([diagnostic]);
 });
 
+it("reports an inherited operation only once", async () => {
+  await tester
+    .expect(
+      `
+      @route("/base") interface Base {
+        @list @get listWidgets(@query @continuationToken token?: string): {
+          @pageItems value: string[];
+          @nextLink nextLink?: url;
+        };
+      }
+      @route("/derived") interface Derived extends Base {}
+      @route("/other") interface Other extends Base {}
+    `,
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
+
+it("does not let a valid specialization hide an invalid one", async () => {
+  await tester
+    .expect(
+      `
+      model WidgetPage { @pageItems value: string[]; }
+      model PairedPage extends WidgetPage { @continuationToken token?: string; }
+      interface Lists<T> {
+        @list @get listWidgets(@query @continuationToken token?: string): T;
+      }
+      @route("/paired") interface PairedLists extends Lists<PairedPage> {}
+      @route("/unpaired") interface UnpairedLists extends Lists<WidgetPage> {}
+    `,
+    )
+    .toEmitDiagnostics([diagnostic]);
+});
+
+it("reports separately declared operations sharing a signature", async () => {
+  await tester
+    .expect(
+      `
+      @route("/first")
+      @list @get op listWidgets(@query @continuationToken token?: string): {
+        @pageItems value: string[];
+        @nextLink nextLink?: url;
+      };
+      @route("/second") op listMoreWidgets is listWidgets;
+    `,
+    )
+    .toEmitDiagnostics([diagnostic, diagnostic]);
+});
+
 it.each([false, true])("supports operation suppression: %s", async (suppress) => {
   const diagnostics = await Tester.diagnose(
     `

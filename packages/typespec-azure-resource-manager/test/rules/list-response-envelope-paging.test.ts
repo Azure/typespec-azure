@@ -41,14 +41,17 @@ const continuationTokenDiagnostic = {
     "This list operation has a request @continuationToken but no response @continuationToken. Review the SDK paging contract: when the response uses @nextLink, the pager may resume with a URL rather than the raw request token.",
 } as const;
 
-it("reports a request token even when the response has a valid next-link envelope", async () => {
+it("reports an inherited request token once with a valid next-link envelope", async () => {
   await tester
     .expect(
       `
-      @get @list op listWidgets(@query @continuationToken token?: string): {
-        @pageItems value: string[];
-        @nextLink nextLink?: url;
-      };
+      @route("/base") interface Base {
+        @get @list listWidgets(@query @continuationToken token?: string): {
+          @pageItems value: string[];
+          @nextLink nextLink?: url;
+        };
+      }
+      @route("/derived") interface Derived extends Base {}
     `,
     )
     .toEmitDiagnostics([continuationTokenDiagnostic]);
