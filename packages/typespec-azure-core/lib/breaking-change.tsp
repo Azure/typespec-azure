@@ -58,6 +58,9 @@ model ApprovedUnversionedChangeOptions {
    * Required when the suppression is not on the target node itself.
    * Uses dot-separated segments matching the finding's element path
    * (e.g., "city", "properties.name").
+   * For an OperationRemoved approval on the operation's surviving interface or namespace,
+   * use the deleted operation's declaration name (e.g., "deleteWidget").
+   * This scope applies only to that immediate parent, not to other interfaces or namespaces.
    */
   path?: string;
 }

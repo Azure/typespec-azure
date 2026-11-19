@@ -23,7 +23,7 @@ export function emitFindingDiagnostics(program: Program, result: AnalysisResult)
     const target = getDiagnosticTarget(finding);
     if (!target) continue;
 
-    const codefix = createApproveBreakingChangeCodeFix(finding);
+    const codefix = createApproveBreakingChangeCodeFix(finding, program);
     const codefixes = codefix ? [codefix] : [];
 
     const diagnostic = $lib.createDiagnostic({
