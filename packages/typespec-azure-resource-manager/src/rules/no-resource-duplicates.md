@@ -71,18 +71,55 @@ interface Parts {
 }
 ```
 
-If legacy routing must be retained, override the resource name on the operation definition so it matches the standard operations:
+If a non-standard pattern is required, such as an optional request body for CreateOrReplace or a list without paging, use the operation templates in `Azure.ResourceManager.Legacy`, not the legacy interface templates. These operation templates use the resource model's name, so no resource name override is required. For example, make the `createOrUpdate` request body optional:
 
 ```typespec
 @armResourceOperations
 interface Parts {
   get is ArmResourceRead<Part>;
-  createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part, OverrideResourceName = "Part">;
+  createOrUpdate is Azure.ResourceManager.Legacy.CreateOrReplaceSync<
+    Part,
+    OptionalRequestBody = true
+  >;
   list is ArmResourceListByParent<Part>;
 }
 ```
 
-This example uses the `PartsLegacy` interface defined above. The override aligns the resource names without changing the HTTP path.
+If legacy routing must be retained, set the `ResourceName` parameter on the `LegacyOperations` interface template so it matches the standard operations. Replace the `PartsLegacy` interface defined above with:
+
+```typespec
+@armResourceOperations
+interface PartsLegacy
+  extends Azure.ResourceManager.Legacy.LegacyOperations<
+      {
+        ...ApiVersionParameter,
+        ...SubscriptionIdParameter,
+        ...ResourceGroupParameter,
+        ...Azure.ResourceManager.Legacy.Provider,
+
+        @path
+        @segment("widgets")
+        @key
+        widgetName: string,
+      },
+      {
+        @path
+        @segment("parts")
+        @key
+        partName: string,
+      },
+      ResourceName = "Part"
+    > {}
+
+@armResourceOperations
+interface Parts {
+  get is ArmResourceRead<Part>;
+  createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part>;
+  list is ArmResourceListByParent<Part>;
+}
+```
+
+The override aligns the resource names without changing the HTTP path.
 
 ## Impact
 
