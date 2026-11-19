@@ -55,6 +55,14 @@ export const UnbrandedSdkEmitterOptions = {
         "When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
     },
   },
+  "use-client-name-for-friendly-name-source": {
+    "use-client-name-for-friendly-name-source": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.",
+    },
+  },
   "api-version": {
     "api-version": apiVersionSchema,
   },
@@ -105,6 +113,7 @@ const UnbrandedSdkEmitterOptionsInterfaceSchema: JSONSchemaType<UnbrandedSdkEmit
     properties: {
       ...UnbrandedSdkEmitterOptions["generate-protocol-methods"],
       ...UnbrandedSdkEmitterOptions["generate-convenience-methods"],
+      ...UnbrandedSdkEmitterOptions["use-client-name-for-friendly-name-source"],
       ...UnbrandedSdkEmitterOptions["api-version"],
       ...UnbrandedSdkEmitterOptions["license"],
     },
@@ -117,7 +126,7 @@ export const BrandedSdkEmitterOptions = {
       nullable: true,
       format: "absolute-path",
       description:
-        "Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.",
+        "Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.\n\n**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).",
     },
   },
   namespace: {
@@ -425,6 +434,13 @@ export const $lib = createTypeSpecLibrary({
           "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
       },
     },
+    "invalid-client-lro-result": {
+      ...doc("invalid-client-lro-result"),
+      severity: "error",
+      messages: {
+        default: paramMessage`${"reason"}`,
+      },
+    },
     "non-head-bool-response-decorator": {
       ...doc("non-head-bool-response-decorator"),
       severity: "warning",
@@ -573,13 +589,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "`@client` with multiple services is only allowed on `Namespace`.",
-      },
-    },
-    "inconsistent-multiple-service": {
-      ...doc("inconsistent-multiple-service"),
-      severity: "error",
-      messages: {
-        default: "All services must have the same server and auth definitions.",
       },
     },
     "inconsistent-multiple-service-dependency": {

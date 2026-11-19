@@ -51,7 +51,9 @@ Use this flag if you would like to generate the sdk only for a specific version.
 
 **Type:** `string`
 
-Specifies the directory where the emitter will look for example files. If the flag isn't set, the emitter defaults to using an `examples` directory located at the project root.
+Overrides the directory for legacy JSON example files. When unset, discovers `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 

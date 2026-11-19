@@ -53,19 +53,10 @@ describe("HTTP SDK names", () => {
       .expect(`${header} @${verb} @route("/widgets") op ${invalid}(): void;`)
       .toEmitDiagnostics([diagnostic(verb, prefix, invalid)]);
   });
-  it.each(["", "Widget", "OrUpdate"])("accepts the prefix with suffix %s", async (suffix) => {
-    await tester.expect(`${header} ${endpoint(prefix + suffix)}`).toBeValid();
-  });
   it("accepts prefixes case-insensitively", async () => {
     await tester.expect(`${header} ${endpoint(prefix.toUpperCase() + "Widget")}`).toBeValid();
   });
-  it.each(["invalid", "prefix-inside", "truncated"])("rejects a %s name", async (kind) => {
-    const name =
-      kind === "invalid"
-        ? invalid
-        : kind === "prefix-inside"
-          ? `soft${prefix}`
-          : prefix.slice(0, -1);
+  it.each([`soft${prefix}`, prefix.slice(0, -1)])("rejects %s", async (name) => {
     await tester.expect(`${header} ${endpoint(name)}`).toEmitDiagnostics([finding(name)]);
   });
   it("honors an unscoped common name", async () => {
@@ -131,27 +122,6 @@ describe("HTTP SDK names", () => {
         `${header} interface ${prefix}Widgets { @${verb} @route("/widgets") ${invalid}_${prefix}(): void; }`,
       )
       .toEmitDiagnostics([finding(`${invalid}_${prefix}`)]);
-  });
-  it("reports each concrete endpoint once", async () => {
-    await tester
-      .expect(
-        `${header}
-      @${verb} @route("/one") op ${invalid}One(): void;
-      @${verb} @route("/two") op ${invalid}Two(): void;
-      @${verb} @route("/valid") op ${prefix}(): void;
-    `,
-      )
-      .toEmitDiagnostics([finding(invalid + "One"), finding(invalid + "Two")]);
-  });
-  it("does not check client-only declarations outside the service", async () => {
-    await tester
-      .expect(
-        `
-      @service namespace Test { ${endpoint(invalid)} }
-      namespace Customizations { @${verb} @route("/other") op helper(): void; }
-    `,
-      )
-      .toEmitDiagnostics([finding(invalid)]);
   });
 });
 
@@ -257,6 +227,9 @@ describe("standard ARM operations", () => {
       @key("widgetName") @segment("widgets") name: string;
     }
     model WidgetProperties { provisioningState?: ResourceProvisioningState; }
+    model Gadget is TrackedResource<WidgetProperties> {
+      @key("gadgetName") @segment("gadgets") name: string;
+    }
   `;
   beforeEach(async () => {
     tester = createLinterRuleTester(

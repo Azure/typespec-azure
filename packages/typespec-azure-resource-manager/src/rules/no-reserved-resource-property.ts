@@ -10,6 +10,7 @@ import { getProperties } from "./utils.js";
  */
 const reservedProperties = new Map<string, string>([
   ["billingData", "platform billing integration"],
+  ["systemData", "resource system metadata"],
 ]);
 
 /**
@@ -25,7 +26,7 @@ export const noReservedResourcePropertyRule = createRule({
   name: "no-reserved-resource-property",
   docs: fileRef.fromPackageRoot("src/rules/no-reserved-resource-property.md"),
   description:
-    "Reserved property names (for example 'billingData') must not be present in a resource's property bag. The property name is matched case-insensitively.",
+    "Reserved property names must not be present in a resource's property bag. The property name is matched case-insensitively.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-reserved-resource-property",
   messages: {

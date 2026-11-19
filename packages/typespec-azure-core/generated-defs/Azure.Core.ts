@@ -5,11 +5,35 @@ import type {
   EnumMember,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   Type,
+  TypeRefValue,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+
+/**
+ * A deployment's HTTP endpoint and OAuth authentication requirements.
+ */
+export interface AzureServiceConfiguration {
+  /**
+   * The server URL or URL template, as accepted by `@server`.
+   */
+  readonly endpoint: string;
+  /**
+   * A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`.
+   */
+  readonly authentication: TypeRefValue;
+  /**
+   * A reference to the parameter model used in the endpoint URL template.
+   */
+  readonly parameters?: TypeRefValue;
+  /**
+   * Description of the server.
+   */
+  readonly description?: string;
+}
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -44,6 +68,98 @@ export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   options?: Type,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Pairs named HTTP server endpoints with OAuth authentication configurations.
+ *
+ * Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and exposes the combined OR of HTTP authentication requirements. Existing AND groups and credential alternatives are preserved.
+ *
+ * The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
+ *
+ * Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+ *
+ * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+ *
+ * Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+ *
+ * ```yaml
+ * kind: project
+ * features:
+ *   - typeref
+ * ```
+ *
+ * @param target The namespace using these configurations.
+ * @param configurations The named endpoint and authentication records.
+ * @example
+ * ```typespec
+ * model PublicAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.io/.default"],
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+ * >;
+ * model GovernmentAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.us/.default"],
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+ * >;
+ *
+ * const Configurations: Record<AzureServiceConfiguration> = #{
+ *   public: #{
+ *     endpoint: "https://api.loganalytics.io",
+ *     authentication: typeref(PublicAuth),
+ *   },
+ *   government: #{
+ *     endpoint: "https://api.loganalytics.us",
+ *     authentication: typeref(GovernmentAuth),
+ *   },
+ * };
+ *
+ * @service
+ * @azureServiceConfigurations(Configurations)
+ * namespace Logs {
+ *   @get op query(): string;
+ * }
+ * ```
+ * @example Parameterized endpoint
+ *
+ * Declare endpoint parameters inline with `parameters: typeref({ ... })`, using the same property types and defaults as `@server`. Here, `account` is required and `region` defaults to `"westus"`.
+ *
+ * ```typespec
+ * import "@typespec/http";
+ * import "@azure-tools/typespec-azure-core";
+ *
+ * using TypeSpec.Http;
+ * using Azure.Core;
+ *
+ * model ServiceAuth is AadOauth2Auth<["https://example.com/.default"]>;
+ *
+ * const Configurations: Record<AzureServiceConfiguration> = #{
+ *   public: #{
+ *     endpoint: "https://{account}.{region}.example.com",
+ *     authentication: typeref(ServiceAuth),
+ *     parameters: typeref({
+ *       @doc("Account name.")
+ *       account: string;
+ *
+ *       @doc("Deployment region.")
+ *       region?: string = "westus";
+ *     }),
+ *     description: "Regional service endpoint",
+ *   },
+ * };
+ *
+ * @service
+ * @azureServiceConfigurations(Configurations)
+ * namespace RegionalService {
+ *   @get op read(): string;
+ * }
+ * ```
+ */
+export type AzureServiceConfigurationsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  configurations: Record<string, AzureServiceConfiguration>,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -197,6 +313,7 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
+  azureServiceConfigurations: AzureServiceConfigurationsDecorator;
   previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
