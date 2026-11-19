@@ -71,7 +71,15 @@ interface Parts {
 }
 ```
 
-If a non-standard pattern is required, such as an optional request body for CreateOrReplace or a list without paging, use the operation templates in `Azure.ResourceManager.Legacy`, not the legacy interface templates. These operation templates use the resource model's name, so no resource name override is required. For example, make the `createOrUpdate` request body optional:
+If a non-standard pattern is required, such as an optional request body for CreateOrReplace or a list without paging, use the operation templates in `Azure.ResourceManager.Legacy`, not the legacy interface templates. These operation templates use the resource model's name, so no resource name override is required. For example:
+
+| Template                                                       | Description                                                                                                        |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `CreateOrReplaceSync`, `CreateOrReplaceAsync`                  | Create or replace a resource; set `OptionalRequestBody = true` to make the request body optional.                  |
+| `CustomPatchSync`, `CustomPatchAsync`                          | Update a resource with a custom PATCH payload; set `OptionalRequestBody = true` to make the request body optional. |
+| `ArmListSinglePageByParent`, `ArmListSinglePageBySubscription` | List resources in a single page without a pageable response.                                                       |
+
+Make the `createOrUpdate` request body optional:
 
 ```typespec
 @armResourceOperations
@@ -85,7 +93,7 @@ interface Parts {
 }
 ```
 
-If legacy routing must be retained, set the `ResourceName` parameter on the `LegacyOperations` interface template so it matches the standard operations. Replace the `PartsLegacy` interface defined above with:
+If legacy routing must be retained, set the `ResourceName` parameter on the `LegacyOperations` interface template to the name of the resource model. Replace the `PartsLegacy` interface defined above with:
 
 ```typespec
 @armResourceOperations
@@ -119,7 +127,7 @@ interface Parts {
 }
 ```
 
-The override aligns the resource names without changing the HTTP path.
+This aligns the resource names without changing the HTTP path.
 
 ## Impact
 
