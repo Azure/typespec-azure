@@ -71,7 +71,9 @@ interface Parts {
 }
 ```
 
-If a non-standard pattern is required, such as an optional request body for CreateOrReplace or a list without paging, use the operation templates in `Azure.ResourceManager.Legacy`, not the legacy interface templates. These operation templates use the resource model's name, so no resource name override is required. For example:
+Legacy interface templates are for older APIs that expose the same resource type at multiple fixed paths, with each path representing a distinct resource. For example, `LocationWidgets` might use `/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/locations/{location}/widgets/{widgetName}`, while `EntityWidgets` might use `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/entities/{entityName}/widgets/{widgetName}`. Use the interface template for every operation on the resource at that path.
+
+If an older API uses a non-standard operation pattern unrelated to the resource path, such as an optional request body for PUT or PATCH operations or a non-pageable list response, use the operation templates in `Azure.ResourceManager.Legacy` instead. These operation templates use the resource model's name, so no resource name override is required. For example:
 
 | Template                                                       | Description                                                                                                        |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
