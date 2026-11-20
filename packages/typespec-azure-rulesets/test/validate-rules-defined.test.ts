@@ -89,6 +89,13 @@ describe("expect all rules to be defined", () => {
     strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
   });
 
+  it("keeps resource path validation opt-in in the central ruleset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/resource-path-validation";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
+
   it("keeps combined SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-correct-verb";
     strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
