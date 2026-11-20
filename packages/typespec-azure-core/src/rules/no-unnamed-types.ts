@@ -1,14 +1,22 @@
 import {
   createRule,
   fileRef,
+  getEffectiveModelType,
+  getFriendlyName,
+  getLocationContext,
+  getTypeName,
   ignoreDiagnostics,
+  isArrayModelType,
   isNullType,
+  isTemplateDeclaration,
+  isTemplateInstance,
   type Model,
   type ModelProperty,
   paramMessage,
   type Program,
   type Type,
   type Union,
+  walkPropertiesInherited,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import {
@@ -31,6 +39,7 @@ export const noUnnamedTypesRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-types",
   messages: {
     default: paramMessage`Anonymous ${"type"} should be defined as a named ${"type"} declaration.`,
+    response: paramMessage`Response model '${"type"}' should be defined as a named model declaration or a template with @friendlyName.`,
   },
   create(context) {
     const program = context.program;
@@ -39,7 +48,7 @@ export const noUnnamedTypesRule = createRule({
     const excludedUnions = new Set<Union>();
     const invalidUnions = new Set<Union>();
 
-    // Models: collect anonymous property types and request bodies.
+    // Models: collect anonymous property types, request bodies and implicit responses.
     const invalidModels = new Set<Model>();
     const excludedModels = new Set<Model>();
 
@@ -83,7 +92,8 @@ export const noUnnamedTypesRule = createRule({
           excludedUnions.add(operation.returnType);
         }
 
-        const { body } = ignoreDiagnostics(getHttpOperation(program, operation)).parameters;
+        const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
+        const { body } = httpOperation.parameters;
         if (
           body?.bodyKind === "single" &&
           body.property !== undefined &&
@@ -91,6 +101,67 @@ export const noUnnamedTypesRule = createRule({
           isInsideTemplateArgument(body.type)
         ) {
           invalidModels.add(body.type);
+        }
+
+        const responseTarget =
+          operation.interface && operation.node?.parent !== operation.interface.node
+            ? (operation.interface.node?.id ?? operation)
+            : (operation.node?.id ?? operation);
+        if (
+          isTemplateDeclaration(operation) ||
+          (operation.interface !== undefined && isTemplateDeclaration(operation.interface)) ||
+          getLocationContext(program, responseTarget).type !== "project"
+        ) {
+          return;
+        }
+
+        const originals = new Set(getModelConstituents(operation.returnType));
+        const unnamedInstances = new Set<Model>();
+        for (const response of httpOperation.responses) {
+          for (const content of response.responses) {
+            if (!content.body) {
+              continue;
+            }
+            for (const bodyType of getModelConstituents(content.body.type)) {
+              if (needsConcreteResponseName(program, bodyType)) {
+                unnamedInstances.add(bodyType);
+                continue;
+              }
+              for (const original of getOriginalModels(bodyType, originals)) {
+                if (needsConcreteResponseName(program, original)) {
+                  unnamedInstances.add(original);
+                }
+              }
+              if (
+                content.body.property &&
+                needsModelName(program, bodyType) &&
+                isInsideTemplateArgument(bodyType)
+              ) {
+                invalidModels.add(bodyType);
+                continue;
+              }
+              const effectiveType = getEffectiveModelType(
+                program,
+                bodyType,
+                (property) => !isHeader(program, property) && !isStatusCode(program, property),
+              );
+              if (bodyType.properties.size === 0 || effectiveType.name !== "") {
+                continue;
+              }
+              for (const responseType of getOriginalModels(bodyType, originals)) {
+                if (responseType.name === "") {
+                  invalidModels.add(responseType);
+                }
+              }
+            }
+          }
+        }
+        for (const model of unnamedInstances) {
+          context.reportDiagnostic({
+            messageId: "response",
+            target: responseTarget,
+            format: { type: getTypeName(model, { nameOnly: true }) },
+          });
         }
       },
       union: (union) => {
@@ -114,6 +185,35 @@ export const noUnnamedTypesRule = createRule({
   },
 });
 
+function* getModelConstituents(type: Type, visited = new Set<Type>()): Iterable<Model> {
+  if (visited.has(type)) return;
+  visited.add(type);
+  if (type.kind === "Model") {
+    yield type;
+  } else if (type.kind === "Union") {
+    for (const variant of type.variants.values()) {
+      yield* getModelConstituents(variant.type, visited);
+    }
+  }
+}
+
+function* getOriginalModels(
+  model: Model,
+  originals: Set<Model>,
+  visited = new Set<Model>(),
+): Iterable<Model> {
+  if (visited.has(model)) return;
+  visited.add(model);
+  if (originals.has(model)) {
+    yield model;
+  } else {
+    // HTTP-filtered payloads preserve their original model in compiler provenance.
+    for (const source of model.sourceModels) {
+      yield* getOriginalModels(source.model, originals, visited);
+    }
+  }
+}
+
 function needsModelName(program: Program, type: Type): type is Model {
   return (
     type.kind === "Model" &&
@@ -121,6 +221,27 @@ function needsModelName(program: Program, type: Type): type is Model {
     type.properties.size > 0 &&
     !isHttpEnvelope(program, type)
   );
+}
+
+function needsConcreteResponseName(program: Program, model: Model): boolean {
+  if (model.name === "" || !isTemplateInstance(model) || getFriendlyName(program, model)) {
+    return false;
+  }
+  const location = getLocationContext(program, model);
+  if (
+    location.type === "library" &&
+    (location.metadata.name === "@azure-tools/typespec-azure-core" ||
+      location.metadata.name === "@azure-tools/typespec-azure-resource-manager")
+  ) {
+    return false;
+  }
+  for (let current: Model | undefined = model; current; current = current.baseModel) {
+    if (current.indexer) return !isArrayModelType(current);
+  }
+  for (const property of walkPropertiesInherited(model)) {
+    if (!isHeader(program, property) && !isStatusCode(program, property)) return true;
+  }
+  return false;
 }
 
 /** Check if the type's source node is inside a template argument position */
