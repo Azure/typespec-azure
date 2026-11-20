@@ -27,6 +27,7 @@ import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationFunction } from "./helpers/operation-helpers.js";
+import { getClientServiceConfigurations } from "./helpers/service-configuration-helpers.js";
 import { PagingHelpers, SimplePollerHelpers } from "./static-helpers-metadata.js";
 
 export function buildClassicalClient(
@@ -56,10 +57,22 @@ export function buildClassicalClient(
     )}.ts`,
   );
 
+  const contextModuleSpecifier = `./api/${normalizeName(modularClientName, NameType.File)}Context.js`;
+  const serviceConfigs = getClientServiceConfigurations(client);
+  const typeExports = [`${classicalClientName}OptionalParams`];
+  if (serviceConfigs) {
+    typeExports.push(serviceConfigs.serviceConfigTypeName);
+    if (serviceConfigs.knownAudienceEnumName && emitterOptions.options.addCredentials !== false) {
+      clientFile.addExportDeclaration({
+        namedExports: [serviceConfigs.knownAudienceEnumName],
+        moduleSpecifier: contextModuleSpecifier,
+      });
+    }
+  }
   clientFile.addExportDeclaration({
     isTypeOnly: true,
-    namedExports: [`${classicalClientName}OptionalParams`],
-    moduleSpecifier: `./api/${normalizeName(modularClientName, NameType.File)}Context.js`,
+    namedExports: typeExports,
+    moduleSpecifier: contextModuleSpecifier,
   });
 
   const clientClass = clientFile.addClass({

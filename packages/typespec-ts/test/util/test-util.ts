@@ -50,7 +50,7 @@ const __dirname = getDirectoryPath(fileURLToPath(import.meta.url));
  * base so the libraries resolve from this package's dependencies.
  */
 const sharedTester = createTester(resolvePath(__dirname, "..", ".."), {
-  features: ["union-extends"],
+  features: ["typeref", "union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -121,7 +121,7 @@ const SSE_USAGE = /\bSSEStream\b|@events\b|@terminalEvent\b|\bSSE\b|\bEvents\./;
  * caught by the snapshot oracle.
  */
 const AZURE_CORE_USAGE =
-  /\bAzure\.Core\b|@(pollingOperation|finalLocation|lroStatus|pollingLocation|operationLink|pagedResult|items|nextLink|useFinalStateVia|resourceOperation)\b|\b(ResourceOperations|StandardResourceOperations|ResourceCreateOrUpdate|ResourceCreateOrReplace|ResourceCreateWithServiceProvidedName|ResourceRead|ResourceDelete|ResourceList|ResourceCollectionOperations|ResourceOperationsBase|RpcOperation|LongRunningRpcOperation|TrackedResource|ProxyResource|ExtensionResource|SingletonResourceOperations)\b/;
+  /\bAzure\.Core\b|@(azureServiceConfigurations|pollingOperation|finalLocation|lroStatus|pollingLocation|operationLink|pagedResult|items|nextLink|useFinalStateVia|resourceOperation)\b|\b(AzureServiceConfiguration|ResourceOperations|StandardResourceOperations|ResourceCreateOrUpdate|ResourceCreateOrReplace|ResourceCreateWithServiceProvidedName|ResourceRead|ResourceDelete|ResourceList|ResourceCollectionOperations|ResourceOperationsBase|RpcOperation|LongRunningRpcOperation|TrackedResource|ProxyResource|ExtensionResource|SingletonResourceOperations)\b/;
 const ARM_USAGE =
   /\bAzure\.ResourceManager\b|@(armResourceOperations|armResourceCreateOrUpdate|armResourceRead|armResourceDelete|armResourceList|armResourceAction|armResourceCollectionAction|tenantResource|subscriptionResource|locationResource|resourceGroupResource|armProviderNamespace|armProviderNameValue|armResourceIdentifier|armCommonTypesVersion|useLibraryNamespace|identifiers|singleton)\b/;
 const TCGC_USAGE =
