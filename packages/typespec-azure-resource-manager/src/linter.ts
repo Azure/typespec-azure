@@ -44,6 +44,7 @@ import { noResourceNameConflictRule } from "./rules/no-resource-name-conflict.js
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
+import { noUnsafePatchBodyPropertiesRule } from "./rules/no-unsafe-patch-body-properties.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
@@ -113,6 +114,7 @@ const rules = [
   noQueryInPostRule,
   noRepeatedPathInfoRule,
   operationsInterfaceMissingRule,
+  noUnsafePatchBodyPropertiesRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   privateEndpointApisMissingRule,
