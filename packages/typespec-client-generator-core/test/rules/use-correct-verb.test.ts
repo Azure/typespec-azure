@@ -9,19 +9,16 @@ const cases = [
     verb: "put",
     prefix: "create",
     invalid: "replace",
-    template: "ArmResourceCreateOrReplaceAsync<Widget>",
   },
   {
     verb: "patch",
     prefix: "update",
     invalid: "modify",
-    template: "ArmResourcePatchSync<Widget, Properties = WidgetProperties>",
   },
   {
     verb: "delete",
     prefix: "delete",
     invalid: "remove",
-    template: "ArmResourceDeleteSync<Widget>",
   },
 ] as const;
 
@@ -236,31 +233,59 @@ describe("standard ARM operations", () => {
   `;
   beforeEach(async () => {
     tester = createLinterRuleTester(
-      await ArmTester.createInstance(),
+      await ArmTester.wrap(
+        (code) => `${resource} @armResourceOperations interface Widgets { ${code} }`,
+      ).createInstance(),
       useCorrectVerbRule,
       "@azure-tools/typespec-client-generator-core",
     );
   });
-  it("checks aliases of standard templates and honors common overrides", async () => {
-    const [put, patch, del] = cases;
-    const gadget = (template: string) => template.replace("<Widget", "<Gadget");
+  it("reports invalid aliases", async () => {
     await tester
       .expect(
-        `${resource}
-        @armResourceOperations interface Widgets {
-          ${put.invalid} is ${put.template};
-          ${patch.invalid} is ${patch.template};
-          ${del.invalid} is ${del.template};
-        }
-        @armResourceOperations interface Gadgets {
-          @clientName("${put.prefix}Gadget") ${put.invalid}Gadget is ${gadget(put.template)};
-          @clientName("${patch.invalid}Gadget") ${patch.prefix}Gadget is ${gadget(patch.template)};
-          ${del.prefix}Gadget is ${gadget(del.template)};
-        }`,
+        `
+        replace is ArmResourceCreateOrReplaceAsync<Widget>;
+        modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+        remove is ArmResourceDeleteSync<Widget>;
+      `,
       )
-      .toEmitDiagnostics([
-        ...cases.map(({ verb, prefix, invalid }) => diagnostic(verb, prefix, invalid)),
-        diagnostic(patch.verb, patch.prefix, `${patch.invalid}Gadget`, `${patch.prefix}Gadget`),
-      ]);
+      .toEmitDiagnostics(
+        cases.map(({ verb, prefix, invalid }) => diagnostic(verb, prefix, invalid)),
+      );
+  });
+  it("accepts valid aliases", async () => {
+    await tester
+      .expect(
+        `
+        create is ArmResourceCreateOrReplaceAsync<Widget>;
+        update is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+      `,
+      )
+      .toBeValid();
+  });
+  it("honors common names on aliases", async () => {
+    await tester
+      .expect(
+        `
+        @clientName("createWidget") replace is ArmResourceCreateOrReplaceAsync<Widget>;
+        @clientName("updateWidget") modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+        @clientName("deleteWidget") remove is ArmResourceDeleteSync<Widget>;
+      `,
+      )
+      .toBeValid();
+  });
+  it("targets authored aliases for invalid common names", async () => {
+    await tester
+      .expect(
+        `
+        @clientName("replace") create is ArmResourceCreateOrReplaceAsync<Widget>;
+        @clientName("modify") update is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+        @clientName("remove") delete is ArmResourceDeleteSync<Widget>;
+      `,
+      )
+      .toEmitDiagnostics(
+        cases.map(({ verb, prefix, invalid }) => diagnostic(verb, prefix, invalid, prefix)),
+      );
   });
 });
