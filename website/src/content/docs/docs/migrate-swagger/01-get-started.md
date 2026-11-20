@@ -94,9 +94,9 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
 
 #### Prioritize semantic equivalence over textual parity
 
-Preserve the API's functional contract and existing SDK compatibility rather than reproducing every detail of the legacy Swagger output. Prefer supported native TypeSpec and Azure library constructs where available, including for paging and long-running operations. Avoid workarounds solely to reproduce historical output when differences are confirmed not to affect API behavior, SDK compatibility, or relevant tooling.
+Preserve the API's functional contract and existing SDK compatibility where applicable rather than reproducing every detail of the legacy Swagger output. Where supported native TypeSpec and Azure library constructs are available, prefer them to model paging and long-running operations, and let the emitter generate the corresponding OpenAPI metadata. Avoid workarounds solely to reproduce historical output when differences are confirmed not to affect API behavior, SDK compatibility, or relevant tooling.
 
-Validate actual SDK changes, and do not relax compatibility requirements based on plans for future SDK generation.
+Validate actual SDK changes to confirm compatibility with existing SDK consumers, where applicable.
 
 Once the TypeSpec-generated OpenAPI achieves functional equivalence with the original OpenAPI at the API level, add SDK emitter configurations to your `tspconfig.yaml` to validate that SDKs can be generated correctly from the TypeSpec.
 
