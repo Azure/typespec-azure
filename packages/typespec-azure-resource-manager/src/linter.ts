@@ -47,6 +47,7 @@ import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
+import { providerNamespacePascalCaseRule } from "./rules/provider-namespace-pascal-case.js";
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -134,6 +135,7 @@ const rules = [
   useScopePathStandardNameRule,
   noResourceNameConflictRule,
   noResourceDuplicatesRule,
+  providerNamespacePascalCaseRule,
   requireErrorDecoratorRule,
 ];
 
