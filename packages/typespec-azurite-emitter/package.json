@@ -1,0 +1,75 @@
+{
+  "name": "@azure-tools/typespec-azurite-emitter",
+  "version": "0.1.0",
+  "description": "TypeSpec emitter generating Azurite server artifacts (models, route metadata, serialization helpers, handler interfaces).",
+  "type": "module",
+  "license": "MIT",
+  "author": "Microsoft Corporation",
+  "keywords": [
+    "typespec",
+    "emitter",
+    "azurite"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "tspMain": "lib/main.tsp",
+  "files": [
+    "lib/**",
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "exports": {
+    ".": {
+      "typespec": "./lib/main.tsp",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm gen-extern-signature && alloy build",
+    "watch": "alloy build --watch",
+    "clean": "rimraf ./dist ./temp",
+    "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test:ui": "vitest --ui",
+    "test:ci": "vitest run --coverage  --reporter=junit --reporter=default"
+  },
+  "dependencies": {
+    "@alloy-js/core": "catalog:",
+    "@alloy-js/typescript": "catalog:",
+    "@typespec/emitter-framework": "workspace:^"
+  },
+  "peerDependencies": {
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/xml": "workspace:^"
+  },
+  "devDependencies": {
+    "@alloy-js/cli": "catalog:",
+    "@alloy-js/rollup-plugin": "catalog:",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@types/node": "catalog:",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/xml": "workspace:^",
+    "@typespec/tspd": "workspace:^",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
