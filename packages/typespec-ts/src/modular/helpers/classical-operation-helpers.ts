@@ -15,7 +15,7 @@ import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { getClientModuleInfo } from "../../utils/client-utils.js";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName, normalizeSdkName } from "../../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName, type SdkName } from "../../utils/name-utils.js";
 import type { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
 import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
@@ -52,7 +52,7 @@ export function getClassicalOperation(
   dpgContext: SdkContext,
   clientMap: [string[], SdkClientType<SdkServiceOperation>],
   classicFile: SourceFile,
-  operationGroup: [string[], ServiceOperation[]],
+  operationGroup: [SdkName[], ServiceOperation[]],
   layer: number = operationGroup[0].length - 1,
 ) {
   const prefixes = operationGroup[0];
@@ -108,8 +108,8 @@ export function getClassicalOperation(
     .filter((i) => i.getName() === interfaceName)[0];
   const properties: OptionalKind<PropertySignatureStructure>[] = [];
   if (layer !== prefixes.length - 1) {
-    const name = normalizeName(
-      (layer === prefixes.length - 1 ? prefixes[layer] : prefixes[layer + 1]) ?? "",
+    const name = normalizeSdkName(
+      (layer === prefixes.length - 1 ? prefixes[layer] : prefixes[layer + 1]) ?? { name: "" },
       NameType.Property,
     );
     if (
@@ -312,14 +312,14 @@ export function getClassicalOperation(
     if (returnStatement) {
       let statement: string | undefined = undefined;
       if (layer !== prefixes.length - 1) {
-        const name = normalizeName(prefixes[layer + 1] ?? "FIXME", NameType.Property);
+        const name = normalizeSdkName(prefixes[layer + 1] ?? { name: "FIXME" }, NameType.Property);
 
         // HACK: check if the statement includes a group of this name already to prevent an operation group appearing multiple times
         // TODO: would be good to refactor so that we have an intermediate data structure before generating the return statement
         if (!returnStatement.includes(`${name}:`)) {
           statement = `,
-          ${normalizeName(
-            prefixes[layer + 1] ?? "FIXME",
+          ${normalizeSdkName(
+            prefixes[layer + 1] ?? { name: "FIXME" },
             NameType.Property,
           )}: ${resolveReference(refkey(client, nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)}`;
         }
@@ -348,8 +348,8 @@ export function getClassicalOperation(
       statements:
         layer !== prefixes.length - 1
           ? `return {
-            ${normalizeName(
-              prefixes[layer + 1] ?? "FIXME",
+            ${normalizeSdkName(
+              prefixes[layer + 1] ?? { name: "FIXME" },
               NameType.Property,
             )}: ${resolveReference(refkey(client, nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)
       }`

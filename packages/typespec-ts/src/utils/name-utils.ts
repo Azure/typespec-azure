@@ -170,7 +170,6 @@ export function normalizeName(
   shouldGuard?: boolean,
   customReservedNames?: ReservedName[],
   casingOverride?: CasingConvention,
-  oriName?: string,
 ): string;
 export function normalizeName(
   name: string,
@@ -183,7 +182,6 @@ export function normalizeName(
   optionsOrShouldGuard?: NormalizeNameOption | boolean,
   optionalCustomReservedNames?: ReservedName[],
   optionalCasingOverride?: CasingConvention,
-  oriName?: string,
 ): string {
   let shouldGuard: boolean | undefined,
     customReservedNames: ReservedName[],
@@ -198,9 +196,6 @@ export function normalizeName(
     customReservedNames = optionsOrShouldGuard?.customReservedNames ?? [];
     casingOverride = optionsOrShouldGuard?.casingOverride;
     numberPrefixOverride = optionsOrShouldGuard?.numberPrefixOverride;
-  }
-  if ((oriName ?? name).startsWith("$DO_NOT_NORMALIZE$")) {
-    return (oriName ?? name).replace("$DO_NOT_NORMALIZE$", "");
   }
   const casingConvention = casingOverride ?? getCasingConvention(nameType);
   const parts = deconstruct(name);

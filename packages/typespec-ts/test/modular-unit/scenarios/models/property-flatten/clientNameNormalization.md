@@ -3,7 +3,7 @@
 Should keep the property names passed to `areAllPropsUndefined` consistent with the
 client-side (normalized) property names. When `@clientName` renames a property,
 the generated interface uses the normalized name (e.g. `Publisher` -> `publisher`),
-while `$DO_NOT_NORMALIZE$` keeps the name as-is (e.g. `Product`). The
+while `@clientName(exact(...))` keeps the name as-is (e.g. `Product`). The
 `areAllPropsUndefined` check must reference the same normalized names so that the
 undefined check works correctly.
 
@@ -27,7 +27,8 @@ model DataProduct {
 op foo(body: DataProduct): DataProduct;
 
 @@clientName(DataProductProperties.publisher, "Publisher");
-@@clientName(DataProductProperties.product, "$DO_NOT_NORMALIZE$Product");
+#suppress "experimental-feature" "exact name test"
+@@clientName(DataProductProperties.product, exact("Product"));
 ```
 
 Enable the raw content with TCGC dependency.

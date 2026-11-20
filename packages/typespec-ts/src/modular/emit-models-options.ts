@@ -9,7 +9,7 @@ import type {
 import { useContext } from "../context-manager.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import { NameType, normalizeSdkName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { buildOperationOptions } from "./build-operations.js";
 
@@ -25,14 +25,13 @@ export function buildApiOptions(
   const modelOptionsFiles = [];
   const { subfolder } = getClientModuleInfo(clientMap);
   const methodMap = getMethodHierarchiesMap(context, client);
-  for (const [prefixKey, operations] of methodMap) {
-    const prefixes = prefixKey.split("/");
+  for (const [prefixes, operations] of methodMap) {
     const modelOptionsFile = project.createSourceFile(
       joinPaths(
         emitterOptions.modularOptions.sourceRoot,
         subfolder ?? "",
         `api`,
-        ...prefixes.map((p) => normalizeName(p, NameType.File)),
+        ...prefixes.map((p) => normalizeSdkName(p, NameType.File)),
         "options.ts",
       ),
       undefined,
