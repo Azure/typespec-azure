@@ -32,6 +32,8 @@ export class TypeAdapter {
   // lazily built index of how each tcgc union type is used across the tcgc code model
   private unionUsage?: Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>;
 
+  // types reachable from LRO status-monitor models that the generated pollers read
+  private lroStatusTypes = new Set<tcgc.SdkType>();
   private readonly unionInterfaces = new Map<tcgc.SdkUnionType, go.Interface>();
 
   constructor(ctx: tcgc.SdkContext, codeModel: go.CodeModel) {
@@ -95,13 +97,15 @@ export class TypeAdapter {
    */
   adaptTypes() {
     const queryOnlyModels = this.getQueryOnlyModels();
+    this.lroStatusTypes = this.getLroStatusTypes();
     for (const enumType of this.ctx.sdkPackage.enums) {
       if ((enumType.usage & tcgc.UsageFlags.ApiVersionEnum) !== 0) {
         // skip enums that are used for API version
         continue;
       } else if (
         (enumType.usage & tcgc.UsageFlags.Input) === 0 &&
-        (enumType.usage & tcgc.UsageFlags.Output) === 0
+        (enumType.usage & tcgc.UsageFlags.Output) === 0 &&
+        !this.lroStatusTypes.has(enumType)
       ) {
         // skip types without input and output usage
         continue;
@@ -140,7 +144,8 @@ export class TypeAdapter {
         continue;
       } else if (
         (modelType.usage & tcgc.UsageFlags.Input) === 0 &&
-        (modelType.usage & tcgc.UsageFlags.Output) === 0
+        (modelType.usage & tcgc.UsageFlags.Output) === 0 &&
+        !this.lroStatusTypes.has(modelType)
       ) {
         // skip types without input and output usage
         continue;
@@ -188,36 +193,6 @@ export class TypeAdapter {
     const queryModels = new Set<tcgc.SdkModelType>();
     const payloadTypes = new Set<tcgc.SdkType>();
     const bodyTypes = new Set<tcgc.SdkType>();
-    const visitType = (type: tcgc.SdkType, types: Set<tcgc.SdkType>): void => {
-      if (types.has(type)) {
-        return;
-      }
-      types.add(type);
-      switch (type.kind) {
-        case "array":
-        case "dict":
-          visitType(type.valueType, types);
-          break;
-        case "nullable":
-          visitType(type.type, types);
-          break;
-        case "union":
-          type.variantTypes.forEach((variant) => visitType(variant, types));
-          break;
-        case "model":
-          type.properties.forEach((prop) => visitType(prop.type, types));
-          if (type.baseModel) {
-            visitType(type.baseModel, types);
-          }
-          if (type.additionalProperties) {
-            visitType(type.additionalProperties, types);
-          }
-          Object.values(type.discriminatedSubtypes ?? {}).forEach((subtype) =>
-            visitType(subtype, types),
-          );
-          break;
-      }
-    };
     const visitClient = (client: tcgc.SdkClientType<tcgc.SdkHttpOperation>): void => {
       for (const method of client.methods) {
         for (const param of method.operation.parameters) {
@@ -259,6 +234,31 @@ export class TypeAdapter {
         (model) => queryTypes.has(model) && !payloadTypes.has(model) && !bodyTypes.has(model),
       ),
     );
+  }
+
+  /**
+   * Finds the types reachable from LRO status-monitor models that the generated
+   * pollers unmarshal to read status metadata or operation IDs.
+   */
+  private getLroStatusTypes(): Set<tcgc.SdkType> {
+    const types = new Set<tcgc.SdkType>();
+    if (!this.ctx.emitContext.options["lro-metadata-pollers"]) {
+      return types;
+    }
+    const visitClient = (client: tcgc.SdkClientType<tcgc.SdkHttpOperation>): void => {
+      for (const method of client.methods) {
+        if (method.kind !== "lro" && method.kind !== "lropaging") {
+          continue;
+        }
+        const statusModel = getLroStatusModel(method);
+        if (statusModel) {
+          visitType(statusModel, types);
+        }
+      }
+      client.children?.forEach(visitClient);
+    };
+    this.ctx.sdkPackage.clients.forEach(visitClient);
+    return types;
   }
 
   // returns the synthesized paged response types
@@ -1009,7 +1009,10 @@ export class TypeAdapter {
       return <go.Model | go.PolymorphicModel>modelType;
     }
 
-    const usage = getUsageFlags(model.usage);
+    let usage = getUsageFlags(model.usage);
+    if (this.lroStatusTypes.has(model)) {
+      usage |= go.UsageFlags.Output;
+    }
 
     let omitSerde = false;
     const omitValue = helpers.getClientOption<string>("omitSerdeMethods", model, this.ctx.program);
@@ -1818,6 +1821,58 @@ export class TypeAdapter {
 
     this.unionUsage = index;
     return index;
+  }
+}
+
+export function getLroStatusModel(
+  method:
+    | tcgc.SdkLroPagingServiceMethod<tcgc.SdkHttpOperation>
+    | tcgc.SdkLroServiceMethod<tcgc.SdkHttpOperation>,
+): tcgc.SdkModelType | undefined {
+  const metadata = method.lroMetadata;
+  if (
+    !metadata.statusMetadata?.length &&
+    !metadata.operationId?.some((id) => id.kind === "property")
+  ) {
+    return undefined;
+  }
+  return metadata.pollingStep.responseBody ?? metadata.pollingInfo.responseModel;
+}
+
+/**
+ * adds the specified type and all types reachable from it to types.
+ *
+ * @param type the type from which to start
+ * @param types the set of visited types
+ */
+function visitType(type: tcgc.SdkType, types: Set<tcgc.SdkType>): void {
+  if (types.has(type)) {
+    return;
+  }
+  types.add(type);
+  switch (type.kind) {
+    case "array":
+    case "dict":
+      visitType(type.valueType, types);
+      break;
+    case "nullable":
+      visitType(type.type, types);
+      break;
+    case "union":
+      type.variantTypes.forEach((variant) => visitType(variant, types));
+      break;
+    case "model":
+      type.properties.forEach((prop) => visitType(prop.type, types));
+      if (type.baseModel) {
+        visitType(type.baseModel, types);
+      }
+      if (type.additionalProperties) {
+        visitType(type.additionalProperties, types);
+      }
+      Object.values(type.discriminatedSubtypes ?? {}).forEach((subtype) =>
+        visitType(subtype, types),
+      );
+      break;
   }
 }
 
