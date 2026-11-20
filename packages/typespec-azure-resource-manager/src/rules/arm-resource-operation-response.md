@@ -16,6 +16,8 @@ This rule corresponds to the LintDiff rule [PutGetPatchResponseSchema](https://g
 
 ## ❌ Incorrect
 
+### Individual resource response
+
 ```tsp
 @armResourceOperations
 interface FooResources {
@@ -26,7 +28,28 @@ interface FooResources {
 }
 ```
 
+### Collection response
+
+```tsp
+model FooSummary {
+  name: string;
+}
+
+@armResourceOperations
+interface FooResources {
+  read is ArmResourceRead<FooResource>;
+  list is ArmListBySubscription<
+    FooResource,
+    Response = ArmResponse<{
+      value: FooSummary[];
+    }>
+  >;
+}
+```
+
 ## ✅ Correct
+
+### Individual resource response
 
 ```tsp
 @armResourceOperations
@@ -34,6 +57,16 @@ interface FooResources {
   @get
   @armResourceRead(FooResource)
   get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
+}
+```
+
+### Collection response
+
+```tsp
+@armResourceOperations
+interface FooResources {
+  read is ArmResourceRead<FooResource>;
+  list is ArmListBySubscription<FooResource>;
 }
 ```
 
