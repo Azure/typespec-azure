@@ -91,6 +91,8 @@ export async function _stopTestDeserialize(result: PathUncheckedResponse): Promi
 
   return;
 }
+
+/** Performs the stopTest operation. */
 export async function stopTest(
   context: Client,
   body: {
@@ -162,6 +164,8 @@ export async function _stopOptionalWrapperTestDeserialize(
 
   return;
 }
+
+/** Performs the stopOptionalWrapperTest operation. */
 export async function stopOptionalWrapperTest(
   context: Client,
   options: StopOptionalWrapperTestOptionalParams = { requestOptions: {} },
@@ -233,6 +237,8 @@ export async function _stopOptionalPropTestDeserialize(
 
   return;
 }
+
+/** Performs the stopOptionalPropTest operation. */
 export async function stopOptionalPropTest(
   context: Client,
   body: {
@@ -304,6 +310,8 @@ export async function _stopBothOptionalTestDeserialize(
 
   return;
 }
+
+/** Performs the stopBothOptionalTest operation. */
 export async function stopBothOptionalTest(
   context: Client,
   options: StopBothOptionalTestOptionalParams = { requestOptions: {} },

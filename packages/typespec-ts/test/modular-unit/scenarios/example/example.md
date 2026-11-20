@@ -130,6 +130,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<E
 
   return exampleDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   id: string,
