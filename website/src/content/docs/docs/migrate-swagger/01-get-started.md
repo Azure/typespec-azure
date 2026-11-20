@@ -92,6 +92,12 @@ You will need to compare the OpenAPI file generated from TypeSpec with the origi
   3. **Detail differences** within paths and definitions last
      :::
 
+#### Prioritize semantic equivalence over textual parity
+
+Preserve the API's functional contract and existing SDK compatibility rather than reproducing every detail of the legacy Swagger output. Prefer supported native TypeSpec and Azure library constructs where available, including for paging and long-running operations. Avoid workarounds solely to reproduce historical output when differences are confirmed not to affect API behavior, SDK compatibility, or relevant tooling.
+
+Validate actual SDK changes, and do not relax compatibility requirements based on plans for future SDK generation.
+
 Once the TypeSpec-generated OpenAPI achieves functional equivalence with the original OpenAPI at the API level, add SDK emitter configurations to your `tspconfig.yaml` to validate that SDKs can be generated correctly from the TypeSpec.
 
 Refer to the example at [`specification/widget/resource-manager/Microsoft.Widget/Widget/tspconfig.yaml`](https://github.com/Azure/azure-rest-api-specs/blob/main/specification/widget/resource-manager/Microsoft.Widget/Widget/tspconfig.yaml) in `azure-rest-api-specs` for the language-specific emitter options to add.
