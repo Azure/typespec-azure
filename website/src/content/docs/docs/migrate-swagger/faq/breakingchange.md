@@ -193,3 +193,9 @@ You can generally choose an asynchronous operation template that matches your op
 ### Visibility Changes for `nextLink` and `value` Properties
 
 For the `nextLink` and `value` properties of pageable operation response model, some older specifications marked these values as `readOnly`. This has no impact on the API or on SDKs, you can safely ignore this difference in the spec, and any resulting breaking change violation.
+
+### Required `value` in Pageable Responses
+
+When migrating an ARM Swagger specification, assess a change that makes `value` required by checking actual service responses and the API contract. If the service always returns `value`, the required declaration may more accurately describe existing behavior. If valid responses can omit `value`, the required declaration does not match the service behavior and needs correction.
+
+Assess generated SDK compatibility separately. The service always returning `value` is not, by itself, sufficient to conclude that the change is non-breaking or to automatically ignore breaking change validation failures.
