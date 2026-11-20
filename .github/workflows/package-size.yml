@@ -59,23 +59,28 @@ jobs:
 
       # --- Measure the base branch ---
       - name: Checkout base
-        run: |
-          git checkout ${{ github.event.pull_request.base.sha }}
-          git submodule update --init --recursive
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          submodules: recursive
+          path: temp/package-size-base
 
-      # The measure/compare scripts are added by this PR, so restore them from the PR
-      # head after checking out the (possibly script-less) base commit.
+      # Use the head's size scripts even when the base predates them.
       - name: Restore size scripts from PR head
-        run: git checkout ${{ github.sha }} -- eng/scripts/bundle-size
+        run: cp -R eng/scripts/bundle-size temp/package-size-base/eng/scripts/
 
       - name: Install dependencies (base)
         run: pnpm install
+        working-directory: temp/package-size-base
 
       - name: Build (base)
         run: pnpm run-all build
+        working-directory: temp/package-size-base
 
       - name: Measure base sizes
-        run: node eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/base.json
+        run: node eng/scripts/bundle-size/measure.ts --out "$GITHUB_WORKSPACE/temp/bundle-size/base.json"
+        working-directory: temp/package-size-base
 
       # --- Compare and prepare the comment payload ---
       - name: Compare sizes
