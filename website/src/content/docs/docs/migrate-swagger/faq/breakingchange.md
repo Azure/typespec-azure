@@ -196,6 +196,6 @@ For the `nextLink` and `value` properties of pageable operation response model, 
 
 ### Required `value` in Pageable Responses
 
-When migrating an ARM Swagger specification, assess a change that makes `value` required by checking actual service responses and the API contract. If the service always returns `value`, the required declaration may more accurately describe existing behavior. If valid responses can omit `value`, the required declaration does not match the service behavior and needs correction.
+When migrating an ARM specification from Swagger to TypeSpec, assess a change that makes `value` required by checking actual service responses and the API contract. If the service always returns `value`, the required declaration may more accurately describe existing behavior. If valid responses can omit `value`, the required declaration does not match the service behavior and needs correction.
 
 Assess generated SDK compatibility separately. The service always returning `value` is not, by itself, sufficient to conclude that the change is non-breaking or to automatically ignore breaking change validation failures.
