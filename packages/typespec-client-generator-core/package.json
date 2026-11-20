@@ -57,6 +57,7 @@
   "dependencies": {
     "@azure-tools/typespec-azure-examples": "workspace:^",
     "change-case": "catalog:",
+    "compromise": "^14.19.0",
     "pluralize": "catalog:",
     "yaml": "catalog:"
   },
