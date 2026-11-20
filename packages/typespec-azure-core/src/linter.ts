@@ -17,6 +17,7 @@ import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource
 import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noHeaderExplodeRule } from "./rules/no-header-explode.js";
 import { noLegacyUsage } from "./rules/no-legacy-usage.js";
+import { noLocalizedDocLinksRule } from "./rules/no-localized-doc-links.js";
 import { noMultipleDiscriminatorRule } from "./rules/no-multiple-discriminator.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
@@ -72,6 +73,7 @@ const rules = [
   noOpenAPIRule,
   noUnnamedTypesRule,
   noHeaderExplodeRule,
+  noLocalizedDocLinksRule,
   noRedundantSummaryRule,
   noRequestBodyRule,
   preventFormatRule,
