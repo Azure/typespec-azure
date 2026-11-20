@@ -30,10 +30,11 @@ export function buildRootIndex(
   emitterOptions: ModularEmitterOptions,
   rootIndexFile: SourceFile,
   clientMap?: [string[], SdkClientType<SdkServiceOperation>],
+  exactNames: Set<string> = new Set(),
 ) {
   beginSourceFileBatch();
   try {
-    buildRootIndexImpl(context, emitterOptions, rootIndexFile, clientMap);
+    buildRootIndexImpl(context, emitterOptions, rootIndexFile, clientMap, exactNames);
   } finally {
     flushSourceFileBatch();
   }
@@ -44,10 +45,11 @@ function buildRootIndexImpl(
   emitterOptions: ModularEmitterOptions,
   rootIndexFile: SourceFile,
   clientMap?: [string[], SdkClientType<SdkServiceOperation>],
+  exactNames: Set<string> = new Set(),
 ) {
   if (!clientMap) {
     // we still need to export the models if no client is provided
-    exportModels(emitterOptions, rootIndexFile);
+    exportModels(emitterOptions, rootIndexFile, "", exactNames);
     exportRestErrorTypes(rootIndexFile);
     return;
   }
@@ -77,7 +79,7 @@ function buildRootIndexImpl(
   exportClassicalClient(client, rootIndexFile, subfolder ?? "");
   exportSimplePollerLike(context, clientMap, rootIndexFile, project, srcPath, subfolder);
   exportRestoreHelpers(rootIndexFile, project, srcPath, clientName, subfolder, true);
-  exportModels(emitterOptions, rootIndexFile, clientName);
+  exportModels(emitterOptions, rootIndexFile, clientName, exactNames);
   exportModules(rootIndexFile, project, srcPath, clientName, "api", {
     subfolder,
     interfaceOnly: true,
@@ -98,6 +100,7 @@ function exportModels(
   emitterOptions: ModularEmitterOptions,
   rootIndexFile: SourceFile,
   clientName: string = "",
+  exactNames?: Set<string>,
 ) {
   // export models index file if not exists
   const project = useContext("outputProject");
@@ -109,6 +112,7 @@ function exportModels(
     exportModules(rootIndexFile, project, srcPath, clientName, "models", {
       isTopLevel: true,
       recursive: true,
+      exactNames,
     });
   }
 }
@@ -293,6 +297,7 @@ export interface ExportModulesOptions {
   isTopLevel?: boolean;
   subfolder?: string;
   recursive?: boolean;
+  exactNames?: Set<string>;
 }
 
 function exportModules(
@@ -349,7 +354,7 @@ function exportModules(
     const serializerOrDeserializerRegex = /.*(Serializer|Deserializer)(_\d+)?$/;
     const filteredEntries = [...modelsFile.getExportedDeclarations().entries()].filter(
       (exDeclaration) => {
-        if (exDeclaration[0].startsWith("_")) {
+        if (exDeclaration[0].startsWith("_") && !options.exactNames?.has(exDeclaration[0])) {
           return false;
         }
         return exDeclaration[1].some((ex) => {

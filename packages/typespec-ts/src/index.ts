@@ -85,7 +85,7 @@ import { buildRestorePoller } from "./modular/build-restore-poller.js";
 import { buildSubpathIndexFile } from "./modular/build-subpath-index.js";
 import { emitLoggerFile } from "./modular/emit-logger-file.js";
 import { buildApiOptions } from "./modular/emit-models-options.js";
-import { emitNonModelResponseTypes, emitTypes } from "./modular/emit-models.js";
+import { emitNonModelResponseTypes, emitTypes, getExactModelNames } from "./modular/emit-models.js";
 import { emitSamples } from "./modular/emit-samples.js";
 import { emitTests } from "./modular/emit-tests.js";
 import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
@@ -281,13 +281,15 @@ export async function $onEmit(context: EmitContext) {
 
     emitTypes(dpgContext, { sourceRoot: sourcesRoot });
     emitNonModelResponseTypes(dpgContext, { sourceRoot: sourcesRoot });
+    const exactModelNames = getExactModelNames(dpgContext);
     buildSubpathIndexFile(modularEmitterOptions, "models", undefined, {
       recursive: true,
+      exactNames: exactModelNames,
     });
     const clientMap = getClientHierarchyMap(dpgContext);
     if (clientMap.length === 0) {
       // If no clients, we still need to build the root index file
-      buildRootIndex(dpgContext, modularEmitterOptions, rootIndexFile);
+      buildRootIndex(dpgContext, modularEmitterOptions, rootIndexFile, undefined, exactModelNames);
     }
     for (const subClient of clientMap) {
       await renameClientName(subClient[1], modularEmitterOptions);
@@ -318,7 +320,7 @@ export async function $onEmit(context: EmitContext) {
       if (subfolder) {
         buildSubClientIndexFile(dpgContext, subClient, modularEmitterOptions);
       }
-      buildRootIndex(dpgContext, modularEmitterOptions, rootIndexFile, subClient);
+      buildRootIndex(dpgContext, modularEmitterOptions, rootIndexFile, subClient, exactModelNames);
     }
     // Sample generation is enabled only when the modular generator actually emits
     // samples. Reset the baseline here, then re-enable it below if any are emitted.

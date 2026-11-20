@@ -6,6 +6,7 @@ name normalization.
 ## TypeSpec
 
 ```tsp
+@clientName(exact("_PrefixOriEnum"))
 union OriginalEnum {
   string,
 
@@ -116,7 +117,7 @@ export interface my_model {
   "property-name": string;
   "123": string;
   'property"name': string;
-  originalEnum: OriginalEnum;
+  originalEnum: _PrefixOriEnum;
 }
 ```
 
@@ -127,9 +128,9 @@ export interface Date {
 }
 ```
 
-```ts models enum KnownOriginalEnum
-/** Known values of {@link OriginalEnum} that the service accepts. */
-export enum KnownOriginalEnum {
+```ts models enum Known_PrefixOriEnum
+/** Known values of {@link _PrefixOriEnum} that the service accepts. */
+export enum Known_PrefixOriEnum {
   /** original */
   enum_value = "original",
   /** punctuated */
@@ -624,5 +625,54 @@ enableModelNamespace: true
 /** model interface Modelsmy_model */
 export interface Modelsmy_model {
   value: string;
+}
+```
+
+# Exact name for an alternate heterogeneous union
+
+## TypeSpec
+
+```tsp
+model ToolFilter {
+  toolNames: string[];
+}
+
+namespace JavaScriptToolCompatibility {
+  #suppress "experimental-feature" "exact name test"
+  @clientName(exact("_MCPToolAllowedTools"), "javascript")
+  union MCPToolAllowedTools {
+    string[],
+    ToolFilter,
+  }
+}
+
+model Tool {
+  allowedTools: string[] | ToolFilter;
+}
+
+@@alternateType(Tool.allowedTools, JavaScriptToolCompatibility.MCPToolAllowedTools, "javascript");
+
+@route("/tool")
+@post
+op useTool(@body body: Tool): Tool;
+```
+
+```yaml
+needTCGC: true
+```
+
+## Union alias
+
+```ts models alias _MCPToolAllowedTools
+/** Alias for _MCPToolAllowedTools */
+export type _MCPToolAllowedTools = string[] | ToolFilter;
+```
+
+## Model using the union
+
+```ts models interface Tool
+/** model interface Tool */
+export interface Tool {
+  allowedTools: _MCPToolAllowedTools;
 }
 ```
