@@ -21,6 +21,7 @@ import { buildClassicOperationFiles } from "../../src/modular/build-classical-op
 import { buildClientContext } from "../../src/modular/build-client-context.js";
 import { transformModularEmitterOptions } from "../../src/modular/build-modular-options.js";
 import { buildOperationFiles } from "../../src/modular/build-operations.js";
+import { buildRestorePoller } from "../../src/modular/build-restore-poller.js";
 import { buildRootIndex } from "../../src/modular/build-root-index.js";
 import { buildSubpathIndexFile } from "../../src/modular/build-subpath-index.js";
 import { emitSamples } from "../../src/modular/emit-samples.js";
@@ -233,6 +234,9 @@ export async function emitModularOperationsFromTypeSpec(
     const clientMap = Array.from(getClientHierarchyMap(dpgContext));
     const res = buildOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
     buildApiOptions(dpgContext, clientMap[0]!, modularEmitterOptions);
+    if (options["withRestorePoller"]) {
+      buildRestorePoller(dpgContext, clientMap[0]!, modularEmitterOptions);
+    }
     if (options.mustEmptyDiagnostic && dpgContext.program.diagnostics.length > 0) {
       throw dpgContext.program.diagnostics;
     }
@@ -302,6 +306,7 @@ export async function emitModularClientFromTypeSpec(
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
   dpgContext.emitterOptions!.typespecTitleMap = options["typespec-title-map"];
   dpgContext.emitterOptions!.hierarchyClient = options["hierarchy-client"] ?? true;
+  dpgContext.emitterOptions!.compatibilityLro = options["compatibility-lro"] === true;
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });

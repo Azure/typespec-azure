@@ -186,6 +186,10 @@ Whether to affect the generation of the additional property feature for the Modu
 
 [deprecated] Whether to generate the legacy LRO interface. When `true`, we will generate legacy beginXXX and beginXXXAndWait LRO methods.
 
+### LRO operation metadata
+
+For non-paged LROs, `@lroStatusMetadata` and `@lroOperationId` expose live values on the named operation state. These non-enumerable getters are omitted by object spread, JSON serialization, and continuation tokens; restored pollers refresh body metadata on the next poll. Metadata is not currently exposed for LROs with paged results. URI-derived operation IDs support simple path parameters, not reserved (`{+parameter}`) expansions.
+
 ### `experimental-extensible-enums`
 
 **Type:** `boolean`

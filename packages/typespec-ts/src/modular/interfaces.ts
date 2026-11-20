@@ -20,4 +20,6 @@ export interface OperationPathAndDeserDetails {
   expectedStatusesExpression: string;
   deserName: string;
   renamedDeserName?: string;
+  operationMetadataName?: string;
+  renamedOperationMetadataName?: string;
 }

@@ -72,10 +72,10 @@ export interface SimplePollerLike<TState extends OperationState<TResult>, TResul
  * @param poller PollerLike to convert
  * @returns SimplePollerLike
  */
-export function getSimplePoller<TResult>(
-  poller: PollerLike<OperationState<TResult>, TResult>,
-): SimplePollerLike<OperationState<TResult>, TResult> {
-  const simplePoller: SimplePollerLike<OperationState<TResult>, TResult> = {
+export function getSimplePoller<TResult, TState extends OperationState<TResult>>(
+  poller: PollerLike<TState, TResult>,
+): SimplePollerLike<TState, TResult> {
+  const simplePoller: SimplePollerLike<TState, TResult> = {
     isDone() {
       return poller.isDone;
     },
