@@ -16,7 +16,7 @@ let translationWithPathPollCount = 0;
 
 Scenarios.Azure_ClientGenerator_Core_Lro_OperationId_analyze = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/operation-id/documentModels/document-1:analyze",
+    uri: "/azure/client-generator-core/lro/operation-id/documentModels/document-1\\:analyze",
     method: "post",
     request: {
       query: {
@@ -99,7 +99,7 @@ function analyzeLroHandler(req: MockRequest) {
 
 Scenarios.Azure_ClientGenerator_Core_Lro_OperationId_startTranslation = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/operation-id/translations:start",
+    uri: "/azure/client-generator-core/lro/operation-id/translations\\:start",
     method: "post",
     request: {
       query: {
@@ -186,7 +186,7 @@ function translationLroHandler(req: MockRequest) {
 
 Scenarios.Azure_ClientGenerator_Core_Lro_OperationId_startTranslationWithPath = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/operation-id/translations:start-with-path",
+    uri: "/azure/client-generator-core/lro/operation-id/translations\\:start-with-path",
     method: "post",
     request: {
       query: {

@@ -14,7 +14,7 @@ let pollCount = 0;
 
 Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/lro/metadata/analyzers/analyzer-1:analyze",
+    uri: "/azure/client-generator-core/lro/metadata/analyzers/analyzer-1\\:analyze",
     method: "post",
     request: {
       query: {
@@ -130,7 +130,7 @@ Scenarios.Azure_ClientGenerator_Core_Lro_Metadata_analyzeJobWithFailure = create
 
 function createJobScenario(fails: boolean): ScenarioMockApi {
   const jobId = fails ? "job-failure" : "job-success";
-  const operationPath = fails ? "/jobs/failure:analyze" : "/jobs:analyze";
+  const operationPath = fails ? "/jobs/failure\\:analyze" : "/jobs\\:analyze";
   const pollingPath = `/azure/client-generator-core/lro/metadata/jobs/${jobId}`;
   let polls = 0;
   const initial = {
