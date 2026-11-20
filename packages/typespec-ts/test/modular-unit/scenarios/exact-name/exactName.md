@@ -627,3 +627,52 @@ export interface Modelsmy_model {
   value: string;
 }
 ```
+
+# Exact name for an alternate heterogeneous union
+
+## TypeSpec
+
+```tsp
+model ToolFilter {
+  toolNames: string[];
+}
+
+namespace JavaScriptToolCompatibility {
+  #suppress "experimental-feature" "exact name test"
+  @clientName(exact("_MCPToolAllowedTools"), "javascript")
+  union MCPToolAllowedTools {
+    string[],
+    ToolFilter,
+  }
+}
+
+model Tool {
+  allowedTools: string[] | ToolFilter;
+}
+
+@@alternateType(Tool.allowedTools, JavaScriptToolCompatibility.MCPToolAllowedTools, "javascript");
+
+@route("/tool")
+@post
+op useTool(@body body: Tool): Tool;
+```
+
+```yaml
+needTCGC: true
+```
+
+## Union alias
+
+```ts models alias _MCPToolAllowedTools
+/** Alias for _MCPToolAllowedTools */
+export type _MCPToolAllowedTools = string[] | ToolFilter;
+```
+
+## Model using the union
+
+```ts models interface Tool
+/** model interface Tool */
+export interface Tool {
+  allowedTools: _MCPToolAllowedTools;
+}
+```
