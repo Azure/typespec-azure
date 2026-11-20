@@ -1,18 +1,13 @@
 import { Tester } from "#test/tester.js";
-import {
-  type LinterRuleTester,
-  type TesterInstance,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
-
+import { getSourceLocation } from "@typespec/compiler";
+import { type LinterRuleTester, createLinterRuleTester, t } from "@typespec/compiler/testing";
+import { beforeEach, describe, it } from "vitest";
 import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
 
-let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await Tester.createInstance();
+  const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     patchOperationsRule,
@@ -62,11 +57,23 @@ it("Requires PATCH to be a proper subset of resource for model references", asyn
        }
     `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message:
-        "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
-    });
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blahdeeblah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
+      },
+    ]);
 });
 
 it("Requires PATCH to be a proper subset of resource for model spread", async () => {
@@ -114,11 +121,23 @@ it("Requires PATCH to be a proper subset of resource for model spread", async ()
        }
     `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message:
-        "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
-    });
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "The property 'blahdeeblah' in the PATCH body does not correspond to a property in the PUT body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message:
+          "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
+      },
+    ]);
 });
 
 it("emit diagnostic when there is no request body", async () => {
@@ -172,8 +191,816 @@ it("emit diagnostic when there is no request body", async () => {
 
     `,
     )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-      message: "The request body of a PATCH must be a model with a subset of resource properties",
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message: "The PATCH operation must have a request body.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+        message: "The request body of a PATCH must be a model with a subset of resource properties",
+      },
+    ]);
+});
+
+describe("writable input properties", () => {
+  const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-patch";
+
+  describe("standard ARM operations", () => {
+    const models = `
+      @service @armProviderNamespace namespace Contoso.Widgets;
+      model WidgetProperties { displayName?: string; }
+      model Widget is TrackedResource<WidgetProperties> {
+        ...ResourceNameParameter<Widget>;
+      }
+      model WidgetPatchProperties { displayName?: string; /*target*/extra?: string; }
+      model WidgetPatch { tags?: Record<string>; properties?: WidgetPatchProperties; }
+    `;
+    const operations = `
+      @armResourceOperations
+      interface Widgets {
+        createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+      }
+    `;
+    const examples = [models, models.replace("/*target*/extra?: string;", "")];
+
+    it("diagnoses the incorrect ARM template fixture", async () => {
+      await tester.expect(examples[0] + operations).toEmitDiagnostics(({ pos }) => ({
+        ...missingProperty("extra"),
+        pos: pos.target.pos,
+        end: pos.target.pos + "extra?: string".length,
+      }));
     });
+
+    it("accepts the correct ARM template fixture", async () => {
+      await tester.expect(examples[1] + operations).toBeValid();
+    });
+
+    it("checks missing input against an inherited ARM create operation", async () => {
+      await tester
+        .expect(
+          `${models}
+          @armResourceOperations
+          interface Widgets extends ResourceCreateAsync<Widget> {
+            update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+          }`,
+        )
+        .toEmitDiagnostics(missingProperty("extra"));
+    });
+
+    it.each([0, 1])("checks inherited ARM operation pairs for fixture %s", async (index) => {
+      const fixture = `${examples[index]}
+        @armResourceOperations
+        interface Widgets extends ResourceCreateAsync<Widget>,
+          ResourceUpdateAsync<Widget, WidgetPatchProperties> {}`;
+      if (index === 0) {
+        await tester.expect(fixture).toEmitDiagnostics(missingProperty("extra"));
+      } else {
+        await tester.expect(fixture).toBeValid();
+      }
+    });
+
+    it("targets a project interface for inherited library PATCH properties", async () => {
+      await tester
+        .expect(
+          t.code`${examples[1]}
+            @armResourceOperations
+            interface ${t.interface("Widgets")}
+              extends ResourceUpdateAsync<Widget, WidgetPatchProperties> {
+              @TypeSpec.Rest.autoRoute
+              @put
+              createOrUpdate(...ResourceInstanceParameters<Widget>,
+                @body body: {properties?: WidgetProperties}): void;
+            }`,
+        )
+        .toEmitDiagnostics(({ Widgets }) => {
+          const { pos, end } = getSourceLocation(Widgets);
+          return { ...missingProperty("tags"), pos, end };
+        });
+    });
+  });
+
+  it.each(["shared", "distinct"] as const)(
+    "deduplicates cross-service findings by property target with %s PATCH models",
+    async (models) => {
+      const missingNames =
+        models === "shared" ? ["extra", "other"] : ["extra", "other", "extra", "other"];
+      await tester
+        .expect(
+          `
+          model PutBody {
+            common?: string;
+          }
+          model FirstPatchBody {
+            common?: string;
+            extra?: string;
+            other?: string;
+          }
+          model SecondPatchBody {
+            common?: string;
+            extra?: string;
+            other?: string;
+          }
+
+          @service namespace FirstService {
+            @route("/first/widgets") @put op create(@body body: PutBody): void;
+            @route("/first/widgets") @patch op update(@body body: FirstPatchBody): void;
+          }
+
+          @service namespace SecondService {
+            @route("/second/widgets") @put op create(@body body: PutBody): void;
+            @route("/second/widgets")
+            @patch op update(@body body: ${models === "shared" ? "FirstPatchBody" : "SecondPatchBody"}): void;
+          }
+          `,
+        )
+        .toEmitDiagnostics(missingNames.map(missingProperty));
+    },
+  );
+
+  it("reports a nested PATCH leaf absent from PUT without provider metadata", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { properties?: { common?: string; }; }
+        model PatchBody { properties?: { common?: string; missing?: string; }; }
+      `),
+      )
+      .toEmitDiagnostics(missingProperty("missing"));
+  });
+
+  it("reports different JSON names for the same authored property", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { @encodedName("application/json", "putName") name?: string; }
+        model PatchBody { /*target*/@encodedName("application/json", "patchName") name?: string; }
+      `),
+      )
+      .toEmitDiagnostics(({ pos }) => ({
+        ...missingProperty("patchName"),
+        pos: pos.target.pos,
+        end: pos.target.pos + '@encodedName("application/json", "patchName") name?: string'.length,
+      }));
+  });
+
+  it("compares inherited leaves rather than their nested wrapper names", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model Shared { value?: string; }
+        model PutWrapper extends Shared {}
+        model PatchWrapper extends Shared {}
+        model PutBody { putWrapper?: PutWrapper; }
+        model PatchBody { patchWrapper?: PatchWrapper; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  describe("opaque object containers", () => {
+    it("accepts a corresponding object with no Update-visible children", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody { properties?: Properties; tags?: string; }
+          model PatchBody { properties?: Properties; tags?: string; }
+        `),
+        )
+        .toBeValid();
+    });
+
+    it("matches nested nullable containers by inherited and encoded JSON paths", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Base {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model Properties extends Base {}
+          model PutBody {
+            @encodedName("application/json", "outer")
+            putOuter?: {
+              @encodedName("application/json", "settings") putSettings?: Properties | null;
+            };
+          }
+          model PatchBody {
+            @encodedName("application/json", "outer")
+            patchOuter?: {
+              @encodedName("application/json", "settings") patchSettings?: Properties | null;
+            };
+          }
+        `),
+        )
+        .toBeValid();
+    });
+
+    it.each([
+      ["absent", "", "/*target*/properties?: Properties;"],
+      [
+        "read-only",
+        "@visibility(Lifecycle.Read) properties?: Properties;",
+        "/*target*/properties?: Properties;",
+      ],
+      [
+        "behind a read-only ancestor",
+        "@visibility(Lifecycle.Read) outer?: { properties?: Properties; };",
+        "outer?: { /*target*/properties?: Properties; };",
+      ],
+      [
+        "at another payload position",
+        "other?: { properties?: Properties; };",
+        "/*target*/properties?: Properties;",
+      ],
+    ])("rejects a PUT counterpart that is %s", async (_, put, patch) => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody { ${put} tags?: string; }
+          model PatchBody { ${patch} tags?: string; }
+        `),
+        )
+        .toEmitDiagnostics(({ pos }) => ({
+          ...missingProperty("properties"),
+          pos: pos.target.pos,
+          end: pos.target.pos + "properties?: Properties".length,
+        }));
+    });
+
+    it("does not confuse dotted JSON names with nested paths", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody {
+            @encodedName("application/json", "outer.settings") combined?: Properties;
+          }
+          model PatchBody { outer?: { settings?: Properties; }; }
+        `),
+        )
+        .toEmitDiagnostics(missingProperty("settings"));
+    });
+
+    it("resolves finite opaque paths through recursive PUT ancestors", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model PutBody { next?: PutBody; settings?: {}; }
+          model PatchBody { next?: { settings?: {}; }; }
+        `),
+        )
+        .toBeValid();
+    });
+
+    it("does not infer type compatibility for an opaque container", async () => {
+      await tester
+        .expect(
+          bodyPair(`
+          model Properties {
+            @visibility(Lifecycle.Read, Lifecycle.Create) value?: string;
+          }
+          model PutBody { properties?: string; other?: { properties?: {}; }; }
+          model PatchBody { properties?: Properties; }
+        `),
+        )
+        .toBeValid();
+    });
+  });
+
+  it("finds inherited writable PUT leaves behind read-only direct members", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model Key { identityType?: string; }
+        model Encryption { key?: Key; }
+        model UpdateProperties { encryption?: Encryption; }
+        model PutProperties extends UpdateProperties {
+          @visibility(Lifecycle.Read) state?: string;
+        }
+        model PutBody { properties?: PutProperties; }
+        model PatchBody { properties?: UpdateProperties; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("reports genuinely missing inherited nested PATCH leaves", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutProperties { common?: string; }
+        model PatchBase { common?: string; extra?: string; }
+        model PatchProperties extends PatchBase {
+          @visibility(Lifecycle.Read) state?: string;
+        }
+        model PutBody { properties?: PutProperties; }
+        model PatchBody { properties?: PatchProperties; }
+      `),
+      )
+      .toEmitDiagnostics(missingProperty("extra"));
+  });
+
+  it("requires a PATCH request body", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Test;
+        @route("/widgets") @put op put(@body body: { common?: string; }): void;
+        @route("/widgets") @patch op patch(): void;
+      `,
+      )
+      .toEmitDiagnostics({ code, message: "The PATCH operation must have a request body." });
+  });
+
+  it("treats a void PATCH body as missing", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { common?: string; }
+        alias PatchBody = void;
+      `),
+      )
+      .toEmitDiagnostics({ code, message: "The PATCH operation must have a request body." });
+  });
+
+  it("rejects a PATCH body with no properties", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { common?: string; }
+        model PatchBody {}
+      `),
+      )
+      .toEmitDiagnostics({
+        code,
+        message: "The PATCH request body must contain at least one property.",
+      });
+  });
+
+  it.each(["", "@body body: void"])(
+    "reports PATCH properties when the PUT body is missing (%s)",
+    async (parameter) => {
+      await tester
+        .expect(
+          `
+        @service namespace Test;
+        @route("/widgets") @put op put(${parameter}): void;
+        @route("/widgets") @patch op patch(@body body: { common?: string; }): void;
+      `,
+        )
+        .toEmitDiagnostics(missingProperty("common"));
+    },
+  );
+
+  it.each([false, true])(
+    "compares effective input of a standard PUT with Create visibility (unrelated property: %s)",
+    async (unrelated) => {
+      await tester
+        .expect(
+          `
+          @service @armProviderNamespace namespace Microsoft.TestService;
+          model WidgetProperties {
+            common?: string;
+            @visibility(Lifecycle.Update) updateOnly?: string;
+            ${unrelated ? "@visibility(Lifecycle.Read, Lifecycle.Query) queryOnly?: string;" : ""}
+          }
+          model Widget is TrackedResource<WidgetProperties> {
+            @key("widgetName") @segment("widgets") @path name: string;
+          }
+          model WidgetPatch {
+            tags?: Record<string>;
+            properties?: { /*target*/updateOnly?: string; };
+          }
+          @armResourceOperations interface Widgets {
+            @parameterVisibility(Lifecycle.Create)
+            create is ArmResourceCreateOrReplaceSync<Widget>;
+            update is ArmCustomPatchSync<Widget, WidgetPatch>;
+          }
+          `,
+        )
+        .toEmitDiagnostics(({ pos }) => ({
+          ...missingProperty("updateOnly"),
+          pos: pos.target.pos,
+          end: pos.target.pos + "updateOnly?: string".length,
+        }));
+    },
+  );
+
+  it.each(["Read", "Create"])("excludes %s-only PATCH properties", async (visibility) => {
+    await tester
+      .expect(
+        bodyPair(`
+          model PutBody { common?: string; }
+          model PatchBody {
+            common?: string;
+            @visibility(Lifecycle.${visibility}) excluded?: string;
+          }
+        `),
+      )
+      .toBeValid();
+  });
+
+  it("compares an explicitly exposed Create-only PATCH property", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Test;
+        model PutBody { common?: string; }
+        model PatchBody {
+          common?: string;
+          @visibility(Lifecycle.Create) extra?: string;
+        }
+        @route("/widgets") @put op put(@body body: PutBody): void;
+        @parameterVisibility(Lifecycle.Create)
+        @route("/widgets") @patch op patch(@body body: PatchBody): void;
+        `,
+      )
+      .toEmitDiagnostics(missingProperty("extra"));
+  });
+
+  it("rejects a PATCH model with no effective input properties", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+          model PutBody { common?: string; }
+          model PatchBody { @visibility(Lifecycle.Read) common?: string; }
+        `),
+      )
+      .toEmitDiagnostics({
+        code,
+        message: "The PATCH request body must contain at least one property.",
+      });
+  });
+
+  it("preserves empty PATCH validation when the PUT body is missing", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Test;
+        @route("/widgets") @put op put(): void;
+        @route("/widgets") @patch op patch(@body body: {}): void;
+      `,
+      )
+      .toEmitDiagnostics({
+        code,
+        message: "The PATCH request body must contain at least one property.",
+      });
+  });
+
+  it.each(["body", "bodyRoot"])("respects HTTP metadata in an explicit @%s", async (decorator) => {
+    const expectation = tester.expect(`
+        @service namespace Test;
+        model PutBody { common?: string; }
+        model PatchBody {
+          common?: string;
+          ${decorator === "body" ? '#suppress "@typespec/http/metadata-ignored" "Test explicit body JSON membership."' : ""}
+          @header extra?: string;
+        }
+        @route("/widgets") @put op put(@body body: PutBody): void;
+        @route("/widgets") @patch op patch(@${decorator} body: PatchBody): void;
+      `);
+    if (decorator === "body") {
+      await expectation.toEmitDiagnostics(missingProperty("extra"));
+    } else {
+      await expectation.toBeValid();
+    }
+  });
+
+  it.each(["string", "First | Second", "string[]", "Record<string>"])(
+    "does not interpret unsupported PUT body %s as an empty object",
+    async (body) => {
+      await tester
+        .expect(
+          bodyPair(`
+            model First { common?: string; }
+            model Second { other?: string; }
+            alias PutBody = ${body};
+            model PatchBody { extra?: string; }
+          `),
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each(["extends", "spread"])("filters inherited input visibility through %s", async (shape) => {
+    await tester
+      .expect(
+        bodyPair(`
+            model Base {
+              common?: string;
+              @visibility(Lifecycle.Read, Lifecycle.Create) excluded?: string;
+            }
+            model PutBody { common?: string; }
+            ${shape === "extends" ? "model PatchBody extends Base {}" : "model PatchBody { ...Base; }"}
+          `),
+      )
+      .toBeValid();
+  });
+
+  it("does not resurrect inherited PUT properties overridden with never", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+          model Base { value?: string; common?: string; }
+          model PutBody extends Base { value?: never; }
+          model PatchBody { value?: string; common?: string; }
+        `),
+      )
+      .toEmitDiagnostics(missingProperty("value"));
+  });
+
+  it.each(["body", "bodyRoot"])("respects PUT @%s membership", async (decorator) => {
+    const expectation = tester.expect(`
+      @service namespace Test;
+      model PutBody {
+        common?: string;
+        ${decorator === "body" ? '#suppress "@typespec/http/metadata-ignored" "Test explicit body JSON membership."' : ""}
+        @header extra?: string;
+      }
+      model PatchBody { common?: string; extra?: string; }
+      @route("/widgets") @put op put(@${decorator} body: PutBody): void;
+      @route("/widgets") @patch op patch(@body body: PatchBody): void;
+    `);
+    if (decorator === "body") {
+      await expectation.toBeValid();
+    } else {
+      await expectation.toEmitDiagnostics(missingProperty("extra"));
+    }
+  });
+
+  it("keeps visibility independent for operations sharing a body model", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Test;
+        model Body { common?: string; @visibility(Lifecycle.Update) updateOnly?: string; }
+        @parameterVisibility(Lifecycle.Create)
+        @route("/create") @put op create(@body body: Body): void;
+        @route("/create") @patch op patchCreate(@body body: Body): void;
+        @parameterVisibility(Lifecycle.Update)
+        @route("/update") @put op update(@body body: Body): void;
+        @route("/update") @patch op patchUpdate(@body body: Body): void;
+      `,
+      )
+      .toEmitDiagnostics(missingProperty("updateOnly"));
+  });
+
+  it("accepts nullable single-model bodies", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+          model Body { common?: string; }
+          alias PutBody = Body | null;
+          alias PatchBody = Body | null;
+        `),
+      )
+      .toBeValid();
+  });
+
+  it("terminates recursive models without hiding distinct sibling targets", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+          model PutNode { common?: string; next?: PutNode; }
+          model FirstPatchNode { common?: string; extra?: string; next?: FirstPatchNode; }
+          model SecondPatchNode { common?: string; extra?: string; next?: SecondPatchNode; }
+          model PutBody { first?: PutNode; second?: PutNode; }
+          model PatchBody { first?: FirstPatchNode; second?: SecondPatchNode; }
+        `),
+      )
+      .toEmitDiagnostics([missingProperty("extra"), missingProperty("extra")]);
+  });
+
+  it("accepts a PATCH subset of PUT", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { name?: string; extra?: string; }
+        model PatchBody { name?: string; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("accepts matching leaf names at different nesting levels", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { properties?: { name?: string; }; }
+        model PatchBody { name?: string; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("accepts different authored names with the same JSON name", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { @encodedName("application/json", "shared") putName?: string; }
+        model PatchBody { @encodedName("application/json", "shared") patchName?: string; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("ignores absent discriminators on both bodies", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        @discriminator("kind") model PutBody { name?: string; }
+        model ConcretePut extends PutBody { kind: "concrete"; }
+        @discriminator("kind") model PatchBody { name?: string; }
+        model ConcretePatch extends PatchBody { kind: "concrete"; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("accepts matching scalar and array leaves", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { name?: string; count?: int32; items?: string[]; }
+        model PatchBody { name?: string; count?: int32; items?: string[]; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("checks names without comparing property constraints or value types", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody {
+          @format("arm-id") id?: string;
+          @maxLength(20) name?: string;
+          @minItems(1) items?: string[];
+          @minValue(1) count?: int32;
+          value?: string;
+        }
+        model PatchBody {
+          id?: string;
+          @maxLength(30) name?: string;
+          items?: string[];
+          count?: int32;
+          value?: int32;
+        }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("accepts explicit property resets", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { value?: string; reset?: string; }
+        model PatchBody { value?: string | null; reset?: null; }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("preserves fallback behavior for non-ARM payload shapes", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model First { first?: string; }
+        model Second { second?: string; }
+        union Choice { First, Second }
+        model PutBody {
+          dictionary?: Record<string>;
+          choice?: Choice;
+          nullable?: First | null;
+          empty?: {};
+        }
+        model PatchBody {
+          dictionary?: Record<string>;
+          choice?: Choice;
+          nullable?: First | null;
+          empty?: {};
+        }
+      `),
+      )
+      .toBeValid();
+  });
+
+  it("does not compare routes without a corresponding PUT", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Test;
+        @route("/other") @put op put(@body body: { common?: string; }): void;
+        @route("/widgets") @patch op patch(@body body: { missing?: string; }): void;
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("deduplicates a shared missing property across operation pairs", async () => {
+    await tester
+      .expect(
+        bodyPair(`
+        model PutBody { common?: string; }
+        model PatchBody { missing?: string; }
+        @route("/other") @put op otherPut(@body body: PutBody): void;
+        @route("/other") @patch op otherPatch(@body body: PatchBody): void;
+      `),
+      )
+      .toEmitDiagnostics(missingProperty("missing"));
+  });
+
+  it("compares base operation bodies instead of same-endpoint overload bodies", async () => {
+    await tester
+      .expect(
+        `
+        @Azure.ResourceManager.armProviderNamespace
+        @service
+        namespace Microsoft.TestService;
+
+        model PutBody {
+          emittedProperty?: string;
+        }
+
+        model PatchBody {
+          emittedProperty?: string;
+        }
+
+        model PutOverloadBody {
+          putOverloadOnly?: string;
+        }
+
+        model PatchOverloadBody {
+          patchOverloadOnly?: string;
+        }
+
+        interface Widgets {
+          @route("/widgets/{name}")
+          @put
+          createOrUpdate(@path name: string, @body body: PutBody): void;
+
+          @route("/widgets/{name}")
+          @put
+          @overload(Widgets.createOrUpdate)
+          createOrUpdateOverload(@path name: string, @body body: PutOverloadBody): void;
+
+          @route("/widgets/{name}")
+          @patch
+          update(@path name: string, @body body: PatchBody): void;
+
+          @route("/widgets/{name}")
+          @patch
+          @overload(Widgets.update)
+          updateOverload(@path name: string, @body body: PatchOverloadBody): void;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  function bodyPair(models: string): string {
+    return `
+      @service namespace Test;
+      ${models}
+      @route("/widgets") @put op put(@body body: PutBody): void;
+      @route("/widgets") @patch op patch(@body body: PatchBody): void;
+    `;
+  }
+
+  function missingProperty(property: string) {
+    return {
+      code,
+      message: `The property '${property}' in the PATCH body does not correspond to a property in the PUT body.`,
+    };
+  }
+
+  it.each([false, true])(
+    "uses the last resolved PATCH at a shared path (last input has extra: %s)",
+    async (extra) => {
+      const expectation = tester.expect(`
+        @service namespace Test;
+        model PutBody { common?: string; }
+        model FirstPatch { ${extra ? "common" : "extra"}?: string; }
+        model LastPatch { ${extra ? "extra" : "common"}?: string; }
+        @route("/widgets") @put op put(@body body: PutBody): void;
+        @sharedRoute @route("/widgets") @patch op first(@body body: FirstPatch): void;
+        @sharedRoute @route("/widgets") @patch op last(@body body: LastPatch): void;
+      `);
+      if (extra) {
+        await expectation.toEmitDiagnostics(missingProperty("extra"));
+      } else {
+        await expectation.toBeValid();
+      }
+    },
+  );
 });

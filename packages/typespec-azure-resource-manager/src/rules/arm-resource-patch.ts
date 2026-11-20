@@ -23,6 +23,7 @@ import {
 } from "@typespec/http";
 
 import { getArmResource } from "../resource.js";
+import { createPatchBodyListener, patchBodyMessages } from "./arm-resource-patch-body.js";
 import { getSourceModel, isInternalTypeSpec } from "./utils.js";
 
 export const patchOperationsRule = createRule({
@@ -32,12 +33,14 @@ export const patchOperationsRule = createRule({
   description: "Validate ARM PATCH operations.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-patch",
   messages: {
+    ...patchBodyMessages,
     default: "The request body of a PATCH must be a model with a subset of resource properties",
     missingTags: "Resource PATCH must contain the 'tags' property.",
     modelSuperset: paramMessage`Resource PATCH models must be a subset of the resource type. The following properties: [${"name"}] do not exist in resource Model '${"resourceModel"}'.`,
   },
   create(context) {
     return {
+      ...createPatchBodyListener(context),
       operation: (operation: Operation) => {
         if (!isInternalTypeSpec(context.program, operation)) {
           const verb = getOperationVerb(context.program, operation);
