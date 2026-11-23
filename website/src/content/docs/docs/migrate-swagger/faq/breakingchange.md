@@ -196,6 +196,21 @@ For the `nextLink` and `value` properties of pageable operation response model, 
 
 ### Required `value` in Pageable Responses
 
-When migrating an ARM specification from Swagger to TypeSpec, assess a change that makes `value` required by checking actual service responses and the API contract. If the service always returns `value`, the required declaration may more accurately describe existing behavior. If valid responses can omit `value`, the required declaration does not match the service behavior and needs correction.
+By default, ARM pageable operation templates use [`Azure.ResourceManager.ResourceListResult`](./mustread.md#using-page-model-from-library), which defines the `value` property as required, whereas some older specifications left `value` optional. Unlike `readOnly`, this difference can affect both the API and generated SDKs, so you cannot automatically ignore the resulting breaking change violation. Assess both areas when making your migration decision:
 
-Assess generated SDK compatibility separately. The service always returning `value` is not, by itself, sufficient to conclude that the change is non-breaking or to automatically ignore breaking change validation failures.
+- **API contract and service behavior:** Check actual service responses and the API contract. If the service always returns `value`, a required `value` property may more accurately describe existing behavior. If valid responses can omit `value`, a required `value` property does not match the service behavior and needs correction in TypeSpec.
+- **SDK compatibility:** Assess generated SDK compatibility separately. The service always returning `value` is not sufficient to conclude that there is no breaking change or to automatically ignore breaking change validation failures.
+
+When `value` needs to remain optional, define a custom pageable response model and pass it with the `Response` parameter (see [Changing Response Types](#changing-response-types)):
+
+```tsp
+model WidgetListResult {
+  @pageItems
+  value?: Widget[];
+
+  @nextLink
+  nextLink?: url;
+}
+
+op listBySubscription is ArmListBySubscription<Widget, Response = ArmResponse<WidgetListResult>>;
+```
