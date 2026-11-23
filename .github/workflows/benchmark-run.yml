@@ -45,7 +45,7 @@ on:
       runner:
         required: false
         type: string
-        default: "ubuntu-latest"
+        default: "ubuntu-24.04"
       backfill_from:
         description: "Backfill from: commit SHA or number of recent commits (main only)"
         required: false

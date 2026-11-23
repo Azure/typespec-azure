@@ -8,10 +8,11 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 2. The compiler provides built-in `Stats` data including per-stage timing and per-linter-rule breakdown
 3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
 4. Per-spec variability (standard deviation and coefficient of variation) is captured from raw iterations
-5. Optional noise-gating retries compilation only; it never regenerates SDKs
-6. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
-7. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
-8. PR comments show a comparison table highlighting performance changes
+5. Compiler warmups and measurements share one isolated Node process, creating a fresh Program and collecting garbage before each compilation
+6. Optional noise-gating checks both compilation and linter variability and retries compilation only; it never regenerates SDKs
+7. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
+8. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
+9. PR comments show a comparison table highlighting performance changes
 
 ## Local usage
 
@@ -42,8 +43,8 @@ node packages/benchmark/dist/src/cli.js run \
 
 ### Compare results
 
-Comparisons require the same measurement method. The CLI rejects legacy combined
-results versus split results instead of reporting methodological differences as
+Comparisons require the same measurement method. The CLI rejects legacy combined,
+cold split, and warmed split results compared against one another instead of reporting methodological differences as
 performance improvements or regressions.
 
 ```bash
@@ -106,15 +107,15 @@ repo's Go, Java/Maven, Python/uv tools and .NET SDK 10.0.x before running. Local
 use `mise exec --` for commands when mise is not activated in your shell.
 
 All workspace emitters and TypeSpec/TCGC libraries run from this checkout.
-`setup-csharp.ts` installs `@azure-typespec/http-client-csharp@latest` and its
+`setup-csharp.ts` installs `@azure-typespec/http-client-csharp@1.0.0-alpha.20261015.2` and its
 published backend into the ignored `.emitters/` directory and links the Azure
 emitter into the benchmark's `node_modules`. It disables npm peer installation
 and verifies that TypeSpec/TCGC peers resolve to this workspace. Re-run setup to
-refresh C#; it never changes the workspace manifest or lockfile.
+restore that version; it never changes the workspace manifest or lockfile.
 
-The `latest` npm tag may point to a prerelease. Each result records the exact
-Azure and base C# versions in `externalEmitterVersions`, because that dependency
-can change independently of the benchmarked commit. Installation happens before
+The version is deliberately pinned rather than following the moving `latest` tag.
+Update the pin explicitly when changing the C# baseline. Each result also records
+the exact Azure and base C# versions in `externalEmitterVersions`. Installation happens before
 timing begins. Missing tools, unresolved emitters, and missing/invalid emitter
 timings fail the run rather than silently reducing coverage.
 
@@ -132,6 +133,12 @@ each spec's compiler and each configured emitter. They reuse that prepared build
 and source snapshot, rather than rebuilding packages or fetching a moving spec
 branch for every job. Each job runs one workload serially, avoiding CPU/memory
 contention between emitters on the same runner.
+
+The default runner image is `ubuntu-24.04`, not the moving `ubuntu-latest` label,
+and Node remains pinned to 24.15.0. GitHub-hosted runners can still have different
+CPU models and contention. Set the repository variable `BENCHMARK_RUNNER` to a
+dedicated runner label for tighter hardware control. Results record the actual
+CPU model/count for each compiler and emitter worker.
 
 Both datasets use **25 compiler measurements + 3 warmups** and **3 full-generation
 measurements + 1 warmup per emitter/spec**. Compiler noise retries do not affect
@@ -227,8 +234,15 @@ The TypeSpec compiler provides built-in `Stats` covering:
   - `linter` — per-rule timing (e.g., `@azure-tools/typespec-azure-core/auth-required`)
   - `emit` — per-emitter timing with per-step breakdown
 
-New results use `measurementMode: "split"`. `iterations`, `rawIterations`, and
+New results use `measurementMode: "split-warm"`. `iterations`, `rawIterations`, and
 compiler variability describe compilation-only samples (`noEmit: true`).
+Each compiler workload has its own Node process: all warmups, measured samples,
+and noise retries run there. Every iteration creates a fresh compiler Program;
+only loaded modules and JIT state carry over. Full GC runs before compilation,
+outside the compiler's measured timers. Earlier `split` results spawned a fresh
+Node process per iteration, so their warmups only warmed filesystem caches.
+The sample count stays at 25 measurements + 3 warmups; emitter sampling and
+process isolation are unchanged.
 `emitterMeasurements` records each emitter's actual sample/warmup counts, raw
 timings, variability, and runner. Emitter timings do not include recompilation
 or process startup, although the workload log reports end-to-end elapsed time.
@@ -240,8 +254,15 @@ compilation-only runs skip loading emitter modules. Emitters run in
 isolation without another emitter's cached state. Treat the switch to split
 measurement as a methodology change when comparing against old results.
 Existing history remains readable and is not rewritten automatically.
-Dashboard baseline comparisons only use runs with the same measurement method,
-so this transition is not presented as a compiler or emitter performance regression.
+Dashboard baselines and chart connections require matching measurement methods,
+recorded source revisions, Node versions and CPU models/counts. Emitter comparisons
+use the emitter worker's hardware, not the compiler worker's, and C# comparisons
+also require matching published versions. Kernel patch versions do not split a
+series. The averaged view also requires the same contributing specs.
+Runs still above the compiler or linter CV threshold after retries remain visible
+as raw points but do not participate in compiler baseline comparisons.
+The charts are not smoothed or rewritten to hide noise. Legacy results without
+provenance remain readable but cannot establish comparability with newer results.
 When a metric is absent from the last run, its comparison window and method are
 anchored to the last non-null sample that actually supplies its displayed value.
 
@@ -275,12 +296,12 @@ Each external spec is **one directory** under `external-spec/` (the directory na
 ```json
 {
   "repository": "https://github.com/Azure/azure-rest-api-specs.git",
-  "ref": "main",
+  "ref": "d218330c5a3b727df9504ba852e97259479e8fef",
   "path": "specification/web/resource-manager/Microsoft.Web/AppService"
 }
 ```
 
-- `repository` / `ref` — the repo and git ref to sparse-checkout; `ref` tracks latest (e.g. `main`), no pinning.
+- `repository` / `ref` — the repo and Git commit, branch or tag to sparse-checkout. The checked-in corpus uses a fixed commit so workload changes do not masquerade as compiler changes. Update all three service pins together when intentionally refreshing the corpus; the resolved source revision is preserved in the plan, results and history.
 - `path` — the entry directory (containing `main.tsp`) relative to the repo root. The spec's own `main.tsp` is the entrypoint (it imports `client.tsp`).
 - `checkoutPath` (optional) — directory to sparse-checkout, when the spec imports sibling folders (e.g. `../common`). Defaults to `path`.
 - `name` (optional) — overrides the benchmark name (defaults to the directory name).
