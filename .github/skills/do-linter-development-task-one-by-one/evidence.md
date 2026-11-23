@@ -22,29 +22,30 @@ before discovery advances.
 
 Native-first consumers discover the shared Swagger baseline before specs setup;
 follow the [consumer/producer contract](../analyze-native-lint-coverage/shared-baseline.md).
-The initial publication uses the verified `msyyc/azure-rest-api-specs` fork,
-branch `evidence/shared-swagger-baseline`, with `.lintdiff-baselines\current.json`
-and immutable `.lintdiff-baselines\swagger-arm-20261026-2cd3c5dd\baseline.json`.
-Pin the fetched metadata commit and version descriptor before reading data.
-The metadata branch is derived from frozen source, but its new metadata commit
-is not the tested source commit. Runtimes use descriptor `source.commit`.
+The verified `msyyc/azure-rest-api-specs` fork publishes discovery on
+`evidence/shared-swagger-baseline`. Read `.lintdiff-baselines\current.json`,
+resolve its `baselineId` to the immutable
+`.lintdiff-baselines\<baselineId>\baseline.json`, and pin both at one metadata
+commit. That metadata commit is not the tested source commit; runtimes use the
+selected descriptor's `source.commit`.
 
-The large archive belongs to the same specs repository's release
-`swagger-lint-baseline-20261026-2cd3c5dd`, asset
-`swagger-arm-20261026-2cd3c5dd.tar.gz`. Record descriptor SHA-256, archive size/hash,
-baseline identity, source preservation tuple and verified download receipt.
-Archive root retains `manifest.json`, `baseline.json`, `dataset\**`; do not
-commit the unpacked large dataset to Git. The unchanged source preservation ref
-`evidence/long-running-operations-options-validator-20261022-source` remains
-separate from metadata discovery and runtime injection.
+Resolve the release, asset name, size/hash, baseline identity and source
+preservation repository/ref from that same descriptor and record a verified
+download receipt. Archive root retains `manifest.json`, `baseline.json`,
+`dataset\**`; do not commit the unpacked large dataset to Git. The prior
+`swagger-arm-20261026-2cd3c5dd` descriptor and its release asset remain
+historical and immutable. Source preservation is a separate ref from metadata
+discovery and runtime injection.
 
 Shared Swagger-only completion is not native completion. Native execution,
 full population, controls, investigations, independent local reviews and A/B
 checkpoints remain required. Changing a validator selector alone does not
-require a refresh. Missing/incompatible publication blocks consumers with an
-exact prerequisite; only an explicitly requested producer runs the Swagger
-suite. Refresh appends new immutable assets and advances discovery only after
-verification, retaining prior versions. Legacy flow stays unchanged.
+require an extra refresh within a cycle. Missing/incompatible publication blocks
+consumers with an exact prerequisite; the separate producer runs the Swagger
+suite once per monthly TypeSpec release cycle, or out of cycle only with
+explicit authorization and material incompatibility/validity evidence. Refresh
+appends new immutable assets and advances discovery only after verification,
+retaining prior versions. Legacy flow stays unchanged.
 
 Staging-only ARM/common Spectral data can be published as a separately authorized
 [immutable supplement](../analyze-native-lint-coverage/shared-baseline.md#staging-only-diagnostic-supplements).
@@ -113,12 +114,21 @@ preserving it; this is not permission to allow arbitrary drive paths or skip
 the remaining sanitization checks.
 
 When validating evidence with tools installed in a prepared native/tooling
-checkout, explicitly select that checkout's configuration. The command's cwd
-alone does not prevent configuration discovery beside the target files.
+checkout, use that prepared checkout as the formatter's cwd as well as explicitly
+selecting its configuration and the applicable ignore file. An explicit config
+alone may not resolve bare plugins from an unprepared evidence cwd; cwd alone
+does not prevent configuration discovery beside the target files.
 Verify configuration equivalence and retain applicable rules and overrides.
 Disable nested discovery only when no distinct required configuration is
 omitted. Do not install or build the evidence checkout merely to load an
 identical configuration from the prepared checkout.
+
+Apply the shared [local helper execution](../shared/recovery-context.md#local-helper-execution)
+defaults to evidence validators and publication/status writers, not just the
+review collector. For a proven encoding-only helper failure, use the existing
+ordinary correction or the coordinator-owned
+[bounded local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery);
+do not report it as failed CI or request user input while that recovery is eligible.
 
 Write generated publication text, including JSON and task-scoped
 `.gitattributes`, as UTF-8 with LF endings before freezing published hashes.
@@ -218,7 +228,7 @@ the tested snapshot; retain both identities where different. Evidence commit
 `E` references `C`, `S`, `P` and baseline `B`; the native PR's migration-report
 section links directly to `migration.md` on the actual evidence branch whose
 verified pushed head is `E`, under the shared
-[two-section PR body](../shared/migration-pr-description.md). Keep provenance in
+[PR body contract](../shared/migration-pr-description.md). Keep provenance in
 that report or its appendix, not extra PR content.
 Do not amend `C` merely to insert its own evidence hash.
 The evidence publisher returns `E` after pushing; `migration.md` need not

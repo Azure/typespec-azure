@@ -1,11 +1,28 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion.
-argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | <legacy worker commands>"
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion. Include CI-derived companion suppression proposals by default and rebuild their source branches only on explicit refresh.
+argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | --refresh-suppression-pr <linter-pr-url> | <legacy worker commands>"
 user-invocable: true
 ---
 
 # Develop lintdiff rules one by one
+
+## Companion suppression PR mode
+
+Follow [companion-suppressions.md](companion-suppressions.md) for default initial
+linter delivery and explicitly requested refreshes. Initial delivery includes
+a directly linked Azure-hosted suppression proposal when failed CI and source
+analysis establish PR-caused compatibility diagnostics; do not require a separate
+opt-in or create empty proposals. Consumer proposals use CI evidence only, not
+local validation, and do not require CI repair, landing or checkpoint B.
+
+Route the standalone `--refresh-suppression-pr <linter-pr-url>` mode before the
+flow/rule grammar below. It keeps the existing companion PR, recreates its
+source branch from current `typespec-next`, and regenerates current justified
+suppressions rather than appending the old patch. Only explicit refresh grants
+the documented expected-SHA force-with-lease on that suppression source branch;
+it never authorizes force-pushing linter/base branches or replacing the PR.
+Do not run normal queue setup or restart a linter cycle for refresh mode.
 
 ## Select the flow before parsing or preparing tasks
 
@@ -78,6 +95,8 @@ worktrees before creating missing roles; follow the
 [reuse and isolation checks](preparation.md#native-first-worktree-reuse).
 Fresh-checkout recovery verification remains required, but uses temporary
 isolation rather than a fourth persistent replay worktree.
+The conditional companion consumer checkout is separate from those frozen
+coverage roles and follows the same containment and ownership rules.
 
 Both flows follow the shared
 [analysis-first edit loop](../shared/analysis-first-lint-migration.md).
@@ -95,9 +114,16 @@ Require the shared contract's explicit **Assessed coverage** summary in
 section 2, with scoped quantitative evidence and honest unassessed limits;
 a raw-diagnostic scorecard alone is not an assessment.
 
+On every refresh, rewrite `migration.md` as a coherent whole for human readers,
+not an append-only update to the original. Rework all four sections and NOTES
+from the reconciled assessment; replace stale or duplicated explanations, not
+just the newest numbers. Preserve required evidence and honest limitations, with
+one consistent account of coverage, remaining gaps and recommended actions.
+
 All rule PR descriptions follow the shared
-[two-section PR body](../shared/migration-pr-description.md): original Swagger
-documentation/logic links, then the published `migration.md` link. Keep detailed
+[PR body contract](../shared/migration-pr-description.md): original Swagger
+documentation/logic links, then the published `migration.md` link and verified
+companion suppression PR section when applicable. Keep detailed
 analysis and required evidence in that report, not additional PR sections.
 
 ## Legacy contract
@@ -336,10 +362,15 @@ Keep an ordered ledger with one entry per parsed queue entry:
 - coordinator-owned local reserve usage (three total per task) and native
   baseline-comparison usage (one per task), eligibility decisions, same-owner
   handoffs and required rerun results; preserve these across every phase/cycle
+- bounded local UTF-8 recovery usage (one prospective encoding-only correction
+  per task), eligibility evidence and same-owner grant; never reset ordinary counters
 - predeclared required/supplemental validation plan, authority and per-command
   disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
   query evidence, and the separate one-correction publication budget
+- companion proposal mode/status, linter/CI/specs identities, causal report,
+  Azure head/base/PR binding and direct description links; for explicit refresh,
+  retained old patch/head, fresh base, captured lease and rebuilt head
 - original readiness/status/quiescence deadlines, last genuine progress,
   status-request identity and evidence that previous task activity stopped
 - explicit recovery authorizations, including the user message, named failure,
@@ -414,6 +445,15 @@ For each successfully prepared command, in input order:
    [finite reconciliation and quiescence gate](app-session-execution.md#completion-delivery-and-reconciliation).
    If quiescence cannot be established, stop the queue with later entries
    pending; a timeout is not permission to overlap owners.
+
+Before the initial actual-linter PR handoff, the coordinator applies the
+[default companion proposal](companion-suppressions.md#initial-delivery-by-default)
+to existing CI evidence, with prior owners idle. This is separate from native
+or promotion validation, not another native PR or permission to waive a failed
+required gate. Apply it also when an existing linter PR returns a CI-related
+partial stop; do not skip the proposal merely because checkpoint B cannot run.
+Record a proposal-only outcome separately when that is the
+user's requested deliverable. Never refresh an existing companion automatically.
 
 Use background mode for a worker when the runtime requires multiple turns for a
 long-running development and review workflow. After its completion notification,
@@ -573,18 +613,23 @@ side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-Except for the narrowly eligible native-test timeout and setup-hook recovery below,
+Except for the narrowly eligible native-test timeout, setup-hook recovery below,
+and shared [local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery),
 external/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
 
 Before treating an exhausted local allowance as terminal, apply the shared
 [coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+For a proven local encoding-only helper failure, also evaluate the separate
+[bounded local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery)
+before asking the user, including when both ordinary and reserve budgets are
+exhausted. It is not permission to retry a real failed test, CI or publication.
 Keep the task running during its nonterminal handoff. This queue invocation
 authorizes the coordinator, not the worker, to allocate up to three reserve
 attempts across the entire rule task. Continue the same owner without restarting
 its phase or review pair; retain ordinary counters and all failed attempts.
-Local-recovery, native-comparison and setup-hook handoffs are explicit exceptions
+Local-recovery, local-UTF-8, native-comparison and setup-hook handoffs are explicit exceptions
 to the otherwise restricted same-worker follow-ups. In app-session mode, continue the
 recorded phase owner instead. Do not create a replacement worker or a fresh
 review invocation for either handoff. Pass both task-wide counters and the
@@ -780,6 +825,8 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   evidence; no secrets or generated corpus payloads
 - review owner and capability evidence, pending review phase, review invocation
   and agent IDs, and verified result when returning from an outer-owned review
+- companion proposal binding/status and report, pinned linter/CI/specs sources,
+  description links and stale-head disposition; refresh requires explicit intent
 - worktree state manifest at handoff: branch/HEAD, tracked/staged/untracked
   task-owned paths, their diffs and content hashes, and the completed actions
   establishing ownership of any unfinished edits
@@ -1103,6 +1150,8 @@ Never omit failed input lines or stop the final report at the first failure.
 After the task sections, include the skill-update PR link and brief summary, or
 a publishing blocker, only when required by the shared policy's final handoff.
 Do not print a process-suggestions list or low-confidence observations.
+For an applicable companion, also report its URL, pinned linter head, causality
+report and proposal status. Do not present proposal publication as green CI.
 
 ## Post-run process review
 

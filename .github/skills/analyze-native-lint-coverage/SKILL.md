@@ -117,6 +117,8 @@ select the supported `--baseline-policy frozen-reference`. Reuse saved Swagger
 diagnostics and rerun native diagnostics across the full frozen corpus.
 Investigate actual failures and gaps; different runtime versions alone do not
 require refresh or prove incompatibility.
+The dedicated producer refreshes the shared snapshot once per monthly TypeSpec
+release cycle; consumers do not resolve moving specs refs or regenerate it.
 
 1. Record the caller's current branch before any checkout. Do not change its
    base merely because the candidate targets `main`.
@@ -145,8 +147,9 @@ require refresh or prove incompatibility.
 6. Record the descriptor commit, resolved SHAs, package/tool versions, selection policies and
    build/pack commands. Freeze them through the run. Related rule comparisons
    reuse the same shared baseline; changing the validator selector alone does
-   not invalidate it. Only a separately requested producer refresh resolves new
-   specs sources and executes the Swagger suite.
+   not invalidate it. Only the scheduled monthly release producer or an
+   explicitly authorized out-of-cycle producer resolves new specs sources and
+   executes the Swagger suite.
 
 The tool snapshots the supplied clean checkouts, not remote branch names. The
 skill owns descriptor selection and pinning. Preserve build logs proving that artifacts were
@@ -182,8 +185,9 @@ rejects selected staging-only rules without evaluated supplemental data instead
 of interpreting their absent production shard as zero.
 
 Without `--baseline-run`, the existing analyzer generates Swagger and executes
-validators. That path is **producer-only**, for a separately requested shared
-baseline creation/refresh, not a missing-cache recovery during migration.
+validators. That path is **producer-only**, for the scheduled monthly shared
+baseline refresh or an explicitly authorized out-of-cycle refresh, not a
+missing-cache recovery during migration.
 Retain older immutable assets. See the [producer procedure](shared-baseline.md#explicit-producer-refresh).
 
 Reuse verifies completion, exact specs source/package manager/selection,

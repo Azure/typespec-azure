@@ -81,6 +81,29 @@ describe("spec dataset results", () => {
     }
   });
 
+  it("uses a non-project build config for project configs", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "lintdiff-project-config-test-"));
+    try {
+      const config = path.join(directory, "tspconfig.yaml");
+      const original =
+        'kind: project\nfeatures:\n  - union-extends\nentrypoint: main.tsp\nemit: ["@azure-tools/typespec-autorest"]\n';
+      fs.writeFileSync(config, original);
+      const temporary = buildTempConfig(
+        { ...project, projectDir: directory, tspConfigPath: config },
+        path.join(directory, "swagger"),
+        path.join(directory, "common-types"),
+      );
+      const temporaryContent = fs.readFileSync(temporary, "utf8");
+      expect(temporaryContent).not.toMatch(/^kind:\s*project$/m);
+      expect(temporaryContent).not.toMatch(/^features:/m);
+      expect(temporaryContent).not.toMatch(/^entrypoint:/m);
+      expect(temporaryContent).toContain('service-yaml: "never"');
+      expect(fs.readFileSync(config, "utf8")).toBe(original);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it("passes local validator paths as file URLs instead of package-name references", () => {
     const root = path.resolve("specs with spaces");
     const reference = getValidatorExtensionReference(root);

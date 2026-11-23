@@ -179,7 +179,9 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
   failure, push failure, uncertain finding, or required validation/corpus failure that
   does not qualify for [bounded draft correction](#bounded-draft-correction)
   or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis),
-  or a queue-granted [setup-hook recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery).
+  or a queue-granted [setup-hook recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
+  or [local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery)
+  for non-collector task helpers only.
   Apply the shared gate disposition to supplemental validation; a task defect
   discovered there still blocks. Its optional status never excuses a regression.
   The only recovery paths are those procedures and the separately
@@ -705,7 +707,9 @@ Standalone review does not receive that reserve.
    required scope. The parent independently verifies that every prior failure
    is accounted for and no failed required check remains unresolved.
 6. Except for the queue reserve above, an eligible native-test timeout
-   diagnosis below, or a coordinator-granted setup-hook recovery, stop on an
+   diagnosis below, a coordinator-granted setup-hook recovery, or the shared
+   [local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery)
+   for non-collector task helpers, stop on an
    unknown cause, unsafe/out-of-scope correction, exhausted budget,
    or an external/indeterminate operational failure (such as credentials, network,
    dependency/tool availability, harness/emitter crash, or publication failure).

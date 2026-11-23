@@ -198,6 +198,14 @@ equality alone as the migration criterion. For groups, combined comparable
 counts per project are the primary numerical signal. Define and justify the
 comparison unit, then investigate directional and absolute/relative gaps.
 
+Keep the original configured totals in machine-readable evidence. For the
+reader-facing comparison, count individual diagnostics within the original
+Swagger rules' assessed policy and population, including corresponding captured
+suppressed diagnostics. Filter a mixed TypeSpec rule by its actual checks, not
+its rule ID alone. Preserve the inclusion/exclusion ledger and distinguish this
+scoped observed total from the unfiltered configured total. Do not exclude an
+in-scope TypeSpec-only finding merely because Swagger did not report it.
+
 Swagger rules run over emitted OpenAPI occurrences. TypeSpec rules run over
 semantic source targets. One TypeSpec declaration may produce multiple Swagger
 occurrences through:
@@ -303,7 +311,7 @@ For each investigated gap, record separately in its grouped supporting evidence:
   authored suppressions, genuinely missing behavior, modeling/spec issues and
   unresolved/deferred policy. Check existing owning rules before proposing a
   duplicate check.
-- **Recommended action and rationale:** weigh coverage benefit against
+- **Analysis and proposed action:** weigh coverage benefit against
   implementation complexity, diagnostic noise and maintenance. Recommend the
   smallest justified owning-rule fix, spec/model correction, comparison repair,
   further investigation, non-porting or explicit defer decision. State the
@@ -328,9 +336,9 @@ totals or port confirmed upstream defects. Do not add a standalone action sectio
 to the reader-facing report; link its evidence-backed decision from the relevant
 behavior/difference entry.
 
-### 10. Reach the migration conclusion
+### 10. Assess the migration evidence
 
-Accept the migrated TypeSpec rule as functionally equivalent when:
+Evidence supporting functional equivalence requires:
 
 - Violating and compliant fixtures establish matching semantics.
 - The compared populations and API-version scopes are aligned.
@@ -347,6 +355,10 @@ occurrences and the other reports semantic source targets.
 Do not claim equivalence when one-sided projects or outliers remain unexplained,
 or required functionality is missing/deferred. An approved narrower policy
 requires an explicitly scoped conclusion, not full Swagger parity.
+Keep that semantic assessment in linked supporting evidence. The reader-facing
+report presents observations, missing behavior and proposed actions without a
+blanket migration verdict or a claim that the proposed action is approved.
+Reviewers retain the acceptance and policy decisions.
 
 ## Correctness Requirements
 
@@ -366,7 +378,7 @@ For legacy work create `migration.md` beside the rule fixtures. Native-first
 work uses the verified fork [evidence layout](../do-linter-development-task-one-by-one/evidence.md),
 with a group note linked from the native PR and per-member notes linked from
 that group note. Follow the shared
-[two-section PR body](../shared/migration-pr-description.md).
+[PR body contract](../shared/migration-pr-description.md).
 
 This is the shared report contract for migration development, native coverage
 analysis and gap investigation. It changes presentation, not the investigation,
@@ -391,122 +403,123 @@ refresh the immutable Swagger baseline or waive review/checkpoint/replay gates.
 
 ### Reader-facing report
 
-Keep `migration.md` concise and focused on the migration decision. Use
+Keep `migration.md` concise and focused on reviewer-facing analysis. Use
 **Swagger linter** and **TypeSpec linter** in reader-facing prose, not
 "validator" and "native". Preserve actual package names, source identifiers,
 receipt fields, filenames and quoted diagnostics unchanged.
 
-On refresh, first reconcile one underlying assessment, then rewrite the complete
-main and member narratives together. Replace superseded tables, classifications
-and summaries instead of appending corrections that leave competing conclusions.
+On an assessment refresh, first reconcile one underlying assessment, then
+rewrite the complete main report and all member notes together for human readers. Treat the whole
+document as editable, not as an original narrative to preserve with appended
+updates. Rework all four sections and NOTES into a single current explanation;
+do not only add corrections, patch newly changed findings or replace a few
+counts. Replace superseded tables, classifications and summaries, and remove
+stale or duplicated prose so readers do not have to reconcile old and new
+conclusions.
 Reader-appropriate aggregations may differ while remaining traceable to that
 assessment; do not impose one rule's grouping or data constants on other rules.
 Preserve all audit, recovery and semantic evidence through direct links, without
 repeating provenance/accounting or introducing competing taxonomies.
+An editorial-only cleanup may retain unchanged sections after verifying that
+their counts, scopes and linked evidence remain consistent.
 
 Use exactly four numbered sections followed by an unnumbered `NOTES` section:
 
-1. **Conclusion and scope.** In a short paragraph, name the TypeSpec rule and
-   hyperlink the original Swagger linter rule ID to verified documentation or
-   implementation. State clearly whether the migration is functionally
-   equivalent for the assessed policy, is not equivalent, or remains
-   undetermined. Keep any material gap, failed required gate or scope restriction
-   visible here; never manufacture equivalence to fit the format. Keep this
-   section limited to the conclusion and policy boundaries, not work performed:
-   omit successful test/coverage/recovery milestones, review status, implementation
-   PR links, candidate/commit hashes, commands, repair history and redundant
-   no-change statements. Put that context in NOTES or linked evidence instead.
-   Summarize material non-equivalence or restrictions here; put per-group
-   diagnostic counts and their explanations in section 4, not the conclusion.
-   If a confirmed Swagger linter bug affects the conclusion, name the bug and its
-   impact concisely, and state whether the TypeSpec linter intentionally avoids
-   it. Distinguish intended-policy coverage from bug-for-bug equivalence.
-2. **Actual coverage.** Briefly state the assessed project population and
-   failures/unassessed projects, if any. Explain that reported diagnostics are
-   total individual findings across that population, not project counts.
-   Use a three-column table: count, Swagger linter, TypeSpec linter. Show raw
-   reported totals. When they differ, add a second row only for an explicitly
-   justified common unit. Name what it counts and the grouping identity, such
-   as "Affected HTTP operations (grouped by project/route)", rather than
-   "After analysis". Grouping changes the counting unit; it does not normalize
-   findings into equivalent defects or require the remaining counts to match.
-   Do not relabel adjusted values as raw findings or imply correspondence from
-   equal totals. Mark unsupported comparison/attribution unassessed, and non-lint
-   outcomes not applicable, rather than inventing zero or matching counts.
-   Keep project overlap and detailed location summaries out of the scorecard.
-   Immediately after the table, require an explicit **Assessed coverage**
-   summary, not just raw totals or a list of possible causes. State the
-   evidence-backed coverage outcome for the assessed policy, supported by
-   quantified observations and their scope. Use justified comparable counts
-   when available; otherwise report the verified diagnostic categories or
-   assessed subsets and explain what their counts establish. Distinguish
-   predicate classification from proven semantic disposition: an unequal-schema
-   count, for example, is not automatically a false-positive count.
-   Keep covered behavior, material missing/deferred behavior and unassessed
-   scope visible. If complete correspondence is unsupported, explicitly mark
-   comparable violation totals/coverage percentages unassessed and identify
-   the missing evidence; do not omit known assessed data or invent adjusted
-   totals. If no behavioral assessment is supported, say so and carry that
-   limitation into the conclusion and existing acceptance gates.
-   Equal totals or zero warnings alone do not establish coverage.
-   Briefly explain the evidenced causes of any remaining gap and link first to
-   `[Why diagnostic counts differ](#4-why-diagnostic-counts-differ)`, where the
-   reader can follow links to detailed evidence. Identify unresolved causes as
-   unresolved, not accepted differences. Keep the assessment concise: retain
-   detailed member/callback accounting and investigations in section 4 or its
-   linked evidence, and exact-reproduction receipts/tracing provenance in NOTES
-   or linked evidence. Brief quantified semantic categories needed to interpret
-   the assessed outcome belong here. Retain qualifications needed to interpret
-   the table; do not turn category counts into matched defects or a coverage rate.
-3. **Function-level coverage.** Use a compact three-column table:
-   **Behavior**, **Result**, and **Rationale**, covering material checks and
-   compliant controls. Keep the result to the coverage status; explain why that
-   status applies in the rationale, with a direct link to supporting evidence
-   and any material scope limitation. Do not merely repeat the result.
-   Distinguish covered, missing,
-   compiler-prevented, approved retirement and unassessed behavior honestly.
-   Keep test inventories and fixture counts in NOTES or linked evidence.
-   Test-case percentages do not establish production prevalence or exhaustive
-   rule coverage; do not minimize missing core behavior as a rare corner case.
-4. **Why diagnostic counts differ.** Explain only differing projects or
-   diagnostic groups: Swagger-linter-only, TypeSpec-linter-only, count-only,
-   or semantic/identity differences even when totals match. State each cause,
-   both observed counts, coverage status and recommended action/rationale from
-   **Gap analysis and decision**, with a direct link to its grouped appendix
-   entry. Exclude matching projects and routine examples.
-   If there are no differences, say so briefly. Keep unresolved differences
-   visible; do not let opposing project gaps cancel.
-   When an upstream defect causes a difference, call it a bug, explain its
-   mechanism and false-positive/false-negative effect, and link the pinned
-   implementation. Distinguish confirmed defects from suspected causes and code
-   inspection from captured execution traces; do not imply that a newer upstream
-   version or an uncaptured execution path was tested.
+1. **Scope.** Name the TypeSpec linter and hyperlink every original Swagger
+   linter ID to verified documentation or implementation. Add the original
+   migration linter PR link when one exists. Include only that mapping and PR
+   link: no equivalence verdict, validation history, counts or proposed actions.
+2. **Coverage.** State the assessed project population and any failed or
+   unassessed projects. Use a three-column table: **Count**, **Swagger linter**,
+   **TypeSpec linter**, containing only **Reported diagnostics**. These are
+   individual diagnostic occurrences within the stated comparison scope, not
+   projects, routes, grouped checks or equivalent defects. Do not add a grouped
+   count row or silently substitute normalized values.
 
-   For a difference table, use explicit column names:
-   **Difference (with evidence)**, **Swagger diagnostics (raw / grouped)**,
-   **TypeSpec diagnostics for the same check**, and
-   **Recommended action and rationale**.
-   Preserve the compact cell format, such as `53 / 25` and `0`; do not split
-   counts into extra columns or repeat labels inside each cell.
-   Explain before the table that `raw / grouped` means reported diagnostics /
-   justified grouped check instances, and define the grouping identity.
-   Grouping must retain distinct checks and meet the correspondence requirements
-   above; grouped checks are not necessarily proven service defects.
-   Define the TypeSpec column's assessed rule/message scope: it counts observed
-   diagnostics attributed to the same check and target/context, not unrelated
-   warnings on the same operation or results before suppression.
-   Use **unassessed** when attribution is unsupported, not zero. Keep other
-   rules' evidence and predicted post-fix gains explicitly separate.
-   The action column must distinguish recommendations from approved decisions
-   and retain coverage status, unresolved policy and required approval where
-   relevant; a vague **Decision** heading must not imply approval.
+   Include captured suppressed diagnostics attributed to the original Swagger
+   checks, whether emitted by the selected rule or an existing owning rule.
+   Count each distinct diagnostic once across members; do not collapse different
+   diagnostics for the same check. Source inspection or predicted findings are
+   not captured diagnostics. State the configured, excluded and suppressed
+   components and preserve their identities in linked evidence. If suppression
+   inspection covers only an affected subset, label the total as observed in
+   that subset; never claim an exhaustive suppression-inclusive corpus count.
 
-**NOTES** holds technical context: frozen inputs, audience/API-version and
-source/projection policies, severity/default activation, counting method,
-directional gaps, test totals and limitations, runtime, provenance and recovery
-links, validation/publication status and implementation PR links. An unsupported
-comparison, required-check failure or semantic gap still
-belongs in the conclusion and relevant behavior/difference entry, not only NOTES.
+   For a mixed TypeSpec rule, exclude checks outside the original rules' assessed
+   policy or population, not all unmatched warnings. Retain in-scope
+   TypeSpec-only findings and investigate them. Missing attribution is
+   **unassessed**, not evidence that a finding is out of scope or compliant.
+   Keep unfiltered totals and exclusion reasons in the appendix.
+
+   Follow the table with a brief **Analysis:** describing the quantified
+   observed coverage, material missing/deferred behavior and limitations,
+   without declaring migration acceptance. If grouped check contexts are used,
+   define their identity and distinguish them from diagnostic counts. A context
+   with no TypeSpec diagnostic may be a false positive, policy difference or
+   missing check; do not label all such contexts implementation gaps.
+   Unsupported comparable-defect totals and coverage percentages stay
+   unassessed. Link to
+   `[Why diagnostic counts differ](#3-why-diagnostic-counts-differ)`.
+
+3. **Why diagnostic counts differ.** Explain differing projects or diagnostic
+   groups, including count-only differences for already-diagnosed behavior.
+   Use **Difference (with evidence)**, **Swagger diagnostics (raw / grouped)**,
+   **TypeSpec diagnostics for the same check**, and **analysis** as table
+   headings. Use **Swagger diagnostics** instead when no grouping is needed.
+   Define any grouping identity and keep compact cells such as `53 / 25`.
+   Grouping retains distinct checks and does not establish equivalent defects.
+   Both linters' columns must use the section 2 inclusion and suppression policy;
+   never show zero solely because a captured finding was suppressed.
+
+   State the evidenced cause, coverage status and proposed action with a direct
+   link to its grouped appendix entry. Distinguish confirmed bugs, suspected
+   causes, code inspection and captured execution. Preserve unresolved causes,
+   pending approvals and required gates. Present analysis and proposals, not
+   claims that an action is inherently rational or an approved decision.
+   Keep excluded mixed-rule diagnostics out of the difference table and totals;
+   retain their audit trail in linked supporting evidence.
+
+   Make the entire raw-count difference calculable from this section. Show a
+   signed reconciliation of **Swagger total - TypeSpec total**, including
+   source/emission multiplicity, several member checks sharing one diagnostic,
+   and distinct owning diagnostics overlapping the same check. A concise
+   count-only explanation may replace a table row for already-diagnosed
+   behavior, but its contribution to the gap must remain explicit. Do not
+   confuse suppressed findings with missing coverage or hide a count difference
+   merely because the behavior is covered. Retain opposing project differences
+   in linked evidence; their cancellation does not establish correspondence.
+   If a residual cannot be explained, quantify it as unresolved rather than
+   inventing a balancing category. Matching controls belong in supporting
+   evidence, not routine difference rows.
+
+4. **Function-level coverage.** Use **Behavior**, **Result**, and **analysis**
+   to show material checks and compliant controls. The result states the
+   evidence-backed coverage status; the analysis explains it with direct
+   supporting links and scope limits. Distinguish covered, missing,
+   compiler-prevented, approved retirement and unassessed behavior.
+   Keep pending policy decisions and core gaps visible. Test-case percentages
+   do not establish production prevalence or exhaustive rule coverage.
+
+**NOTES** is a short reference, not a second assessment or a change log.
+Keep only:
+
+- Assessed source/specs/closure identities, material API-version or execution
+  limits, and whether this is a report-only reuse rather than a new run.
+- Counting or suppression limitations not already explained in sections 2 and
+  3, with direct links to the original configured observations, scoped accounting,
+  exclusion ledger and per-member evidence.
+- Validation status at the assessed revision, especially failed or unrun
+  required checks; link the detailed test inventory, recovery and CI receipts.
+- Verified follow-up PRs and their relevance, clearly separated from frozen
+  counts and from validated outcomes.
+
+Prefer a few compact labeled bullets. Move member matrices, repeated
+definitions/arithmetic, test inventories, runtime details and repair chronology
+to existing linked evidence. Preserve any information not already present there
+before removing it from NOTES. Label historical CI results by the assessed
+revision; do not present them as current PR status. Do not carry forward stale
+counts, superseded conclusions or repeated disclaimers. Material coverage
+limits and semantic gaps remain visible in sections 2-4, not only NOTES.
 
 Do not add a fifth numbered section or a standalone examples/actions section.
 Keep code-backed examples, complete investigations, coverage/action decisions,
@@ -518,77 +531,74 @@ Use this outline, replacing placeholders with verified observations:
 ```markdown
 # <Swagger rule ID> migration
 
-## 1. Conclusion and scope
+## 1. Scope
 
-The TypeSpec rule `<TypeSpec rule ID>` migrates Swagger linter rule
+The TypeSpec linter `<TypeSpec rule ID>` is assessed against Swagger linter rule
 [`<Swagger rule ID>`](<verified original rule documentation or implementation URL>).
-**<Evidence-backed equivalence conclusion and assessed scope; name any material confirmed upstream bug concisely.>**
+Original migration linter PR: [<owner/repo#number>](<verified PR URL>).
 
-## 2. Actual coverage
+## 2. Coverage
 
 <Assessed projects and failures/unassessed projects.>
-Reported diagnostics means individual findings, not projects.
+Reported diagnostics are individual findings for the original Swagger checks,
+including corresponding captured suppressed findings. State exclusions and
+whether suppression capture is exhaustive or limited to an inspected subset.
 
-| Count                                         | Swagger linter        | TypeSpec linter       |
-| --------------------------------------------- | --------------------- | --------------------- |
-| Reported diagnostics                          | <raw total>           | <raw total>           |
-| <Justified common unit and grouping identity> | <count or unassessed> | <count or unassessed> |
+| Count                | Swagger linter     | TypeSpec linter    |
+| -------------------- | ------------------ | ------------------ |
+| Reported diagnostics | <scoped raw total> | <scoped raw total> |
 
-**Assessed coverage:** <Evidence-backed coverage outcome and policy, supported by
-quantified comparable findings or verified categories/subsets with their scope.
-State what those data establish, material missing/deferred behavior and what
-remains unassessed; raw totals alone are not the assessment.>
+**Analysis:** <Quantified observed behavior, missing/deferred checks and
+unassessed scope. Define any check-context counts; do not declare acceptance
+or infer an equivalent-defect coverage percentage from raw totals.>
 
-<If complete correspondence is unsupported, identify the missing evidence and
-mark comparable violation totals/coverage percentages unassessed. Do not discard
-known assessed subsets or invent adjusted counts. Briefly explain remaining
-evidenced causes and explicitly unresolved causes.>
-See [Why diagnostic counts differ](#4-why-diagnostic-counts-differ) for the breakdown and remaining limitations.
+See [Why diagnostic counts differ](#3-why-diagnostic-counts-differ).
 
-## 3. Function-level coverage
-
-| Behavior                               | Result            | Rationale                                                              |
-| -------------------------------------- | ----------------- | ---------------------------------------------------------------------- |
-| <Material check and compliant control> | <Verified status> | <Why this status applies, with evidence link and any scope limitation> |
-
-## 4. Why diagnostic counts differ
+## 3. Why diagnostic counts differ
 
 <Define any grouping identity and the assessed TypeSpec rule/message scope.
-Include differing projects/diagnostic groups only; if none, say so instead of
-adding a table.>
+Use the same diagnostic inclusion/suppression policy as section 2.>
 
-| Difference (with evidence)        | Swagger diagnostics (raw / grouped)         | TypeSpec diagnostics for the same check | Recommended action and rationale                                      |
-| --------------------------------- | ------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------- |
-| <Cause and grouped-evidence link> | <Raw count> / <Grouped count or unassessed> | <Observed count or unassessed>          | <Coverage status; recommendation, rationale and any pending approval> |
+| Difference (with evidence)        | Swagger diagnostics (raw / grouped)         | TypeSpec diagnostics for the same check | analysis                                                          |
+| --------------------------------- | ------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------- |
+| <Cause and grouped-evidence link> | <Raw count> / <Grouped count or unassessed> | <Observed count or unassessed>          | <Evidence, coverage status, proposed action and pending approval> |
 
-<Keep compact numeric cells. If grouping is not needed, use "Swagger diagnostics"
-and a single raw count. Keep other rules' evidence and predicted post-fix gains
-separate from observed attributed diagnostics.>
+**Raw-count reconciliation:** <Swagger total> - <TypeSpec total> =
+<signed sum of all difference contributions, including count-only differences>.
+<Link the corresponding evidence; quantify any unexplained residual.>
+
+## 4. Function-level coverage
+
+| Behavior                               | Result            | analysis                                                   |
+| -------------------------------------- | ----------------- | ---------------------------------------------------------- |
+| <Material check and compliant control> | <Verified status> | <Evidence, scope limits and proposed action if applicable> |
 
 ## NOTES
 
-<Technical context, validation limits and links to supporting evidence/recovery.>
+- **Inputs:** <Assessed identities, execution/version limits and provenance link.>
+- **Counting evidence:** <Only necessary limits and direct accounting/member links.>
+- **Validation:** <Assessed results, failed/unrun checks and detailed receipt link.>
+- **Follow-ups:** <Separate verified PR links; not credited without evidence.>
 ```
 
-Omit the common-unit row when raw counts agree. When counts differ but no
-supported common unit exists, retain the raw counts and mark comparison
-unassessed; do not invent normalization.
+Omit inapplicable placeholders and PR links rather than guessing them. Do not
+add a grouped/common-unit row to the coverage scorecard. When exact comparable
+counts or attribution are unsupported, mark that comparison unassessed and
+retain the known scoped observations; do not invent normalization.
 
 Before publishing or refreshing, read the entire main report, all member notes
 and linked grouped conclusions together, not just sections 1 and 2. Can the
-reader readily decide: Is migration complete, and for which policy? What do the
-numbers count? Why do they differ? What should change, and why is it worth the
-complexity? What remains uncertain? Verify section 2 includes an evidence-backed
-assessed outcome and scoped quantitative data, not only raw totals or general
-causes; unsupported assessment must be explicitly unassessed. Check that scorecards, behavior tables,
-decisions and limitations answer consistently, with matching controls separate
-from differences and technical proofs directly linked. Quality is the reader's
-decision, not word count or outline compliance. Remove stale summaries and
-repeated accounting/provenance without discarding evidence or hiding gaps.
+reviewer determine the supported policy and remaining gaps, what the numbers
+count, how the complete gap reconciles, and which actions still need approval?
+Verify the scorecard filters, suppressed callbacks, excluded checks and signed
+reconciliation against the same underlying assessment. Keep known observed data
+and limitations visible without a blanket verdict. Check that behavior tables,
+proposals and linked evidence use consistent scopes. Remove repeated
+accounting/provenance without discarding evidence or hiding failed gates.
 
-For many-to-one tasks, name and link every original Swagger linter in the short
-conclusion. Put the member status matrix in NOTES or directly linked member
-evidence; keep combined raw/comparable counts in the scorecard. Retain every
+For many-to-one tasks, name and link every original Swagger linter in Scope.
+Put the member status matrix in directly linked member evidence, not NOTES;
+keep combined scoped raw counts in the scorecard. Retain every
 member's semantic evidence and unresolved result. Do not invent per-member
 TypeSpec counts when attribution is unavailable. Use the same outline for member
 notes without duplicating shared baseline data.
@@ -598,7 +608,7 @@ notes without duplicating shared baseline data.
 Start the appendix's difference analysis with a linked summary of only projects
 or diagnostic groups that differ. For each, show reported Swagger/TypeSpec
 counts, justified after-analysis counts or unassessed status, cause, coverage
-status and recommended action/rationale. Group details by project, then exact
+status and analysis/proposed action. Group details by project, then exact
 diagnostic target such as path/method, schema or source declaration. Show both linters' counts per group
 so reviewers can account for the entire project difference without reading raw
 JSON. Reconstructable shared prefixes can shorten long paths without losing
@@ -620,8 +630,8 @@ Keep all of the following in the concise report or its directly linked supportin
 evidence. Moving details must not discard evidence, weaken a gate or turn an
 unresolved investigation into an accepted difference:
 
-1. Final migration conclusion.
-2. Separate coverage status, exact cause and recommended action/rationale under
+1. Evidence-backed semantic assessment and unresolved reviewer decisions.
+2. Separate coverage status, exact cause and analysis/proposed action under
    **Gap analysis and decision**, including deferred gaps and pending approvals.
 3. Concrete TypeSpec source/fixture/compliance-control requirements for recommended
    changes, or the justified non-code decision and any further investigation.
@@ -673,8 +683,8 @@ implementation difference that causes the gap>.
 
 **Coverage status:** <evidenced behavior and policy boundary>.
 
-**Recommended action and rationale:** <smallest justified fix or explicit
-non-porting/defer/investigation decision; benefit versus complexity/noise/maintenance>.
+**analysis:** <evidenced cause and proposed fix, non-porting, defer or
+investigation action; tradeoffs, limitations and required approval>.
 ```
 
 Use excerpts verified against the pinned source and generated output; do not
@@ -690,5 +700,6 @@ same cause. Separate examples are required for different causes. Resolved gaps
 must retain an example when it explains why production or comparison behavior
 changed; mark the status and disposition accordingly.
 
-The final statement should state functional equivalence for the assessed policy,
-any approved scope restriction and remaining uncertainty.
+Close the supporting assessment with the evidenced semantic coverage, approved
+scope restrictions, missing behavior and remaining uncertainty. Leave migration
+acceptance and unapproved policy decisions to reviewers.

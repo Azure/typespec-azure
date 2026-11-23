@@ -417,6 +417,13 @@ export function keepOutputFileInsideEmitterDirectory(content: string): string {
   return content.replace(/(output-file:\s*["']?)(?:(?:\.\.\/)+|\{project-root\}\/)+(.*)/, "$1$2");
 }
 
+function removeRootYamlProperty(content: string, name: string): string {
+  return content.replace(
+    new RegExp(`^${name}:[^\\r\\n]*(?:\\r?\\n[ \\t]+[^\\r\\n]*)*\\r?\\n?`, "m"),
+    "",
+  );
+}
+
 export function buildTempConfig(
   project: ArmProject,
   outputDir: string,
@@ -427,6 +434,11 @@ export function buildTempConfig(
   content = updateAutorestOption(content, "emitter-output-dir", yamlOutputDir);
   content = updateAutorestOption(content, "arm-types-dir", normalizeRelative(commonTypesDir));
   content = updateAutorestOption(content, "service-yaml", "never");
+  if (/^kind:[ \t]*project[ \t]*$/m.test(content)) {
+    content = content.replace(/^kind:[ \t]*project[ \t]*$/m, "");
+    content = removeRootYamlProperty(content, "entrypoint");
+    content = removeRootYamlProperty(content, "features");
+  }
 
   // Keep every emitter output inside the dataset, even when a service normally
   // writes generated Swagger outside its TypeSpec project directory.

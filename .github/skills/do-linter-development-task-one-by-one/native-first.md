@@ -118,17 +118,20 @@ before selecting specs or installing dependencies. Record its metadata commit
 and immutable descriptor/archive identity. Select the canonical candidate base
 once, but prepare specs at the descriptor's frozen `source.commit`, not the
 metadata commit or a newly fetched specs tip. Missing/corrupt/incompatible
-shared data blocks migration; only a separately requested producer refresh
-runs the Swagger suite. Changing validator IDs alone does not invalidate the
-all-production-ARM observation baseline. Never
+shared data blocks migration; consumers never run the Swagger suite. The
+separate baseline producer refreshes once per monthly TypeSpec release cycle;
+an out-of-cycle refresh requires explicit authorization and evidence of
+material incompatibility or unresolved baseline validity. Changing validator
+IDs alone does not invalidate the all-production-ARM observation baseline. Never
 substitute arbitrary latest compiler packages: use the candidate's compatible
 closure and actual core gitlink. Verify prerequisite layers before installing;
 install only missing/invalid dependencies or changed manifests.
 
 Apply the [monthly evaluation snapshot](../analyze-native-lint-coverage/shared-baseline.md#monthly-evaluation-snapshot):
-new native branches use current canonical main, but coverage reuses the same
-specs commit throughout the dependency-upgrade cycle. New PRs or source SHAs
-alone do not justify baseline refresh. Assume current-main compiler and libraries
+new native branches use current canonical main, while one separately published
+baseline is refreshed at the start of each monthly TypeSpec release cycle and
+reused for coverage throughout that cycle. New PRs or source SHAs alone do not
+justify another refresh within the cycle. Assume current-main compiler and libraries
 remain backward-compatible with the frozen specs, and explicitly use the supported
 `--baseline-policy frozen-reference` with `--baseline-run`. Keep saved Swagger
 diagnostics and run fresh native diagnostics over the full frozen population.
@@ -136,6 +139,19 @@ Preserve both runtime identities and investigate actual compile failures and
 diagnostic gaps. A strict verifier's runtime-closure mismatch alone is not a
 blocker; this assumption does not prove identical emission or semantic equivalence,
 authorize refresh, or waive any required gate.
+
+During preparation, inspect the actual consumer integration suite and compile
+flags. If restored/default-enabled guidance produces warnings and integration
+uses `--warn-as-error`, record the likely downstream rollout dependency and its
+authorized scope before final evidence work. Warning-bearing frozen coverage
+does not establish green integration against a different current consumer
+population. Do not silently disable the rule, upgrade published contracts,
+extend cross-repository publication scope, or merge compatibility changes.
+The default [companion suppression proposal](companion-suppressions.md) is the
+narrowly authorized consumer scope when existing CI proves PR-caused findings.
+Its checkout starts from current canonical `typespec-next`, not the frozen
+coverage source. It is not a new replay worktree or permission to validate the
+consumer locally.
 
 ## Execute one implementation, with two review checkpoints
 
@@ -200,7 +216,7 @@ authorize refresh, or waive any required gate.
    native finding/comparison metrics are not applicable, not zero or equivalent.
 5. **Checkpoint A: development review.** After all required development checks
    and independent local review, publish/update the one native draft PR, with
-   the shared [PR title and two-section body](../shared/migration-pr-description.md).
+   the shared [PR title and body contract](../shared/migration-pr-description.md).
    Native rule implementations use
    `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`,
    matching promotion PRs; the destination name is the final unqualified
@@ -211,6 +227,12 @@ authorize refresh, or waive any required gate.
    invocation carrying `flowVersion: native-first`, task/members and
    `checkpoint: development-review`. Preserve the full five-round limit,
    persistent agents, verified review-specific collection and parent approval.
+   Before the initial linter handoff, the coordinator prepares the default
+   [CI-derived companion proposal](companion-suppressions.md#initial-delivery-by-default)
+   when applicable, links it directly in the description, and records its
+   pinned linter/consumer identities. Missing evidence is disclosed, not
+   replaced by local validation or guessed suppressions. Existing companions
+   refresh only on explicit request; changed linter heads otherwise mark them stale.
 6. **Checkpoint B: release readiness.** Keep the same native publisher/PR.
    Apply the shared native contract's full package/docs/ruleset/integration
    requirements, a separate independent local readiness review, and a fresh
@@ -221,6 +243,12 @@ authorize refresh, or waive any required gate.
    current applicable A/B reviews, required checks, evidence commit/assets and
    all links. Preserve intentional differences and limitations. Confirm every
    command/worker/review agent stopped before preparing the next task.
+
+Companion proposal completion is publication of the attributed suppression PR
+and direct links, not landing it or making external CI green. A user-requested
+proposal-only continuation does not run checkpoint B or CI/merge coordination.
+The full native task still retains its own required checks and readiness
+classification; a published companion is not a waiver or a passing CI result.
 
 If B changes production semantics, invalidate affected tests/coverage and return
 to A on the new content, then B. Documentation-only fixes repeat affected
@@ -272,7 +300,8 @@ success. General many-to-many analysis requires a separate design.
 Follow the [coverage lifecycle](../analyze-native-lint-coverage/SKILL.md#baseline-lifecycle)
 and [evidence contract](evidence.md). Discover/pin shared completed data first,
 reuse it across rules, and reserve fresh source selection/Swagger execution for
-an explicitly requested separate producer refresh into a new immutable baseline.
+the scheduled monthly producer or explicitly authorized out-of-cycle producer
+to publish a new immutable baseline.
 Keep shared input read-only and each parallel candidate's writable specs runtime
 separate. Separate frozen
 emitter/Swagger inputs from changed native artifacts. Specs SHA equality alone
@@ -300,7 +329,9 @@ initial cycle plus at most three task-wide semantic repair cycles; one eligible
 setup-only orchestration retry; three local draft corrections per phase/cycle
 and existing per-round review allowance; three coordinator reserve attempts;
 one native timeout diagnosis; one baseline comparison; the existing bounded
-setup-hook diagnostic/correction. Group size never multiplies allowances.
+setup-hook diagnostic/correction; and the prospective
+[local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery).
+Group size never multiplies allowances.
 Map development and promotion phase counters to development and readiness;
 returning to a phase or resuming a task never resets them. Preserve the current
 eligibility, explicit-authorization and quiescence rules, not just the numbers.
