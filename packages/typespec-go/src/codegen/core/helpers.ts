@@ -7,6 +7,7 @@ import * as go from "../../codemodel/index.js";
 import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import { ImportManager } from "./imports.js";
+import * as syntax from "./syntax.js";
 
 // variable to be used to determine comment length when calling comment from @azure-tools
 export const commentLength = 120;
@@ -593,7 +594,7 @@ export function formatValue(paramName: string, type: go.WireType, imports: Impor
         case "constantDef":
           return unwrappedType.type.name;
         default:
-          return `"${unwrappedType.literal}"`;
+          return syntax.stringLiteral(`${unwrappedType.literal}`);
       }
     case "scalar":
       switch (unwrappedType.type) {
@@ -652,7 +653,7 @@ export function formatLiteralValue(value: go.Literal, withCast: boolean): string
       // extensible enum with a value that's not one of the pre-defined ones.
       // emit it as a cast to the enum type, e.g. NetworkAPIVersion("2026-04-15-preview").
       if (value.type.type === "string") {
-        return `${value.type.name}("${value.literal}")`;
+        return `${value.type.name}(${syntax.stringLiteral(<string>value.literal)})`;
       }
       return `${value.type.name}(${value.literal})`;
     case "constantDef":
@@ -676,13 +677,8 @@ export function formatLiteralValue(value: go.Literal, withCast: boolean): string
           return <string>value.literal;
       }
     case "string":
-      if ((<string>value.literal)[0] === '"') {
-        // string is already quoted
-        return <string>value.literal;
-      }
-      return `"${value.literal}"`;
     case "time":
-      return `"${value.literal}"`;
+      return syntax.stringLiteral(<string>value.literal);
   }
 }
 
@@ -889,10 +885,14 @@ function formatDocListItem(item: go.DocListItem, prefix: string): string {
     .join("\n");
 }
 
+function normalizeCommentLineEndings(text: string): string {
+  return text.replace(/\r\n|[\r\u2028\u2029]/g, "\n");
+}
+
 // reports whether text has a non-blank line that isn't a list item, i.e. a line
 // go/doc/comment will see with zero indentation.
 function hasProseLine(text: string): boolean {
-  return text
+  return normalizeCommentLineEndings(text)
     .split("\n")
     .some((line) => line.trim() !== "" && go.matchDocListItem(line) === undefined);
 }
@@ -919,7 +919,7 @@ function renderDocBody(text: string, prefix = "//", hasPrecedingProse = false): 
   const renderLists = hasPrecedingProse || hasProseLine(text);
   const lastIsBlank = () => out.length === 0 || out[out.length - 1] === prefix;
 
-  for (const raw of text.split("\n")) {
+  for (const raw of normalizeCommentLineEndings(text).split("\n")) {
     const line = raw.replace(/\s+$/, "");
     if (line.trim() === "") {
       inList = false;
@@ -1087,7 +1087,21 @@ export function zeroValue(param: go.ClientParameter | go.MethodParameter): strin
 export type SerDeFormat = "JSON" | "XML";
 
 // used by getSerDeFormat to cache results
-const serDeFormatCache = new Map<string, SerDeFormat>();
+const serDeFormatCache = new WeakMap<go.Model | go.PolymorphicModel, SerDeFormat>();
+
+function inferModelSerDeFormat(model: go.Model | go.PolymorphicModel): SerDeFormat {
+  if (model.serialization?.xml && !model.serialization?.json) {
+    return "XML";
+  }
+  if (
+    model.fields.some(
+      (f) => f.serialization.xml !== undefined && f.serialization.json === undefined,
+    )
+  ) {
+    return "XML";
+  }
+  return "JSON";
+}
 
 // returns the wire format for the named model.
 // at present this assumes the formats to be mutually exclusive.
@@ -1095,17 +1109,17 @@ export function getSerDeFormat(
   model: go.Model | go.PolymorphicModel,
   pkg: go.PackageContent,
 ): SerDeFormat {
-  let serDeFormat = serDeFormatCache.get(model.name);
+  let serDeFormat = serDeFormatCache.get(model);
   if (serDeFormat) {
     return serDeFormat;
   }
 
-  // for model-only builds we assume the format to be JSON
+  // for model-only builds we infer from model usage/serialization metadata (defaulting to JSON)
   if (pkg.clients.length === 0) {
-    return "JSON";
+    return inferModelSerDeFormat(model);
   }
 
-  // recursively walks the fields in model, updating serDeFormatCache with the model name and specified format
+  // recursively walks the fields in model, updating serDeFormatCache with the model and specified format
   const recursiveWalkModelFields = function (type: go.WireType, serDeFormat: SerDeFormat): void {
     type = recursiveUnwrapMapSlice(type);
     switch (type.kind) {
@@ -1119,12 +1133,12 @@ export function getSerDeFormat(
         break;
       case "model":
       case "polymorphicModel":
-        if (serDeFormatCache.has(type.name)) {
+        if (serDeFormatCache.has(type)) {
           // we've already processed this type, don't do it again
           return;
         }
 
-        serDeFormatCache.set(type.name, serDeFormat);
+        serDeFormatCache.set(type, serDeFormat);
         for (const field of type.fields) {
           const fieldType = recursiveUnwrapMapSlice(field.type);
           recursiveWalkModelFields(fieldType, serDeFormat);
@@ -1169,15 +1183,12 @@ export function getSerDeFormat(
     }
   }
 
-  serDeFormat = serDeFormatCache.get(model.name);
+  serDeFormat = serDeFormatCache.get(model);
   if (!serDeFormat) {
-    // if we get here there are two possibilities
-    //  - we have a bug in the above indexing
-    //  - the model type is unreferenced by any operation
-    //
-    // while the former is possible, the latter has the potential to be real.
-    // regardless of the cause, we will just assume the format to be JSON.
-    serDeFormat = "JSON";
+    // Models only referenced via @error responses or outside client method bodies/results
+    // carry format flags in model.usage / field.serialization; fall back to JSON otherwise.
+    serDeFormat = inferModelSerDeFormat(model);
+    recursiveWalkModelFields(model, serDeFormat);
   }
   return serDeFormat;
 }
@@ -1703,25 +1714,30 @@ export function comment(content: string, prefix = lineCommentPrefix, factor = 0,
   let line = "";
   prefix = indent(prefix, factor);
 
-  content = content.trim();
+  content = normalizeCommentLineEndings(content).trim();
   if (content) {
-    for (const word of content.replace(/\n+/g, " » ").split(/\s+/g)) {
-      if (word === "»") {
+    const paragraphs = content.split(/\n+/g);
+    for (let p = 0; p < paragraphs.length; p++) {
+      if (p > 0) {
         result.push(line);
         line = prefix;
-        continue;
       }
+      for (const word of paragraphs[p]!.trim().split(/\s+/g)) {
+        if (!word) {
+          continue;
+        }
 
-      if (maxLength < line.length) {
-        result.push(line);
-        line = "";
+        if (maxLength < line.length) {
+          result.push(line);
+          line = "";
+        }
+
+        if (!line) {
+          line = prefix;
+        }
+
+        line += ` ${word}`;
       }
-
-      if (!line) {
-        line = prefix;
-      }
-
-      line += ` ${word}`;
     }
     if (line) {
       result.push(line);

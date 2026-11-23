@@ -5,6 +5,7 @@
 
 import * as go from "../../codemodel/index.js";
 import * as helpers from "./helpers.js";
+import * as syntax from "./syntax.js";
 
 /**
  * Creates the content for the constants.go file.
@@ -48,7 +49,7 @@ export function generateConstants(pkg: go.PackageContent): string {
     text += "const (\n";
     for (const val of enm.values) {
       text += helpers.formatDocCommentWithPrefix(val.name, val.docs);
-      let formatValue = `"${val.value}"`;
+      let formatValue = syntax.stringLiteral(`${val.value}`);
       if (enm.type !== "string") {
         formatValue = `${val.value}`;
       }

@@ -8,6 +8,7 @@ import { CodegenError } from "../core/errors.js";
 import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
 import { getPathExpansionStyle } from "../core/path-expansion.js";
+import * as syntax from "../core/syntax.js";
 import type { RequiredHelpers } from "./internal.js";
 
 /** Emits a typed parser shared by URI-template arrays, maps, and object members. */
@@ -109,7 +110,7 @@ export function parseURITemplateParameter(
     const { prefix } = getPathExpansionStyle(param);
     text += `var ${result} ${go.getTypeDeclaration(param.type, pkg)}\n`;
     text += `if ${raw} != "" {\n`;
-    let value = `strings.TrimPrefix(${raw}, ${JSON.stringify(prefix)})`;
+    let value = `strings.TrimPrefix(${raw}, ${syntax.stringLiteral(prefix)})`;
     if (param.pathStyle === "matrix") {
       value = `strings.TrimPrefix(${value}, "=")`;
     }
@@ -134,7 +135,7 @@ export function parseURITemplateParameter(
     requiredHelpers.splitURIPath = true;
     const { prefix, separator } = getPathExpansionStyle(param);
     const values = `${result}Values`;
-    text += `${values}, err := splitURIPath(${raw}, ${JSON.stringify(prefix)}, ${JSON.stringify(separator)})\n${fail}`;
+    text += `${values}, err := splitURIPath(${raw}, ${syntax.stringLiteral(prefix)}, ${syntax.stringLiteral(separator)})\n${fail}`;
     const parser = valueParser(param.type.itemType, pkg, imports);
     let parse: string;
     if (param.kind === "pathMapParam") {
@@ -154,7 +155,7 @@ export function parseURITemplateParameter(
         text += `${result}, err := ${parse}\n${fail}`;
       } else {
         text += `var ${result} ${go.getTypeDeclaration(param.type, pkg)}\n`;
-        text += `if ${querySource}.Has(${JSON.stringify(param.queryParameter)}) {\n`;
+        text += `if ${querySource}.Has(${syntax.stringLiteral(param.queryParameter)}) {\n`;
         text += `parsed, parseErr := ${parse}\n${parseFail}${result} = parsed\n}\n`;
       }
     } else {
@@ -178,7 +179,7 @@ export function parseURITemplateParameter(
       text += `${result} := ${typeName}{}\n`;
       text += `for key, values := range ${querySource} {\n`;
       if (excluded.size > 0) {
-        text += `if ${[...excluded].map((key) => `key == ${JSON.stringify(key)}`).join(" || ")} { continue }\n`;
+        text += `if ${[...excluded].map((key) => `key == ${syntax.stringLiteral(key)}`).join(" || ")} { continue }\n`;
       }
       text += `if len(values) == 0 { continue }\n`;
       text += `parsed, parseErr := (${parser})(values[0])\n${parseFail}`;
@@ -205,7 +206,7 @@ export function parseURITemplateParameter(
       text += `${result}, err := ${parse}\n${fail}`;
     } else {
       text += `var ${result} ${go.getTypeDeclaration(param.type, pkg)}\n`;
-      text += `if ${querySource}.Has(${JSON.stringify(param.queryParameter)}) {\n`;
+      text += `if ${querySource}.Has(${syntax.stringLiteral(param.queryParameter)}) {\n`;
       text += `parsed, parseErr := ${parse}\n${parseFail}`;
       text += `${result} = ${param.type.kind === "ptr" ? "&" : ""}parsed\n}\n`;
     }

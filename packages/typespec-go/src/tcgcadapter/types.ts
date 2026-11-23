@@ -559,7 +559,7 @@ export class TypeAdapter {
     }
     let mpc = this.types.get(keyName);
     if (!mpc) {
-      const ct = contentType ? new go.Literal(this.getStringType(), `"${contentType}"`) : undefined;
+      const ct = contentType ? new go.Literal(this.getStringType(), contentType) : undefined;
       mpc = new go.MultipartContent(ct);
       if (sliceOf) {
         mpc = new go.Slice(mpc);
@@ -936,7 +936,7 @@ export class TypeAdapter {
       const field = new go.ModelField(
         naming.ensureNameCase(discriminatorField),
         this.getPtrType(model.discriminatorValue),
-        discriminatorField,
+        { json: { name: discriminatorField } },
         new go.ModelFieldAnnotations(true, false, false, true),
       );
       field.defaultValue = model.discriminatorValue;
@@ -954,18 +954,18 @@ export class TypeAdapter {
         }
         model.fields.push(
           ...this.getModelFields(variant).filter(
-            (field) => field.serializedName !== options.discriminatorPropertyName,
+            (field) => field.serialization.json?.name !== options.discriminatorPropertyName,
           ),
         );
       } else {
         const type = this.getWireType(variant, false, true);
         const fieldType = helpers.isPtrType(type) ? this.getPtrType(type) : type;
-        const serializedName = options.envelopePropertyName!;
+        const wireName = options.envelopePropertyName!;
         model.fields.push(
           new go.ModelField(
-            naming.ensureNameCase(serializedName),
+            naming.ensureNameCase(wireName),
             fieldType,
-            serializedName,
+            { json: { name: wireName } },
             new go.ModelFieldAnnotations(true, false, false, false),
           ),
         );
@@ -1080,6 +1080,13 @@ export class TypeAdapter {
       }
     }
 
+    if (model.usage & (tcgc.UsageFlags.Json | tcgc.UsageFlags.Xml)) {
+      modelType.serialization = {
+        json: (model.usage & tcgc.UsageFlags.Json) !== 0 || undefined,
+        xml: (model.usage & tcgc.UsageFlags.Xml) !== 0 || undefined,
+      };
+    }
+
     modelType.docs.summary = model.summary;
     modelType.docs.description = model.doc;
     if (modelType.docs.summary) {
@@ -1119,7 +1126,7 @@ export class TypeAdapter {
     if (content.addlProps) {
       const annotations = new go.ModelFieldAnnotations(false, false, true, false);
       const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
-      fields.push(new go.ModelField("AdditionalProperties", addlPropsType, "", annotations));
+      fields.push(new go.ModelField("AdditionalProperties", addlPropsType, {}, annotations));
     }
     return fields;
   }
@@ -1178,15 +1185,38 @@ export class TypeAdapter {
       }
     }
 
-    let serializedName: string;
+    let xmlKind: go.XMLKind | undefined;
+    if (prop.serializationOptions.xml?.attribute) {
+      xmlKind = "attribute";
+    } else if (prop.serializationOptions.xml?.unwrapped) {
+      if (type.kind === "string") {
+        xmlKind = "text";
+      } else {
+        xmlKind = "unwrappedList";
+      }
+    }
+
+    const serialization: go.ModelFieldSerialization = {};
     if (prop.serializationOptions.json) {
-      serializedName = prop.serializationOptions.json.name;
-    } else if (prop.serializationOptions.xml) {
-      serializedName = prop.serializationOptions.xml.name;
-    } else {
+      serialization.json = { name: prop.serializationOptions.json.name };
+    }
+    if (prop.serializationOptions.xml) {
+      serialization.xml = {
+        name: prop.serializationOptions.xml.name,
+        kind: xmlKind,
+      };
+    }
+    if (prop.serializationOptions.multipart) {
+      serialization.multipart = { name: prop.serializationOptions.multipart.name };
+    }
+    if (!serialization.json && !serialization.xml && !serialization.multipart) {
       // there are some edge cases where serializationOptions is empty so we fall back to serializedName.
       // e.g. /typespec-go/test/tsp/HardwareSecurityModules.Management/CloudHsmCluster.tsp#L99-L105
-      serializedName = prop.serializedName;
+      if (isMultipartFormData) {
+        serialization.multipart = { name: prop.serializedName };
+      } else {
+        serialization.json = { name: prop.serializedName };
+      }
     }
 
     const fieldName = helpers.getEffectiveName({
@@ -1202,7 +1232,7 @@ export class TypeAdapter {
     const field = new go.ModelField(
       fieldName,
       usePtr && helpers.isPtrType(type) ? this.getPtrType(type) : type,
-      serializedName,
+      serialization,
       annotations,
     );
     field.docs.summary = prop.summary;
@@ -1230,16 +1260,6 @@ export class TypeAdapter {
       );
       if (!field.docs.summary && !field.docs.description) {
         field.docs.summary = helpers.getClientDefaultValueDoc(field.defaultValue);
-      }
-    }
-
-    if (prop.serializationOptions.xml?.attribute) {
-      field.xmlKind = "attribute";
-    } else if (prop.serializationOptions.xml?.unwrapped) {
-      if (type.kind === "string") {
-        field.xmlKind = "text";
-      } else {
-        field.xmlKind = "unwrappedList";
       }
     }
 

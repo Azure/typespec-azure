@@ -6,6 +6,7 @@
 import * as go from "../../codemodel/index.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
+import * as syntax from "./syntax.js";
 
 /**
  * Creates the content for the polymorphic_helpers.go file.
@@ -121,8 +122,9 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
       text += `${indent.get()}if m == nil {\n`;
       text += `${indent.push().get()}return nil, nil\n`;
       text += `${indent.pop().get()}}\n`;
+      const discFieldLit = syntax.stringLiteral(interfaceType.discriminatorField);
       text += `${indent.get()}var b ${prefix}${interfaceType.name}\n`;
-      text += `${indent.get()}switch m["${interfaceType.discriminatorField}"] {\n`;
+      text += `${indent.get()}switch m[${discFieldLit}] {\n`;
       for (const possibleType of interfaceType.possibleTypes) {
         let disc = helpers.formatLiteralValue(possibleType.discriminatorValue!, true);
         // when the discriminator value is an enum, cast the const as a string
@@ -139,7 +141,10 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
       if (interfaceType.rootType) {
         text += `${indent.get()}b = &${prefix}${interfaceType.rootType.name}{}\n`;
       } else {
-        text += `${indent.get()}return nil, fmt.Errorf("unrecognized discriminator value %v for ${interfaceType.name}", m["${interfaceType.discriminatorField}"])\n`;
+        const errFmt = syntax.stringLiteral(
+          `unrecognized discriminator value %v for ${interfaceType.name}`,
+        );
+        text += `${indent.get()}return nil, fmt.Errorf(${errFmt}, m[${discFieldLit}])\n`;
       }
       text += `${indent.pop().get()}}\n`;
       text += `${indent.get()}if err := json.Unmarshal(rawMsg, b); err != nil {\n`;

@@ -8,6 +8,7 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
+import * as syntax from "./syntax.js";
 
 // represents the generated content for an example
 export class ExampleContent {
@@ -73,7 +74,7 @@ export function generateExamples(
       for (const example of method.examples) {
         const indent = new helpers.Indentation();
         // function signature
-        exampleText += `// Generated from example definition: ${example.filePath}\n`;
+        exampleText += `// Generated from example definition: ${syntax.sanitizeSingleLineComment(example.filePath)}\n`;
         const exampleFuncNamePrefix =
           method.examples.length > 1 ? `_${helpers.camelCase(example.name)}` : "";
         exampleText += `func Example${client.name}_${method.name}${exampleFuncNamePrefix}() {\n`;
@@ -322,13 +323,13 @@ function getExampleValue(
 ): string {
   switch (example.kind) {
     case "string": {
-      let exampleText = `"${escapeString(example.value)}"`;
+      let exampleText = syntax.stringLiteral(example.value);
       if (example.type.kind === "constant") {
         exampleText = getConstantValue(pkg, example.type, example.value);
       } else if (example.type.kind === "time") {
         exampleText = getTimeValue(example.type, example.value, imports);
       } else if (example.type.kind === "encodedBytes") {
-        exampleText = `[]byte("${escapeString(example.value)}")`;
+        exampleText = `[]byte(${syntax.stringLiteral(example.value)})`;
       } else if (example.type.kind === "literal" && example.type.type.kind === "constant") {
         exampleText = getConstantValue(
           pkg,
@@ -337,13 +338,13 @@ function getExampleValue(
         );
       } else if (example.type.kind === "etag") {
         imports?.add(example.type.module);
-        exampleText = `${go.getTypeDeclaration(example.type, pkg)}("${escapeString(example.value)}")`;
+        exampleText = `${go.getTypeDeclaration(example.type, pkg)}(${syntax.stringLiteral(example.value)})`;
       } else if (go.isScalar(example.type, "byte")) {
-        exampleText = `io.NopCloser(bytes.NewReader([]byte("${escapeString(example.value)}")))`;
+        exampleText = `io.NopCloser(bytes.NewReader([]byte(${syntax.stringLiteral(example.value)})))`;
       } else if (example.type.kind === "readSeekCloser") {
         imports?.add("bytes");
         imports?.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
-        exampleText = `streaming.NopCloser(bytes.NewReader([]byte("${escapeString(example.value)}")))`;
+        exampleText = `streaming.NopCloser(bytes.NewReader([]byte(${syntax.stringLiteral(example.value)})))`;
       }
       return `${indent}${getPointerValue(example.type, exampleText, byValue, imports)}`;
     }
@@ -389,7 +390,7 @@ function getExampleValue(
       const isValueByValue = example.type.itemType.kind !== "ptr";
       const isValuePolymorphic = example.type.itemType.kind === "interface";
       for (const key in example.value) {
-        exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic).slice(indent.length + 1)},\n`;
+        exampleText += `${indent}\t${syntax.stringLiteral(key)}: ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic).slice(indent.length + 1)},\n`;
       }
       exampleText += `${indent}}`;
       return exampleText;
@@ -434,7 +435,7 @@ function getExampleValue(
           additionalPropertiesField.type.itemType.kind === "interface";
         exampleText += `${indent}\t${additionalPropertiesField.name}: ${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
-          exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
+          exampleText += `${indent}\t${syntax.stringLiteral(key)}: ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
         }
         exampleText += `${indent}},\n`;
       }
@@ -458,7 +459,7 @@ function getConstantValue(pkg: go.TestPackage, type: go.Constant, value: any): s
   }
   switch (type.type) {
     case "string":
-      return `${go.getTypeDeclaration(type, pkg)}("${value}")`;
+      return `${go.getTypeDeclaration(type, pkg)}(${syntax.stringLiteral(`${value}`)})`;
     default:
       return `${go.getTypeDeclaration(type, pkg)}(${value})`;
   }
@@ -724,7 +725,7 @@ function getPointerValue(
 
 function jsonToGo(value: any, indent: string): string {
   if (typeof value === "string") {
-    return `${indent}"${escapeString(value)}"`;
+    return `${indent}${syntax.stringLiteral(value)}`;
   } else if (typeof value === "number" || typeof value === "bigint") {
     return `${indent}${value}`;
   } else if (typeof value === "boolean") {
@@ -744,7 +745,7 @@ function jsonToGo(value: any, indent: string): string {
     } else {
       let result = `${indent}map[string]any{\n`;
       for (const key in value) {
-        result += `${indent}\t"${key}": ${jsonToGo(value[key], indent + "\t").slice(indent.length + 1)},\n`;
+        result += `${indent}\t${syntax.stringLiteral(key)}: ${jsonToGo(value[key], indent + "\t").slice(indent.length + 1)},\n`;
       }
       result += `${indent}}`;
       return result;
@@ -813,16 +814,6 @@ function getConcreteInterfaceModel(goType: go.Interface): go.PolymorphicModel {
     throw new CodegenError("InternalError", `no concrete type for interface ${goType.name}`);
   }
   return model;
-}
-
-function escapeString(str: string): string {
-  return str
-    .split("\\")
-    .join("\\\\")
-    .split('"')
-    .join('\\"')
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r");
 }
 
 /**

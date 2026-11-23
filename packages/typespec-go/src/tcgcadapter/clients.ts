@@ -1098,7 +1098,7 @@ export class ClientAdapter {
         // if the param is required then it's always passed by value
         const isRequired = go.isRequiredParameter(paramStyle);
         const contentType = this.adaptContentType(opParam.defaultContentType);
-        const getSerializedNameFromProperty = function (
+        const getWireNameFromProperty = function (
           property: tcgc.SdkModelPropertyType,
         ): string | undefined {
           if (contentType === "JSON") {
@@ -1115,15 +1115,15 @@ export class ClientAdapter {
         switch (contentType) {
           case "JSON":
           case "XML": {
-            // find the corresponding field within the model param so we can get the serialized name
-            let serializedName: string | undefined;
+            // find the corresponding field within the model param so we can get the wire name
+            let wireName: string | undefined;
             for (const property of opParam.type.properties) {
               if (property.name === param.name) {
-                serializedName = getSerializedNameFromProperty(property);
+                wireName = getWireNameFromProperty(property);
                 break;
               }
             }
-            if (!serializedName) {
+            if (!wireName) {
               throw new AdapterError(
                 "InternalError",
                 `didn't find body model property for spread parameter ${param.name}`,
@@ -1133,7 +1133,7 @@ export class ClientAdapter {
             const paramType = this.ta.getWireType(param.type, true, true);
             adaptedParam = new go.PartialBodyParameter(
               paramName,
-              serializedName,
+              wireName,
               contentType,
               !isRequired && helpers.isPtrType(paramType)
                 ? this.ta.getPtrType(paramType)
@@ -2530,7 +2530,7 @@ export class ClientAdapter {
                 }
                 const key = go.isQueryParameter(goParam)
                   ? goParam.queryParameter
-                  : (<go.PartialBodyParameter>goParam).serializedName;
+                  : (<go.PartialBodyParameter>goParam).wireName;
                 const propertyValue = (<tcgc.SdkModelExampleValue>param.value).value[key];
                 if (isQueryMember && propertyValue === undefined) {
                   continue;
@@ -2799,7 +2799,12 @@ export class ClientAdapter {
               ? Object.entries(exampleType.additionalPropertiesValue ?? {})
               : [];
           for (const [k, v] of entries) {
-            const field = concreteType.fields.find((f) => f.serializedName === k);
+            const field = concreteType.fields.find(
+              (f) =>
+                f.serialization.json?.name === k ||
+                f.serialization.xml?.name === k ||
+                f.serialization.multipart?.name === k,
+            );
             if (!field) {
               if (exampleType.kind === "raw") {
                 additionalProperties.push([k, v]);
@@ -2807,7 +2812,7 @@ export class ClientAdapter {
               }
               throw new AdapterError(
                 "InternalError",
-                `field with serializedName '${k}' not found in model '${concreteType.name}'.`,
+                `field with wire name '${k}' not found in model '${concreteType.name}'.`,
               );
             }
             ret.value[field.name] = this.adaptExampleType(v, field.type);

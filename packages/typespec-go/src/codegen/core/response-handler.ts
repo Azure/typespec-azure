@@ -8,6 +8,7 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
+import * as syntax from "./syntax.js";
 
 /**
  * emits the response handler for the specified method.
@@ -254,19 +255,19 @@ function formatHeaderResponseValue(
   if (headerResp.kind === "headerMapResponse") {
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
     imports.add("strings");
-    const headerPrefix = headerResp.headerName;
+    const headerPrefixLit = syntax.stringLiteral(headerResp.headerName);
     let text = `${indent.get()}for hh := range resp.Header {\n`;
-    text += `${indent.push().get()}if len(hh) > len("${headerPrefix}") && strings.EqualFold(hh[:len("${headerPrefix}")], "${headerPrefix}") {\n`;
+    text += `${indent.push().get()}if len(hh) > len(${headerPrefixLit}) && strings.EqualFold(hh[:len(${headerPrefixLit})], ${headerPrefixLit}) {\n`;
     text += `${indent.push().get()}if ${respObj}.${headerResp.fieldName} == nil {\n`;
     text += `${indent.push().get()}${respObj}.${headerResp.fieldName} = map[string]*string{}\n`;
     text += `${indent.pop().get()}}\n`;
-    text += `${indent.get()}${respObj}.${headerResp.fieldName}[hh[len("${headerPrefix}"):]] = to.Ptr(resp.Header.Get(hh))\n`;
+    text += `${indent.get()}${respObj}.${headerResp.fieldName}[hh[len(${headerPrefixLit}):]] = to.Ptr(resp.Header.Get(hh))\n`;
     text += `${indent.pop().get()}}\n`;
     text += `${indent.pop().get()}}\n`;
     return text;
   }
 
-  let text = `${indent.get()}if val := resp.Header.Get("${helpers.canonicalizeHeaderName(headerResp.headerName)}"); val != "" {\n`;
+  let text = `${indent.get()}if val := resp.Header.Get(${syntax.stringLiteral(helpers.canonicalizeHeaderName(headerResp.headerName))}); val != "" {\n`;
   indent.push();
   let name = naming.uncapitalize(headerResp.fieldName);
   let byRef = "&";
