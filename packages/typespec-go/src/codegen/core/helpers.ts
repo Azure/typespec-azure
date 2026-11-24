@@ -1566,69 +1566,7 @@ export function clientHasNoExportedMethods(client: go.Client): boolean {
  * @returns a quoted and escaped Go string literal
  */
 export function formatGoStringLiteral(value: string): string {
-  let out = '"';
-  for (let i = 0; i < value.length; ++i) {
-    const code = value.charCodeAt(i);
-    if (code >= 0xd800 && code <= 0xdbff) {
-      const next = i + 1 < value.length ? value.charCodeAt(i + 1) : 0;
-      if (next >= 0xdc00 && next <= 0xdfff) {
-        out += value.slice(i, i + 2);
-        ++i;
-      } else {
-        out += "\\ufffd";
-      }
-      continue;
-    }
-    if (code >= 0xdc00 && code <= 0xdfff) {
-      out += "\\ufffd";
-      continue;
-    }
-    switch (code) {
-      case 0x07:
-        out += "\\a";
-        break;
-      case 0x08:
-        out += "\\b";
-        break;
-      case 0x09:
-        out += "\\t";
-        break;
-      case 0x0a:
-        out += "\\n";
-        break;
-      case 0x0b:
-        out += "\\v";
-        break;
-      case 0x0c:
-        out += "\\f";
-        break;
-      case 0x0d:
-        out += "\\r";
-        break;
-      case 0x22:
-        out += '\\"';
-        break;
-      case 0x5c:
-        out += "\\\\";
-        break;
-      default:
-        if (code < 0x20 || code === 0x7f) {
-          out += `\\x${code.toString(16).padStart(2, "0")}`;
-        } else if (
-          (code >= 0x80 && code <= 0x9f) ||
-          code === 0x2028 ||
-          code === 0x2029 ||
-          code === 0xfeff
-        ) {
-          out += `\\u${code.toString(16).padStart(4, "0")}`;
-        } else {
-          out += value[i];
-        }
-        break;
-    }
-  }
-  out += '"';
-  return out;
+  return JSON.stringify(value).replace(/\ufeff/g, "\\ufeff");
 }
 
 /**
