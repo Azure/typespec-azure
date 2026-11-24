@@ -271,6 +271,12 @@ Read the main explanation and examples without the migration section and verify
 that they teach the native requirement without legacy validator or
 emitted-reference comparisons. Apply the same check to regenerated public pages;
 compiling examples alone does not prove the documentation meets this contract.
+Before publication or local-review handoff, also verify that incorrect/correct
+example headings include `❌ Incorrect` / `✅ Correct`, respectively, in both
+the authored source and regenerated pages when applicable. Fix missing symbols
+in the authored source and regenerate rather than patching generated copies.
+This is a documentation review check, not a reason to add a per-rule Markdown
+parser.
 
 ## Deliverable
 
