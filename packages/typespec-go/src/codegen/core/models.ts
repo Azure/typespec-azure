@@ -5,7 +5,6 @@
 
 import * as go from "../../codemodel/index.js";
 import * as naming from "../../naming/index.js";
-import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 import * as syntax from "./syntax.js";
@@ -546,40 +545,6 @@ function needsXMLNestedModelMarshalling(modelType: go.Model): boolean {
   return false;
 }
 
-function getJSONFieldName(field: go.ModelField): string {
-  if (!field.serialization.json) {
-    throw new CodegenError(
-      "InternalError",
-      `missing JSON serialization metadata for field ${field.name}`,
-    );
-  }
-  return field.serialization.json.name;
-}
-
-function getXMLFieldSerialization(field: go.ModelField): go.XMLFieldSerialization {
-  if (field.serialization.xml) {
-    return field.serialization.xml;
-  }
-  if (field.serialization.json) {
-    return { name: field.serialization.json.name };
-  }
-  throw new CodegenError(
-    "InternalError",
-    `missing XML serialization metadata for field ${field.name}`,
-  );
-}
-
-function getMultipartFieldName(field: go.ModelField): string {
-  const name = field.serialization.multipart?.name ?? field.serialization.json?.name;
-  if (name === undefined) {
-    throw new CodegenError(
-      "InternalError",
-      `missing multipart serialization metadata for field ${field.name}`,
-    );
-  }
-  return name;
-}
-
 /**
  * narrows field to a Model or Ptr<Model> type that requires custom
  * marshalling due to the field's serialized name being different from
@@ -595,8 +560,7 @@ function fieldNeedsXMLNestedModelMarshalling(
   if (fieldType.kind !== "model" || !fieldType.xmlName) {
     return false;
   }
-  const xml = getXMLFieldSerialization(field);
-  return xml.name !== fieldType.xmlName;
+  return field.serializedName !== fieldType.xmlName;
 }
 
 // generates discriminator marker method
@@ -648,7 +612,7 @@ function generateToMultipartForm(modelDef: ModelDef, indent: helpers.Indentation
       method += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
       indent.push();
     }
-    const wireNameLit = syntax.stringLiteral(getMultipartFieldName(field));
+    const wireNameLit = syntax.stringLiteral(field.serializedName);
     const fieldType = helpers.recursiveUnwrapMapSlice(field.type);
     if (fieldType.kind === "model" && !fieldType.annotations.multipartFormData) {
       method += `${indent.get()}if err := populateMultipartJSON(objectMap, ${wireNameLit}, ${star}${receiver}.${field.name}); err != nil {\n`;
@@ -729,7 +693,7 @@ function generateJSONMarshallerBody(
     // type and read isPtr to decide pointer-to-type emission.
     const fieldType = go.unwrapPtr(field.type);
     const deref = helpers.deref(field.type);
-    const wireNameLit = syntax.stringLiteral(getJSONFieldName(field));
+    const wireNameLit = syntax.stringLiteral(field.serializedName);
     if (field.annotations.isDiscriminator) {
       if (field.defaultValue) {
         marshaller += `${indent.get()}objectMap[${wireNameLit}] = ${helpers.formatLiteralValue(field.defaultValue, true)}\n`;
@@ -857,7 +821,7 @@ function generateJSONMarshallerBody(
     marshaller += `${indent.push().get()}for key, val := range ${receiver}.AdditionalProperties {\n`;
     const discriminatorCheck = modelDef.Model.fields
       .filter((field) => !go.isAdditionalProperties(field) && field.annotations.isDiscriminator)
-      .map((field) => `key == ${syntax.stringLiteral(getJSONFieldName(field))}`)
+      .map((field) => `key == ${syntax.stringLiteral(field.serializedName)}`)
       .join(" || ");
     if (discriminatorCheck) {
       marshaller += `${indent.push().get()}if ${discriminatorCheck} {\n`;
@@ -987,7 +951,7 @@ function generateJSONUnmarshallerBody(
       }
       // dispatch on the unwrapped type; pointer-ness is captured in the code model.
       const fieldType = go.unwrapPtr(field.type);
-      const wireNameLit = syntax.stringLiteral(getJSONFieldName(field));
+      const wireNameLit = syntax.stringLiteral(field.serializedName);
       const fieldNameLit = syntax.stringLiteral(field.name);
       unmarshalBody += `${indent.get()}case ${wireNameLit}:\n`;
       indent.push(); // case body level
@@ -1298,7 +1262,7 @@ function generateAliasType(
     } else if (fieldType.kind === "encodedBytes") {
       text += `${indent.get()}${field.name} *string ${xmlTag}\n`;
     } else if (fieldNeedsXMLNestedModelMarshalling(field)) {
-      text += `${indent.get()}${field.name} *${getXMLNestedModelAliasTypeName(field.type)} ${syntax.structTag("xml", getXMLFieldSerialization(field).name)}\n`;
+      text += `${indent.get()}${field.name} *${getXMLNestedModelAliasTypeName(field.type)} ${syntax.structTag("xml", field.serializedName)}\n`;
     }
   }
   text += `${indent.pop().get()}}{\n`;
@@ -1444,9 +1408,8 @@ function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): stri
   if (go.isAdditionalProperties(field)) {
     return "";
   }
-  const xml = getXMLFieldSerialization(field);
-  let serialization = xml.name;
-  switch (xml.kind) {
+  let serialization = field.serializedName;
+  switch (field.xmlKind) {
     case "attribute":
       serialization += ",attr";
       return serialization;
@@ -1477,7 +1440,7 @@ function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): stri
     // </slideshow>
 
     // for unwrapped lists we use the serialized name on the field
-    if (xml.kind !== "unwrappedList") {
+    if (field.xmlKind !== "unwrappedList") {
       // start with the serialized name of the element, preferring xml name if available
       const unwrappedPtrType = go.unwrapPtr(field.type.itemType);
       const inner = field.type.xmlName

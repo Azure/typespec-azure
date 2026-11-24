@@ -195,8 +195,8 @@ export interface ParameterGroup {
 export interface PartialBodyParameter extends HttpParameterBase {
   kind: "partialBodyParam";
 
-  /** the wire name of the field within the type sent in the request body */
-  wireName: string;
+  /** the name of the field within the type sent in the request body */
+  serializedName: string;
 
   /** the wire format of the underlying type */
   format: "JSON" | "XML";
@@ -691,7 +691,7 @@ export class ParameterRef implements ParameterRef {
 export class PartialBodyParameter extends HttpParameterBase implements PartialBodyParameter {
   constructor(
     name: string,
-    wireName: string,
+    serializedName: string,
     format: "JSON" | "XML",
     type: type.WireType,
     style: ParameterStyle,
@@ -699,7 +699,7 @@ export class PartialBodyParameter extends HttpParameterBase implements PartialBo
     super(name, type, style, "method");
     this.kind = "partialBodyParam";
     this.format = format;
-    this.wireName = wireName;
+    this.serializedName = serializedName;
   }
 }
 

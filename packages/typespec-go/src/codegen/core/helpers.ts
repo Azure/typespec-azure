@@ -1089,20 +1089,6 @@ export type SerDeFormat = "JSON" | "XML";
 // used by getSerDeFormat to cache results
 const serDeFormatCache = new WeakMap<go.Model | go.PolymorphicModel, SerDeFormat>();
 
-function inferModelSerDeFormat(model: go.Model | go.PolymorphicModel): SerDeFormat {
-  if (model.serialization?.xml && !model.serialization?.json) {
-    return "XML";
-  }
-  if (
-    model.fields.some(
-      (f) => f.serialization.xml !== undefined && f.serialization.json === undefined,
-    )
-  ) {
-    return "XML";
-  }
-  return "JSON";
-}
-
 // returns the wire format for the named model.
 // at present this assumes the formats to be mutually exclusive.
 export function getSerDeFormat(
@@ -1114,9 +1100,9 @@ export function getSerDeFormat(
     return serDeFormat;
   }
 
-  // for model-only builds we infer from model usage/serialization metadata (defaulting to JSON)
+  // for model-only builds we assume the format to be JSON
   if (pkg.clients.length === 0) {
-    return inferModelSerDeFormat(model);
+    return "JSON";
   }
 
   // recursively walks the fields in model, updating serDeFormatCache with the model and specified format
@@ -1185,10 +1171,13 @@ export function getSerDeFormat(
 
   serDeFormat = serDeFormatCache.get(model);
   if (!serDeFormat) {
-    // Models only referenced via @error responses or outside client method bodies/results
-    // carry format flags in model.usage / field.serialization; fall back to JSON otherwise.
-    serDeFormat = inferModelSerDeFormat(model);
-    recursiveWalkModelFields(model, serDeFormat);
+    // if we get here there are two possibilities
+    //  - we have a bug in the above indexing
+    //  - the model type is unreferenced by any operation
+    //
+    // while the former is possible, the latter has the potential to be real.
+    // regardless of the cause, we will just assume the format to be JSON.
+    serDeFormat = "JSON";
   }
   return serDeFormat;
 }
@@ -1716,28 +1705,23 @@ export function comment(content: string, prefix = lineCommentPrefix, factor = 0,
 
   content = normalizeCommentLineEndings(content).trim();
   if (content) {
-    const paragraphs = content.split(/\n+/g);
-    for (let p = 0; p < paragraphs.length; p++) {
-      if (p > 0) {
+    for (const word of content.replace(/\n+/g, " » ").split(/\s+/g)) {
+      if (word === "»") {
         result.push(line);
         line = prefix;
+        continue;
       }
-      for (const word of paragraphs[p]!.trim().split(/\s+/g)) {
-        if (!word) {
-          continue;
-        }
 
-        if (maxLength < line.length) {
-          result.push(line);
-          line = "";
-        }
-
-        if (!line) {
-          line = prefix;
-        }
-
-        line += ` ${word}`;
+      if (maxLength < line.length) {
+        result.push(line);
+        line = "";
       }
+
+      if (!line) {
+        line = prefix;
+      }
+
+      line += ` ${word}`;
     }
     if (line) {
       result.push(line);

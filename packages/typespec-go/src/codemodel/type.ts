@@ -209,38 +209,22 @@ export type MapValueType =
   | Slice
   | SliceArray;
 
-export interface JSONFieldSerialization {
-  name: string;
-}
-
-export interface XMLFieldSerialization {
-  name: string;
-  kind?: XMLKind;
-}
-
-export interface MultipartFieldSerialization {
-  name: string;
-}
-
-export interface ModelFieldSerialization {
-  json?: JSONFieldSerialization;
-  xml?: XMLFieldSerialization;
-  multipart?: MultipartFieldSerialization;
-}
-
 /** a field within a model */
 export interface ModelField extends StructField {
   /** the field's underlying type */
   type: WireType;
 
-  /** format-specific wire serialization metadata for this field */
-  serialization: ModelFieldSerialization;
+  /** the name of the field as it's sent/received over the wire */
+  serializedName: string;
 
   /** metadata for this field */
   annotations: ModelFieldAnnotations;
 
   /** the value to send over the wire if one isn't specified */
   defaultValue?: Literal;
+
+  /** contains XML-specific serde info */
+  xmlKind?: XMLKind;
 }
 
 /** additional settings for a model type */
@@ -877,12 +861,6 @@ interface ModelBase extends StructBase {
    * different from the type's name.
    */
   xmlName?: string;
-
-  /** wire serialization formats observed for this model */
-  serialization?: {
-    json?: boolean;
-    xml?: boolean;
-  };
 }
 
 class StructBase implements StructBase {
@@ -1002,11 +980,11 @@ export class ModelField extends StructField implements ModelField {
   constructor(
     name: string,
     type: WireType,
-    serialization: ModelFieldSerialization,
+    serializedName: string,
     annotations: ModelFieldAnnotations,
   ) {
     super(name, type);
-    this.serialization = serialization;
+    this.serializedName = serializedName;
     this.annotations = annotations;
   }
 }

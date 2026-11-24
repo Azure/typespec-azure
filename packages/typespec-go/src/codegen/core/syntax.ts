@@ -183,3 +183,77 @@ export function sanitizeSingleLineComment(text: string): string {
 export function escapeRegexpLiteral(text: string): string {
   return text.replace(/[\\.+*?()|[\]{}^$]/g, "\\$&");
 }
+
+/**
+ * Encodes an arbitrary parameter segment name into a valid, collision-free Go RE2
+ * named capture group identifier (`[A-Za-z0-9_]+`).
+ *
+ * ASCII letters and digits are preserved verbatim; every other code point (including `_`)
+ * is encoded as `_${hex}_` so distinct names such as `p.a` and `p_a` never collide.
+ */
+export function encodeRegexpCaptureName(name: string): string {
+  if (name.length === 0) {
+    return "_";
+  }
+  let out = "";
+  for (let i = 0; i < name.length; ) {
+    const code = name.charCodeAt(i);
+    if (
+      (code >= 0x30 && code <= 0x39) ||
+      (code >= 0x41 && code <= 0x5a) ||
+      (code >= 0x61 && code <= 0x7a)
+    ) {
+      out += String.fromCharCode(code);
+      i += 1;
+      continue;
+    }
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = i + 1 < name.length ? name.charCodeAt(i + 1) : 0;
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        const cp = name.codePointAt(i)!;
+        out += `_${cp.toString(16)}_`;
+        i += 2;
+        continue;
+      }
+    }
+    out += `_${code.toString(16)}_`;
+    i += 1;
+  }
+  return out;
+}
+
+const jsonStructTagPunctuation = "!#$%&()*+-./:;<=>?@[]^_{|}~ ";
+const jsonStructTagLetterOrDigit = /^[\p{L}\p{Nd}]$/u;
+
+/**
+ * Reports whether `name` is preserved verbatim by Go's `encoding/json` struct field tag
+ * parser (`parseTag` + `isValidTag`). Names that are empty, `"-"`, contain commas, quotes,
+ * backslashes, backticks, control characters, or other disallowed runes are rejected or
+ * altered by `encoding/json` even when Go-escaped inside a struct tag literal.
+ */
+export function isValidJSONStructTagName(name: string): boolean {
+  if (name.length === 0 || name === "-") {
+    return false;
+  }
+  for (let i = 0; i < name.length; ) {
+    const code = name.charCodeAt(i);
+    let ch: string;
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = i + 1 < name.length ? name.charCodeAt(i + 1) : 0;
+      if (next < 0xdc00 || next > 0xdfff) {
+        return false;
+      }
+      ch = name.slice(i, i + 2);
+      i += 2;
+    } else if (code >= 0xdc00 && code <= 0xdfff) {
+      return false;
+    } else {
+      ch = String.fromCharCode(code);
+      i += 1;
+    }
+    if (!jsonStructTagPunctuation.includes(ch) && !jsonStructTagLetterOrDigit.test(ch)) {
+      return false;
+    }
+  }
+  return true;
+}

@@ -160,7 +160,7 @@ function generateSseFrame(
     text = `${indent.get()}data, err := json.Marshal(${source})\n`;
     text += `${indent.get()}${helpers.buildErrCheck(indent, "err", "streaming.SSEFrame{}")}\n`;
     if (sse.envelopeField) {
-      const envelopeKeyLit = syntax.stringLiteral(sse.envelopeField.serialization.json!.name);
+      const envelopeKeyLit = syntax.stringLiteral(sse.envelopeField.serializedName);
       text += `${indent.get()}rawMsg := map[string]json.RawMessage{${envelopeKeyLit}: json.RawMessage("null")}\n`;
       text += `${indent.get()}${helpers.buildIfBlock(indent, {
         condition: "err := json.Unmarshal(data, &rawMsg); err != nil",

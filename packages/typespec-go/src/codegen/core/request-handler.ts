@@ -752,35 +752,67 @@ function emitBody(
     }
     return text;
   } else if (partialBodyParams.length > 0) {
-    // partial body params are discrete params that are all fields within an internal struct.
-    // define and instantiate an instance of the wire type, using the values from each param.
-    text += `${indent.get()}body := struct {\n`;
-    indent.push();
-    for (const partialBodyParam of partialBodyParams) {
-      text += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} ${syntax.structTag(partialBodyParam.format.toLowerCase(), partialBodyParam.wireName)}\n`;
-    }
-    indent.pop();
-    text += `${indent.get()}}{\n`;
-    indent.push();
-    // required params are emitted as initializers in the struct literal
-    for (const partialBodyParam of partialBodyParams) {
-      if (go.isRequiredParameter(partialBodyParam.style)) {
-        text += `${indent.get()}${naming.capitalize(partialBodyParam.name)}: ${naming.uncapitalize(partialBodyParam.name)},\n`;
+    const needsJSONMapBody =
+      partialBodyParams[0].format === "JSON" &&
+      partialBodyParams.some(
+        (partialBodyParam) => !syntax.isValidJSONStructTagName(partialBodyParam.serializedName),
+      );
+    const bodyVar = needsJSONMapBody
+      ? helpers.getUniqueVarName(partialBodyParams, ["body", "bodyMap"])
+      : "body";
+    if (needsJSONMapBody) {
+      const requiredPartialParams = partialBodyParams.filter((partialBodyParam) =>
+        go.isRequiredParameter(partialBodyParam.style),
+      );
+      if (requiredPartialParams.length === 0) {
+        text += `${indent.get()}${bodyVar} := map[string]any{}\n`;
+      } else {
+        text += `${indent.get()}${bodyVar} := map[string]any{\n`;
+        indent.push();
+        for (const partialBodyParam of requiredPartialParams) {
+          text += `${indent.get()}${syntax.stringLiteral(partialBodyParam.serializedName)}: ${naming.uncapitalize(partialBodyParam.name)},\n`;
+        }
+        indent.pop();
+        text += `${indent.get()}}\n`;
       }
-    }
-    indent.pop();
-    text += `${indent.get()}}\n`;
-    // now populate any optional params from the options type
-    for (const partialBodyParam of partialBodyParams) {
-      if (!go.isRequiredParameter(partialBodyParam.style)) {
-        text += emitParamGroupCheck(partialBodyParam, indent);
-        text += `${indent.push().get()}body.${naming.capitalize(partialBodyParam.name)} = options.${naming.capitalize(partialBodyParam.name)}\n`;
-        text += `${indent.pop().get()}}\n`;
+      for (const partialBodyParam of partialBodyParams) {
+        if (!go.isRequiredParameter(partialBodyParam.style)) {
+          text += emitParamGroupCheck(partialBodyParam, indent);
+          text += `${indent.push().get()}${bodyVar}[${syntax.stringLiteral(partialBodyParam.serializedName)}] = options.${naming.capitalize(partialBodyParam.name)}\n`;
+          text += `${indent.pop().get()}}\n`;
+        }
+      }
+    } else {
+      // partial body params are discrete params that are all fields within an internal struct.
+      // define and instantiate an instance of the wire type, using the values from each param.
+      text += `${indent.get()}body := struct {\n`;
+      indent.push();
+      for (const partialBodyParam of partialBodyParams) {
+        text += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} ${syntax.structTag(partialBodyParam.format.toLowerCase(), partialBodyParam.serializedName)}\n`;
+      }
+      indent.pop();
+      text += `${indent.get()}}{\n`;
+      indent.push();
+      // required params are emitted as initializers in the struct literal
+      for (const partialBodyParam of partialBodyParams) {
+        if (go.isRequiredParameter(partialBodyParam.style)) {
+          text += `${indent.get()}${naming.capitalize(partialBodyParam.name)}: ${naming.uncapitalize(partialBodyParam.name)},\n`;
+        }
+      }
+      indent.pop();
+      text += `${indent.get()}}\n`;
+      // now populate any optional params from the options type
+      for (const partialBodyParam of partialBodyParams) {
+        if (!go.isRequiredParameter(partialBodyParam.style)) {
+          text += emitParamGroupCheck(partialBodyParam, indent);
+          text += `${indent.push().get()}body.${naming.capitalize(partialBodyParam.name)} = options.${naming.capitalize(partialBodyParam.name)}\n`;
+          text += `${indent.pop().get()}}\n`;
+        }
       }
     }
     // TODO: spread params are JSON only https://github.com/Azure/typespec-azure/issues/4949
     text += `${indent.get()}req.Raw().Header["Content-Type"] = []string{"application/json"}\n`;
-    text += `${indent.get()}if err := runtime.MarshalAsJSON(req, body); err != nil {\n`;
+    text += `${indent.get()}if err := runtime.MarshalAsJSON(req, ${bodyVar}); err != nil {\n`;
     text += `${indent.push().get()}return nil, err\n`;
     text += `${indent.pop().get()}}\n`;
     return text;

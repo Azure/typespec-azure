@@ -344,7 +344,7 @@ function generateObjectMatch(
       if (literal.kind !== "literal") {
         throw new CodegenError("InternalError", `expected literal for ${modelField.name}`);
       }
-      return `hasLiteralValue[${go.getTypeDeclaration(literal.type, goUnion.pkg)}](rawMsg, ${syntax.stringLiteral(getJSONFieldName(modelField))}, ${helpers.formatLiteralValue(literal, false)})`;
+      return `hasLiteralValue[${go.getTypeDeclaration(literal.type, goUnion.pkg)}](rawMsg, ${syntax.stringLiteral(modelField.serializedName)}, ${helpers.formatLiteralValue(literal, false)})`;
     });
     const probeFields = getJsonFieldsForProbe(type.ptrType, requiredOnly);
     const probeArgs = ["rawMsg", ...probeFields].join(", ");
@@ -413,16 +413,6 @@ function hasLiteralFields(
   });
 }
 
-function getJSONFieldName(field: go.ModelField): string {
-  if (!field.serialization.json) {
-    throw new CodegenError(
-      "InternalError",
-      `missing JSON serialization metadata for field ${field.name}`,
-    );
-  }
-  return field.serialization.json.name;
-}
-
 /**
  * returns the JSON field names used to probe if the JSON contains the target object.
  * JSON value unions use optional fields as shape discriminators. SSE payloads only probe required fields.
@@ -435,7 +425,7 @@ function getJsonFieldsForProbe(model: go.Model, requiredOnly: boolean): Array<st
   const fields = requiredOnly
     ? model.fields.filter((field) => !go.isAdditionalProperties(field) && field.annotations.required)
     : model.fields.filter((field) => !go.isAdditionalProperties(field));
-  return fields.slice(0, 4).map((field) => syntax.stringLiteral(getJSONFieldName(field)));
+  return fields.slice(0, 4).map((field) => syntax.stringLiteral(field.serializedName));
 }
 
 /** info for emitting mixed types */
@@ -1028,7 +1018,7 @@ function generateSseEventClause(
     const envelopeType = go.getTypeDeclaration(go.unwrapPtr(field.type), goUnion.pkg);
     text = `${indent.get()}var v ${envelopeType}\n`;
     // Decode through the model codec to preserve property encodings and discriminator handling.
-    text += `${indent.get()}data, err := json.Marshal(map[string]json.RawMessage{${syntax.stringLiteral(getJSONFieldName(sse.envelopeField))}: frame.Data})\n`;
+    text += `${indent.get()}data, err := json.Marshal(map[string]json.RawMessage{${syntax.stringLiteral(sse.envelopeField.serializedName)}: frame.Data})\n`;
     text += `${indent.get()}${helpers.buildErrCheck(indent, "err", `${goUnion.name}{}, false`)}\n`;
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: "err := json.Unmarshal(data, &v); err != nil",

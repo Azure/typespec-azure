@@ -882,9 +882,8 @@ function dispatchForOperationBody(
     for (const param of multipartBodyParams) {
       if (isModelType(param.type)) {
         for (const field of param.type.fields) {
-          const partName = field.serialization.multipart?.name ?? field.serialization.json!.name;
           content += emitCase(
-            partName,
+            field.serializedName,
             `${param.name}.${field.name}`,
             go.unwrapPtr(field.type),
             field.type.kind !== "ptr",
@@ -937,14 +936,40 @@ function dispatchForOperationBody(
     content += `${indent.get()}}\n`; // end for
   } else if (partialBodyParams.length > 0) {
     // construct the partial body params type and unmarshal it
-    content += `${indent.get()}type partialBodyParams struct {\n`;
-    indent.push();
-    for (const partialBodyParam of partialBodyParams) {
-      content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)} ${syntax.structTag(partialBodyParam.format.toLowerCase(), partialBodyParam.wireName)}\n`;
+    const needsJSONMapBody =
+      partialBodyParams[0].format === "JSON" &&
+      partialBodyParams.some(
+        (partialBodyParam) => !syntax.isValidJSONStructTagName(partialBodyParam.serializedName),
+      );
+    if (needsJSONMapBody) {
+      imports.add("encoding/json");
+      content += `${indent.get()}type partialBodyParams struct {\n`;
+      indent.push();
+      for (const partialBodyParam of partialBodyParams) {
+        content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)}\n`;
+      }
+      content += `${indent.pop().get()}}\n`;
+      content += `${indent.get()}rawBody, err := server.UnmarshalRequestAsJSON[map[string]json.RawMessage](req)\n`;
+      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+      content += `${indent.get()}var body partialBodyParams\n`;
+      for (const partialBodyParam of partialBodyParams) {
+        content += `${indent.get()}if rawVal, ok := rawBody[${syntax.stringLiteral(partialBodyParam.serializedName)}]; ok {\n`;
+        indent.push();
+        content += `${indent.get()}err = json.Unmarshal(rawVal, &body.${naming.capitalize(partialBodyParam.name)})\n`;
+        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+        indent.pop();
+        content += `${indent.get()}}\n`;
+      }
+    } else {
+      content += `${indent.get()}type partialBodyParams struct {\n`;
+      indent.push();
+      for (const partialBodyParam of partialBodyParams) {
+        content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)} ${syntax.structTag(partialBodyParam.format.toLowerCase(), partialBodyParam.serializedName)}\n`;
+      }
+      content += `${indent.pop().get()}}\n`;
+      content += `${indent.get()}body, err := server.UnmarshalRequestAs${partialBodyParams[0].format}[partialBodyParams](req)\n`;
+      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     }
-    content += `${indent.pop().get()}}\n`;
-    content += `${indent.get()}body, err := server.UnmarshalRequestAs${partialBodyParams[0].format}[partialBodyParams](req)\n`;
-    content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
   }
 
   const result = parseHeaderPathQueryParams(pkg, method, imports, indent);
@@ -1206,12 +1231,6 @@ function dispatchForSseBody(
   return content;
 }
 
-function sanitizeRegexpCaptureGroupName(name: string): string {
-  // Go RE2 named capture groups only allow ASCII word characters [A-Za-z0-9_].
-  const sanitized = name.replace(/[^A-Za-z0-9_]/g, "_");
-  return sanitized.length === 0 ? "_" : sanitized;
-}
-
 function buildPathParamCapture(param: go.PathParameter): string {
   // most path params are URL encoded by the client, so their values never
   // contain a path delimiter and the capture must exclude '/' to avoid
@@ -1219,7 +1238,7 @@ function buildPathParamCapture(param: go.PathParameter): string {
   // (allowReserved, e.g. ARM scopes/resource IDs such as {+scope}) are
   // inserted unescaped and can span multiple path segments, so their
   // captures must also admit '/'.
-  const groupName = sanitizeRegexpCaptureGroupName(param.pathSegment);
+  const groupName = syntax.encodeRegexpCaptureName(param.pathSegment);
   const pathDelimiter = !param.isEncoded || param.pathStyle === "path" ? "/" : "";
   let capture = `(?P<${groupName}>[a-zA-Z0-9._~%!$&'()*+,;=:@${pathDelimiter}-]+)`;
   if (param.pathStyle === "path") {
@@ -1854,7 +1873,7 @@ function getRawParamValue(param: go.MethodParameter): string {
     case "pathMapParam":
     case "pathScalarParam":
       // path params are in the matches slice
-      return `matches[regex.SubexpIndex(${syntax.stringLiteral(sanitizeRegexpCaptureGroupName(param.pathSegment))})]`;
+      return `matches[regex.SubexpIndex(${syntax.stringLiteral(syntax.encodeRegexpCaptureName(param.pathSegment))})]`;
     case "queryCollectionParam":
     case "queryMapParam":
     case "queryScalarParam":
