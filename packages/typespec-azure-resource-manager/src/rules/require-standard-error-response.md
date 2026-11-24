@@ -36,6 +36,4 @@ Retain an operation without a generic error response only when required to prese
 
 ## LintDiff Equivalent
 
-This rule implements the shared ARM error-response guideline documented by [MissingDefaultResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/missing-default-response.md) and [RequiredDefaultResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/required-default-response.md), using one native check for the two Swagger rule names.
-
-The native rule follows the documented requirement rather than reproducing the Spectral selector defect. It checks concrete TypeSpec operations, including declarations outside emitted service APIs, without claiming equal emitted diagnostic counts.
+This rule implements the shared ARM error-response guideline from [MissingDefaultResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/missing-default-response.md) and [RequiredDefaultResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/required-default-response.md).
