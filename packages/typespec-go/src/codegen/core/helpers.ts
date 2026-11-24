@@ -1560,6 +1560,33 @@ export function clientHasNoExportedMethods(client: go.Client): boolean {
 }
 
 /**
+ * formats a string value as a Go interpreted string literal.
+ *
+ * @param value the raw string value
+ * @returns a quoted and escaped Go string literal
+ */
+export function formatGoStringLiteral(value: string): string {
+  const escaped = value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+  return `"${escaped}"`;
+}
+
+/**
+ * formats an XML struct tag value as a Go struct tag literal.
+ *
+ * @param value the XML tag contents
+ * @returns a backtick or interpreted Go string literal for the xml struct tag
+ */
+export function formatXMLStructTag(value: string): string {
+  const tag = `xml:${formatGoStringLiteral(value)}`;
+  return tag.includes("`") ? formatGoStringLiteral(tag) : `\`${tag}\``;
+}
+
+/**
  * provides access to the next link field, handling nested fields as required.
  * e.g. var.Foo.Bar
  *

@@ -179,7 +179,7 @@ function emit(
         let tag = "";
         if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML" && respEnv.result.xmlWrapper) {
           // only emit tags for XML; JSON uses custom marshallers/unmarshallers
-          tag = ` \`xml:"${respEnv.result.xmlWrapper}"\``;
+          tag = ` ${helpers.formatXMLStructTag(respEnv.result.xmlWrapper)}`;
         }
 
         fields.push({
