@@ -1,7 +1,8 @@
 import type { IExtractorConfigPrepareOptions } from "@microsoft/api-extractor";
 import { Extractor, ExtractorConfig, ExtractorLogLevel } from "@microsoft/api-extractor";
-import { mkdtempSync, rmSync, writeFileSync } from "fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "fs";
 import * as fs from "fs/promises";
+import { createRequire } from "module";
 import { tmpdir } from "os";
 import { dirname, join as joinPath } from "path";
 import type { CompilerOptions } from "typescript";
@@ -9,6 +10,28 @@ import { createProgram } from "typescript";
 import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
 import { runCommand } from "./run-command.js";
+
+// Resolve the TypeSpec compiler CLI entry (cmd/tsp.js) once per process and invoke it
+// directly with `node`. Spawning `npx tsp` re-resolves the package on every call, which
+// adds ~5s of pure boot overhead per spec; `node <entry>` keeps the same subprocess
+// isolation (one fresh process per compile) without that tax.
+let cachedTspCliPath: string | undefined;
+function resolveTspCliPath(): string {
+  if (cachedTspCliPath) {
+    return cachedTspCliPath;
+  }
+  const require = createRequire(import.meta.url);
+  let dir = dirname(require.resolve("@typespec/compiler"));
+  for (let i = 0; i < 8; i++) {
+    const candidate = joinPath(dir, "cmd", "tsp.js");
+    if (existsSync(candidate)) {
+      cachedTspCliPath = candidate;
+      return candidate;
+    }
+    dir = dirname(dir);
+  }
+  throw new Error("Could not resolve @typespec/compiler CLI entry (cmd/tsp.js)");
+}
 
 // api-extractor only merges its default settings when the config is read from disk, and the
 // object holding those defaults is an implementation detail (it used to hang off
@@ -41,12 +64,13 @@ interface GenEnv {
   readonly phase: () => GenPhase;
   readonly sourceTypespec: () => any;
   readonly targetFolder: () => any;
+  readonly packageName: () => string | undefined;
   readonly scriptDir: () => string;
   readonly declarationSubpath: () => string;
 }
 
 function genEnv(config: any, phase: GenPhase): GenEnv {
-  const { inputPath: sourceTypespec, outputPath: targetFolder } = config;
+  const { inputPath: sourceTypespec, outputPath: targetFolder, packageName } = config;
 
   const __filename = fileURLToPath(import.meta.url);
   const testRoot = dirname(__filename);
@@ -60,6 +84,7 @@ function genEnv(config: any, phase: GenPhase): GenEnv {
     phase: () => phase,
     sourceTypespec: () => sourceTypespec,
     targetFolder: () => targetFolder,
+    packageName: () => packageName,
     scriptDir: () => testRoot,
     declarationSubpath: () => declarationDir,
   } as const;
@@ -108,13 +133,22 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const logger = env.logger();
 
     const workingDir = outputPath();
-    const commandArguments = [
-      `"${joinPath(env.scriptDir(), "compile-spector.ts")}"`,
-      `"${await entryPath()}"`,
-      `"${joinPath(workingDir, "tspconfig.yaml")}"`,
-    ];
+    const fixtureConfig = joinPath(workingDir, "tspconfig.yaml");
+    const args = [`"${resolveTspCliPath()}"`, "compile", `"${await entryPath()}"`];
+    if (existsSync(fixtureConfig)) {
+      args.push("--config", `"${fixtureConfig}"`);
+    } else {
+      // Leave project-root discovery to the source scenario, but emit into the fixture.
+      await fs.mkdir(workingDir, { recursive: true });
+      const emitter = "@azure-tools/typespec-ts";
+      args.push("--emit", emitter, "--option", `"${emitter}.emitter-output-dir=${workingDir}"`);
+      const packageName = env.packageName();
+      if (packageName !== undefined) {
+        args.push("--option", `"${emitter}.package-details.name=${packageName}"`);
+      }
+    }
 
-    await runCommand("node", commandArguments, workingDir, logger);
+    await runCommand("node", args, workingDir, logger);
   }
 
   async function emitGitignore(): Promise<void> {

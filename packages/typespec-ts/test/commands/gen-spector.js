@@ -6,13 +6,13 @@ import { runTypespec } from "./run.ts";
 // Spec selection lives in the opt-in `spector.config.yaml` at the package root
 // (see Azure/typespec-azure#4997), parsed by the shared @azure-tools/spector-runner
 // package. Each enabled spec resolves to an input path plus optional emitter
-// metadata: `outputPath` (the generated folder, defaults to the spec path) and
-// `debug` (only run under --debug). This reconstructs the legacy list shape so
-// the rest of this script is unchanged.
+// metadata: `outputPath` (the generated folder, defaults to the spec path),
+// `packageName` (for fixtures without a config), and `debug` (only run under --debug).
 const configPath = fileURLToPath(new URL("../../spector.config.yaml", import.meta.url));
 const azureModularTsps = resolveSpecs(loadSpectorConfig(configPath)).map(({ path, options }) => ({
   inputPath: path,
   outputPath: typeof options.outputPath === "string" ? options.outputPath : path,
+  packageName: typeof options.packageName === "string" ? options.packageName : undefined,
   debug: options.debug === true,
 }));
 
@@ -46,7 +46,7 @@ async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {
     }
   }
 
-  await Promise.all(activePromises);
+  await Promise.allSettled(activePromises);
 }
 
 async function main() {

@@ -6,15 +6,16 @@ import { ExampleClient } from "./generated/azure/resource-manager/example/src/in
 
 describe("Azure Resource Manager Example", () => {
   it("generates a sample from the unified YAML example", async () => {
-    const sample = await readFile(
-      new URL(
-        "./generated/azure/resource-manager/example/samples-dev/widgetsListByResourceGroupSample.ts",
-        import.meta.url,
+    const fixture = new URL("./generated/azure/resource-manager/example/", import.meta.url);
+    const [sample, packageJson] = await Promise.all(
+      ["samples-dev/widgetsListByResourceGroupSample.ts", "package.json"].map((path) =>
+        readFile(new URL(path, fixture), "utf8"),
       ),
-      "utf8",
     );
+    const { name } = JSON.parse(packageJson);
+    assert.strictEqual(name, "@msinternal/azure-resource-manager-example");
     assert.include(sample, "x-ms-original-file: examples.yaml#list");
-    assert.include(sample, 'from "@msinternal/azure-resource-manager-example"');
+    assert.include(sample, `from "${name}"`);
     assert.include(sample, 'client.widgets.listByResourceGroup("test-rg")');
   });
 
