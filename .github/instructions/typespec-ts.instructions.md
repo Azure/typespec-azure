@@ -75,10 +75,8 @@ Integration (spector) tests generate real clients from specs, then assert on the
    `test/commands/spector-list.js` (the only spec set) and runs `test/commands/run.ts`
    for each entry, emitting into `test/azure-modular-integration/generated/<outputPath>`.
    Generation is split into two phases via `--phase` (default `all` runs both):
-   - `--phase=client` emits the `src/*.ts` sources the tests import. It compiles via
-     `node <@typespec/compiler>/cmd/tsp.js compile` (resolved once per process) rather
-     than `npx tsp`, which avoids ~5 s/spec of npx re-resolution while keeping one fresh
-     subprocess per compile.
+   - `--phase=client` emits the `src/*.ts` sources the tests import.
+     It compiles in a separate `node` subprocess, resolving the source scenario's config for example discovery and applying the generated fixture's emitter options and output paths.
    - `--phase=declarations` emits the tracked `src/index.d.ts` baseline (tsc `.d.ts` +
      api-extractor rollup). Only `check:tree` consumes these, so the e2e script
      `generate-and-run` runs the vitest suite in parallel with the

@@ -46,7 +46,7 @@ async function generateTypeSpecs(isDebugging, pathFilter, phase = "all") {
     }
   }
 
-  await Promise.allSettled(activePromises);
+  await Promise.all(activePromises);
 }
 
 async function main() {

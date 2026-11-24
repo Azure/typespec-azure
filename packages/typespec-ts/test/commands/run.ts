@@ -1,8 +1,7 @@
 import type { IExtractorConfigPrepareOptions } from "@microsoft/api-extractor";
 import { Extractor, ExtractorConfig, ExtractorLogLevel } from "@microsoft/api-extractor";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "fs";
+import { mkdtempSync, rmSync, writeFileSync } from "fs";
 import * as fs from "fs/promises";
-import { createRequire } from "module";
 import { tmpdir } from "os";
 import { dirname, join as joinPath } from "path";
 import type { CompilerOptions } from "typescript";
@@ -10,28 +9,6 @@ import { createProgram } from "typescript";
 import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
 import { runCommand } from "./run-command.js";
-
-// Resolve the TypeSpec compiler CLI entry (cmd/tsp.js) once per process and invoke it
-// directly with `node`. Spawning `npx tsp` re-resolves the package on every call, which
-// adds ~5s of pure boot overhead per spec; `node <entry>` keeps the same subprocess
-// isolation (one fresh process per compile) without that tax.
-let cachedTspCliPath: string | undefined;
-function resolveTspCliPath(): string {
-  if (cachedTspCliPath) {
-    return cachedTspCliPath;
-  }
-  const require = createRequire(import.meta.url);
-  let dir = dirname(require.resolve("@typespec/compiler"));
-  for (let i = 0; i < 8; i++) {
-    const candidate = joinPath(dir, "cmd", "tsp.js");
-    if (existsSync(candidate)) {
-      cachedTspCliPath = candidate;
-      return candidate;
-    }
-    dir = dirname(dir);
-  }
-  throw new Error("Could not resolve @typespec/compiler CLI entry (cmd/tsp.js)");
-}
 
 // api-extractor only merges its default settings when the config is read from disk, and the
 // object holding those defaults is an implementation detail (it used to hang off
@@ -132,10 +109,9 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
 
     const workingDir = outputPath();
     const commandArguments = [
-      resolveTspCliPath(),
-      "compile",
-      `${await entryPath()}`,
-      "--config tspconfig.yaml ",
+      `"${joinPath(env.scriptDir(), "compile-spector.ts")}"`,
+      `"${await entryPath()}"`,
+      `"${joinPath(workingDir, "tspconfig.yaml")}"`,
     ];
 
     await runCommand("node", commandArguments, workingDir, logger);

@@ -3,6 +3,7 @@ import { isRestError } from '@azure/core-rest-pipeline';
 import { OperationOptions } from '@azure-rest/core-client';
 import { Pipeline } from '@azure/core-rest-pipeline';
 import { RestError } from '@azure/core-rest-pipeline';
+import { TokenCredential } from '@azure/core-auth';
 
 export declare enum AzureClouds {
     AZURE_PUBLIC_CLOUD = "AZURE_PUBLIC_CLOUD",
@@ -38,7 +39,7 @@ export declare interface ErrorResponse {
 export declare class ExampleClient {
     private _client;
     readonly pipeline: Pipeline;
-    constructor(subscriptionId: string, options?: ExampleClientOptionalParams);
+    constructor(credential: TokenCredential, subscriptionId: string, options?: ExampleClientOptionalParams);
     readonly widgets: WidgetsOperations;
 }
 
