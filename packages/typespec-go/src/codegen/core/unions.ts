@@ -7,7 +7,6 @@ import * as go from "../../codemodel/index.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
-import * as syntax from "./syntax.js";
 
 /** the union types content to emit */
 export interface Unions {
@@ -344,7 +343,7 @@ function generateObjectMatch(
       if (literal.kind !== "literal") {
         throw new CodegenError("InternalError", `expected literal for ${modelField.name}`);
       }
-      return `hasLiteralValue[${go.getTypeDeclaration(literal.type, goUnion.pkg)}](rawMsg, ${syntax.stringLiteral(modelField.serializedName)}, ${helpers.formatLiteralValue(literal, false)})`;
+      return `hasLiteralValue[${go.getTypeDeclaration(literal.type, goUnion.pkg)}](rawMsg, ${JSON.stringify(modelField.serializedName)}, ${helpers.formatLiteralValue(literal, false)})`;
     });
     const probeFields = getJsonFieldsForProbe(type.ptrType, requiredOnly);
     const probeArgs = ["rawMsg", ...probeFields].join(", ");
@@ -423,9 +422,9 @@ function hasLiteralFields(
  */
 function getJsonFieldsForProbe(model: go.Model, requiredOnly: boolean): Array<string> {
   const fields = requiredOnly
-    ? model.fields.filter((field) => !go.isAdditionalProperties(field) && field.annotations.required)
-    : model.fields.filter((field) => !go.isAdditionalProperties(field));
-  return fields.slice(0, 4).map((field) => syntax.stringLiteral(field.serializedName));
+    ? model.fields.filter((field) => field.annotations.required)
+    : model.fields;
+  return fields.slice(0, 4).map((field) => JSON.stringify(field.serializedName));
 }
 
 /** info for emitting mixed types */
@@ -912,11 +911,10 @@ function generateSseDecoder(
 
   for (const named of events.named) {
     // an event named message is also received when the SSE event field is absent
-    const eventName = named.sse!.name!;
     const expression =
-      eventName === messageEventName && !events.message.length
+      named.sse!.name === messageEventName && !events.message.length
         ? `"", "${messageEventName}"`
-        : syntax.stringLiteral(eventName);
+        : `"${named.sse!.name}"`;
     cases.push({
       expression: expression,
       clause: (indent) => generateSseEventClause(goUnion, named, imports, indent),
@@ -1018,7 +1016,7 @@ function generateSseEventClause(
     const envelopeType = go.getTypeDeclaration(go.unwrapPtr(field.type), goUnion.pkg);
     text = `${indent.get()}var v ${envelopeType}\n`;
     // Decode through the model codec to preserve property encodings and discriminator handling.
-    text += `${indent.get()}data, err := json.Marshal(map[string]json.RawMessage{${syntax.stringLiteral(sse.envelopeField.serializedName)}: frame.Data})\n`;
+    text += `${indent.get()}data, err := json.Marshal(map[string]json.RawMessage{${JSON.stringify(sse.envelopeField.serializedName)}: frame.Data})\n`;
     text += `${indent.get()}${helpers.buildErrCheck(indent, "err", `${goUnion.name}{}, false`)}\n`;
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: "err := json.Unmarshal(data, &v); err != nil",

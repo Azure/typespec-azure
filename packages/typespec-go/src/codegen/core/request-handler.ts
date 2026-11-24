@@ -10,7 +10,6 @@ import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 import { getPathExpansionStyle } from "./path-expansion.js";
 import { isRawQueryExpansion, preservedQueryExpansions } from "./query-expansion.js";
-import * as syntax from "./syntax.js";
 
 /**
  * emits the request handler for the specified method.
@@ -69,15 +68,15 @@ export function createRequestHandler(
   } else if (method.receiver.type.instance?.kind === "templatedHost") {
     imports.add("strings");
     // we have a templated host
-    text += `${indent.get()}host := ${syntax.stringLiteral(method.receiver.type.instance.path)}\n`;
+    text += `${indent.get()}host := "${method.receiver.type.instance.path}"\n`;
     // get all the host params on the client
     for (const hostParam of hostParams) {
-      text += `${indent.get()}host = strings.ReplaceAll(host, ${syntax.stringLiteral(`{${hostParam.uriPathSegment}}`)}, ${helpers.formatValue(`client.${hostParam.name}`, hostParam.type, imports)})\n`;
+      text += `${indent.get()}host = strings.ReplaceAll(host, "{${hostParam.uriPathSegment}}", ${helpers.formatValue(`client.${hostParam.name}`, hostParam.type, imports)})\n`;
     }
     // check for any method local host params
     for (const param of method.parameters) {
       if (param.location === "method" && param.kind === "uriParam") {
-        text += `${indent.get()}host = strings.ReplaceAll(host, ${syntax.stringLiteral(`{${param.uriPathSegment}}`)}, ${helpers.formatValue(helpers.getParamName(param), param.type, imports)})\n`;
+        text += `${indent.get()}host = strings.ReplaceAll(host, "{${param.uriPathSegment}}", ${helpers.formatValue(helpers.getParamName(param), param.type, imports)})\n`;
       }
     }
     hostParam = "host";
@@ -114,11 +113,10 @@ export function createRequestHandler(
   let opEndpoint = hostParam;
   if (hasPathParams || (!pathContainsParms && pathStr.length > 1)) {
     // there are path params, or the path doesn't contain tokens and is not "/" so emit it
-    const httpPathLit = syntax.stringLiteral(method.httpPath);
     text +=
       joinBeforeExpansion && !normalizeScalarsFirst
-        ? `${indent.get()}urlPath := runtime.JoinPaths(${hostParam}, ${httpPathLit})\n`
-        : `${indent.get()}urlPath := ${httpPathLit}\n`;
+        ? `${indent.get()}urlPath := runtime.JoinPaths(${hostParam}, "${method.httpPath}")\n`
+        : `${indent.get()}urlPath := "${method.httpPath}"\n`;
     opEndpoint = joinBeforeExpansion ? "urlPath" : `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
@@ -181,7 +179,7 @@ export function createRequestHandler(
           text += `${indent.get()}${joinedParamName} := ${paramValue}\n`;
           imports.add("errors");
           text += `${indent.get()}if len(${joinedParamName}) == 0 {\n`;
-          text += `${indent.push().get()}return nil, errors.New(${syntax.stringLiteral(`parameter ${paramName} cannot be empty`)})\n`;
+          text += `${indent.push().get()}return nil, errors.New("parameter ${paramName} cannot be empty")\n`;
           text += `${indent.pop().get()}}\n`;
           paramValue = joinedParamName;
         }
@@ -208,8 +206,8 @@ export function createRequestHandler(
           const escaped = emitPathEscape(pp, optionalValue, imports);
           optionalValue =
             pp.pathStyle === "matrix"
-              ? `expandPathMatrix(${syntax.stringLiteral(prefix)}, ${escaped})`
-              : `${syntax.stringLiteral(prefix)} + ${escaped}`;
+              ? `expandPathMatrix(${JSON.stringify(prefix)}, ${escaped})`
+              : `${JSON.stringify(prefix)} + ${escaped}`;
         }
         text += `${indent.push().get()}${paramValue} = ${optionalValue}\n`;
         text += `${indent.pop().get()}}\n`;
@@ -244,11 +242,11 @@ export function createRequestHandler(
       if (pp.kind === "pathScalarParam" && pp.pathStyle !== "simple" && !optionalStyledScalar) {
         paramValue =
           pp.pathStyle === "matrix"
-            ? `expandPathMatrix(${syntax.stringLiteral(prefix)}, ${paramValue})`
-            : `${syntax.stringLiteral(prefix)} + ${paramValue}`;
+            ? `expandPathMatrix(${JSON.stringify(prefix)}, ${paramValue})`
+            : `${JSON.stringify(prefix)} + ${paramValue}`;
       }
 
-      text += `${indent.get()}urlPath = strings.ReplaceAll(urlPath, ${syntax.stringLiteral(`{${pp.pathSegment}}`)}, ${paramValue})\n`;
+      text += `${indent.get()}urlPath = strings.ReplaceAll(urlPath, "{${pp.pathSegment}}", ${paramValue})\n`;
     }
   }
 
@@ -294,7 +292,7 @@ export function createRequestHandler(
   if (forNextLinkPager && rawQueryParams.length > 0 && reinjectedExpansions.length === 0) {
     imports.add("net/url");
     const keys = rawQueryParams.map((param) =>
-      syntax.stringLiteral(param.queryExpansion?.queryParameter ?? param.queryParameter),
+      JSON.stringify(param.queryExpansion?.queryParameter ?? param.queryParameter),
     );
     text += `${indent.get()}if !firstPage {\n`;
     text += `${indent.push().get()}${queryURL}, ${queryErr} := url.Parse(nextLink)\n`;
@@ -336,7 +334,7 @@ export function createRequestHandler(
       text += `${indent.get()}${rawQueryValues} := url.Values{}\n`;
       if (preservedParams.length > 0) {
         const keys = preservedParams.map((param) =>
-          syntax.stringLiteral(param.queryExpansion?.queryParameter ?? param.queryParameter),
+          JSON.stringify(param.queryExpansion?.queryParameter ?? param.queryParameter),
         );
         let source = "req.Raw().URL.RawQuery";
         if (forNextLinkPager && forReinjection !== "none") {
@@ -374,7 +372,7 @@ export function createRequestHandler(
       } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "csv") {
         const itemType = qp.type.itemType;
         imports.addForType(itemType);
-        setter = `${rawQueryValues}.Set(${syntax.stringLiteral(qp.queryParameter)}, expandQueryArray(${helpers.getParamName(qp)}, func(value ${go.getTypeDeclaration(itemType, method.receiver.type.pkg)}) string {\n`;
+        setter = `${rawQueryValues}.Set(${JSON.stringify(qp.queryParameter)}, expandQueryArray(${helpers.getParamName(qp)}, func(value ${go.getTypeDeclaration(itemType, method.receiver.type.pkg)}) string {\n`;
         setter += `${indent.push().get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
         setter += `${indent.pop().get()}}))`;
       } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
@@ -385,7 +383,7 @@ export function createRequestHandler(
           setter += `${indent.push().get()}continue\n`;
           setter += `${indent.pop().get()}}\n`;
         }
-        setter += `${indent.get()}reqQP.Add(${syntax.stringLiteral(qp.queryParameter)}, ${helpers.formatValue("qv", qp.type.itemType, imports)})\n`;
+        setter += `${indent.get()}reqQP.Add("${qp.queryParameter}", ${helpers.formatValue("qv", qp.type.itemType, imports)})\n`;
         setter += `${indent.pop().get()}}`;
       } else if (qp.kind === "queryMapParam") {
         setter = emitQueryObject(
@@ -398,7 +396,7 @@ export function createRequestHandler(
         );
       } else {
         // cannot initialize setter to this value as helpers.formatParamValue() can change imports
-        setter = `reqQP.Set(${syntax.stringLiteral(qp.queryParameter)}, ${helpers.formatParamValue(qp, imports, indent)})`;
+        setter = `reqQP.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
       }
 
       const qpText =
@@ -474,12 +472,12 @@ export function createRequestHandler(
         continue;
       } else if (qp.kind === "queryCollectionParam" && qp.collectionFormat === "multi") {
         setter = `for _, qv := range ${helpers.getParamName(qp)} {\n`;
-        setter += `${indent.push().get()}unencodedParams = append(unencodedParams, ${syntax.stringLiteral(`${qp.queryParameter}=`)}+qv)\n`;
+        setter += `${indent.push().get()}unencodedParams = append(unencodedParams, "${qp.queryParameter}="+qv)\n`;
         setter += `${indent.pop().get()}}`;
       } else if (qp.kind === "queryMapParam") {
         setter = emitQueryObject(method.receiver.type.pkg, qp, imports, indent, true);
       } else {
-        setter = `unencodedParams = append(unencodedParams, ${syntax.stringLiteral(`${qp.queryParameter}=`)}+${helpers.formatParamValue(qp, imports, indent)})`;
+        setter = `unencodedParams = append(unencodedParams, "${qp.queryParameter}="+${helpers.formatParamValue(qp, imports, indent)})`;
       }
       text += emitQueryParam(qp, imports, indent, setter);
     }
@@ -619,7 +617,7 @@ function emitBody(
         } else {
           tagName = go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg);
         }
-        text += `${indent.get()}XMLName xml.Name ${syntax.structTag("xml", tagName)}\n`;
+        text += `${indent.get()}XMLName xml.Name ${helpers.formatXMLStructTag(tagName)}\n`;
         const fieldName = naming.capitalize(bodyParam.name);
         let tag = go.getTypeDeclaration(
           go.unwrapPtr(bodyParam.type.itemType),
@@ -628,7 +626,7 @@ function emitBody(
         if (bodyParam.type.itemType.kind === "model" && bodyParam.type.itemType.xmlName) {
           tag = bodyParam.type.itemType.xmlName;
         }
-        text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} ${syntax.structTag("xml", tag)}\n`;
+        text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} ${helpers.formatXMLStructTag(tag)}\n`;
         text += `${indent.pop().get()}}\n`;
         body = `wrapper{${fieldName}: &${body}}`;
       } else if (bodyParam.type.kind === "time") {
@@ -752,67 +750,35 @@ function emitBody(
     }
     return text;
   } else if (partialBodyParams.length > 0) {
-    const needsJSONMapBody =
-      partialBodyParams[0].format === "JSON" &&
-      partialBodyParams.some(
-        (partialBodyParam) => !syntax.isValidJSONStructTagName(partialBodyParam.serializedName),
-      );
-    const bodyVar = needsJSONMapBody
-      ? helpers.getUniqueVarName(partialBodyParams, ["body", "bodyMap"])
-      : "body";
-    if (needsJSONMapBody) {
-      const requiredPartialParams = partialBodyParams.filter((partialBodyParam) =>
-        go.isRequiredParameter(partialBodyParam.style),
-      );
-      if (requiredPartialParams.length === 0) {
-        text += `${indent.get()}${bodyVar} := map[string]any{}\n`;
-      } else {
-        text += `${indent.get()}${bodyVar} := map[string]any{\n`;
-        indent.push();
-        for (const partialBodyParam of requiredPartialParams) {
-          text += `${indent.get()}${syntax.stringLiteral(partialBodyParam.serializedName)}: ${naming.uncapitalize(partialBodyParam.name)},\n`;
-        }
-        indent.pop();
-        text += `${indent.get()}}\n`;
+    // partial body params are discrete params that are all fields within an internal struct.
+    // define and instantiate an instance of the wire type, using the values from each param.
+    text += `${indent.get()}body := struct {\n`;
+    indent.push();
+    for (const partialBodyParam of partialBodyParams) {
+      text += `${indent.get()}${naming.capitalize(partialBodyParam.serializedName)} ${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} \`${partialBodyParam.format.toLowerCase()}:"${partialBodyParam.serializedName}"\`\n`;
+    }
+    indent.pop();
+    text += `${indent.get()}}{\n`;
+    indent.push();
+    // required params are emitted as initializers in the struct literal
+    for (const partialBodyParam of partialBodyParams) {
+      if (go.isRequiredParameter(partialBodyParam.style)) {
+        text += `${indent.get()}${naming.capitalize(partialBodyParam.serializedName)}: ${naming.uncapitalize(partialBodyParam.name)},\n`;
       }
-      for (const partialBodyParam of partialBodyParams) {
-        if (!go.isRequiredParameter(partialBodyParam.style)) {
-          text += emitParamGroupCheck(partialBodyParam, indent);
-          text += `${indent.push().get()}${bodyVar}[${syntax.stringLiteral(partialBodyParam.serializedName)}] = options.${naming.capitalize(partialBodyParam.name)}\n`;
-          text += `${indent.pop().get()}}\n`;
-        }
-      }
-    } else {
-      // partial body params are discrete params that are all fields within an internal struct.
-      // define and instantiate an instance of the wire type, using the values from each param.
-      text += `${indent.get()}body := struct {\n`;
-      indent.push();
-      for (const partialBodyParam of partialBodyParams) {
-        text += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} ${syntax.structTag(partialBodyParam.format.toLowerCase(), partialBodyParam.serializedName)}\n`;
-      }
-      indent.pop();
-      text += `${indent.get()}}{\n`;
-      indent.push();
-      // required params are emitted as initializers in the struct literal
-      for (const partialBodyParam of partialBodyParams) {
-        if (go.isRequiredParameter(partialBodyParam.style)) {
-          text += `${indent.get()}${naming.capitalize(partialBodyParam.name)}: ${naming.uncapitalize(partialBodyParam.name)},\n`;
-        }
-      }
-      indent.pop();
-      text += `${indent.get()}}\n`;
-      // now populate any optional params from the options type
-      for (const partialBodyParam of partialBodyParams) {
-        if (!go.isRequiredParameter(partialBodyParam.style)) {
-          text += emitParamGroupCheck(partialBodyParam, indent);
-          text += `${indent.push().get()}body.${naming.capitalize(partialBodyParam.name)} = options.${naming.capitalize(partialBodyParam.name)}\n`;
-          text += `${indent.pop().get()}}\n`;
-        }
+    }
+    indent.pop();
+    text += `${indent.get()}}\n`;
+    // now populate any optional params from the options type
+    for (const partialBodyParam of partialBodyParams) {
+      if (!go.isRequiredParameter(partialBodyParam.style)) {
+        text += emitParamGroupCheck(partialBodyParam, indent);
+        text += `${indent.push().get()}body.${naming.capitalize(partialBodyParam.serializedName)} = options.${naming.capitalize(partialBodyParam.name)}\n`;
+        text += `${indent.pop().get()}}\n`;
       }
     }
     // TODO: spread params are JSON only https://github.com/Azure/typespec-azure/issues/4949
     text += `${indent.get()}req.Raw().Header["Content-Type"] = []string{"application/json"}\n`;
-    text += `${indent.get()}if err := runtime.MarshalAsJSON(req, ${bodyVar}); err != nil {\n`;
+    text += `${indent.get()}if err := runtime.MarshalAsJSON(req, body); err != nil {\n`;
     text += `${indent.push().get()}return nil, err\n`;
     text += `${indent.pop().get()}}\n`;
     return text;
@@ -849,7 +815,7 @@ function emitBody(
     } else {
       text += `${indent.get()}formData := map[string]any{}\n`;
       for (const param of multipartBodyParams) {
-        const setter = `formData[${syntax.stringLiteral(param.name)}] = ${helpers.getParamName(param)}`;
+        const setter = `formData["${param.name}"] = ${helpers.getParamName(param)}`;
         if (go.isRequiredParameter(param.style)) {
           text += `${indent.get()}${setter}\n`;
         } else {
@@ -870,7 +836,7 @@ function emitBody(
     text += `${indent.get()}formData := url.Values{}\n`;
     // find all the form body params
     for (const param of formBodyParams) {
-      const setter = `formData.Set(${syntax.stringLiteral(param.formDataName)}, ${helpers.formatParamValue(param, imports, indent)})`;
+      const setter = `formData.Set("${param.formDataName}", ${helpers.formatParamValue(param, imports, indent)})`;
       if (go.isRequiredParameter(param.style)) {
         text += `${indent.get()}${setter}\n`;
       } else {
@@ -914,16 +880,16 @@ function emitClientSideDefault(
   text += `${indent.push().get()}${defaultVar} = *options.${naming.capitalize(param.name)}\n`;
   text += `${indent.pop().get()}}\n`;
 
-  let wireName: string;
+  let serializedName: string;
   switch (param.kind) {
     case "headerCollectionParam":
     case "headerScalarParam":
-      wireName = param.headerName;
+      serializedName = param.headerName;
       break;
     case "queryCollectionParam":
     case "queryMapParam":
     case "queryScalarParam":
-      wireName = param.queryParameter;
+      serializedName = param.queryParameter;
       break;
   }
 
@@ -931,7 +897,7 @@ function emitClientSideDefault(
   // optional param, so we must unwrap before assigning the value
   // to prevent attempting to dereference it.
   const setterFormatText = setterFormat(
-    syntax.stringLiteral(wireName),
+    `"${serializedName}"`,
     helpers.formatValue(defaultVar, go.unwrapPtr(param.type), imports),
   );
   text += setterFormatText;
@@ -960,7 +926,7 @@ function emitHeaderSet(
   if (headerParam.kind === "headerMapParam") {
     let headerText = `${indent.get()}for k, v := range ${helpers.getParamName(headerParam)} {\n`;
     headerText += `${indent.push().get()}if v != nil {\n`;
-    headerText += `${indent.push().get()}req.Raw().Header[${syntax.stringLiteral(headerParam.headerName)}+k] = []string{*v}\n`;
+    headerText += `${indent.push().get()}req.Raw().Header["${headerParam.headerName}"+k] = []string{*v}\n`;
     headerText += `${indent.pop().get()}}\n`;
     headerText += `${indent.pop().get()}}\n`;
     return headerText;
@@ -969,7 +935,7 @@ function emitHeaderSet(
       return `${indent.get()}req.Raw().Header[${name}] = []string{${val}}`;
     });
   } else {
-    return `${indent.get()}req.Raw().Header[${syntax.stringLiteral(headerParam.headerName)}] = []string{${helpers.formatParamValue(headerParam, imports, indent)}}\n`;
+    return `${indent.get()}req.Raw().Header["${headerParam.headerName}"] = []string{${helpers.formatParamValue(headerParam, imports, indent)}}\n`;
   }
 }
 
@@ -1014,7 +980,7 @@ function formatPathParamValue(
   const explode = param.kind === "pathMapParam" ? `, ${param.explode}` : "";
   const itemType = param.type.itemType;
   imports.addForType(itemType);
-  let text = `${helper}(${helpers.getParamName(param)}, ${syntax.stringLiteral(prefix)}, ${syntax.stringLiteral(separator)}, ${param.isEncoded}${explode}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
+  let text = `${helper}(${helpers.getParamName(param)}, ${JSON.stringify(prefix)}, ${JSON.stringify(separator)}, ${param.isEncoded}${explode}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
   indent.push();
   text += `${indent.get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
   text += `${indent.pop().get()}})`;
@@ -1051,7 +1017,7 @@ function emitQueryObject(
   if (!unencoded && !param.explode && param.type.itemType.kind !== "ptr") {
     const itemType = param.type.itemType;
     imports.addForType(itemType);
-    let text = `${rawQueryValues}.Set(${syntax.stringLiteral(param.queryParameter)}, expandQueryMap(${helpers.getParamName(param)}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
+    let text = `${rawQueryValues}.Set(${JSON.stringify(param.queryParameter)}, expandQueryMap(${helpers.getParamName(param)}, func(value ${go.getTypeDeclaration(itemType, pkg)}) string {\n`;
     text += `${indent.push().get()}return ${helpers.formatValue("value", itemType, imports)}\n`;
     text += `${indent.pop().get()}}))`;
     return text;
@@ -1085,8 +1051,8 @@ function emitQueryObject(
   if (!param.explode) {
     text += `${indent.get()}${
       unencoded
-        ? set(syntax.stringLiteral(param.queryParameter), 'strings.Join(parts, ",")')
-        : `${rawQueryValues}.Set(${syntax.stringLiteral(param.queryParameter)}, strings.Join(parts, ","))`
+        ? set(JSON.stringify(param.queryParameter), 'strings.Join(parts, ",")')
+        : `${rawQueryValues}.Set(${JSON.stringify(param.queryParameter)}, strings.Join(parts, ","))`
     }\n`;
   }
   text += `${indent.pop().get()}}`;
@@ -1113,14 +1079,13 @@ function emitMultipartContentTypeSetter(
   if (unwrapped.kind !== "multipartContent" || !unwrapped.contentType) {
     return text;
   }
-  const contentTypeLit = helpers.formatLiteralValue(unwrapped.contentType, false);
   switch (wireType.kind) {
     case "multipartContent":
-      text += `${indent.get()}${paramName}.ContentType = ${contentTypeLit}\n`;
+      text += `${indent.get()}${paramName}.ContentType = ${unwrapped.contentType.literal}\n`;
       break;
     case "slice":
       text += `${indent.get()}for i := range ${paramName} {\n`;
-      text += `${indent.push().get()}${paramName}[i].ContentType = ${contentTypeLit}\n`;
+      text += `${indent.push().get()}${paramName}[i].ContentType = ${unwrapped.contentType.literal}\n`;
       text += `${indent.pop().get()}}\n`;
       break;
   }
@@ -1352,10 +1317,10 @@ function emitQueryExpansion(
     )
   ) {
     const args = params.flatMap((param) => [
-      syntax.stringLiteral(param.queryParameter),
+      JSON.stringify(param.queryParameter),
       helpers.formatParamValue(param, imports, indent),
     ]);
-    return `${indent.get()}setQueryExpansion(${rawQueryValues}, ${syntax.stringLiteral(expansion.queryParameter)}${args.length > 0 ? `, ${args.join(", ")}` : ""})\n`;
+    return `${indent.get()}setQueryExpansion(${rawQueryValues}, ${JSON.stringify(expansion.queryParameter)}${args.length > 0 ? `, ${args.join(", ")}` : ""})\n`;
   }
   if (unencoded) {
     imports.add("strings");
@@ -1368,7 +1333,7 @@ function emitQueryExpansion(
   text += `${indent.push().get()}${parts} := []string{}\n`;
   for (const param of params) {
     const append = (value: string): string =>
-      `${parts} = append(${parts}, ${syntax.stringLiteral(param.queryParameter)}, ${value})`;
+      `${parts} = append(${parts}, ${JSON.stringify(param.queryParameter)}, ${value})`;
     if (go.isClientSideDefault(param.style)) {
       text += emitClientSideDefault(
         param,
@@ -1388,10 +1353,10 @@ function emitQueryExpansion(
   }
   if (unencoded) {
     text += `${indent.get()}if len(${parts}) > 0 {\n`;
-    text += `${indent.push().get()}unencodedParams = append(unencodedParams, ${syntax.stringLiteral(expansion.queryParameter)}+"="+strings.Join(${parts}, ","))\n`;
+    text += `${indent.push().get()}unencodedParams = append(unencodedParams, ${JSON.stringify(expansion.queryParameter)}+"="+strings.Join(${parts}, ","))\n`;
     text += `${indent.pop().get()}}\n`;
   } else {
-    text += `${indent.get()}setQueryExpansion(${rawQueryValues}, ${syntax.stringLiteral(expansion.queryParameter)}, ${parts}...)\n`;
+    text += `${indent.get()}setQueryExpansion(${rawQueryValues}, ${JSON.stringify(expansion.queryParameter)}, ${parts}...)\n`;
   }
   text += `${indent.pop().get()}}\n`;
   return text;

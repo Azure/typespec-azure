@@ -34,7 +34,7 @@ export function matchDocListItem(line: string): DocListItem | undefined {
 }
 
 export function startsWithDocListItem(text: string): boolean {
-  for (const line of text.replace(/\r\n|[\r\u2028\u2029]/g, "\n").split("\n")) {
+  for (const line of text.split("\n")) {
     if (line.trim() === "") {
       continue;
     }

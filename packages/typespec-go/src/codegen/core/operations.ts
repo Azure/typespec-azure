@@ -10,7 +10,6 @@ import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 import { createRequestHandler } from "./request-handler.js";
 import { createResponseHandler } from "./response-handler.js";
-import * as syntax from "./syntax.js";
 
 // represents the generated content for an operation group
 export class OperationGroupContent {
@@ -88,11 +87,11 @@ export function generateOperations(
       clientText += `//\n// Generated from API version`;
       if (client.apiVersions.length > 1) {
         clientText += `s ${client.apiVersions
-          .map((v) => syntax.sanitizeSingleLineComment(`${v.literal.literal}`))
+          .map((v) => v.literal.literal)
           .sort()
           .join(", ")}\n`;
       } else {
-        clientText += ` ${syntax.sanitizeSingleLineComment(`${client.apiVersions[0].literal.literal}`)}\n`;
+        clientText += ` ${client.apiVersions[0].literal.literal}\n`;
       }
     }
 
@@ -369,7 +368,7 @@ function generateConstructors(
         indent.push(); // level 2 for PipelineOptions fields
         if (name) {
           indent.push(); // level 3 for APIVersionOptions fields
-          name = `\n${indent.get()}Name: ${syntax.stringLiteral(name)},`;
+          name = `\n${indent.get()}Name: "${name}",`;
           indent.pop(); // back to level 2
         } else {
           name = "";
@@ -412,7 +411,7 @@ function generateConstructors(
               indent.push(); // level 3 for BearerTokenOptions fields
               const tokenPolicyOpts = `&policy.BearerTokenOptions{\n${indent.get()}InsecureAllowCredentialWithHTTP: options.InsecureAllowCredentialWithHTTP,\n${indent.pop().get()}}`;
               // we assume a single scope. this is enforced when adapting the data from tcgc
-              const tokenPolicy = `\n${indent.get()}PerCall: []policy.Policy{\n${indent.get()}runtime.NewBearerTokenPolicy(credential, []string{c.Audience + ${syntax.stringLiteral(helpers.splitScope(credentialParam.type.scopes[0]).scope)}}, ${tokenPolicyOpts}),\n${indent.get()}},\n`;
+              const tokenPolicy = `\n${indent.get()}PerCall: []policy.Policy{\n${indent.get()}runtime.NewBearerTokenPolicy(credential, []string{c.Audience + "${helpers.splitScope(credentialParam.type.scopes[0]).scope}"}, ${tokenPolicyOpts}),\n${indent.get()}},\n`;
               indent.pop(); // back to level 1
               prolog = emitProlog(
                 go.getTypeDeclaration(clientOptions, client.pkg, true),
@@ -492,17 +491,16 @@ function generateConstructors(
     if (client.instance.endpoint?.supplemental) {
       // the endpoint param is always the first ctor param
       const endpointParam = client.instance.constructors[0].parameters[0];
-      const supplementalPathLit = syntax.stringLiteral(client.instance.endpoint.supplemental.path);
       if (client.instance.endpoint.supplemental.parameters.length > 0) {
         imports.add("strings");
-        ctorText += `${indent.get()}host := ${supplementalPathLit}\n`;
+        ctorText += `${indent.get()}host := "${client.instance.endpoint.supplemental.path}"\n`;
         for (const param of client.instance.endpoint.supplemental.parameters) {
-          ctorText += `${indent.get()}host = strings.ReplaceAll(host, ${syntax.stringLiteral(`{${param.uriPathSegment}}`)}, ${helpers.formatValue(param.name, param.type, imports)})\n`;
+          ctorText += `${indent.get()}host = strings.ReplaceAll(host, "{${param.uriPathSegment}}", ${helpers.formatValue(param.name, param.type, imports)})\n`;
         }
         ctorText += `${indent.get()}${endpointParam.name} = runtime.JoinPaths(${endpointParam.name}, host)\n`;
       } else {
         // there are no params for the supplemental host, so just append it
-        ctorText += `${indent.get()}${endpointParam.name} = runtime.JoinPaths(${endpointParam.name}, ${supplementalPathLit})\n`;
+        ctorText += `${indent.get()}${endpointParam.name} = runtime.JoinPaths(${endpointParam.name}, "${client.instance.endpoint.supplemental.path}")\n`;
       }
     }
 
@@ -1067,7 +1065,7 @@ function generateLROBeginMethod(
       text += `${indent.get()}FinalStateVia: ${finalStateVia},\n`;
     }
     if (method.operationLocationResultPath) {
-      text += `${indent.get()}OperationLocationResultPath: ${syntax.stringLiteral(method.operationLocationResultPath)},\n`;
+      text += `${indent.get()}OperationLocationResultPath: "${method.operationLocationResultPath}",\n`;
     }
     if (pollerType !== "nil") {
       text += `${indent.get()}Response: ${pollerType},\n`;

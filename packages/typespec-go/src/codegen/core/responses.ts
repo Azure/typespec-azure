@@ -7,7 +7,6 @@ import * as go from "../../codemodel/index.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
-import * as syntax from "./syntax.js";
 
 export interface ResponsesSerDe {
   responses: string;
@@ -178,13 +177,9 @@ function emit(
         first = false;
       } else {
         let tag = "";
-        if (
-          respEnv.result.kind === "monomorphicResult" &&
-          respEnv.result.format === "XML" &&
-          respEnv.result.xmlWrapper
-        ) {
+        if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML" && respEnv.result.xmlWrapper) {
           // only emit tags for XML; JSON uses custom marshallers/unmarshallers
-          tag = ` ${syntax.structTag("xml", respEnv.result.xmlWrapper)}`;
+          tag = ` ${helpers.formatXMLStructTag(respEnv.result.xmlWrapper)}`;
         }
 
         fields.push({

@@ -10,7 +10,6 @@ import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
 import { getPathExpansionStyle } from "../core/path-expansion.js";
 import { isRawQueryExpansion } from "../core/query-expansion.js";
-import * as syntax from "../core/syntax.js";
 import { generateServerInternal, RequiredHelpers } from "./internal.js";
 import { parseURITemplateParameter, valueParser } from "./uri-template.js";
 
@@ -577,12 +576,12 @@ function generateServerTransportMethods(
           if (header.kind === "headerMapResponse") {
             content += `${indent.get()}for k, v := range server.GetResponse(respr).${header.fieldName} {\n`;
             content += `${indent.push().get()}if v != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set(${syntax.stringLiteral(header.headerName)}+k, *v)\n`;
+            content += `${indent.push().get()}resp.Header.Set("${header.headerName}"+k, *v)\n`;
             content += `${indent.pop().get()}}\n`;
             content += `${indent.pop().get()}}\n`;
           } else {
             content += `${indent.get()}if val := server.GetResponse(respr).${header.fieldName}; val != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set(${syntax.stringLiteral(helpers.canonicalizeHeaderName(header.headerName))}, ${helpers.formatValue("val", header.type, imports)})\n`;
+            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}", ${helpers.formatValue("val", header.type, imports)})\n`;
             content += `${indent.pop().get()}}\n`;
           }
         }
@@ -631,7 +630,7 @@ function dispatchForOperationBody(
   let content = "";
   if (numPathParams > 0) {
     imports.add("regexp");
-    content += `${indent.get()}const regexStr = ${syntax.rawOrStringLiteral(createPathParamsRegex(method, methodParamGroups.pathParams))}\n`;
+    content += `${indent.get()}const regexStr = \`${createPathParamsRegex(method, methodParamGroups.pathParams)}\`\n`;
     content += `${indent.get()}regex := regexp.MustCompile(regexStr)\n`;
     content += `${indent.get()}matches := regex.FindStringSubmatch(req.URL.EscapedPath())\n`;
     // the total number of matches is the number of capture groups
@@ -778,7 +777,7 @@ function dispatchForOperationBody(
       type: go.WireType,
       destIsByValue: boolean,
     ): string {
-      let caseContent = `${indent.get()}case ${syntax.stringLiteral(caseValue)}:\n`;
+      let caseContent = `${indent.get()}case "${caseValue}":\n`;
       indent.push();
       caseContent += `${indent.get()}content, err = io.ReadAll(part)\n`;
       caseContent += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
@@ -914,7 +913,7 @@ function dispatchForOperationBody(
     content += `${indent.get()}for key := range req.Form {\n`;
     content += `${indent.push().get()}switch key {\n`;
     for (const param of formBodyParams) {
-      content += `${indent.get()}case ${syntax.stringLiteral(param.formDataName)}:\n`;
+      content += `${indent.get()}case "${param.formDataName}":\n`;
       let assignedValue: string;
       switch (param.type.kind) {
         case "constant":
@@ -936,40 +935,14 @@ function dispatchForOperationBody(
     content += `${indent.get()}}\n`; // end for
   } else if (partialBodyParams.length > 0) {
     // construct the partial body params type and unmarshal it
-    const needsJSONMapBody =
-      partialBodyParams[0].format === "JSON" &&
-      partialBodyParams.some(
-        (partialBodyParam) => !syntax.isValidJSONStructTagName(partialBodyParam.serializedName),
-      );
-    if (needsJSONMapBody) {
-      imports.add("encoding/json");
-      content += `${indent.get()}type partialBodyParams struct {\n`;
-      indent.push();
-      for (const partialBodyParam of partialBodyParams) {
-        content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)}\n`;
-      }
-      content += `${indent.pop().get()}}\n`;
-      content += `${indent.get()}rawBody, err := server.UnmarshalRequestAsJSON[map[string]json.RawMessage](req)\n`;
-      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-      content += `${indent.get()}var body partialBodyParams\n`;
-      for (const partialBodyParam of partialBodyParams) {
-        content += `${indent.get()}if rawVal, ok := rawBody[${syntax.stringLiteral(partialBodyParam.serializedName)}]; ok {\n`;
-        indent.push();
-        content += `${indent.get()}err = json.Unmarshal(rawVal, &body.${naming.capitalize(partialBodyParam.name)})\n`;
-        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-        indent.pop();
-        content += `${indent.get()}}\n`;
-      }
-    } else {
-      content += `${indent.get()}type partialBodyParams struct {\n`;
-      indent.push();
-      for (const partialBodyParam of partialBodyParams) {
-        content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)} ${syntax.structTag(partialBodyParam.format.toLowerCase(), partialBodyParam.serializedName)}\n`;
-      }
-      content += `${indent.pop().get()}}\n`;
-      content += `${indent.get()}body, err := server.UnmarshalRequestAs${partialBodyParams[0].format}[partialBodyParams](req)\n`;
-      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+    content += `${indent.get()}type partialBodyParams struct {\n`;
+    indent.push();
+    for (const partialBodyParam of partialBodyParams) {
+      content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)} \`json:"${partialBodyParam.serializedName}"\`\n`;
     }
+    content += `${indent.pop().get()}}\n`;
+    content += `${indent.get()}body, err := server.UnmarshalRequestAs${partialBodyParams[0].format}[partialBodyParams](req)\n`;
+    content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
   }
 
   const result = parseHeaderPathQueryParams(pkg, method, imports, indent);
@@ -1231,66 +1204,50 @@ function dispatchForSseBody(
   return content;
 }
 
-function buildPathParamCapture(param: go.PathParameter): string {
-  // most path params are URL encoded by the client, so their values never
-  // contain a path delimiter and the capture must exclude '/' to avoid
-  // consuming subsequent path segments. however, skip-encoding params
-  // (allowReserved, e.g. ARM scopes/resource IDs such as {+scope}) are
-  // inserted unescaped and can span multiple path segments, so their
-  // captures must also admit '/'.
-  const groupName = syntax.encodeRegexpCaptureName(param.pathSegment);
-  const pathDelimiter = !param.isEncoded || param.pathStyle === "path" ? "/" : "";
-  let capture = `(?P<${groupName}>[a-zA-Z0-9._~%!$&'()*+,;=:@${pathDelimiter}-]+)`;
-  if (param.pathStyle === "path") {
-    capture = `(?P<${groupName}>/${param.isEncoded && (param.kind === "pathScalarParam" || !param.explode) ? "[^/]*" : ".*?"})`;
-  } else if (param.pathStyle !== "simple") {
-    const { prefix } = getPathExpansionStyle(param);
-    const escapedPrefix = syntax.escapeRegexpLiteral(prefix);
-    const suffix = `[a-zA-Z0-9._~%!$&'()*+,;=:@${pathDelimiter}-]*`;
-    let expansion = escapedPrefix + suffix;
-    if (param.pathStyle === "matrix" && prefix !== ";") {
-      const entry = `${escapedPrefix}(?:=${suffix.replace(";", "")})?`;
-      expansion = param.kind === "pathCollectionParam" && param.explode ? `(?:${entry})+` : entry;
-    }
-    capture = `(?P<${groupName}>${expansion})`;
-  }
-  if (param.style === "optional" || param.style === "flag") {
-    capture += "?";
-  }
-  return capture;
+function sanitizeRegexpCaptureGroupName(name: string): string {
+  // dash '-' characters are not allowed so replace them with '_'
+  return name.replace("-", "_");
 }
 
 function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathParameter>): string {
   // "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}"
-  // Tokenize around {pathSegment} placeholders first so static segments can be RE2-escaped
-  // without breaking placeholder matching or triggering String.prototype.replace '$' expansions.
-  const urlPath = method.httpPath.split("?")[0];
-  const remaining = [...pathParams];
-  let result = "";
-  let pos = 0;
-  while (pos < urlPath.length && remaining.length > 0) {
-    let bestIdx = -1;
-    let bestParamIdx = -1;
-    let bestToken = "";
-    for (let i = 0; i < remaining.length; i++) {
-      const token = `{${remaining[i].pathSegment}}`;
-      const idx = urlPath.indexOf(token, pos);
-      if (idx !== -1 && (bestIdx === -1 || idx < bestIdx)) {
-        bestIdx = idx;
-        bestParamIdx = i;
-        bestToken = token;
+  // each path param will replaced with a regex capture.
+  // note that some path params are optional.
+  let urlPath = method.httpPath.split("?")[0];
+  // escape any characters in the path that could be interpreted as regex tokens
+  // per RFC3986, these are the pchars that also double as regex tokens
+  // . $ * + ()
+  urlPath = urlPath.replace(/([.$*+()])/g, "\\$1");
+  for (const param of pathParams) {
+    const toReplace = `{${param.pathSegment}}`;
+    // most path params are URL encoded by the client, so their values never
+    // contain a path delimiter and the capture must exclude '/' to avoid
+    // consuming subsequent path segments. however, skip-encoding params
+    // (allowReserved, e.g. ARM scopes/resource IDs such as {+scope}) are
+    // inserted unescaped and can span multiple path segments, so their
+    // captures must also admit '/'.
+    // NOTE: Use "$$" because "$&" and "$'" are special replacement patterns.
+    const pathDelimiter = !param.isEncoded || param.pathStyle === "path" ? "/" : "";
+    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]+)`;
+    if (param.pathStyle === "path") {
+      replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>/${param.isEncoded && (param.kind === "pathScalarParam" || !param.explode) ? "[^/]*" : ".*?"})`;
+    } else if (param.pathStyle !== "simple") {
+      const { prefix } = getPathExpansionStyle(param);
+      const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const suffix = `[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]*`;
+      let expansion = escapedPrefix + suffix;
+      if (param.pathStyle === "matrix" && prefix !== ";") {
+        const entry = `${escapedPrefix}(?:=${suffix.replace(";", "")})?`;
+        expansion = param.kind === "pathCollectionParam" && param.explode ? `(?:${entry})+` : entry;
       }
+      replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>${expansion})`;
     }
-    if (bestIdx === -1) {
-      break;
+    if (param.style === "optional" || param.style === "flag") {
+      replaceWith += "?";
     }
-    result += syntax.escapeRegexpLiteral(urlPath.slice(pos, bestIdx));
-    const [matchedParam] = remaining.splice(bestParamIdx, 1);
-    result += buildPathParamCapture(matchedParam);
-    pos = bestIdx + bestToken.length;
+    urlPath = urlPath.replace(toReplace, replaceWith);
   }
-  result += syntax.escapeRegexpLiteral(urlPath.slice(pos));
-  return result + (pathParams.some((param) => param.pathStyle === "path") ? "$" : "");
+  return urlPath + (pathParams.some((param) => param.pathStyle === "path") ? "$" : "");
 }
 
 interface parseResult {
@@ -1387,9 +1344,9 @@ function parseHeaderPathQueryParams(
           (member) => go.isQueryParameter(member) && member.queryExpansion === param.queryExpansion,
         )
         .map((member) =>
-          go.isQueryParameter(member) ? syntax.stringLiteral(member.queryParameter) : "",
+          go.isQueryParameter(member) ? JSON.stringify(member.queryParameter) : "",
         );
-      content += `${indent.get()}${name}, err := parseURIQueryObject(${rawQueryVariable}.Get(${syntax.stringLiteral(param.queryExpansion.queryParameter)}), []string{${keys.join(", ")}})\n`;
+      content += `${indent.get()}${name}, err := parseURIQueryObject(${rawQueryVariable}.Get(${JSON.stringify(param.queryExpansion.queryParameter)}), []string{${keys.join(", ")}})\n`;
       content += `${indent.get()}if err != nil { return nil, err }\n`;
     }
   }
@@ -1434,7 +1391,7 @@ function parseHeaderPathQueryParams(
     let querySource = "qp";
     if (go.isQueryParameter(param) && isRawQueryExpansion(param)) {
       querySource = rawQueryVariable;
-      paramValue = `${rawQueryVariable}.Get(${syntax.stringLiteral(param.queryParameter)})`;
+      paramValue = `${rawQueryVariable}.Get(${JSON.stringify(param.queryParameter)})`;
     }
     if (go.isQueryParameter(param) && param.queryExpansion && !param.queryExpansion.explode) {
       const source = queryExpansions.get(param.queryExpansion);
@@ -1442,7 +1399,7 @@ function parseHeaderPathQueryParams(
         throw new CodegenError("InternalError", "missing URI query-object expansion");
       }
       querySource = source;
-      paramValue = `${querySource}.Get(${syntax.stringLiteral(param.queryParameter)})`;
+      paramValue = `${querySource}.Get(${JSON.stringify(param.queryParameter)})`;
     }
     if (
       param.kind === "pathCollectionParam" ||
@@ -1485,7 +1442,7 @@ function parseHeaderPathQueryParams(
       const { prefix } = getPathExpansionStyle(param);
       if (prefix) {
         imports.add("strings");
-        paramValue = `strings.TrimPrefix(${paramValue}, ${syntax.stringLiteral(prefix)})`;
+        paramValue = `strings.TrimPrefix(${paramValue}, ${JSON.stringify(prefix)})`;
       }
       let paramVar = createLocalVariableName(param, "Unescaped");
       if (go.isRequiredParameter(param.style) && go.isConstant(param.type, "string")) {
@@ -1535,7 +1492,7 @@ function parseHeaderPathQueryParams(
         if (param.collectionFormat !== "multi") {
           requiredHelpers.splitHelper = true;
           const elementsParam = createLocalVariableName(param, "Elements");
-          content += `${indent.get()}${elementsParam} := splitHelper(${paramValue}, ${syntax.stringLiteral(helpers.getDelimiterForCollectionFormat(param.collectionFormat))})\n`;
+          content += `${indent.get()}${elementsParam} := splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")\n`;
           paramValue = elementsParam;
         }
 
@@ -1618,7 +1575,7 @@ function parseHeaderPathQueryParams(
         // the invocation of the fake e.g. srv.FakeFunc(splitHelper...). but if it's optional, we
         // need to create a local first which will later be copied into the optional param group.
         requiredHelpers.splitHelper = true;
-        content += `${indent.get()}${createLocalVariableName(param, "Param")} := splitHelper(${paramValue}, ${syntax.stringLiteral(helpers.getDelimiterForCollectionFormat(param.collectionFormat))})\n`;
+        content += `${indent.get()}${createLocalVariableName(param, "Param")} := splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")\n`;
       }
     } else if (go.isScalar(paramType, "bool")) {
       imports.add("strconv");
@@ -1699,11 +1656,11 @@ function parseHeaderPathQueryParams(
       const localVar = createLocalVariableName(param, "Param");
       content += `${indent.get()}var ${localVar} map[string]*string\n`;
       content += `${indent.get()}for hh := range ${paramValue} {\n`;
-      const headerPrefixLit = syntax.stringLiteral(param.headerName);
+      const headerPrefix = param.headerName;
       requiredHelpers.getHeaderValue = true;
-      content += `${indent.push().get()}if len(hh) > len(${headerPrefixLit}) && strings.EqualFold(hh[:len(${headerPrefixLit})], ${headerPrefixLit}) {\n`;
+      content += `${indent.push().get()}if len(hh) > len("${headerPrefix}") && strings.EqualFold(hh[:len("x-ms-meta-")], "${headerPrefix}") {\n`;
       content += `${indent.push().get()}if ${localVar} == nil {\n${indent.push().get()}${localVar} = map[string]*string{}\n${indent.pop().get()}}\n`;
-      content += `${indent.get()}${localVar}[hh[len(${headerPrefixLit}):]] = to.Ptr(getHeaderValue(req.Header, hh))\n`;
+      content += `${indent.get()}${localVar}[hh[len("${headerPrefix}"):]] = to.Ptr(getHeaderValue(req.Header, hh))\n`;
       content += `${indent.pop().get()}}\n${indent.pop().get()}}\n`;
     } else if (!go.isRequiredParameter(param.style)) {
       // we check this last as it's a superset of the previous conditions
@@ -1866,22 +1823,22 @@ function getRawParamValue(param: go.MethodParameter): string {
     case "headerScalarParam":
       // use req
       requiredHelpers.getHeaderValue = true;
-      return `getHeaderValue(req.Header, ${syntax.stringLiteral(param.headerName)})`;
+      return `getHeaderValue(req.Header, "${param.headerName}")`;
     case "headerMapParam":
       return "req.Header";
     case "pathCollectionParam":
     case "pathMapParam":
     case "pathScalarParam":
       // path params are in the matches slice
-      return `matches[regex.SubexpIndex(${syntax.stringLiteral(syntax.encodeRegexpCaptureName(param.pathSegment))})]`;
+      return `matches[regex.SubexpIndex("${sanitizeRegexpCaptureGroupName(param.pathSegment)}")]`;
     case "queryCollectionParam":
     case "queryMapParam":
     case "queryScalarParam":
       // use qp
       if (param.kind === "queryCollectionParam" && param.collectionFormat === "multi") {
-        return `qp[${syntax.stringLiteral(param.queryParameter)}]`;
+        return `qp["${param.queryParameter}"]`;
       }
-      return `qp.Get(${syntax.stringLiteral(param.queryParameter)})`;
+      return `qp.Get("${param.queryParameter}")`;
     case "uriParam":
       return "req.URL.Host";
     case "sseLastEventIDParam":
@@ -1935,7 +1892,7 @@ function getFinalParamValue(
       // not necessary for optional params as they're already in slice format.
       if (param.collectionFormat !== "multi" && param.type.itemType.kind === "string") {
         requiredHelpers.splitHelper = true;
-        return `splitHelper(${paramValue}, ${syntax.stringLiteral(helpers.getDelimiterForCollectionFormat(param.collectionFormat))})`;
+        return `splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")`;
       }
     } else if (
       (go.isHeaderParameter(param) || go.isQueryParameter(param)) &&

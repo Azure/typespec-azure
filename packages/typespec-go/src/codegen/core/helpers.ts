@@ -7,7 +7,6 @@ import * as go from "../../codemodel/index.js";
 import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import { ImportManager } from "./imports.js";
-import * as syntax from "./syntax.js";
 
 // variable to be used to determine comment length when calling comment from @azure-tools
 export const commentLength = 120;
@@ -594,7 +593,7 @@ export function formatValue(paramName: string, type: go.WireType, imports: Impor
         case "constantDef":
           return unwrappedType.type.name;
         default:
-          return syntax.stringLiteral(`${unwrappedType.literal}`);
+          return `"${unwrappedType.literal}"`;
       }
     case "scalar":
       switch (unwrappedType.type) {
@@ -653,7 +652,7 @@ export function formatLiteralValue(value: go.Literal, withCast: boolean): string
       // extensible enum with a value that's not one of the pre-defined ones.
       // emit it as a cast to the enum type, e.g. NetworkAPIVersion("2026-04-15-preview").
       if (value.type.type === "string") {
-        return `${value.type.name}(${syntax.stringLiteral(<string>value.literal)})`;
+        return `${value.type.name}("${value.literal}")`;
       }
       return `${value.type.name}(${value.literal})`;
     case "constantDef":
@@ -677,8 +676,13 @@ export function formatLiteralValue(value: go.Literal, withCast: boolean): string
           return <string>value.literal;
       }
     case "string":
+      if ((<string>value.literal)[0] === '"') {
+        // string is already quoted
+        return <string>value.literal;
+      }
+      return `"${value.literal}"`;
     case "time":
-      return syntax.stringLiteral(<string>value.literal);
+      return `"${value.literal}"`;
   }
 }
 
@@ -885,14 +889,10 @@ function formatDocListItem(item: go.DocListItem, prefix: string): string {
     .join("\n");
 }
 
-function normalizeCommentLineEndings(text: string): string {
-  return text.replace(/\r\n|[\r\u2028\u2029]/g, "\n");
-}
-
 // reports whether text has a non-blank line that isn't a list item, i.e. a line
 // go/doc/comment will see with zero indentation.
 function hasProseLine(text: string): boolean {
-  return normalizeCommentLineEndings(text)
+  return text
     .split("\n")
     .some((line) => line.trim() !== "" && go.matchDocListItem(line) === undefined);
 }
@@ -919,7 +919,7 @@ function renderDocBody(text: string, prefix = "//", hasPrecedingProse = false): 
   const renderLists = hasPrecedingProse || hasProseLine(text);
   const lastIsBlank = () => out.length === 0 || out[out.length - 1] === prefix;
 
-  for (const raw of normalizeCommentLineEndings(text).split("\n")) {
+  for (const raw of text.split("\n")) {
     const line = raw.replace(/\s+$/, "");
     if (line.trim() === "") {
       inList = false;
@@ -1087,7 +1087,7 @@ export function zeroValue(param: go.ClientParameter | go.MethodParameter): strin
 export type SerDeFormat = "JSON" | "XML";
 
 // used by getSerDeFormat to cache results
-const serDeFormatCache = new WeakMap<go.Model | go.PolymorphicModel, SerDeFormat>();
+const serDeFormatCache = new Map<string, SerDeFormat>();
 
 // returns the wire format for the named model.
 // at present this assumes the formats to be mutually exclusive.
@@ -1095,7 +1095,7 @@ export function getSerDeFormat(
   model: go.Model | go.PolymorphicModel,
   pkg: go.PackageContent,
 ): SerDeFormat {
-  let serDeFormat = serDeFormatCache.get(model);
+  let serDeFormat = serDeFormatCache.get(model.name);
   if (serDeFormat) {
     return serDeFormat;
   }
@@ -1105,7 +1105,7 @@ export function getSerDeFormat(
     return "JSON";
   }
 
-  // recursively walks the fields in model, updating serDeFormatCache with the model and specified format
+  // recursively walks the fields in model, updating serDeFormatCache with the model name and specified format
   const recursiveWalkModelFields = function (type: go.WireType, serDeFormat: SerDeFormat): void {
     type = recursiveUnwrapMapSlice(type);
     switch (type.kind) {
@@ -1119,12 +1119,12 @@ export function getSerDeFormat(
         break;
       case "model":
       case "polymorphicModel":
-        if (serDeFormatCache.has(type)) {
+        if (serDeFormatCache.has(type.name)) {
           // we've already processed this type, don't do it again
           return;
         }
 
-        serDeFormatCache.set(type, serDeFormat);
+        serDeFormatCache.set(type.name, serDeFormat);
         for (const field of type.fields) {
           const fieldType = recursiveUnwrapMapSlice(field.type);
           recursiveWalkModelFields(fieldType, serDeFormat);
@@ -1169,7 +1169,7 @@ export function getSerDeFormat(
     }
   }
 
-  serDeFormat = serDeFormatCache.get(model);
+  serDeFormat = serDeFormatCache.get(model.name);
   if (!serDeFormat) {
     // if we get here there are two possibilities
     //  - we have a bug in the above indexing
@@ -1560,6 +1560,89 @@ export function clientHasNoExportedMethods(client: go.Client): boolean {
 }
 
 /**
+ * formats a string value as a Go interpreted string literal.
+ *
+ * @param value the raw string value
+ * @returns a quoted and escaped Go string literal
+ */
+export function formatGoStringLiteral(value: string): string {
+  let out = '"';
+  for (let i = 0; i < value.length; ++i) {
+    const code = value.charCodeAt(i);
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = i + 1 < value.length ? value.charCodeAt(i + 1) : 0;
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        out += value.slice(i, i + 2);
+        ++i;
+      } else {
+        out += "\\ufffd";
+      }
+      continue;
+    }
+    if (code >= 0xdc00 && code <= 0xdfff) {
+      out += "\\ufffd";
+      continue;
+    }
+    switch (code) {
+      case 0x07:
+        out += "\\a";
+        break;
+      case 0x08:
+        out += "\\b";
+        break;
+      case 0x09:
+        out += "\\t";
+        break;
+      case 0x0a:
+        out += "\\n";
+        break;
+      case 0x0b:
+        out += "\\v";
+        break;
+      case 0x0c:
+        out += "\\f";
+        break;
+      case 0x0d:
+        out += "\\r";
+        break;
+      case 0x22:
+        out += '\\"';
+        break;
+      case 0x5c:
+        out += "\\\\";
+        break;
+      default:
+        if (code < 0x20 || code === 0x7f) {
+          out += `\\x${code.toString(16).padStart(2, "0")}`;
+        } else if (
+          (code >= 0x80 && code <= 0x9f) ||
+          code === 0x2028 ||
+          code === 0x2029 ||
+          code === 0xfeff
+        ) {
+          out += `\\u${code.toString(16).padStart(4, "0")}`;
+        } else {
+          out += value[i];
+        }
+        break;
+    }
+  }
+  out += '"';
+  return out;
+}
+
+/**
+ * formats an XML struct tag value as a Go struct tag literal.
+ *
+ * @param value the XML tag contents
+ * @returns a backtick or interpreted Go string literal for the xml struct tag
+ */
+export function formatXMLStructTag(value: string): string {
+  const tag = `xml:${formatGoStringLiteral(value)}`;
+  return tag.includes("`") ? formatGoStringLiteral(tag) : `\`${tag}\``;
+}
+
+/**
  * provides access to the next link field, handling nested fields as required.
  * e.g. var.Foo.Bar
  *
@@ -1703,7 +1786,7 @@ export function comment(content: string, prefix = lineCommentPrefix, factor = 0,
   let line = "";
   prefix = indent(prefix, factor);
 
-  content = normalizeCommentLineEndings(content).trim();
+  content = content.trim();
   if (content) {
     for (const word of content.replace(/\n+/g, " » ").split(/\s+/g)) {
       if (word === "»") {

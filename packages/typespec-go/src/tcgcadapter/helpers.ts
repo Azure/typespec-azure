@@ -5,7 +5,6 @@
 
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
 import * as tsp from "@typespec/compiler";
-import * as syntax from "../codegen/core/syntax.js";
 import * as go from "../codemodel/index.js";
 import * as naming from "../naming/index.js";
 
@@ -213,13 +212,13 @@ export function getClientDefaultValueDoc(literal: go.Literal): string {
       if ((<go.ConstantValue>literal.literal)?.kind === "constantValue") {
         value = (<go.ConstantValue>literal.literal).name;
       } else if (literal.type.type === "string") {
-        value = `${literal.type.name}(${syntax.stringLiteral(<string>literal.literal)})`;
+        value = `${literal.type.name}("${<string>literal.literal}")`;
       } else {
         value = `${literal.type.name}(${<string>literal.literal})`;
       }
       break;
     case "string":
-      value = syntax.stringLiteral(value);
+      value = `"${value}"`;
       break;
   }
   return `The default value is ${value}.`;

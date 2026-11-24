@@ -8,7 +8,6 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "../core/errors.js";
 import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
-import * as syntax from "../core/syntax.js";
 
 /** the receiver name for the generated encode functions */
 const receiverName = "e";
@@ -160,19 +159,18 @@ function generateSseFrame(
     text = `${indent.get()}data, err := json.Marshal(${source})\n`;
     text += `${indent.get()}${helpers.buildErrCheck(indent, "err", "streaming.SSEFrame{}")}\n`;
     if (sse.envelopeField) {
-      const envelopeKeyLit = syntax.stringLiteral(sse.envelopeField.serializedName);
-      text += `${indent.get()}rawMsg := map[string]json.RawMessage{${envelopeKeyLit}: json.RawMessage("null")}\n`;
+      text += `${indent.get()}rawMsg := map[string]json.RawMessage{${JSON.stringify(sse.envelopeField.serializedName)}: json.RawMessage("null")}\n`;
       text += `${indent.get()}${helpers.buildIfBlock(indent, {
         condition: "err := json.Unmarshal(data, &rawMsg); err != nil",
         body: (indent) => `${indent.get()}return streaming.SSEFrame{}, err\n`,
       })}\n`;
-      text += `${indent.get()}data = rawMsg[${envelopeKeyLit}]\n`;
+      text += `${indent.get()}data = rawMsg[${JSON.stringify(sse.envelopeField.serializedName)}]\n`;
     }
     dataVar = "data";
   }
 
   // unnamed events have no event field so the frame type is left unset
-  const frameType = sse.name ? `Type: ${syntax.stringLiteral(sse.name)}, ` : "";
+  const frameType = sse.name ? `Type: "${sse.name}", ` : "";
   text += `${indent.get()}return streaming.SSEFrame{${frameType}Data: ${dataVar}}, nil\n`;
   return text;
 }

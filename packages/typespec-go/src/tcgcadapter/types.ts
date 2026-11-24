@@ -559,7 +559,7 @@ export class TypeAdapter {
     }
     let mpc = this.types.get(keyName);
     if (!mpc) {
-      const ct = contentType ? new go.Literal(this.getStringType(), contentType) : undefined;
+      const ct = contentType ? new go.Literal(this.getStringType(), `"${contentType}"`) : undefined;
       mpc = new go.MultipartContent(ct);
       if (sliceOf) {
         mpc = new go.Slice(mpc);
@@ -1179,14 +1179,10 @@ export class TypeAdapter {
     }
 
     let serializedName: string;
-    if (isMultipartFormData && prop.serializationOptions.multipart) {
-      serializedName = prop.serializationOptions.multipart.name;
-    } else if (prop.serializationOptions.json) {
+    if (prop.serializationOptions.json) {
       serializedName = prop.serializationOptions.json.name;
     } else if (prop.serializationOptions.xml) {
       serializedName = prop.serializationOptions.xml.name;
-    } else if (prop.serializationOptions.multipart) {
-      serializedName = prop.serializationOptions.multipart.name;
     } else {
       // there are some edge cases where serializationOptions is empty so we fall back to serializedName.
       // e.g. /typespec-go/test/tsp/HardwareSecurityModules.Management/CloudHsmCluster.tsp#L99-L105
