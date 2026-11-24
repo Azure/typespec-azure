@@ -1566,7 +1566,13 @@ export function clientHasNoExportedMethods(client: go.Client): boolean {
  * @returns a quoted and escaped Go string literal
  */
 export function formatGoStringLiteral(value: string): string {
-  return JSON.stringify(value).replace(/\ufeff/g, "\\ufeff");
+  const escaped = value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+  return `"${escaped}"`;
 }
 
 /**
