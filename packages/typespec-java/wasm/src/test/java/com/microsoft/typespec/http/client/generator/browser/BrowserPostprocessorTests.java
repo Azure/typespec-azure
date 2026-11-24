@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.javaparser.utils.Utils;
-import com.google.googlejavaformat.java.RemoveUnusedImports;
 import org.junit.jupiter.api.Test;
 
 class BrowserPostprocessorTests {
@@ -34,7 +33,11 @@ class BrowserPostprocessorTests {
             }
             """;
         String cleaned = postprocessor.removeUnusedImports("Example.java", source);
-        assertEquals(RemoveUnusedImports.removeUnusedImports(source), cleaned);
+        assertEquals(source.replace("import missing.dependency.Unused;\n", "")
+            .replace("import missing.dependency.OnlyInString;\n", "")
+            .replace("import missing.dependency.OnlyInComment;\n", "")
+            .replace("import missing.dependency.OnlyInProse;\n", "")
+            .replace("import static missing.dependency.Methods.trim;\n", ""), cleaned);
         assertTrue(cleaned.contains("import java.util.List;"));
         assertTrue(cleaned.contains("import static java.util.Collections.emptyList;"));
     }
@@ -60,7 +63,8 @@ class BrowserPostprocessorTests {
                 Map.Entry<String, T> entry;
             }
             """;
-        assertEquals(RemoveUnusedImports.removeUnusedImports(source),
+        assertEquals(source.replace("import missing.dependency.Entry;\n", "")
+            .replace("import java.lang.Deprecated;\n", ""),
             postprocessor.removeUnusedImports("Example.java", source));
     }
 
@@ -87,7 +91,8 @@ class BrowserPostprocessorTests {
             }
             """;
         String cleaned = postprocessor.removeUnusedImports("Example.java", source);
-        assertEquals(RemoveUnusedImports.removeUnusedImports(source), cleaned);
+        assertEquals(source.replace("import missing.dependency.OnlyInProse;\n", "")
+            .replace("import missing.dependency.OnlyInCode;\n", ""), cleaned);
         assertTrue(cleaned.contains("import java.time.Instant;"));
         assertTrue(cleaned.contains("import java.util.List;"));
         assertTrue(cleaned.contains("import java.net.URI;"));
@@ -98,7 +103,10 @@ class BrowserPostprocessorTests {
         String source = "package sample;\r\nimport missing.dependency.Unused;\r\nimport java.lang.String;\r\n"
             + "import sample.Example;\r\nimport sample.*;\r\nimport java.util.*;\r\n"
             + "class Example {\r\n\tString value;\r\n}\r\n";
-        assertEquals(RemoveUnusedImports.removeUnusedImports(source),
+        assertEquals(source.replace("import missing.dependency.Unused;\r\n", "")
+            .replace("import java.lang.String;\r\n", "")
+            .replace("import sample.Example;\r\n", "")
+            .replace("import sample.*;\r\n", ""),
             postprocessor.removeUnusedImports("Example.java", source));
     }
 
