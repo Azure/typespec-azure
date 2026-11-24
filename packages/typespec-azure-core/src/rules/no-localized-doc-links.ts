@@ -1,16 +1,14 @@
 import {
-  $doc,
   createRule,
   fileRef,
   getDoc,
-  getDocData,
+  getDocDiagnosticTarget,
   getErrorsDoc,
   getReturnsDoc,
-  type ModelProperty,
+  type DiagnosticTarget,
   type Operation,
   type Type,
 } from "@typespec/compiler";
-import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 
 const localizedDocLink = /https:\/\/docs\.microsoft\.com\/\w+-\w+\/azure\//;
 
@@ -26,7 +24,7 @@ export const noLocalizedDocLinksRule = createRule({
   create(context) {
     const reported = new Map<object, Set<object>>();
 
-    function reportOnce(target: Type, diagnosticTarget: Type | Node = target) {
+    function reportOnce(target: Type, diagnosticTarget: DiagnosticTarget = target) {
       const location = diagnosticTarget === target ? (target.node ?? target) : diagnosticTarget;
       const source = target.node ?? target;
       let sources = reported.get(location);
@@ -40,115 +38,39 @@ export const noLocalizedDocLinksRule = createRule({
       }
     }
 
-    function checkDoc(target: Type) {
-      const doc = getDoc(context.program, target);
-      const docData = getDocData(context.program, target);
-      if (!doc || !docData || !localizedDocLink.test(doc)) {
+    function checkDoc(
+      target: Type,
+      doc: string | undefined = getDoc(context.program, target),
+      diagnosticTarget: DiagnosticTarget | undefined = getDocDiagnosticTarget(
+        context.program,
+        target,
+      ),
+    ) {
+      if (!doc || !localizedDocLink.test(doc)) {
         return;
       }
 
-      if (target.kind === "ModelProperty" || target.kind === "EnumMember") {
-        if (docData.source === "decorator") {
-          const application = target.decorators.findLast((item) => item.decorator === $doc);
-          if (application?.node?.kind === SyntaxKind.AugmentDecoratorStatement) {
-            reportOnce(target, application.node);
-            return;
-          }
-          if (target.kind === "ModelProperty" && target.sourceProperty) {
-            for (
-              let property: ModelProperty | undefined = target.sourceProperty;
-              property && getDoc(context.program, property) === doc;
-              property = property.sourceProperty
-            ) {
-              const sourceApplication = property.decorators.findLast(
-                (item) => item.decorator === $doc,
-              );
-              if (sourceApplication?.node?.kind === SyntaxKind.AugmentDecoratorStatement) {
-                reportOnce(property, sourceApplication.node);
-                return;
-              }
-              if (sourceApplication) {
-                reportOnce(property);
-                return;
-              }
-            }
-          }
-        } else if (target.kind === "ModelProperty" && target.sourceProperty) {
-          // A copied property can inherit documentation authored on an intermediate owner.
-          for (
-            let property: ModelProperty | undefined = target;
-            property && getDoc(context.program, property) === doc;
-            property = property.sourceProperty
-          ) {
-            const model = property.model;
-            const signature = model?.node?.parent;
-            const owner =
-              signature?.kind === SyntaxKind.OperationSignatureDeclaration
-                ? signature.parent
-                : model?.node;
-            let ownDoc: string | undefined;
-            for (const comment of owner?.docs ?? []) {
-              for (const tag of comment.tags) {
-                if (
-                  (tag.kind === SyntaxKind.DocPropTag && tag.propName.sv === target.name) ||
-                  (tag.kind === SyntaxKind.DocParamTag && tag.paramName.sv === target.name)
-                ) {
-                  ownDoc = tag.content.map((part) => part.text).join("");
-                }
-              }
-            }
-            if (ownDoc && ownDoc === doc && owner) {
-              reportOnce(target, owner);
-              return;
-            }
-          }
-
-          let source: ModelProperty | undefined = target;
-          while (source?.sourceProperty) {
-            source = source.sourceProperty;
-          }
-          if (source?.model?.node?.parent?.kind === SyntaxKind.OperationSignatureDeclaration) {
-            return;
-          }
-        }
-      }
-
-      reportOnce(target);
+      reportOnce(target, diagnosticTarget ?? target);
     }
 
     function checkOperation(operation: Operation) {
-      if (operation.sourceOperation) {
-        for (const parameter of operation.parameters.properties.values()) {
-          const doc = getDoc(context.program, parameter);
-          if (doc && localizedDocLink.test(doc)) {
-            for (
-              let owner: Operation | undefined = operation;
-              owner;
-              owner = owner.sourceOperation
-            ) {
-              const hasOwnParamDoc = owner.node?.docs?.some((comment) =>
-                comment.tags.some(
-                  (tag) =>
-                    tag.kind === SyntaxKind.DocParamTag &&
-                    tag.paramName.sv === parameter.name &&
-                    localizedDocLink.test(tag.content.map((part) => part.text).join("")),
-                ),
-              );
-              if (hasOwnParamDoc && owner.node) {
-                reportOnce(owner, owner.node);
-                break;
-              }
-            }
-          }
-        }
-      }
       const docs = [
-        getDoc(context.program, operation),
-        getReturnsDoc(context.program, operation),
-        getErrorsDoc(context.program, operation),
+        {
+          doc: getDoc(context.program, operation),
+          target: getDocDiagnosticTarget(context.program, operation),
+        },
+        {
+          doc: getReturnsDoc(context.program, operation),
+          target: getDocDiagnosticTarget(context.program, operation, "returns"),
+        },
+        {
+          doc: getErrorsDoc(context.program, operation),
+          target: getDocDiagnosticTarget(context.program, operation, "errors"),
+        },
       ];
-      if (docs.some((doc) => doc !== undefined && localizedDocLink.test(doc))) {
-        reportOnce(operation);
+      const localizedDoc = docs.find(({ doc }) => doc !== undefined && localizedDocLink.test(doc));
+      if (localizedDoc) {
+        reportOnce(operation, localizedDoc.target ?? operation);
       }
     }
 
