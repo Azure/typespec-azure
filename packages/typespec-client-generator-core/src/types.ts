@@ -593,13 +593,14 @@ export function getSdkUnionWithDiagnostics(
       updateReferencedTypeMap(context, type, retval);
     } else {
       const namespace = getClientNamespace(context, type);
+      const isExactName = isExactClientName(context, type);
       // if a union is `type | null`, then we will return a nullable wrapper type of the type
       if (nonNullOptions.length === 1 && nullOption !== undefined) {
         retval = {
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: !type.name,
-          isExactName: false,
+          isExactName,
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
           type: diagnostics.pipe(getUnknownType(context, type)),
           access: "public",
@@ -630,7 +631,7 @@ export function getSdkUnionWithDiagnostics(
               ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
               name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
               isGeneratedName: !type.name,
-              isExactName: false,
+              isExactName,
               crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
               type: retval,
               access: "public",
@@ -648,7 +649,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
-          isExactName: false,
+          isExactName,
           namespace,
           variantTypes: [],
           variants: new Map(),
@@ -673,7 +674,7 @@ export function getSdkUnionWithDiagnostics(
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
             name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
             isGeneratedName: !type.name,
-            isExactName: false,
+            isExactName,
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
             type: retval,
             access: "public",
@@ -937,7 +938,7 @@ function getEmptyUnionType(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
     name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
     isGeneratedName: !type.name,
-    isExactName: false,
+    isExactName: isExactClientName(context, type),
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
