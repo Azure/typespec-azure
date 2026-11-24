@@ -129,6 +129,12 @@ generate("sseregression", sseregression, "test/local/sseregression", [
   "azcore-version=1.23.4-0.20261027204849-705fff0e3d0a",
 ]);
 
+const lrometadatapaging = pkgRoot + "test/tsp/LroMetadataPaging";
+generate("lrometadatapaging", lrometadatapaging, "test/local/lrometadatapaging", [
+  "lro-metadata-pollers=true",
+  "inject-spans=true",
+]);
+
 const containingmod = pkgRoot + "test/tsp/ContainingMod";
 generate("containingmod", containingmod, "test/local/containingmod/subpkg", [
   "containing-module=containingmod",

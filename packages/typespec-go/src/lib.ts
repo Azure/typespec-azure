@@ -15,6 +15,7 @@ export interface GoEmitterOptions {
   "go-generate"?: string;
   "head-as-boolean"?: boolean;
   "inject-spans"?: boolean;
+  "lro-metadata-pollers"?: boolean;
   module?: string;
   "omit-constructors"?: boolean;
   "rawjson-as-bytes"?: boolean;
@@ -84,6 +85,12 @@ const EmitterOptionsSchema: JSONSchemaType<GoEmitterOptions> = {
       type: "boolean",
       nullable: true,
       description: "Enables generation of spans for distributed tracing. The default is false.",
+    },
+    "lro-metadata-pollers": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "When true, LROs with `@lroStatusMetadata` or `@lroOperationId` return a generated poller wrapper. Enabling this changes the public `Begin` method return type and may break existing SDK consumers. Status metadata and polling URL IDs are available again after the next poll when resuming. Polling URLs supplied in response bodies are not supported. The default is false.",
     },
     module: {
       type: "string",

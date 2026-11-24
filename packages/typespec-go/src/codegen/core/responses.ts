@@ -7,6 +7,7 @@ import * as go from "../../codemodel/index.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
+import { generateLROPollerTypes } from "./operations.js";
 
 export interface ResponsesSerDe {
   responses: string;
@@ -42,6 +43,17 @@ export function generateResponses(pkg: go.PackageContent, options: go.Options): 
       serdeContent += generateMarshaller(respEnv, serdeImports, indent);
     }
     serdeContent += generateUnmarshaller(respEnv, serdeImports, indent);
+  }
+  for (const client of pkg.clients) {
+    for (const method of client.methods) {
+      if (go.isLROMethod(method) && method.poller) {
+        const typeParam = method.kind === "lroPageableMethod"
+          ? `[*runtime.Pager[${method.returns.name}]]`
+          : `[${method.returns.name}]`;
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
+        respContent += generateLROPollerTypes(method, method.poller, typeParam, imports);
+      }
+    }
   }
 
   responses += imports.text();
