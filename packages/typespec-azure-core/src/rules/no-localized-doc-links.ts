@@ -1,16 +1,14 @@
 import {
-  $doc,
   createRule,
   fileRef,
   getDoc,
-  getDocData,
   getErrorsDoc,
   getReturnsDoc,
-  type ModelProperty,
   type Operation,
   type Type,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { getDocDiagnosticTarget } from "./doc-source.js";
 
 const localizedDocLink = /https:\/\/docs\.microsoft\.com\/\w+-\w+\/azure\//;
 
@@ -41,78 +39,13 @@ export const noLocalizedDocLinksRule = createRule({
     }
 
     function checkDoc(target: Type) {
-      const doc = getDocData(context.program, target);
-      if (!doc || !localizedDocLink.test(doc.value)) {
+      const doc = getDoc(context.program, target);
+      if (!doc || !localizedDocLink.test(doc)) {
         return;
       }
 
-      if (target.kind === "ModelProperty" || target.kind === "EnumMember") {
-        if (doc.source === "decorator") {
-          const application = target.decorators.findLast((item) => item.decorator === $doc);
-          if (application?.node?.kind === SyntaxKind.AugmentDecoratorStatement) {
-            reportOnce(target, application.node);
-            return;
-          }
-          if (target.kind === "ModelProperty" && target.sourceProperty) {
-            for (
-              let property: ModelProperty | undefined = target.sourceProperty;
-              property && getDoc(context.program, property) === doc.value;
-              property = property.sourceProperty
-            ) {
-              const sourceApplication = property.decorators.findLast(
-                (item) => item.decorator === $doc,
-              );
-              if (sourceApplication?.node?.kind === SyntaxKind.AugmentDecoratorStatement) {
-                reportOnce(property, sourceApplication.node);
-                return;
-              }
-              if (sourceApplication) {
-                reportOnce(property);
-                return;
-              }
-            }
-          }
-        } else if (target.kind === "ModelProperty" && target.sourceProperty) {
-          // A copied property can inherit documentation authored on an intermediate owner.
-          for (
-            let property: ModelProperty | undefined = target;
-            property && getDoc(context.program, property) === doc.value;
-            property = property.sourceProperty
-          ) {
-            const model = property.model;
-            const signature = model?.node?.parent;
-            const owner =
-              signature?.kind === SyntaxKind.OperationSignatureDeclaration
-                ? signature.parent
-                : model?.node;
-            let ownDoc: string | undefined;
-            for (const comment of owner?.docs ?? []) {
-              for (const tag of comment.tags) {
-                if (
-                  (tag.kind === SyntaxKind.DocPropTag && tag.propName.sv === target.name) ||
-                  (tag.kind === SyntaxKind.DocParamTag && tag.paramName.sv === target.name)
-                ) {
-                  ownDoc = tag.content.map((part) => part.text).join("");
-                }
-              }
-            }
-            if (ownDoc && ownDoc === doc.value && owner) {
-              reportOnce(target, owner);
-              return;
-            }
-          }
-
-          let source: ModelProperty | undefined = target;
-          while (source?.sourceProperty) {
-            source = source.sourceProperty;
-          }
-          if (source?.model?.node?.parent?.kind === SyntaxKind.OperationSignatureDeclaration) {
-            return;
-          }
-        }
-      }
-
-      reportOnce(target);
+      const location = getDocDiagnosticTarget(context.program, target, doc);
+      if (location) reportOnce(location.source, location.diagnosticTarget);
     }
 
     function checkOperation(operation: Operation) {

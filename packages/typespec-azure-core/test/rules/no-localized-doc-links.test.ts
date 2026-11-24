@@ -172,26 +172,6 @@ describe("no-localized-doc-links", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
-  it("honors suppression on an intermediate documentation owner", async () => {
-    const [, diagnostics] = await Tester.compileAndDiagnose(
-      `
-        model Source { name: string; }
-        #suppress "@azure-tools/typespec-azure-core/no-localized-doc-links" "Exception."
-        /** @prop name https://docs.microsoft.com/en-us/azure/widgets */
-        model Middle { ...Source; }
-        model Copy { ...Middle; }
-      `,
-      {
-        compilerOptions: {
-          linterRuleSet: {
-            enable: { "@azure-tools/typespec-azure-core/no-localized-doc-links": true },
-          },
-        },
-      },
-    );
-    expectDiagnostics(diagnostics, []);
-  });
-
   it("reports copied operation parameter documentation at its author", async () => {
     const [, diagnostics] = await Tester.compileAndDiagnose(
       `

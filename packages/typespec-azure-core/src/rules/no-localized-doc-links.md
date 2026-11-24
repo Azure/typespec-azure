@@ -32,4 +32,4 @@ model ResourceHealth {}
 
 ## LintDiff Equivalent
 
-This rule implements the documented intent of [docLinkLocale](https://github.com/Azure/azure-openapi-validator/blob/main/docs/doc-link-locale.md). Unlike the current Swagger implementation, it reports localized links in TypeSpec documentation.
+Based on Swagger's [docLinkLocale](https://github.com/Azure/azure-openapi-validator/blob/main/docs/doc-link-locale.md).
