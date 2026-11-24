@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-azure-examples
 
+## 0.3.0
+
+### Features
+
+- [#5566](https://github.com/Azure/typespec-azure/pull/5566) Add the `tsp-examples add` command that adds examples for a new API version, adding an entry only when an operation is new or its contract changed (parity with OpenAPI-diff): changed operations get a `since` variant cloned from the previous example, new operations get a schema-shaped skeleton, and unchanged operations are left untouched.
+
+### Bug Fixes
+
+- [#5827](https://github.com/Azure/typespec-azure/pull/5827) Disable automatic line wrapping when writing unified example YAML so long titles and payload strings stay on one line. Preserve intentional newlines in string values.
+
+
 ## 0.2.2
 
 ### Features
