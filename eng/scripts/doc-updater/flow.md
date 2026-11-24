@@ -19,7 +19,7 @@ flowchart LR
         PRECOMPUTE["steps: precompute.ts
         Extract diffs + feedback + knowledge
         (deterministic, no untrusted text)"]
-        AGENT["Agent (copilot, claude-opus-4_6)
+        AGENT["Agent (copilot, gpt-6.1-sol)
         Update docs + build knowledge"]
         VALIDATE["post-steps: validate file scope
         + update-meta.ts"]
