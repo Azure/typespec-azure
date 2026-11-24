@@ -60,6 +60,12 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
+### `use-client-name-for-friendly-name-source`
+
+**Type:** `boolean`
+
+Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.
+
 ### `api-version`
 
 **Type:** `string | object`
@@ -91,7 +97,9 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 
@@ -129,7 +137,9 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                             | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
 | [`@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-operation-group-name-conflict) | Operation group names should not conflict with type names in the same namespace.                                                                                    |
 | [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
+| [`@azure-tools/typespec-client-generator-core/use-valid-client-lro-result`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result)           | LRO client results should follow the operation's protocol result contract.                                                                                          |
 | [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
+| [`@azure-tools/typespec-client-generator-core/unsupported-scope`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/unsupported-scope)                               | Use supported scopes for TCGC decorators.                                                                                                                           |
 
 ## Decorators
 
@@ -143,6 +153,7 @@ Available ruleSets:
 - [`@clientDoc`](#@clientdoc)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientLocation`](#@clientlocation)
+- [`@clientLroResult`](#@clientlroresult)
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
 - [`@clientOption`](#@clientoption)
@@ -772,6 +783,44 @@ getHealthStatus(
 // client.tsp
 
 @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
+```
+
+#### `@clientLroResult`
+
+Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
+
+Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
+
+See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The long-running operation to customize.
+`Operation`
+
+##### Parameters
+
+| Name   | Type                                                            | Description                                                                     |
+| ------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| result | `Model \| ModelProperty`                                        | The response model or status-monitor property to return from generated clients. |
+| scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                                         |
+
+##### Examples
+
+###### Return an action's whole status monitor
+
+```typespec
+@@clientLroResult(start, ActionStatus);
+```
+
+###### Return a property of an action's status monitor
+
+```typespec
+@@clientLroResult(start, ActionStatus.result);
 ```
 
 #### `@clientName`
