@@ -118,6 +118,11 @@ validator or migration history:
 
 - Explain the native requirement, applicability, rationale, and corrective
   TypeSpec pattern. Describe accepted and rejected authoring constructs directly.
+- Label incorrect and correct example headings with `❌ Incorrect` and
+  `✅ Correct`, respectively, matching existing rule pages. Preserve the
+  appropriate heading level and any useful scenario-specific suffix; plain
+  `Incorrect example` / `Correct example` headings without the symbols are not
+  sufficient.
 - Omit routine "this rule is opt-in", enable-this-rule, and ruleset-membership
   boilerplate from individual rule pages. Keep activation bookkeeping in central
   linter/ruleset references and migration NOTES. Include rule-specific configuration
