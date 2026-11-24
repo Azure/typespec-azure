@@ -32,6 +32,8 @@ export class TypeAdapter {
   // lazily built index of how each tcgc union type is used across the tcgc code model
   private unionUsage?: Map<tcgc.SdkUnionType | tcgc.SdkEnumType, UnionUsage>;
 
+  private readonly unionInterfaces = new Map<tcgc.SdkUnionType, go.Interface>();
+
   constructor(ctx: tcgc.SdkContext, codeModel: go.CodeModel) {
     this.ctx = ctx;
     this.codeModel = codeModel;
@@ -112,6 +114,9 @@ export class TypeAdapter {
     }
 
     for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
+      if (sdkUnion.discriminatedOptions && !this.getSseMetadata(sdkUnion)) {
+        continue;
+      }
       const goUnion = this.getUnionStruct(
         sdkUnion,
         this.codeModel.options["slice-elements-byval"] ?? false,
@@ -164,6 +169,12 @@ export class TypeAdapter {
       const model = this.getModel(pagedResponse);
       if (!this.getPkg().models.includes(model)) {
         this.getPkg().models.push(model);
+      }
+    }
+
+    for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
+      if (sdkUnion.discriminatedOptions && !this.getSseMetadata(sdkUnion)) {
+        this.getDiscriminatedUnion(sdkUnion);
       }
     }
   }
@@ -443,7 +454,7 @@ export class TypeAdapter {
       case "model":
         if (helpers.isPolymorphicRoot(type) && substituteDiscriminator) {
           this.getModel(type);
-          return this.getInterfaceType(type);
+          return this.getDiscriminatedUnion(type);
         } else if (
           helpers.isHttpFileType(type) ||
           (type.baseModel && helpers.isHttpFileType(type.baseModel))
@@ -465,12 +476,8 @@ export class TypeAdapter {
           mapElementsByValue,
         );
       case "union":
-        if (type.discriminatedOptions) {
-          throw new AdapterError(
-            "UnsupportedTsp",
-            `unsupported type kind ${type.kind}`,
-            type.__raw?.node,
-          );
+        if (type.discriminatedOptions && !this.getSseMetadata(type)) {
+          return this.getDiscriminatedUnion(type);
         }
         return this.getUnionStruct(type, elementTypeByValue);
       default:
@@ -828,45 +835,153 @@ export class TypeAdapter {
     return <go.String>stringType;
   }
 
-  // Hierarchy metadata is populated by getModel after caching the root model.
-  private getInterfaceType(model: tcgc.SdkModelType): go.Interface {
-    if (model.name.length === 0) {
-      throw new AdapterError("InternalError", "unnamed model", model.__raw?.node);
+  // Model hierarchy metadata is populated by getModel after caching the root model.
+  private getDiscriminatedUnion(src: tcgc.SdkModelType | tcgc.SdkUnionType): go.Interface {
+    if (src.name.length === 0) {
+      throw new AdapterError("InternalError", `unnamed ${src.kind}`, src.__raw?.node);
     }
-    if (!helpers.isPolymorphicRoot(model)) {
+    if (src.kind === "model" && !helpers.isPolymorphicRoot(src)) {
       throw new AdapterError(
         "InternalError",
-        `type ${model.name} isn't a discriminator root`,
-        model.__raw?.node,
+        `type ${src.name} isn't a discriminator root`,
+        src.__raw?.node,
       );
     }
-    let ifaceName = naming.createPolymorphicInterfaceName(helpers.getEffectiveName(model));
-    if (model.access === "internal") {
-      ifaceName = naming.uncapitalize(ifaceName);
+    let typeName = helpers.getEffectiveName(src);
+    if (src.access === "internal") {
+      typeName = naming.uncapitalize(typeName);
     }
-    let iface = this.types.get(ifaceName);
-    if (iface) {
-      return <go.Interface>iface;
+    const ifaceName = naming.createPolymorphicInterfaceName(typeName);
+    const cached = this.types.get(ifaceName);
+    if (cached) {
+      if (
+        cached.kind !== "interface" ||
+        (src.kind === "union" && this.unionInterfaces.get(src) !== cached)
+      ) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `duplicate discriminated union interface name ${ifaceName}`,
+          src.__raw?.node,
+        );
+      }
+      return cached;
     }
-    // find the discriminator field
+
     let discriminatorField: string | undefined;
-    for (const prop of model.properties) {
-      if (prop.kind === "property" && prop.discriminator) {
-        // only json support discriminator type
-        discriminatorField = prop.serializationOptions.json?.name;
+    switch (src.kind) {
+      case "model":
+        discriminatorField = src.properties.find(
+          (prop) => prop.kind === "property" && prop.discriminator,
+        )?.serializationOptions.json?.name;
+        break;
+      case "union": {
+        if (!src.discriminatedOptions) {
+          throw new AdapterError(
+            "InternalError",
+            `type ${src.name} isn't a discriminated union`,
+            src.__raw?.node,
+          );
+        }
+        discriminatorField = src.discriminatedOptions.discriminatorPropertyName;
         break;
       }
     }
     if (!discriminatorField) {
       throw new AdapterError(
         "InternalError",
-        `failed to find discriminator field for type ${model.name}`,
+        `failed to find discriminator field for type ${src.name}`,
+        src.__raw?.node,
       );
     }
-    iface = new go.Interface(this.getPkg(), ifaceName, discriminatorField);
+    const iface = new go.Interface(this.getPkg(), ifaceName, discriminatorField);
+    iface.docs.summary = src.summary;
+    iface.docs.description = src.doc;
     this.types.set(ifaceName, iface);
-    if (model.baseModel && helpers.isPolymorphicRoot(model.baseModel)) {
-      iface.parent = this.getInterfaceType(model.baseModel);
+    if (src.kind === "model") {
+      if (src.baseModel && helpers.isPolymorphicRoot(src.baseModel)) {
+        iface.parent = this.getDiscriminatedUnion(src.baseModel);
+      }
+      return iface;
+    }
+
+    this.unionInterfaces.set(src, iface);
+    this.getPkg().interfaces.push(iface);
+
+    const options = src.discriminatedOptions!;
+    const usage = getUsageFlags(src.usage);
+    for (const [tag, variant] of src.variants) {
+      if (typeof tag !== "string") {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `discriminated union ${src.name} requires named variants`,
+          src.__raw?.node,
+        );
+      }
+      const name = typeName + naming.ensureNameCase(tag);
+      if (this.types.has(name)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `duplicate discriminated union variant type name ${name}`,
+          src.__raw?.node,
+        );
+      }
+      const model = new go.PolymorphicModel(
+        this.getPkg(),
+        name,
+        iface,
+        new go.ModelAnnotations(false, false),
+        usage,
+      );
+      model.discriminatorValue = this.getLiteral(this.getStringType(), tag);
+      const field = new go.ModelField(
+        naming.ensureNameCase(discriminatorField),
+        this.getPtrType(model.discriminatorValue),
+        discriminatorField,
+        new go.ModelFieldAnnotations(true, false, false, true),
+      );
+      field.defaultValue = model.discriminatorValue;
+      model.fields.push(field);
+      iface.possibleTypes.push(model);
+      this.types.set(name, model);
+
+      if (options.envelope === "none") {
+        if (variant.kind !== "model") {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `inline discriminated union ${src.name} requires model variants`,
+            src.__raw?.node,
+          );
+        }
+        model.fields.push(
+          ...this.getModelFields(variant).filter(
+            (field) => field.serializedName !== options.discriminatorPropertyName,
+          ),
+        );
+      } else {
+        const type = this.getWireType(variant, false, true);
+        const fieldType = helpers.isPtrType(type) ? this.getPtrType(type) : type;
+        const serializedName = options.envelopePropertyName!;
+        model.fields.push(
+          new go.ModelField(
+            naming.ensureNameCase(serializedName),
+            fieldType,
+            serializedName,
+            new go.ModelFieldAnnotations(true, false, false, false),
+          ),
+        );
+      }
+      const fieldNames = new Set<string>();
+      for (const field of model.fields) {
+        if (fieldNames.has(field.name)) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `duplicate field name ${field.name} in discriminated union variant ${model.name}`,
+            src.__raw?.node,
+          );
+        }
+        fieldNames.add(field.name);
+      }
+      this.getPkg().models.push(model);
     }
     return iface;
   }
@@ -879,16 +994,22 @@ export class TypeAdapter {
     }
     let modelType = this.types.get(modelName);
     if (modelType) {
+      if (
+        (modelType.kind === "interface" &&
+          [...this.unionInterfaces.values()].includes(modelType)) ||
+        (modelType.kind === "polymorphicModel" &&
+          [...this.unionInterfaces.values()].includes(modelType.interface))
+      ) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `duplicate discriminated union ${modelType.kind === "interface" ? "interface" : "variant type"} name ${modelName}`,
+          model.__raw?.node,
+        );
+      }
       return <go.Model | go.PolymorphicModel>modelType;
     }
 
-    let usage = go.UsageFlags.None;
-    if (model.usage & tsp.UsageFlags.Input) {
-      usage = go.UsageFlags.Input;
-    }
-    if (model.usage & tsp.UsageFlags.Output) {
-      usage |= go.UsageFlags.Output;
-    }
+    const usage = getUsageFlags(model.usage);
 
     let omitSerde = false;
     const omitValue = helpers.getClientOption<string>("omitSerdeMethods", model, this.ctx.program);
@@ -917,13 +1038,13 @@ export class TypeAdapter {
 
       if (helpers.isPolymorphicRoot(model)) {
         // root type, we can get the InterfaceType directly from it
-        iface = this.getInterfaceType(model);
+        iface = this.getDiscriminatedUnion(model);
       } else {
         // walk the parents until we find the first root type
         let parent = model.baseModel;
         while (parent) {
           if (helpers.isPolymorphicRoot(parent)) {
-            iface = this.getInterfaceType(parent);
+            iface = this.getDiscriminatedUnion(parent);
             break;
           }
           parent = parent.baseModel;
@@ -988,18 +1109,19 @@ export class TypeAdapter {
       }
     }
 
+    modelType.fields.push(...this.getModelFields(model));
+    return modelType;
+  }
+
+  private getModelFields(model: tcgc.SdkModelType): Array<go.ModelField> {
     const content = helpers.aggregateProperties(this.ctx, model);
-    for (const prop of content.props) {
-      modelType.fields.push(this.getModelField(prop, model));
-    }
+    const fields = content.props.map((prop) => this.getModelField(prop, model));
     if (content.addlProps) {
       const annotations = new go.ModelFieldAnnotations(false, false, true, false);
       const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
-      modelType.fields.push(
-        new go.ModelField("AdditionalProperties", addlPropsType, "", annotations),
-      );
+      fields.push(new go.ModelField("AdditionalProperties", addlPropsType, "", annotations));
     }
-    return modelType;
+    return fields;
   }
 
   private getDiscriminatorLiteral(sdkProp: tcgc.SdkModelPropertyType): go.Literal {
@@ -1697,6 +1819,17 @@ export class TypeAdapter {
     this.unionUsage = index;
     return index;
   }
+}
+
+function getUsageFlags(usage: tcgc.UsageFlags): go.UsageFlags {
+  let flags = go.UsageFlags.None;
+  if (usage & tcgc.UsageFlags.Input) {
+    flags |= go.UsageFlags.Input;
+  }
+  if (usage & tcgc.UsageFlags.Output) {
+    flags |= go.UsageFlags.Output;
+  }
+  return flags;
 }
 
 function getPrimitiveType(
