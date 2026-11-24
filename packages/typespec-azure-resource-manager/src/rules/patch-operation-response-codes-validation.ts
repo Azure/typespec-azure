@@ -8,11 +8,11 @@ const syncResponses = new Set<number | "*">([200, "*"]);
 const lroResponses = new Set<number | "*">([200, 202, "*"]);
 
 export const patchOperationResponseCodesRule = createRule({
-  name: "patch-operation-response-codes",
-  docs: fileRef.fromPackageRoot("src/rules/patch-operation-response-codes.md"),
+  name: "patch-operation-response-codes-validation",
+  docs: fileRef.fromPackageRoot("src/rules/patch-operation-response-codes-validation.md"),
   description: "Ensure ARM PATCH operations have the appropriate response codes.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-operation-response-codes",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-operation-response-codes-validation",
   messages: {
     sync: "Synchronous PATCH operations must have only a 200 response and a standard error response.",
     async: "Long-running PATCH operations must have only 200, 202, and a standard error response.",

@@ -46,7 +46,7 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
-import { patchOperationResponseCodesRule } from "./rules/patch-operation-response-codes.js";
+import { patchOperationResponseCodesRule } from "./rules/patch-operation-response-codes-validation.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";

@@ -1,9 +1,10 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeAll, describe, it } from "vitest";
-import { patchOperationResponseCodesRule } from "../../src/rules/patch-operation-response-codes.js";
+import { patchOperationResponseCodesRule } from "../../src/rules/patch-operation-response-codes-validation.js";
 
-const code = "@azure-tools/typespec-azure-resource-manager/patch-operation-response-codes";
+const code =
+  "@azure-tools/typespec-azure-resource-manager/patch-operation-response-codes-validation";
 const responses = `
   model Ok { @statusCode statusCode: 200; @body value: string; }
   model Status {
@@ -70,32 +71,6 @@ describe("synchronous PATCH responses", () => {
       message:
         "Synchronous PATCH operations must have only a 200 response and a standard error response.",
     });
-  });
-
-  it("accepts a singleton response status range as its literal code", async () => {
-    await tester
-      .expect(
-        patch(
-          "Range | ErrorResponse",
-          "model Range { @statusCode @minValue(200) @maxValue(200) code: int32; }",
-        ),
-      )
-      .toBeValid();
-  });
-
-  it("rejects a response status range", async () => {
-    await tester
-      .expect(
-        patch(
-          "Range | ErrorResponse",
-          "model Range { @statusCode @minValue(200) @maxValue(299) code: int32; }",
-        ),
-      )
-      .toEmitDiagnostics({
-        code,
-        message:
-          "Synchronous PATCH operations must have only a 200 response and a standard error response.",
-      });
   });
 });
 

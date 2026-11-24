@@ -66,6 +66,10 @@ interface Widgets {
 
 The rule inspects unprojected response types. If a response is added or removed in a particular API version, the unprojected result may not reflect every emitted version.
 
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rules [PatchResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-response-codes.md) and [LroPatch202](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-patch202.md).
+
 An explicit `x-ms-long-running-operation` extension or legacy `@Azure.ClientGenerator.Core.Legacy.markAsLro` marker alone does not provide LRO metadata. AutoRest may emit a long-running flag for these operations while this rule treats them as synchronous. The rule does not validate `x-ms-long-running-operation-options`.
 
 HTTP metadata resolution can repeat existing compiler diagnostics, as tracked in [#6084](https://github.com/Azure/typespec-azure/issues/6084).
