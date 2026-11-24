@@ -2,14 +2,15 @@ import { createRule, fileRef, isTemplateDeclarationOrInstance } from "@typespec/
 import { getResponsesForOperation } from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
-export const missingDefaultResponseRule = createRule({
-  name: "missing-default-response",
-  docs: fileRef.fromPackageRoot("src/rules/missing-default-response.md"),
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-default-response",
-  description: "ARM operations must define a default response.",
+export const requireStandardErrorResponseRule = createRule({
+  name: "require-standard-error-response",
+  docs: fileRef.fromPackageRoot("src/rules/require-standard-error-response.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/require-standard-error-response",
+  description: "ARM operations must include a standard error response.",
   severity: "warning",
   messages: {
-    default: "Operation is missing a default response. Include the standard ARM ErrorResponse.",
+    default:
+      "Operation is missing a standard error response. Include the standard ARM ErrorResponse.",
   },
   create(context) {
     return {

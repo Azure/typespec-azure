@@ -2,13 +2,14 @@ import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, expect, it } from "vitest";
-import { missingDefaultResponseRule } from "../../src/rules/missing-default-response.js";
+import { requireStandardErrorResponseRule } from "../../src/rules/require-standard-error-response.js";
 
 let tester: LinterRuleTester;
-const code = "@azure-tools/typespec-azure-resource-manager/missing-default-response";
+const code = "@azure-tools/typespec-azure-resource-manager/require-standard-error-response";
 const diagnostic = {
   code,
-  message: "Operation is missing a default response. Include the standard ARM ErrorResponse.",
+  message:
+    "Operation is missing a standard error response. Include the standard ARM ErrorResponse.",
 };
 const resource = `
   @armProviderNamespace
@@ -21,13 +22,13 @@ const resource = `
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    missingDefaultResponseRule,
+    requireStandardErrorResponseRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
 it.each(["get", "put", "patch", "post", "delete", "head"])(
-  "requires a default response on %s operations",
+  "requires a standard error response on %s operations",
   async (verb) => {
     await tester
       .expect(`@${verb} op /*read*/read(): { @statusCode status: 200; };`)
@@ -44,7 +45,7 @@ it.each([
   "ExplicitError",
   "RangedError",
   "NotFoundResponse | ExplicitError | RangedError",
-])("does not mistake %s for a default response", async (response) => {
+])("does not mistake %s for a generic error response", async (response) => {
   await tester
     .expect(
       `
@@ -63,15 +64,15 @@ it("reports once for an operation with no responses", async () => {
   await tester.expect("@get op read(): never;").toEmitDiagnostics(diagnostic);
 });
 
-it.each(["CommonTypes.ErrorResponse", "CustomError", "ExplicitDefault"])(
-  "accepts the default response %s without requiring a particular error shape",
+it.each(["CommonTypes.ErrorResponse", "CustomError", "ExplicitFallback"])(
+  "accepts the generic response %s without requiring a particular error shape",
   async (response) => {
     await tester
       .expect(
         `
         @error model CustomError { message: string; }
         @TypeSpec.OpenAPI.defaultResponse
-        model ExplicitDefault { message: string; }
+        model ExplicitFallback { message: string; }
         @get op read(): string | ${response};
       `,
       )
@@ -103,7 +104,7 @@ it("checks inherited concrete operations rather than the uninstantiated interfac
 });
 
 it.each(["ArmResourceRead", "ArmResourceCheckExistence", "ArmResourceActionSync"])(
-  "checks a removed default on %s",
+  "checks a removed standard error response on %s",
   async (template) => {
     const arguments_ =
       template === "ArmResourceActionSync"
@@ -121,7 +122,7 @@ it.each(["ArmResourceRead", "ArmResourceCheckExistence", "ArmResourceActionSync"
   },
 );
 
-it("accepts standard ARM templates with their default error responses", async () => {
+it("accepts standard ARM templates with their standard error responses", async () => {
   await tester
     .expect(
       `${resource}
@@ -178,12 +179,12 @@ it.each([
 
 it.each([false, true])(
   "reports independently of a missing-error diagnostic regardless of rule order: %s",
-  async (defaultFirst) => {
+  async (standardResponseFirst) => {
     const standardError = "@azure-tools/typespec-azure-resource-manager/use-standard-error";
     const [, diagnostics] = await Tester.compileAndDiagnose("@get op read(): string;", {
       compilerOptions: {
         linterRuleSet: {
-          enable: defaultFirst
+          enable: standardResponseFirst
             ? { [code]: true, [standardError]: true }
             : { [standardError]: true, [code]: true },
         },
@@ -198,7 +199,7 @@ it.each([false, true])(
   },
 );
 
-it("retains independent error-payload and missing-default diagnostics", async () => {
+it("retains independent error-payload and missing-standard-response diagnostics", async () => {
   const standardError = "@azure-tools/typespec-azure-resource-manager/use-standard-error";
   const [, diagnostics] = await Tester.compileAndDiagnose(
     `

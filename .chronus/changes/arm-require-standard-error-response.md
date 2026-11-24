@@ -4,7 +4,7 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Add `missing-default-response` to require an ARM fallback response across HTTP methods, independently of existing ARM response rules.
+Add `require-standard-error-response` to require a standard ARM error response across HTTP methods, independently of existing ARM response rules.
 
 ```tsp
 @armResourceOperations
