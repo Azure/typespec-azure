@@ -42,7 +42,7 @@ const immutable = (path: string) => ({
 
 const visibility = (path: string) => ({
   code,
-  message: `PATCH request body property '${path}' must include Lifecycle.Update visibility.`,
+  message: `PATCH request body property '${path}' must use default visibility, or explicitly include Lifecycle.Update visibility.`,
 });
 
 const legacyPatch = `
@@ -285,17 +285,17 @@ describe("partial resource layout", () => {
       .toEmitDiagnostics([required("wire"), visibility("wire")]);
   });
 
-  it.each(["Read", "Update", "Query"])(
-    "compares response members with %s visibility without rejecting write-only input",
+  it.each(["Read", "Create", "Update", "Query"])(
+    "checks resource members with %s visibility",
     async (lifecycle) => {
-      await tester
-        .expect(
-          `${service}
+      const expectation = tester.expect(
+        `${service}
         model Resource { details: { @visibility(Lifecycle.${lifecycle}) value?: string; }; }
         @patch op update(@body body: { details?: { value?: string } }): Resource;
       `,
-        )
-        .toBeValid();
+      );
+      if (lifecycle === "Update") await expectation.toBeValid();
+      else await expectation.toEmitDiagnostics(immutable("details.value"));
     },
   );
 
@@ -331,6 +331,28 @@ describe("partial resource layout", () => {
       `,
       )
       .toBeValid();
+  });
+
+  it("does not infer a resource from a response without a readable body", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op update(@body body: { value?: string }):
+          { @visibility(Lifecycle.Query) value: string };
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("reports layout rather than resource visibility when response filtering removes the member", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op update(@body body: { value?: string }):
+          { sentinel: string; @visibility(Lifecycle.Query) value: string };
+      `,
+      )
+      .toEmitDiagnostics(missing("value"));
   });
 
   it("retains safety checks on keys permitted by a resource record", async () => {
@@ -414,14 +436,14 @@ describe("partial resource layout", () => {
   });
 });
 
-describe("immutable paths and effective input", () => {
-  it("checks inherited encoded immutable envelope names", async () => {
+describe("lifecycle visibility and effective input", () => {
+  it("matches inherited encoded input to resource visibility", async () => {
     await tester
       .expect(
         `${service}
         model Base { @encodedName("application/json", "location") region?: string; }
         model Patch extends Base {}
-        @patch op update(@body body: Patch): void;
+        @patch op update(@body body: Patch): { @visibility(Lifecycle.Read) location: string };
       `,
       )
       .toEmitDiagnostics(immutable("location"));
@@ -436,7 +458,8 @@ describe("immutable paths and effective input", () => {
         #suppress "@typespec/http/metadata-ignored" "Explicit JSON body property."
         @header value: string = "fixed";
       }
-      @patch op update(@body body: Patch): void;
+      @patch op update(@body body: Patch):
+        { @visibility(Lifecycle.Read) location: string; value: string };
     `,
       )
       .toEmitDiagnostics([immutable("location"), required("value"), defaultValue("value")]);
@@ -451,30 +474,50 @@ describe("immutable paths and effective input", () => {
       )
       .toBeValid();
   });
-  it.each(["id", "name", "type", "location"])("rejects writable top-level %s", async (name) => {
+  it("preserves ARM reserved-field checks without a resource counterpart", async () => {
     await tester
       .expect(
         `${service}
-      @patch op update(@body body: { ${name}?: string }): void;
-    `,
-      )
-      .toEmitDiagnostics(immutable(name));
-  });
-
-  it("rejects the encoded provisioning-state path only at its reserved level", async () => {
-    await tester
-      .expect(
-        `${service}
-      model Base { @encodedName("application/json", "provisioningState") state?: string; }
       @patch op update(@body body: {
-        @encodedName("application/json", "properties") bag?: Base;
-        nested?: { id?: string; name?: string; type?: string; location?: string; provisioningState?: string };
-        provisioningState?: string;
-        @encodedName("application/json", "properties.provisioningState") dotted?: string;
+        id?: string; name?: string; type?: string; location?: string;
+        properties?: { provisioningState?: string };
       }): void;
     `,
       )
-      .toEmitDiagnostics(immutable("properties.provisioningState"));
+      .toEmitDiagnostics([
+        immutable("id"),
+        immutable("name"),
+        immutable("type"),
+        immutable("location"),
+        immutable("properties.provisioningState"),
+      ]);
+  });
+
+  it("checks encoded resource visibility and reports reserved fields only once", async () => {
+    await tester
+      .expect(
+        `${service}
+      model Patch {
+        @encodedName("application/json", "properties") bag?: {
+          @encodedName("application/json", "provisioningState") state?: string;
+          ordinary?: string;
+        };
+        provisioningState?: string;
+      }
+      model Resource {
+        properties: {
+          @visibility(Lifecycle.Read) provisioningState: string;
+          @visibility(Lifecycle.Read) ordinary: string;
+        };
+        provisioningState: string;
+      }
+      @patch op update(@body body: Patch): Resource;
+    `,
+      )
+      .toEmitDiagnostics([
+        immutable("properties.provisioningState"),
+        immutable("properties.ordinary"),
+      ]);
   });
 
   it("excludes Read/Create properties and descendants from ordinary PATCH", async () => {
@@ -512,14 +555,14 @@ describe("immutable paths and effective input", () => {
     await tester
       .expect(
         `${service}
-      model Patch { @visibility(Lifecycle.Create) value?: string; }
+      model Patch { @visibility(Lifecycle.Create) location?: string; }
       @parameterVisibility(Lifecycle.Create) @patch op update(@body body: Patch): void;
     `,
       )
-      .toEmitDiagnostics(visibility("value"));
+      .toEmitDiagnostics([immutable("location"), visibility("location")]);
   });
 
-  it("does not let Update visibility permit an immutable field", async () => {
+  it("does not let explicit Update visibility override ARM reserved-field policy", async () => {
     await tester
       .expect(
         `${service}
@@ -528,6 +571,20 @@ describe("immutable paths and effective input", () => {
       )
       .toEmitDiagnostics(immutable("id"));
   });
+
+  it.each(["", "@visibility(Lifecycle.Update)"])(
+    "accepts resource properties that allow Update: %s",
+    async (annotation) => {
+      await tester
+        .expect(
+          `${service}
+          model Resource { ${annotation} value: string; }
+          @patch op update(@body body: { value?: string }): Resource;
+        `,
+        )
+        .toBeValid();
+    },
+  );
 
   it("reports independent categories without suppressing a finding", async () => {
     await tester
@@ -544,6 +601,35 @@ describe("immutable paths and effective input", () => {
         visibility("id"),
         missing("id"),
       ]);
+  });
+
+  it.each(["id", "name", "type", "location"])(
+    "does not trust missing resource lifecycle annotations for reserved %s",
+    async (name) => {
+      await tester
+        .expect(
+          `${service}
+          model Resource { ${name}?: string; }
+          @patch op update(@body body: { ${name}?: string }): Resource;
+        `,
+        )
+        .toEmitDiagnostics(immutable(name));
+    },
+  );
+
+  it("does not trust unannotated provisioning state even when its owning rule is suppressed", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Properties {
+          #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "Legacy model."
+          provisioningState?: string;
+        }
+        model Resource { properties?: Properties; }
+        @patch op update(@body body: { properties?: Properties }): Resource;
+      `,
+      )
+      .toEmitDiagnostics(immutable("properties.provisioningState"));
   });
 
   it("isolates shared models across operation visibility", async () => {
@@ -663,6 +749,17 @@ describe("partial-update safety and traversal policies", () => {
     `,
       )
       .toEmitDiagnostics([missing("first.extra"), missing("second.extra")]);
+  });
+
+  it("does not expand recursive record values or skip named siblings", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Node { value: string; children?: Record<Node>; }
+        @patch op update(@body body: { dictionary?: Record<Node>; direct?: Node }): void;
+      `,
+      )
+      .toEmitDiagnostics(required("direct.value"));
   });
 
   it("checks recursive policy transitions under identity and array elements", async () => {

@@ -46,7 +46,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
     immutable: paramMessage`PATCH request body property '${"propertyName"}' is immutable and must be excluded from PATCH input.`,
     required: paramMessage`Properties of a PATCH request body must not be required, property:${"propertyName"}.`,
     default: paramMessage`Properties of a PATCH request body must not have default value, property:${"propertyName"}.`,
-    visibility: paramMessage`PATCH request body property '${"propertyName"}' must include Lifecycle.Update visibility.`,
+    visibility: paramMessage`PATCH request body property '${"propertyName"}' must use default visibility, or explicitly include Lifecycle.Update visibility.`,
   },
   create(context) {
     const { program } = context;
@@ -124,10 +124,22 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
           });
         }
 
-        // The active stack, rather than a global visited set, preserves sibling uses.
         function visit(type: Type, state: TraversalState): boolean {
-          const model = objectModel(type);
-          if (model === undefined || isOrExtendsHttpFile(program, model)) return false;
+          switch (type.kind) {
+            case "Union": {
+              const member = getSingleNonNullMember(type);
+              return member?.kind === "Model" ? visitModel(member, state) : false;
+            }
+            case "Model":
+              return visitModel(type, state);
+            default:
+              return false;
+          }
+        }
+
+        // The active stack, rather than a global visited set, preserves sibling uses.
+        function visitModel(model: Model, state: TraversalState): boolean {
+          if (isOrExtendsHttpFile(program, model)) return false;
           const counterpart = objectModel(state.resource);
           // An unsupported union is not an absent resource property.
           if (state.resource?.kind === "Union" && counterpart === undefined) {
@@ -198,7 +210,14 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
             const resourceProperty = resourceProperties.get(name);
             const indexed =
               !hasResourceProperty && counterpart !== undefined && isRecordModelType(counterpart);
-            if (isImmutablePath(path)) report("immutable", target, path);
+            if (
+              isImmutablePath(path) ||
+              (safety &&
+                resourceProperty !== undefined &&
+                !getVisibilityForClass(program, resourceProperty, lifecycle).has(update))
+            ) {
+              report("immutable", target, path);
+            }
             if (safety) {
               if (
                 !(state.visibility & Visibility.Item) &&

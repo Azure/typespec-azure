@@ -3,17 +3,18 @@ ARM PATCH request bodies should allow partial updates: include only resource pro
 ## How to fix
 
 - Remove properties that do not belong to the resource, or move them to their resource JSON nesting level.
-- Exclude immutable `id`, `name`, `type`, `location`, and `properties.provisioningState` from PATCH input.
+- Exclude immutable `id`, `name`, `type`, `location`, and `properties.provisioningState` from PATCH input, even when lifecycle annotations are missing or incorrectly allow updates.
+- Exclude other properties whose resource declaration does not allow `Lifecycle.Update`, including read-only and create-only resource properties. Making a separate PATCH property writable does not make the resource property updatable.
 - Make PATCH fields optional and remove default values, including `false`, `0`, and `""`.
-- Exclude properties that cannot be updated. Properties exposed in PATCH input must include `Lifecycle.Update` visibility.
+- Exclude properties that cannot be updated. Properties exposed in PATCH input must use default visibility or explicitly include `Lifecycle.Update`.
 
 The request is compared with the associated resource, or otherwise its PATCH response or same-route GET response. Keep matching JSON property names and nesting; a PATCH document may omit resource properties.
 
-Required fields inside replacement array elements are allowed. The top-level `identity` property and its descendants are exempt from optionality, default, and visibility checks, but must still match the resource layout. The rule respects effective HTTP optionality; it does not warn about legacy implicit optionality or guarantee SDK optionality.
+Required fields inside replacement array elements are allowed. The top-level `identity` property and its descendants are exempt from optionality, default, and resource/input visibility checks, but must still match the resource layout. The rule respects effective HTTP optionality; it does not warn about legacy implicit optionality or guarantee SDK optionality.
 
 ## Incorrect example
 
-Given a `Widget` resource with `displayName` and `description` in its `properties` model, this request exposes immutable `location`, requires `properties` and `displayName`, adds an unknown property, and supplies a default:
+Given a `Widget` tracked resource with `displayName` and `description` in its `properties` model, this request exposes non-updatable `location`, requires `properties` and `displayName`, adds an unknown property, and supplies a default:
 
 ```tsp
 model UnsafeWidgetPatch {
