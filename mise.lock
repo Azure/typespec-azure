@@ -33,32 +33,32 @@ checksum = "sha256:f26081f438319757f8a1b46d7d0b2c5ec7583d4038e485e0aa725cfde7885
 url = "https://dl.google.com/go/go1.27.3.windows-amd64.zip"
 
 [[tools.java]]
-version = "microsoft-11.0.31"
+version = "microsoft-17.0.21.0.2"
 backend = "core:java"
 
 [tools.java."platforms.linux-arm64"]
-checksum = "sha256:545c6ff26e02b494d323975f233bc1acb0e4e36483be86c901f29368d66aebca"
-url = "https://aka.ms/download-jdk/microsoft-jdk-11.0.31-linux-aarch64.tar.gz"
+checksum = "sha256:fc80cf268662b058a7b360fb118f9a729987932d1ab8d72c5813e86df89c6034"
+url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-linux-aarch64.tar.gz"
 
 [tools.java."platforms.linux-x64"]
-checksum = "sha256:d10004134ed177a4d1a5417e8216af4baf44b4abbaf44d8b973d32088cb03b59"
-url = "https://aka.ms/download-jdk/microsoft-jdk-11.0.31-linux-x64.tar.gz"
+checksum = "sha256:f7230e6d76ccfd62ceb11687a24e93d1f63d236e6a5fdeb8d923700075de42f8"
+url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-linux-x64.tar.gz"
 
 [tools.java."platforms.linux-x64-musl"]
-checksum = "sha256:c5cdd9ba67c868e4427b7a4ad8b51abcde2c82e7fe3d617000d8c8459577118b"
-url = "https://aka.ms/download-jdk/microsoft-jdk-11.0.31-alpine-x64.tar.gz"
+checksum = "sha256:40fc35a752c3b00c443dc44bf54ad488b418f55f2cca126acfd98d46cb28bd90"
+url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-alpine-x64.tar.gz"
 
 [tools.java."platforms.macos-arm64"]
-checksum = "sha256:03e7a317bf74e370252a86049d379183628dfb7320e9e74ae0bdcfd8a4506bd9"
-url = "https://aka.ms/download-jdk/microsoft-jdk-11.0.31-macos-aarch64.tar.gz"
+checksum = "sha256:6bc0241428f9485a3aa8fcf606c8395c24a5ff0f6d5e9dae2c70eae410a3f5f3"
+url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-macos-aarch64.tar.gz"
 
 [tools.java."platforms.macos-x64"]
-checksum = "sha256:f16583e0fe5ce4274dc4bec49593470d899353b16f5571a2cd980d6438f9f3ef"
-url = "https://aka.ms/download-jdk/microsoft-jdk-11.0.31-macos-x64.tar.gz"
+checksum = "sha256:4a5f9e0cb0bb33c841e29cd6bb6d0eaf32893a5d404ea027d2b5123b72977ce5"
+url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-macos-x64.tar.gz"
 
 [tools.java."platforms.windows-x64"]
-checksum = "sha256:a63b83ba4c601e0e2907050e88e939c484c4ae520931f52eb356d0516f2ff4f5"
-url = "https://aka.ms/download-jdk/microsoft-jdk-11.0.31-windows-x64.zip"
+checksum = "sha256:49154292866386b2f4f09a3ecf3be07ab80a419149c84ec1d4419b9eec9e4b64"
+url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-windows-x64.zip"
 
 [[tools.maven]]
 version = "3.9.16"

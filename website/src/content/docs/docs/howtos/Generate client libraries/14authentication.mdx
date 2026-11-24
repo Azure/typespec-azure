@@ -1,0 +1,83 @@
+---
+title: Endpoint and OAuth Configurations
+llmstxt: true
+---
+
+Use `@azureServiceConfigurations` when a data-plane service has deployment-specific endpoints, OAuth URLs, or scopes, such as Azure Monitor Logs in Public and Government clouds. Declare each endpoint and its authentication together rather than maintaining separate mappings for SDK generation.
+
+:::note
+This feature provides shared metadata in Azure Core and TCGC. Language emitters must adopt it before generated SDK constructors expose a configuration selector. The decorator alone does not add a cloud-selection option to existing SDKs.
+:::
+
+## Declare the service configurations
+
+Declare the catalog as a value record, using `typeref(...)` to reference ordinary HTTP authentication types. Every catalog must declare a configuration named exactly `public`; it is always the default. This Logs-style example declares `government` first to show that declaration order does not select the default. No additional audience annotation is needed.
+
+Enable the experimental `typeref` compiler feature in your project's configuration:
+
+```yaml title=tspconfig.yaml
+kind: project
+features:
+  - typeref
+```
+
+```typespec title=main.tsp
+import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
+
+using TypeSpec.Http;
+using Azure.Core;
+
+model PublicAuth is AadOauth2Auth<
+  ["https://api.loganalytics.io/.default"],
+  "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+>;
+
+model GovernmentAuth is AadOauth2Auth<
+  ["https://api.loganalytics.us/.default"],
+  "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+  "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+>;
+
+const Configurations: Record<AzureServiceConfiguration> = #{
+  government: #{ endpoint: "https://api.loganalytics.us", authentication: typeref(GovernmentAuth) },
+  public: #{ endpoint: "https://api.loganalytics.io", authentication: typeref(PublicAuth) },
+};
+
+@service
+@azureServiceConfigurations(Configurations)
+namespace Logs {
+  @get
+  @route("/query")
+  op query(): string;
+}
+```
+
+The decorator replaces direct `@server` and `@useAuth` declarations on the same namespace; do not combine them. Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and OR-of-AND requirements may differ between configurations. API-key alternatives are also supported.
+
+For services with caller-supplied instance endpoints, use `endpoint: "{endpoint}"` and `parameters: typeref({ endpoint: url })`. Referencing a parameter model preserves its types and defaults; optional `description` follows the same convention as `@server`. Reference an OR union or AND tuple as a whole, for example `authentication: typeref([PublicAuth, ApiKeyAuth<ApiKeyLocation.header, "api-key">] | NoAuth)`.
+
+## Generate the data-plane client
+
+Compile `main.tsp` using your language emitter as described in [Setup](./01setup.mdx).
+
+TCGC keeps the existing HTTP-based client initialization unchanged: the endpoint parameter includes all servers from the client's first service, and the credential and authentication fields include that service's combined authentication alternatives. Azure Core places the `public` server first, matching the catalog's default. The complete paired catalog is available separately on `client.clientInitialization.serviceConfigurations`:
+
+| Field                             | Meaning                                                |
+| --------------------------------- | ------------------------------------------------------ |
+| `defaultConfiguration`            | `"public"`.                                            |
+| `configurations[].name`           | `"public"` or `"government"`.                          |
+| `configurations[].endpoint`       | That configuration's endpoint and template parameters. |
+| `configurations[].authentication` | Its OAuth URLs, scopes, and OR-of-AND requirements.    |
+| `configurations[].credential`     | Its projected credential parameter.                    |
+
+An adopting emitter must select the endpoint and authentication from the same entry. For Government, that means `https://api.loganalytics.us`, the `login.microsoftonline.us` OAuth URLs, and `https://api.loganalytics.us/.default`; it must not combine the Government endpoint with Public scopes.
+
+Each client, including a child client, gets its catalog from the same first service used by its existing initialization logic. Only a catalog declared on that service is projected; catalogs on SDK-client namespaces or other non-service namespaces do not override it. Clients that merge services use the first service's endpoint, authentication, and configuration catalog; TCGC does not compare the other services' settings. If the first service has no catalog, a later service's catalog is not selected.
+
+## Credential and runtime boundaries
+
+The caller still supplies the language SDK's credential. OAuth URL metadata does not change that credential's authority or tenant; configure the credential for the selected cloud using its native options. Endpoint-derived scope inference, challenge processing, and new native audience APIs are outside this feature.
+
+Until an emitter supports configuration selection, continue using the generated SDK's existing constructor and its documented cloud, endpoint, and credential customization. Do not assume changing the endpoint alone changes OAuth scopes.

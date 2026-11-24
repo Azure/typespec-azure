@@ -6,11 +6,34 @@ export interface HistoryEntry {
   timestamp: string;
   /** Source commit date; legacy feeds may only have the measurement timestamp. */
   commitTimestamp?: string;
-  measurementMode?: "split";
+  measurementMode?: "split" | "split-warm";
+  runner?: RunnerInfo;
+  specSources?: Record<string, { repository: string; commit: string; path: string }>;
+  externalEmitterVersions?: Record<string, string>;
+  specMetadata?: Record<
+    string,
+    {
+      runner: RunnerInfo;
+      emitterRunners: Record<string, RunnerInfo>;
+      iterations: number;
+      warmup?: number;
+      totalCv?: number;
+      linterCv?: number;
+      noiseThreshold?: number;
+    }
+  >;
   /** Metrics averaged across every spec in the run. */
   metrics: Record<string, number>;
   /** Per-spec metrics (spec name → flat metrics). */
   specMetrics?: Record<string, Record<string, number>>;
+}
+
+export interface RunnerInfo {
+  os: string;
+  arch: string;
+  nodeVersion: string;
+  cpuModel?: string;
+  cpuCount?: number;
 }
 
 /** The `history.json` payload. */
@@ -34,7 +57,7 @@ export type TimeRange = "30d" | "90d" | "all";
 export interface ChartPoint {
   commit: string;
   timestamp: string;
-  measurementMode?: "split";
+  measurementMode?: HistoryEntry["measurementMode"];
 }
 
 /** A named line, with values aligned to the current `ChartPoint[]`. */
@@ -45,6 +68,7 @@ export interface Series {
   label: string;
   data: (number | null)[];
   color: string;
+  comparisonKeys?: string[];
 }
 
 /**
@@ -59,6 +83,7 @@ export interface MetricView {
   points: ChartPoint[];
   /** Metric label → values aligned with `points`. */
   values: Record<string, (number | null)[]>;
+  comparisonKeys?: Record<string, string[]>;
 }
 
 /** A metric summarized for the table, cards and change panel. */
@@ -78,4 +103,5 @@ export interface MetricRow {
   share: number | null;
   /** Full value column, for the sparkline. */
   values: (number | null)[];
+  comparisonKeys?: string[];
 }

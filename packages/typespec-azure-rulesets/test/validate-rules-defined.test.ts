@@ -64,9 +64,29 @@ describe("expect all rules to be defined", () => {
       ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-correct-verb"],
       false,
     );
+    strictEqual(
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/use-valid-client-lro-result"],
+      true,
+    );
     ok(
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );
+  });
+
+  it("enables TCGC scope validation only in the client-sdk ruleset", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/unsupported-scope";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], true);
+    for (const name of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[name].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[name].disable?.[ruleName], undefined);
+    }
+  });
+
+  it("keeps ARM resource metadata name conflict detection opt-in in the central ruleset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-resource-name-conflict";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
   });
 
   it("keeps combined SDK naming guidance opt-in", () => {
@@ -199,6 +219,13 @@ describe("expect all rules to be defined", () => {
     ok(rule);
   });
 
+  it("keeps missing error decorators in ARM all but out of the recommended preset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/require-error-decorator";
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
+
   it("keeps the combined ARM polling metadata rule disabled in the central ruleset", () => {
     const name = "lro-missing-polling-metadata";
     strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
@@ -208,6 +235,19 @@ describe("expect all rules to be defined", () => {
       ],
       false,
     );
+  });
+
+  it("keeps combined ARM collection guidance opt-in and retires the old rule", () => {
+    const name = "list-response-envelope";
+    const fullName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+    const retired = "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable";
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[fullName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[fullName], false);
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "list-operation-missing-pageable"),
+    );
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[retired], undefined);
   });
 
   it("keeps ARM resource-group path guidance opt-in", () => {

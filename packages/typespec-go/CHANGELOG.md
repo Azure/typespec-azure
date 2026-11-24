@@ -1,5 +1,17 @@
 # Release History
 
+## 0.19.0
+
+### Features
+
+- [#5894](https://github.com/Azure/typespec-azure/pull/5894) Add URI-template path and query expansion support along with supporting Spector and unit tests.
+
+### Bug Fixes
+
+- [#6027](https://github.com/Azure/typespec-azure/pull/6027) Preserve acronym casing in response types for long-running operations such as `BMSPrepareDataMove`, keeping the response types consistent with the public operation names.
+- [#6019](https://github.com/Azure/typespec-azure/pull/6019) Fix generated examples for models with `AdditionalProperties` maps to use map literals instead of pointers to maps, preserving pointer-valued entries.
+
+
 ## 0.18.0
 
 ### Features
