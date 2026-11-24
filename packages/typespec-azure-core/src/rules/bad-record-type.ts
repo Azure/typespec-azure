@@ -58,7 +58,7 @@ function validatePropertyRecordType(
   type: Type,
   target: ModelProperty,
 ) {
-  if (type.kind === "Model" && type.indexer) {
+  if (type.kind === "Model" && type.indexer && context.program.checker.isStdType(type, "Record")) {
     const indexerVal = type.indexer.value;
     if (indexerVal.kind === "Intrinsic" && indexerVal.name === "unknown") {
       const displayName = target.model ? `${target.model.name}.${target.name}` : target.name;
