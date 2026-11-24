@@ -220,10 +220,9 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("keeps ARM PATCH response guidance opt-in in the central ruleset", () => {
-    const ruleName =
-      "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes";
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+  it("enables ARM PATCH response guidance separately in the central ruleset", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/patch-operation-response-codes";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
     strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
   });

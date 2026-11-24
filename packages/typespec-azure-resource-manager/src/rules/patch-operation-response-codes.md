@@ -1,4 +1,4 @@
-Synchronous ARM PATCH operations must return exactly `200` and `default`. Long-running PATCH operations must return exactly `200`, `202`, and `default`, and the `202` response must not have a body. The rule checks operations in ARM provider services, including nested namespaces.
+Synchronous ARM PATCH operations must return exactly a `200` response and a standard error response. Long-running PATCH operations must return exactly `200`, `202`, and a standard error response, and the `202` response must not have a body. The rule checks operations in ARM provider services, including nested namespaces.
 
 Like the ARM DELETE response-code rule, this rule identifies long-running operations using Azure Core LRO metadata. Prefer native polling metadata for new operations.
 
@@ -12,7 +12,7 @@ Other response codes or a body on `202` violate the ARM PATCH contract and can c
 
 Assume `Widget` is an ARM resource and these operations belong to its provider service.
 
-### Synchronous update without a default response
+### Synchronous update without a standard error response
 
 ```tsp
 @patch
@@ -42,12 +42,14 @@ op update():
 
 ## ✅ Correct
 
+Assume `Widget`, `WidgetPatch`, and their provider service are already declared.
+
 ### Synchronous update
 
 ```tsp
 @armResourceOperations
 interface Widgets {
-  update is ArmCustomPatchSync<Widget>;
+  update is ArmCustomPatchSync<Widget, WidgetPatch>;
 }
 ```
 
@@ -56,7 +58,7 @@ interface Widgets {
 ```tsp
 @armResourceOperations
 interface Widgets {
-  update is ArmCustomPatchAsync<Widget>;
+  update is ArmCustomPatchAsync<Widget, WidgetPatch>;
 }
 ```
 
@@ -73,7 +75,3 @@ The `no-response-body` rule can also warn about a `202` body when both rules are
 ## Suppression
 
 Prefer the standard ARM PATCH templates or correct the custom response types. Suppression is appropriate only for a documented compatibility requirement of an existing API.
-
-## LintDiff Equivalent
-
-This rule covers [`PatchResponseCodes`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-response-codes.md) and [`LroPatch202`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-patch202.md).

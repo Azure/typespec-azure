@@ -8,7 +8,6 @@ import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js
 import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
-import { armPatchResponseCodesRule } from "./rules/arm-patch-response-codes.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
 import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
@@ -47,6 +46,7 @@ import { noTagsOnProxyResourceRule } from "./rules/no-tags-on-proxy-resource.js"
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { patchOperationResponseCodesRule } from "./rules/patch-operation-response-codes.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
@@ -78,7 +78,7 @@ const rules = [
   noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
-  armPatchResponseCodesRule,
+  patchOperationResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,

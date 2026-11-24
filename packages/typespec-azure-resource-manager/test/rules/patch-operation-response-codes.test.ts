@@ -1,9 +1,9 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeAll, describe, it } from "vitest";
-import { armPatchResponseCodesRule } from "../../src/rules/arm-patch-response-codes.js";
+import { patchOperationResponseCodesRule } from "../../src/rules/patch-operation-response-codes.js";
 
-const code = "@azure-tools/typespec-azure-resource-manager/arm-patch-operation-response-codes";
+const code = "@azure-tools/typespec-azure-resource-manager/patch-operation-response-codes";
 const responses = `
   model Ok { @statusCode statusCode: 200; @body value: string; }
   model Status {
@@ -22,6 +22,7 @@ const responses = `
   }
   model Accepted { @statusCode statusCode: 202; @header location?: string; }
   model AcceptedWithBody { @statusCode statusCode: 202; @body value: string; }
+  model AcceptedWithBodyRange { @statusCode @minValue(202) @maxValue(202) statusCode: int32; @body value: string; }
   model NoContent { @statusCode statusCode: 204; }
 `;
 
@@ -41,7 +42,7 @@ let tester: LinterRuleTester;
 beforeAll(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    armPatchResponseCodesRule,
+    patchOperationResponseCodesRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 }, 60_000);
@@ -54,51 +55,65 @@ describe("synchronous PATCH responses", () => {
     });
   });
 
-  it("accepts exactly 200 and default", async () => {
+  it("accepts exactly 200 and a standard error response", async () => {
     await tester.expect(patch("Ok | ErrorResponse")).toBeValid();
   });
 
   it.each([
-    ["a missing default", "Ok"],
+    ["a missing standard error response", "Ok"],
     ["a missing 200", "ErrorResponse"],
     ["an extra response", "Ok | NoContent | ErrorResponse"],
     ["a 202 without an LRO marker", "Ok | Accepted | ErrorResponse"],
   ])("rejects %s", async (_, returnType) => {
     await tester.expect(patch(returnType)).toEmitDiagnostics({
       code,
-      message: "Synchronous PATCH operations must have only 200 and default responses.",
+      message:
+        "Synchronous PATCH operations must have only a 200 response and a standard error response.",
     });
   });
 
-  it.each([200, 299])("rejects a status range ending at %i", async (end) => {
+  it("accepts a singleton response status range as its literal code", async () => {
     await tester
       .expect(
         patch(
           "Range | ErrorResponse",
-          `model Range { @statusCode @minValue(200) @maxValue(${end}) code: int32; }`,
+          "model Range { @statusCode @minValue(200) @maxValue(200) code: int32; }",
+        ),
+      )
+      .toBeValid();
+  });
+
+  it("rejects a response status range", async () => {
+    await tester
+      .expect(
+        patch(
+          "Range | ErrorResponse",
+          "model Range { @statusCode @minValue(200) @maxValue(299) code: int32; }",
         ),
       )
       .toEmitDiagnostics({
         code,
-        message: "Synchronous PATCH operations must have only 200 and default responses.",
+        message:
+          "Synchronous PATCH operations must have only a 200 response and a standard error response.",
       });
   });
 });
 
 describe("long-running PATCH responses", () => {
-  it("accepts exactly 200, 202 without a body, and default", async () => {
+  it("accepts exactly 200, 202 without a body, and a standard error response", async () => {
     await tester.expect(patch("Started | Accepted | ErrorResponse")).toBeValid();
   });
 
   it.each([
-    ["a missing 202", "Started | ErrorResponse"],
+    ["a missing 202 with native polling metadata", "Started | ErrorResponse"],
     ["a missing 200", "AcceptedLro | ErrorResponse"],
-    ["a missing default", "Started | Accepted"],
+    ["a missing standard error response", "Started | Accepted"],
     ["an extra response", "Started | Accepted | NoContent | ErrorResponse"],
   ])("rejects %s with one response-set warning", async (_, returnType) => {
     await tester.expect(patch(returnType)).toEmitDiagnostics({
       code,
-      message: "Long-running PATCH operations must have only 200, 202, and default responses.",
+      message:
+        "Long-running PATCH operations must have only 200, 202, and a standard error response.",
     });
   });
 
@@ -107,6 +122,15 @@ describe("long-running PATCH responses", () => {
       code,
       message: "The 202 response of a long-running PATCH operation must not have a body.",
     });
+  });
+
+  it("rejects a 202 body declared with a singleton status range", async () => {
+    await tester
+      .expect(patch("Started | AcceptedWithBodyRange | ErrorResponse"))
+      .toEmitDiagnostics({
+        code,
+        message: "The 202 response of a long-running PATCH operation must not have a body.",
+      });
   });
 
   it("rejects a body in one of multiple 202 response variants", async () => {
@@ -143,73 +167,14 @@ describe("long-running PATCH responses", () => {
       .toEmitDiagnostics([
         {
           code,
-          message: "Long-running PATCH operations must have only 200, 202, and default responses.",
+          message:
+            "Long-running PATCH operations must have only 200, 202, and a standard error response.",
         },
         {
           code,
           message: "The 202 response of a long-running PATCH operation must not have a body.",
         },
       ]);
-  });
-});
-
-describe("explicit OpenAPI LRO extensions", () => {
-  it("does not treat an explicit flag alone as LRO metadata", async () => {
-    await tester
-      .expect(patch("Ok | ErrorResponse", '@extension("x-ms-long-running-operation", true)'))
-      .toBeValid();
-  });
-
-  it("uses synchronous response rules when only an explicit flag is present", async () => {
-    await tester
-      .expect(
-        patch("Ok | Accepted | ErrorResponse", '@extension("x-ms-long-running-operation", true)'),
-      )
-      .toEmitDiagnostics({
-        code,
-        message: "Synchronous PATCH operations must have only 200 and default responses.",
-      });
-  });
-
-  it("uses semantic polling metadata when there is no explicit marker", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace namespace Microsoft.Contoso;
-        model Status {
-          @Azure.Core.lroStatus status: "Succeeded" | "Failed" | "Canceled" | "Running";
-        }
-        model Started {
-          @statusCode code: 200;
-          @Azure.Core.pollingLocation @header("Operation-Location")
-          location: ResourceLocation<Status>;
-          @body value: string;
-        }
-        @route("/widgets") @patch op update(): Started | ErrorResponse;
-      `,
-      )
-      .toEmitDiagnostics({
-        code,
-        message: "Long-running PATCH operations must have only 200, 202, and default responses.",
-      });
-  });
-
-  it("uses LRO metadata even when an explicit flag is false", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace namespace Microsoft.Contoso;
-        using TypeSpec.OpenAPI;
-        model Employee is ProxyResource<{}> {
-          ...ResourceNameParameter<Employee>;
-        }
-        @armResourceOperations interface Employees {
-          @extension("x-ms-long-running-operation", false)
-          update is ArmCustomPatchAsync<Employee>;
-        }
-      `,
-      )
-      .toBeValid();
   });
 });
 
@@ -227,7 +192,8 @@ describe("operation and service scope", () => {
       )
       .toEmitDiagnostics({
         code,
-        message: "Synchronous PATCH operations must have only 200 and default responses.",
+        message:
+          "Synchronous PATCH operations must have only a 200 response and a standard error response.",
       });
   });
 
@@ -260,7 +226,8 @@ describe("operation and service scope", () => {
       )
       .toEmitDiagnostics({
         code,
-        message: "Synchronous PATCH operations must have only 200 and default responses.",
+        message:
+          "Synchronous PATCH operations must have only a 200 response and a standard error response.",
       });
   });
 
@@ -287,12 +254,12 @@ describe("operation and service scope", () => {
     [
       "synchronous",
       "ArmCustomPatchSync<Employee, Response = ArmResponse<Employee> | NoContent>",
-      "Synchronous PATCH operations must have only 200 and default responses.",
+      "Synchronous PATCH operations must have only a 200 response and a standard error response.",
     ],
     [
       "long-running",
       'ArmCustomPatchAsync<Employee, Response = ArmAcceptedLroResponse<"Accepted", ArmLroLocationHeader<FinalResult = Employee>>>',
-      "Long-running PATCH operations must have only 200, 202, and default responses.",
+      "Long-running PATCH operations must have only 200, 202, and a standard error response.",
     ],
   ])("reports an invalid %s ARM resource update", async (_, operation, message) => {
     await tester
