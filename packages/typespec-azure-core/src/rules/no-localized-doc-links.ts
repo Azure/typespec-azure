@@ -41,13 +41,14 @@ export const noLocalizedDocLinksRule = createRule({
     }
 
     function checkDoc(target: Type) {
-      const doc = getDocData(context.program, target);
-      if (!doc || !localizedDocLink.test(doc.value)) {
+      const doc = getDoc(context.program, target);
+      const docData = getDocData(context.program, target);
+      if (!doc || !docData || !localizedDocLink.test(doc)) {
         return;
       }
 
       if (target.kind === "ModelProperty" || target.kind === "EnumMember") {
-        if (doc.source === "decorator") {
+        if (docData.source === "decorator") {
           const application = target.decorators.findLast((item) => item.decorator === $doc);
           if (application?.node?.kind === SyntaxKind.AugmentDecoratorStatement) {
             reportOnce(target, application.node);
@@ -56,7 +57,7 @@ export const noLocalizedDocLinksRule = createRule({
           if (target.kind === "ModelProperty" && target.sourceProperty) {
             for (
               let property: ModelProperty | undefined = target.sourceProperty;
-              property && getDoc(context.program, property) === doc.value;
+              property && getDoc(context.program, property) === doc;
               property = property.sourceProperty
             ) {
               const sourceApplication = property.decorators.findLast(
@@ -76,7 +77,7 @@ export const noLocalizedDocLinksRule = createRule({
           // A copied property can inherit documentation authored on an intermediate owner.
           for (
             let property: ModelProperty | undefined = target;
-            property && getDoc(context.program, property) === doc.value;
+            property && getDoc(context.program, property) === doc;
             property = property.sourceProperty
           ) {
             const model = property.model;
@@ -96,7 +97,7 @@ export const noLocalizedDocLinksRule = createRule({
                 }
               }
             }
-            if (ownDoc && ownDoc === doc.value && owner) {
+            if (ownDoc && ownDoc === doc && owner) {
               reportOnce(target, owner);
               return;
             }
