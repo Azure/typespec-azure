@@ -3,11 +3,10 @@ import {
   fileRef,
   isTemplateDeclarationOrInstance,
   paramMessage,
-  type Program,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { getArmProviderNamespace } from "../namespace.js";
-import { getArmResources, resolveArmResources } from "../resource.js";
+import { resolveArmResources, type ResolvedResource } from "../resource.js";
 import { isInternalTypeSpec, isTemplatedInterfaceOperation } from "./utils.js";
 
 const resourceTypePattern = /^.*\/providers\/\w+\.\w+\/\w+.*/i;
@@ -34,9 +33,9 @@ function markPathSeen(pathsByNamespace: Map<string, Set<string>>, namespace: str
   return true;
 }
 
-function getNestedResourcePathValidity(program: Program) {
+function getNestedResourcePathValidity(resources: ResolvedResource[]) {
   const paths = new Map<string, boolean>();
-  for (const resource of resolveArmResources(program).resources ?? []) {
+  for (const resource of resources) {
     if (resource.parent === undefined) continue;
 
     const parentPath = resource.parent.resourceInstancePath.replace(/\/$/, "");
@@ -90,25 +89,28 @@ export const resourcePathValidationRule = createRule({
 
     return {
       root(program) {
-        for (const [path, isValid] of getNestedResourcePathValidity(program)) {
+        const resources = resolveArmResources(program).resources ?? [];
+        for (const [path, isValid] of getNestedResourcePathValidity(resources)) {
           nestedResourcePaths.set(path, isValid);
         }
 
-        for (const resource of getArmResources(program)) {
+        for (const resource of resources) {
           if (resource.kind !== "Tracked") continue;
 
-          let paths = trackedPathsByNamespace.get(resource.armProviderNamespace);
+          let paths = trackedPathsByNamespace.get(resource.providerNamespace);
           if (paths === undefined) {
             paths = new Set<string>();
-            trackedPathsByNamespace.set(resource.armProviderNamespace, paths);
+            trackedPathsByNamespace.set(resource.providerNamespace, paths);
           }
 
-          for (const operation of Object.values(resource.operations.lifecycle)) {
-            if (
-              operation !== undefined &&
-              (operation.httpOperation.verb === "get" || operation.httpOperation.verb === "put")
-            ) {
-              paths.add(operation.path);
+          for (const operations of Object.values(resource.operations.lifecycle)) {
+            for (const operation of operations ?? []) {
+              if (
+                operation.httpOperation.verb === "get" ||
+                operation.httpOperation.verb === "put"
+              ) {
+                paths.add(operation.path);
+              }
             }
           }
         }
