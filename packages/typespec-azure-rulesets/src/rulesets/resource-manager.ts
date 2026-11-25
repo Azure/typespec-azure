@@ -106,7 +106,6 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
     "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": true,
     "@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis": false,
-    "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable": false,
     "@azure-tools/typespec-azure-resource-manager/lro-location-header": true,
     "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata": false,
     "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": true,

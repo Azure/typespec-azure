@@ -617,7 +617,7 @@ function emitBody(
         } else {
           tagName = go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg);
         }
-        text += `${indent.get()}XMLName xml.Name \`xml:"${tagName}"\`\n`;
+        text += `${indent.get()}XMLName xml.Name ${helpers.formatXMLStructTag(tagName)}\n`;
         const fieldName = naming.capitalize(bodyParam.name);
         let tag = go.getTypeDeclaration(
           go.unwrapPtr(bodyParam.type.itemType),
@@ -626,7 +626,7 @@ function emitBody(
         if (bodyParam.type.itemType.kind === "model" && bodyParam.type.itemType.xmlName) {
           tag = bodyParam.type.itemType.xmlName;
         }
-        text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} \`xml:"${tag}"\`\n`;
+        text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} ${helpers.formatXMLStructTag(tag)}\n`;
         text += `${indent.pop().get()}}\n`;
         body = `wrapper{${fieldName}: &${body}}`;
       } else if (bodyParam.type.kind === "time") {

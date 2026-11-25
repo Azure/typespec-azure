@@ -94,6 +94,8 @@ export async function _postDeserialize(result: PathUncheckedResponse): Promise<A
     propA: !["propA"] ? ["propA"] : _postRequestDeserializer(["propA"]),
   };
 }
+
+/** Performs the post operation. */
 export async function post(
   context: Client,
   body: A,

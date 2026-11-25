@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
   type ChartOptions,
+  type ScriptableLineSegmentContext,
 } from "chart.js";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Line } from "react-chartjs-2";
@@ -132,11 +133,18 @@ export function MetricChart({
         borderColor: s.color,
         backgroundColor: s.color,
         borderWidth: 1.75,
-        pointRadius: 0,
+        pointRadius: 2,
         pointHoverRadius: 4,
         pointHitRadius: 12,
-        tension: 0.25,
-        spanGaps: true,
+        tension: 0,
+        spanGaps: false,
+        segment: {
+          borderColor: (context: ScriptableLineSegmentContext) =>
+            s.comparisonKeys &&
+            s.comparisonKeys[context.p0DataIndex] !== s.comparisonKeys[context.p1DataIndex]
+              ? "transparent"
+              : s.color,
+        },
       })),
     }),
     [points, series],
@@ -182,7 +190,13 @@ export function MetricChart({
                 hour: "numeric",
                 minute: "2-digit",
               });
-              return `${point.commit.slice(0, 7)} · ${date}${point.measurementMode === "split" ? " · split sampling" : ""}`;
+              const method =
+                point.measurementMode === "split-warm"
+                  ? " · warmed compiler"
+                  : point.measurementMode === "split"
+                    ? " · cold split sampling"
+                    : "";
+              return `${point.commit.slice(0, 7)} · ${date}${method}`;
             },
             label: (item) => `${item.dataset.label}: ${formatMs(item.parsed.y)}`,
             footer: () => "Click to open this commit on GitHub",

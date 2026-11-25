@@ -8,9 +8,12 @@ import com.microsoft.typespec.http.client.generator.core.extension.model.codemod
 import com.microsoft.typespec.http.client.generator.core.extension.plugin.JavaSettings;
 import com.microsoft.typespec.http.client.generator.core.model.clientmodel.Client;
 import com.microsoft.typespec.http.client.generator.core.model.javamodel.JavaPackage;
+import com.microsoft.typespec.http.client.generator.core.postprocessor.implementation.CodeFormatterUtil;
 import com.microsoft.typespec.http.client.generator.fluent.TypeSpecFluentPlugin;
 import com.microsoft.typespec.http.client.generator.model.EmitterOptions;
 import io.clientcore.core.serialization.json.JsonReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
@@ -36,9 +39,10 @@ public final class BrowserGenerator {
             ? generateArm(codeModel, options)
             : generateDataPlane(codeModel, options);
         JSObject files = newFiles();
-        BrowserPostprocessor postprocessor = new BrowserPostprocessor();
-        output.getJavaFiles().forEach(file -> addFile(files, file.getFilePath(),
-            postprocessor.removeUnusedImports(file.getFilePath(), file.getContents().toString())));
+        Map<String, String> javaSources = new LinkedHashMap<>();
+        output.getJavaFiles().forEach(file -> javaSources.put(file.getFilePath(), file.getContents().toString()));
+        var cleanedSources = CodeFormatterUtil.formatCode(javaSources).iterator();
+        javaSources.keySet().forEach(name -> addFile(files, name, cleanedSources.next()));
         output.getXmlFiles().forEach(file -> addFile(files, file.getFilePath(), file.getContents().toString()));
         output.getTextFiles().forEach(file -> addFile(files, file.getFilePath(), file.getContents()));
         return files;

@@ -622,6 +622,44 @@ getHealthStatus(
 @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
 ```
 
+### `@clientLroResult` {#@Azure.ClientGenerator.Core.clientLroResult}
+
+Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
+
+Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
+
+See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The long-running operation to customize.
+`Operation`
+
+#### Parameters
+
+| Name   | Type                                                            | Description                                                                     |
+| ------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| result | `Model \| ModelProperty`                                        | The response model or status-monitor property to return from generated clients. |
+| scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                                         |
+
+#### Examples
+
+##### Return an action's whole status monitor
+
+```typespec
+@@clientLroResult(start, ActionStatus);
+```
+
+##### Return a property of an action's status monitor
+
+```typespec
+@@clientLroResult(start, ActionStatus.result);
+```
+
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
 
 Overrides the generated name for client SDK elements including clients, methods, parameters,

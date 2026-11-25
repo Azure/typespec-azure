@@ -4,7 +4,8 @@ import type { LinterRuleSet } from "@typespec/compiler";
 // "@azure-tools/typespec-azure-rulesets/client-sdk" in tspconfig.yaml.
 export default {
   enable: {
-    "@azure-tools/typespec-client-generator-core/no-get-lro": true,
+    "@azure-tools/typespec-client-generator-core/no-get-lro": false,
+    "@azure-tools/typespec-client-generator-core/unsupported-scope": true,
     "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
     "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
     "@azure-tools/typespec-client-generator-core/use-union-hierarchy": true,
@@ -12,6 +13,7 @@ export default {
     "@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict": false,
     "@azure-tools/typespec-client-generator-core/no-repeated-client-name": false,
     "@azure-tools/typespec-client-generator-core/use-correct-verb": false,
+    "@azure-tools/typespec-client-generator-core/use-valid-client-lro-result": true,
   },
   disable: {
     "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms":

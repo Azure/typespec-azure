@@ -134,7 +134,15 @@ export function ServiceGrid({
               />
               <MetricChart
                 points={view.points}
-                series={[{ key: row.key, label: row.name, data: row.values, color }]}
+                series={[
+                  {
+                    key: row.key,
+                    label: row.name,
+                    data: row.values,
+                    color,
+                    comparisonKeys: row.comparisonKeys,
+                  },
+                ]}
                 theme={theme}
                 height={190}
                 yAxisLabel=""

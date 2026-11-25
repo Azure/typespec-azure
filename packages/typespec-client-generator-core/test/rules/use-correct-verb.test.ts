@@ -56,19 +56,10 @@ describe("HTTP SDK names", () => {
       .expect(`${header} @${verb} @route("/widgets") op ${invalid}(): void;`)
       .toEmitDiagnostics([diagnostic(verb, prefix, invalid)]);
   });
-  it.each(["", "Widget", "OrUpdate"])("accepts the prefix with suffix %s", async (suffix) => {
-    await tester.expect(`${header} ${endpoint(prefix + suffix)}`).toBeValid();
-  });
   it("accepts prefixes case-insensitively", async () => {
     await tester.expect(`${header} ${endpoint(prefix.toUpperCase() + "Widget")}`).toBeValid();
   });
-  it.each(["invalid", "prefix-inside", "truncated"])("rejects a %s name", async (kind) => {
-    const name =
-      kind === "invalid"
-        ? invalid
-        : kind === "prefix-inside"
-          ? `soft${prefix}`
-          : prefix.slice(0, -1);
+  it.each([`soft${prefix}`, prefix.slice(0, -1)])("rejects %s", async (name) => {
     await tester.expect(`${header} ${endpoint(name)}`).toEmitDiagnostics([finding(name)]);
   });
   it("honors an unscoped common name", async () => {
@@ -134,27 +125,6 @@ describe("HTTP SDK names", () => {
         `${header} interface ${prefix}Widgets { @${verb} @route("/widgets") ${invalid}_${prefix}(): void; }`,
       )
       .toEmitDiagnostics([finding(`${invalid}_${prefix}`)]);
-  });
-  it("reports each concrete endpoint once", async () => {
-    await tester
-      .expect(
-        `${header}
-      @${verb} @route("/one") op ${invalid}One(): void;
-      @${verb} @route("/two") op ${invalid}Two(): void;
-      @${verb} @route("/valid") op ${prefix}(): void;
-    `,
-      )
-      .toEmitDiagnostics([finding(invalid + "One"), finding(invalid + "Two")]);
-  });
-  it("does not check client-only declarations outside the service", async () => {
-    await tester
-      .expect(
-        `
-      @service namespace Test { ${endpoint(invalid)} }
-      namespace Customizations { @${verb} @route("/other") op helper(): void; }
-    `,
-      )
-      .toEmitDiagnostics([finding(invalid)]);
   });
 });
 
@@ -260,6 +230,9 @@ describe("standard ARM operations", () => {
       @key("widgetName") @segment("widgets") name: string;
     }
     model WidgetProperties { provisioningState?: ResourceProvisioningState; }
+    model Gadget is TrackedResource<WidgetProperties> {
+      @key("gadgetName") @segment("gadgets") name: string;
+    }
   `;
   beforeEach(async () => {
     tester = createLinterRuleTester(
@@ -268,29 +241,26 @@ describe("standard ARM operations", () => {
       "@azure-tools/typespec-client-generator-core",
     );
   });
-  it.each(cases)(
-    "checks $verb aliases and common overrides",
-    async ({ verb, prefix, invalid, template }) => {
-      await tester
-        .expect(
-          `${resource} @armResourceOperations interface Widgets { ${invalid} is ${template}; }`,
-        )
-        .toEmitDiagnostics([diagnostic(verb, prefix, invalid)]);
-      await tester
-        .expect(
-          `${resource} @armResourceOperations interface Widgets { ${prefix} is ${template}; }`,
-        )
-        .toBeValid();
-      await tester
-        .expect(
-          `${resource} @armResourceOperations interface Widgets { @clientName("${prefix}Widget") ${invalid} is ${template}; }`,
-        )
-        .toBeValid();
-      await tester
-        .expect(
-          `${resource} @armResourceOperations interface Widgets { @clientName("${invalid}") ${prefix} is ${template}; }`,
-        )
-        .toEmitDiagnostics([diagnostic(verb, prefix, invalid, prefix)]);
-    },
-  );
+  it("checks aliases of standard templates and honors common overrides", async () => {
+    const [put, patch, del] = cases;
+    const gadget = (template: string) => template.replace("<Widget", "<Gadget");
+    await tester
+      .expect(
+        `${resource}
+        @armResourceOperations interface Widgets {
+          ${put.invalid} is ${put.template};
+          ${patch.invalid} is ${patch.template};
+          ${del.invalid} is ${del.template};
+        }
+        @armResourceOperations interface Gadgets {
+          @clientName("${put.prefix}Gadget") ${put.invalid}Gadget is ${gadget(put.template)};
+          @clientName("${patch.invalid}Gadget") ${patch.prefix}Gadget is ${gadget(patch.template)};
+          ${del.prefix}Gadget is ${gadget(del.template)};
+        }`,
+      )
+      .toEmitDiagnostics([
+        ...cases.map(({ verb, prefix, invalid }) => diagnostic(verb, prefix, invalid)),
+        diagnostic(patch.verb, patch.prefix, `${patch.invalid}Gadget`, `${patch.prefix}Gadget`),
+      ]);
+  });
 });

@@ -50,7 +50,7 @@ function gofmt(source: string): string {
 // Base tester for most scenarios. Kept lean (no ARM) so the common case compiles
 // quickly; ARM libraries are heavy to load and would slow every scenario.
 const GoTester = createTester(resolvePath(import.meta.dirname, "../.."), {
-  features: ["typeref"],
+  features: ["typeref", "union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -80,6 +80,7 @@ const GoTester = createTester(resolvePath(import.meta.dirname, "../.."), {
 // used when a scenario references ARM constructs (see pickTester) so non-ARM
 // scenarios don't pay the ARM load cost.
 const GoArmTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+  features: ["union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
