@@ -46,3 +46,7 @@ tags?: Record<string>;
 ## Suppression
 
 Fix the resource model to follow the ARM resource property and tags requirements.
+
+## LintDiff Equivalent
+
+This rule combines [RequiredPropertiesMissingInResourceModel](https://github.com/Azure/azure-openapi-validator/blob/main/docs/required-properties-missing-in-resource-model.md) and [AzureResourceTagsSchema](https://github.com/Azure/azure-openapi-validator/blob/main/docs/azure-resource-tags-schema.md).
