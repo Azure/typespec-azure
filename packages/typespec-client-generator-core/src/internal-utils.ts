@@ -132,6 +132,7 @@ export const overrideKey = createStateSymbol("override");
 export const responseOverrideKey = createStateSymbol("responseOverride");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
+export const markAsLroKey = createStateSymbol("markAsLro");
 
 export function hasExplicitClient(context: TCGCContext): boolean {
   return listScopedDecoratorData(context, clientKey).size > 0;

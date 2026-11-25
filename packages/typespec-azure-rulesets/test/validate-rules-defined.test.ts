@@ -163,11 +163,18 @@ describe("expect all rules to be defined", () => {
     }
   });
 
-  it("keeps ARM GET LRO guidance opt-in", () => {
-    const ruleName = "@azure-tools/typespec-azure-resource-manager/no-get-lro";
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+  it("enables Legacy GET LRO guidance only in client-sdk", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/no-get-lro";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], true);
+    for (const rulesetName of ["resource-manager", "data-plane"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[rulesetName].disable?.[ruleName], undefined);
+    }
     for (const ruleset of Object.values($linter.ruleSets ?? {})) {
-      ok(!ruleset.enable?.[ruleName]);
+      strictEqual(
+        ruleset.enable?.["@azure-tools/typespec-azure-resource-manager/no-get-lro"],
+        undefined,
+      );
     }
   });
 

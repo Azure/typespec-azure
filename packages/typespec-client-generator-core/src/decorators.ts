@@ -84,6 +84,7 @@ import {
   getScopedDecoratorData,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
+  markAsLroKey,
   negationScopesKey,
   normalizeScope,
   omitOperation,
@@ -1912,8 +1913,6 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
 
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
-
-const markAsLroKey = createStateSymbol("markAsLro");
 
 export const $markAsLro: MarkAsLroDecorator = (
   context: DecoratorContext,
