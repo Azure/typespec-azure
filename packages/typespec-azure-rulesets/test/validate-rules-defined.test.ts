@@ -206,6 +206,14 @@ describe("expect all rules to be defined", () => {
     ok(rule);
   });
 
+  it("keeps private link schema guidance opt-in", () => {
+    const name = "private-link-resource-schema";
+    const ruleName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+  });
+
   it("keeps missing error decorators in ARM all but out of the recommended preset", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/require-error-decorator";
     strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
