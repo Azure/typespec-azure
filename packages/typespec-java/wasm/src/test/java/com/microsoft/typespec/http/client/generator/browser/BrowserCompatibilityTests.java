@@ -5,12 +5,22 @@ package com.microsoft.typespec.http.client.generator.browser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.github.javaparser.utils.Utils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class BrowserCompatibilityTests {
+    @Test
+    void normalizesJavadocLineBreaksWithoutRegex() {
+        String source = "a\r\nb\rc\nd\u000Be\ff\u0085g\u2028h\u2029";
+        for (String separator : new String[] { "\n", "\r\n" }) {
+            assertEquals(Utils.normalizeEolInTextBlock(source, separator),
+                BrowserCompatibility.normalizeEolInTextBlock(source, separator));
+        }
+    }
+
     @Test
     void deduplicatesAcrossConcatenatedStreamsInEncounterOrder() {
         Object widget = new Object();

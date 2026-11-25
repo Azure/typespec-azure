@@ -12,6 +12,11 @@ on:
         default: false
         type: boolean
 
+concurrency:
+  group: "gh-aw-${{ github.workflow }}-${{ inputs.config }}"
+  job-discriminator: ${{ inputs.config }}
+  queue: max
+
 engine:
   id: copilot
   env:
@@ -41,7 +46,7 @@ runtimes:
 
 steps:
   - name: Setup pnpm
-    uses: pnpm/action-setup@v4
+    uses: pnpm/action-setup@v6.1.1
 
   - name: Setup Maven
     run: |

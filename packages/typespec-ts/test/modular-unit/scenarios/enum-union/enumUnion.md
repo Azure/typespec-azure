@@ -84,6 +84,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   contentType: SchemaContentTypeValues,
@@ -544,6 +546,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   testHeader: "A" | "B",
@@ -625,6 +629,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<vo
 
   return;
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   testHeader: string,

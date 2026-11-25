@@ -64,12 +64,13 @@ interface GenEnv {
   readonly phase: () => GenPhase;
   readonly sourceTypespec: () => any;
   readonly targetFolder: () => any;
+  readonly packageName: () => string | undefined;
   readonly scriptDir: () => string;
   readonly declarationSubpath: () => string;
 }
 
 function genEnv(config: any, phase: GenPhase): GenEnv {
-  const { inputPath: sourceTypespec, outputPath: targetFolder } = config;
+  const { inputPath: sourceTypespec, outputPath: targetFolder, packageName } = config;
 
   const __filename = fileURLToPath(import.meta.url);
   const testRoot = dirname(__filename);
@@ -83,6 +84,7 @@ function genEnv(config: any, phase: GenPhase): GenEnv {
     phase: () => phase,
     sourceTypespec: () => sourceTypespec,
     targetFolder: () => targetFolder,
+    packageName: () => packageName,
     scriptDir: () => testRoot,
     declarationSubpath: () => declarationDir,
   } as const;
@@ -131,14 +133,22 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     const logger = env.logger();
 
     const workingDir = outputPath();
-    const commandArguments = [
-      resolveTspCliPath(),
-      "compile",
-      `${await entryPath()}`,
-      "--config tspconfig.yaml ",
-    ];
+    const fixtureConfig = joinPath(workingDir, "tspconfig.yaml");
+    const args = [`"${resolveTspCliPath()}"`, "compile", `"${await entryPath()}"`];
+    if (existsSync(fixtureConfig)) {
+      args.push("--config", `"${fixtureConfig}"`);
+    } else {
+      // Leave project-root discovery to the source scenario, but emit into the fixture.
+      await fs.mkdir(workingDir, { recursive: true });
+      const emitter = "@azure-tools/typespec-ts";
+      args.push("--emit", emitter, "--option", `"${emitter}.emitter-output-dir=${workingDir}"`);
+      const packageName = env.packageName();
+      if (packageName !== undefined) {
+        args.push("--option", `"${emitter}.package-details.name=${packageName}"`);
+      }
+    }
 
-    await runCommand("node", commandArguments, workingDir, logger);
+    await runCommand("node", args, workingDir, logger);
   }
 
   async function emitGitignore(): Promise<void> {

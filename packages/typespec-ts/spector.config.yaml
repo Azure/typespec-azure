@@ -13,6 +13,8 @@ specs:
   azure/client-generator-core/flatten-property: true
   azure/core/model: true
   azure/resource-manager/resources: true
+  azure/resource-manager/example:
+    options: { packageName: "@msinternal/azure-resource-manager-example" }
   azure/core/lro/rpc: true
   azure/core/lro/standard: true
   azure/client-generator-core/access: true
