@@ -57,6 +57,8 @@ export async function _recordDeserialize(result: PathUncheckedResponse): Promise
 
   return;
 }
+
+/** Performs the record operation. */
 export async function record(
   context: Client,
   param: Record<string, number>,
@@ -93,6 +95,8 @@ export async function _arrayDeserialize(result: PathUncheckedResponse): Promise<
 
   return;
 }
+
+/** Performs the array operation. */
 export async function array(
   context: Client,
   param: string[],
@@ -127,6 +131,8 @@ export async function _primitiveDeserialize(result: PathUncheckedResponse): Prom
 
   return;
 }
+
+/** Performs the primitive operation. */
 export async function primitive(
   context: Client,
   param: string,

@@ -27,7 +27,7 @@ import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
-import { getDocsFromDescription } from "./helpers/docs-helpers.js";
+import { getDocsFromDescription, getInputDocs } from "./helpers/docs-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
 import { CloudSettingHelpers } from "./static-helpers-metadata.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
@@ -118,7 +118,7 @@ export function buildClientContext(
     isExported: true,
     name: `${clientName}`,
     extends: [resolveReference(dependencies.Client)],
-    docs: getDocsFromDescription(client.doc),
+    docs: getDocsFromDescription(client.doc?.trim() || `The client context for ${name}.`),
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
   });
 
@@ -170,7 +170,7 @@ export function buildClientContext(
   });
 
   const factoryFunction = clientContextFile.addFunction({
-    docs: getDocsFromDescription(client.doc),
+    docs: getDocsFromDescription(client.doc?.trim() || `Creates a ${name} client context.`),
     name: `create${name}`,
     returnType: `${clientName}`,
     parameters: getClientParametersDeclaration(client, dpgContext, {
@@ -302,7 +302,7 @@ function getDocsWithKnownVersion(
   dpgContext: SdkContext,
   param: SdkMethodParameter | SdkEndpointParameter | SdkCredentialParameter | SdkHttpParameter,
 ) {
-  const docs = getDocsFromDescription(param.doc);
+  const docs = getInputDocs(param.type, param.doc);
   if (param.name.toLowerCase() !== "apiversion") {
     return docs;
   }

@@ -106,6 +106,8 @@ export async function _checkNameAvailabilityDeserialize(
 
   return;
 }
+
+/** Performs the checkNameAvailability operation. */
 export async function checkNameAvailability(
   context: Client,
   apiVersion: string,
