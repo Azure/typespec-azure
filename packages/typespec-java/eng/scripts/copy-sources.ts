@@ -18,9 +18,20 @@ async function main() {
       force: true,
       filter: (source) => basename(source) !== "options.ts",
     });
-    await cp(join(emitterRoot, "test"), join(packageRoot, "test"), {
+    const sourceTests = join(emitterRoot, "test");
+    const destinationTests = join(packageRoot, "test");
+    const isTestFile = (name: string) =>
+      name.endsWith(".test.ts") || name.endsWith(".test.ts.snap");
+    await mkdir(destinationTests, { recursive: true });
+    for (const entry of await readdir(destinationTests, { recursive: true, withFileTypes: true })) {
+      if (entry.isFile() && isTestFile(entry.name)) {
+        await rm(join(entry.parentPath, entry.name));
+      }
+    }
+    await cp(sourceTests, destinationTests, {
       recursive: true,
       force: true,
+      filter: (source) => !isTestFile(basename(source)),
     });
 
     const diagnosticsRoot = join(packageRoot, "src", "diagnostics");

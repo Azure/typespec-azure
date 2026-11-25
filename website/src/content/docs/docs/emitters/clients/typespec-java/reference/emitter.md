@@ -52,7 +52,9 @@ Specify the human readable name of the service. The name will be used for classe
 
 **Type:** `string`
 
-Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `generate-samples`
 

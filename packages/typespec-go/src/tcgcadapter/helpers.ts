@@ -27,74 +27,6 @@ export interface XMLSourceInfo {
 }
 
 /**
- * creates XMLInfo for models and model fields.
- * returns undefined if no XMLInfo is required.
- *
- * @param src the source information to adapt
- * @returns XMLInfo or undefined
- */
-export function adaptXMLInfo(src: XMLSourceInfo): go.XMLInfo | undefined {
-  const xmlInfo = new go.XMLInfo();
-  let returnXMLInfo = false;
-
-  if (src.xml?.name && src.xml.name !== src.goTypeName) {
-    xmlInfo.name = src.xml.name;
-    returnXMLInfo = true;
-  }
-
-  if (src.xml?.attribute) {
-    xmlInfo.attribute = true;
-    returnXMLInfo = true;
-  }
-
-  const srcType = go.unwrapPtr(src.type);
-  if (srcType.kind === "slice") {
-    const elementXMLInfo = hasXMLInfo(srcType.elementType);
-    if (src.xml?.unwrapped === false) {
-      if (src.xml.itemsName) {
-        xmlInfo.wraps = src.xml.itemsName;
-      } else if (elementXMLInfo?.name) {
-        xmlInfo.wraps = elementXMLInfo.name;
-      } else if (src.orTypeName !== src.goTypeName) {
-        xmlInfo.wraps = src.orTypeName;
-      } else {
-        xmlInfo.wraps = src.goTypeName;
-      }
-      returnXMLInfo = true;
-    } else if (elementXMLInfo?.name) {
-      xmlInfo.name = elementXMLInfo.name;
-      returnXMLInfo = true;
-    } else if (src.orTypeName !== src.goTypeName) {
-      // we can land here if the Go-specific type name was renamed to remove stuttering
-      xmlInfo.name = src.orTypeName;
-      returnXMLInfo = true;
-    }
-  } else if (src.xml?.unwrapped && srcType.kind === "string") {
-    // an unwrapped string means it's text
-    xmlInfo.text = true;
-    // the ",chardata" tag is mutually exclusive
-    // with a name tag so clear it if set
-    xmlInfo.name = undefined;
-    returnXMLInfo = true;
-  }
-
-  return returnXMLInfo ? xmlInfo : undefined;
-}
-
-/**
- * returns any XMLInfo available for the provided type or undefined
- *
- * @param type the type to inspect for XMLInfo
- * @returns the XMLInfo or undefined
- */
-export function hasXMLInfo(type: go.WireType): go.XMLInfo | undefined {
-  if ("xml" in type) {
-    return type.xml;
-  }
-  return undefined;
-}
-
-/**
  * returns true if model is a polymorphic root type.
  *
  * @param model the model to inspect
@@ -109,6 +41,20 @@ export function isPolymorphicRoot(model: tcgc.SdkModelType): boolean {
     return true;
   } else {
     return false;
+  }
+}
+
+/** narrows a literal to the subset of literals supported as a slice element type */
+export function isSliceElementLiteral(
+  literal: go.Literal,
+): literal is go.Literal<go.Constant | go.Scalar | go.String> {
+  switch (literal.type.kind) {
+    case "constant":
+    case "scalar":
+    case "string":
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -294,10 +240,10 @@ export function isExtensibleEnum(type: tcgc.SdkType): boolean {
  * when isExactName is true (set by the tsp exact() function on @clientName), the name
  * (with any provided suffix appended verbatim) is honored as-authored apart from the
  * first character, whose casing must still obey Go's export rules: unexported/parameter
- * identifiers (lowerFirst, or access "internal") are lower-cased while exported ones are
- * upper-cased. otherwise the name (with any provided suffix appended) is canonicalized via
- * naming.ensureNameCase(), with lowerFirst optionally lowercasing the first character
- * for unexported/parameter identifiers.
+ * identifiers (lowerFirst, or access "internal" when lowerFirst is undefined) are lower-cased
+ * while exported ones are upper-cased. otherwise the name (with any provided suffix appended)
+ * is canonicalized via naming.ensureNameCase(), with lowerFirst optionally lowercasing the
+ * first character for unexported/parameter identifiers.
  */
 export function getEffectiveName(
   src: { name: string; isExactName?: boolean; access?: tcgc.AccessFlags },
@@ -308,7 +254,7 @@ export function getEffectiveName(
   if (src.isExactName) {
     // exact names are honored as-authored, but Go's export rules still dictate
     // the first character's casing.
-    if (lowerFirst || src.access === "internal") {
+    if (lowerFirst ?? src.access === "internal") {
       return naming.uncapitalize(name);
     }
     // NOTE: for exact names, we don't want to use naming.ensureNameCase() because it will
@@ -331,4 +277,42 @@ export function isHttpFileType(model: tcgc.SdkModelType): boolean {
   return (
     model.namespace.toLowerCase() === "typespec.http" && model.name.toLowerCase().startsWith("file")
   );
+}
+
+// aggregate the properties from the provided type and its parent types.
+// this includes any inherited additional properties.
+export function aggregateProperties(
+  sdkContext: tcgc.SdkContext,
+  model: tcgc.SdkModelType,
+): { props: Array<tcgc.SdkModelPropertyType>; addlProps?: tcgc.SdkType } {
+  const allProps = new Array<tcgc.SdkModelPropertyType>();
+  for (const prop of model.properties) {
+    if (tcgc.isHttpMetadata(sdkContext, prop)) {
+      continue;
+    }
+    allProps.push(prop);
+  }
+
+  let addlProps = model.additionalProperties;
+  let parent = model.baseModel;
+  while (parent) {
+    for (const parentProp of parent.properties) {
+      if (tcgc.isHttpMetadata(sdkContext, parentProp)) {
+        continue;
+      }
+      const exists = allProps.find((p) => p.name === parentProp.name);
+      if (exists) {
+        // don't add the duplicate. the TS compiler has better enforcement than OpenAPI
+        // to ensure that duplicate fields with different types aren't added.
+        continue;
+      }
+      allProps.push(parentProp);
+    }
+    // if we haven't found additional properties yet and the parent has it, use it
+    if (!addlProps && parent.additionalProperties) {
+      addlProps = parent.additionalProperties;
+    }
+    parent = parent.baseModel;
+  }
+  return { props: allProps, addlProps: addlProps };
 }

@@ -1,0 +1,41 @@
+# Changelog - @azure-tools/typespec-azure-examples
+
+## 0.3.0
+
+### Features
+
+- [#5566](https://github.com/Azure/typespec-azure/pull/5566) Add the `tsp-examples add` command that adds examples for a new API version, adding an entry only when an operation is new or its contract changed (parity with OpenAPI-diff): changed operations get a `since` variant cloned from the previous example, new operations get a schema-shaped skeleton, and unchanged operations are left untouched.
+
+### Bug Fixes
+
+- [#5827](https://github.com/Azure/typespec-azure/pull/5827) Disable automatic line wrapping when writing unified example YAML so long titles and payload strings stay on one line. Preserve intentional newlines in string values.
+
+
+## 0.2.2
+
+### Features
+
+- [#5799](https://github.com/Azure/typespec-azure/pull/5799) Validate example request and response values against the current TypeSpec API with `tsp-examples validate path/to/project`, including required and typed server parameters and API-version/YAML-location diagnostics. Use `--schema-only` for format-only validation.
+
+### Bug Fixes
+
+- [#5799](https://github.com/Azure/typespec-azure/pull/5799) Resolve local and external Swagger parameter references before migrating request locations, preserving path parameters and each API version's body names. Report missing or circular references explicitly.
+- [#5811](https://github.com/Azure/typespec-azure/pull/5811) Preserve request and response payload field order during migration. Retain version-specific variants when only field order changes, including nested objects and array items, and keep response body and headers in their original order.
+
+
+## 0.2.1
+
+### Bug Fixes
+
+- [#5690](https://github.com/Azure/typespec-azure/pull/5690) Use `id` instead of `legacyFilename` for example filename metadata, omitting the `.json` extension. Existing filename metadata and title-based lineages remain supported.
+
+
+
+
+## 0.2.0
+
+### Features
+
+- [#5121](https://github.com/Azure/typespec-azure/pull/5121) Add the transitional `tsp-examples-legacy-expand` tool that expands the unified examples into the concrete example for each operation at a target API version (greatest `since <= target` per lineage, using the `service.yaml` order) and materializes the `{api-version}` placeholder.
+- [#5120](https://github.com/Azure/typespec-azure/pull/5120) Add the transitional `tsp-examples-migrate` tool that converts existing `x-ms-examples` JSON into the unified `examples.yaml` format (crawls versioned Swagger, normalizes `{api-version}`, dedupes across versions into `since` lineages, and uses an adjacent `service.yaml` as the authoritative version list).
+- [#4908](https://github.com/Azure/typespec-azure/pull/4908) Add `@azure-tools/typespec-azure-examples` with the `examples.yaml` JSON Schema and the `tsp-examples validate` command for the unified examples format.

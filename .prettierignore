@@ -19,6 +19,11 @@
 # Coverage report directory
 **/coverage/
 
+# Benchmark inputs downloaded from other repos and generated SDK output.
+packages/benchmark/.external/
+packages/benchmark/.emitters/
+packages/benchmark/**/tsp-output/
+
 packages/samples/specs/resource-manager/common-types/**/*
 
 # These are standard and should not be edited
@@ -81,3 +86,7 @@ packages/typespec-java/emitter-tests/
 packages/typespec-java/src/**
 !packages/typespec-java/src/options.ts
 packages/typespec-java/test/
+
+# Round-trip proof fixtures are copied verbatim from azure-rest-api-specs
+# (Microsoft.Contoso); keep them byte-for-byte as shipped, not reformatted.
+packages/typespec-azure-examples/test/roundtrip/fixtures/**

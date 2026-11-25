@@ -17,20 +17,22 @@ import { ImportManager } from "./imports.js";
  * @returns the generated response handler code as a string.
  */
 export function createResponseHandler(
-  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod,
+  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod | go.SseMethod,
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
   const name = method.naming.responseMethod;
-  let text = `${helpers.comment(name, "// ")} handles the ${method.name} response.\n`;
+  let text = `${helpers.comment(name, "// ")} handles the ${go.isLROMethod(method) || go.isPageableMethod(method) ? method.naming.operationMethod : method.name} response.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(resp *http.Response, successCodes ...int) (${method.returns.name}, error) {\n`;
 
   const resultVarName = "result";
   text += `${indent.get()}${resultVarName} := ${method.returns.name}{}\n`;
-  text += `${indent.get()}${helpers.buildIfBlock(indent, {
-    condition: "!runtime.HasStatusCode(resp, successCodes...)",
-    body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
-  })}\n`;
+  if (method.kind !== "sseMethod") {
+    text += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "!runtime.HasStatusCode(resp, successCodes...)",
+      body: (indent) => `${indent.get()}return ${resultVarName}, runtime.NewResponseError(resp)\n`,
+    })}\n`;
+  }
 
   for (const header of method.returns.headers) {
     text += formatHeaderResponseValue(
@@ -80,7 +82,7 @@ export function createResponseHandler(
       case "modelResult":
         text += generateResponseUnmarshaller(
           method,
-          result.modelType,
+          result.type,
           result.format,
           `${resultVarName}.${helpers.getResultFieldName(method)}`,
           imports,
@@ -90,12 +92,12 @@ export function createResponseHandler(
       case "monomorphicResult":
         let target = `${resultVarName}.${helpers.getResultFieldName(method)}`;
         // when unmarshalling a wrapped XML array, unmarshal into the response envelope
-        if (result.format === "XML" && result.monomorphicType.kind === "slice") {
+        if (result.format === "XML" && result.type.kind === "slice") {
           target = resultVarName;
         }
         text += generateResponseUnmarshaller(
           method,
-          result.monomorphicType,
+          result.type,
           result.format,
           target,
           imports,
@@ -105,12 +107,15 @@ export function createResponseHandler(
       case "polymorphicResult":
         text += generateResponseUnmarshaller(
           method,
-          result.interface,
+          result.type,
           result.format,
           resultVarName,
           imports,
           indent,
         );
+        break;
+      case "sseResult":
+        // The connector validates the response and transfers the body to the event reader.
         break;
       default:
         result satisfies never;
@@ -143,8 +148,8 @@ function generateResponseUnmarshaller(
     return unmarshallerText;
   } else if (go.isSlice(type, "time")) {
     // unmarshalling arrays of date/time is a little more involved
-    const timeType = go.unwrapPtr(type.elementType);
-    const elementPtr = type.elementType.kind === "ptr" ? "*" : "";
+    const timeType = go.unwrapPtr(type.itemType);
+    const elementPtr = type.itemType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
     unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeType.format}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
@@ -157,20 +162,34 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   } else if (go.isMap(type, "time")) {
-    const timeType = type.valueType.ptrType;
+    const timeType = go.unwrapPtr(type.itemType);
+    const elementPtr = type.itemType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
+    unmarshallerText += `${indent.get()}aux := map[string]${elementPtr}datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
-    unmarshallerText += `${indent.get()}cp := map[string]*time.Time{}\n`;
+    unmarshallerText += `${indent.get()}cp := map[string]${elementPtr}time.Time{}\n`;
     unmarshallerText += `${indent.get()}for k, v := range aux {\n`;
-    unmarshallerText += `${indent.push().get()}cp[k] = (*time.Time)(v)\n`;
+    unmarshallerText += `${indent.push().get()}cp[k] = (${elementPtr}time.Time)(v)\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   }
-  if (format === "JSON" || format === "XML") {
+  if (
+    format === "JSON" &&
+    (type.kind === "slice" || type.kind === "map") &&
+    helpers.recursiveUnwrapMapSlice(type).kind === "interface"
+  ) {
+    unmarshallerText += `${indent.get()}body, err := runtime.Payload(resp)\n`;
+    unmarshallerText += `${indent.get()}if err != nil {\n`;
+    unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
+    unmarshallerText += `${indent.pop().get()}}\n`;
+    unmarshallerText += `${indent.get()}${unmarshalTarget}, err = ${helpers.getDiscriminatorUnmarshallerName(type)}(body)\n`;
+    unmarshallerText += `${indent.get()}if err != nil {\n`;
+    unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
+    unmarshallerText += `${indent.pop().get()}}\n`;
+  } else if (format === "JSON" || format === "XML") {
     if (type.kind === "rawJSON") {
       unmarshallerText += `${indent.get()}body, err := runtime.Payload(resp)\n`;
       unmarshallerText += `${indent.get()}if err != nil {\n`;
@@ -224,7 +243,7 @@ function generateResponseUnmarshaller(
 
 // use this to generate the code that will help process values returned in response headers
 function formatHeaderResponseValue(
-  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod,
+  method: go.SyncMethod | go.LROPageableMethod | go.PageableMethod | go.SseMethod,
   headerResp: go.HeaderScalarResponse | go.HeaderMapResponse,
   respObj: string,
   zeroResp: string,

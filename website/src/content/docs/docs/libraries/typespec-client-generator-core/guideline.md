@@ -62,6 +62,8 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 TCGC provides flags to control the client type graph style, such as enabling or disabling convenience and protocol APIs for Java and C# emitters. Other emitters should not set `generate-convenience-methods` or `generate-protocol-methods`; TCGC reports an `unnecessary-emitter-option` warning when either option is explicitly set for another language. See the [documentation](../reference/emitter/#emitter-options) for details.
 
+By default, `createSdkContext` converts eligible inline-discriminated unions to the existing polymorphic model representation. Emitters that use native discriminated unions, such as Rust, can opt out with `{ convertDiscriminatedUnionsToModels: false }` in the third argument to `createSdkContext`.
+
 ## TCGC Raw Types and Helpers
 
 In order to introduce the client concept, TCGC introduces some new raw types and helper functions.
@@ -81,7 +83,7 @@ Most TCGC types share the following common properties:
 - **`namespace`**: Indicates the type's namespace.
 - **`doc` and `summary`**: Contain documentation-related information.
 - **`apiVersions`**: Indicates which API versions the type exists in.
-- **`decorators`**: Stores TypeSpec decorator information for advanced use cases. Decorator arguments that reference TypeSpec models are converted to TCGC SDK types. For example, a model-reference value passed to `@clientOption` preserves scoped transformations such as `@alternateType`.
+- **`decorators`**: Stores TypeSpec decorator information for advanced use cases. Model-reference arguments are converted to TCGC SDK types only for `@clientOption`, preserving scoped transformations such as `@alternateType`. Model-reference arguments on other decorators are unsupported: TCGC reports `unsupported-generic-decorator-arg-type` and records the argument as `undefined`.
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters. When `@alternateType` replaces a union, model, enum, scalar, or model property, the original type uses the replacement type's ID. This is resolved recursively, so a chain of alternate types has one identity.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
 - **`isExactName`**: Indicates that the name was set via `@clientName` with the `exact()` function and must be used as-is by language emitters, without applying any casing transformations (e.g., no snake_case for Python, no camelCase for JavaScript).
@@ -101,7 +103,7 @@ Most TCGC types share the following common properties:
   - `LroFinalEnvelope` (8192): Type is used in the final envelope of an LRO.
   - `External` (16384): Type is only referenced through external alternate types. When a type has the `External` flag and no `Input` or `Output` flags, it means emitters do not need to generate serialization/deserialization code for it — the external package handles that. TCGC blocks propagation of non-`External` usage flags (such as `Input`, `Output`, `Json`) through types marked as external.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
-- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
+- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters. For an API-version parameter, an effective `@Azure.Core.Legacy.overrideApiVersion` value takes precedence over the selected service version. TCGC resolves the override from the operation's declaration scope, including its source-operation chain, rather than from a client to which `@clientLocation` moved the operation. The override changes the parameter default only; it does not change the client's `apiVersions` metadata.
 
 ### Package
 
@@ -147,6 +149,10 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
 `SdkClientType.versionsEnum` is the [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) describing the API versions supported by this client's service (its `usage` includes the `ApiVersionEnum` flag, and it is the same object that appears in `SdkPackage.enums`). It is `undefined` for unversioned services and for multi-service root clients (which span more than one service). Sub clients that map to a single service still expose their own service's `versionsEnum`.
+
+`SdkClientType.authentication` preserves the service's HTTP authentication requirements as an `Authentication` object. Each entry in `authentication.options` is an alternative authentication option (OR), while every scheme within one option is required together (AND). `NoAuth` remains an explicit scheme, including when it is the only option. The property is `undefined` when the client has no associated service or the service does not declare authentication. For a client that combines multiple services, it describes the first service, consistent with the client's endpoint and credential metadata.
+
+When `exportTCGCoutput` generates `tcgc-output.yaml`, the serialized authentication value preserves the option and scheme grouping but omits each scheme's compiler `model` reference.
 
 `SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
 
@@ -226,6 +232,8 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Enumeration Types:**
 
 - [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- `SdkEnumValueType.value` retains the original member value, or its TypeSpec name when no value is specified. `@encodedName` names are exposed separately as `serializationOptions.json.name` and `serializationOptions.xml.name`; an unset option falls back to `value`. `SdkEnumType.valueType` and member `valueType` retain the client-facing type. Member options use the shared `SerializationOptions` type and follow the same content-type propagation as models and properties, including explicit serialization metadata on orphan types. This also applies to enum members flattened into unions. Emitters can use the options for the protocol being serialized without replacing client-facing enum values or defaults. Discriminator tags and subtype mapping keys retain their original spec values independently of encoded names; JSON example matching uses the JSON wire value.
+- For a union converted to an enum, an explicit scalar `extends` constraint determines `SdkEnumType.valueType` and the value type of its known variants, taking precedence over scalar variants and literal-based inference. For example, `union Priority extends int64 { low: 1, high: 2 }` has an `int64` value type rather than an inferred `int32`. The constraint does not make the enum extensible: `isFixed` remains `true` unless the union includes an open scalar variant, directly or through a nested union.
 
 **Literal Types:**
 
@@ -234,6 +242,39 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Union Types:**
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
+
+#### Inline-discriminated union conversion
+
+An inline-discriminated union handled by the SDK context is converted when it uses `@discriminated(#{ envelope: "none" })`, explicitly extends a named model, and every alternative is a named variant whose model nominally inherits from that base, directly or transitively. Unhandled unions do not reshape otherwise-used models.
+
+```tsp
+model PetBase {
+  name: string;
+}
+model Cat extends PetBase {
+  meows: boolean;
+}
+model Dog extends PetBase {
+  barks: boolean;
+}
+
+@discriminated(#{ envelope: "none" })
+union Pet extends PetBase {
+  cat: Cat,
+  dog: Dog,
+}
+
+@post op echo(@body pet: Pet): Pet;
+```
+
+References to `Pet` resolve to the existing `PetBase` SDK model, including operation parameters/responses, model properties, containers, and nullable uses. The base's `discriminatorProperty` and `discriminatedSubtypes`, plus each variant's `discriminatorValue` and discriminator property, describe the inline tags. Missing discriminator properties are synthesized; the compiler type graph is not changed. The projected model retains the base model's name and identity rather than introducing a model named after the union.
+
+Ordinary unions, object-envelope unions, structural-only variants, unions without a model constraint, and unions containing defaults or the base model itself as an alternative are not converted. Alternate types and legacy hierarchy rebasing retain their existing handling. Eligible unions always resolve to their base SDK model. Conflicting discriminator metadata produces a `union-model-conversion-conflict` error rather than overwriting an existing hierarchy or falling back to a union representation.
+
+Compatible unions sharing the same base share its SDK model and combined subtype map; the polymorphic representation does not enforce each union's subset separately. Synthesized inline discriminator properties also appear on directly used SDK variants. Disable conversion when an emitter needs union-specific serialization or exact alternative-set information.
+
+Do not combine `@discriminated` unions with `@discriminator` on their variant models or ancestors. Conversion reports `union-model-discriminator-conflict` for such hierarchies, including when both decorators use the same property name. Use one discriminator mechanism, or disable union conversion.
 
 **Model Types:**
 
@@ -317,12 +358,104 @@ Parameters used in client (either API version parameter or client parameter defi
 The method's return type is determined by the underlying operation's normal responses:
 
 - If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
+- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. Either replacement disables pageable-method classification and reports `override-response-replacement`. For any other override operation, TCGC ignores its declared return type, preserves the response calculated from the original operation, and does not perform response compatibility validation.
 - If the responses contain multiple return types, the return type is a union of all the types.
 - If the responses contain empty return type, the return type is wrapped with a nullable type.
 
 The paging method's return type is an array type of the page items type. It is inferred from `@pageItems` or `@items` decorator.
 
-The LRO method's return type is the final response type. It is inferred from `LroMetadata`.
+The LRO method's return type is `lroMetadata.finalResponse.result`, or absent when there is no final response. For native LROs, TCGC selects this client result from Azure.Core's `getLroProtocolMetadata` facts, then translates the selected types into the SDK type graph. The same TCGC selection supplies native LRO model usage, access, and naming.
+
+`LroProtocolMetadata` keeps `operation` at the top level and groups facts into required `initial`, `polling`, and `completion` objects. `initial` contains `initialResponse`, `resourceOperation?`, and `isAction`; `polling` contains `statusMonitorStep?`, `pollingInfo`, and `statusMonitorResult?`; `completion` contains `finalStateVia`, `finalStep?`, and `originalUriHasGetOperation?`. This grouping preserves every leaf's type and semantics; the combined `LroMetadata` and raw compatibility projections remain flat.
+
+Azure.Core remains responsible for polling links, parameter bindings, terminal states, `finalStateVia`, and required final HTTP requests. Client-result selection must not replace or discard a `finalOperationLink` or `finalOperationReference`. The `finalStep` union also retains success-property and no-result variants.
+
+`lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
+
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` retain their existing shapes. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result-type defaults are preserved, but inconsistent resource PUT result/envelope/path combinations are corrected.
+
+The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
+
+#### Customizing LRO Results
+
+TCGC applies `@clientLroResult` when calculating the SDK-facing result without changing polling, parameter binding, or required final requests. A model selection must be the status-monitor response model or the response model containing the default final result. A property selection must be a direct property of the status-monitor model, including inherited properties, and have a model or scalar type, or `unknown`. The property does not need `@lroResult`. Unrelated and nested selections report `invalid-client-lro-result`. The decorator supports the existing language scopes and overrides.
+
+TCGC derives the default result from the discovered protocol. When the result is a complete response body, no status-monitor extraction path is retained. Selecting a non-resource result on a resource LRO (or any result on a resource DELETE LRO) reports the suppressible `use-valid-client-lro-result` warning, which can be suppressed to preserve an existing SDK contract.
+
+`finalResponse.result` is the selected SDK type, `finalResponse.envelopeResult` is the response body containing it, and `resultSegments` identifies the selected direct property when one exists. The raw result paths likewise contain a name only for a direct property selection. Emitters must process `finalStep` independently because a required final request can return a different body from the selected result envelope.
+
+#### LRO status metadata
+
+The TCGC-only `@lroStatusMetadata` decorator lets an SDK expose auxiliary status-monitor metadata without changing Azure.Core polling protocol semantics or the normal method response:
+
+```typespec
+model OperationStatus {
+  status: OperationState;
+
+  @lroStatusMetadata
+  percentComplete?: int32;
+
+  @lroStatusMetadata
+  requestId?: string;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(@path operationId: string): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.statusMetadata` contains wrappers around the exact cached `SdkModelPropertyType` objects from the polling response model, in deterministic direct-then-inherited model/property order. Consequently, client and wire names, optionality, decorators, serialization, and property types are preserved. These properties are auxiliary operation or poller state and do not affect polling, status evaluation, error handling, final-result extraction, or polling and final locations. TCGC diagnoses attempts to decorate those structural LRO properties. An auxiliary `errors` array containing per-item diagnostics may be selected, but a property designated as the structural LRO error by `@lroErrorResult` or Azure.Core conventions may not.
+
+Each active decorated direct or inherited property applies to every LRO that uses that status-monitor model. Decorate each property to expose several values; the decorator is property-level only. Nested properties are not scanned; decorate the direct property to expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`, and inclusion or negation on each property.
+
+Each entry also provides `propertySegments`, following the typed segment convention used by paging and LRO final results. The path is rooted at `pollingInfo.responseModel`, not the final result or HTTP response wrapper. Currently it contains a single segment identical to `property`, including for inherited properties; hierarchy reconciliation updates both to the retained SDK property. Segments carry SDK names in `name` and JSON wire names in `serializationOptions.json.name`. The path does not describe an arbitrary replacement model supplied by `@alternateType` through `pollingStep.responseBody`.
+
+Values come from the most recent status-monitor response the SDK has received, including the initial response when it contains the status-monitor model. Any value may be absent until a response containing it arrives. Metadata remains exposed on failed or canceled terminal responses, independently of whether a logical final result is available. Emitters expose these values on their idiomatic poller or operation object and should keep them current after each poll. Metadata is not part of the continuation token; after rehydration, it is populated again by the next poll.
+
+TCGC describes the selected properties, not runtime response values. Language emitters must implement this lifecycle and their public accessor shape; Spector HTTP scenarios alone do not demonstrate generated poller access or removal of SDK customizations. An emitter that already exposes a typed status-monitor response may satisfy this contract through its existing operation or poller API, provided it reflects the latest received response and remains accessible after failure or cancellation.
+
+Separate `@lroStatusMetadata` declarations on one property use the standard TCGC scope rules, including overlapping scopes. Each selected property appears only once in the metadata collection. Projected client-name conflicts are handled by the existing `duplicate-client-name` validation, not a separate LRO metadata diagnostic.
+
+Status metadata requires native Azure.Core LRO discovery. An operation detected only through the legacy `@markAsLro` fallback does not acquire status metadata selections. A decorator on a model unused by native LROs has no generation effect.
+
+#### Legacy LRO operation identity
+
+TCGC-only `@lroOperationId` lets an SDK preserve an operation-identity API for a legacy service that returns a server-issued identifier in its status-monitor URI, response body, or both:
+
+```typespec
+model OperationStatus {
+  @lroOperationId
+  id: string;
+
+  status: OperationState;
+}
+
+@route("/operations/{operationId}")
+@get
+op getOperationStatus(
+  @lroOperationId
+  @path
+  operationId: string,
+): OperationStatus;
+
+@pollingOperation(getOperationStatus)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains ordered, source-tagged metadata: the exact `SdkOperationLink` and `SdkPathParameter` for the polling URI first, followed by the exact `SdkModelPropertyType` for the status-monitor body. The path form is available from the initial response and must remain derivable after poller rehydration from the stored polling URL. The property form becomes available only after a status-monitor response is received.
+
+For `kind: "property"`, `propertySegments` gives the access path from `pollingInfo.responseModel` to the ID, following the segment representation used by paging metadata. Currently only direct or inherited properties are selectable, so the path is `[property]`; inheritance does not add a JSON nesting level. Each segment is the exact effective SDK property, carrying its client name and `serializationOptions.json.name` for emitters reading a typed model or raw JSON. An overridden base property is not a second source, and `@hierarchyBuilding` replacements use the retained SDK property's names and serialization metadata.
+
+TCGC validates active operation ID selections while processing each LRO. A selected response property must be string-like; invalid selections are diagnosed and omitted. Annotations on models not used by the LRO, or excluded by emitter scope or response visibility, have no effect.
+
+For example, after the body-only Translation scenario returns `{ id: "translation-123", status: "Running" }`, an emitter reads the selected `id` using `propertySegments` and exposes `"translation-123"` through its operation or poller accessor. No ID is available before that response in the body-only case. When both sources are selected, the URI-derived value is available first and the body value becomes available after polling. These scenarios supply HTTP fixtures; each emitter must implement and test the public accessor.
+
+This metadata does not drive polling and is distinct from a caller-supplied `Operation-Id` API parameter. Emitters choose their idiomatic accessor and lifecycle; expected homes include .NET `Operation.Id`, a Java poll-result or poller accessor, a Python poller property, JavaScript poller state, and a Go poller method. An LRO with a path selection but only an opaque polling URI and no modeled polling operation cannot expose operation-ID metadata.
+
+Conforming Azure services expose operation identity through their request and response API, including `Operation-Id` and the status-monitor body's `id`, and do not need this decorator. `@lroOperationId` is a compatibility opt-in for an established nonconforming wire contract; it is not a standard polling mechanism. A resource's own identifier or name, such as a Key Vault secret URI or a delete-until-gone resource name, is not an operation identifier.
 
 ### HTTP Operation Parameters Handling
 
@@ -333,6 +466,8 @@ TCGC infers the body parameter type from TypeSpec HTTP lib type [`HttpOperationB
 TCGC creates the `Content-Type` header parameter for any operation with body parameter if it doesn't exist, and creates the `Accept` header parameter for any operation with response that contains body. TCGC also creates corresponding method parameters for the operation's upper layer method for each case.
 
 For request bodies with multiple content types, the `Content-Type` parameter is modeled as an enum with one value per content type. For responses with multiple content types, the `Accept` header parameter is modeled as a single constant whose value is a comma-joined string of all response content types. Structured content types (JSON, XML, `text/plain`) are sorted before unstructured ones. For example, if a response can return `image/png` or `application/json`, the `Accept` constant value is `"application/json, image/png"`.
+
+For a `File` request body without an explicit content type, the HTTP library reports the unconstrained marker `*/*`. TCGC exposes the generated method and HTTP `Content-Type` parameters as optional strings with `clientDefaultValue: "application/octet-stream"` rather than generating a required `"*/*"` constant. This special case applies only to uploads; a `File` response without an explicit content type still has a constant `Accept: "*/*"` parameter.
 
 TCGC uses several ways to find an HTTP operation's parameter's corresponding method parameter or model property:
 

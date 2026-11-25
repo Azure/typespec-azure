@@ -25,24 +25,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const sampleHref = `${base}/docs/samples/${sample.id}/`;
 ---
 
-{
-  collapsed ? (
-    <details class="example-ref">
-      <summary class="example-ref-header">{sample.title}</summary>
-      <a class="example-ref-link" href={sampleHref}>
-        View full sample →
-      </a>
-      <SampleContent sample={sample} />
-    </details>
-  ) : (
-    <section class="example-ref">
-      <div class="example-ref-header">
-        <a href={sampleHref}>{sample.title}</a>
-      </div>
-      <SampleContent sample={sample} />
-    </section>
-  )
-}
+{collapsed ? (
+  <details class="example-ref">
+    <summary class="example-ref-header">{sample.title}</summary>
+    <a class="example-ref-link" href={sampleHref}>
+      View full sample →
+    </a>
+    <SampleContent sample={sample} />
+  </details>
+) : (
+  <section class="example-ref">
+    <div class="example-ref-header">
+      <a href={sampleHref}>{sample.title}</a>
+    </div>
+    <SampleContent sample={sample} />
+  </section>
+)}
 
 <style>
   .example-ref {

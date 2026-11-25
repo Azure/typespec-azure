@@ -60,6 +60,7 @@ import { logger } from "../logger.js";
 import { ClientType } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Service. */
 export interface ServiceContext extends Client {
   /** Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client. */
   clientParam?: ClientType;
@@ -71,6 +72,7 @@ export interface ServiceClientOptionalParams extends ClientOptions {
   clientParam?: ClientType;
 }
 
+/** Creates a Service client context. */
 export function createService(
   endpointParam: string,
   options: ServiceClientOptionalParams = {},
@@ -79,7 +81,10 @@ export function createService(
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -154,6 +159,7 @@ import { logger } from "../logger.js";
 import { ClientType } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Service. */
 export interface ServiceContext extends Client {
   /** Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client. */
   clientParam?: ClientType;
@@ -167,13 +173,17 @@ export interface ServiceClientOptionalParams extends ClientOptions {
   clientParam?: ClientType;
 }
 
+/** Creates a Service client context. */
 export function createService(options: ServiceClientOptionalParams = {}): ServiceContext {
   const endpointParam = options.endpointParam ?? "http://localhost:3000";
   const clientParam = options.clientParam ?? "default";
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -250,6 +260,7 @@ import { logger } from "../logger.js";
 import { ClientType } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for TestService. */
 export interface TestServiceContext extends Client {
   /** Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client. */
   clientParam?: ClientType;
@@ -261,6 +272,7 @@ export interface TestServiceClientOptionalParams extends ClientOptions {
   clientParam?: ClientType;
 }
 
+/** Creates a TestService client context. */
 export function createTestService(
   endpointParam: string,
   options: TestServiceClientOptionalParams = {},
@@ -269,7 +281,10 @@ export function createTestService(
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 

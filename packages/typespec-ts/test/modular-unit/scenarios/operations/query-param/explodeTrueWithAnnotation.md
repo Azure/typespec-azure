@@ -70,6 +70,8 @@ export async function _requiredDeserialize(result: PathUncheckedResponse): Promi
 
   return;
 }
+
+/** Performs the required operation. */
 export async function required(
   context: Client,
   select: string[],
@@ -111,6 +113,8 @@ export async function _optionalDeserialize(result: PathUncheckedResponse): Promi
 
   return;
 }
+
+/** Performs the optional operation. */
 export async function optional(
   context: Client,
   foo: string,

@@ -115,7 +115,7 @@ After migration, all models (including enums) will have capitalized names.
 
 ## Swagger ModelValidation
 
-Some validation rules may fail because TypeSpec fixes certain legacy patterns. Review the known issues below and take appropriate action.
+For generally validation error, inspect the inner error details to determine the root cause and update the spec directly. Do not treat suppression as the first-line response for ordinary conformance failures; consider it only after confirming the error is not a normal conformance issue. Some validation rules may fail because TypeSpec fixes certain legacy patterns. Review the known issues below and take appropriate action.
 
 ### INVALID_FORMAT: Object didn't pass validation for format uri: {nextlink}
 

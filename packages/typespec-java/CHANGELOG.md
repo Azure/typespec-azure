@@ -1,5 +1,100 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.49.2
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `35cd3c4f8`. Fix XML storage generation regressions ([microsoft/typespec#12635](https://github.com/microsoft/typespec/pull/12635)) and propagate synchronous ARM long-running operation failures ([microsoft/typespec#12633](https://github.com/microsoft/typespec/pull/12633)). Use JavaParser for unused-import cleanup ([microsoft/typespec#12622](https://github.com/microsoft/typespec/pull/12622)), reduce duplicate ARM implementations ([microsoft/typespec#12645](https://github.com/microsoft/typespec/pull/12645)), and generate ClientCore HTTP operations without requiring its annotation processor ([microsoft/typespec#12621](https://github.com/microsoft/typespec/pull/12621)).
+
+
+## 0.49.1
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `4a6bebe511` to support named JSON server-sent events (`SSEStream`) in data-plane convenience APIs ([microsoft/typespec#12312](https://github.com/microsoft/typespec/pull/12312)), initialize routing fields for retrieved create-only ARM resources ([microsoft/typespec#12593](https://github.com/microsoft/typespec/pull/12593)), and log generated `XmlSerializer` exceptions through `ClientLogger` ([microsoft/typespec#12598](https://github.com/microsoft/typespec/pull/12598)).
+
+
+## 0.49.0
+
+### Features
+
+- Support preview annotations for APIs marked with `@TypeSpec.HttpClient.experimental` through the `experimental-annotation` option ([microsoft/typespec#12409](https://github.com/microsoft/typespec/pull/12409)).
+- Support `@access(Access.internal)` for ARM operations, models, and enums ([microsoft/typespec#12488](https://github.com/microsoft/typespec/pull/12488)).
+- Prototype a TeaVM WebAssembly target for `@azure-tools/typespec-java` in the Azure playground, included by the normal build and PR previews. Building requires JDK 17; native CLI generation is unchanged.
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `ccde4f5b0` to fix base64 encoding of byte-valued headers and query parameters ([microsoft/typespec#12540](https://github.com/microsoft/typespec/pull/12540)).
+
+
+## 0.48.6
+
+### Bug Fixes
+
+- Remove dependencies on deprecated autorest packages
+
+
+## 0.48.5
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `cba4987c6` to prevent service-defined YAML map keys, such as discriminator value `responses`, from being interpreted as code-model properties ([microsoft/typespec#12434](https://github.com/microsoft/typespec/pull/12434)).
+- Update the Java generator to TypeSpec core commit `6ba281975` to preserve resource ID parameters for ARM models shared across multiple routes ([microsoft/typespec#12443](https://github.com/microsoft/typespec/pull/12443)).
+
+
+## 0.48.4
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `d771b2957` to fix empty model packages in module-info ([microsoft/typespec#12429](https://github.com/microsoft/typespec/pull/12429)), discriminator key collisions ([microsoft/typespec#12428](https://github.com/microsoft/typespec/pull/12428)), ARM resource ID parsing ([microsoft/typespec#12373](https://github.com/microsoft/typespec/pull/12373)), and Create visibility handling ([microsoft/typespec#12378](https://github.com/microsoft/typespec/pull/12378)). Includes generator performance improvements ([microsoft/typespec#12346](https://github.com/microsoft/typespec/pull/12346)).
+
+
+## 0.48.3
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `e4f588a5f` to fix discriminator handling for untagged intermediate models ([microsoft/typespec#12294](https://github.com/microsoft/typespec/pull/12294)), preserve continuation-token method parameters ([microsoft/typespec#12305](https://github.com/microsoft/typespec/pull/12305)), and add an option to include continuation-token parameters ([microsoft/typespec#12309](https://github.com/microsoft/typespec/pull/12309)).
+
+
+## 0.48.2
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `f098e0fdd`. Includes Azure V1 continuation-token paging ([microsoft/typespec#12196](https://github.com/microsoft/typespec/pull/12196)), escaped enum values in schema Javadoc ([microsoft/typespec#12177](https://github.com/microsoft/typespec/pull/12177)), and dependency updates with version synchronization ([microsoft/typespec#12286](https://github.com/microsoft/typespec/pull/12286)). Add a local script to align test dependencies and plugins with the pinned generator.
+
+
+## 0.48.1
+
+### Bug Fixes
+
+- Update the Java generator to the latest TypeSpec core.
+
+
+## 0.48.0
+
+### Features
+
+- Update TypeSpec dependencies to their October minor versions and sync core to commit `545ec91fc`. Includes upstream library behavior changes ([microsoft/typespec#12137](https://github.com/microsoft/typespec/pull/12137)) and the Java generator Jackson dependency update ([microsoft/typespec#12056](https://github.com/microsoft/typespec/pull/12056)).
+
+
+## 0.47.1
+
+### Bug Fixes
+
+- Sync core to commit `057557b68`. Includes fixes for casting null parameters in generated samples and
+  tests ([microsoft/typespec#11967](https://github.com/microsoft/typespec/pull/11967)), redundant casts
+  in generated XML serializers ([microsoft/typespec#11982](https://github.com/microsoft/typespec/pull/11982)),
+  and generated Java path-length limits
+  ([microsoft/typespec#11983](https://github.com/microsoft/typespec/pull/11983)).
+
+
+## 0.47.0
+
+### Features
+
+- Update TypeSpec dependencies to their September minor versions. Includes behavior changes from upstream libraries such as TCGC ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
+
+
 ## 0.46.4
 
 ### Features

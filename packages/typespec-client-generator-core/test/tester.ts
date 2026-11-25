@@ -27,8 +27,10 @@ export interface SdkTesterOptions extends BrandedSdkEmitterOptionsInterface {
  * Simple base tester. Loads the core libraries needed for TCGC testing.
  */
 export const SimpleBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["union-extends", "declaration-expressions"],
   libraries: [
     "@typespec/http",
+    "@typespec/openapi",
     "@typespec/rest",
     "@typespec/versioning",
     "@azure-tools/typespec-client-generator-core",
@@ -86,6 +88,7 @@ ${x}
  * XML tester with XML library support
  */
 export const XmlTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["union-extends"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -116,6 +119,7 @@ ${x}
  * Base tester for TCGC tests with Azure Core libraries loaded but no auto-imports/usings.
  */
 export const AzureCoreBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["typeref"],
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -159,10 +163,7 @@ ${x}
 `,
 );
 
-/**
- * Tester for TCGC tests with Azure Resource Manager library support.
- */
-export const ArmTester = createTester(resolvePath(import.meta.dirname, ".."), {
+export const ArmBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -172,23 +173,26 @@ export const ArmTester = createTester(resolvePath(import.meta.dirname, ".."), {
     "@azure-tools/typespec-azure-resource-manager",
     "@azure-tools/typespec-client-generator-core",
   ],
-})
-  .import(
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@azure-tools/typespec-azure-core",
-    "@azure-tools/typespec-azure-resource-manager",
-    "@azure-tools/typespec-client-generator-core",
-  )
-  .using(
-    "Http",
-    "Rest",
-    "Versioning",
-    "Azure.Core",
-    "Azure.ResourceManager",
-    "Azure.ClientGenerator.Core",
-  );
+});
+
+/**
+ * Tester for TCGC tests with Azure Resource Manager library support.
+ */
+export const ArmTester = ArmBaseTester.import(
+  "@typespec/http",
+  "@typespec/rest",
+  "@typespec/versioning",
+  "@azure-tools/typespec-azure-core",
+  "@azure-tools/typespec-azure-resource-manager",
+  "@azure-tools/typespec-client-generator-core",
+).using(
+  "Http",
+  "Rest",
+  "Versioning",
+  "Azure.Core",
+  "Azure.ResourceManager",
+  "Azure.ClientGenerator.Core",
+);
 
 /**
  * Tester with a built-in Azure Resource Manager service namespace.

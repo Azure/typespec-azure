@@ -22,7 +22,7 @@ enum Versions {
   /**
    * The 2025-05-01 API version.
    */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_05_01: "2025-05-01",
 }
 

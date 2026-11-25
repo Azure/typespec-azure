@@ -112,6 +112,7 @@ withRawContent: true
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for BillingBenefits. */
 export interface BillingBenefitsContext extends Client {
   /** The expand header parameter. */
   expand?: string;
@@ -123,6 +124,7 @@ export interface BillingBenefitsClientOptionalParams extends ClientOptions {
   expand?: string;
 }
 
+/** Creates a BillingBenefits client context. */
 export function createBillingBenefits(
   endpointParam: string,
   options: BillingBenefitsClientOptionalParams = {},
@@ -130,7 +132,10 @@ export function createBillingBenefits(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -206,6 +211,7 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
+
 /** Get savings plan. */
 export async function get(
   context: Client,
@@ -343,6 +349,7 @@ withRawContent: true
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for BillingBenefits. */
 export interface BillingBenefitsContext extends Client {
   /** The expand header parameter. */
   expand: string;
@@ -351,6 +358,7 @@ export interface BillingBenefitsContext extends Client {
 /** Optional parameters for the client. */
 export interface BillingBenefitsClientOptionalParams extends ClientOptions {}
 
+/** Creates a BillingBenefits client context. */
 export function createBillingBenefits(
   endpointParam: string,
   expand: string,
@@ -359,7 +367,10 @@ export function createBillingBenefits(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -435,6 +446,7 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
+
 /** Get savings plan. */
 export async function get(
   context: Client,

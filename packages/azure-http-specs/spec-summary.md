@@ -1268,6 +1268,119 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeJob
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/jobs:analyze`
+
+Declares a Language-shaped job with several property-level status metadata selections, including
+inherited timestamps. Emitter tests should expose the latest received metadata on the poller or
+operation rather than waiting for the logical final result.
+Expected calls:
+
+- POST `/jobs:analyze` returns 202 with the initial status-monitor body and polling URI;
+  `statistics` and `errors` are absent
+- GET `/jobs/job-success` returns Running with one succeeded document and an updated timestamp
+- GET `/jobs/job-success` returns Succeeded with three succeeded documents, a newer timestamp,
+  an empty auxiliary `errors` array, and the result
+
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeJobWithFailure
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/jobs/failure:analyze`
+
+Declares a failed Language-shaped job using the same status-monitor model as `analyzeJob`.
+The auxiliary `errors` array contains item-level diagnostics and remains available as metadata
+even though the LRO fails. The separate structural `error` property is not selected as metadata.
+Emitter-specific tests must verify access on the poller or operation after handling its failure.
+Expected calls:
+
+- POST `/jobs/failure:analyze` returns 202 with the initial status-monitor body and polling URI
+- GET `/jobs/job-failure` returns Running with one succeeded document
+- GET `/jobs/job-failure` returns Failed with updated statistics, timestamp, item-level `errors`,
+  and the structural `error`, without a logical result
+
+### Azure_ClientGenerator_Core_Lro_Metadata_analyzeWithUsage
+
+- Endpoint: `post /azure/client-generator-core/lro/metadata/analyzers/{analyzerId}:analyze`
+
+Declares a Content Understanding-shaped flow for emitter tests of property-level
+`@lroStatusMetadata`.
+
+The optional `usage` value is a typed nested model with optional numeric fields and a token
+dictionary. The standard status-monitor `id` remains part of the response model and is not
+selected as auxiliary status metadata. Emitter-specific client tests can assert the generated
+public usage type and runtime value.
+
+Expected calls:
+
+- POST `/analyzers/analyzer-1:analyze` returns 202 with a status-monitor URI
+- GET the status-monitor URI returns a running status with nested `usage`
+- GET the status-monitor URI returns a succeeded status with nested `usage` and the result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_analyze
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/documentModels/{modelId}:analyze`
+
+Declares a legacy Document Intelligence-shaped flow for emitter tests of
+`@lroOperationId` on the status-monitor operation ID path parameter.
+
+The status-monitor body does not model the server-issued result ID. The service returns the
+complete opaque status-monitor URI, including its API-version query, and polling must continue
+with that URI. Emitter-specific client tests can separately expose `analysis-123` as operation
+identity by binding the decorated `resultId` parameter to the returned URI.
+
+Expected calls:
+
+- POST `/documentModels/document-1:analyze` returns 202 with
+  `Operation-Location: {endpoint}/documentModels/document-1/analyzeResults/analysis-123?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status
+- GET that exact status-monitor URI returns a succeeded status with the analysis result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_startTranslation
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start`
+
+Declares a status-body operation ID flow where the polling URI does not contain the identifier. After a poll response, emitters use the operation ID property's segments to read `id` from `TranslationStatus` and expose `translation-123` on the SDK operation or poller. Before that response the ID is unavailable. It is not a request parameter and must not be used to construct the polling URL; polling continues with the complete `Operation-Location` URI. The scenario supplies the HTTP flow; emitter tests must verify their public operation-ID accessor.
+
+Expected calls:
+
+- POST `/translations:start` returns 202 with
+  `Operation-Location: {endpoint}/translations/status?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status with `id: translation-123`
+- GET that exact status-monitor URI returns a succeeded status with the same ID and result
+
+### Azure_ClientGenerator_Core_Lro_OperationId_startTranslationWithPath
+
+- Endpoint: `post /azure/client-generator-core/lro/operation-id/translations:start-with-path`
+
+Declares a Translation-shaped fallback flow with operation identity in both the Operation-Location path and the status-monitor body. Emitters can expose `translation-456` from the polling URI before the first poll, then use the body's `id` once a status response is available. The ID is SDK operation or poller state, not a replacement for the complete polling URI.
+
+Expected calls:
+
+- POST `/translations:start-with-path` returns 202 with
+  `Operation-Location: {endpoint}/translations/operations/translation-456?api-version=2022-12-01-preview`
+- GET that exact status-monitor URI returns a running status with `id: translation-456`
+- GET that exact status-monitor URI returns a succeeded status with the same ID and result
+
+### Azure_ClientGenerator_Core_Lro_Result_createDefault
+
+- Endpoint: `get /azure/client-generator-core/lro/result/default`
+
+Verifies that a resource create-or-replace LRO returns the complete resource even when its polling model defines an `@lroResult` property.
+PUT /default/jobs/default with api-version=2022-12-01-preview and body {"status": "Running"}.
+Expect 201 with an Operation-Location pointing to /default/jobs/default/status.
+Poll until status is Succeeded, then GET /default/jobs/default with the same api-version.
+Expect the complete Job: {"id": "default", "status": "Succeeded", "result": {"value": "completed"}}.
+
+### Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResult
+
+- Endpoint: `get /azure/client-generator-core/lro/result/client-result`
+
+Verifies that `@clientLroResult` can preserve an existing SDK contract that returns the established result property of a resource LRO.
+PUT /client-result/jobs/client-result with api-version=2022-12-01-preview and body {"status": "Running"}.
+Expect 201 with an Operation-Location pointing to /client-result/jobs/client-result/status.
+Poll until status is Succeeded, then GET /client-result/jobs/client-result with the same api-version.
+Expect the selected JobResult: {"value": "completed"}, not the enclosing Job.
+
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
 - Endpoint: `post /azure/client-generator-core/next-link-verb/items`
@@ -1372,6 +1485,29 @@ Expected call:
 
 - HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
 
+### Azure_ClientGenerator_Core_ResponseReplacement_bytesResponse
+
+- Endpoint: `get /azure/client-generator-core/response-replacement/bytes`
+
+Verify that `replaceResponseWithBytes` exposes the raw response bytes from the generated method
+while preserving the JSON service response on the wire.
+Expected response:
+
+- Status: 200
+- Content-Type: application/json
+- Body: {"name":"widget"}
+
+### Azure_ClientGenerator_Core_ResponseReplacement_voidResponse
+
+- Endpoint: `post /azure/client-generator-core/response-replacement/void`
+
+Verify that `replaceResponseWithVoid` removes the generated method response while preserving the
+service response on the wire.
+Expected response:
+
+- Status: 200
+- Body: {"name":"widget"}
+
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
 - Endpoints:
@@ -1393,6 +1529,26 @@ All models within the namespace (including nested sub-namespaces) inherit the us
 'NamespaceModel' and 'NestedNamespaceModel' are orphan models that should be generated
 because their parent namespace has @usage(Usage.input | Usage.json) applied.
 The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
+
+### Azure_Core_ApiVersionOverride_LegacyClient_get
+
+- Endpoint: `get /azure/core/api-version-override/legacy`
+
+Verifies that an API-version override on a child client replaces the default service API version.
+The client call takes no API-version argument and must send the overridden query parameter
+`api-version=2022-10-01` instead of the service version `2025-01-01`.
+
+### Azure_Core_Authentication_Configurations_defaultConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/default`
+
+Supply no configuration or endpoint override. The required public default is not the first declared configuration. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.io/.default to /azure/core/authentication/configurations/oauth2/public/token. Use the returned access_token as a Bearer token for /public/azure/core/authentication/configurations/default and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
+
+### Azure_Core_Authentication_Configurations_governmentConfiguration
+
+- Endpoint: `get /azure/core/authentication/configurations/government`
+
+Select government without overriding the endpoint. Use a credential that exchanges the selected configuration's scopes at its tokenUrl. POST form-encoded grant_type=client_credentials, client_id=mock-client-id, client_secret=mock-client-secret, and scope=https://api.loganalytics.us/.default to /azure/core/authentication/configurations/oauth2/government/token. Use the returned access_token as a Bearer token for /government/azure/core/authentication/configurations/government and expect 204. Both the token exchange and the service request are required; do not use a fixed-token credential.
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -2390,6 +2546,15 @@ Expected response body:
   }
 }
 ```
+
+### Azure_ResourceManager_Example
+
+- Endpoint: `get https://management.azure.com`
+
+Generate management-plane sample code using the unified YAML example at examples.yaml.
+Do not set "examples-dir"; the scenario-local tspconfig.yaml enables discovery.
+Expected sample provenance: examples.yaml#list.
+List widgets in resource group test-rg, returning one widget named widget.
 
 ### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
 

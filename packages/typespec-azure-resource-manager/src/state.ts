@@ -19,6 +19,7 @@ export const ArmStateKeys = {
   externalTypeRef: azureResourceManagerCreateStateSymbol("externalTypeRef"),
   armResourceOperationData: azureResourceManagerCreateStateSymbol("armResourceOperationData"),
   resourceOperationList: azureResourceManagerCreateStateSymbol("resourceOperationList"),
+  armResourceNameExpression: azureResourceManagerCreateStateSymbol("armResourceNameExpression"),
 
   // resource.ts
   armResolvedResources: azureResourceManagerCreateStateSymbol("armResolvedResources"),

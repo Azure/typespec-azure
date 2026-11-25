@@ -1,6 +1,11 @@
 import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getServers, type HttpServer } from "@typespec/http";
+import {
+  type Authentication,
+  getAuthentication,
+  getServers,
+  type HttpServer,
+} from "@typespec/http";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -18,6 +23,7 @@ import {
   type SdkEnumType,
   type SdkHttpOperation,
   type SdkPathParameter,
+  type SdkServiceConfiguration,
   type SdkServiceOperation,
   type SdkUnionType,
   type TCGCContext,
@@ -27,6 +33,7 @@ import {
   createGeneratedName,
   getActualClientType,
   getClientDoc,
+  getClientServiceConfigurations,
   getTypeDecorators,
   getValueTypeValue,
   isSubscriptionId,
@@ -42,6 +49,14 @@ function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType |
     return undefined;
   }
   return context.getPackageVersionSdkEnum().get(client.services[0]);
+}
+
+function getClientAuthentication(
+  context: TCGCContext,
+  client: SdkClient,
+): Authentication | undefined {
+  const service = client.services[0];
+  return service ? getAuthentication(context.program, service) : undefined;
 }
 
 function getEndpointTypeFromSingleServer<
@@ -161,6 +176,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       access: "public",
       usage: UsageFlags.None,
       variantTypes: types,
+      variants: new Map(types.map((type) => [Symbol("variant"), type])),
       name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
       isExactName: false,
@@ -207,7 +223,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     __raw: client,
     kind: "client",
     name,
-    isExactName: client.type ? isExactClientName(context, client.type) : false,
+    isExactName:
+      client.isExactName || (client.type ? isExactClientName(context, client.type) : false),
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
@@ -217,6 +234,9 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
+    // Multiple services currently use the first service for client-level endpoint and credential
+    // metadata. Keep authentication aligned with that behavior.
+    authentication: getClientAuthentication(context, client),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
@@ -238,6 +258,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   }
   // Handle default client parameters (endpoint, credential, api version, subscription id)
   addDefaultClientParameters(context, sdkClientType);
+  const configurations = diagnostics.pipe(getSdkServiceConfigurations(context, sdkClientType));
+  if (configurations) sdkClientType.clientInitialization.serviceConfigurations = configurations;
 
   return diagnostics.wrap(sdkClientType);
 }
@@ -306,6 +328,36 @@ function addDefaultClientParameters<
     ...defaultClientParamters,
     ...client.clientInitialization.parameters,
   ];
+}
+
+function getSdkServiceConfigurations<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  client: SdkClientType<TServiceOperation>,
+): [SdkClientInitializationType["serviceConfigurations"], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const catalog = getClientServiceConfigurations(context, client.__raw);
+  if (!catalog) return diagnostics.wrap(undefined);
+  const configurations: SdkServiceConfiguration[] = [];
+  for (const configuration of catalog.configurations) {
+    const [endpoint] = diagnostics.pipe(
+      getEndpointTypeFromSingleServer(context, client, configuration.server),
+    );
+    configurations.push({
+      name: configuration.name,
+      endpoint: {
+        ...endpoint,
+        serverUrl: configuration.server.url,
+        templateArguments:
+          configuration.server.parameters.size === 0 ? [] : endpoint.templateArguments,
+      },
+      authentication: configuration.authentication,
+      credential: getSdkCredentialParameter(context, client, configuration.authentication),
+    });
+  }
+  return diagnostics.wrap({
+    defaultConfiguration: catalog.defaultConfiguration,
+    configurations,
+  });
 }
 
 function createSdkClientInitializationType<

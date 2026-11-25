@@ -491,6 +491,22 @@ it("duplicate model property with all language scopes", async () => {
   ]);
 });
 
+it("allows a derived property to narrow an inherited client-name property", async () => {
+  await SimpleTester.compile(`
+    @service
+    namespace Contoso.WidgetManager;
+
+    model Base {
+      @clientName("progress")
+      value: string;
+    }
+
+    model Derived extends Base {
+      progress: "complete";
+    }
+  `);
+});
+
 it("duplicate enum member with all language scopes", async () => {
   const diagnostics = await SimpleTester.diagnose(
     `

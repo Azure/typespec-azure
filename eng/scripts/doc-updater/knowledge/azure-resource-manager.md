@@ -155,3 +155,40 @@ The former multi-purpose `arm-resource-operation` checks are represented by thre
 ## Resource Identity Resolution
 
 Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+Identity paths are matched case-insensitively for literal segments and by position for variable segments. A createOrUpdate operation can establish a resource without a read operation; list-only and action-only operation sets cannot.
+
+## ARM Request and Response Rules
+
+- `no-query-in-collection` allows only `api-version` and case-sensitive `$filter` on collection GET operations.
+- `no-query-in-point-op` allows only `api-version` (case-insensitively) on GET, PUT, PATCH, and DELETE resource-instance paths.
+- `no-query-in-post` allows only `api-version` on POST operations; other inputs belong in the request body.
+- `list-response-envelope` requires collection GET operations to use `@list` and checks paging metadata and the standard `value` array and `nextLink` response envelope. Standard ARM list templates supply these. The former `list-operation-missing-pageable` rule ID is retired; migrate configurations and suppressions to `list-response-envelope`.
+- `resource-missing-read` requires a resource with a registered createOrUpdate or update operation to also have a registered read operation.
+- `scope-path-segment-casing` checks every complete path segment case-insensitively and requires exact `subscriptions` and `resourceGroups` casing.
+- `use-application-json-content-type` requires `application/json` request and response bodies in ARM provider namespaces.
+- `use-model-request-body` requires non-multipart request bodies to use plain models without indexers.
+- `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
+- `lro-response-mismatch` validates that PUT and PATCH final results match the resource type, DELETE final results are `void`, and POST final results match successful response bodies.
+
+Do not recommend `ArmTopParameter`, `ArmSkipParameter`, `order-by`, continuation tokens, or other custom query parameters for collection GET examples. Standard ARM list templates supply the required paging metadata; custom list operations need `@list`, `@pageItems`, `@nextLink`, and an envelope containing only `value` and `nextLink`.
+
+Primitive, union, array, and record request bodies are rejected; bodyless and multipart operations are allowed. `ArmResponse<string>` resolves to a non-JSON scalar response; wrap scalar values in a response model.
+
+When these rules are added or promoted, update both the generated linter reference and the manually maintained rule evaluation and RPC coverage guides.
+
+The `lro-response-mismatch` implementation has a detailed adjacent Markdown file but no `docs` association in its TypeScript rule definition. Consequently, `pnpm regen-docs` generates only its short description. Fixing the association requires an edit under `packages/typespec-azure-resource-manager/src/rules/`.
+
+## Long-Running Operation Results
+
+LRO final-result metadata must match operation semantics: PUT and PATCH return the resource, DELETE returns `void`, and POST actions use their response type (or `void` for no-content actions). Standard async templates configure these defaults. When overriding `LroHeaders`, preserve the matching `FinalResult`.
+
+## Feature Files
+
+`ArmFeatureFileOptions.version` optionally selects the API version used for clients generated from that feature file. Empty or whitespace-only values are invalid. This property exists only on the current `Azure.ResourceManager.featureFileOptions`; do not document it on deprecated `Legacy.featureOptions`. Feature files remain restricted to approved brownfield migrations.
+
+The internal `getFeatureFileSet` accessor returns the enum configured by `@featureFiles`, or `undefined` when the decorator is absent. The `arm-feature-file-usage-discourage` rule tests for `undefined`; an empty or otherwise falsey-looking enum state still represents configured feature files.
+
+## Documentation Feedback
+
+Use rendered documentation URLs for canonical sample links and link to canonical samples through the published samples site (`https://azure.github.io/typespec-azure/docs/samples/...`) rather than the repository source tree. In examples, omit every template argument that is equal to its declared default, including inferred `ResourceNameParameter` key, segment, and name-pattern values.

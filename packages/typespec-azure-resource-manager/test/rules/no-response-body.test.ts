@@ -4,7 +4,7 @@ import {
   type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { noResponseBodyRule } from "../../src/rules/no-response-body.js";
 
@@ -185,4 +185,126 @@ it("allows templates but emit on use of the template ", async () => {
       code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
       message: `The body of 202 response should be empty.`,
     });
+});
+
+describe("DELETE response bodies", () => {
+  it("rejects a body-bearing 200 response on a standard synchronous delete", async () => {
+    await tester
+      .expect(
+        `
+          @armProviderNamespace
+          namespace Microsoft.Contoso;
+
+          model Widget is ProxyResource<{}> {
+            ...ResourceNameParameter<Widget>;
+          }
+
+          @armResourceOperations
+          interface Widgets {
+            /*target*/delete is ArmResourceDeleteSync<
+              Widget,
+              Response = (ArmDeletedResponse & { @body body: string; }) | ArmDeletedNoContentResponse
+            >;
+          }
+        `,
+      )
+      .toEmitDiagnostics((result) => ({
+        code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
+        message: "The body of 200 response for DELETE should be empty.",
+        pos: result.pos.target.pos,
+      }));
+  });
+
+  it.each(["@body body: string;", "@bodyRoot body: { value: string };", "value: string;"])(
+    "rejects a DELETE 200 payload declared with %s",
+    async (body) => {
+      await tester
+        .expect(
+          `
+            /*target*/@delete op remove(): {
+              @statusCode statusCode: 200;
+              ${body}
+            };
+          `,
+        )
+        .toEmitDiagnostics((result) => ({
+          code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
+          message: "The body of 200 response for DELETE should be empty.",
+          pos: result.pos.target.pos,
+        }));
+    },
+  );
+
+  it("reports once per violating DELETE status", async () => {
+    await tester
+      .expect(
+        `
+          /*target*/@delete op remove():
+            | { @statusCode statusCode: 200; @body body: string; }
+            | { @statusCode statusCode: 200; @body body: int32; }
+            | { @statusCode statusCode: 204; @bodyRoot body: string; };
+        `,
+      )
+      .toEmitDiagnostics((result) => [
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
+          message: "The body of 200 response for DELETE should be empty.",
+          pos: result.pos.target.pos,
+        },
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
+          message: "The body of 204 response should be empty.",
+          pos: result.pos.target.pos,
+        },
+      ]);
+  });
+
+  it("accepts standard asynchronous delete and header-only responses", async () => {
+    await tester
+      .expect(
+        `
+          @armProviderNamespace
+          namespace Microsoft.Contoso;
+
+          model Widget is ProxyResource<{}> {
+            ...ResourceNameParameter<Widget>;
+          }
+
+          @armResourceOperations
+          interface Widgets {
+            delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+          }
+
+          @route("/header-only") @delete op remove():
+            | { @statusCode statusCode: 200; @header etag: string; }
+            | { @statusCode statusCode: 204; @header etag: string; };
+        `,
+      )
+      .toBeValid();
+  });
+});
+
+it.each([
+  ["delete", 202],
+  ["delete", 204],
+  ["post", 202],
+  ["post", 204],
+])("checks %s bodies for status %s after a bodyless 200 response", async (verb, status) => {
+  await tester
+    .expect(
+      `
+        /*target*/@${verb} op remove():
+          | { @statusCode statusCode: 200; }
+          | { @statusCode statusCode: ${status}; @body body: string; };
+      `,
+    )
+    .toEmitDiagnostics((result) => ({
+      code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
+      message: `The body of ${status} response should be empty.`,
+      pos: result.pos.target.pos,
+    }));
+});
+
+it.each(["get", "post", "put"])("accepts non-DELETE 200 response bodies for %s", async (verb) => {
+  await tester.expect(`@${verb} op read(): { @body body: string; };`).toBeValid();
 });

@@ -356,3 +356,52 @@ export async function download(
   return addStorageCompatResponse(_storageCompat.getRawResponse()!, parsedBody, parsedHeaders);
 }
 ```
+
+# Storage compat response wrapping for optional response body
+
+When an operation can return either a body response (200) or an empty response (204),
+the generated storage-compat return type must include both body-present and body-absent branches.
+
+## TypeSpec
+
+```yaml
+enable-storage-compat: true
+include-headers-in-response: true
+```
+
+```tsp
+model Widget {
+  name: string;
+}
+
+@get
+op getWidget():
+  | {
+      @statusCode statusCode: 200;
+      @header("x-request-id") requestId?: string;
+      @body body: Widget;
+    }
+  | {
+      @statusCode statusCode: 204;
+      @header("x-request-id") requestId?: string;
+    };
+```
+
+```ts operations function getWidget
+export async function getWidget(
+  context: Client,
+  options: GetWidgetOptionalParams = { requestOptions: {} },
+): Promise<
+  | ({ requestId?: string } & Widget & StorageCompatResponseInfo<Widget, { requestId?: string }>)
+  | ({ requestId?: string } & StorageCompatResponseInfo<void, { requestId?: string }>)
+> {
+  const _storageCompat = createStorageCompatOnResponse(options.onResponse);
+  const result = await _getWidgetSend(context, {
+    ...options,
+    onResponse: _storageCompat.onResponse,
+  });
+  const parsedBody = await _getWidgetDeserialize(result);
+  const parsedHeaders = _getWidgetDeserializeHeaders(result);
+  return addStorageCompatResponse(_storageCompat.getRawResponse()!, parsedBody, parsedHeaders);
+}
+```

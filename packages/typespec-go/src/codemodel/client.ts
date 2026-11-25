@@ -187,7 +187,7 @@ export type FinalStateVia =
 export type HTTPMethod = "delete" | "get" | "head" | "patch" | "post" | "put";
 
 /** the possible method types */
-export type MethodType = LROMethod | LROPageableMethod | SyncMethod | PageableMethod;
+export type MethodType = LROMethod | LROPageableMethod | SseMethod | SyncMethod | PageableMethod;
 
 /** a long-running operation method */
 export interface LROMethod extends LROMethodBase {
@@ -206,8 +206,13 @@ export interface SyncMethod extends HttpMethodBase {
 
 /** contains the names of the helper methods used to create a complete method implementation */
 export interface MethodNaming {
-  /** the name of the internal method for consumption by LROs/paging methods */
-  internalMethod: string;
+  /**
+   * the unadulterated method name (no prefix/suffix).
+   * for LROs the name is camel cased (i.e. not exported).
+   * all other methods are pascal cased unless they're
+   * explicitly marked as internal.
+   */
+  operationMethod: string;
 
   /** the name of the internal method that creates the HTTP request */
   requestMethod: string;
@@ -283,6 +288,11 @@ export interface PageableStrategyNextLink {
   method?: NextPageMethod;
 }
 
+/** a synchronous method that returns SSE */
+export interface SseMethod extends HttpMethodBase {
+  kind: "sseMethod";
+}
+
 /** narrows method to a LRO method type within the conditional block */
 export function isLROMethod(method: MethodType): method is LROMethod | LROPageableMethod {
   return method.kind === "lroMethod" || method.kind === "lroPageableMethod";
@@ -317,6 +327,8 @@ interface LROMethodBase extends HttpMethodBase {
   finalStateVia?: FinalStateVia;
 
   operationLocationResultPath?: string;
+
+  finalResponseResultPath: string[];
 }
 
 interface HttpMethodBase extends method.Method<Client, result.ResponseEnvelope> {
@@ -465,6 +477,7 @@ export class LROMethod extends HttpMethodBase implements LROMethod {
   ) {
     super(name, client, httpPath, httpMethod, statusCodes, naming);
     this.kind = "lroMethod";
+    this.finalResponseResultPath = [];
   }
 }
 
@@ -480,6 +493,21 @@ export class LROPageableMethod extends HttpMethodBase implements LROPageableMeth
     super(name, client, httpPath, httpMethod, statusCodes, naming);
     this.kind = "lroPageableMethod";
     this.nextLinkVerb = "get";
+    this.finalResponseResultPath = [];
+  }
+}
+
+export class SseMethod extends HttpMethodBase implements SseMethod {
+  constructor(
+    name: string,
+    client: Client,
+    httpPath: string,
+    httpMethod: HTTPMethod,
+    statusCodes: Array<number>,
+    naming: MethodNaming,
+  ) {
+    super(name, client, httpPath, httpMethod, statusCodes, naming);
+    this.kind = "sseMethod";
   }
 }
 
@@ -498,8 +526,8 @@ export class SyncMethod extends HttpMethodBase implements SyncMethod {
 }
 
 export class MethodNaming implements MethodNaming {
-  constructor(internalMethod: string, requestMethod: string, responseMethod: string) {
-    this.internalMethod = internalMethod;
+  constructor(operationMethod: string, requestMethod: string, responseMethod: string) {
+    this.operationMethod = operationMethod;
     this.requestMethod = requestMethod;
     this.responseMethod = responseMethod;
   }

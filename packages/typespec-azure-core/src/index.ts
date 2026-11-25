@@ -5,6 +5,11 @@ export { $linter } from "./linter.js";
 
 export { diffKinds, isDiffKind, type DiffKind } from "./breaking-change-kinds.js";
 export * from "./decorators.js";
+export {
+  getAzureServiceConfigurations,
+  type AzureServiceConfiguration,
+  type AzureServiceConfigurations,
+} from "./decorators/azure-service-configurations.js";
 export * from "./decorators/breaking-change.js";
 export { extractLroStates } from "./decorators/lro-status.js";
 export {
@@ -12,6 +17,10 @@ export {
   type OperationLink,
   type OperationLinkMetadata,
 } from "./decorators/operation-link.js";
+export {
+  getApiVersionOverride,
+  getEffectiveApiVersionOverride,
+} from "./decorators/override-api-version.js";
 export { isPreviewVersion } from "./decorators/preview-version.js";
 export {
   getArmResourceIdentifierConfig,

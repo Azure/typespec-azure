@@ -66,7 +66,7 @@ Given a PATCH operation, for example:
 
 ```tsp
 interface Widgets {
-  update is ArmResourcePatchAsync<Widget, WidgetProperties>;
+  update is ArmCustomPatchAsync<Widget, WidgetPatch>;
 }
 ```
 
@@ -156,13 +156,7 @@ You can generally choose an asynchronous operation template that matches your op
   op update is ArmTagsPatchAsync<Resource>;
   ```
 
-- `ArmResourcePatchAsync` is a PATCH operation that uses the visibility settings to select properties for the PATCH request body (any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
-
-  ```tsp
-  op update is ArmResourcePatchAsync<Resource, ResourceProperties>;
-  ```
-
-- `ArmCustomPatchAsync` is a PATCH operation that allows you to customize the PATCH request body.
+- `ArmCustomPatchAsync` is a PATCH operation that allows you to customize the PATCH request body. It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
 
   ```tsp
   op update is ArmCustomPatchAsync<Resource, PatchRequestBody>;

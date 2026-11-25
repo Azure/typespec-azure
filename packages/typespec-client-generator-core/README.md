@@ -60,6 +60,12 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
+### `use-client-name-for-friendly-name-source`
+
+**Type:** `boolean`
+
+Use scoped `@clientName` overrides on source types when resolving `@friendlyName` templates. Default value is `true`. Set to `false` to preserve names based on the original TypeSpec source names.
+
 ### `api-version`
 
 **Type:** `string | object`
@@ -91,7 +97,9 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
+Overrides the directory for legacy JSON example files. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+**Caution:** explicitly setting this option disables unified YAML discovery. See [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).
 
 ### `namespace`
 
@@ -118,13 +126,20 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                                                                                                                                                  | Description                                                                                     |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)               | Client names should end with 'Client'.                                                          |
-| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)             | Avoid naming conflicts between a property and a model of the same name.                         |
-| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
-| [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                   | Model names should use recommended suffixes for C# SDKs.                                        |
-| [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms) | C# SDK names should use standard acronym casing.                                                |
+| Name                                                                                                                                                                                                          | Description                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-client-generator-core/use-correct-verb`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-correct-verb)                                 | PUT, PATCH, and DELETE SDK method names should start with 'create', 'update', and 'delete', respectively.                                                           |
+| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)                       | Client names should end with 'Client'.                                                                                                                              |
+| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)                     | Avoid naming conflicts between a property and a model of the same name.                                                                                             |
+| [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                         | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions.                                                                     |
+| [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                           | Model names should use recommended suffixes for C# SDKs.                                                                                                            |
+| [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms)         | C# SDK names should use standard acronym casing.                                                                                                                    |
+| [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                             | GET SDK method names should use 'Get' or 'List' as the verb prefix.                                                                                                 |
+| [`@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-operation-group-name-conflict) | Operation group names should not conflict with type names in the same namespace.                                                                                    |
+| [`@azure-tools/typespec-client-generator-core/use-union-hierarchy`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-union-hierarchy)                           | Named unions other than string unions should declare an extends constraint, with model variants inheriting from the base and belonging to only one union hierarchy. |
+| [`@azure-tools/typespec-client-generator-core/use-valid-client-lro-result`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result)           | LRO client results should follow the operation's protocol result contract.                                                                                          |
+| [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
+| [`@azure-tools/typespec-client-generator-core/unsupported-scope`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/unsupported-scope)                               | Use supported scopes for TCGC decorators.                                                                                                                           |
 
 ## Decorators
 
@@ -138,11 +153,15 @@ Available ruleSets:
 - [`@clientDoc`](#@clientdoc)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientLocation`](#@clientlocation)
+- [`@clientLroResult`](#@clientlroresult)
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
 - [`@clientOption`](#@clientoption)
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
+- [`@dynamicModel`](#@dynamicmodel)
+- [`@lroOperationId`](#@lrooperationid)
+- [`@lroStatusMetadata`](#@lrostatusmetadata)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
@@ -674,7 +693,7 @@ The operation to change location for.
 
 | Name   | Type                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| target | `Interface \| Namespace \| Operation` \| `valueof string`       | The target `Namespace`, `Interface` or a string which can indicate the client. Use `exact("name")` to preserve the exact casing of a string target in generated client code.                                                                                                                                                                                                                                                                                                                                                                                                              |
 | scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
@@ -721,6 +740,13 @@ interface ProductOperations {
 }
 ```
 
+###### Move to a sub client with exact casing
+
+```typespec
+@clientLocation(exact("vMHost"), "javascript")
+op listVMHosts(): string[];
+```
+
 ###### Move operation to root client
 
 ```typespec
@@ -757,6 +783,44 @@ getHealthStatus(
 // client.tsp
 
 @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
+```
+
+#### `@clientLroResult`
+
+Customizes the final result returned by generated clients for a long-running operation without changing the service protocol.
+
+Pass the status-monitor or final response model to return the whole response body. Pass a direct property of the status-monitor model to return that property's value.
+
+See the [LRO result customization guideline](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/guideline/#customizing-lro-results) for more information.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLroResult(result: Model | ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The long-running operation to customize.
+`Operation`
+
+##### Parameters
+
+| Name   | Type                                                            | Description                                                                     |
+| ------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| result | `Model \| ModelProperty`                                        | The response model or status-monitor property to return from generated clients. |
+| scope  | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                                         |
+
+##### Examples
+
+###### Return an action's whole status monitor
+
+```typespec
+@@clientLroResult(start, ActionStatus);
+```
+
+###### Return a property of an action's status monitor
+
+```typespec
+@@clientLroResult(start, ActionStatus.result);
 ```
 
 #### `@clientName`
@@ -997,6 +1061,107 @@ model MyModel {
 }
 ```
 
+#### `@dynamicModel`
+
+Adds dynamic-model metadata to a model or namespace for opted-in SDK emitters.
+A dynamic model represents updates as JSON Patch operations rather than a replacement of the full model.
+In C# generation, a marked model exposes patch-aware properties and a `JsonPatch`-backed `Patch` API.
+This shared decorator provides opt-in metadata pending emitter adoption; it does not itself generate JSON Patch fields.
+
+```typespec
+@Azure.ClientGenerator.Core.dynamicModel(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The model or namespace to mark as dynamic.
+`Model | Namespace`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                                                                                                                        |
+| ----- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies which emitters receive this metadata. Must explicitly include "csharp"; missing or unsupported scopes produce a warning. |
+
+##### Examples
+
+###### Mark a model as dynamic
+
+```typespec
+@dynamicModel("csharp")
+model Pet {
+  name: string;
+}
+```
+
+###### Mark a namespace for C# dynamic-model metadata
+
+```typespec
+@dynamicModel("csharp")
+namespace PetStore {
+  model Pet {
+    name: string;
+  }
+}
+```
+
+#### `@lroOperationId`
+
+Identifies a server-issued long-running operation identifier exposed by a legacy service through
+either the status-monitor URI or its response body. This compatibility metadata does not drive
+polling and is distinct from a caller-supplied `Operation-Id` API parameter. Conforming services
+with modeled operation identity do not need this decorator. Emitters choose their idiomatic
+accessor and storage.
+
+```typespec
+@Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The operation identifier path parameter on the linked status-monitor operation, or
+a string-like property on its response model.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
+#### `@lroStatusMetadata`
+
+Marks a status-monitor model property as transient polling data that the SDK should expose to
+callers while the long-running operation is in progress, for scenarios like reporting progress,
+usage, or job statistics. Emitters whose operations return only the final result, such as Python
+and JavaScript, would otherwise need handwritten code to surface these values; marked properties
+appear on the emitter's idiomatic poller or operation object instead. The property does not affect
+polling, status evaluation, errors, or final-result extraction.
+
+Values come from the most recent status-monitor response the SDK has received, including the
+initial response when it contains the status-monitor model. Any value may be absent until a
+response containing it arrives. Metadata remains exposed on failed or canceled terminal responses.
+Emitters should keep these values current after each poll. Metadata is not part of the
+continuation token; after rehydration, the next poll populates it again.
+
+Multiple declarations use the standard TCGC scope rules, including overlapping scopes.
+Each selected property appears only once in the metadata collection.
+
+```typespec
+@Azure.ClientGenerator.Core.lroStatusMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+##### Target
+
+The status-monitor model property.
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
 #### `@operationGroup`
 
 Define the sub client generated in the client SDK.
@@ -1030,8 +1195,10 @@ interface MyInterface {}
 #### `@override`
 
 Customize a method's signature in the generated client SDK.
-Currently, only parameter signature customization is supported.
-This decorator allows you to specify a different method signature for the client SDK than the original definition.
+The override operation defines the client method parameters, but its declared return type is
+ignored. To intentionally replace the generated method response, pass an operation returned by
+`replaceResponseWithVoid` or `replaceResponseWithBytes`; these functions preserve the original
+HTTP response metadata.
 
 ```typespec
 @Azure.ClientGenerator.Core.override(override: Operation, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)

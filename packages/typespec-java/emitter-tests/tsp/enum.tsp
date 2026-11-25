@@ -8,10 +8,12 @@ using Azure.ClientGenerator.Core;
 @service(#{ title: "EnumService" })
 namespace TspTest.EnumService;
 
+#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
 enum Color {
   Red,
   Blue,
   Green,
+  CommentTerminator: "*/",
 }
 
 union ColorModel {
@@ -23,6 +25,7 @@ union ColorModel {
 union ColorModelBase {
   string,
   Red: "Red",
+  CommentTerminator: "*/",
 }
 
 union ReasoningEffort {
@@ -44,17 +47,20 @@ union OlympicRecordModel {
   Olympic_200_Meters: 19.30,
 }
 
+#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
 enum Priority {
   High: 100,
   Low: 0,
 }
 
+#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
 enum Unit {
   Grams: 1,
   KiloGrams: 0.001,
   Milligram: 1000,
 }
 
+#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
 enum OperationStateValues {
   Running,
   Completed,

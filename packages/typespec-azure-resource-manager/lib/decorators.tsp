@@ -322,6 +322,9 @@ model ArmFeatureFileOptions {
 
   /** The feature terms of service in Swagger */
   termsOfService?: string;
+
+  /** The API version to use for clients generated from this feature file */
+  version?: string;
 }
 
 /**

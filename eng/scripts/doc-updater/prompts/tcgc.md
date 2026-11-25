@@ -121,19 +121,25 @@ Spector specs must cover all TCGC features — both decorator customizations and
 
 **Then, fill every gap.** Work through the list. Use the test cases you studied in Step 1 as the basis — the test inputs and expected outputs tell you exactly what to demonstrate. Group related scenarios into a single spec where it makes sense. Follow existing patterns and the guidelines in `.github/prompts/testserver-generation.md`.
 
-After creating all specs, **run the full validation sequence** from `packages/azure-http-specs`:
+After creating all specs, **run the full validation sequence** — first from `packages/azure-http-specs`:
 
 ```
-pnpm build && pnpm validate-mock-apis && pnpm cspell && pnpm format && pnpm lint && pnpm regen-docs
+pnpm build && pnpm validate-mock-apis && pnpm regen-docs
+```
+
+Then from the repository root:
+
+```
+pnpm cspell && pnpm format && pnpm lint
 ```
 
 ### Step 4: Finalize
 
 You should only reach this step after completing Steps 1–3.
 
-> ⚠️ **IMPORTANT:** If you added or modified any Spector specs in `packages/azure-http-specs/specs/`, you **MUST** run `pnpm change add` from the repo root and add a changeset for `@typespec/azure-http-specs` with type "new feature". The CI will fail without this changeset.
+> ⚠️ **IMPORTANT:** If you added or modified any Spector specs in `packages/azure-http-specs/specs/`, you **MUST** run `pnpm change add` from the repo root and add a changeset for `@azure-tools/azure-http-specs` with type `feature`. The CI will fail without this changeset.
 
-Run `pnpm change add` from the repo root to record changelog entries for any modified packages.
+Run `pnpm change add` from the repo root if any non-Markdown files in versioned packages (such as `lib/*.tsp` or `packages/azure-http-specs/specs/`) were modified.
 
 ## Quality Guidelines
 

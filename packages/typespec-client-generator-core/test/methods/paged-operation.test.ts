@@ -15,6 +15,42 @@ import {
 } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
+it("preserves nested paging paths separately from an LRO result property", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service namespace TestService;
+    model Item { value: string; }
+    model Page {
+      nested: { @pageItems items: Item[]; };
+      @TypeSpec.nextLink next?: string;
+    }
+    model Status {
+      @lroStatus status: "Succeeded" | "Failed" | "Canceled";
+      @lroResult result: Page;
+    }
+    @list @route("/jobs") @post op start(): {
+      @pollingLocation @header("Operation-Location") location: ResourceLocation<Status>;
+      @body body: Page;
+    };
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  strictEqual(method.kind, "lropaging");
+  strictEqual(method.response.type?.kind, "array");
+  deepStrictEqual(
+    method.response.resultSegments?.map((p) => p.name),
+    ["nested", "items"],
+  );
+  strictEqual(method.pagingMetadata.pageItemsSegments, method.response.resultSegments);
+  deepStrictEqual(
+    method.lroMetadata.finalResponse?.resultSegments?.map((p) => p.name),
+    ["result"],
+  );
+  strictEqual(method.lroMetadata.finalResponse?.result.kind, "model");
+  strictEqual(method.lroMetadata.finalResponse.result.name, "Page");
+  ok("__raw_lro_metadata" in method);
+  strictEqual(method.__raw_lro_metadata, method.lroMetadata.__raw);
+});
+
 it("normal paged result", async () => {
   const { program } = await SimpleTesterWithService.compile(`
     @list

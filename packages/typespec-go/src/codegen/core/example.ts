@@ -76,7 +76,7 @@ export function generateExamples(
         exampleText += `// Generated from example definition: ${example.filePath}\n`;
         const exampleFuncNamePrefix =
           method.examples.length > 1 ? `_${helpers.camelCase(example.name)}` : "";
-        exampleText += `func Example${client.name}_${helpers.fixUpMethodName(method)}${exampleFuncNamePrefix}() {\n`;
+        exampleText += `func Example${client.name}_${method.name}${exampleFuncNamePrefix}() {\n`;
 
         // create credential
         exampleText += `${indent.get()}cred, err := azidentity.NewDefaultAzureCredential(nil)\n`;
@@ -177,7 +177,7 @@ export function generateExamples(
         const methodOptionalParameters = example.optionalParamsGroup.filter(
           (p) => p.parameter.location === "method",
         );
-        const checkResponse = example.responseEnvelope !== undefined;
+        const checkResponse = example.responseEnvelope !== undefined || method.kind === "sseMethod";
 
         let methodOptionalParametersText = "nil";
         if (methodOptionalParameters.length > 0) {
@@ -194,7 +194,7 @@ export function generateExamples(
         switch (method.kind) {
           case "lroMethod":
           case "lroPageableMethod":
-            exampleText += `${indent.get()}poller, err := ${clientRef}.${helpers.fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}poller, err := ${clientRef}.${method.name}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
@@ -205,13 +205,19 @@ export function generateExamples(
             exampleText += `${indent.pop().get()}}\n`;
             break;
           case "method":
-            exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${helpers.fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+          case "sseMethod":
+            exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${method.name}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
+            if (method.kind === "sseMethod") {
+              exampleText += `${indent.get()}defer func() {\n`;
+              exampleText += `${indent.push().get()}_ = res.Stream.Close()\n`;
+              exampleText += `${indent.pop().get()}}()\n`;
+            }
             break;
           case "pageableMethod":
-            exampleText += `${indent.get()}pager := ${clientRef}.${helpers.fixUpMethodName(method)}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}pager := ${clientRef}.${method.name}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             break;
           default:
             method satisfies never;
@@ -228,7 +234,7 @@ export function generateExamples(
           }
           const itemType = (
             (method as go.PageableMethod).returns.result as go.ModelResult
-          ).modelType.fields.find((f) => f.type.kind === "slice")!;
+          ).type.fields.find((f) => f.type.kind === "slice")!;
           exampleText += `${indent.get()}for ${resultName}.More() {\n`;
           exampleText += `${indent.push().get()}page, err := ${resultName}.NextPage(ctx)\n`;
           exampleText += `${indent.get()}if err != nil {\n`;
@@ -281,9 +287,9 @@ export function generateExamples(
               ? fieldName
               : (example.responseEnvelope?.result.type as go.Model).name;
             if (method.returns.result?.kind === "monomorphicResult") {
-              resultByValue = method.returns.result.monomorphicType.kind !== "ptr";
+              resultByValue = method.returns.result.type.kind !== "ptr";
             } else if (method.returns.result?.kind === "polymorphicResult") {
-              resultFieldName = method.returns.result.interface.name;
+              resultFieldName = method.returns.result.type.name;
               resultByValue = false;
             }
             exampleText += `${indent.get()}// \t${resultFieldName}: ${getExampleValue(pkg, example.responseEnvelope.result, "", undefined, resultByValue).split("\n").join(`\n${indent.get()}// \t`)},\n`;
@@ -365,10 +371,11 @@ function getExampleValue(
     case "any":
       return jsonToGo(example.value, indent);
     case "array": {
-      const isElementByValue = example.type.elementType.kind !== "ptr";
+      imports?.addForType(example.type);
+      const isElementByValue = example.type.itemType.kind !== "ptr";
       // if polymorphic, need to add type name in array, so inArray will be set to false
       // if other case, no need to add type name in array, so inArray will be set to true
-      const isElementPolymorphic = example.type.elementType.kind === "interface";
+      const isElementPolymorphic = example.type.itemType.kind === "interface";
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       for (const element of example.value) {
         exampleText += `${getExampleValue(pkg, element, indent + "\t", imports, isElementByValue && !isElementPolymorphic, !isElementPolymorphic)},\n`;
@@ -377,9 +384,10 @@ function getExampleValue(
       return exampleText;
     }
     case "dictionary": {
+      imports?.addForType(example.type);
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
-      const isValueByValue = example.type.valueType.kind !== "ptr";
-      const isValuePolymorphic = example.type.valueType.kind === "interface";
+      const isValueByValue = example.type.itemType.kind !== "ptr";
+      const isValuePolymorphic = example.type.itemType.kind === "interface";
       for (const key in example.value) {
         exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic).slice(indent.length + 1)},\n`;
       }
@@ -387,12 +395,31 @@ function getExampleValue(
       return exampleText;
     }
     case "model": {
+      // Response comments omit imports and keep nil instead of azcore.NullValue.
+      const isRequest = imports !== undefined;
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       if (inArray) {
         exampleText = `${indent}{\n`;
       }
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
+        const fieldExample = example.value[field];
+        const isNullField =
+          fieldExample.kind === "null" ||
+          (fieldExample.kind === "any" && fieldExample.value === null);
+        if (isRequest && isNullField) {
+          // NullValue[T] requires a concrete pointer, slice, or map type.
+          const nullType =
+            goField.type.kind === "interface"
+              ? new go.Ptr(getConcreteInterfaceModel(goField.type))
+              : goField.type;
+          imports?.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+          imports?.addForType(nullType);
+          const nullTypeName =
+            nullType.kind === "any" ? "*any" : go.getTypeDeclaration(nullType, pkg);
+          exampleText += `${indent}\t${field}: azcore.NullValue[${nullTypeName}](),\n`;
+          continue;
+        }
         const isFieldByValue = goField.type.kind !== "ptr";
         const isFieldPolymorphic = goField.type.kind === "interface";
         exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic).slice(indent.length + 1)},\n`;
@@ -402,10 +429,10 @@ function getExampleValue(
           go.isAdditionalProperties(f),
         )!;
         const isAdditionalPropertiesFieldByValue =
-          additionalPropertiesField.type.valueType.kind !== "ptr";
+          additionalPropertiesField.type.itemType.kind !== "ptr";
         const isAdditionalPropertiesPolymorphic =
-          additionalPropertiesField.type.valueType.kind === "interface";
-        exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(isAdditionalPropertiesFieldByValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
+          additionalPropertiesField.type.itemType.kind === "interface";
+        exampleText += `${indent}\t${additionalPropertiesField.name}: ${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
           exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
         }
@@ -774,11 +801,18 @@ function generateFakeExample(goType: go.Type, name?: string): go.ExampleType {
       // return an empty map example for map types
       return new go.DictionaryExample(goType);
     case "interface":
-      // for interface types, use the root type (which is a PolymorphicModel) to create an example
-      return new go.StructExample(goType.rootType);
+      return new go.StructExample(getConcreteInterfaceModel(goType));
     default:
       throw new CodegenError("InternalError", `unhandled fake example kind ${goType.kind}`);
   }
+}
+
+function getConcreteInterfaceModel(goType: go.Interface): go.PolymorphicModel {
+  const model = goType.rootType ?? goType.possibleTypes[0];
+  if (!model) {
+    throw new CodegenError("InternalError", `no concrete type for interface ${goType.name}`);
+  }
+  return model;
 }
 
 function escapeString(str: string): string {
@@ -815,8 +849,25 @@ function isParamByValue(p: go.ParameterExample): boolean {
  */
 function shouldRenderParam(param: go.MethodParameter, example: go.MethodExample): boolean {
   if (go.isLiteralParameter(param.style)) return false;
-  if (example.parameters.find((p) => p.parameter.name === param.name)) return true;
+  if (findParamExample(param, example)) return true;
   return go.isRequiredParameter(param.style);
+}
+
+/**
+ * Finds a parameter's example by identity, or by group identity and field name for required groups.
+ * Shared groups retain the first operation's field objects, so later operations need the fallback.
+ */
+function findParamExample(
+  param: go.MethodParameter,
+  example: go.MethodExample,
+): go.ParameterExample | undefined {
+  return example.parameters.find(
+    (p) =>
+      p.parameter === param ||
+      (param.group?.required &&
+        p.parameter.group === param.group &&
+        p.parameter.name === param.name),
+  );
 }
 
 /**
@@ -830,7 +881,7 @@ function getParamExampleValue(
   example: go.MethodExample,
   imports: ImportManager,
 ): string {
-  const paramExample = example.parameters.find((p) => p.parameter.name === param.name);
+  const paramExample = findParamExample(param, example);
   if (paramExample) {
     return getExampleValue(
       pkg,
@@ -841,5 +892,11 @@ function getParamExampleValue(
     ).slice(1);
   }
   const fakeValue = generateFakeExample(param.type, param.name);
-  return getExampleValue(pkg, fakeValue, "\t", imports, param.type.kind !== "ptr").slice(1);
+  return getExampleValue(
+    pkg,
+    fakeValue,
+    "\t",
+    imports,
+    isParamByValue({ parameter: param, value: fakeValue }),
+  ).slice(1);
 }

@@ -90,6 +90,8 @@ export async function _createDeserialize(result: PathUncheckedResponse): Promise
 
   return;
 }
+
+/** Performs the create operation. */
 export async function create(
   context: Client,
   ssvArray: number[],
@@ -132,6 +134,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   simpleArray: string[],
@@ -207,6 +211,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<v
 
   return;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   ssvArray: number[],

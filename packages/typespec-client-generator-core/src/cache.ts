@@ -10,6 +10,7 @@ import {
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
+import { normalizeExactName } from "./functions.js";
 import type { SdkClient, TCGCContext } from "./interfaces.js";
 import {
   clientKey,
@@ -108,6 +109,13 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           // operation with `@clientLocation` decorator is placed in another client
           if (context.__rawClientsCache.has(clientLocation)) {
             pushClient = context.__rawClientsCache.get(clientLocation)!;
+            const operationService =
+              client.services.length > 1
+                ? findServiceForOperation(client.services, op)
+                : client.services[0];
+            if (operationService && !pushClient.services.includes(operationService)) {
+              pushClient.services.push(operationService);
+            }
           } else {
             reportDiagnostic(context.program, {
               code: "client-location-wrong-type",
@@ -386,7 +394,6 @@ function createVirtualSubClientsFromClientLocation(
 ): void {
   if (clients.length === 0) return;
 
-  const newSubClientWithServices = new Map<string, Namespace[]>();
   listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
     // only deal with mutated types or without mutation
     if (
@@ -404,9 +411,10 @@ function createVirtualSubClientsFromClientLocation(
           return;
         }
 
+        const { name, isExactName } = normalizeExactName(v);
         // Check if a sub client with this name already exists, only check first level for string target
         const existingSc = clients[0].subClients.find(
-          (sc) => sc.type && getLibraryName(context, sc.type) === v,
+          (sc) => (sc.type ? getLibraryName(context, sc.type) : sc.name) === name,
         );
 
         const operationService =
@@ -415,6 +423,9 @@ function createVirtualSubClientsFromClientLocation(
             : clients[0].services[0];
 
         if (existingSc) {
+          if (isExactName) {
+            existingSc.isExactName = true;
+          }
           // Sub client already exists - check if moving this operation would create a multi-service situation
           if (!existingSc.services.includes(operationService)) {
             existingSc.services.push(operationService);
@@ -424,35 +435,22 @@ function createVirtualSubClientsFromClientLocation(
           return;
         }
 
-        if (newSubClientWithServices.has(v)) {
-          // Add the service to the list if it's not already there
-          const services = newSubClientWithServices.get(v)!;
-          if (!services.includes(operationService)) {
-            services.push(operationService);
-          }
-        } else {
-          newSubClientWithServices.set(v, [operationService]);
-        }
+        const sc: SdkClient = {
+          kind: "SdkClient",
+          name,
+          isExactName,
+          clientPath: `${clients[0].name}.${name}`,
+          services: [operationService],
+          type: undefined, // virtual sub client has no backing type
+          subClients: [],
+          parent: clients[0],
+        };
+        context.__rawClientsCache!.set(v, sc);
+        clients[0].subClients.push(sc);
+        context.__clientToOperationsCache!.set(sc, []);
       }
     }
   });
-
-  if (newSubClientWithServices.size > 0) {
-    newSubClientWithServices.forEach((services, scName) => {
-      const sc: SdkClient = {
-        kind: "SdkClient",
-        name: scName,
-        clientPath: `${clients[0].name}.${scName}`,
-        services,
-        type: undefined, // virtual sub client has no backing type
-        subClients: [],
-        parent: clients[0],
-      };
-      context.__rawClientsCache!.set(scName, sc);
-      clients[0].subClients.push(sc);
-      context.__clientToOperationsCache!.set(sc, []);
-    });
-  }
 }
 
 function handleMultipleServicesSubClientNameConflict(

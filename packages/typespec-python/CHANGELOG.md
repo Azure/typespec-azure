@@ -1,5 +1,29 @@
 # Release
 
+## 0.63.12
+
+No changes, version bump only.
+
+## 0.63.11
+
+- Bump `@typespec/http-client-python` to 0.40.0
+
+## 0.63.10
+
+- Bump @typespec/http-client-python to 0.39.0
+
+## 0.63.9
+
+- Bump @typespec/http-client-python to 0.38.1 and bump latest typespec lib version
+
+## 0.63.8
+
+- Bump @typespec/http-client-python to 0.37.3
+
+## 0.63.7
+
+- Bump @typespec/http-client-python to 0.37.2
+
 ## 0.63.6
 
 ### Bug Fixes

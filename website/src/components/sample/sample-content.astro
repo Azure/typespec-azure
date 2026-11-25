@@ -23,21 +23,19 @@ const hasMultipleFiles = sortedFiles.length > 1;
 
 <p>{sample.description}</p>
 
-{
-  hasMultipleFiles ? (
-    <EditorTabs>
-      {sortedFiles.map(([fileName, content]) => (
-        <TabItem label={fileName}>
-          <Code lang="typespec" code={content} />
-        </TabItem>
-      ))}
-    </EditorTabs>
-  ) : (
-    <Code
-      lang="typespec"
-      title="main.tsp"
-      meta={`tryit="${JSON.stringify({ emit: ["@azure-tools/typespec-autorest"] })}"`}
-      code={sample.files["main.tsp"]!}
-    />
-  )
-}
+{hasMultipleFiles ? (
+  <EditorTabs>
+    {sortedFiles.map(([fileName, content]) => (
+      <TabItem label={fileName}>
+        <Code lang="typespec" code={content} />
+      </TabItem>
+    ))}
+  </EditorTabs>
+) : (
+  <Code
+    lang="typespec"
+    title="main.tsp"
+    meta={`tryit="${JSON.stringify({ emit: ["@azure-tools/typespec-autorest"] })}"`}
+    code={sample.files["main.tsp"]!}
+  />
+)}

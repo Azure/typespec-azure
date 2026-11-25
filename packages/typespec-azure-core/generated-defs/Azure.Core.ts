@@ -10,18 +10,68 @@ import type {
   Operation,
   Scalar,
   Type,
+  TypeRefValue,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
 
+/**
+ * A deployment's HTTP endpoint and OAuth authentication requirements.
+ */
+export interface AzureServiceConfiguration {
+  /**
+   * The server URL or URL template, as accepted by `@server`.
+   */
+  readonly endpoint: string;
+  /**
+   * A reference to authentication models, an OR union, or an AND tuple, as accepted by `@useAuth`.
+   */
+  readonly authentication: TypeRefValue;
+  /**
+   * A reference to the parameter model used in the endpoint URL template.
+   */
+  readonly parameters?: TypeRefValue;
+  /**
+   * Description of the server.
+   */
+  readonly description?: string;
+}
+
+/**
+ * Options for the approvedBreakingChange decorator.
+ */
 export interface ApprovedBreakingChangeOptions {
+  /**
+   * Optional DiffKind filter (e.g., "ResponsePropertyRemoved").
+   */
   readonly kind?: string;
+  /**
+   * Optional version lower bound — suppression applies when head version >= since.
+   */
   readonly since?: string;
+  /**
+   * Identity path from the suppression site to the violation target.
+   * Required when the suppression is not on the target node itself.
+   * Uses dot-separated segments matching the finding's element path
+   * (e.g., "body.properties.legacy", "query.filter", "properties.name").
+   */
   readonly path?: string;
 }
 
+/**
+ * Options for the approvedUnversionedChange decorator.
+ */
 export interface ApprovedUnversionedChangeOptions {
+  /**
+   * Optional DiffKind filter (e.g., "ResponsePropertyRemoved").
+   */
   readonly kind?: string;
+  /**
+   * Identity path from the suppression site to the violation target.
+   * Required when the suppression is not on the target node itself.
+   * Uses dot-separated segments matching the finding's element path
+   * (e.g., "city", "properties.name").
+   */
   readonly path?: string;
 }
 
@@ -58,6 +108,98 @@ export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   options?: Type,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Pairs named HTTP server endpoints with OAuth authentication configurations.
+ *
+ * Requires a `public` configuration, which is always the default regardless of declaration order. Calls `@server` for each configuration, with `public` first, and exposes the combined OR of HTTP authentication requirements. Existing AND groups and credential alternatives are preserved.
+ *
+ * The HTTP view exposes servers and auth alternatives independently. Azure Core metadata retains their pairing and the `public` default for SDK generation.
+ *
+ * Every configuration must include OAuth2, but OAuth flows, URLs, scopes, and authentication requirements may differ between configurations. Use ordinary HTTP authentication models. Do not combine this decorator with `@server` or `@useAuth` on the same namespace.
+ *
+ * OAuth URL metadata does not change a caller-owned credential's authority or tenant.
+ *
+ * Declare a value record and use `typeref(...)` to reference authentication types and endpoint parameter models. Enable the experimental `typeref` compiler feature in the consuming project's `tspconfig.yaml`:
+ *
+ * ```yaml
+ * kind: project
+ * features:
+ *   - typeref
+ * ```
+ *
+ * @param target The namespace using these configurations.
+ * @param configurations The named endpoint and authentication records.
+ * @example
+ * ```typespec
+ * model PublicAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.io/.default"],
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+ * >;
+ * model GovernmentAuth is AadOauth2Auth<
+ *   ["https://api.loganalytics.us/.default"],
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/authorize",
+ *   "https://login.microsoftonline.us/common/oauth2/v2.0/token"
+ * >;
+ *
+ * const Configurations: Record<AzureServiceConfiguration> = #{
+ *   public: #{
+ *     endpoint: "https://api.loganalytics.io",
+ *     authentication: typeref(PublicAuth),
+ *   },
+ *   government: #{
+ *     endpoint: "https://api.loganalytics.us",
+ *     authentication: typeref(GovernmentAuth),
+ *   },
+ * };
+ *
+ * @service
+ * @azureServiceConfigurations(Configurations)
+ * namespace Logs {
+ *   @get op query(): string;
+ * }
+ * ```
+ * @example Parameterized endpoint
+ *
+ * Declare endpoint parameters inline with `parameters: typeref({ ... })`, using the same property types and defaults as `@server`. Here, `account` is required and `region` defaults to `"westus"`.
+ *
+ * ```typespec
+ * import "@typespec/http";
+ * import "@azure-tools/typespec-azure-core";
+ *
+ * using TypeSpec.Http;
+ * using Azure.Core;
+ *
+ * model ServiceAuth is AadOauth2Auth<["https://example.com/.default"]>;
+ *
+ * const Configurations: Record<AzureServiceConfiguration> = #{
+ *   public: #{
+ *     endpoint: "https://{account}.{region}.example.com",
+ *     authentication: typeref(ServiceAuth),
+ *     parameters: typeref({
+ *       @doc("Account name.")
+ *       account: string;
+ *
+ *       @doc("Deployment region.")
+ *       region?: string = "westus";
+ *     }),
+ *     description: "Regional service endpoint",
+ *   },
+ * };
+ *
+ * @service
+ * @azureServiceConfigurations(Configurations)
+ * namespace RegionalService {
+ *   @get op read(): string;
+ * }
+ * ```
+ */
+export type AzureServiceConfigurationsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  configurations: Record<string, AzureServiceConfiguration>,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -208,7 +350,7 @@ export type UniqueItemsDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * Marks a breaking change as intentionally approved for cross-version (Phase B) comparison.
+ * Marks a breaking change as intentionally approved for cross-version comparison.
  *
  * When placed on a type, property, operation, or namespace, it suppresses
  * the matching breaking-change finding in the tool output.
@@ -234,10 +376,10 @@ export type ApprovedBreakingChangeDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- * Marks a same-version (Phase A) structural difference as intentionally approved.
+ * Marks a same-version structural difference as intentionally approved.
  *
- * Phase A compares two compilations of the same version. Any diff indicates a
- * version projection inconsistency. Use this decorator only when the inconsistency
+ * A same-version comparison uses two compilations of the same API version. Any difference
+ * indicates a version projection inconsistency. Use this decorator only when the inconsistency
  * is known and accepted (e.g., during a refactoring migration).
  *
  * @param reason A required explanation of why the unversioned change is approved.
@@ -264,6 +406,7 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
+  azureServiceConfigurations: AzureServiceConfigurationsDecorator;
   previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;

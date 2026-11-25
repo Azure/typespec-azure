@@ -26,6 +26,8 @@ export interface AutorestEmitterContext {
   readonly outputFile: string;
   readonly tcgcSdkContext: TCGCContext;
   readonly version?: string;
+  /** The service's full ordered list of API versions (used to resolve unified examples). */
+  readonly versions?: readonly string[];
   readonly proxy?: OpenApi2DocumentProxy;
   readonly multiService: boolean;
 }

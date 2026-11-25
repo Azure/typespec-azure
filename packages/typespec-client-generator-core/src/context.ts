@@ -17,7 +17,7 @@ import {
   type Type,
   type Union,
 } from "@typespec/compiler";
-import type { HttpOperation } from "@typespec/http";
+import type { Authentication, HttpAuth, HttpOperation } from "@typespec/http";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -71,6 +71,7 @@ export function createTCGCContext(
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
+    convertDiscriminatedUnionsToModels: true,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
     __referencedTypeCache: new Map<
@@ -83,6 +84,8 @@ export function createTCGCContext(
     __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
+    __clientLroMetadataCache: new Map(),
+    __lroStatusMetadataCache: new Map(),
     __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),
     __clientApiVersionDefaultValueCache: new Map(),
@@ -173,6 +176,8 @@ export interface CreateSdkContextOptions {
   exportTCGCoutput?: boolean; // this flag is for emitter to export TCGC output as yaml file
   flattenUnionAsEnum?: boolean; // this flag is for emitter to decide whether tcgc should flatten union as enum
   enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
+  /** Convert eligible inline-discriminated unions to model hierarchies. Default: true. */
+  convertDiscriminatedUnionsToModels?: boolean;
 }
 
 export async function createSdkContext<
@@ -238,6 +243,7 @@ export async function createSdkContext<
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
+    convertDiscriminatedUnionsToModels: options?.convertDiscriminatedUnionsToModels ?? true,
   };
 
   if (context.options["examples-dir"]) {
@@ -253,9 +259,7 @@ export async function createSdkContext<
     }
   }
   sdkContext.sdkPackage = diagnostics.pipe(await createSdkPackage(sdkContext));
-  for (const client of sdkContext.sdkPackage.clients) {
-    diagnostics.pipe(await handleClientExamples(sdkContext, client));
-  }
+  diagnostics.pipe(await handleClientExamples(sdkContext, sdkContext.sdkPackage.clients));
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   // Validate duplicate operation names in clients (e.g., from multi-service merge or sub-client merge).
@@ -349,6 +353,16 @@ function validateOperationNamesInClients(context: SdkContext) {
 }
 
 async function exportTCGCOutput(context: SdkContext) {
+  const serializeAuthScheme = (auth: HttpAuth) => {
+    const { model, ...rest } = auth;
+    return rest;
+  };
+  const serializeAuthentication = (authentication: Authentication) => ({
+    options: authentication.options.map((option) => ({
+      schemes: option.schemes.map(serializeAuthScheme),
+    })),
+  });
+
   await emitFile(context.program, {
     path: resolvePath(context.emitContext.emitterOutputDir, "tcgc-output.yaml"),
     content: stringify(
@@ -357,7 +371,15 @@ async function exportTCGCOutput(context: SdkContext) {
         if (typeof k === "string" && k.startsWith("__")) {
           return undefined; // skip keys starting with "__" from the output
         }
-        if (k === "scheme") {
+        if (
+          k === "authentication" &&
+          typeof v === "object" &&
+          v !== null &&
+          Array.isArray(v.options)
+        ) {
+          return serializeAuthentication(v);
+        }
+        if (k === "scheme" && typeof v === "object" && v !== null && "model" in v) {
           const { model, ...rest } = v;
           return rest; // remove credential schema's model property
         }
@@ -365,6 +387,12 @@ async function exportTCGCOutput(context: SdkContext) {
           return undefined; // remove raw example
         }
         if (v instanceof Map) {
+          if (k === "variants") {
+            return [...v].map(([name, type]) => ({
+              name: typeof name === "string" ? name : undefined,
+              type,
+            }));
+          }
           return Object.fromEntries(v);
         }
         return v;

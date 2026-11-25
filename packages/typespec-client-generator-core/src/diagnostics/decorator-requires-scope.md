@@ -7,6 +7,7 @@ This diagnostic is issued when a TCGC decorator that requires a language scope i
   - `@convenientAPI` — must be scoped to `"java"` and/or `"csharp"` (both `true` and `false` values require a scope)
   - `@protocolAPI` — must be scoped to `"java"` and/or `"csharp"` (both `true` and `false` values require a scope)
   - `@clientOption` — must be scoped to any specific language
+  - `@dynamicModel` — must explicitly include `"csharp"` in its scope; applies to the shared `Azure.ClientGenerator.Core` decorator, not the legacy C# decorator
 
 ## ❌ Incorrect Usage
 
@@ -25,6 +26,9 @@ op yetAnotherOperation(): void;
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
 @clientOption("enableFeatureFoo", true)
 model Widget {}
+
+@dynamicModel
+model Pet {}
 ```
 
 ## Diagnostic Message
@@ -35,6 +39,7 @@ TCGC reports:
 @convenientAPI should be applied with a language scope of "java" or "csharp".
 @protocolAPI should be applied with a language scope of "java" or "csharp".
 @clientOption should be applied with a language scope of a language scope.
+@dynamicModel should be applied with a language scope of "csharp".
 ```
 
 ## ✅ How to Fix
@@ -57,6 +62,14 @@ op protocolOperation(): void;
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "temporary workaround"
 @clientOption("enableFeatureFoo", true, "python")
 model Widget {}
+
+@dynamicModel("csharp")
+model Pet {}
+
+@dynamicModel(#{ scope: "csharp" })
+namespace PetStore {
+
+}
 ```
 
 ## Suppression

@@ -1,6 +1,8 @@
 import {
+  type AzureServiceConfigurations,
   FinalStateValue,
-  getLroMetadata,
+  getAzureServiceConfigurations,
+  getEffectiveApiVersionOverride,
   isPreviewVersion,
   type LroMetadata,
 } from "@azure-tools/typespec-azure-core";
@@ -42,14 +44,13 @@ import {
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  type Authentication,
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
+  getServers,
   type HttpOperation,
   type HttpOperationResponseContent,
   type HttpPayloadBody,
-  type HttpServer,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -87,6 +88,7 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
+import { getClientLroMetadataWithDiagnostics } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -102,6 +104,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
+  "use-client-name-for-friendly-name-source"?: boolean;
   "api-version"?: ApiVersionConfig;
   license?: {
     name: string;
@@ -128,6 +131,7 @@ export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 export const responseOverrideKey = createStateSymbol("responseOverride");
+export const clientLroResultKey = createStateSymbol("clientLroResult");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
@@ -202,6 +206,71 @@ export function normalizeScope(scope?: LanguageScopes | DecoratorOptions): strin
   if (scope === undefined) return undefined;
   if (typeof scope === "string") return scope;
   return scope.scope;
+}
+
+/**
+ * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
+ * client-parameters model is passed directly as the second argument.
+ *
+ * Detection is based on model provenance rather than the model name alone:
+ * - The structural options `parameters` and `initializedBy` are declared only on
+ *   `ClientInitializationOptions`, so their presence unambiguously identifies the options bag
+ *   (this covers the common inline literal form `{ parameters: ..., scope: ... }`).
+ * - A *named* model that explicitly derives from `ClientInitializationOptions` through its
+ *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
+ *   ClientInitializationOptions { scope: "csharp"; }`).
+ *
+ * The provenance check follows `baseModel` (`extends`) as well as `sourceModel`/`sourceModels`
+ * (`model is`, `PickProperties`/`OmitProperties` and other spread-based transformations), so a named
+ * model derived from `ClientInitializationOptions` through any of those is still recognized.
+ *
+ * Anonymous model expressions are intentionally excluded from the provenance check: the compiler links
+ * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
+ * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
+ * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
+ * client-parameters model keeps its `scope` property a real client parameter, preserving backward
+ * compatibility for that previously supported form.
+ */
+export function isClientInitializationOptionsBag(options: Type): boolean {
+  if (options.kind !== "Model") {
+    return false;
+  }
+  if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
+    return true;
+  }
+  if (options.name === "") {
+    return false;
+  }
+  return derivesFromClientInitializationOptions(options);
+}
+
+/**
+ * Whether a model is `ClientInitializationOptions` (from `Azure.ClientGenerator.Core`) or derives
+ * from it through any combination of `extends` (`baseModel`) and `model is` / spread provenance
+ * (`sourceModel`/`sourceModels`).
+ */
+function derivesFromClientInitializationOptions(model: Model): boolean {
+  const visited = new Set<Model>();
+  const stack: (Model | undefined)[] = [model];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (current === undefined || visited.has(current)) {
+      continue;
+    }
+    visited.add(current);
+    if (
+      current.name === "ClientInitializationOptions" &&
+      current.namespace !== undefined &&
+      getNamespaceFullName(current.namespace) === "Azure.ClientGenerator.Core"
+    ) {
+      return true;
+    }
+    stack.push(current.baseModel, current.sourceModel);
+    for (const source of current.sourceModels) {
+      stack.push(source.model);
+    }
+  }
+  return false;
 }
 
 /**
@@ -372,7 +441,29 @@ export function updateWithApiVersionInformation(
   clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
-  if (!isApiVersionParam || !client) {
+  if (!isApiVersionParam) {
+    return { isApiVersionParam, clientDefaultValue: undefined };
+  }
+
+  let apiVersionOverride: string | undefined;
+  if (operation) {
+    let declaration: Operation | undefined = operation;
+    while (declaration && apiVersionOverride === undefined) {
+      apiVersionOverride = getEffectiveApiVersionOverride(context.program, declaration);
+      declaration = declaration.sourceOperation;
+    }
+  } else if (client) {
+    apiVersionOverride = getEffectiveApiVersionOverride(
+      context.program,
+      getActualClientType(client),
+    );
+  }
+
+  if (apiVersionOverride !== undefined) {
+    return { isApiVersionParam, clientDefaultValue: apiVersionOverride };
+  }
+
+  if (!client) {
     return { isApiVersionParam, clientDefaultValue: undefined };
   }
 
@@ -613,7 +704,10 @@ function getDecoratorArgValue(
 ): [any, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
-    if (arg.kind === "EnumMember" || arg.kind === "Model") {
+    if (
+      arg.kind === "EnumMember" ||
+      (arg.kind === "Model" && decoratorName === "Azure.ClientGenerator.Core.@clientOption")
+    ) {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg as any)));
     }
     if (
@@ -1293,7 +1387,7 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
  * Retrieves Long Running Operation (LRO) metadata for a given operation.
  *
  * This function serves as a wrapper that:
- * 1. First tries to get LRO metadata using the `getLroMetadata` function from the Azure Core library
+ * 1. Selects the native client result from Azure Core's LRO protocol facts
  * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
  *    and return a mock LRO metadata object if the operation is marked as LRO
  *
@@ -1306,7 +1400,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
-  const lroMetaData = getLroMetadata(context.program, operation);
+  const lroMetaData = ignoreDiagnostics(getClientLroMetadataWithDiagnostics(context, operation));
   if (lroMetaData) {
     return lroMetaData;
   }
@@ -1352,130 +1446,16 @@ export function getActualClientType(client: SdkClient): Namespace | Interface {
   return client.services[0];
 }
 
-export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
-  if (left.length !== right.length) {
-    return false;
-  }
-  for (let i = 0; i < left.length; i++) {
-    if (left[i].url !== right[i].url) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function isSameAuth(left: Authentication, right: Authentication): boolean {
-  if (left.options.length !== right.options.length) {
-    return false;
-  }
-  for (let i = 0; i < left.options.length; i++) {
-    if (left.options[i].schemes.length !== right.options[i].schemes.length) {
-      return false;
-    }
-    for (let j = 0; j < left.options[i].schemes.length; j++) {
-      const leftScheme = left.options[i].schemes[j];
-      const rightScheme = right.options[i].schemes[j];
-      if (leftScheme.type !== rightScheme.type) {
-        return false;
-      }
-      switch (leftScheme.type) {
-        case "http":
-          compilerAssert(rightScheme.type === "http", "Unexpected auth scheme type mismatch");
-          if (leftScheme.scheme !== rightScheme.scheme) {
-            return false;
-          }
-          break;
-        case "apiKey":
-          compilerAssert(rightScheme.type === "apiKey", "Unexpected auth scheme type mismatch");
-          if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
-            return false;
-          }
-          break;
-        case "oauth2":
-          compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
-          if (leftScheme.flows.length !== rightScheme.flows.length) {
-            return false;
-          }
-          for (let k = 0; k < leftScheme.flows.length; k++) {
-            const leftFlow = leftScheme.flows[k];
-            const rightFlow = rightScheme.flows[k];
-            if (leftFlow.type !== rightFlow.type) {
-              return false;
-            }
-            if (leftFlow.scopes.length !== rightFlow.scopes.length) {
-              return false;
-            }
-            for (let l = 0; l < leftFlow.scopes.length; l++) {
-              if (leftFlow.scopes[l].value !== rightFlow.scopes[l].value) {
-                return false;
-              }
-            }
-            switch (leftFlow.type) {
-              case "authorizationCode":
-                compilerAssert(
-                  rightFlow.type === "authorizationCode",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "clientCredentials":
-                compilerAssert(
-                  rightFlow.type === "clientCredentials",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "implicit":
-                compilerAssert(
-                  rightFlow.type === "implicit",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-              case "password":
-                compilerAssert(
-                  rightFlow.type === "password",
-                  "Unexpected auth scheme type mismatch",
-                );
-                if (
-                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
-                  leftFlow.refreshUrl !== rightFlow.refreshUrl
-                ) {
-                  return false;
-                }
-                break;
-            }
-          }
-          break;
-        case "openIdConnect":
-          compilerAssert(
-            rightScheme.type === "openIdConnect",
-            "Unexpected auth scheme type mismatch",
-          );
-          if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
-            return false;
-          }
-          break;
-      }
-    }
-  }
-  return true;
+export function getClientServiceConfigurations(
+  context: TCGCContext,
+  client: SdkClient,
+): AzureServiceConfigurations | undefined {
+  const service = client.services[0];
+  const catalog = getAzureServiceConfigurations(context.program, service);
+  // Do not inherit a catalog whose server is not declared on this service.
+  return getServers(context.program, service)?.[0] === catalog?.configurations[0].server
+    ? catalog
+    : undefined;
 }
 
 export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {

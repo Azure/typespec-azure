@@ -26,7 +26,6 @@ import {
   getParentResource,
   getSegment,
 } from "@typespec/rest";
-import { pascalCase } from "change-case";
 import type {
   ArmResourceActionDecorator,
   ArmResourceCheckExistenceDecorator,
@@ -45,11 +44,18 @@ import type {
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
 import {
+  evaluateResourceNameExpression,
+  getDefaultLegacyExtensionResourceName,
+  getDefaultLegacyResourceName,
+  getResourceNameExpression,
+  getStandardResourceNameExpression,
+  setResourceNameExpression,
+} from "./resource-name.js";
+import {
   getArmResourceInfo,
   getResourceBaseType,
   isArmVirtualResource,
   isCustomAzureResource,
-  parseArmResourceInstancePath,
   ResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -194,8 +200,10 @@ function setResourceLifecycleOperation(
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
   const operations = getArmResourceOperations(context.program, resourceType);
-  const resolvedResourceName: string = resourceName ?? resourceType.name;
-  const operation: Partial<ArmResourceOperation> = {
+  const resourceNameExpression = getStandardResourceNameExpression(resourceType, resourceName);
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : resourceType.name;
+  const operation: Partial<ArmResourceOperationData> = {
     name: target.name,
     kind,
     operation: target,
@@ -221,6 +229,7 @@ function setResourceLifecycleOperation(
     resourceName: resolvedResourceName,
   };
   addArmResourceOperation(context.program, resourceType, operationId);
+  setResourceNameExpression(context.program, target, resourceNameExpression);
 }
 
 export const [getArmOperationList, setArmOperationList] = useStateMap<
@@ -334,8 +343,10 @@ export const $armResourceList: ArmResourceListDecorator = (
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
   const operations = getArmResourceOperations(context.program, resourceType);
-  const resolvedResourceName: string = resourceName ?? resourceType.name;
-  const operation: Partial<ArmResourceOperation> = {
+  const resourceNameExpression = getStandardResourceNameExpression(resourceType, resourceName);
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : resourceType.name;
+  const operation: Partial<ArmResourceOperationData> = {
     name: target.name,
     kind: "list",
     operation: target,
@@ -361,6 +372,7 @@ export const $armResourceList: ArmResourceListDecorator = (
     resourceModelName: resourceType.name,
     resourceName: resolvedResourceName,
   });
+  setResourceNameExpression(context.program, target, resourceNameExpression);
 };
 
 export function armRenameListByOperationInternal(
@@ -473,8 +485,10 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
   const operations = getArmResourceOperations(program, resourceType);
-  const resolvedResourceName: string = resourceName ?? resourceType.name;
-  const operation: Partial<ArmResourceOperation> = {
+  const resourceNameExpression = getStandardResourceNameExpression(resourceType, resourceName);
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : resourceType.name;
+  const operation: Partial<ArmResourceOperationData> = {
     name: target.name,
     kind: "action",
     operation: target,
@@ -500,6 +514,7 @@ export const $armResourceAction: ArmResourceActionDecorator = (
     resourceModelName: resourceType.name,
     resourceName: resolvedResourceName,
   });
+  setResourceNameExpression(program, target, resourceNameExpression);
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);
   if (!segment) {
@@ -686,53 +701,25 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
   };
 }
 
-export function getDefaultLegacyExtensionResourceName(path: string, resourceName: string): string {
-  const providerIndex = path.lastIndexOf("/providers");
-  if (providerIndex > -1 && providerIndex < path.length - 1) {
-    const targetPath = path.slice(0, providerIndex);
-    const extensionPath = path.slice(providerIndex);
-    const extensionInfo = parseArmResourceInstancePath(extensionPath);
-    if (!extensionInfo) return resourceName;
-    const extensionName = extensionInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
-    if (targetPath.length === 0) {
-      return extensionName;
-    }
-    if (targetPath.length === 1) {
-      return `${pascalCase(targetPath[0].replaceAll("{", "").replaceAll("}", ""))}${extensionName}`;
-    }
-    const targetInfo = parseArmResourceInstancePath(targetPath);
-    if (!targetInfo || targetInfo.resourceType.types.length === 0) return resourceName;
-    const types = targetInfo.resourceType.types;
-    return `${pascalCase(types[types.length - 1])}${extensionName}`;
-  }
-  return resourceName;
-}
+export { getDefaultLegacyExtensionResourceName } from "./resource-name.js";
 
-function getDefaultLegacyResourceName(operation: ArmResourceOperationData, httpOp: string): string {
-  const pathInfo = parseArmResourceInstancePath(httpOp);
-  if (pathInfo !== undefined) {
-    let types: string[] = pathInfo.resourceType.types;
-    if (types.length > 1) {
-      types = types.slice(types.length - 2);
-    }
-    return types.flatMap((t) => pascalCase(t)).join("");
-  } else {
-    return operation.resourceModelName;
-  }
-}
 export function getResourceNameForOperation(
   program: Program,
   operation: ArmResourceOperationData,
   operationPath: string,
 ): string | undefined {
-  if (operation.resourceName !== undefined && operation.resourceName.length > 0)
+  const expression = getResourceNameExpression(program, operation.operation);
+  if (expression !== undefined) {
+    return evaluateResourceNameExpression(expression, operationPath);
+  }
+  if (operation.resourceName !== undefined && operation.resourceName.length > 0) {
     return operation.resourceName;
+  }
   if (operation.resourceKind === "legacy-extension") {
     return getDefaultLegacyExtensionResourceName(operationPath, operation.resourceModelName);
   }
   if (operation.resourceKind === "legacy") {
-    return getDefaultLegacyResourceName(operation, operationPath);
+    return getDefaultLegacyResourceName(operation.resourceModelName, operationPath);
   }
-
   return undefined;
 }

@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging -- codemodel intentionally merges interface and class declarations of the same name to define its public API shape. */
 
-import * as path from "path";
+import { getBaseFileName } from "@typespec/compiler";
 import * as client from "./client.js";
 import * as result from "./result.js";
 import * as type from "./type.js";
@@ -92,7 +92,7 @@ export function getPackageName(pkg: FakePackage | PackageContent | TestPackage):
     case "fake":
       return pkg.kind;
     case "module":
-      return path.basename(pkg.identity.replace(/\/v\d+$/, ""));
+      return getBaseFileName(pkg.identity.replace(/\/v\d+$/, ""));
     case "package":
       return pkg.name;
     case "test":

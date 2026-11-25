@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging -- codemodel intentionally merges interface and class declarations of the same name to define its public API shape. */
 
-import * as path from "path";
+import { getBaseFileName } from "@typespec/compiler";
 import { Client, ClientOptions } from "./client.js";
 import { type PackageContent, type PackageType, getPackageName } from "./module.js";
 import { ParameterGroup } from "./param.js";
@@ -45,6 +45,7 @@ export type WireType =
   | Scalar
   | Slice
   | SliceArray
+  | SSEReader
   | String
   | Time
   | UnionStruct;
@@ -154,8 +155,8 @@ export interface Interface {
   /** does this polymorphic type have a parent (e.g. SalmonClassification has parent FishClassification) */
   parent?: Interface;
 
-  /**  this is the "root" type in the list of polymorphic types (e.g. Fish for FishClassification) */
-  rootType: PolymorphicModel;
+  /** the base model, if this interface represents a model hierarchy rather than a union */
+  rootType?: PolymorphicModel;
 
   /** the package to which this type belongs */
   pkg: PackageContent;
@@ -189,16 +190,16 @@ export interface Map<T extends MapValueType = MapValueType> {
 
   /**
    * the type of values in the map.
-   * note that the type is always pointer-to-type
-   * unless the type is implicitly nil-able.
+   * model/body maps normally use pointers; parameter maps can use values.
    */
-  valueType: T;
+  itemType: T;
 }
 
 /** the set of map value types */
 export type MapValueType =
   | Any
   | EncodedBytes
+  | Exclude<PtrType, ETag | Literal | MultipartContent>
   | Interface
   | Map
   | Ptr<Exclude<PtrType, ETag | Literal>>
@@ -222,8 +223,8 @@ export interface ModelField extends StructField {
   /** the value to send over the wire if one isn't specified */
   defaultValue?: Literal;
 
-  /** any XML metadata */
-  xml?: XMLInfo;
+  /** contains XML-specific serde info */
+  xmlKind?: XMLKind;
 }
 
 /** additional settings for a model type */
@@ -349,7 +350,10 @@ export interface Slice<T extends SliceElementType = SliceElementType> {
   kind: "slice";
 
   /** the element type for this slice */
-  elementType: T;
+  itemType: T;
+
+  /** the XML name for the elements */
+  xmlName?: string;
 }
 
 /** the set of slice element types */
@@ -358,6 +362,7 @@ export type SliceElementType =
   | Constant
   | EncodedBytes
   | Interface
+  | Literal<Constant | Scalar | String>
   | Map
   | Model
   | MultipartContent
@@ -378,7 +383,7 @@ export interface SliceArray {
   kind: "sliceArray";
 
   /** the element type for this slice */
-  elementType: SliceArrayElementType;
+  itemType: SliceArrayElementType;
 
   /** the delimiter used to separate elements */
   delimiter: SliceArrayDelimiter;
@@ -392,6 +397,39 @@ export type SliceArrayElementType = SliceArrayElementWireType | Ptr<SliceArrayEl
 
 /** the set of slice array wire types */
 export type SliceArrayElementWireType = Constant | String;
+
+/** describes the server-sent event (SSE) modeled by a union variant */
+export interface SseEvent {
+  /**
+   * the value of the SSE event field used to identify this event.
+   * undefined for unnamed variants which are message events.
+   */
+  name?: string;
+
+  /** indicates that receiving this event terminates the stream */
+  terminal: boolean;
+
+  /** the format of the event's data field */
+  format: SseEventFormat;
+
+  /**
+   * set when the variant type is an event envelope. the data field contains only
+   * the event payload which is deserialized into this field of the envelope.
+   * when unset, the data field contains the complete variant type.
+   */
+  envelopeField?: ModelField;
+}
+
+/** the set of formats for an SSE event's data field */
+export type SseEventFormat = "JSON" | "Text";
+
+/** the streaming.SSEReader type in azcore */
+export interface SSEReader extends QualifiedType {
+  kind: "sseReader";
+
+  /** the union of possible events */
+  eventType: UnionStruct;
+}
 
 /** a Go string */
 export interface String {
@@ -446,6 +484,9 @@ export interface TokenCredential extends QualifiedType {
 export interface UnionField extends StructField {
   /** the variant's underlying type */
   type: UnionVariantType;
+
+  /** contains SSE specific info for this variant */
+  sse?: SseEvent;
 }
 
 /** a Go struct modeling a non-discriminated union where exactly one field is set */
@@ -454,6 +495,18 @@ export interface UnionStruct extends StructBase {
 
   /** the variant fields of the union. exactly one is populated at runtime */
   fields: Array<UnionField>;
+
+  /** usage flags for this type */
+  usage: UnionStructFlags;
+}
+
+/** bit flags indicating how a union type is used */
+export enum UnionStructFlags {
+  /** used as a sum type */
+  SumType = 1,
+
+  /** used in SSE */
+  SseType = 2,
 }
 
 /**
@@ -480,27 +533,8 @@ export enum UsageFlags {
   Output = 2,
 }
 
-/** metadata used for XML serde */
-export interface XMLInfo {
-  /** element name to use instead of the default name */
-  name?: string;
-
-  /**
-   * name propagated to the generated wrapper type.
-   * this is used solely in method bodies to generate
-   * a "type wrapper struct" with the specified name.
-   */
-  wrapper?: string;
-
-  /** slices only. this is the name of the wrapped type */
-  wraps?: string;
-
-  /** value is an XML attribute */
-  attribute: boolean;
-
-  /** value is raw text */
-  text: boolean;
-}
+/** XMLKind contains info used for generating XML-specific serde */
+export type XMLKind = "attribute" | "text" | "unwrappedList";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // helpers
@@ -596,14 +630,14 @@ export function getTypeDeclaration(
     case "literal":
       return getTypeDeclaration(type.type, scope);
     case "map":
-      return `map[string]${getTypeDeclaration(type.valueType, scope)}`;
+      return `map[string]${getTypeDeclaration(type.itemType, scope)}`;
     case "ptr":
       return `${instance ? "&" : "*"}${getTypeDeclaration(type.ptrType, scope)}`;
     case "scalar":
       return type.type;
     case "slice":
     case "sliceArray":
-      return `[]${getTypeDeclaration(type.elementType, scope)}`;
+      return `[]${getTypeDeclaration(type.itemType, scope)}`;
     case "time":
       return "time.Time";
     case "armClientOptions":
@@ -612,9 +646,34 @@ export function getTypeDeclaration(
     case "readCloser":
     case "readSeekCloser":
     case "tokenCredential":
-      // strip module to just the leaf package as required
-      return `${byRef}${path.basename(type.module)}.${type.name}`;
+      return `${byRef}${getQualifiedTypeDecl(type)}`;
+    case "sseReader":
+      return `*${getQualifiedTypeDecl(type)}[${getTypeDeclaration(type.eventType, scope)}]`;
   }
+}
+
+/**
+ * returns a type name qualified by the leaf package name of its module
+ *
+ * @param qualifiedType the type to render
+ * @returns the package-qualified type declaration
+ */
+function getQualifiedTypeDecl(qualifiedType: QualifiedType): string {
+  // strip module to just the leaf package as required
+  return `${getBaseFileName(qualifiedType.module)}.${qualifiedType.name}`;
+}
+
+/**
+ * returns the XML name for the provided type or undefined
+ *
+ * @param type the type to inspect for XMLInfo
+ * @returns the XMLInfo or undefined
+ */
+export function hasXMLName(type: WireType): string | undefined {
+  if ("xmlName" in type) {
+    return type.xmlName;
+  }
+  return undefined;
 }
 
 /** narrows the field to the model's JSON additional properties bucket, whose type is always a map */
@@ -663,8 +722,8 @@ export function isMap<T extends MapValueType["kind"] | MapPtrType["kind"] = MapV
   }
   return (
     kinds.length === 0 ||
-    (kinds as Array<string>).includes(type.valueType.kind) ||
-    (kinds as Array<string>).includes(unwrapPtr(type.valueType).kind)
+    (kinds as Array<string>).includes(type.itemType.kind) ||
+    (kinds as Array<string>).includes(unwrapPtr(type.itemType).kind)
   );
 }
 
@@ -709,8 +768,8 @@ export function isSlice<
   }
   return (
     kinds.length === 0 ||
-    (kinds as Array<string>).includes(type.elementType.kind) ||
-    (kinds as Array<string>).includes(unwrapPtr(type.elementType).kind)
+    (kinds as Array<string>).includes(type.itemType.kind) ||
+    (kinds as Array<string>).includes(unwrapPtr(type.itemType).kind)
   );
 }
 
@@ -797,8 +856,11 @@ interface ModelBase extends StructBase {
   /** usage flags for this model */
   usage: UsageFlags;
 
-  /** any XML metadata */
-  xml?: XMLInfo;
+  /**
+   * the name of the type over the wire if it's
+   * different from the type's name.
+   */
+  xmlName?: string;
 }
 
 class StructBase implements StructBase {
@@ -880,9 +942,8 @@ export class ETag extends QualifiedType implements ETag {
 }
 
 export class Interface implements Interface {
-  // WireTypes and rootType are required. however, we have a chicken-and-egg
-  // problem as creating a PolymorphicType requires the necessary InterfaceType.
-  // so these fields MUST be populated after creating the InterfaceType.
+  // Creating a PolymorphicModel requires its Interface, so possibleTypes and
+  // the optional rootType are populated after creating the Interface.
   constructor(pkg: PackageContent, name: string, discriminatorField: string) {
     this.kind = "interface";
     this.name = name;
@@ -902,9 +963,9 @@ export class Literal<T> implements Literal<T> {
 }
 
 export class Map<T extends MapValueType = MapValueType> implements Map<T> {
-  constructor(valueType: T) {
+  constructor(itemType: T) {
     this.kind = "map";
-    this.valueType = valueType;
+    this.itemType = itemType;
   }
 }
 
@@ -1009,17 +1070,32 @@ export class Scalar<T extends ScalarType = ScalarType> implements Scalar<T> {
 }
 
 export class Slice<T extends SliceElementType = SliceElementType> implements Slice<T> {
-  constructor(elementType: T) {
+  constructor(itemType: T) {
     this.kind = "slice";
-    this.elementType = elementType;
+    this.itemType = itemType;
   }
 }
 
 export class SliceArray implements SliceArray {
-  constructor(elementType: SliceArrayElementType, delimiter: SliceArrayDelimiter) {
+  constructor(itemType: SliceArrayElementType, delimiter: SliceArrayDelimiter) {
     this.kind = "sliceArray";
-    this.elementType = elementType;
+    this.itemType = itemType;
     this.delimiter = delimiter;
+  }
+}
+
+export class SseEvent implements SseEvent {
+  constructor(format: SseEventFormat, terminal: boolean) {
+    this.format = format;
+    this.terminal = terminal;
+  }
+}
+
+export class SSEReader extends QualifiedType implements SSEReader {
+  constructor(eventType: UnionStruct) {
+    super("SSEReader", "github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
+    this.kind = "sseReader";
+    this.eventType = eventType;
   }
 }
 
@@ -1043,9 +1119,10 @@ export class UnionField extends StructField implements UnionField {
 }
 
 export class UnionStruct extends StructBase implements UnionStruct {
-  constructor(pkg: PackageContent, name: string) {
+  constructor(pkg: PackageContent, name: string, usage: UnionStructFlags) {
     super(pkg, name);
     this.kind = "unionStruct";
+    this.usage = usage;
     this.fields = new Array<UnionField>();
   }
 }
@@ -1064,12 +1141,5 @@ export class TokenCredential extends QualifiedType implements TokenCredential {
     super("TokenCredential", "github.com/Azure/azure-sdk-for-go/sdk/azcore");
     this.kind = "tokenCredential";
     this.scopes = scopes;
-  }
-}
-
-export class XMLInfo implements XMLInfo {
-  constructor() {
-    this.attribute = false;
-    this.text = false;
   }
 }

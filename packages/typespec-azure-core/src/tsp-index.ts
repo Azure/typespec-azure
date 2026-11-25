@@ -1,9 +1,11 @@
 import type { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
 import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
 import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
+import type { AzureCoreLegacyDecorators } from "../generated-defs/Azure.Core.Legacy.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import { $requestParameter, $responseProperty } from "./decorators.js";
+import { $azureServiceConfigurations } from "./decorators/azure-service-configurations.js";
 import {
   $approvedBreakingChange,
   $approvedUnversionedChange,
@@ -18,6 +20,7 @@ import { $lroResult } from "./decorators/lro-result.js";
 import { $lroStatus } from "./decorators/lro-status.js";
 import { $lroSucceeded } from "./decorators/lro-succeeded.js";
 import { $operationLink } from "./decorators/operation-link.js";
+import { $overrideApiVersion } from "./decorators/override-api-version.js";
 import { $pollingLocation } from "./decorators/polling-location.js";
 import { $pollingOperationParameter } from "./decorators/polling-operation-parameter.js";
 import { $pollingOperation } from "./decorators/polling-operation.js";
@@ -54,6 +57,7 @@ export const $decorators = {
   "Azure.Core": {
     approvedBreakingChange: $approvedBreakingChange,
     approvedUnversionedChange: $approvedUnversionedChange,
+    azureServiceConfigurations: $azureServiceConfigurations,
     lroStatus: $lroStatus,
     finalLocation: $finalLocation,
     pollingLocation: $pollingLocation,
@@ -87,6 +91,10 @@ export const $decorators = {
     defaultFinalStateVia: $defaultFinalStateVia,
     parameterizedNextLinkConfig: parameterizedNextLinkConfigDecorator,
   } satisfies AzureCoreFoundationsPrivateDecorators,
+
+  "Azure.Core.Legacy": {
+    overrideApiVersion: $overrideApiVersion,
+  } satisfies AzureCoreLegacyDecorators,
 
   "Azure.Core.Traits": {
     trait: $trait,

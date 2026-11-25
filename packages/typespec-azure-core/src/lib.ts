@@ -1,8 +1,15 @@
-import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, fileRef, paramMessage } from "@typespec/compiler";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
   diagnostics: {
+    "azure-authentication-invalid": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/azure-authentication-invalid.md"),
+      severity: "error",
+      messages: {
+        default: paramMessage`${"reason"}`,
+      },
+    },
     "breaking-change": {
       severity: "error",
       messages: {
@@ -275,6 +282,13 @@ export const $lib = createTypeSpecLibrary({
         default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
       },
     },
+    "invalid-api-version-override": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-api-version-override.md"),
+      severity: "error",
+      messages: {
+        default: "The API version override must be a non-empty string.",
+      },
+    },
     "experimental-feature": {
       severity: "warning",
       messages: {
@@ -287,6 +301,9 @@ export const $lib = createTypeSpecLibrary({
   state: {
     approvedBreakingChange: { description: "Approved breaking change suppressions" },
     approvedUnversionedChange: { description: "Approved unversioned change suppressions" },
+    azureServiceConfigurations: {
+      description: "Paired Azure service endpoints and OAuth settings",
+    },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },
@@ -318,6 +335,9 @@ export const $lib = createTypeSpecLibrary({
     },
     previewVersion: {
       description: "Data for `@previewVersion` decorator",
+    },
+    apiVersionOverride: {
+      description: "Data for `@overrideApiVersion` decorator",
     },
   },
   // AzureCoreStateKeys.traitLocation

@@ -28,6 +28,8 @@ jobs:
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup
 
+      - uses: ./.github/actions/setup-java
+
       - name: Install dependencies
         run: pnpm install
 

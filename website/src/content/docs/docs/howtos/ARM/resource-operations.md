@@ -133,14 +133,12 @@ PATCH for Resource tags only, a PATCH for all updateable properties, or a custom
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description                       | TypeSpec                                                                |
-| ------------------------------------------- | ----------------------------------------------------------------------- |
-| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                              |
-| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                             |
-| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`         |
-| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>`        |
-| Sync Lifecycle PATCH                        | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`  |
-| Async Lifecycle PATCH                       | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>` |
+| Operation Description                       | TypeSpec                                                         |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                       |
+| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                      |
+| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`  |
+| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>` |
 
 The `ArmCustomPatch*` templates are the recommended choice for PATCH operations. They take the
 resource type and your custom PATCH request type as parameters, giving you full control over the
@@ -196,23 +194,22 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 | ListBySubscription | `listBySubscription is ArmListBySubscriptionScope<ResourceType>` |
 | ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`            |
 
+These templates model pageable list operations and default to `ArmResponse<ResourceListResult<Resource>>`. Use `ResourceListResult<T>`, the standard ARM page model, for the paging response when it fits the contract instead of hand-defining an operation or page envelope. If a custom page model is unavoidable, keep exactly one `@nextLink` property in each page model.
+
 The `ArmListBySubscriptionScope` template is used for listing a resource directly at the subscription
 scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
 Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.
 
-#### Adding standard `$top`, `$filter`, and `$skip` query parameters
+#### Adding the standard `$filter` query parameter
 
-Pass ARM's standard list query parameters through the `Parameters` template argument instead of
-defining custom `@query("$top")`, `@query("$filter")`, or `@query("$skip")` properties yourself.
-Compose the reusable ARM parameter models for the options your operation supports.
+ARM collection GET operations may use only the standard `api-version` and `$filter` query
+parameters. Pass `ArmFilterParameter` through the `Parameters` template argument instead of
+defining a custom `@query("$filter")` property.
 
 ```typespec
 @armResourceOperations
 interface Employees {
-  listBySubscription is ArmListBySubscription<
-    Employee,
-    Parameters = ArmTopParameter & ArmFilterParameter & ArmSkipParameter
-  >;
+  listBySubscription is ArmListBySubscription<Employee, Parameters = ArmFilterParameter>;
 }
 ```
 
@@ -416,6 +413,13 @@ ARM long-running operations (LROs) use operation status endpoints to allow clien
 status of an async operation. The `GetResourceOperationStatus` operation template provides a
 standard way to expose these endpoints, and `ArmOperationStatus` provides the response model.
 
+:::note
+These templates can represent existing ARM operation-status endpoints. Use them when they
+reproduce the existing wire contract; otherwise, preserve the contract with an explicit status
+model. ARM's complete LRO polling flow, particularly `Azure-AsyncOperation`, is not yet
+standardized enough for this to be blanket guidance for new APIs.
+:::
+
 ### ArmOperationStatus
 
 `ArmOperationStatus` is a response model that represents the status of an async operation. The `id`
@@ -470,6 +474,13 @@ interface OperationStatuses {
 ### Custom response properties
 
 To add custom properties to the operation status response, use the `ArmOperationStatus` template:
+
+:::caution
+`ArmOperationStatus<Properties>` is not a literal drop-in for every converted custom model. If your
+existing operation-status payload has extra top-level members (for example `operations` or
+`resourceId`) or different wire semantics, keep or author an explicit status model that matches the
+existing contract.
+:::
 
 ```typespec
 model WidgetOperationStatus is ArmOperationStatus<WidgetOperationStatusProperties>;

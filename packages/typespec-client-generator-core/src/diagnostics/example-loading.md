@@ -1,4 +1,4 @@
-This diagnostic is issued when TCGC skips loading examples because the examples directory cannot be read, an example file cannot be parsed, or required `operationId` or `title` metadata is missing.
+This diagnostic is issued when TCGC skips loading examples because the examples directory cannot be read, an example file cannot be parsed or validated, or required legacy JSON `operationId` or `title` metadata is missing.
 
 ## Impact
 
@@ -18,6 +18,12 @@ Skipped loading invalid example file: get.json. Error: Unexpected token
 ### ✅ How to Fix
 
 Fix the JSON syntax or contents of the example file so it can be parsed.
+
+## Invalid unified YAML examples
+
+Unified `examples.yaml` and `examples/*.yaml` files are validated by the shared examples package before resolution. Fix the reported YAML syntax, schema, placement, or version-lineage error. `since` values must be quoted and belong to the service's TypeSpec version enum. If provided, `$namespace` must match the service's full namespace. `{api-version}` requires a versioned service.
+
+Invalid unified input skips the service's examples, without falling back to legacy JSON files. To explicitly use legacy files instead, configure `examples-dir`.
 
 ## Examples directory cannot be read
 

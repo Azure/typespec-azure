@@ -313,7 +313,7 @@ function buildCredentials(
 }
 
 function buildLoggingOptions(): string | undefined {
-  return `{ logger: options.loggingOptions?.logger ?? logger.info }`;
+  return `{ ...options.loggingOptions, logger: options.loggingOptions?.logger ?? logger.info }`;
 }
 
 /**

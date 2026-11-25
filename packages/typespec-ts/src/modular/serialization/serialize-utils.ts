@@ -27,10 +27,14 @@ export function getAllDiscriminatedValues(
     if (!model.discriminatorValue) {
       continue;
     }
+    let baseModel = model.baseModel;
+    while (baseModel && !baseModel.discriminatorProperty) {
+      baseModel = baseModel.baseModel;
+    }
     // Check if this model is a subtype of the given discriminator property
     if (
       !!discriminatorProperty &&
-      model.baseModel?.discriminatorProperty?.name === discriminatorProperty?.name
+      baseModel?.discriminatorProperty?.name === discriminatorProperty?.name
     ) {
       values.push(model.discriminatorValue);
       if (model.discriminatorProperty?.name === discriminatorProperty.name) {

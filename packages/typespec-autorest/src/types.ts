@@ -92,6 +92,13 @@ export interface AutorestEmitterResult {
   /** The examples */
   readonly operationExamples: OperationExamples[];
 
+  /**
+   * Whether the emitter generated (materialized) the example files from the unified
+   * `examples.yaml` format. When true, the files must always be written to the output even if
+   * `skip-example-copying` is set, since there is no on-disk source file to reference.
+   */
+  readonly examplesGenerated?: boolean;
+
   /** Output file used */
   readonly outputFile: string;
 

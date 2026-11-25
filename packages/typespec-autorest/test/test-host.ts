@@ -100,7 +100,9 @@ export async function compileMultipleOpenAPI<K extends string>(
   files: Record<K, string>,
   options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
-  const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
+  const tester =
+    options?.tester ?? (await (options.preset === "azure" ? AzureTester : Tester).createInstance());
+  const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(code, {
     compilerOptions: options?.options
       ? {
           options: {

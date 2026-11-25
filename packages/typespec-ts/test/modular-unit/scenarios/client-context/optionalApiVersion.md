@@ -58,6 +58,7 @@ import { logger } from "../logger.js";
 import { KnownVersions } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for DataMapService. */
 export interface DataMapServiceContext extends Client {
   /** The API version to use for this operation. */
   /** Known values of {@link KnownVersions} that the service accepts. */
@@ -71,6 +72,7 @@ export interface DataMapServiceClientOptionalParams extends ClientOptions {
   apiVersion?: string;
 }
 
+/** Creates a DataMapService client context. */
 export function createDataMapService(
   endpointParam: string,
   options: DataMapServiceClientOptionalParams = {},
@@ -78,7 +80,10 @@ export function createDataMapService(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
   const apiVersion = options.apiVersion;

@@ -1,4 +1,4 @@
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   type DecoratorContext,
@@ -27,14 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import {
-  getAuthentication,
-  getHttpOperation,
-  getServers,
-  isBody,
-  isBodyRoot,
-  isPathParam,
-} from "@typespec/http";
+import { getHttpOperation, isBody, isBodyRoot, isPathParam } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
 import type {
   AccessDecorator,
@@ -44,11 +37,15 @@ import type {
   ClientDecorator,
   ClientDocDecorator,
   ClientInitializationDecorator,
+  ClientLroResultDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  DynamicModelDecorator,
+  LroOperationIdDecorator,
+  LroStatusMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -80,14 +77,14 @@ import {
   AllScopes,
   clientKey,
   clientLocationKey,
+  clientLroResultKey,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  isSameAuth,
-  isSameServers,
+  isClientInitializationOptionsBag,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -103,6 +100,47 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+const lroStatusMetadataKey = createStateSymbol("lroStatusMetadata");
+
+export const $lroStatusMetadata: LroStatusMetadataDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(context, $lroStatusMetadata, lroStatusMetadataKey, target, true, scope);
+};
+
+export function getLroStatusMetadataDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): boolean | undefined {
+  return getScopedDecoratorData(context, lroStatusMetadataKey, target);
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(
+    context,
+    $lroOperationId,
+    lroOperationIdKey,
+    target,
+    { target: context.decoratorTarget },
+    scope,
+  );
+};
+
+export function getLroOperationIdDecorator(
+  context: TCGCContext,
+  target: ModelProperty,
+): { target: DiagnosticTarget } | undefined {
+  return getScopedDecoratorData(context, lroOperationIdKey, target);
+}
 
 /**
  * The set of emitters a scope string effectively selects.
@@ -289,41 +327,6 @@ export const $client: ClientDecorator = (
       return;
     }
     services = serviceConfig.values;
-    // validate all services has same server definition
-    let servers = undefined;
-    let auth = undefined;
-    let isSame = true;
-    for (const svc of services) {
-      const currentServers = getServers(context.program, svc);
-      if (currentServers === undefined) continue;
-      if (servers === undefined) {
-        servers = currentServers;
-      } else {
-        isSame = isSameServers(servers, currentServers);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    for (const svc of services) {
-      const currentAuth = getAuthentication(context.program, svc);
-      if (currentAuth === undefined) continue;
-      if (auth === undefined) {
-        auth = currentAuth;
-      } else {
-        isSame = isSameAuth(auth, currentAuth);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    if (!isSame) {
-      reportDiagnostic(context.program, {
-        code: "inconsistent-multiple-service",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
     // For clients merging multiple services, ensure all services agree on the
     // version of any shared library dependency (e.g. ARM common-types).
     // Diverging versions cause TCGC to emit duplicated/diverged models.
@@ -712,7 +715,12 @@ export function getUsage(context: TCGCContext, entity: Model | Enum | Union): Us
   switch (entity.kind) {
     case "Union":
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "model" ||
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.usage;
       }
       return UsageFlags.None;
@@ -771,7 +779,12 @@ export function getAccess(
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "model" ||
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.access;
       }
       return "public";
@@ -1216,72 +1229,25 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   scope?: LanguageScopes | DecoratorOptions,
 ) => {};
 
+export const $dynamicModel: DynamicModelDecorator = (
+  context: DecoratorContext,
+  target: Model | Namespace,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const [, positiveScopes] = parseScopes(normalizeScope(scope));
+  if (!positiveScopes?.includes("csharp")) {
+    reportDiagnostic(context.program, {
+      code: "decorator-requires-scope",
+      format: {
+        decoratorName: "dynamicModel",
+        allowedScopes: '"csharp"',
+      },
+      target,
+    });
+  }
+};
+
 const clientInitializationKey = createStateSymbol("clientInitialization");
-
-/**
- * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
- * client-parameters model is passed directly as the second argument.
- *
- * Detection is based on model provenance rather than the model name alone:
- * - The structural options `parameters` and `initializedBy` are declared only on
- *   `ClientInitializationOptions`, so their presence unambiguously identifies the options bag
- *   (this covers the common inline literal form `{ parameters: ..., scope: ... }`).
- * - A *named* model that explicitly derives from `ClientInitializationOptions` through its
- *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
- *   ClientInitializationOptions { scope: "csharp"; }`).
- *
- * The provenance check follows `baseModel` (`extends`) as well as `sourceModel`/`sourceModels`
- * (`model is`, `PickProperties`/`OmitProperties` and other spread-based transformations), so a named
- * model derived from `ClientInitializationOptions` through any of those is still recognized.
- *
- * Anonymous model expressions are intentionally excluded from the provenance check: the compiler links
- * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
- * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
- * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
- * client-parameters model keeps its `scope` property a real client parameter, preserving backward
- * compatibility for that previously supported form.
- */
-function isClientInitializationOptionsBag(options: Type): boolean {
-  if (options.kind !== "Model") {
-    return false;
-  }
-  if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
-    return true;
-  }
-  if (options.name === "") {
-    return false;
-  }
-  return derivesFromClientInitializationOptions(options);
-}
-
-/**
- * Whether a model is `ClientInitializationOptions` (from `Azure.ClientGenerator.Core`) or derives
- * from it through any combination of `extends` (`baseModel`) and `model is` / spread provenance
- * (`sourceModel`/`sourceModels`).
- */
-function derivesFromClientInitializationOptions(model: Model): boolean {
-  const visited = new Set<Model>();
-  const stack: (Model | undefined)[] = [model];
-  while (stack.length > 0) {
-    const current = stack.pop();
-    if (current === undefined || visited.has(current)) {
-      continue;
-    }
-    visited.add(current);
-    if (
-      current.name === "ClientInitializationOptions" &&
-      current.namespace !== undefined &&
-      getNamespaceFullName(current.namespace) === "Azure.ClientGenerator.Core"
-    ) {
-      return true;
-    }
-    stack.push(current.baseModel, current.sourceModel);
-    for (const source of current.sourceModels) {
-      stack.push(source.model);
-    }
-  }
-  return false;
-}
 
 /**
  * Resolve the nearest effective option property of an options bag by name, walking the `extends`
@@ -1730,6 +1696,23 @@ export function getResponseAsBool(context: TCGCContext, target: Operation): bool
   return getScopedDecoratorData(context, responseAsBoolKey, target);
 }
 
+export const $clientLroResult: ClientLroResultDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  result: Model | ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  setScopedDecoratorData(context, $clientLroResult, clientLroResultKey, target, result, scope);
+};
+
+/** Gets the LRO result selected for the current language scope. @internal */
+export function getClientLroResult(
+  context: TCGCContext,
+  target: Operation,
+): Model | ModelProperty | undefined {
+  return getScopedDecoratorData(context, clientLroResultKey, target);
+}
+
 const clientDocKey = createStateSymbol("clientDoc");
 
 /**
@@ -1907,7 +1890,7 @@ export const $markAsLro: MarkAsLroDecorator = (
     });
     return;
   }
-  if (getLroMetadata(context.program, target)) {
+  if (getLroProtocolMetadata(context.program, target)) {
     reportDiagnostic(context.program, {
       code: "mark-as-lro-ineffective",
       format: {

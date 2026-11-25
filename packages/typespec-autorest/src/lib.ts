@@ -39,7 +39,7 @@ export interface AutorestEmitterOptions {
   "output-file"?: string;
 
   /**
-   * Directory where the examples are located.
+   * Directory containing legacy JSON examples. Unified YAML is discovered at the project root.
    * @default `{project-root}/examples`
    */
   "examples-dir"?: string;
@@ -120,8 +120,8 @@ export interface AutorestEmitterOptions {
   "output-splitting"?: "legacy-feature-files";
 
   /**
-   * When enabled, the emitter will not copy example files to the output directory.
-   * Instead, it will reference the source example files using relative file paths.
+   * For legacy JSON examples, reference source files instead of copying them to the output.
+   * Unified YAML examples are still materialized as JSON.
    * @default false
    */
   "skip-example-copying"?: boolean;
@@ -154,6 +154,22 @@ export interface AutorestEmitterOptions {
    * @default "auto"
    */
   "service-yaml"?: "auto" | "always" | "never";
+
+  /**
+   * Controls how the emitter sources `x-ms-examples`.
+   *
+   * - `"auto"`: Use the unified `examples.yaml` format when a `examples.yaml` (or
+   *   `examples/*.yaml`) file is present at the project root; otherwise fall back to loading legacy
+   *   per-version `x-ms-examples` JSON files from `examples-dir`. (default)
+   * - `"legacy"`: Only load legacy per-version `x-ms-examples` JSON files.
+   * - `"unified"`: Only load the unified `examples.yaml` format, resolving and materializing the
+   *   applicable example for each operation at the emitted API version and writing the resulting
+   *   legacy `x-ms-examples` JSON files. Enables a smooth rollout of the new format without
+   *   changing downstream consumers.
+   *
+   * @default "auto"
+   */
+  "examples-format"?: "auto" | "legacy" | "unified";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -204,7 +220,8 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
     "examples-dir": {
       type: "string",
       nullable: true,
-      description: "Directory where the examples are located. Default: `{project-root}/examples`.",
+      description:
+        "Directory containing legacy JSON examples. Unified YAML is discovered at the project root. Default: `{project-root}/examples`.",
       format: "absolute-path",
     },
     "examples-directory": {
@@ -295,7 +312,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       default: false,
       description:
-        "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
+        "For legacy JSON examples, reference the source files instead of copying them to the output directory. Unified YAML examples are still materialized as JSON.",
     },
     "type-name-strategy": {
       type: "string",
@@ -312,6 +329,14 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "auto",
       description:
         'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.',
+    },
+    "examples-format": {
+      type: "string",
+      enum: ["auto", "legacy", "unified"],
+      nullable: true,
+      default: "auto",
+      description:
+        'Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.\n\nSee [Author API examples in YAML](https://azure.github.io/typespec-azure/docs/howtos/examples/).',
     },
   },
   required: [],
@@ -401,6 +426,18 @@ export const $lib = createTypeSpecLibrary({
         noOperationId: paramMessage`Skipping example file ${"filename"} because it does not contain an operationId and/or title.`,
       },
     },
+    "unknown-example-operation": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Example operation '${"operation"}' does not exist in API version '${"version"}'.`,
+      },
+    },
+    "unified-example-loading": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`${"message"}`,
+      },
+    },
     "unsupported-http-auth-scheme": {
       severity: "warning",
       messages: {
@@ -462,6 +499,12 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "Cannot emit service.yaml because the project defines multiple services. Only the first service will be included.",
+      },
+    },
+    "inconsistent-client-api-version-override": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Operations emitted to the same OpenAPI document must specify one consistent \`@overrideApiVersion\` value. Found values: ${"values"}. The normal document version ${"fallback"} will be retained.`,
       },
     },
   },

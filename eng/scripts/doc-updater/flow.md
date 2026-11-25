@@ -16,13 +16,12 @@ flowchart LR
 
     subgraph "Agentic Workflow (per config)"
         direction TB
-        PRECOMPUTE["steps: precompute.ts
-        Extract diffs + feedback + knowledge
+        PRECOMPUTE["steps: setup tools + caches,
+        precompute.ts, build workspace
         (deterministic, no untrusted text)"]
-        AGENT["Agent (copilot, claude-opus-4_6)
-        Update docs + build knowledge"]
-        VALIDATE["post-steps: validate file scope
-        + update-meta.ts"]
+        AGENT["Agent (copilot, gpt-6.1-sol)
+        Update docs + knowledge + update-meta.ts"]
+        VALIDATE["post-steps: validate file scope"]
     end
 
     Config --> PRECOMPUTE

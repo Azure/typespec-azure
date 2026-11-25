@@ -4,14 +4,15 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 
 ## How it works
 
-1. **Benchmark runner** compiles dedicated TypeSpec specs using the compiler's programmatic API
+1. **Benchmark runner** measures compilation and each emitter independently using the compiler's programmatic API
 2. The compiler provides built-in `Stats` data including per-stage timing and per-linter-rule breakdown
 3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
 4. Per-spec variability (standard deviation and coefficient of variation) is captured from raw iterations
-5. Optional noise-gating can auto-run extra iterations when variance is high
-6. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
-7. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
-8. PR comments show a comparison table highlighting performance changes
+5. Compiler warmups and measurements share one isolated Node process, creating a fresh Program and collecting garbage before each compilation
+6. Optional noise-gating checks both compilation and linter variability and retries compilation only; it never regenerates SDKs
+7. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
+8. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
+9. PR comments show a comparison table highlighting performance changes
 
 ## Local usage
 
@@ -21,13 +22,18 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 # Build the benchmark package (and its dependencies)
 pnpm -r --filter "@azure-tools/typespec-benchmark..." build
 
-# Run all benchmark specs (5 iterations + 1 warmup by default)
+# Install the Azure C# emitter from npm for this benchmark job/session
+node packages/benchmark/scripts/setup-csharp.ts
+
+# Compiler: 25 measurements + 3 warmups; each emitter: 3 measurements + 1 warmup
 node packages/benchmark/dist/src/cli.js run --output results.json
 
 # Run with custom options
 node packages/benchmark/dist/src/cli.js run \
   --iterations 3 \
   --warmup 1 \
+  --emitter-iterations 3 \
+  --emitter-warmup 1 \
   --noise-cv-threshold 0.08 \
   --max-reruns 1 \
   --rerun-iterations 5 \
@@ -36,6 +42,10 @@ node packages/benchmark/dist/src/cli.js run \
 ```
 
 ### Compare results
+
+Comparisons require the same measurement method. The CLI rejects legacy combined,
+cold split, and warmed split results compared against one another instead of reporting methodological differences as
+performance improvements or regressions.
 
 ```bash
 # Console summary
@@ -78,9 +88,79 @@ Located in `specs/`:
 | `azure-arm-resource-manager` | ARM resource provider with tracked, proxy resources and multiple resource types |
 | `azure-full`                 | Comprehensive data-plane service with many models, resources, and operations    |
 
+### Emitter coverage
+
+All built-in specs run AutoRest, OpenAPI3, Azure Python, generic JavaScript,
+Azure TypeScript, Azure Java, Azure Go, Azure C#, and standalone TCGC. The Azure
+services (`compute`, `network`, and `web`) run the same set **except OpenAPI3**:
+the service corpus contains Azure-specific routes that OpenAPI3 cannot represent.
+For example, Compute has a route with a query string.
+
+Network also temporarily excludes Azure TypeScript (`@azure-tools/typespec-ts`):
+its `P2sVpnGateways` and `P2SVpnGateways` client groups normalize to the same
+generated file path and crash the emitter. Generic JavaScript remains enabled.
+These exceptions are explicit in the coverage tests, not silent runtime skips.
+
+These are **full-generation** benchmarks, including downstream generators and Go
+post-generation tools, not just intermediate code-model generation. Install the
+repo's Go, Java/Maven, Python/uv tools and .NET SDK 10.0.x before running. Locally,
+use `mise exec --` for commands when mise is not activated in your shell.
+
+All workspace emitters and TypeSpec/TCGC libraries run from this checkout.
+`setup-csharp.ts` installs `@azure-typespec/http-client-csharp@1.0.0-alpha.20261015.2` and its
+published backend into the ignored `.emitters/` directory and links the Azure
+emitter into the benchmark's `node_modules`. It disables npm peer installation
+and verifies that TypeSpec/TCGC peers resolve to this workspace. Re-run setup to
+restore that version; it never changes the workspace manifest or lockfile.
+
+The version is deliberately pinned rather than following the moving `latest` tag.
+Update the pin explicitly when changing the C# baseline. Each result also records
+the exact Azure and base C# versions in `externalEmitterVersions`. Installation happens before
+timing begins. Missing tools, unresolved emitters, and missing/invalid emitter
+timings fail the run rather than silently reducing coverage.
+
+The dashboard discovers emitters from result metrics; new emitter series start
+with the first run that includes them. Existing history is only replaced when
+explicitly backfilled with `--force`. Missing samples remain gaps, not zero-duration samples.
+
 ## CI integration
 
-Benchmarks run **on push to `main`** (via `benchmark.yml` and `benchmark-external.yml`, each instantiating the reusable `benchmark-run.yml`). Each run stores its results to the `benchmark-data` branch via the `store-results` CLI command — the built-in specs under `results/` and the external specs under `external-results/`. Changes are monitored on the [benchmarks dashboard](https://typespec.io/benchmarks); benchmarks do not run on pull requests.
+Benchmarks run **on push to `main`** (via `benchmark.yml` and `benchmark-external.yml`, each instantiating the reusable `benchmark-run.yml`). Each run stores its results to the `benchmark-data` branch via the `store-results` CLI command — the built-in specs under `results/` and the external specs under `external-results/`. Changes are monitored on the [benchmarks dashboard](https://azure.github.io/typespec-azure/benchmarks/); benchmarks do not run on pull requests.
+
+The reusable workflow builds dependencies and installs C# once, then snapshots the
+external specs and prepares an explicit workload plan. Independent jobs measure
+each spec's compiler and each configured emitter. They reuse that prepared build
+and source snapshot, rather than rebuilding packages or fetching a moving spec
+branch for every job. Each job runs one workload serially, avoiding CPU/memory
+contention between emitters on the same runner.
+
+The default runner image is `ubuntu-24.04`, not the moving `ubuntu-latest` label,
+and Node remains pinned to 24.15.0. GitHub-hosted runners can still have different
+CPU models and contention. Set the repository variable `BENCHMARK_RUNNER` to a
+dedicated runner label for tighter hardware control. Results record the actual
+CPU model/count for each compiler and emitter worker.
+
+Both datasets use **25 compiler measurements + 3 warmups** and **3 full-generation
+measurements + 1 warmup per emitter/spec**. Compiler noise retries do not affect
+emitter sample counts. Workloads have a 30-minute execution limit; missing,
+failed, duplicated, or mismatched workload results prevent publication rather
+than silently reducing coverage. The end-to-end runtime target is under 30
+minutes excluding runner queue delays; the job timeout is a failure boundary,
+not evidence that the target was met.
+
+The final job combines the complete matrix and publishes the same dashboard
+metric labels as before. Manual runs upload the combined JSON as an artifact
+without publishing feature-branch results to the production dashboard.
+
+For local debugging, `run` executes the same workloads serially. To reproduce an
+individual CI workload:
+
+```bash
+node packages/benchmark/dist/src/cli.js plan \
+  --specs-dir packages/benchmark/external-spec --specs network --output plan.json
+node packages/benchmark/dist/src/cli.js run-workload \
+  --plan plan.json --workload network--azure-typespec-http-client-csharp --output csharp.json
+```
 
 ### Data storage
 
@@ -90,30 +170,56 @@ Results are stored on the `benchmark-data` orphan branch:
 - `results/latest.json` — latest main baseline
 - `results/history.json` — aggregated history for the website
 
+`timestamp` records measurement completion; `commitTimestamp` records the source
+commit's committer date. `latest.json` and history use the same Git topological
+commit order, so late measurements, equal commit dates, or clock skew cannot move
+the baseline backwards. Charts use commit dates rather than measurement dates.
+Publication recovers metadata from Git for legacy results without rewriting their
+original timestamp values, fetching missing source history when necessary.
+
 ### Backfill historical data
 
-To backfill benchmark results for past commits:
+Build the current harness and install C# as shown above, then fetch the source
+history before backfilling. The default source is `origin/main`, independently of
+the branch containing the harness (so a fix branch can benchmark main's history).
 
 ```bash
-# Backfill last 100 commits (default)
+# Fill missing results among the last 100 first-parent commits (default)
 node packages/benchmark/dist/src/cli.js backfill
 
-# Backfill last 50 commits, then push
-node packages/benchmark/dist/src/cli.js backfill --from 50 --push
+# Replace the last 10 results with the current emitter matrix, matching CI sampling
+NODE_OPTIONS=--max-old-space-size=12288 node packages/benchmark/dist/src/cli.js backfill \
+  --from 10 --force --iterations 25 --warmup 3 \
+  --noise-cv-threshold 0.08 --max-reruns 1 --rerun-iterations 10 --push
 
-# Backfill from a specific commit to HEAD of main
+# Backfill from a specific commit to the source branch tip
 node packages/benchmark/dist/src/cli.js backfill --from abc1234
 
-# Backfill a specific commit range
+# Backfill an inclusive commit range (use the same SHA for exactly one commit)
 node packages/benchmark/dist/src/cli.js backfill --from abc1234 --to def5678
 ```
 
 The backfill command:
 
-1. Builds and saves the current benchmark CLI
-2. Checks out each historical commit, builds its dependencies, and runs benchmarks using the saved CLI
-3. Skips commits that already have results on the `benchmark-data` branch
-4. Commits all new results to the `benchmark-data` branch
+1. Resolves the selected commit range once and skips existing results unless `--force` is set.
+2. Creates a fresh temporary worktree for each commit, leaving the caller's branch and dirty files untouched and preventing stale generated files from contaminating another commit.
+3. Restores the current harness/configuration before installing and building each historical workspace's complete emitter dependencies.
+4. Reuses the job's installed C# version with peers resolved against that historical workspace.
+5. Keeps per-commit results and real build/generation logs in the printed temporary output directory. Any failed commit makes the command fail.
+6. With `--push`, publishes each successful result immediately. Without it, retains the JSON files locally without changing branches.
+
+Backfilled points retain both measurement time and historical commit time. Compiler
+noise settings are forwarded exactly, including explicit zeros; CI uses the same
+configured noise gate as normal runs. Publishing an older result
+does not move `latest.json` backwards, and concurrent writers regenerate history
+against the latest data branch rather than rebasing conflicting generated JSON.
+
+The `Benchmark` workflow exposes `backfill_from`, `backfill_to`, `backfill_force`,
+compiler `iterations`/`warmup`, and `emitter_iterations`/`emitter_warmup`. Backfill runs have separate concurrency groups from
+normal main runs. For a large full-generation backfill, dispatch one SHA per run
+(`backfill_from` and `backfill_to` equal) to avoid one job hitting the execution
+time limit. Use a separate `branch` input to smoke-test publication without
+changing dashboard data. Results and logs are also uploaded as workflow artifacts.
 
 ## What gets measured
 
@@ -127,6 +233,38 @@ The TypeSpec compiler provides built-in `Stats` covering:
   - `validation` — per-validator timing (compiler, @typespec/http, @typespec/versioning, etc.)
   - `linter` — per-rule timing (e.g., `@azure-tools/typespec-azure-core/auth-required`)
   - `emit` — per-emitter timing with per-step breakdown
+
+New results use `measurementMode: "split-warm"`. `iterations`, `rawIterations`, and
+compiler variability describe compilation-only samples (`noEmit: true`).
+Each compiler workload has its own Node process: all warmups, measured samples,
+and noise retries run there. Every iteration creates a fresh compiler Program;
+only loaded modules and JIT state carry over. Full GC runs before compilation,
+outside the compiler's measured timers. Earlier `split` results spawned a fresh
+Node process per iteration, so their warmups only warmed filesystem caches.
+The sample count stays at 25 measurements + 3 warmups; emitter sampling and
+process isolation are unchanged.
+`emitterMeasurements` records each emitter's actual sample/warmup counts, raw
+timings, variability, and runner. Emitter timings do not include recompilation
+or process startup, although the workload log reports end-to-end elapsed time.
+The aggregate `emit` value is the sum of independently aggregated emitter times,
+not the wall time of parallel jobs.
+
+Unlike legacy combined runs, compiler complexity excludes emitter mutations and
+compilation-only runs skip loading emitter modules. Emitters run in
+isolation without another emitter's cached state. Treat the switch to split
+measurement as a methodology change when comparing against old results.
+Existing history remains readable and is not rewritten automatically.
+Dashboard baselines and chart connections require matching measurement methods,
+recorded source revisions, Node versions and CPU models/counts. Emitter comparisons
+use the emitter worker's hardware, not the compiler worker's, and C# comparisons
+also require matching published versions. Kernel patch versions do not split a
+series. The averaged view also requires the same contributing specs.
+Runs still above the compiler or linter CV threshold after retries remain visible
+as raw points but do not participate in compiler baseline comparisons.
+The charts are not smoothed or rewritten to hide noise. Legacy results without
+provenance remain readable but cannot establish comparability with newer results.
+When a metric is absent from the last run, its comparison window and method are
+anchored to the last non-null sample that actually supplies its displayed value.
 
 ## Benchmark specs
 
@@ -158,30 +296,41 @@ Each external spec is **one directory** under `external-spec/` (the directory na
 ```json
 {
   "repository": "https://github.com/Azure/azure-rest-api-specs.git",
-  "ref": "main",
+  "ref": "d218330c5a3b727df9504ba852e97259479e8fef",
   "path": "specification/web/resource-manager/Microsoft.Web/AppService"
 }
 ```
 
-- `repository` / `ref` — the repo and git ref to sparse-checkout; `ref` tracks latest (e.g. `main`), no pinning.
+- `repository` / `ref` — the repo and Git commit, branch or tag to sparse-checkout. The checked-in corpus uses a fixed commit so workload changes do not masquerade as compiler changes. Update all three service pins together when intentionally refreshing the corpus; the resolved source revision is preserved in the plan, results and history.
 - `path` — the entry directory (containing `main.tsp`) relative to the repo root. The spec's own `main.tsp` is the entrypoint (it imports `client.tsp`).
 - `checkoutPath` (optional) — directory to sparse-checkout, when the spec imports sibling folders (e.g. `../common`). Defaults to `path`.
 - `name` (optional) — overrides the benchmark name (defaults to the directory name).
 
-`external-spec/web/tspconfig.yaml` selects what to measure — e.g. TCGC plus the ARM ruleset:
+`external-spec/web/tspconfig.yaml` selects what to measure: the client emitters,
+AutoRest, and standalone TCGC, plus the ARM ruleset. The checked-in config also
+supplies package names and namespaces for each language:
 
 ```yaml
 emit:
+  - "@azure-tools/typespec-autorest"
+  - "@azure-tools/typespec-python"
+  - "@typespec/http-client-js"
+  - "@azure-tools/typespec-ts"
+  - "@azure-tools/typespec-java"
+  - "@azure-tools/typespec-go"
+  - "@azure-typespec/http-client-csharp"
   - "@azure-tools/typespec-client-generator-core"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/resource-manager"
 ```
 
-Run the external specs (fewer iterations, since they are heavy):
+Run the external specs (fewer iterations and a larger Node heap, since they are
+heavy). CI also sets this heap limit through `NODE_OPTIONS` so the isolated
+iteration processes inherit it:
 
 ```bash
-node packages/benchmark/dist/src/cli.js run \
+NODE_OPTIONS=--max-old-space-size=12288 node packages/benchmark/dist/src/cli.js run \
   --specs-dir packages/benchmark/external-spec \
   --warmup 0 --iterations 1 \
   --output external.json

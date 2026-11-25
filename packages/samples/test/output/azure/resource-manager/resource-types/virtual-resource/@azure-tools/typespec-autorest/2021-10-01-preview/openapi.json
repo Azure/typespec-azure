@@ -56,20 +56,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -87,13 +87,13 @@
         "description": "List Employee resources by Group",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -122,7 +122,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -140,13 +140,13 @@
         "description": "Get a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -183,7 +183,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -196,13 +196,13 @@
         "description": "Create a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -265,7 +265,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -282,13 +282,13 @@
         "description": "Update a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -334,7 +334,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -347,13 +347,13 @@
         "description": "Delete a Employee",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -390,7 +390,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -403,13 +403,13 @@
         "description": "A sample HEAD operation to check resource existence",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -446,7 +446,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -461,13 +461,13 @@
         "description": "A sample resource action that move employee to different location",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "divisionId",
@@ -513,7 +513,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -546,7 +546,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v6/types.json#/definitions/TrackedResource"
         }
       ]
     },
