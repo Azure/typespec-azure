@@ -28,9 +28,9 @@ engine:
     GOMODCACHE: "/tmp/gh-aw/agent/cache/go-mod"
     MAVEN_OPTS: "-Dmaven.repo.local=/tmp/gh-aw/agent/cache/m2"
     NPM_CONFIG_CACHE: "/tmp/gh-aw/agent/cache/npm"
-    NPM_CONFIG_STORE_DIR: "/tmp/gh-aw/agent/cache/pnpm-store"
     NUGET_PACKAGES: "/tmp/gh-aw/agent/cache/nuget"
     PIP_CACHE_DIR: "/tmp/gh-aw/agent/cache/pip"
+    PNPM_CONFIG_STORE_DIR: "/tmp/gh-aw/agent/cache/pnpm-store"
     TURBO_CACHE_DIR: "/tmp/gh-aw/agent/cache/turbo"
     UV_CACHE_DIR: "/tmp/gh-aw/agent/cache/uv"
     XDG_CACHE_HOME: "/tmp/gh-aw/agent/cache/xdg"
@@ -122,14 +122,14 @@ steps:
   - name: Install repo dependencies
     env:
       NPM_CONFIG_CACHE: /tmp/gh-aw/agent/cache/npm
-      NPM_CONFIG_STORE_DIR: /tmp/gh-aw/agent/cache/pnpm-store
+      PNPM_CONFIG_STORE_DIR: /tmp/gh-aw/agent/cache/pnpm-store
       XDG_CACHE_HOME: /tmp/gh-aw/agent/cache/xdg
     run: pnpm install
 
   - name: Build workspace tooling
     env:
       NPM_CONFIG_CACHE: /tmp/gh-aw/agent/cache/npm
-      NPM_CONFIG_STORE_DIR: /tmp/gh-aw/agent/cache/pnpm-store
+      PNPM_CONFIG_STORE_DIR: /tmp/gh-aw/agent/cache/pnpm-store
       TURBO_CACHE_DIR: /tmp/gh-aw/agent/cache/turbo
       XDG_CACHE_HOME: /tmp/gh-aw/agent/cache/xdg
     run: |
