@@ -275,6 +275,25 @@ describe("private link resource schema", () => {
       .toEmitDiagnostics(connectionDiagnostic);
   });
 
+  it("checks custom list responses on the standard private link operation", async () => {
+    await tester
+      .expect(
+        `
+        ${setup}
+        model Link is PrivateLink {}
+        model IncompleteLink {
+          properties: { groupId?: string; requiredMembers?: string[]; };
+        }
+        alias Links = PrivateLinks<Link>;
+        @armResourceOperations interface Widgets {
+          getLink is Links.Read<Widget>;
+          listLinks is Links.ListByParent<Widget, Response = ArmResponse<ResourceListCustomResult<IncompleteLink>>>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(linkListDiagnostic);
+  });
+
   it("excludes unregistered routes and unmatched list-only operations", async () => {
     await tester
       .expect(
