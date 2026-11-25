@@ -17,6 +17,7 @@ import org.teavm.model.ValueType;
 import org.teavm.model.emit.ProgramEmitter;
 import org.teavm.model.instructions.ClassConstantInstruction;
 import org.teavm.model.instructions.InvokeInstruction;
+import org.teavm.model.instructions.NullConstantInstruction;
 
 /**
  * Rewrites TeaVM's in-memory class model, not the native generator JAR.
@@ -87,6 +88,18 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                 ProgramEmitter pe = ProgramEmitter.create(method, context.getHierarchy());
                 pe.construct(UnsupportedOperationException.class,
                     pe.constant("Code model snapshots are not supported in the browser")).raise();
+            } else if (cls.getName().equals(
+                GENERATOR + "core.postprocessor.implementation.CodeFormatterUtil")) {
+                if (name.equals("loadEclipseSettings")) {
+                    method.setProgram(null);
+                    ProgramEmitter.create(method, context.getHierarchy())
+                        .constantNull(ValueType.object("java.util.Map")).returnValue();
+                } else if (name.equals("formatCode") && method.parameterCount() == 3
+                    && method.parameterType(0).equals(ValueType.object("java.lang.String"))) {
+                    // Keep upstream import cleanup, but omit Eclipse's native formatting stage.
+                    method.setProgram(null);
+                    ProgramEmitter.create(method, context.getHierarchy()).var(1, String.class).returnValue();
+                }
             }
 
             Program program = method.getProgram();
@@ -134,11 +147,20 @@ public final class BrowserTransformer implements ClassHolderTransformer {
                             && cls.getName().startsWith(GENERATOR)) {
                             invoke.setMethod(new MethodReference(BrowserCompatibility.class.getName(),
                                 "newKeySet", ValueType.object("java.util.Set")));
-                        } else if (ref.getClassName().equals(
+                        } else if (cls.getName().equals(
                             GENERATOR + "core.postprocessor.implementation.CodeFormatterUtil")
-                            && ref.getName().equals("formatCode") && ref.parameterCount() == 1) {
+                            && ref.getClassName().equals("org.eclipse.jdt.core.ToolFactory")
+                            && ref.getName().equals("createCodeFormatter")) {
+                            NullConstantInstruction replacement = new NullConstantInstruction();
+                            replacement.setReceiver(invoke.getReceiver());
+                            invoke.insertPrevious(replacement);
+                            invoke.delete();
+                        } else if (cls.getName().equals(
+                            GENERATOR + "core.postprocessor.implementation.CodeFormatterUtil")
+                            && ref.getClassName().equals("com.github.javaparser.StaticJavaParser")
+                            && ref.getName().equals("getParserConfiguration")) {
                             invoke.setMethod(new MethodReference(BrowserCompatibility.class.getName(),
-                                "unformattedCode", ValueType.object("java.util.Map"), ValueType.object("java.util.List")));
+                                "parserConfiguration", ValueType.object("com.github.javaparser.ParserConfiguration")));
                         } else if (ref.getClassName().equals("com.github.javaparser.utils.Utils")
                             && ref.getName().equals("normalizeEolInTextBlock")
                             && ref.parameterCount() == 2

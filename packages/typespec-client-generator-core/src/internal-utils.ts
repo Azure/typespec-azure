@@ -88,7 +88,7 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getRawLroMetadata } from "./lro-metadata.js";
+import { getClientLroMetadataWithDiagnostics } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -104,6 +104,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
+  "use-client-name-for-friendly-name-source"?: boolean;
   "api-version"?: ApiVersionConfig;
   license?: {
     name: string;
@@ -130,6 +131,7 @@ export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 export const responseOverrideKey = createStateSymbol("responseOverride");
+export const clientLroResultKey = createStateSymbol("clientLroResult");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
@@ -1398,7 +1400,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
-  const lroMetaData = getRawLroMetadata(context.program, operation);
+  const lroMetaData = ignoreDiagnostics(getClientLroMetadataWithDiagnostics(context, operation));
   if (lroMetaData) {
     return lroMetaData;
   }

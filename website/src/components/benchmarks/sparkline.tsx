@@ -22,10 +22,12 @@ export function Sparkline({
   values,
   color,
   ariaLabel,
+  comparisonKeys,
 }: {
   values: (number | null)[];
   color: string;
   ariaLabel?: string;
+  comparisonKeys?: string[];
 }) {
   const styles = useStyles();
   const path = useMemo(() => {
@@ -44,10 +46,15 @@ export function Sparkline({
       .map((p, i) => {
         const x = (p.index / lastIndex) * WIDTH;
         const y = PADDING + usableHeight - ((p.value - min) / span) * usableHeight;
-        return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+        const previous = present[i - 1];
+        const connected =
+          previous &&
+          previous.index === p.index - 1 &&
+          (!comparisonKeys || comparisonKeys[previous.index] === comparisonKeys[p.index]);
+        return `${connected ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
       })
       .join(" ");
-  }, [values]);
+  }, [values, comparisonKeys]);
 
   if (!path) return <span className={styles.empty}>—</span>;
 
