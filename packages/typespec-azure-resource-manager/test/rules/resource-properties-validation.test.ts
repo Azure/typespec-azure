@@ -118,6 +118,45 @@ describe("resource tags", () => {
       .toBeValid();
   });
 
+  it("accepts nullable tags with string values", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        namespace Microsoft.Foo;
+
+        model FooResource is ProxyResource<{}> {
+          ...ResourceNameParameter<FooResource>;
+          tags?: Record<string> | null;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    "Record<int32> | null",
+    "Record<string | null> | null",
+    "Record<string> | string | null",
+  ])("reports invalid nullable tags: %s", async (tagsType) => {
+    await tester
+      .expect(
+        `
+          @armProviderNamespace
+          namespace Microsoft.Foo;
+
+          model FooResource is ProxyResource<{}> {
+            ...ResourceNameParameter<FooResource>;
+            tags?: ${tagsType};
+          }
+          `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
+        message: "The resource 'tags' property must be a record with string values.",
+      });
+  });
+
   it("reports tags with non-string values on a proxy resource", async () => {
     await tester
       .expect(

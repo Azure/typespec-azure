@@ -11,7 +11,7 @@ import {
 
 import { getArmResource } from "../resource.js";
 import { isReadonlyProperty } from "../utils.js";
-import { walkJsonProperties } from "./model-utils.js";
+import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
 const requiredProperties = ["name", "id", "type"] as const;
 
@@ -65,7 +65,12 @@ export const resourcePropertiesValidationRule = createRule({
 });
 
 function isStringRecord(type: Type): boolean {
-  return type.kind === "Model" && type.indexer !== undefined && isStringType(type.indexer.value);
+  const recordType = type.kind === "Union" ? getSingleNonNullMember(type) : type;
+  return (
+    recordType?.kind === "Model" &&
+    recordType.indexer !== undefined &&
+    isStringType(recordType.indexer.value)
+  );
 }
 
 function isStringType(type: Type): boolean {
