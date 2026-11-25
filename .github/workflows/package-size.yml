@@ -38,10 +38,6 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Resolve merge base
-        id: base
-        run: echo "sha=$(git rev-parse HEAD^1)" >> "$GITHUB_OUTPUT"
-
       - uses: ./.github/actions/setup
 
       - uses: ./.github/actions/setup-java
@@ -61,32 +57,25 @@ jobs:
       - name: Measure head sizes
         run: node eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/head.json
 
-      # --- Measure the base of the merge result in a separate checkout ---
+      # --- Measure the base branch ---
       - name: Checkout base
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ steps.base.outputs.sha }}
-          path: temp/bundle-size/base-checkout
-          fetch-depth: 0
-          submodules: recursive
-
-      # Use the same measurement scripts for both checkouts.
-      - name: Restore size scripts from PR head
         run: |
-          mkdir -p temp/bundle-size/base-checkout/eng/scripts/bundle-size
-          cp -a eng/scripts/bundle-size/. temp/bundle-size/base-checkout/eng/scripts/bundle-size/
+          git checkout ${{ github.event.pull_request.base.sha }}
+          git submodule update --init --recursive
+
+      # The measure/compare scripts are added by this PR, so restore them from the PR
+      # head after checking out the (possibly script-less) base commit.
+      - name: Restore size scripts from PR head
+        run: git checkout ${{ github.sha }} -- eng/scripts/bundle-size
 
       - name: Install dependencies (base)
-        working-directory: temp/bundle-size/base-checkout
         run: pnpm install
 
       - name: Build (base)
-        working-directory: temp/bundle-size/base-checkout
         run: pnpm run-all build
 
       - name: Measure base sizes
-        working-directory: temp/bundle-size/base-checkout
-        run: node eng/scripts/bundle-size/measure.ts --out "$GITHUB_WORKSPACE/temp/bundle-size/base.json"
+        run: node eng/scripts/bundle-size/measure.ts --out ./temp/bundle-size/base.json
 
       # --- Compare and prepare the comment payload ---
       - name: Compare sizes
