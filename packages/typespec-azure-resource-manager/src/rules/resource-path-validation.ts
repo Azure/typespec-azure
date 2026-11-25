@@ -1,14 +1,14 @@
 import {
   createRule,
   fileRef,
+  isTemplateDeclarationOrInstance,
   paramMessage,
-  type Operation,
   type Program,
 } from "@typespec/compiler";
-import { getAllHttpServices } from "@typespec/http";
+import { getHttpOperation } from "@typespec/http";
 import { getArmProviderNamespace } from "../namespace.js";
 import { getArmResources, resolveArmResources } from "../resource.js";
-import { isInternalTypeSpec } from "./utils.js";
+import { isInternalTypeSpec, isTemplatedInterfaceOperation } from "./utils.js";
 
 const resourceTypePattern = /^.*\/providers\/\w+\.\w+\/\w+.*/i;
 const resourceGroupScopePattern =
@@ -22,6 +22,17 @@ const invalidNestedPatterns = [
 const providerNamePattern = /providers\/([\w.]+)/g;
 const providerPascalCasePattern = /^[A-Z][a-z0-9]+(.([A-Z]{1,3}[a-z0-9]+)+[A-Z]{0,2})+$/;
 const resourceCrudVerbs = new Set(["get", "put", "patch", "delete"]);
+
+function markPathSeen(pathsByNamespace: Map<string, Set<string>>, namespace: string, path: string) {
+  let paths = pathsByNamespace.get(namespace);
+  if (paths === undefined) {
+    paths = new Set<string>();
+    pathsByNamespace.set(namespace, paths);
+  }
+  if (paths.has(path)) return false;
+  paths.add(path);
+  return true;
+}
 
 function getNestedResourcePathValidity(program: Program) {
   const paths = new Map<string, boolean>();
@@ -71,11 +82,18 @@ export const resourcePathValidationRule = createRule({
     providerNamespace: paramMessage`The last provider namespace '${"pathNamespace"}' in path '${"path"}' must match the ARM service namespace '${"serviceNamespace"}'.`,
   },
   create(context) {
+    const nestedResourcePaths = new Map<string, boolean>();
+    const trackedPathsByNamespace = new Map<string, Set<string>>();
+    const checkedProviderPaths = new Map<string, Set<string>>();
+    const checkedResourcePaths = new Map<string, Set<string>>();
+    const checkedTrackedPaths = new Map<string, Set<string>>();
+
     return {
-      root() {
-        const program = context.program;
-        const nestedResourcePaths = getNestedResourcePathValidity(program);
-        const trackedPathsByNamespace = new Map<string, Set<string>>();
+      root(program) {
+        for (const [path, isValid] of getNestedResourcePathValidity(program)) {
+          nestedResourcePaths.set(path, isValid);
+        }
+
         for (const resource of getArmResources(program)) {
           if (resource.kind !== "Tracked") continue;
 
@@ -94,79 +112,83 @@ export const resourcePathValidationRule = createRule({
             }
           }
         }
+      },
+      operation(operation) {
+        const program = context.program;
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          isTemplatedInterfaceOperation(operation) ||
+          isInternalTypeSpec(program, operation)
+        ) {
+          return;
+        }
 
-        const [services] = getAllHttpServices(program);
+        const namespace = operation.interface?.namespace ?? operation.namespace;
+        if (namespace === undefined) return;
 
-        for (const service of services) {
-          const serviceNamespace = getArmProviderNamespace(program, service.namespace);
-          if (serviceNamespace === undefined) continue;
+        const serviceNamespace = getArmProviderNamespace(program, namespace);
+        if (serviceNamespace === undefined) return;
 
-          const paths = new Map<string, { target: Operation; verbs: Set<string> }>();
-          for (const httpOperation of service.operations) {
-            if (isInternalTypeSpec(program, httpOperation.operation)) continue;
+        const [httpOperation] = getHttpOperation(program, operation);
+        const { path, verb } = httpOperation;
 
-            let pathInfo = paths.get(httpOperation.path);
-            if (pathInfo === undefined) {
-              pathInfo = { target: httpOperation.operation, verbs: new Set<string>() };
-              paths.set(httpOperation.path, pathInfo);
-            }
-            pathInfo.verbs.add(httpOperation.verb);
+        if (markPathSeen(checkedProviderPaths, serviceNamespace, path)) {
+          const providerNamespaces = Array.from(
+            path.matchAll(providerNamePattern),
+            (match) => match[1],
+          );
+          const lastProviderNamespace = providerNamespaces.at(-1);
+          const invalidProviderNamespaces = new Set(
+            providerNamespaces.filter((provider) => !providerPascalCasePattern.test(provider)),
+          );
+
+          if (invalidProviderNamespaces.size > 0) {
+            context.reportDiagnostic({
+              target: operation,
+              messageId: "providerCase",
+              format: { namespaces: [...invalidProviderNamespaces].join(", "), path },
+            });
           }
 
-          const trackedPaths = trackedPathsByNamespace.get(serviceNamespace);
-          for (const [path, { target, verbs }] of paths) {
-            const providerNamespaces = Array.from(
-              path.matchAll(providerNamePattern),
-              (match) => match[1],
-            );
-            const lastProviderNamespace = providerNamespaces.at(-1);
-            const invalidProviderNamespaces = new Set(
-              providerNamespaces.filter((namespace) => !providerPascalCasePattern.test(namespace)),
-            );
-
-            if (invalidProviderNamespaces.size > 0) {
-              context.reportDiagnostic({
-                target,
-                messageId: "providerCase",
-                format: { namespaces: [...invalidProviderNamespaces].join(", "), path },
-              });
-            }
-
-            if (lastProviderNamespace !== undefined && lastProviderNamespace !== serviceNamespace) {
-              context.reportDiagnostic({
-                target,
-                messageId: "providerNamespace",
-                format: {
-                  pathNamespace: lastProviderNamespace,
-                  path,
-                  serviceNamespace,
-                },
-              });
-            }
-
-            if ([...verbs].some((verb) => resourceCrudVerbs.has(verb))) {
-              if (!resourceTypePattern.test(path)) {
-                context.reportDiagnostic({ target, messageId: "resourceType" });
-              }
-
-              const knownNestedPathIsValid = nestedResourcePaths.get(path);
-              if (
-                knownNestedPathIsValid === false ||
-                (knownNestedPathIsValid === undefined &&
-                  invalidNestedPatterns.some((pattern) => pattern.test(path)))
-              ) {
-                context.reportDiagnostic({ target, messageId: "nested" });
-              }
-            }
-
-            if (
-              trackedPaths?.has(path) &&
-              (verbs.has("get") || verbs.has("put")) &&
-              !resourceGroupScopePattern.test(path)
-            ) {
-              context.reportDiagnostic({ target, messageId: "tracked" });
-            }
+          if (lastProviderNamespace !== undefined && lastProviderNamespace !== serviceNamespace) {
+            context.reportDiagnostic({
+              target: operation,
+              messageId: "providerNamespace",
+              format: {
+                pathNamespace: lastProviderNamespace,
+                path,
+                serviceNamespace,
+              },
+            });
           }
+        }
+
+        if (
+          resourceCrudVerbs.has(verb) &&
+          markPathSeen(checkedResourcePaths, serviceNamespace, path)
+        ) {
+          if (!resourceTypePattern.test(path)) {
+            context.reportDiagnostic({ target: operation, messageId: "resourceType" });
+          }
+
+          const knownNestedPathIsValid = nestedResourcePaths.get(path);
+          if (
+            knownNestedPathIsValid === false ||
+            (knownNestedPathIsValid === undefined &&
+              invalidNestedPatterns.some((pattern) => pattern.test(path)))
+          ) {
+            context.reportDiagnostic({ target: operation, messageId: "nested" });
+          }
+        }
+
+        const trackedPaths = trackedPathsByNamespace.get(serviceNamespace);
+        if (
+          (verb === "get" || verb === "put") &&
+          trackedPaths?.has(path) &&
+          !resourceGroupScopePattern.test(path) &&
+          markPathSeen(checkedTrackedPaths, serviceNamespace, path)
+        ) {
+          context.reportDiagnostic({ target: operation, messageId: "tracked" });
         }
       },
     };

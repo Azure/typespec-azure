@@ -47,6 +47,17 @@ it("does not apply the resource-type check to POST-only paths", async () => {
   await tester.expect(service(operation("/providers/Microsoft.Contoso", "post"))).toBeValid();
 });
 
+it("reports path-based diagnostics once when HTTP methods share a path", async () => {
+  const path = "/providers/Microsoft.Contoso";
+  await tester
+    .expect(service(`${operation(path, "get", "read")}\n${operation(path, "put", "replace")}`))
+    .toEmitDiagnostics(
+      diagnostic(
+        "The path for a GET, PUT, PATCH, or DELETE operation must contain a resource type after the provider namespace.",
+      ),
+    );
+});
+
 it.each([
   "/providers/Microsoft.Contoso/widgets/{widget}/parts/action",
   "/providers/Microsoft.Contoso/widgets/{widget}/parts/{part}/action/run",
