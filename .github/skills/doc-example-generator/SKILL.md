@@ -21,7 +21,7 @@ This skill operates in a **temporary working directory** to compile and generate
 
 ### Step 1: Set Up Temporary Project
 
-1. Create a temp directory (e.g., `/tmp/tsp-doc-example-<feature>/` or a workspace-relative `.tmp/` folder)
+1. Create a temp directory under `/tmp/gh-aw/agent/tsp-doc-example-<feature>/` when `/tmp/gh-aw/agent/` exists, or a workspace-relative `.tmp/tsp-doc-example-<feature>/` folder otherwise (do not create directories directly in root `/tmp/`)
 2. Copy the `package.json` from this skill's directory (`package.json` next to this file) into the temp directory
 
 3. Run `npm install --legacy-peer-deps` to install all dependencies
