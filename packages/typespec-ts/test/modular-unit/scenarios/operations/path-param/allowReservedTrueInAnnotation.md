@@ -51,6 +51,8 @@ export async function _annotationDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
+
+/** Performs the annotation operation. */
 export async function annotation(
   context: Client,
   param: string,

@@ -61,11 +61,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { MachineLearningServicesClientOptionalParams } from "./api/machineLearningServicesContext.js";
 
+/** Client for MachineLearningServices. */
 export class MachineLearningServicesClient {
   private _client: MachineLearningServicesContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of MachineLearningServicesClient. */
   constructor(
     endpointParam: string,
     subscriptionId: string,
@@ -85,6 +87,7 @@ export class MachineLearningServicesClient {
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the createOrUpdate operation. */
   createOrUpdate(
     name: string,
     version: string,

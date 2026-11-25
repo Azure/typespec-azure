@@ -20,7 +20,11 @@ needTCGC: true
 ## Models
 
 ```ts models alias HeadResourceResponse
-export type HeadResourceResponse = { body: boolean };
+/** The response for the headResource operation. */
+export type HeadResourceResponse = {
+  /** The response body. */
+  body: boolean;
+};
 ```
 
 ## Operations
@@ -64,6 +68,8 @@ export async function _headResourceDeserialize(
 
   return { body: result.status.startsWith("2") };
 }
+
+/** Performs the headResource operation. */
 export async function headResource(
   context: Client,
   resourceName: string,
@@ -131,6 +137,8 @@ export async function _headResourceDeserialize(result: PathUncheckedResponse): P
 
   return result.status.startsWith("2");
 }
+
+/** Performs the headResource operation. */
 export async function headResource(
   context: Client,
   resourceName: string,

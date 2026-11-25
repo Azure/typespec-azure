@@ -60,6 +60,7 @@ import { logger } from "../logger.js";
 import { ClientType } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Service. */
 export interface ServiceContext extends Client {
   /** Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client. */
   clientParam?: ClientType;
@@ -71,6 +72,7 @@ export interface ServiceClientOptionalParams extends ClientOptions {
   clientParam?: ClientType;
 }
 
+/** Creates a Service client context. */
 export function createService(
   endpointParam: string,
   options: ServiceClientOptionalParams = {},
@@ -157,6 +159,7 @@ import { logger } from "../logger.js";
 import { ClientType } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for Service. */
 export interface ServiceContext extends Client {
   /** Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client. */
   clientParam?: ClientType;
@@ -170,6 +173,7 @@ export interface ServiceClientOptionalParams extends ClientOptions {
   clientParam?: ClientType;
 }
 
+/** Creates a Service client context. */
 export function createService(options: ServiceClientOptionalParams = {}): ServiceContext {
   const endpointParam = options.endpointParam ?? "http://localhost:3000";
   const clientParam = options.clientParam ?? "default";
@@ -256,6 +260,7 @@ import { logger } from "../logger.js";
 import { ClientType } from "../models/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for TestService. */
 export interface TestServiceContext extends Client {
   /** Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client. */
   clientParam?: ClientType;
@@ -267,6 +272,7 @@ export interface TestServiceClientOptionalParams extends ClientOptions {
   clientParam?: ClientType;
 }
 
+/** Creates a TestService client context. */
 export function createTestService(
   endpointParam: string,
   options: TestServiceClientOptionalParams = {},

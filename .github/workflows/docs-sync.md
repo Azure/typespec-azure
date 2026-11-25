@@ -16,7 +16,7 @@ safe-outputs:
     base-branch: main
   noop:
     max: 1
-  missing-tool:
+  report-missing-tool:
     create-issue: true
 ---
 

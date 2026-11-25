@@ -23,6 +23,8 @@ ignorePaths:
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
+  - .github/agents/agentic-workflows.md
+  - .github/skills/agentic-workflows/**
   - "*.lock.yml"
   # temp ignore typespec-ts while repo move is inflight
   - packages/typespec-ts/**

@@ -61,6 +61,7 @@ import {
 } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getHeaderClientOptions } from "./helpers/client-option-helpers.js";
+import { getInputDocs } from "./helpers/docs-helpers.js";
 import {
   buildNonModelResponseTypeDeclaration,
   checkWrapNonModelReturn,
@@ -951,7 +952,12 @@ function buildModelProperty(
     isReadonly: isReadOnly(property as SdkModelPropertyType),
   };
 
-  if (property.doc) {
+  if (model.usage & UsageFlags.Input && !propertyStructure.isReadonly) {
+    const docs = getInputDocs(property.type, property.doc);
+    if (docs.length > 0) {
+      propertyStructure.docs = docs;
+    }
+  } else if (property.doc) {
     propertyStructure.docs = [property.doc];
   }
 
