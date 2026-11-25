@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/Azure/azure-rest-api-specs.git",
+  "revision": "b49d50a22eda22bec3be610d26f49bf28447327b",
+  "specs": [
+    {
+      "name": "Network",
+      "relativePath": "specification/network/resource-manager/Microsoft.Network/Network/Network"
+    },
+    {
+      "name": "AppConfiguration",
+      "relativePath": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration"
+    },
+    {
+      "name": "ContainerService/fleet",
+      "relativePath": "specification/containerservice/resource-manager/Microsoft.ContainerService/fleet"
+    }
+  ]
+}

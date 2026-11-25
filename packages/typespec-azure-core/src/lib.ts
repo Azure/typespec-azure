@@ -10,6 +10,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`${"reason"}`,
       },
     },
+    "breaking-change": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Breaking change detected: ${"message"}`,
+      },
+    },
+    "invalid-suppression-kind": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Invalid DiffKind '${"kind"}' specified in suppression decorator.`,
+      },
+    },
     "lro-status-union-non-string": {
       severity: "error",
       messages: {
@@ -287,6 +299,8 @@ export const $lib = createTypeSpecLibrary({
   },
 
   state: {
+    approvedBreakingChange: { description: "Approved breaking change suppressions" },
+    approvedUnversionedChange: { description: "Approved unversioned change suppressions" },
     azureServiceConfigurations: {
       description: "Paired Azure service endpoints and OAuth settings",
     },

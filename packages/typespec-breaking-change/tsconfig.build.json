@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/*.test.*"],
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.build.json" },
+    { "path": "../../core/packages/http/tsconfig.build.json" },
+    { "path": "../../core/packages/versioning/tsconfig.build.json" }
+  ]
+}

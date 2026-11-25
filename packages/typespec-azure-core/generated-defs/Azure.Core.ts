@@ -3,10 +3,12 @@ import type {
   DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
+  Interface,
   Model,
   ModelProperty,
   Namespace,
   Operation,
+  Scalar,
   Type,
   TypeRefValue,
   Union,
@@ -33,6 +35,44 @@ export interface AzureServiceConfiguration {
    * Description of the server.
    */
   readonly description?: string;
+}
+
+/**
+ * Options for the approvedBreakingChange decorator.
+ */
+export interface ApprovedBreakingChangeOptions {
+  /**
+   * Optional DiffKind filter (e.g., "ResponsePropertyRemoved").
+   */
+  readonly kind?: string;
+  /**
+   * Optional version lower bound — suppression applies when head version >= since.
+   */
+  readonly since?: string;
+  /**
+   * Identity path from the suppression site to the violation target.
+   * Required when the suppression is not on the target node itself.
+   * Uses dot-separated segments matching the finding's element path
+   * (e.g., "body.properties.legacy", "query.filter", "properties.name").
+   */
+  readonly path?: string;
+}
+
+/**
+ * Options for the approvedUnversionedChange decorator.
+ */
+export interface ApprovedUnversionedChangeOptions {
+  /**
+   * Optional DiffKind filter (e.g., "ResponsePropertyRemoved").
+   */
+  readonly kind?: string;
+  /**
+   * Identity path from the suppression site to the violation target.
+   * Required when the suppression is not on the target node itself.
+   * Uses dot-separated segments matching the finding's element path
+   * (e.g., "city", "properties.name").
+   */
+  readonly path?: string;
 }
 
 /**
@@ -309,6 +349,59 @@ export type UniqueItemsDecorator = (
   entity: ModelProperty | Model,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Marks a breaking change as intentionally approved for cross-version comparison.
+ *
+ * When placed on a type, property, operation, or namespace, it suppresses
+ * the matching breaking-change finding in the tool output.
+ *
+ * @param reason A required explanation of why the breaking change is approved.
+ * @param options Optional suppression options: kind, since, and path filters.
+ */
+export type ApprovedBreakingChangeDecorator = (
+  context: DecoratorContext,
+  target:
+    | Model
+    | ModelProperty
+    | Operation
+    | Enum
+    | EnumMember
+    | Union
+    | UnionVariant
+    | Scalar
+    | Interface
+    | Namespace,
+  reason: string,
+  options?: ApprovedBreakingChangeOptions,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Marks a same-version structural difference as intentionally approved.
+ *
+ * A same-version comparison uses two compilations of the same API version. Any difference
+ * indicates a version projection inconsistency. Use this decorator only when the inconsistency
+ * is known and accepted (e.g., during a refactoring migration).
+ *
+ * @param reason A required explanation of why the unversioned change is approved.
+ * @param options Optional suppression options: kind filter.
+ */
+export type ApprovedUnversionedChangeDecorator = (
+  context: DecoratorContext,
+  target:
+    | Model
+    | ModelProperty
+    | Operation
+    | Enum
+    | EnumMember
+    | Union
+    | UnionVariant
+    | Scalar
+    | Interface
+    | Namespace,
+  reason: string,
+  options?: ApprovedUnversionedChangeOptions,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
@@ -326,4 +419,6 @@ export type AzureCoreDecorators = {
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
   uniqueItems: UniqueItemsDecorator;
+  approvedBreakingChange: ApprovedBreakingChangeDecorator;
+  approvedUnversionedChange: ApprovedUnversionedChangeDecorator;
 };

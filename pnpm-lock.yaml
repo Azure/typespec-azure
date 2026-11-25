@@ -3716,6 +3716,58 @@ importers:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@26.6.6)(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/typespec-breaking-change:
+    dependencies:
+      yargs:
+        specifier: 'catalog:'
+        version: 18.2.0
+    devDependencies:
+      '@azure-tools/typespec-azure-core':
+        specifier: workspace:^
+        version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:^
+        version: link:../typespec-azure-resource-manager
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      '@types/yargs':
+        specifier: 'catalog:'
+        version: 17.0.35
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@typespec/http':
+        specifier: workspace:^
+        version: link:../../core/packages/http
+      '@typespec/http-canonicalization':
+        specifier: workspace:^
+        version: link:../../core/packages/http-canonicalization
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
+      '@typespec/rest':
+        specifier: workspace:^
+        version: link:../../core/packages/rest
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../../core/packages/versioning
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.1.0(vitest@5.1.0)
+      '@vitest/ui':
+        specifier: 'catalog:'
+        version: 5.1.0(vitest@5.1.0)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.1.4
+      typescript:
+        specifier: 'catalog:'
+        version: '@typescript/typescript6@6.0.2'
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@26.6.6)(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/typespec-client-generator-core:
     dependencies:
       '@azure-tools/typespec-azure-examples':

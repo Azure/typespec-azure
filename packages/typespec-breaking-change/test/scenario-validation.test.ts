@@ -1,0 +1,477 @@
+import { getSourceLocation } from "@typespec/compiler";
+import { describe, expect, it } from "vitest";
+import { analyzeBaseAndHead, analyzeProgram } from "../src/pipeline/orchestrator.js";
+import { resolveFindingLocation } from "../src/pipeline/resolve-location.js";
+import { formatJsonReport } from "../src/reporting/reporter-json.js";
+import { renderMarkdownSummary } from "../src/reporting/reporter-markdown.js";
+import { Tester, TesterWithArm } from "./test-host.js";
+
+/**
+ * End-to-end scenario validation tests using real Azure ARM libraries.
+ * These test the exact patterns used in Azure Resource Manager specs
+ * (TrackedResource<T>, @armProviderNamespace, versioning, etc.)
+ *
+ * Scenarios:
+ * 1. Phase B: Breaking changes with versioning (PR #2 pattern)
+ * 2. Phase A: Unversioned changes (PR #4 pattern)
+ * 3. Resource merge with ARM TrackedResource<T>
+ * 4. Reporting: version comparisons tracked
+ */
+
+/** Contoso ARM spec — base (2 versions, no breaking changes) */
+const CONTOSO_BASE = `
+  @armProviderNamespace
+  @service(#{ title: "Microsoft.Contoso management service" })
+  @versioned(Microsoft.Contoso.Versions)
+  namespace Microsoft.Contoso;
+
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_11_01: "2021-11-01",
+  }
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  model Employee is TrackedResource<EmployeeProperties> {
+    ...ResourceNameParameter<Employee>;
+  }
+
+  model EmployeeProperties {
+    age?: int32;
+    city?: string;
+    @visibility(Lifecycle.Read)
+    provisioningState?: ProvisioningState;
+  }
+
+  @lroStatus
+  union ProvisioningState {
+    ResourceProvisioningState,
+    Provisioning: "Provisioning",
+    string,
+  }
+
+  @armResourceOperations
+  interface Employees {
+    get is ArmResourceRead<Employee>;
+    createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+    update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+    delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+    listByResourceGroup is ArmResourceListByParent<Employee>;
+    listBySubscription is ArmListBySubscription<Employee>;
+  }
+`;
+
+/** Contoso ARM spec — PR #2 pattern (adds version with type change + removal) */
+const CONTOSO_PR2 = `
+  @armProviderNamespace
+  @service(#{ title: "Microsoft.Contoso management service" })
+  @versioned(Microsoft.Contoso.Versions)
+  namespace Microsoft.Contoso;
+
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_11_01: "2021-11-01",
+
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2025_01_01: "2025-01-01",
+  }
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  model Employee is TrackedResource<EmployeeProperties> {
+    ...ResourceNameParameter<Employee>;
+  }
+
+  model EmployeeProperties {
+    @typeChangedFrom(Versions.v2025_01_01, int32)
+    age?: int64;
+
+    @removed(Versions.v2025_01_01)
+    city?: string;
+
+    @visibility(Lifecycle.Read)
+    provisioningState?: ProvisioningState;
+  }
+
+  @lroStatus
+  union ProvisioningState {
+    ResourceProvisioningState,
+    Provisioning: "Provisioning",
+    string,
+  }
+
+  @armResourceOperations
+  interface Employees {
+    get is ArmResourceRead<Employee>;
+    createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+    update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+    delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+    listByResourceGroup is ArmResourceListByParent<Employee>;
+    listBySubscription is ArmListBySubscription<Employee>;
+  }
+`;
+
+/** Contoso ARM spec — PR #4 pattern (city removed without versioning) */
+const CONTOSO_PR4 = `
+  @armProviderNamespace
+  @service(#{ title: "Microsoft.Contoso management service" })
+  @versioned(Microsoft.Contoso.Versions)
+  namespace Microsoft.Contoso;
+
+  enum Versions {
+    @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+    v2021_11_01: "2021-11-01",
+  }
+
+  interface Operations extends Azure.ResourceManager.Operations {}
+
+  model Employee is TrackedResource<EmployeeProperties> {
+    ...ResourceNameParameter<Employee>;
+  }
+
+  model EmployeeProperties {
+    age?: int32;
+    @visibility(Lifecycle.Read)
+    provisioningState?: ProvisioningState;
+  }
+
+  @lroStatus
+  union ProvisioningState {
+    ResourceProvisioningState,
+    Provisioning: "Provisioning",
+    string,
+  }
+
+  @armResourceOperations
+  interface Employees {
+    get is ArmResourceRead<Employee>;
+    createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+    update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+    delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+    listByResourceGroup is ArmResourceListByParent<Employee>;
+    listBySubscription is ArmListBySubscription<Employee>;
+  }
+`;
+
+const CONTOSO_PROPERTY_ADDED = CONTOSO_BASE.replace(
+  "model EmployeeProperties {\n    age?: int32;",
+  "model EmployeeProperties {\n    pooling?: boolean;\n    age?: int32;",
+);
+
+describe("scenario validation: ARM end-to-end", () => {
+  describe("Phase A: anonymous unions across independently compiled programs", () => {
+    const anonymousUnionBase = `
+      @service
+      @versioned(Versions)
+      namespace TestService;
+
+      enum Versions {
+        v1: "2024-01-01",
+      }
+
+      union Status {
+        "active",
+        null,
+      }
+
+      model Widget {
+        status: Status;
+      }
+
+      @route("/widgets/{id}")
+      @get
+      op get(@path id: string): Widget;
+    `;
+
+    it("reports no findings for identical anonymous unions", async () => {
+      const { program: baseProgram } = await Tester.compile(anonymousUnionBase);
+      const { program: headProgram } = await Tester.compile(anonymousUnionBase);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(result.findings).toEqual([]);
+    });
+
+    it("reports only the added anonymous union variant", async () => {
+      const { program: baseProgram } = await Tester.compile(anonymousUnionBase);
+      const { program: headProgram } = await Tester.compile(`
+        @service
+        @versioned(Versions)
+        namespace TestService;
+
+        enum Versions {
+          v1: "2024-01-01",
+        }
+
+        union Status {
+          "active",
+          "pending",
+          null,
+        }
+
+        model Widget {
+          status: Status;
+        }
+
+        @route("/widgets/{id}")
+        @get
+        op get(@path id: string): Widget;
+      `);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(
+        result.findings.map((finding) => ({
+          kind: finding.diff.kind,
+          element: finding.diff.identity.element,
+          message: finding.diff.message,
+        })),
+      ).toEqual([
+        {
+          kind: "ResponsePropertyTypeWidened",
+          element: 'body.properties.status.variants."pending"',
+          message: 'Response union at body.properties.status added variant "pending".',
+        },
+      ]);
+    });
+
+    it("reports only the removed anonymous union variant", async () => {
+      const { program: baseProgram } = await Tester.compile(`
+        @service
+        @versioned(Versions)
+        namespace TestService;
+
+        enum Versions {
+          v1: "2024-01-01",
+        }
+
+        union Status {
+          "active",
+          "pending",
+          null,
+        }
+
+        model Widget {
+          status: Status;
+        }
+
+        @route("/widgets/{id}")
+        @get
+        op get(@path id: string): Widget;
+      `);
+      const { program: headProgram } = await Tester.compile(anonymousUnionBase);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(
+        result.findings.map((finding) => ({
+          kind: finding.diff.kind,
+          element: finding.diff.identity.element,
+          message: finding.diff.message,
+        })),
+      ).toEqual([
+        {
+          kind: "ResponsePropertyTypeNarrowed",
+          element: 'body.properties.status.variants."pending"',
+          message: 'Response union at body.properties.status removed variant "pending".',
+        },
+      ]);
+    });
+  });
+
+  describe("Phase B: cross-version breaking changes (PR #2 pattern)", () => {
+    it("detects type change and property removal across versions", async () => {
+      const { program } = await TesterWithArm.compile(CONTOSO_PR2);
+      const result = analyzeProgram(program, { phase: "cross-version" });
+
+      expect(result.findings).toMatchObject([
+        {
+          diff: {
+            kind: "ResourcePropertyTypeChanged",
+            identity: { element: "body.properties.properties.age" },
+            origin: { declarationPath: "Microsoft.Contoso.EmployeeProperties.age" },
+          },
+          severity: "error",
+          suppressed: false,
+          phase: "cross-version",
+          versionPair: {
+            baseVersion: "2021-11-01",
+            headVersion: "2025-01-01",
+            phase: "cross-version",
+          },
+        },
+        {
+          diff: {
+            kind: "ResourcePropertyRemoved",
+            identity: { element: "body.properties.properties.city" },
+            origin: { declarationPath: "Microsoft.Contoso.EmployeeProperties.city" },
+          },
+          severity: "error",
+          suppressed: false,
+          phase: "cross-version",
+          versionPair: {
+            baseVersion: "2021-11-01",
+            headVersion: "2025-01-01",
+            phase: "cross-version",
+          },
+        },
+      ]);
+      for (const [index, property] of ["age", "city"].entries()) {
+        const [target, diagnostics] = program.resolveTypeReference(
+          `Microsoft.Contoso.EmployeeProperties.${property}`,
+        );
+        expect(diagnostics).toEqual([]);
+        expect(target).toBeDefined();
+        expect(resolveFindingLocation(result.findings[index])).toEqual({
+          location: getSourceLocation(target!, { locateId: true }),
+          sourceTraceLevel: "direct",
+        });
+      }
+    }, 30_000);
+  });
+  describe("Phase A: unversioned changes (PR #4 pattern)", () => {
+    it("detects city removal when comparing base to head", async () => {
+      const { program: baseProgram } = await TesterWithArm.compile(CONTOSO_BASE);
+      const { program: headProgram } = await TesterWithArm.compile(CONTOSO_PR4);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+
+      expect(result.findings).toMatchObject([
+        {
+          diff: {
+            kind: "ResourcePropertyRemoved",
+            identity: { element: "body.properties.properties.city" },
+            origin: { declarationPath: "Microsoft.Contoso.EmployeeProperties.city" },
+          },
+          severity: "error",
+          suppressed: false,
+          phase: "same-version",
+          versionPair: {
+            baseVersion: "2021-11-01",
+            headVersion: "2021-11-01",
+            phase: "same-version",
+          },
+        },
+      ]);
+      const [target, diagnostics] = headProgram.resolveTypeReference(
+        "Microsoft.Contoso.EmployeeProperties",
+      );
+      expect(diagnostics).toEqual([]);
+      expect(target).toBeDefined();
+      expect(resolveFindingLocation(result.findings[0])).toEqual({
+        location: getSourceLocation(target!, { locateId: true }),
+        sourceTraceLevel: "parentModel",
+      });
+    }, 30_000);
+
+    it("reports both source declaration and wire identities for a resource property addition", async () => {
+      const { program: baseProgram } = await TesterWithArm.compile(CONTOSO_BASE);
+      const { program: headProgram } = await TesterWithArm.compile(CONTOSO_PROPERTY_ADDED);
+
+      const result = analyzeBaseAndHead(baseProgram, headProgram, {
+        phase: "same-version",
+      });
+      const finding = result.findings.find(
+        (candidate) =>
+          candidate.diff.kind === "ResourcePropertyAdded" &&
+          candidate.diff.identity.element.endsWith(".pooling"),
+      );
+
+      expect(finding).toBeDefined();
+      expect(finding!.diff.identity.element).toContain("properties");
+      expect(finding!.diff.origin?.declarationPath).toBe(
+        "Microsoft.Contoso.EmployeeProperties.pooling",
+      );
+      expect(result.summary.versionComparisons[0]).toMatchObject({
+        findingCount: 1,
+        rawFindingCount: 2,
+      });
+
+      const json = JSON.parse(formatJsonReport({ ...result, findings: [finding!] }));
+      expect(json.findings[0]).toMatchObject({
+        element: finding!.diff.identity.element,
+        sourceElementPath: "Microsoft.Contoso.EmployeeProperties.pooling",
+      });
+
+      const markdown = renderMarkdownSummary({ ...result, findings: [finding!] });
+      expect(markdown).toContain("Microsoft.Contoso.EmployeeProperties.pooling");
+      expect(markdown).toContain(`\`${finding!.diff.identity.element}\``);
+      expect(markdown).toContain(
+        "| Kind | Source declaration | Wire identity | Source | Suppression |",
+      );
+    }, 30_000);
+  });
+
+  describe("Resource merge with ARM TrackedResource<T>", () => {
+    it("findings use Resource* kinds for shared properties", async () => {
+      const { program } = await TesterWithArm.compile(CONTOSO_PR2);
+      const result = analyzeProgram(program, { phase: "cross-version" });
+
+      const findings = result.findings.filter((f) => f.severity === "error");
+      for (const f of findings) {
+        if (f.diff.identity.element.includes("properties.properties.")) {
+          expect(f.diff.kind).toMatch(/^Resource/);
+        }
+      }
+    }, 30_000);
+
+    it("origin traces to user-declared model property, not ARM-generated copies", async () => {
+      const { program } = await TesterWithArm.compile(CONTOSO_PR2);
+      const result = analyzeProgram(program);
+
+      for (const f of result.findings) {
+        if (f.diff.origin) {
+          // Origin should never point to visibility-filtered copies
+          expect(f.diff.origin.declarationPath).not.toContain("CreateOrUpdate");
+          expect(f.diff.origin.declarationPath).not.toContain("Update");
+
+          // Source location should be in user code, not intrinsics
+          if (f.diff.origin.sourceLocation) {
+            expect(f.diff.origin.sourceLocation.file.path).not.toContain("intrinsics");
+            expect(f.diff.origin.sourceLocation.file.path).not.toContain("node_modules");
+          }
+        }
+      }
+    }, 30_000);
+
+    it("self-comparison (base=head) produces 0 findings", async () => {
+      const { program } = await TesterWithArm.compile(CONTOSO_BASE);
+      const result = analyzeBaseAndHead(program, program, { phase: "same-version" });
+
+      expect(result.findings).toHaveLength(0);
+    }, 30_000);
+  });
+
+  describe("reporting: version comparisons are tracked", () => {
+    it("versionComparisons array is populated for Phase B", async () => {
+      const { program } = await TesterWithArm.compile(CONTOSO_PR2);
+      const result = analyzeProgram(program, { phase: "cross-version" });
+
+      expect(result.summary.versionComparisons).toBeDefined();
+      expect(result.summary.versionComparisons.length).toBeGreaterThanOrEqual(1);
+
+      for (const vc of result.summary.versionComparisons) {
+        expect(vc.serviceName).toBeTruthy();
+        expect(vc.baseVersion).toBeTruthy();
+        expect(vc.headVersion).toBeTruthy();
+        expect(vc.phase).toBe("cross-version");
+        expect(vc.findingCount).toBeGreaterThanOrEqual(0);
+      }
+    }, 30_000);
+
+    it("summary includes phase when filtered", async () => {
+      const { program } = await TesterWithArm.compile(CONTOSO_PR2);
+      const result = analyzeProgram(program, { phase: "cross-version" });
+
+      expect(result.summary.phase).toBe("cross-version");
+    }, 30_000);
+  });
+});

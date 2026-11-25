@@ -6,6 +6,10 @@ import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Tra
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import { $requestParameter, $responseProperty } from "./decorators.js";
 import { $azureServiceConfigurations } from "./decorators/azure-service-configurations.js";
+import {
+  $approvedBreakingChange,
+  $approvedUnversionedChange,
+} from "./decorators/breaking-change.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
@@ -51,6 +55,8 @@ export { $onValidate } from "./validate.js";
 /** @internal */
 export const $decorators = {
   "Azure.Core": {
+    approvedBreakingChange: $approvedBreakingChange,
+    approvedUnversionedChange: $approvedUnversionedChange,
     azureServiceConfigurations: $azureServiceConfigurations,
     lroStatus: $lroStatus,
     finalLocation: $finalLocation,
