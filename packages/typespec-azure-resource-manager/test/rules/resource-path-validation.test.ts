@@ -91,6 +91,32 @@ it("uses the resolved parent relationship for nested resource paths", async () =
     .toBeValid();
 });
 
+it("accepts a subscription child when the parent also exists at tenant scope", async () => {
+  await tester
+    .expect(
+      service(`
+        @subscriptionResource
+        model Event is ProxyResource<{}> { ...ResourceNameParameter<Event>; }
+        @subscriptionResource
+        @parentResource(Event)
+        model ImpactedResource is ProxyResource<{}> { ...ResourceNameParameter<ImpactedResource>; }
+        interface Events {
+          @route("/providers/Microsoft.Contoso/events/{eventId}") @get @armResourceRead(Event)
+          op tenant(@path eventId: string): Event;
+          @route("/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/events/{eventId}")
+          @get @armResourceRead(Event)
+          op subscription(@path subscriptionId: string, @path eventId: string): Event;
+        }
+        interface ImpactedResources {
+          @route("/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/events/{eventId}/impactedResources/{impactedId}")
+          @get @armResourceRead(ImpactedResource)
+          op get(@path subscriptionId: string, @path eventId: string, @path impactedId: string): ImpactedResource;
+        }
+      `),
+    )
+    .toBeValid();
+});
+
 it("checks provider casing on every path regardless of HTTP method", async () => {
   await tester
     .expect(service(operation("/providers/Microsoft.contoso/widgets", "post"), "Microsoft.contoso"))
