@@ -1,17 +1,8 @@
-GET responses for private endpoint connections and private link resources must
-contain the properties needed by private link clients.
+GET responses for private endpoint connections and private link resources must contain the properties needed by private link clients.
 
-For private endpoint connection responses, the resource must contain
-`properties.privateEndpoint` and `properties.privateLinkServiceConnectionState`.
-Private link resources must contain `properties.groupId`,
-`properties.requiredMembers`, and `properties.requiredZoneNames`. Collection
-responses must contain a `value` array of these resources. Properties may be
-optional and may be inherited.
+For private endpoint connection responses, the resource must contain `properties.privateEndpoint` and `properties.privateLinkServiceConnectionState`. Private link resources must contain `properties.groupId`, `properties.requiredMembers`, and `properties.requiredZoneNames`. Collection responses must contain a `value` array of these resources. Properties may be optional and may be inherited.
 
-This rule checks GET 200 responses of resolved ARM resource operations with
-paths ending in `/privateEndpointConnections`, `/privateEndpointConnections/{name}`,
-or `/privateLinkResources`. It does not check whether these APIs exist or
-require an ARM private link operation template.
+This rule checks GET 200 responses of resolved ARM resource operations with paths ending in `/privateEndpointConnections`, `/privateEndpointConnections/{name}`, or `/privateLinkResources`. It does not check whether these APIs exist or require an ARM private link operation template.
 
 ## Impact
 
@@ -21,8 +12,7 @@ Missing properties prevent clients from consistently using private link resource
 
 ## ❌ Incorrect
 
-Assume `Widget` and `Connections` are declared for a private endpoint connection.
-This overridden read response omits the connection state.
+Assume `Widget` and `Connections` are declared for a private endpoint connection. This overridden read response omits the connection state.
 
 ```typespec
 model IncompleteConnection {
@@ -57,12 +47,8 @@ interface Widgets {
 
 ## LintDiff Equivalent
 
-This rule corresponds to
-[PrivateEndpointResourceSchemaValidation](https://github.com/Azure/azure-openapi-validator/blob/main/docs/private-endpoint-resource-schema-validation.md).
-Unlike the Swagger rule, it only checks operations attached to resolved ARM
-resources; unmatched list operations and unregistered paths are outside its scope.
+This rule corresponds to [PrivateEndpointResourceSchemaValidation](https://github.com/Azure/azure-openapi-validator/blob/main/docs/private-endpoint-resource-schema-validation.md). Unlike the Swagger rule, it only checks operations attached to resolved ARM resources; unmatched list operations and unregistered paths are outside its scope.
 
 ## Suppression
 
-Suppress the rule on the operation only for an intentional compatibility
-exception approved by an ARM reviewer.
+Suppress the rule on the operation only for an intentional compatibility exception approved by an ARM reviewer.
