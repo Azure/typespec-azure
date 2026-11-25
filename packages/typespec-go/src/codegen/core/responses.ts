@@ -73,17 +73,41 @@ function generateMarshaller(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  let text = "";
+  const finalResponseResultPath =
+    go.isLROMethod(respEnv.method) && respEnv.method.finalResponseResultPath.length > 0
+      ? respEnv.method.finalResponseResultPath
+      : undefined;
+  let targetField: string | undefined;
   if (go.isLROMethod(respEnv.method) && respEnv.result?.kind === "polymorphicResult") {
     // fakes require a custom marshaller for polymorphics results so that the data is in the correct shape.
     // without it, the response envelope type name is the outer type which is incorrect.
-    imports.add("encoding/json");
-    const receiver = respEnv.name[0].toLowerCase();
-    text += `${helpers.comment(`MarshalJSON implements the json.Marshaller interface for type ${respEnv.name}.`, "// ", undefined, helpers.commentLength)}\n`;
-    text += `func (${receiver} ${respEnv.name}) MarshalJSON() ([]byte, error) {\n`;
-    // TODO: this doesn't include any headers. however, LROs with header responses are currently broken :(
-    text += `${indent.get()}return json.Marshal(${receiver}.${go.getTypeDeclaration(respEnv.result.type, respEnv.method.receiver.type.pkg)})\n}\n\n`;
+    targetField = go.getTypeDeclaration(respEnv.result.type, respEnv.method.receiver.type.pkg);
+  } else if (finalResponseResultPath && respEnv.result?.kind === "monomorphicResult") {
+    targetField = respEnv.result.fieldName;
+  } else if (finalResponseResultPath && respEnv.result?.kind === "modelResult") {
+    targetField = respEnv.result.type.name;
   }
+
+  if (!targetField) {
+    return "";
+  }
+
+  imports.add("encoding/json");
+  const receiver = respEnv.name[0].toLowerCase();
+  let text = `${helpers.comment(`MarshalJSON implements the json.Marshaller interface for type ${respEnv.name}.`, "// ", undefined, helpers.commentLength)}\n`;
+  text += `func (${receiver} ${respEnv.name}) MarshalJSON() ([]byte, error) {\n`;
+  // TODO: this doesn't include any headers. however, LROs with header responses are currently broken :(
+  if (finalResponseResultPath) {
+    // fakes marshal the response envelope directly, so wrap the payload to match UnmarshalJSON
+    text += `${indent.get()}var body any = ${receiver}.${targetField}\n`;
+    for (const segment of [...finalResponseResultPath].reverse()) {
+      text += `${indent.get()}body = map[string]any{${JSON.stringify(segment)}: body}\n`;
+    }
+    text += `${indent.get()}return json.Marshal(body)\n`;
+  } else {
+    text += `${indent.get()}return json.Marshal(${receiver}.${targetField})\n`;
+  }
+  text += "}\n\n";
   return text;
 }
 
@@ -101,17 +125,25 @@ function generateUnmarshaller(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
+  const finalResponseResultPath =
+    go.isLROMethod(respEnv.method) && respEnv.method.finalResponseResultPath.length > 0
+      ? respEnv.method.finalResponseResultPath
+      : undefined;
   // if the response envelope contains a discriminated type we need an unmarshaller
   let polymorphicRes: go.PolymorphicResult | undefined;
   // in addition, if it's an LRO operation that returns a scalar, we will also need one
   let monomorphicRes: go.MonomorphicResult | undefined;
+  // model results need a custom unmarshaller when extracted from a final response
+  let finalResponseModelRes: go.ModelResult | undefined;
   if (respEnv.result?.kind === "polymorphicResult") {
     polymorphicRes = respEnv.result;
   } else if (go.isLROMethod(respEnv.method) && respEnv.result?.kind === "monomorphicResult") {
     monomorphicRes = respEnv.result;
+  } else if (finalResponseResultPath && respEnv.result?.kind === "modelResult") {
+    finalResponseModelRes = respEnv.result;
   }
 
-  if (!polymorphicRes && !monomorphicRes) {
+  if (!polymorphicRes && !monomorphicRes && !finalResponseModelRes) {
     // no unmarshaller required
     return "";
   }
@@ -119,6 +151,24 @@ function generateUnmarshaller(
   const receiver = respEnv.name[0].toLowerCase();
   let unmarshaller = `${helpers.comment(`UnmarshalJSON implements the json.Unmarshaller interface for type ${respEnv.name}.`, "// ", undefined, helpers.commentLength)}\n`;
   unmarshaller += `func (${receiver} *${respEnv.name}) UnmarshalJSON(data []byte) error {\n`;
+
+  if (finalResponseResultPath) {
+    imports.add("encoding/json");
+    imports.add("fmt");
+    for (const [index, segment] of finalResponseResultPath.entries()) {
+      const envelope = `envelope${index}`;
+      const value = `value${index}`;
+      unmarshaller += `${indent.get()}var ${envelope} map[string]json.RawMessage\n`;
+      unmarshaller += `${indent.get()}if err := json.Unmarshal(data, &${envelope}); err != nil {\n`;
+      unmarshaller += `${indent.push().get()}return err\n`;
+      unmarshaller += `${indent.pop().get()}}\n`;
+      unmarshaller += `${indent.get()}${value}, ok := ${envelope}[${JSON.stringify(segment)}]\n`;
+      unmarshaller += `${indent.get()}if !ok {\n`;
+      unmarshaller += `${indent.push().get()}return fmt.Errorf("response is missing result path %q", ${JSON.stringify(finalResponseResultPath.slice(0, index + 1).join("."))})\n`;
+      unmarshaller += `${indent.pop().get()}}\n`;
+      unmarshaller += `${indent.get()}data = ${value}\n`;
+    }
+  }
 
   // add a custom unmarshaller to the response envelope
   if (polymorphicRes) {
@@ -134,6 +184,9 @@ function generateUnmarshaller(
   } else if (monomorphicRes) {
     imports.add("encoding/json");
     unmarshaller += `${indent.get()}return json.Unmarshal(data, &${receiver}.${monomorphicRes.fieldName})\n`;
+  } else if (finalResponseModelRes) {
+    imports.add("encoding/json");
+    unmarshaller += `${indent.get()}return json.Unmarshal(data, &${receiver}.${finalResponseModelRes.type.name})\n`;
   } else {
     throw new CodegenError("InternalError", `unhandled case for response envelope ${respEnv.name}`);
   }
@@ -179,7 +232,7 @@ function emit(
         let tag = "";
         if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML" && respEnv.result.xmlWrapper) {
           // only emit tags for XML; JSON uses custom marshallers/unmarshallers
-          tag = ` \`xml:"${respEnv.result.xmlWrapper}"\``;
+          tag = ` ${helpers.formatXMLStructTag(respEnv.result.xmlWrapper)}`;
         }
 
         fields.push({

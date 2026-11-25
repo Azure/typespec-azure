@@ -64,6 +64,8 @@ export async function _doThingDeserialize(result: PathUncheckedResponse): Promis
 
   return;
 }
+
+/** Performs the doThing operation. */
 export async function doThing(
   context: Client,
   bodyParam: RequestBody,

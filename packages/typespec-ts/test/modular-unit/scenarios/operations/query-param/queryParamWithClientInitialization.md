@@ -112,6 +112,7 @@ withRawContent: true
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for BillingBenefits. */
 export interface BillingBenefitsContext extends Client {
   /** The expand query parameter. */
   expand?: string;
@@ -123,6 +124,7 @@ export interface BillingBenefitsClientOptionalParams extends ClientOptions {
   expand?: string;
 }
 
+/** Creates a BillingBenefits client context. */
 export function createBillingBenefits(
   endpointParam: string,
   options: BillingBenefitsClientOptionalParams = {},
@@ -206,6 +208,7 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
+
 /** Get savings plan. */
 export async function get(
   context: Client,
@@ -343,6 +346,7 @@ withRawContent: true
 import { logger } from "../logger.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
+/** The client context for BillingBenefits. */
 export interface BillingBenefitsContext extends Client {
   /** The expand query parameter. */
   expand: string;
@@ -351,6 +355,7 @@ export interface BillingBenefitsContext extends Client {
 /** Optional parameters for the client. */
 export interface BillingBenefitsClientOptionalParams extends ClientOptions {}
 
+/** Creates a BillingBenefits client context. */
 export function createBillingBenefits(
   endpointParam: string,
   expand: string,
@@ -435,6 +440,7 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Sa
 
   return savingsPlanModelDeserializer(result.body);
 }
+
 /** Get savings plan. */
 export async function get(
   context: Client,

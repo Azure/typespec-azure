@@ -97,6 +97,8 @@ export async function _readDeserialize(
 
   return streamingChatCompletionOptionsDeserializer(result.body);
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   id: string,
@@ -161,6 +163,8 @@ export async function _readDeserialize(result: PathUncheckedResponse): Promise<t
 
   return result.body;
 }
+
+/** Performs the read operation. */
 export async function read(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },

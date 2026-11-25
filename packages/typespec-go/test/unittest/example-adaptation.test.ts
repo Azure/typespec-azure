@@ -186,7 +186,8 @@ describe("Example adaptation", () => {
       expect(example).toContain('Name: to.Ptr("second")');
       expect(example).toContain("Count: to.Ptr[int32](42)");
       expect(example).toContain("Enabled: to.Ptr(false)");
-      expect(example).toContain("Maybe: nil");
+      expect(example).toContain("Maybe: azcore.NullValue[*string]()");
+      expect(example).toContain("// \t\t\tMaybe: nil");
       expect(example).toContain(`Pet: &testmodule.${tag === "known" ? "Cat" : "Pet"}{`);
       expect(example).toContain(`Kind: to.Ptr("${tag}")`);
     },
