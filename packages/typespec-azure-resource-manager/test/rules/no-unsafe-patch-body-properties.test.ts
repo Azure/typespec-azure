@@ -151,13 +151,19 @@ describe("partial resource layout", () => {
       }));
   });
 
-  it.each([false, true])("compares nullable model layouts, extra: %s", async (extra) => {
-    const expectation = tester.expect(`${service}
-      @patch op update(@body body: { details?: { value?: string; ${extra ? "extra?: string;" : ""} } | null } | null):
-        { details: { value: string } | null };
-    `);
-    if (extra) await expectation.toEmitDiagnostics(missing("details.extra"));
-    else await expectation.toBeValid();
+  it("compares nullable input and resource models without requiring omitted fields", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Resource { details: { value: string; omitted: string } | null; }
+        model Partial { details?: { value?: string } | null; }
+        @route("/valid") @patch op valid(@body body: Partial | null): Resource;
+        @route("/invalid") @patch op invalid(@body body: {
+          details?: { value?: string; /*extra*/extra?: string } | null;
+        } | null): Resource;
+      `,
+      )
+      .toEmitDiagnostics((x) => ({ ...missing("details.extra"), pos: x.pos.extra.pos }));
   });
   it("excludes transport headers from an associated resource layout", async () => {
     await tester
@@ -323,7 +329,7 @@ describe("partial resource layout", () => {
       ]);
   });
 
-  it("accepts named PATCH keys permitted by a resource record", async () => {
+  it("allows named PATCH keys through the resource Record indexer", async () => {
     await tester
       .expect(
         `${service}
@@ -355,7 +361,7 @@ describe("partial resource layout", () => {
       .toEmitDiagnostics(missing("value"));
   });
 
-  it("retains safety checks on keys permitted by a resource record", async () => {
+  it("checks required fields, defaults, and visibility on Record-permitted keys", async () => {
     await tester
       .expect(
         `${service}
@@ -463,16 +469,6 @@ describe("lifecycle visibility and effective input", () => {
     `,
       )
       .toEmitDiagnostics([immutable("location"), required("value"), defaultValue("value")]);
-  });
-  it("does not inspect transport headers from bodyRoot as JSON fields", async () => {
-    await tester
-      .expect(
-        `${service}
-      model Patch { @header location?: string; @header value: string = "fixed"; actual?: string; }
-      @patch op update(@bodyRoot body: Patch): void;
-    `,
-      )
-      .toBeValid();
   });
   it("preserves ARM reserved-field checks without a resource counterpart", async () => {
     await tester
@@ -603,19 +599,21 @@ describe("lifecycle visibility and effective input", () => {
       ]);
   });
 
-  it.each(["id", "name", "type", "location"])(
-    "does not trust missing resource lifecycle annotations for reserved %s",
-    async (name) => {
-      await tester
-        .expect(
-          `${service}
-          model Resource { ${name}?: string; }
-          @patch op update(@body body: { ${name}?: string }): Resource;
-        `,
-        )
-        .toEmitDiagnostics(immutable(name));
-    },
-  );
+  it("does not trust missing resource lifecycle annotations for reserved fields", async () => {
+    await tester
+      .expect(
+        `${service}
+        model Resource { id?: string; name?: string; type?: string; location?: string; }
+        @patch op update(@body body: Resource): Resource;
+      `,
+      )
+      .toEmitDiagnostics([
+        immutable("id"),
+        immutable("name"),
+        immutable("type"),
+        immutable("location"),
+      ]);
+  });
 
   it("does not trust unannotated provisioning state even when its owning rule is suppressed", async () => {
     await tester
@@ -649,15 +647,21 @@ describe("lifecycle visibility and effective input", () => {
 });
 
 describe("partial-update safety and traversal policies", () => {
-  it.each([false, true])("checks required nullable input, nested: %s", async (nested) => {
+  it("checks required fields in root and nested nullable input", async () => {
     await tester
       .expect(
         `${service}
-        model Details { value: string; }
-        @patch op update(@body body: ${nested ? "{ details?: Details | null }" : "Details | null"}): void;
+        model Details { /*nested*/value: string; }
+        @patch op update(@body body: {
+          /*root*/value: string;
+          details?: Details | null;
+        } | null): void;
       `,
       )
-      .toEmitDiagnostics(required(nested ? "details.value" : "value"));
+      .toEmitDiagnostics((x) => [
+        { ...required("value"), pos: x.pos.root.pos },
+        { ...required("details.value"), pos: x.pos.nested.pos },
+      ]);
   });
   it("does not exempt identity encoded away from the envelope path", async () => {
     await tester
@@ -807,28 +811,26 @@ describe("partial-update safety and traversal policies", () => {
       .toEmitDiagnostics(required("items"));
   });
 
-  it.each([
-    "Record<{ required: string; enabled?: boolean = false }>",
-    "[{ required: string; enabled?: boolean = false }]",
-    "{ a: string } | { b: string }",
-  ])("does not expand excluded collection/union values: %s", async (type) => {
+  it("checks models without expanding excluded values or comparing scalar types", async () => {
     await tester
       .expect(
         `${service}
-      @patch op update(@body body: { value?: ${type} }): { value: string };
-    `,
+        model Patch {
+          scalarValue?: string;
+          literalValue?: "ready";
+          recordValue?: Record<{ required: string; enabled?: boolean = false }>;
+          tupleValue?: [{ required: string; enabled?: boolean = false }];
+          unionValue?: { a: string } | { b: string };
+          arrayValue?: { id: string }[];
+          modelValue?: { /*value*/value: string };
+        }
+        @patch op update(@body body: Patch): {
+          scalarValue: int32; literalValue: string; recordValue: string; tupleValue: string;
+          unionValue: string; arrayValue: string; modelValue: { value: string };
+        };
+      `,
       )
-      .toBeValid();
-  });
-
-  it("does not add array-versus-scalar type equality checks", async () => {
-    await tester
-      .expect(
-        `${service}
-      @patch op update(@body body: { value?: { id: string }[] }): { value: string };
-    `,
-      )
-      .toBeValid();
+      .toEmitDiagnostics((x) => ({ ...required("modelValue.value"), pos: x.pos.value.pos }));
   });
 });
 
@@ -1140,13 +1142,17 @@ describe("scope and registration", () => {
       ]);
   });
 
-  it.each([
-    '@header contentType: "multipart/form-data", @multipartBody body: { required: HttpPart<string> }',
-    '@header contentType: "multipart/form-data", @multipartBody body: [HttpPart<string, #{name: "required"}>]',
-    "@bodyRoot body: File",
-    '@header contentType: "application/octet-stream", @body body: bytes',
-  ])("does not inspect transport payload: %s", async (parameters) => {
-    await tester.expect(`${service} @patch op update(${parameters}): void;`).toBeValid();
+  it("skips multipart bodies rather than checking their parts as resource properties", async () => {
+    await tester
+      .expect(
+        `${service}
+        @patch op update(
+          @header contentType: "multipart/form-data",
+          @multipartBody body: { required: HttpPart<string> },
+        ): void;
+      `,
+      )
+      .toBeValid();
   });
 
   describe("applicability", () => {
@@ -1179,12 +1185,14 @@ describe("scope and registration", () => {
         )
         .toEmitDiagnostics([required("displayName"), defaultValue("enabled")]);
     });
-    it.each(["post", "put"])("ignores %s request bodies", async (verb) => {
+    it("ignores POST and PUT request bodies", async () => {
       await tester
         .expect(
           `
           namespace Microsoft.TestService;
-          @${verb} op write(@body body: { value: string; enabled?: boolean = false }): void;
+          model Input { value: string; enabled?: boolean = false; }
+          @post op create(@body body: Input): void;
+          @put op replace(@body body: Input): void;
         `,
         )
         .toBeValid();

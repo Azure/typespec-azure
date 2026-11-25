@@ -8,11 +8,9 @@ ARM PATCH request bodies should allow partial updates: include only resource pro
 - Make PATCH fields optional and remove default values, including `false`, `0`, and `""`.
 - Exclude properties that cannot be updated. Properties exposed in PATCH input must use default visibility or explicitly include `Lifecycle.Update`.
 
-The request is compared with the associated resource, or otherwise its PATCH response or same-route GET response. Keep matching JSON property names and nesting; a PATCH document may omit resource properties.
+Required fields inside replacement array elements are allowed. Top-level `identity` fields need only match the resource layout. Check SDK optionality separately when using legacy implicit PATCH optionality.
 
-Required fields inside replacement array elements are allowed. The top-level `identity` property and its descendants are exempt from optionality, default, and resource/input visibility checks, but must still match the resource layout. The rule respects effective HTTP optionality; it does not warn about legacy implicit optionality or guarantee SDK optionality.
-
-## Incorrect example
+## ❌ Incorrect
 
 Given a `Widget` tracked resource with `displayName` and `description` in its `properties` model, this request exposes non-updatable `location`, requires `properties` and `displayName`, adds an unknown property, and supplies a default:
 
@@ -32,7 +30,7 @@ interface Widgets {
 }
 ```
 
-## Correct example
+## ✅ Correct
 
 Use an explicit update model with optional, default-free resource properties:
 
