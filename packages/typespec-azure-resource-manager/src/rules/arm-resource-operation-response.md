@@ -1,8 +1,12 @@
 Resource read, create, update, and list operations must return their associated resource model, or a collection of that model for list operations. A PUT request must also use the associated resource model.
 
-ARM PUT 200 and 201 responses must describe a resource, including custom PUT operations. Resource identity comes from native ARM declarations: registered resources, common resource bases and their descendants, and explicitly declared custom resources. Matching resource property names alone does not make a model a resource.
+ARM PUT 200 and 201 responses must describe a resource, including custom PUT operations. Resource identity comes from resolved ARM resources, common resource bases and their descendants, and explicitly declared custom or virtual resources. Matching resource property names alone does not make a model a resource.
 
 Prefer standard resource and operation templates. For customized operations, use the appropriate ARM decorators so resource associations are available to tooling. A response that already fails the associated-resource comparison does not produce an additional resource-identity warning.
+
+Resource associations are resolved per resource instance path and scope. When a model is reused at several scopes, the operations associated with each occurrence are checked. Operations that tooling cannot associate with a resource are outside the associated-resource comparison.
+
+A resource with only LIST or PATCH registrations may not produce a resolved resource occurrence. Those operations are not checked by this comparison when their resource is unresolved.
 
 The request comparison respects request visibility and accepts aliases of the associated resource, but not separately declared input models. Multipart request bodies are outside this comparison. List responses compare their item type; discriminated base/derived resource responses are accepted.
 

@@ -9,19 +9,17 @@ import {
   isArrayModelType,
   isVoidType,
   paramMessage,
-  type DiagnosticMessages,
-  type LinterRuleContext,
   type Model,
   type Operation,
   type Program,
   type Type,
 } from "@typespec/compiler";
-import { createMetadataInfo, getHttpOperation, resolveRequestVisibility } from "@typespec/http";
+import { createMetadataInfo, resolveRequestVisibility, type HttpOperation } from "@typespec/http";
 
 import { getArmProviderNamespace } from "../namespace.js";
-import { getArmResourceOperationList, type ArmResourceOperation } from "../operations.js";
+import type { ArmResourceOperation } from "../operations.js";
 import { isAzureResource } from "../private.decorators.js";
-import { getArmResource, isCustomAzureResource, resolveArmResources } from "../resource.js";
+import { isArmVirtualResource, isCustomAzureResource, resolveArmResources } from "../resource.js";
 import { containsStatusCode } from "./http-response-utils.js";
 import { isInternalTypeSpec } from "./utils.js";
 
@@ -40,57 +38,66 @@ export const armResourceOperationsRule = createRule({
   },
   create(context) {
     const metadata = createMetadataInfo(context.program);
-    const responseFailures = new Set<Operation>();
     return {
-      model(model) {
+      exitNamespace(namespace) {
+        if (namespace !== context.program.getGlobalNamespaceType()) return;
         const program = context.program;
-        if (isInternalTypeSpec(program, model) || !getArmResource(program, model)) return;
-        const checkedOperations = new Set<Operation>();
-        for (const { kind, operation } of getArmResourceOperationList(program, model)) {
-          if (
-            (kind !== "read" &&
-              kind !== "createOrUpdate" &&
-              kind !== "update" &&
-              kind !== "list") ||
-            isInternalTypeSpec(program, operation) ||
-            checkedOperations.has(operation)
-          ) {
-            continue;
-          }
-          checkedOperations.add(operation);
-          if (kind === "createOrUpdate") {
-            const [httpOperation] = getHttpOperation(program, operation);
-            if (httpOperation.verb === "put") {
-              const body = httpOperation.parameters.body;
-              if (body === undefined || isVoidType(body.type)) {
-                context.reportDiagnostic({ target: operation, messageId: "missingRequest" });
-              } else if (body.bodyKind === "single") {
-                const request = metadata.getEffectivePayloadType(
-                  body.type,
-                  resolveRequestVisibility(program, operation, httpOperation.verb),
-                );
-                if (request !== model) {
-                  context.reportDiagnostic({
-                    target: operation,
-                    messageId: "requestMismatch",
-                    format: { resource: getTypeName(model), request: getTypeName(request) },
-                  });
+        const provider = resolveArmResources(program);
+        const resources = provider.resources ?? [];
+        const resourceModels = new Set(resources.map((resource) => resource.type));
+        const responseFailures = new Set<Operation>();
+        const checkedRequests = new Map<Operation, Set<Model>>();
+        for (const resource of resources) {
+          const model = resource.type;
+          if (isInternalTypeSpec(program, model)) continue;
+          const operations = [
+            ...(resource.operations.lifecycle.read ?? []),
+            ...(resource.operations.lifecycle.createOrUpdate ?? []),
+            ...(resource.operations.lifecycle.update ?? []),
+            ...resource.operations.lists,
+          ];
+          for (const { kind, operation, httpOperation } of operations) {
+            if (isInternalTypeSpec(program, operation)) continue;
+            if (kind === "createOrUpdate" && httpOperation.verb === "put") {
+              const models = checkedRequests.get(operation) ?? new Set<Model>();
+              checkedRequests.set(operation, models);
+              if (!models.has(model)) {
+                models.add(model);
+                const body = httpOperation.parameters.body;
+                if (body === undefined || isVoidType(body.type)) {
+                  context.reportDiagnostic({ target: operation, messageId: "missingRequest" });
+                } else if (body.bodyKind === "single") {
+                  const request = metadata.getEffectivePayloadType(
+                    body.type,
+                    resolveRequestVisibility(program, operation, httpOperation.verb),
+                  );
+                  if (request !== model) {
+                    context.reportDiagnostic({
+                      target: operation,
+                      messageId: "requestMismatch",
+                      format: { resource: getTypeName(model), request: getTypeName(request) },
+                    });
+                  }
                 }
               }
             }
-          }
-          if (!checkArmResourceOperationReturnType(context, model, operation, kind === "list")) {
-            responseFailures.add(operation);
+            if (
+              !checkArmResourceOperationReturnType(
+                program,
+                model,
+                httpOperation,
+                kind === "list",
+              ) &&
+              !responseFailures.has(operation)
+            ) {
+              context.reportDiagnostic({ target: operation });
+              responseFailures.add(operation);
+            }
           }
         }
-      },
-      exitNamespace(namespace) {
-        if (namespace !== context.program.getGlobalNamespaceType()) return;
         // Canonical comparisons run first so the same response is not diagnosed twice.
-        const program = context.program;
-        const provider = resolveArmResources(program);
         const operations: ArmResourceOperation[] = [
-          ...(provider.resources ?? []).flatMap((resource) => [
+          ...resources.flatMap((resource) => [
             ...Object.values(resource.operations.lifecycle).flat(),
             ...resource.operations.lists,
             ...resource.operations.actions,
@@ -122,7 +129,7 @@ export const armResourceOperationsRule = createRule({
                 body && !isVoidType(body.type) ? [body] : [],
               ),
             );
-          if (bodies.some((body) => !isResourceModel(program, body.type))) {
+          if (bodies.some((body) => !isResourceModel(program, body.type, resourceModels))) {
             context.reportDiagnostic({ target: operation, messageId: "nonResourceResponse" });
           }
         }
@@ -132,13 +139,11 @@ export const armResourceOperationsRule = createRule({
 });
 
 function checkArmResourceOperationReturnType(
-  context: LinterRuleContext<DiagnosticMessages>,
+  program: Program,
   model: Model,
-  operation: Operation,
+  httpOperation: HttpOperation,
   list = false,
 ): boolean {
-  const program = context.program;
-  const [httpOperation] = getHttpOperation(program, operation);
   for (const response of httpOperation.responses) {
     const status = response.statusCodes;
     if (
@@ -166,7 +171,6 @@ function checkArmResourceOperationReturnType(
           (!isDiscriminatedAncestor(model, candidate) &&
             !isDiscriminatedAncestor(candidate, model)))
       ) {
-        context.reportDiagnostic({ target: operation });
         return false;
       }
     }
@@ -182,7 +186,7 @@ function checkArmResourceOperationReturnType(
   }
 }
 
-function isResourceModel(program: Program, type: Type): boolean {
+function isResourceModel(program: Program, type: Type, resourceModels: Set<Model>): boolean {
   if (type.kind !== "Model") return false;
   for (
     let model: Model | undefined = getEffectiveModelType(program, type);
@@ -190,8 +194,9 @@ function isResourceModel(program: Program, type: Type): boolean {
     model = model.baseModel
   ) {
     if (
-      getArmResource(program, model) !== undefined ||
+      resourceModels.has(model) ||
       isAzureResource(program, model) ||
+      isArmVirtualResource(program, model) ||
       isCustomAzureResource(program, model)
     ) {
       return true;

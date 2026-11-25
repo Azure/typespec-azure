@@ -157,30 +157,170 @@ const requestDiagnostic = (request: string) => ({
   message: `PUT request body must use resource model Microsoft.Test.Widget. Found ${request}.`,
 });
 
+describe("resource models used at multiple scopes", () => {
+  const scopedModels = `
+    @armProviderNamespace namespace Microsoft.Test;
+    @subscriptionResource
+    model Widget is ProxyResource<{}> { ...ResourceNameParameter<Widget>; }
+    model Other is ProxyResource<{}> { ...ResourceNameParameter<Other>; }
+    alias SubscriptionOps = Azure.ResourceManager.Legacy.LegacyOperations<
+      {...ApiVersionParameter, ...SubscriptionIdParameter, ...Azure.ResourceManager.Legacy.Provider},
+      {@path @key @segment("widgets") widgetName: string;},
+      ResourceName = "Widgets"
+    >;
+    alias TenantOps = Azure.ResourceManager.Legacy.LegacyOperations<
+      {...ApiVersionParameter, ...Azure.ResourceManager.Legacy.Provider},
+      {@path @key @segment("widgets") widgetName: string;},
+      ResourceName = "Widgets"
+    >;
+  `;
+
+  it("accepts the same resource at subscription and tenant scopes", async () => {
+    await tester
+      .expect(
+        `${scopedModels}
+        @armResourceOperations interface Subscriptions {
+          read is SubscriptionOps.Read<Widget>;
+          create is SubscriptionOps.CreateOrUpdateSync<Widget>;
+          list is SubscriptionOps.List<Widget>;
+        }
+        @armResourceOperations interface Tenants {
+          read is TenantOps.Read<Widget>;
+          create is TenantOps.CreateOrUpdateSync<Widget>;
+          list is TenantOps.List<Widget>;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("does not hide an offending scope behind a compliant occurrence of the same model", async () => {
+    await tester
+      .expect(
+        t.code`${scopedModels}
+        model Input { value?: string; }
+        @armResourceOperations interface Subscriptions {
+          create is SubscriptionOps.CreateOrUpdateSync<Widget>;
+        }
+        @armResourceOperations interface Tenants {
+          ${t.op("create")} is TenantOps.CreateOrUpdateSync<Widget, Request = Input>;
+          ${t.op("read")} is TenantOps.Read<Widget, Response = ArmResponse<Other>>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ create, read }) => [
+        {
+          ...responseDiagnostic,
+          pos: getSourceLocation(read).pos,
+          end: getSourceLocation(read).end,
+        },
+        {
+          ...requestDiagnostic("Microsoft.Test.Input"),
+          pos: getSourceLocation(create).pos,
+          end: getSourceLocation(create).end,
+        },
+      ]);
+  });
+
+  it("reports separate offending operations at both scopes", async () => {
+    await tester
+      .expect(
+        t.code`${scopedModels}
+        @armResourceOperations interface Subscriptions {
+          ${t.op("subscriptionRead")} is SubscriptionOps.Read<Widget, Response = ArmResponse<Other>>;
+        }
+        @armResourceOperations interface Tenants {
+          ${t.op("tenantRead")} is TenantOps.Read<Widget, Response = ArmResponse<Other>>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ subscriptionRead, tenantRead }) =>
+        [tenantRead, subscriptionRead].map((operation) => ({
+          ...responseDiagnostic,
+          pos: getSourceLocation(operation).pos,
+          end: getSourceLocation(operation).end,
+        })),
+      );
+  });
+
+  it("reports shared list associations once per offending operation", async () => {
+    await tester
+      .expect(
+        t.code`${scopedModels}
+        @armResourceOperations interface Subscriptions {
+          read is SubscriptionOps.Read<Widget>;
+          ${t.op("subscriptionList")} is SubscriptionOps.List<Widget, Response = ArmResponse<ResourceListResult<Other>>>;
+        }
+        @armResourceOperations interface Tenants {
+          read is TenantOps.Read<Widget>;
+          ${t.op("tenantList")} is TenantOps.List<Widget, Response = ArmResponse<ResourceListResult<Other>>>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ subscriptionList, tenantList }) =>
+        [subscriptionList, tenantList].map((operation) => ({
+          ...responseDiagnostic,
+          pos: getSourceLocation(operation).pos,
+          end: getSourceLocation(operation).end,
+        })),
+      );
+  });
+});
+
 it.each([
-  "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Other> | ErrorResponse;",
-  "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Widget> | ArmCreatedResponse<Other> | ErrorResponse;",
-  "@get @armResourceList(Widget) list(...Foundations.SubscriptionScope<Widget>): ArmResponse<ResourceListResult<Other>> | ErrorResponse;",
-  "@patch @armResourceUpdate(Widget) update(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Other> | ErrorResponse;",
-])("preserves canonical lifecycle and list response validation: %s", async (operation) => {
+  [
+    "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Other> | ErrorResponse;",
+    "",
+  ],
+  [
+    "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Widget> | ArmCreatedResponse<Other> | ErrorResponse;",
+    "",
+  ],
+  [
+    "list is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Other>>>;",
+    "readSupport is ArmResourceRead<Widget>;",
+  ],
+  [
+    "@patch @armResourceUpdate(Widget) update(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Other> | ErrorResponse;",
+    "readSupport is ArmResourceRead<Widget>;",
+  ],
+])("preserves resolved lifecycle and list response validation: %s", async (operation, support) => {
   await tester
-    .expect(`${models} @armResourceOperations interface Widgets { ${operation} }`)
+    .expect(`${models} @armResourceOperations interface Widgets { ${support} ${operation} }`)
     .toEmitDiagnostics([responseDiagnostic]);
 });
 
 it.each([
-  "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Unregistered>;",
-  "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Unregistered>;",
-  "@get @armResourceList(Widget) list(...Foundations.SubscriptionScope<Widget>): ArmResponse<ResourceListResult<Unregistered>>;",
-])("rejects an unrelated unregistered success body: %s", async (operation) => {
+  [
+    "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Unregistered>;",
+    "",
+  ],
+  [
+    "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Unregistered>;",
+    "",
+  ],
+  [
+    "list is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Unregistered>>>;",
+    "readSupport is ArmResourceRead<Widget>;",
+  ],
+])("rejects an unrelated unregistered success body: %s", async (operation, support) => {
   await tester
     .expect(
       `${models}
       model Unregistered { properties?: { state?: string; }; }
-      @armResourceOperations interface Widgets { ${operation} }
+      @armResourceOperations interface Widgets { ${support} ${operation} }
     `,
     )
     .toEmitDiagnostics([responseDiagnostic]);
+});
+
+it.each([
+  "list is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Other>>>;",
+  "@patch @armResourceUpdate(Widget) update(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Other>;",
+])("does not infer a resource occurrence from LIST/PATCH alone: %s", async (operation) => {
+  await tester
+    .expect(`${models} @armResourceOperations interface Widgets { ${operation} }`)
+    .toBeValid();
 });
 
 it.each([true, false])(
@@ -245,8 +385,9 @@ it.each(["ArmResponse<Widget[]>", "ArmResponse<{ value: Widget[]; nextLink?: str
       .expect(
         `${models}
       @armResourceOperations interface Widgets {
-        @get @armResourceList(Widget)
-        list(...Foundations.SubscriptionScope<Widget>): ${response};
+          read is ArmResourceRead<Widget>;
+          @get @autoRoute @segmentOf(Widget) @armResourceList(Widget)
+          list(...Foundations.SubscriptionScope<Widget>): ${response};
       }
     `,
       )
