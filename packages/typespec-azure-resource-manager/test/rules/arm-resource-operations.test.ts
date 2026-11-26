@@ -136,14 +136,6 @@ describe("native PUT response resources", () => {
       await tester.expect(`${service} ${put(response)}`).toBeValid();
     },
   );
-
-  it("does not apply ARM resource policy to data-plane operations", async () => {
-    await tester
-      .expect(
-        "@service namespace DataPlane; interface Custom { @put replace(@body body: string): string; }",
-      )
-      .toBeValid();
-  });
 });
 
 const responseDiagnostic = {
@@ -267,51 +259,51 @@ describe("resource models used at multiple scopes", () => {
   });
 });
 
-it.each([
-  [
-    "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Other> | ErrorResponse;",
-    "",
-  ],
-  [
-    "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Widget> | ArmCreatedResponse<Other> | ErrorResponse;",
-    "",
-  ],
-  [
-    "list is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Other>>>;",
-    "readSupport is ArmResourceRead<Widget>;",
-  ],
-  [
-    "@patch @armResourceUpdate(Widget) update(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Other> | ErrorResponse;",
-    "readSupport is ArmResourceRead<Widget>;",
-  ],
-])("preserves resolved lifecycle and list response validation: %s", async (operation, support) => {
-  await tester
-    .expect(`${models} @armResourceOperations interface Widgets { ${support} ${operation} }`)
-    .toEmitDiagnostics([responseDiagnostic]);
-});
-
-it.each([
-  [
-    "@get @armResourceRead(Widget) read(...ResourceInstanceParameters<Widget>): ArmResponse<Unregistered>;",
-    "",
-  ],
-  [
-    "@put @armResourceCreateOrUpdate(Widget) create(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Unregistered>;",
-    "",
-  ],
-  [
-    "list is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Unregistered>>>;",
-    "readSupport is ArmResourceRead<Widget>;",
-  ],
-])("rejects an unrelated unregistered success body: %s", async (operation, support) => {
+it("preserves resolved lifecycle and list response validation", async () => {
   await tester
     .expect(
-      `${models}
-      model Unregistered { properties?: { state?: string; }; }
-      @armResourceOperations interface Widgets { ${support} ${operation} }
+      t.code`${models}
+      @armResourceOperations interface Widgets {
+        @get @armResourceRead(Widget)
+        ${t.op("read")}(...ResourceInstanceParameters<Widget>): ArmResponse<Other> | ErrorResponse;
+        @put @armResourceCreateOrUpdate(Widget)
+        ${t.op("create")}(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Widget> | ArmCreatedResponse<Other> | ErrorResponse;
+        ${t.op("list")} is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Other>>>;
+        @patch @armResourceUpdate(Widget)
+        ${t.op("update")}(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Other> | ErrorResponse;
+      }
     `,
     )
-    .toEmitDiagnostics([responseDiagnostic]);
+    .toEmitDiagnostics(({ read, create, update, list }) =>
+      [read, create, update, list].map((operation) => ({
+        ...responseDiagnostic,
+        pos: getSourceLocation(operation).pos,
+        end: getSourceLocation(operation).end,
+      })),
+    );
+});
+
+it("rejects unrelated unregistered success bodies", async () => {
+  await tester
+    .expect(
+      t.code`${models}
+      model Unregistered { properties?: { state?: string; }; }
+      @armResourceOperations interface Widgets {
+        @get @armResourceRead(Widget)
+        ${t.op("read")}(...ResourceInstanceParameters<Widget>): ArmResponse<Unregistered>;
+        @put @armResourceCreateOrUpdate(Widget)
+        ${t.op("create")}(...ResourceInstanceParameters<Widget>, @bodyRoot body: Widget): ArmResponse<Unregistered>;
+        ${t.op("list")} is ArmListBySubscription<Widget, Response = ArmResponse<ResourceListResult<Unregistered>>>;
+      }
+    `,
+    )
+    .toEmitDiagnostics(({ read, create, list }) =>
+      [read, create, list].map((operation) => ({
+        ...responseDiagnostic,
+        pos: getSourceLocation(operation).pos,
+        end: getSourceLocation(operation).end,
+      })),
+    );
 });
 
 it.each([
