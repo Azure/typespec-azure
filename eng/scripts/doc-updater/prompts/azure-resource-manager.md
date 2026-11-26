@@ -35,7 +35,7 @@ Auto-generated from doc comments in `lib/**/*.tsp` via `pnpm regen-docs` from `p
 
 ## Critical Rules
 
-**Do NOT call `create_pull_request`.** Only read files, edit files, and run build commands. The outer workflow creates the PR.
+**Sub-agents must NOT call `create_pull_request`.** Only the main coordinator agent may call `create_pull_request` after all steps and metadata updates are complete.
 
 ### What you MUST do
 
@@ -93,7 +93,7 @@ After editing any `.tsp` doc comment under `lib/`, run `pnpm regen-docs` from `p
 Run from the repository root, in order:
 
 1. `pnpm format` — format every changed file.
-2. `pnpm change add` — add changelog entries for every modified package.
+2. `pnpm change add` — add changelog entries only if non-Markdown files in a versioned package (such as `lib/*.tsp`) were modified.
 
 ## Quality Guidelines
 
