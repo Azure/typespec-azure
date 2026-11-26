@@ -27,7 +27,7 @@ beforeEach(async () => {
 });
 
 it.each(["get", "head"])(
-  "requires an error response for otherwise undeclared failures on %s operations",
+  "requires a generic error response for otherwise undeclared failures on %s operations",
   async (verb) => {
     await tester
       .expect(`@${verb} op /*read*/read(): { @statusCode status: 200; };`)
@@ -61,7 +61,7 @@ it("reports when an operation has no responses", async () => {
   await tester.expect("@get op read(): never;").toEmitDiagnostics(diagnostic);
 });
 
-it("requires a default response to be marked with @error", async () => {
+it("requires a generic response to be marked with @error", async () => {
   await tester
     .expect(
       `
@@ -73,7 +73,7 @@ it("requires a default response to be marked with @error", async () => {
     .toEmitDiagnostics(diagnostic);
 });
 
-it("accepts a default @error response", async () => {
+it("accepts a generic @error response", async () => {
   await tester
     .expect(
       `

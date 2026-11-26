@@ -1,14 +1,14 @@
-ARM operations must define a response marked with `@error` and no explicit status code. This default error response covers failure status codes that are not explicitly declared. The requirement applies to every HTTP method, including HEAD, and to custom and resource operations.
+ARM operations must define a response marked with `@error` and no explicit status code. This generic error response covers failure status codes that are not explicitly declared. The requirement applies to every HTTP method, including HEAD, and to custom and resource operations.
 
 Use the standard ARM operation templates with `CommonTypes.ErrorResponse`. A status-specific error, such as a marked `404` or `500`, does not cover otherwise undeclared failure status codes.
 
-This rule checks for a default `@error` response, not its payload shape.
+This rule checks for a generic `@error` response, not its payload shape.
 
 ## Impact
 
 - **Area:** API design and generated SDKs
 
-A standard error response gives generated clients a consistent contract for unexpected failure status codes.
+A generic error response gives generated clients a consistent contract for unexpected failure status codes.
 
 ## ❌ Incorrect
 
