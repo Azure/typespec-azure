@@ -64,8 +64,8 @@ export const useStandardResponseCodesRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-response-codes",
   messages: {
-    default: paramMessage`Operation '${"operationName"}' defines disallowed response status '${"statusCode"}'. Use only 200, 201, 202, 204, or default responses.`,
-    get: "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+    default: paramMessage`Operation '${"operationName"}' defines disallowed response status '${"statusCode"}'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.`,
+    get: "GET operations must include a 200 response and may only use 202 as an additional success response code.",
     emptyGet: "GET operations must declare at least one response and include a 200 response.",
     deleteSync: `Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template.`,
     deleteAsync: `Long-running delete operations must have 202 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.`,

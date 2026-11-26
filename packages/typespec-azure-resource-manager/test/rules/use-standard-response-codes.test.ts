@@ -36,7 +36,7 @@ const resource = `
 function diagnostic(operationName: string, statusCode: number | string) {
   return {
     code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
-    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, 204, or default responses.`,
+    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.`,
   };
 }
 
@@ -271,7 +271,7 @@ it("diagnoses the incorrect template fixture", async () => {
     {
       code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
       message:
-        "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+        "GET operations must include a 200 response and may only use 202 as an additional success response code.",
     },
   ]);
 });
@@ -406,7 +406,7 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({
         code: diagnosticCode,
         message:
-          "Operation 'rejected' defines disallowed response status '404'. Use only 200, 201, 202, 204, or default responses.",
+          "Operation 'rejected' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.",
         target: "rejected",
       });
   });
@@ -423,7 +423,7 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({
         code: diagnosticCode,
         message:
-          "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+          "GET operations must include a 200 response and may only use 202 as an additional success response code.",
         target: "read",
       });
   });
@@ -442,13 +442,13 @@ describe("ARM GET response codes", () => {
         {
           code: diagnosticCode,
           message:
-            "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+            "GET operations must include a 200 response and may only use 202 as an additional success response code.",
           target: "read",
         },
         {
           code: diagnosticCode,
           message:
-            "Operation 'create' defines disallowed response status '404'. Use only 200, 201, 202, 204, or default responses.",
+            "Operation 'create' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.",
           target: "create",
         },
       ]);
@@ -465,7 +465,7 @@ describe("ARM GET response codes", () => {
       .toBeValid();
   });
 
-  it("rejects a GET with only 202 and default responses", async () => {
+  it("rejects a GET with only a 202 success response", async () => {
     await tester
       .expect(
         `
