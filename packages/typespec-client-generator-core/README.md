@@ -140,6 +140,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/use-valid-client-lro-result`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-valid-client-lro-result)           | LRO client results should follow the operation's protocol result contract.                                                                                          |
 | [`@azure-tools/typespec-client-generator-core/no-repeated-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-repeated-client-name)                   | SDK method names should not repeat their owning subclient name.                                                                                                     |
 | [`@azure-tools/typespec-client-generator-core/unsupported-scope`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/unsupported-scope)                               | Use supported scopes for TCGC decorators.                                                                                                                           |
+| [`@azure-tools/typespec-client-generator-core/no-redundant-client-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-redundant-client-name)                 | Avoid client name overrides that do not change SDK naming.                                                                                                          |
 
 ## Decorators
 

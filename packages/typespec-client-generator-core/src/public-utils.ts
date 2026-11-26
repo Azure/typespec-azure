@@ -1,5 +1,6 @@
 import {
   $friendlyName,
+  type DecoratorApplication,
   type Diagnostic,
   type Enum,
   type EnumMember,
@@ -8,6 +9,7 @@ import {
   type ModelProperty,
   type Namespace,
   type Operation,
+  type Program,
   type Scalar,
   type Type,
   type Union,
@@ -216,21 +218,24 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
  * @param context
  * @param type
  * @returns the library name for a typespec type
+ * @param scope Language scope to resolve.
+ * @param ignoreApplication Explicit client-name application to omit when evaluating fallback naming.
  */
 export function getLibraryName(
   context: TCGCContext,
   type: Type & { name?: string | symbol },
   scope?: string | typeof AllScopes,
+  ignoreApplication?: DecoratorApplication,
 ): string {
   // 1. check if there's a client name
-  const emitterSpecificName = getClientNameOverride(context, type, scope);
+  const emitterSpecificName = getClientNameOverride(context, type, scope, ignoreApplication);
   if (emitterSpecificName && emitterSpecificName !== type.name) {
     // Strip the exact-name prefix if present so consumers always see clean names
     return normalizeExactName(emitterSpecificName).name;
   }
 
   // 2. check if there's a friendly name, if so return friendly name
-  const friendlyName = getClientFriendlyName(context, type, scope);
+  const friendlyName = getClientFriendlyName(context, type, scope, ignoreApplication);
   if (friendlyName) return friendlyName;
 
   // 3. if type is derived from template and name is the same as template, add template parameters' name as suffix
@@ -266,6 +271,7 @@ function getClientFriendlyName(
   context: TCGCContext | SdkContext<UnbrandedSdkEmitterOptionsInterface>,
   type: Type,
   scope?: string | typeof AllScopes,
+  ignoreApplication?: DecoratorApplication,
 ): string | undefined {
   const friendlyName = getFriendlyName(context.program, type);
   if (
@@ -277,6 +283,25 @@ function getClientFriendlyName(
     return friendlyName;
   }
 
+  const template = getClientFriendlyNameTemplate(context.program, type);
+  if (!template) return friendlyName;
+  const { format, source } = template;
+  const clientName = getClientNameOverride(context, source, scope, ignoreApplication);
+  if (!clientName) return friendlyName;
+
+  return format.replace(/{(\w+)}/g, (_, property: string) =>
+    property === "name"
+      ? normalizeExactName(clientName).name
+      : String(Reflect.get(source, property)),
+  );
+}
+
+/** @internal The active friendly-name template whose source client name can affect SDK naming. */
+export function getClientFriendlyNameTemplate(
+  program: Program,
+  type: Type,
+): { format: string; source: Type & { name?: string | symbol } } | undefined {
+  if (!("decorators" in type)) return undefined;
   const application = type.decorators.findLast((application) => {
     if (application.decorator !== $friendlyName) return false;
     // Match the compiler's filtering of friendly names copied by `model is` and `op is`.
@@ -284,7 +309,7 @@ function getClientFriendlyName(
       const node = application.node;
       if (node?.kind === SyntaxKind.DecoratorExpression && node.parent !== type.node) return false;
       if (node?.kind === SyntaxKind.AugmentDecoratorStatement) {
-        const checker = context.program.checker as typeof context.program.checker & {
+        const checker = program.checker as typeof program.checker & {
           resolveTypeReference(node: TypeReferenceNode): [Type | undefined, readonly Diagnostic[]];
         };
         if (ignoreDiagnostics(checker.resolveTypeReference(node.targetType))?.node !== type.node) {
@@ -302,16 +327,9 @@ function getClientFriendlyName(
     source?.entityKind !== "Type" ||
     !("name" in source)
   ) {
-    return friendlyName;
+    return undefined;
   }
-  const clientName = getClientNameOverride(context, source, scope);
-  if (!clientName) return friendlyName;
-
-  return format.replace(/{(\w+)}/g, (_, property: string) =>
-    property === "name"
-      ? normalizeExactName(clientName).name
-      : String(Reflect.get(source, property)),
-  );
+  return { format, source };
 }
 
 /**
@@ -320,13 +338,17 @@ function getClientFriendlyName(
  *
  * @param context The SDK context
  * @param type The type to check
+ * @param scope Language scope to resolve.
+ * @param ignoreApplication Explicit client-name application to omit when evaluating fallback naming.
  * @returns true if the client name was marked with `exact()`
  */
 export function isExactClientName(
   context: TCGCContext,
   type: Type & { name?: string | symbol },
+  scope?: string | typeof AllScopes,
+  ignoreApplication?: DecoratorApplication,
 ): boolean {
-  const emitterSpecificName = getClientNameOverride(context, type);
+  const emitterSpecificName = getClientNameOverride(context, type, scope, ignoreApplication);
   if (emitterSpecificName) {
     return normalizeExactName(emitterSpecificName).isExactName;
   }

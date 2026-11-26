@@ -335,6 +335,35 @@ it("isolates service naming options between contexts", async () => {
   }
 });
 
+it("resolves dependent friendly-name effects using each SDK context's source-name option", async () => {
+  const names = new Map<string, string>();
+  for (const hasOverride of [true, false]) {
+    const { program, original } = await SimpleTesterWithService.compile(t.code`
+      model Source {
+        ${hasOverride ? '@clientName("renamed")' : ""}
+        @friendlyName("renamed") ${t.modelProperty("original")}: string;
+      }
+      model Result {
+        @friendlyName("{name}", Source.original) value: string;
+      }
+      @get op read(): Result;
+    `);
+    for (const useSourceNames of [true, false]) {
+      const context = await createSdkContextForTester(program, {
+        "use-client-name-for-friendly-name-source": useSourceNames,
+      });
+      strictEqual(getLibraryName(context, original), "renamed");
+      const result = context.sdkPackage.models.find((model) => model.name === "Result");
+      ok(result);
+      names.set(`${hasOverride}/${useSourceNames}`, result.properties[0].name);
+    }
+  }
+  strictEqual(names.get("true/true"), "renamed");
+  strictEqual(names.get("false/true"), "original");
+  strictEqual(names.get("true/false"), "original");
+  strictEqual(names.get("false/false"), "original");
+});
+
 it.each([
   ['@friendlyName("FixedResult")', "", "FixedResult"],
   ["", '@@friendlyName(ListResult, "FixedResult");', "AIGatewayListResult"],

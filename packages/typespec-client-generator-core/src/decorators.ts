@@ -1,6 +1,7 @@
 import { getLroProtocolMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
+  type DecoratorApplication,
   type DecoratorContext,
   type DecoratorFunction,
   type DecoratorValidatorCallbacks,
@@ -75,6 +76,7 @@ import {
 } from "./interfaces.js";
 import {
   AllScopes,
+  applyScopedDecoratorData,
   clientKey,
   clientLocationKey,
   clientLroResultKey,
@@ -83,6 +85,7 @@ import {
   compareModelProperties,
   findEntriesWithTarget,
   findRootSourceProperty,
+  getClientNameApplications,
   getScopedDecoratorData,
   isClientInitializationOptionsBag,
   legacyHierarchyBuildingKey,
@@ -92,6 +95,7 @@ import {
   omitOperation,
   overrideKey,
   parseScopes,
+  resolveScopedDecoratorData,
   responseOverrideKey,
   scopeKey,
   usageKey,
@@ -240,46 +244,7 @@ function setScopedDecoratorData(
 ) {
   const scope = normalizeScope(scopeArg);
   const targetEntry = context.program.stateMap(key).get(target);
-  // if no scope specified, then set with the new value
-  if (!scope) {
-    if (targetEntry && targetEntry[AllScopes]) {
-      targetEntry[AllScopes] = value;
-    } else {
-      const newObject = Object.fromEntries([[AllScopes, value]]);
-      context.program
-        .stateMap(key)
-        .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
-    }
-    return;
-  }
-
-  const [negationScopes, scopes] = parseScopes(scope);
-  if (negationScopes !== undefined && negationScopes.length > 0) {
-    // override the previous value for negation scopes
-    const newObject: Record<string | symbol, any> =
-      scopes !== undefined && scopes.length > 0
-        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
-        : Object.fromEntries([[AllScopes, value]]);
-    newObject[negationScopesKey] = negationScopes;
-    context.program.stateMap(key).set(target, newObject);
-
-    // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
-    if (targetEntry !== undefined) {
-      const existingScopes = Object.getOwnPropertyNames(targetEntry);
-      const intersections = existingScopes.filter((x) => negationScopes.includes(x));
-      if (intersections !== undefined && intersections.length > 0) {
-        for (const scopeToKeep of intersections) {
-          newObject[scopeToKeep] = targetEntry[scopeToKeep];
-        }
-      }
-    }
-  } else if (scopes !== undefined && scopes.length > 0) {
-    // for normal scopes, add them incrementally
-    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
-    context.program
-      .stateMap(key)
-      .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
-  }
+  context.program.stateMap(key).set(target, applyScopedDecoratorData(targetEntry, value, scope));
 }
 
 export const $client: ClientDecorator = (
@@ -869,7 +834,20 @@ export function getClientNameOverride(
   context: TCGCContext,
   entity: Type,
   languageScope?: string | typeof AllScopes,
+  ignoreApplication?: DecoratorApplication,
 ): string | undefined {
+  if (
+    ignoreApplication &&
+    "decorators" in entity &&
+    entity.decorators.includes(ignoreApplication)
+  ) {
+    let entry;
+    for (const { application, value, scope } of getClientNameApplications(entity)) {
+      if (application === ignoreApplication) continue;
+      entry = applyScopedDecoratorData(entry, value, scope);
+    }
+    return resolveScopedDecoratorData(entry, languageScope ?? context.emitterName);
+  }
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
 

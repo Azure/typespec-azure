@@ -10,7 +10,10 @@ import {
   type BooleanLiteral,
   compilerAssert,
   createDiagnosticCollector,
+  type DecoratedType,
+  type DecoratorApplication,
   type Diagnostic,
+  type Entity,
   type Enum,
   getDeprecationDetails,
   getDoc,
@@ -36,6 +39,7 @@ import {
   type Type,
   type Union,
   type Value,
+  walkPropertiesInherited,
 } from "@typespec/compiler";
 import {
   unsafe_mutateSubgraphWithNamespace,
@@ -139,6 +143,19 @@ export function hasExplicitClient(context: TCGCContext): boolean {
   return listScopedDecoratorData(context, clientKey).size > 0;
 }
 
+/** Scope boundaries at which a scoped decorator's effective value can change. */
+export function getScopedDecoratorDataScopes(
+  context: TCGCContext,
+  key: symbol,
+): Set<string | typeof AllScopes> {
+  const scopes = new Set<string | typeof AllScopes>([AllScopes]);
+  for (const entry of context.program.stateMap(key).values()) {
+    for (const scope of Object.keys(entry)) scopes.add(scope);
+    for (const scope of entry[negationScopesKey] ?? []) scopes.add(scope);
+  }
+  return scopes;
+}
+
 export function listScopedDecoratorData(
   context: TCGCContext,
   key: symbol,
@@ -173,13 +190,23 @@ export function getScopedDecoratorData(
   target: Type,
   languageScope?: string | typeof AllScopes,
 ): any {
-  const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
+  return resolveScopedDecoratorData(
+    context.program.stateMap(key).get(target),
+    languageScope ?? context.emitterName,
+  );
+}
+
+/** Resolve a scoped entry without accessing or changing program state. */
+export function resolveScopedDecoratorData(
+  retval: Record<string | symbol, any> | undefined,
+  languageScope: string | typeof AllScopes,
+): any {
   if (retval === undefined) return retval;
   if (languageScope === AllScopes) {
     return retval[languageScope];
   }
   if (languageScope === undefined || typeof languageScope === "string") {
-    const scope = languageScope ?? context.emitterName;
+    const scope = languageScope;
     if (scope in retval) return retval[scope];
 
     // if the scope is negated, we should return undefined
@@ -190,6 +217,75 @@ export function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
+}
+
+/** Apply the same scope precedence used by decorators to an isolated entry. */
+export function applyScopedDecoratorData(
+  targetEntry: Record<string | symbol, any> | undefined,
+  value: unknown,
+  scope?: string,
+): Record<string | symbol, any> | undefined {
+  if (!scope) {
+    return { ...targetEntry, [AllScopes]: value };
+  }
+  const [negationScopes, scopes] = parseScopes(scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    const entry: Record<string | symbol, any> =
+      scopes !== undefined && scopes.length > 0
+        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        : { [AllScopes]: value };
+    entry[negationScopesKey] = negationScopes;
+    if (targetEntry !== undefined) {
+      for (const scopeToKeep of Object.keys(targetEntry)) {
+        if (negationScopes.includes(scopeToKeep)) {
+          entry[scopeToKeep] = targetEntry[scopeToKeep];
+        }
+      }
+    }
+    return entry;
+  }
+  if (scopes !== undefined && scopes.length > 0) {
+    return { ...targetEntry, ...Object.fromEntries(scopes.map((scope) => [scope, value])) };
+  }
+  return targetEntry;
+}
+
+/** Read evaluated arguments, including those substituted in template instances. */
+export function getClientNameApplications(type: DecoratedType): {
+  application: DecoratorApplication;
+  value: string;
+  scope: string | undefined;
+}[] {
+  const result = [];
+  for (const application of type.decorators) {
+    const definition = application.definition;
+    if (
+      definition?.name !== "@clientName" ||
+      getNamespaceFullName(definition.namespace) !== "Azure.ClientGenerator.Core"
+    ) {
+      continue;
+    }
+    const value = getStringArgument(application.args[0]?.value);
+    if (!value?.trim()) continue;
+    let scope: Entity | undefined = application.args[1]?.value;
+    if (scope?.entityKind === "Value" && scope.valueKind === "ObjectValue") {
+      scope = scope.properties.get("scope")?.value;
+    } else if (scope?.entityKind === "Type" && scope.kind === "Model") {
+      scope = [...walkPropertiesInherited(scope)].find(
+        (property) => property.name === "scope",
+      )?.type;
+    }
+    result.push({ application, value, scope: getStringArgument(scope) });
+  }
+  return result;
+}
+
+function getStringArgument(value: Entity | undefined): string | undefined {
+  return value?.entityKind === "Value" && value.valueKind === "StringValue"
+    ? value.value
+    : value?.entityKind === "Type" && value.kind === "String"
+      ? value.value
+      : undefined;
 }
 
 /**
