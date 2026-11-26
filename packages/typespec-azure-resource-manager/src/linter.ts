@@ -29,6 +29,7 @@ import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { lroMissingPollingMetadataRule } from "./rules/lro-missing-polling-metadata.js";
 import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
+import { missingErrorResponseRule } from "./rules/missing-error-response.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
@@ -48,7 +49,6 @@ import { operationsInterfaceMissingRule } from "./rules/operations-interface-mis
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
-import { requireStandardErrorResponseRule } from "./rules/require-standard-error-response.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -81,7 +81,7 @@ const rules = [
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,
-  requireStandardErrorResponseRule,
+  missingErrorResponseRule,
   useStandardErrorRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
