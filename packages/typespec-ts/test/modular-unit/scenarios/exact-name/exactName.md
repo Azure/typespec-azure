@@ -644,7 +644,7 @@ export interface Modelsmy_model {
 }
 ```
 
-# Exact name for an alternate heterogeneous union
+# Exact names with _ prefix for an alternate union, enum, and model
 
 ## TypeSpec
 
@@ -660,10 +660,25 @@ namespace JavaScriptToolCompatibility {
     string[],
     ToolFilter,
   }
+
+  #suppress "experimental-feature" "exact name test"
+  @clientName(exact("_MCPToolAllowedEnum"), "javascript")
+  enum MCPToolAllowedEnum {
+    Read: "read",
+    Write: "write",
+  }
+
+  #suppress "experimental-feature" "exact name test"
+  @clientName(exact("_MCPToolAllowedModel"), "javascript")
+  model MCPToolAllowedModel {
+    toolNames: string[];
+  }
 }
 
 model Tool {
   allowedTools: string[] | ToolFilter;
+  allowedEnum: JavaScriptToolCompatibility.MCPToolAllowedEnum;
+  allowedModel: JavaScriptToolCompatibility.MCPToolAllowedModel;
 }
 
 @@alternateType(Tool.allowedTools, JavaScriptToolCompatibility.MCPToolAllowedTools, "javascript");
@@ -679,16 +694,111 @@ needTCGC: true
 
 ## Union alias
 
-```ts models alias _MCPToolAllowedTools
+```ts models
+/** This file path is /models/javaScriptToolCompatibility/models.ts */
+
+/*
+ * This file contains only generated model types and their (de)serializers.
+ * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
+ */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { ToolFilter } from "../models.js";
+
 /** Alias for _MCPToolAllowedTools */
 export type _MCPToolAllowedTools = string[] | ToolFilter;
-```
 
-## Model using the union
+export function _MCPToolAllowedToolsSerializer(item: _MCPToolAllowedTools): any {
+  return item;
+}
 
-```ts models interface Tool
+export function _MCPToolAllowedToolsDeserializer(item: any): _MCPToolAllowedTools {
+  return item;
+}
+
+/** Type of _MCPToolAllowedEnum */
+export type _MCPToolAllowedEnum = "read" | "write";
+
+/** model interface _MCPToolAllowedModel */
+export interface _MCPToolAllowedModel {
+  toolNames: string[];
+}
+
+export function _MCPToolAllowedModelSerializer(item: _MCPToolAllowedModel): any {
+  return {
+    toolNames: item["toolNames"].map((p: any) => {
+      return p;
+    }),
+  };
+}
+
+export function _MCPToolAllowedModelDeserializer(item: any): _MCPToolAllowedModel {
+  return {
+    toolNames: item["toolNames"].map((p: any) => {
+      return p;
+    }),
+  };
+}
+
+/** This file path is /models/models.ts */
+
+/*
+ * This file contains only generated model types and their (de)serializers.
+ * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
+ */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import {
+  _MCPToolAllowedTools,
+  _MCPToolAllowedToolsSerializer,
+  _MCPToolAllowedToolsDeserializer,
+  _MCPToolAllowedEnum,
+  _MCPToolAllowedModel,
+  _MCPToolAllowedModelSerializer,
+  _MCPToolAllowedModelDeserializer,
+} from "./javaScriptToolCompatibility/models.js";
+
 /** model interface Tool */
 export interface Tool {
   allowedTools: _MCPToolAllowedTools;
+  allowedEnum: _MCPToolAllowedEnum;
+  allowedModel: _MCPToolAllowedModel;
+}
+
+export function toolSerializer(item: Tool): any {
+  return {
+    allowedTools: _MCPToolAllowedToolsSerializer(item["allowedTools"]),
+    allowedEnum: item["allowedEnum"],
+    allowedModel: _MCPToolAllowedModelSerializer(item["allowedModel"]),
+  };
+}
+
+export function toolDeserializer(item: any): Tool {
+  return {
+    allowedTools: _MCPToolAllowedToolsDeserializer(item["allowedTools"]),
+    allowedEnum: item["allowedEnum"],
+    allowedModel: _MCPToolAllowedModelDeserializer(item["allowedModel"]),
+  };
+}
+
+/** model interface ToolFilter */
+export interface ToolFilter {
+  toolNames: string[];
+}
+
+export function toolFilterSerializer(item: ToolFilter): any {
+  return {
+    toolNames: item["toolNames"].map((p: any) => {
+      return p;
+    }),
+  };
+}
+
+export function toolFilterDeserializer(item: any): ToolFilter {
+  return {
+    toolNames: item["toolNames"].map((p: any) => {
+      return p;
+    }),
+  };
 }
 ```
