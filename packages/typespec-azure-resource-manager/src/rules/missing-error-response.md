@@ -1,6 +1,6 @@
 ARM operations must define a response marked with `@error` and no explicit status code. This generic error response covers failure status codes that are not explicitly declared. The requirement applies to every HTTP method, including HEAD, and to custom and resource operations.
 
-Add `CommonTypes.ErrorResponse` as a response to the operation. The standard ARM operation templates include this generic error response. A status-specific error, such as a marked `404` or `500`, does not cover otherwise undeclared failure status codes.
+Add `CommonTypes.ErrorResponse` as a response to the operation. The standard ARM operation templates include this generic error response.
 
 This rule checks for a generic `@error` response, not its payload shape.
 
