@@ -193,3 +193,24 @@ You can generally choose an asynchronous operation template that matches your op
 ### Visibility Changes for `nextLink` and `value` Properties
 
 For the `nextLink` and `value` properties of pageable operation response model, some older specifications marked these values as `readOnly`. This has no impact on the API or on SDKs, you can safely ignore this difference in the spec, and any resulting breaking change violation.
+
+### Required `value` in Pageable Responses
+
+By default, ARM pageable operation templates use [`Azure.ResourceManager.ResourceListResult`](./mustread.md#using-page-model-from-library), which defines the `value` property as required, whereas some older specifications left `value` optional. Unlike `readOnly`, this difference can affect both the API and generated SDKs, so you cannot automatically ignore the resulting breaking change violation. Assess both areas when making your migration decision:
+
+- **API contract and service behavior:** Check actual service responses and the API contract. If the service always returns `value`, a required `value` property may more accurately describe existing behavior. If valid responses can omit `value`, a required `value` property does not match the service behavior and needs correction in TypeSpec.
+- **SDK compatibility:** Assess generated SDK compatibility separately. The service always returning `value` is not sufficient to conclude that there is no breaking change or to automatically ignore breaking change validation failures.
+
+When `value` needs to remain optional, define a custom pageable response model and pass it with the `Response` parameter (see [Changing Response Types](#changing-response-types)):
+
+```tsp
+model WidgetListResult {
+  @pageItems
+  value?: Widget[];
+
+  @nextLink
+  nextLink?: url;
+}
+
+op listBySubscription is ArmListBySubscription<Widget, Response = ArmResponse<WidgetListResult>>;
+```
