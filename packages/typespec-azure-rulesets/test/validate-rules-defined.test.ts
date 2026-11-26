@@ -140,10 +140,22 @@ describe("expect all rules to be defined", () => {
     }
   });
 
-  it("keeps ARM response status guidance opt-in", () => {
+  it("enables combined ARM response status guidance instead of the legacy rules", () => {
     const ruleName = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
     strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
+    for (const verb of ["delete", "put", "post"]) {
+      const oldName =
+        `@azure-tools/typespec-azure-resource-manager/arm-${verb}-operation-response-codes` as const;
+      strictEqual($linter.ruleSets?.["resource-manager"].enable?.[oldName], false);
+      strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[oldName], false);
+      ok(
+        ResourceManagerLinter.rules.some(
+          (rule) => rule.name === `arm-${verb}-operation-response-codes`,
+        ),
+      );
+    }
     strictEqual(
       ResourceManagerLinter.rules.filter((rule) => rule.name === "use-standard-response-codes")
         .length,

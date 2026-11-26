@@ -1,3 +1,5 @@
+This rule remains available for explicit configuration. The resource-manager and ARM library `all` rulesets disable it in favor of [`use-standard-response-codes`](../use-standard-response-codes), which includes the DELETE success-response checks but leaves error responses to `missing-error-response` ([#6038](https://github.com/Azure/typespec-azure/pull/6038)). Move existing suppressions to the combined rule ID.
+
 ## Impact
 
 - **Area:** API

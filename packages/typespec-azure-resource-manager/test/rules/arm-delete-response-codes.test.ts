@@ -4,26 +4,24 @@ import {
   type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { armDeleteResponseCodesRule } from "../../src/rules/arm-delete-response-codes.js";
+import { useStandardResponseCodesRule } from "../../src/rules/use-standard-response-codes.js";
 
-let runner: TesterInstance;
-let tester: LinterRuleTester;
+describe.each([armDeleteResponseCodesRule, useStandardResponseCodesRule])("$name", (rule) => {
+  let runner: TesterInstance;
+  let tester: LinterRuleTester;
 
-beforeEach(async () => {
-  runner = await Tester.createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    armDeleteResponseCodesRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-});
+  beforeEach(async () => {
+    runner = await Tester.createInstance();
+    tester = createLinterRuleTester(runner, rule, "@azure-tools/typespec-azure-resource-manager");
+  });
 
-it("Emits a warning for synchronous delete operation that does not contain the appropriate response codes", async () => {
-  await tester
-    .expect(
-      `
+  it("Emits a warning for synchronous delete operation that does not contain the appropriate response codes", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -42,18 +40,20 @@ it("Emits a warning for synchronous delete operation that does not contain the a
         }
       }
     `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
-      message:
-        "Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.",
-    });
-});
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message:
+          rule === useStandardResponseCodesRule
+            ? "Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template."
+            : "Synchronous delete operations must have 200, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteSync' template.",
+      });
+  });
 
-it("Does not emit a warning for synchronous delete operation that contains the appropriate response codes", async () => {
-  await tester
-    .expect(
-      `
+  it("Does not emit a warning for synchronous delete operation that contains the appropriate response codes", async () => {
+    await tester
+      .expect(
+        `
     @armProviderNamespace
     namespace Microsoft.Contoso;
     
@@ -74,14 +74,14 @@ it("Does not emit a warning for synchronous delete operation that contains the a
         result: boolean;
       } | ErrorResponse
     }`,
-    )
-    .toBeValid();
-});
+      )
+      .toBeValid();
+  });
 
-it("Does not emit a warning for synchronous delete operation that uses the `ArmResourceDeleteSync` template.", async () => {
-  await tester
-    .expect(
-      `
+  it("Does not emit a warning for synchronous delete operation that uses the `ArmResourceDeleteSync` template.", async () => {
+    await tester
+      .expect(
+        `
     @armProviderNamespace
     namespace Microsoft.Contoso;
     
@@ -95,14 +95,14 @@ it("Does not emit a warning for synchronous delete operation that uses the `ArmR
     interface Employees {
       delete is ArmResourceDeleteSync<Employee>;
     }`,
-    )
-    .toBeValid();
-});
+      )
+      .toBeValid();
+  });
 
-it("Emits a warning for long-running delete operation that does not contain the appropriate response codes", async () => {
-  await tester
-    .expect(
-      `
+  it("Emits a warning for long-running delete operation that does not contain the appropriate response codes", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -118,18 +118,20 @@ it("Emits a warning for long-running delete operation that does not contain the 
         delete is ArmResourceDeleteAsync<Employee>;
       }
     `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
-      message:
-        "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
-    });
-});
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message:
+          rule === useStandardResponseCodesRule
+            ? "Long-running delete operations must have 202 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteWithoutOkAsync' template."
+            : "Long-running delete operations must have 202, 204 and default responses. They must not have any other responses. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
+      });
+  });
 
-it("Does not emit a warning for long-running delete operation that uses the `ArmResourceDeleteWithoutOkAsync` template.", async () => {
-  await tester
-    .expect(
-      `
+  it("Does not emit a warning for long-running delete operation that uses the `ArmResourceDeleteWithoutOkAsync` template.", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -143,6 +145,7 @@ it("Does not emit a warning for long-running delete operation that uses the `Arm
       interface Employees {
         delete is ArmResourceDeleteWithoutOkAsync<Employee>;
       }`,
-    )
-    .toBeValid();
+      )
+      .toBeValid();
+  });
 });

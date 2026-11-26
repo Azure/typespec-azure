@@ -4,26 +4,32 @@ import {
   type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { armPostResponseCodesRule } from "../../src/rules/arm-post-response-codes.js";
+import { useStandardResponseCodesRule } from "../../src/rules/use-standard-response-codes.js";
 
-let runner: TesterInstance;
-let tester: LinterRuleTester;
+describe.each([armPostResponseCodesRule, useStandardResponseCodesRule])("$name", (rule) => {
+  let runner: TesterInstance;
+  let tester: LinterRuleTester;
+  const syncMessage =
+    rule === armPostResponseCodesRule
+      ? armPostResponseCodesRule.messages.sync
+      : useStandardResponseCodesRule.messages.postSync;
+  const asyncMessage =
+    rule === armPostResponseCodesRule
+      ? armPostResponseCodesRule.messages.async
+      : useStandardResponseCodesRule.messages.postAsync;
 
-beforeEach(async () => {
-  runner = await Tester.createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    armPostResponseCodesRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-});
+  beforeEach(async () => {
+    runner = await Tester.createInstance();
+    tester = createLinterRuleTester(runner, rule, "@azure-tools/typespec-azure-resource-manager");
+  });
 
-it("Emits a warning for a synchronous post operation that does not contain the appropriate response codes", async () => {
-  await tester
-    .expect(
-      `
+  it("Emits a warning for a synchronous post operation that does not contain the appropriate response codes", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -41,18 +47,17 @@ it("Emits a warning for a synchronous post operation that does not contain the a
         } | ErrorResponse;
       }
       `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
-      message:
-        "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
-    });
-});
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message: syncMessage,
+      });
+  });
 
-it("Emits a warning for a synchronous post operation that does not contain the appropriate response codes and use multipart/mixed", async () => {
-  await tester
-    .expect(
-      `
+  it("Emits a warning for a synchronous post operation that does not contain the appropriate response codes and use multipart/mixed", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -71,18 +76,17 @@ it("Emits a warning for a synchronous post operation that does not contain the a
         } | ErrorResponse;
       }
       `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
-      message:
-        "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
-    });
-});
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message: syncMessage,
+      });
+  });
 
-it("Does not emit a warning for a synchronous post operation that contains the 200 and default response codes", async () => {
-  await tester
-    .expect(
-      `
+  it("Does not emit a warning for a synchronous post operation that contains the 200 and default response codes", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -100,14 +104,14 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
         } | ErrorResponse;
       }
     `,
-    )
-    .toBeValid();
-});
+      )
+      .toBeValid();
+  });
 
-it("Does not emit a warning for a synchronous post operation that contains 204 and default response codes", async () => {
-  await tester
-    .expect(
-      `
+  it("Does not emit a warning for a synchronous post operation that contains 204 and default response codes", async () => {
+    await tester
+      .expect(
+        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -125,14 +129,14 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
         } | ErrorResponse;
       }
     `,
-    )
-    .toBeValid();
-});
+      )
+      .toBeValid();
+  });
 
-it("Does not emit a warning for a long-running post operation that satisfies the requirements.", async () => {
-  await tester
-    .expect(
-      `
+  it("Does not emit a warning for a long-running post operation that satisfies the requirements.", async () => {
+    await tester
+      .expect(
+        `
       using Azure.Core;
 
       @armProviderNamespace
@@ -165,14 +169,59 @@ it("Does not emit a warning for a long-running post operation that satisfies the
           @body result: Widget;
         } | ErrorResponse;
       }`,
-    )
-    .toBeValid();
-});
+      )
+      .toBeValid();
+  });
 
-it("Emits a warning for a long-running post operation that has a 202 response with a schema.", async () => {
-  await tester
-    .expect(
+  it("accepts a long-running action without a 200 response", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        namespace Microsoft.Contoso;
+        model Employee is ProxyResource<{}> {
+          ...ResourceNameParameter<Employee>;
+        }
+        @armResourceOperations
+        interface Employees {
+          hire is ArmResourceActionNoResponseContentAsync<Employee, void>;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("leaves missing default responses to the error response rule only in the combined rule", async () => {
+    const result = tester.expect(
       `
+        @armProviderNamespace
+        namespace Microsoft.Contoso;
+        model Employee is ProxyResource<{}> {
+          ...ResourceNameParameter<Employee>;
+        }
+        @armResourceOperations
+        interface Employees {
+          @post @armResourceAction(Employee)
+          hire(...ApiVersionParameter): { @statusCode code: 200; @body body: Employee; };
+        }
+      `,
+    );
+    if (rule === useStandardResponseCodesRule) {
+      await result.toBeValid();
+    } else {
+      await result.toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message:
+          "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
+        target: "hire",
+      });
+    }
+  });
+
+  it("Emits a warning for a long-running post operation that has a 202 response with a schema.", async () => {
+    await tester
+      .expect(
+        `
       using Azure.Core;
 
       @armProviderNamespace
@@ -202,18 +251,17 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
           @bodyRoot body: Widget;
         } | ErrorResponse;
       }`,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
-      message:
-        "Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.",
-    });
-});
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message: asyncMessage,
+      });
+  });
 
-it("Emits a warning for a long-running post operation that has a 200 response with no schema.", async () => {
-  await tester
-    .expect(
-      `
+  it("Emits a warning for a long-running post operation that has a 200 response with no schema.", async () => {
+    await tester
+      .expect(
+        `
       using Azure.Core;
 
       @armProviderNamespace
@@ -245,18 +293,17 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
           @header("x-ms-operation-id") operationId: string;
         } | ErrorResponse;
       }`,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
-      message:
-        "Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.",
-    });
-});
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message: asyncMessage,
+      });
+  });
 
-it("Emits a warning for a long-running post operation that has invalid response codes.", async () => {
-  await tester
-    .expect(
-      `
+  it("Emits a warning for a long-running post operation that has invalid response codes.", async () => {
+    await tester
+      .expect(
+        `
       using Azure.Core;
 
       @armProviderNamespace
@@ -285,10 +332,10 @@ it("Emits a warning for a long-running post operation that has invalid response 
           @header("x-ms-operation-id") operationId: string
         } | ErrorResponse;
       }`,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
-      message:
-        "Long-running post operations must have 202 and default responses. They must also have a 200 response if the final response has a schema. They must not have any other responses.",
-    });
+      )
+      .toEmitDiagnostics({
+        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
+        message: asyncMessage,
+      });
+  });
 });

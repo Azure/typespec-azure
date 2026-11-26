@@ -148,7 +148,10 @@ export const $linter = defineLinter({
       enable: Object.fromEntries(
         rules.map((rule) => [
           `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-          rule !== useScopeForExtensionRoutingRule,
+          rule !== useScopeForExtensionRoutingRule &&
+            rule !== armDeleteResponseCodesRule &&
+            rule !== armPutResponseCodesRule &&
+            rule !== armPostResponseCodesRule,
         ]),
       ),
     },
