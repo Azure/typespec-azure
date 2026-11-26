@@ -117,6 +117,8 @@ export async function _getAnyDeserialize(
 
   return result.body;
 }
+
+/** Performs the getAny operation. */
 export async function getAny(
   context: Client,
   options: GetAnyOptionalParams = { requestOptions: {} },

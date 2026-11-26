@@ -1140,7 +1140,7 @@ function generateXMLMarshaller(
   const desc = `MarshalXML implements the xml.Marshaller interface for type ${modelDef.Model.name}.`;
   let text = `func (${receiver} ${modelDef.Model.name}) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {\n`;
   if (modelDef.Model.xmlName) {
-    text += `${indent.get()}start.Name.Local = "${modelDef.Model.xmlName}"\n`;
+    text += `${indent.get()}start.Name.Local = ${helpers.formatGoStringLiteral(modelDef.Model.xmlName)}\n`;
   }
   // declare the type aliases for custom marshalling first
   // as the containing type's alias type depends on them
@@ -1247,15 +1247,15 @@ function generateAliasType(
     const sn = getXMLSerialization(field, modelType.pkg);
     if (fieldType.kind === "time") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      text += `${indent.get()}${field.name} *datetime.${fieldType.format} \`xml:"${sn}"\`\n`;
+      text += `${indent.get()}${field.name} *datetime.${fieldType.format} ${helpers.formatXMLStructTag(sn)}\n`;
     } else if (go.isAdditionalProperties(field) || fieldType.kind === "map") {
-      text += `${indent.get()}${field.name} additionalProperties \`xml:"${sn}"\`\n`;
+      text += `${indent.get()}${field.name} additionalProperties ${helpers.formatXMLStructTag(sn)}\n`;
     } else if (fieldType.kind === "slice") {
-      text += `${indent.get()}${field.name} *${go.getTypeDeclaration(fieldType, modelType.pkg)} \`xml:"${sn}"\`\n`;
+      text += `${indent.get()}${field.name} *${go.getTypeDeclaration(fieldType, modelType.pkg)} ${helpers.formatXMLStructTag(sn)}\n`;
     } else if (fieldType.kind === "encodedBytes") {
-      text += `${indent.get()}${field.name} *string \`xml:"${sn}"\`\n`;
+      text += `${indent.get()}${field.name} *string ${helpers.formatXMLStructTag(sn)}\n`;
     } else if (fieldNeedsXMLNestedModelMarshalling(field)) {
-      text += `${indent.get()}${field.name} *${getXMLNestedModelAliasTypeName(field.type)} \`xml:"${field.serializedName}"\`\n`;
+      text += `${indent.get()}${field.name} *${getXMLNestedModelAliasTypeName(field.type)} ${helpers.formatXMLStructTag(field.serializedName)}\n`;
     }
   }
   text += `${indent.pop().get()}}{\n`;
@@ -1380,7 +1380,7 @@ class ModelDef {
       let tag = "";
       // only emit tags for XML; JSON uses custom marshallers/unmarshallers
       if (this.Format === "XML" && !go.isAdditionalProperties(field)) {
-        tag = ` \`xml:"${serialization}"\``;
+        tag = ` ${helpers.formatXMLStructTag(serialization)}`;
       }
       text += `${indent.get()}${field.name} ${typeName}${tag}\n`;
       first = false;

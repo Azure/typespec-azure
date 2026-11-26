@@ -23,6 +23,8 @@ ignorePaths:
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
+  - .github/agents/agentic-workflows.md
+  - .github/skills/agentic-workflows/**
   - "*.lock.yml"
   # temp ignore typespec-ts while repo move is inflight
   - packages/typespec-ts/**
@@ -62,6 +64,7 @@ words:
   - contosobenchmark
   - contosowidgetmanager
   - Chenjie
+  - Dmaven
   - DMSS
   - Donezo
   - dynatrace
@@ -69,6 +72,8 @@ words:
   - fhir
   - foos
   - français
+  - GOCACHE
+  - GOMODCACHE
   - healthdataaiservices
   - horiz
   - Howtos
