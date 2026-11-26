@@ -21,7 +21,7 @@ beforeEach(async () => {
 });
 
 describe("resource identity properties", () => {
-  it("accepts standard read-only properties and inherited string tags", async () => {
+  it("accepts standard resources and ignores virtual resource path segments", async () => {
     await tester
       .expect(
         `
@@ -30,6 +30,26 @@ describe("resource identity properties", () => {
 
         model FooResource is TrackedResource<{}> {
           ...ResourceNameParameter<FooResource>;
+        }
+
+        @resourceGroupResource
+        @armVirtualResource
+        model Division {
+          #suppress "@azure-tools/typespec-azure-core/key-visibility-required" "Virtual"
+          @path
+          @segment("divisions")
+          @key
+          divisionId: string;
+        }
+
+        @parentResource(Division)
+        @armVirtualResource
+        model Group {
+          #suppress "@azure-tools/typespec-azure-core/key-visibility-required" "Virtual"
+          @path
+          @segment("groups")
+          @key
+          groupId: string;
         }
         `,
       )

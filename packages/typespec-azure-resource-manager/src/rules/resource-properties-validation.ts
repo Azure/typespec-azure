@@ -9,7 +9,7 @@ import {
   paramMessage,
 } from "@typespec/compiler";
 
-import { getArmResource } from "../resource.js";
+import { getArmResource, isArmVirtualResource } from "../resource.js";
 import { isReadonlyProperty } from "../utils.js";
 import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
@@ -28,7 +28,10 @@ export const resourcePropertiesValidationRule = createRule({
   create(context) {
     return {
       model: (model: Model) => {
-        if (getArmResource(context.program, model) === undefined) {
+        if (
+          getArmResource(context.program, model) === undefined ||
+          isArmVirtualResource(context.program, model)
+        ) {
           return;
         }
 
