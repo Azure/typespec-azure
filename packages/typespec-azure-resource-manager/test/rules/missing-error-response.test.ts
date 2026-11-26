@@ -8,7 +8,8 @@ let tester: LinterRuleTester;
 const code = "@azure-tools/typespec-azure-resource-manager/missing-error-response";
 const diagnostic = {
   code,
-  message: "Operation is missing an error response for otherwise undeclared failure status codes.",
+  message:
+    "Operation is missing an error response for otherwise undeclared failure status codes. Add `CommonTypes.ErrorResponse` as a response to the operation.",
 };
 const resource = `
   @armProviderNamespace

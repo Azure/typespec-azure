@@ -16,7 +16,7 @@ export const missingErrorResponseRule = createRule({
   severity: "warning",
   messages: {
     default:
-      "Operation is missing an error response for otherwise undeclared failure status codes.",
+      "Operation is missing an error response for otherwise undeclared failure status codes. Add `CommonTypes.ErrorResponse` as a response to the operation.",
   },
   create(context) {
     return {
