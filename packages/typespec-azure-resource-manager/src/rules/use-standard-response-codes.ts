@@ -97,9 +97,22 @@ export const useStandardResponseCodesRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        const policy = getResponsePolicy(context.program, operation, httpOperation, () =>
-          (resourceRoles ??= getResourceRoles(context.program)).get(operation),
-        );
+        const entry = responsePolicies[httpOperation.verb];
+        let policy: ResponsePolicy | undefined;
+        if (entry?.scope === "service") {
+          for (let ns = operation.namespace; ns; ns = ns.namespace) {
+            if (getService(context.program, ns)) {
+              policy = entry.policy;
+              break;
+            }
+          }
+        } else if (entry) {
+          resourceRoles ??= getResourceRoles(context.program);
+          if (resourceRoles.get(operation) === entry.scope) {
+            policy =
+              entry.lro && getLroMetadata(context.program, operation) ? entry.lro : entry.policy;
+          }
+        }
         if (policy) {
           if (!matchesPolicy(httpOperation.responses, policy)) {
             context.reportDiagnostic({
@@ -143,26 +156,6 @@ function getResourceRoles(program: Program): Map<Operation, ResourceRole> {
     if (operations.lifecycle.delete) roles.set(operations.lifecycle.delete.operation, "delete");
   }
   return roles;
-}
-
-function getResponsePolicy(
-  program: Program,
-  operation: Operation,
-  httpOperation: HttpOperation,
-  getRole: () => ResourceRole | undefined,
-): ResponsePolicy | undefined {
-  const entry = responsePolicies[httpOperation.verb];
-  if (!entry) return undefined;
-  if (entry.scope === "service") {
-    for (let ns = operation.namespace; ns; ns = ns.namespace) {
-      if (getService(program, ns)) return entry.policy;
-    }
-    return undefined;
-  }
-  if (getRole() === entry.scope) {
-    return entry.lro && getLroMetadata(program, operation) ? entry.lro : entry.policy;
-  }
-  return undefined;
 }
 
 function matchesPolicy(
