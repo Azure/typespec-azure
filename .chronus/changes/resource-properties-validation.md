@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Add the `resource-properties-validation` rule for ARM resource identity properties and tags.
+Add the `resource-properties-validation` rule for ARM resource identity properties and tags. The rule is disabled by default in the `resource-manager` ruleset and can be enabled explicitly.
