@@ -132,9 +132,11 @@ function createScenario(kind: ScenarioKind, fails = false): ScenarioMockApi {
 Scenarios.Azure_ClientGenerator_Core_Lro_Result_createDefault = createScenario("default");
 Scenarios.Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResult =
   createScenario("client-result");
-Scenarios.Azure_ClientGenerator_Core_Lro_Result_createDefaultWithFailure = createScenario(
+Scenarios.Azure_ClientGenerator_Core_Lro_Result_createDefaultFailure = createScenario(
   "default-failure",
   true,
 );
-Scenarios.Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResultWithFailure =
-  createScenario("client-result-failure", true);
+Scenarios.Azure_ClientGenerator_Core_Lro_Result_createClientResultFailure = createScenario(
+  "client-result-failure",
+  true,
+);

@@ -59,7 +59,7 @@ public class LroResultTests {
     @Test
     public void defaultResultWithFailure() {
         SyncPoller<Job, Job> poller
-            = client.beginCreateDefaultWithFailure("default-failure", new Job(JobStatus.RUNNING));
+            = client.beginCreateDefaultFailure("default-failure", new Job(JobStatus.RUNNING));
 
         PollResponse<Job> response = poller.waitForCompletion();
         Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
@@ -71,7 +71,7 @@ public class LroResultTests {
     @Test
     public void clientResultWithFailure() {
         SyncPoller<Job, JobResult> poller
-            = client.beginCreateWithClientLroResultWithFailure("client-result-failure", new Job(JobStatus.RUNNING));
+            = client.beginCreateClientResultFailure("client-result-failure", new Job(JobStatus.RUNNING));
 
         PollResponse<Job> response = poller.waitForCompletion();
         Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
@@ -83,7 +83,7 @@ public class LroResultTests {
     @Test
     public void defaultResultWithFailureAsync() {
         AsyncPollResponse<Job, Job> response = asyncClient
-            .beginCreateDefaultWithFailure("default-failure", new Job(JobStatus.RUNNING))
+            .beginCreateDefaultFailure("default-failure", new Job(JobStatus.RUNNING))
             .blockLast();
 
         Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
@@ -94,7 +94,7 @@ public class LroResultTests {
     @Test
     public void clientResultWithFailureAsync() {
         AsyncPollResponse<Job, JobResult> response = asyncClient
-            .beginCreateWithClientLroResultWithFailure("client-result-failure", new Job(JobStatus.RUNNING))
+            .beginCreateClientResultFailure("client-result-failure", new Job(JobStatus.RUNNING))
             .blockLast();
 
         Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());

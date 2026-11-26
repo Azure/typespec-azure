@@ -8,19 +8,19 @@ import { Pipeline } from '@azure/core-rest-pipeline';
 import { PollerLike } from '@azure/core-lro';
 import { RestError } from '@azure/core-rest-pipeline';
 
+export declare interface CreateClientResultFailureOptionalParams extends OperationOptions {
+    updateIntervalInMs?: number;
+}
+
+export declare interface CreateDefaultFailureOptionalParams extends OperationOptions {
+    updateIntervalInMs?: number;
+}
+
 export declare interface CreateDefaultOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
 
-export declare interface CreateDefaultWithFailureOptionalParams extends OperationOptions {
-    updateIntervalInMs?: number;
-}
-
 export declare interface CreateWithClientLroResultOptionalParams extends OperationOptions {
-    updateIntervalInMs?: number;
-}
-
-export declare interface CreateWithClientLroResultWithFailureOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
 
@@ -78,10 +78,10 @@ export declare class ResultClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: ResultClientOptionalParams);
-    createWithClientLroResultWithFailure(id: string, resource: Job, options?: CreateWithClientLroResultWithFailureOptionalParams): PollerLike<OperationState<JobResult>, JobResult>;
+    createClientResultFailure(id: string, resource: Job, options?: CreateClientResultFailureOptionalParams): PollerLike<OperationState<JobResult>, JobResult>;
     pollClientResultFailureJob(id: string, options?: PollClientResultFailureJobOptionalParams): Promise<Job>;
     getClientResultFailureJob(id: string, options?: GetClientResultFailureJobOptionalParams): Promise<Job>;
-    createDefaultWithFailure(id: string, resource: Job, options?: CreateDefaultWithFailureOptionalParams): PollerLike<OperationState<Job>, Job>;
+    createDefaultFailure(id: string, resource: Job, options?: CreateDefaultFailureOptionalParams): PollerLike<OperationState<Job>, Job>;
     pollDefaultFailureJob(id: string, options?: PollDefaultFailureJobOptionalParams): Promise<Job>;
     getDefaultFailureJob(id: string, options?: GetDefaultFailureJobOptionalParams): Promise<Job>;
     createWithClientLroResult(id: string, resource: Job, options?: CreateWithClientLroResultOptionalParams): PollerLike<OperationState<JobResult>, JobResult>;

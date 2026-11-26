@@ -115,7 +115,7 @@ op pollDefaultFailureJob(
   """)
 @pollingOperation(pollDefaultFailureJob)
 @route("/default-failure")
-op createDefaultWithFailure is Operations.LongRunningResourceCreateOrReplace<Job>;
+op createDefaultFailure is Operations.LongRunningResourceCreateOrReplace<Job>;
 
 @route("/client-result-failure/jobs/{id}")
 @get
@@ -141,6 +141,6 @@ op pollClientResultFailureJob(
   """)
 @pollingOperation(pollClientResultFailureJob)
 @route("/client-result-failure")
-op createWithClientLroResultWithFailure is Operations.LongRunningResourceCreateOrReplace<Job>;
+op createClientResultFailure is Operations.LongRunningResourceCreateOrReplace<Job>;
 
-@@clientLroResult(createWithClientLroResultWithFailure, Job.result);
+@@clientLroResult(createClientResultFailure, Job.result);

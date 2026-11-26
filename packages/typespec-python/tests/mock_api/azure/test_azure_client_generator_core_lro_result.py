@@ -44,7 +44,7 @@ def test_client_lro_result(client):
 
 def test_default_lro_result_failure(client):
     with pytest.raises(HttpResponseError):
-        client.begin_create_default_with_failure(
+        client.begin_create_default_failure(
             id="default-failure",
             resource=Job(status="Running"),
             polling_interval=0,
@@ -53,7 +53,7 @@ def test_default_lro_result_failure(client):
 
 def test_client_lro_result_failure(client):
     with pytest.raises(HttpResponseError):
-        client.begin_create_with_client_lro_result_with_failure(
+        client.begin_create_client_result_failure(
             id="client-result-failure",
             resource=Job(status="Running"),
             polling_interval=0,

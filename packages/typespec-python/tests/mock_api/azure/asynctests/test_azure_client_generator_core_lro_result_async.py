@@ -49,7 +49,7 @@ async def test_client_lro_result(client):
 
 @pytest.mark.asyncio
 async def test_default_lro_result_failure(client):
-    poller = await client.begin_create_default_with_failure(
+    poller = await client.begin_create_default_failure(
         id="default-failure",
         resource=Job(status="Running"),
         polling_interval=0,
@@ -60,7 +60,7 @@ async def test_default_lro_result_failure(client):
 
 @pytest.mark.asyncio
 async def test_client_lro_result_failure(client):
-    poller = await client.begin_create_with_client_lro_result_with_failure(
+    poller = await client.begin_create_client_result_failure(
         id="client-result-failure",
         resource=Job(status="Running"),
         polling_interval=0,
