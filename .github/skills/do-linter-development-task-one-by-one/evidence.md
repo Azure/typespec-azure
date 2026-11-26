@@ -263,6 +263,20 @@ downloaded inputs in the persistent evidence role; remove only the task-owned
 temporary checkout after preserving any unique files and stopping its activity.
 This keeps the recovery gate intact while allowing later runs to reuse inputs.
 
+Persist a verification checkpoint before cleanup, separately from the final
+recovery receipt. Mark recovery complete only after required cleanup succeeds;
+a cleanup error must not discard the verification evidence or become a passing
+recovery result.
+
+On Windows, Git pack files can be read-only. Before removing a temporary
+checkout, verify its exact task-owned path and physical containment, stop its
+activity, and reject reparse-point escapes. A cleanup handler may clear only the
+read-only attribute on an owned Git pack file whose unlink failed, then retry
+that exact unlink once. Do not change ACLs, follow paths outside the checkout,
+or broaden deletion scope. Preserve cleanup failures and apply the existing
+bounded local-correction or coordinator-reserve procedure before correcting and
+rerunning a failed recovery helper; this guidance grants no additional retries.
+
 Push the evidence branch and return its repository/ref, actual pushed commit,
 branch-based `migration.md` URL for the PR, separate immutable report/receipt
 links for audit and replay, specs retention tuple and asset/verification receipts.
