@@ -11,9 +11,15 @@ prove the scope and activation, and add the validator mapping to the owning
 existing rule's documentation when a duplicate is omitted. No new lint does not
 mean no documentation work.
 
+Coverage must enforce the derived semantic TypeSpec guideline. An emitter
+omitting an extension or a lint banning raw `@extension` does not establish
+coverage of the corresponding semantic authoring check.
+
 ## Template-enforced
 
-The violating shape is prevented by templates, framework helpers, or generated conventions, so a dedicated native lint is not the main control.
+The native semantic violation is prevented by templates or framework helpers, so
+a dedicated native lint is not the main control. Normalizing generated Swagger
+while still accepting that native violation is not structural prevention.
 
 ## Blocked or suppression-dependent
 
@@ -29,7 +35,10 @@ to reproduce Swagger output/counts. Document partial coverage honestly.
 
 ## True gap
 
-The validator rule fires, the violating shape is authorable without prerequisite blocking evidence, and no existing native coverage explains the behavior. This is the strongest case for new lint work.
+The original validator establishes the guideline, its similar native semantic
+violation is authorable without prerequisite blocking evidence, and no existing
+native coverage enforces the check. A raw `@extension` reproducer does not
+establish this classification.
 
 ## Test-quality issue
 

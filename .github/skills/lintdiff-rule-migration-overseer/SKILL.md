@@ -38,7 +38,9 @@ Do not route that task through temporary development or promotion.
    - partial
    - true gap
    - test-quality issue
-4. Apply the [existing-rule coverage contract](#existing-rule-coverage-contract).
+4. Apply the
+   [native-authoring contract](../shared/native-migration-contract.md#native-authoring-not-swagger-reproduction)
+   and the [existing-rule coverage contract](#existing-rule-coverage-contract).
    Only a true gap or an evidenced incomplete partial warrants native code work;
    partial coverage requires an extension-versus-new-rule decision first.
 5. When native work is justified, sequence the generic skills explicitly:
@@ -53,6 +55,10 @@ Do not route that task through temporary development or promotion.
 ## Guardrails
 
 - Do not assume every validator rule deserves a brand-new native lint.
+- Never use raw `@extension` to recreate the Swagger effect. Derive and assess
+  the similar semantic TypeSpec check before choosing reuse or implementation.
+- Do not classify semantic authoring as covered merely because an emitter omits
+  an extension or an existing rule rejects raw OpenAPI extension authoring.
 - If a violating repro requires suppressing an unrelated TypeSpec diagnostic, treat that as strong evidence that the case may already be blocked by existing linting.
 - Prefer proving existing coverage or documenting blocking/template behavior over inventing redundant lints.
 - If the repository lacks a comparison harness or local migration inventory, say so explicitly and limit claims to the evidence that is actually available.

@@ -20,7 +20,10 @@ If the task is specifically about a named LintDiff or `azure-openapi-validator` 
 
 ## Process
 
-1. Restate the request in lint-authoring terms.
+1. Restate the request in lint-authoring terms. For migrations, identify the
+   original guideline and its similar semantic TypeSpec check under the
+   [native-authoring contract](../shared/native-migration-contract.md#native-authoring-not-swagger-reproduction).
+   Never use raw `@extension` to recreate the Swagger effect.
 2. Inspect the target repository for existing lint packages, registration patterns, helper utilities, diagnostics style, and nearby rules.
 3. Check dependencies or adjacent libraries for prior art before proposing new logic.
 4. Define the [native rule contract](#native-rule-contract), distinguishing between:
@@ -88,8 +91,14 @@ Record these decisions in the brief before implementation:
   final head.
 
 For naming rules, explicitly distinguish source names, common SDK names,
-language-specific overrides, and serialized operation IDs. Select the name
-domain required by the guideline instead of assuming those names are equivalent.
+language-specific overrides, exact-name behavior and serialized operation IDs.
+Select the name domain required by the guideline instead of assuming those names
+are equivalent.
+For redundant SDK-name overrides, compare naming behavior with the native
+fallback when that override is absent, in the same scope. Preserve meaningful
+common/scoped fallback, friendly-name and exact-name effects. A changed wire
+name or an emitter's extension omission does not establish whether the semantic
+override is necessary or whether an existing native check covers it.
 For migrations, carry forward evidenced intentional differences from the source
 validator; output/count equivalence is a separate claim from guideline coverage.
 

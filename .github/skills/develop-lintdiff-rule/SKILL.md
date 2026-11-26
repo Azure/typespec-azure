@@ -386,6 +386,14 @@ comparisons and legacy validator mechanics in a dedicated migration section,
 
 #### Native TypeSpec implementation boundary
 
+Apply the shared
+[native-authoring contract](../shared/native-migration-contract.md#native-authoring-not-swagger-reproduction):
+identify the original guideline and the similar supported TypeSpec check.
+Never use raw `@extension` to recreate the Swagger effect in production logic,
+native violation repros, native tests or documentation examples. Emitted-output
+normalization or a raw-extension ban does not prove the semantic authoring
+guideline is enforced.
+
 Prefer idiomatic TypeSpec validation. Preserve Swagger parity only where it
 naturally maps to TypeSpec semantics; exact executable Swagger behavior is not
 the migration contract when reproducing it requires non-idiomatic TypeSpec or
@@ -434,7 +442,9 @@ prohibited functionality. Research and comparison fixtures may still use the
 prohibited libraries to demonstrate Swagger divergence. Native tests may
 register transitive libraries required by the test host, but must exercise the
 rule through supported native semantics rather than OpenAPI decorators or
-unsafe mutation. ARM-destination rule tests must not rely on TCGC to implement
+unsafe mutation. Comparison research must not manufacture native violations
+with raw `@extension`; preserve original Swagger fixtures separately.
+ARM-destination rule tests must not rely on TCGC to implement
 the check. A rule whose contract genuinely concerns SDK APIs belongs in TCGC,
 where supported SDK-name resolution and common/scoped override tests are
 appropriate; this does not authorize a TCGC dependency in ARM or waive the
@@ -516,21 +526,24 @@ accepting the migrated rule:
 1. State the intended guideline as an idiomatic TypeSpec semantic check. For
    research only, trace relevant emitter paths when needed to explain Swagger
    behavior or a parity gap; do not turn those paths into an implementation
-   checklist.
+   checklist or treat normalized output as enforcement of native authoring.
 2. Enumerate the valid supported TypeSpec type families and meaningful subtypes
    relevant to that check, including transformed or inherited types and relevant
    decorators or content types. Separately classify Swagger-only, emitter-invalid,
    already-rejected, and unsupported-but-emitted shapes; they do not expand the
    native contract.
-3. Record a rule-local emission matrix with, at minimum:
+3. Record a rule-local native semantic matrix with, at minimum:
    - authored TypeSpec shape
    - validity and support status, with any rejecting TypeSpec or Azure diagnostic
-   - native semantic check and any relevant emitter function or branch
-   - whether the selected OpenAPI field is present
-   - its emitted value or value category when present
-   - expected Swagger result
-   - expected TypeSpec lint result and any intentional parity gap
+   - original guideline and the corresponding native metadata/predicate
+   - expected TypeSpec lint result, target/unit and closest compliant control
+   - supported exemptions and intentional differences from the Swagger check
    - the fixture or code-backed rejection evidence that proves the row
+
+   Keep emitted-field values, emitter branches and Swagger results in separate
+   comparison research only when those claims require them. An emission matrix
+   is not a prerequisite for defining or accepting the native semantic check.
+
 4. Distinguish **surface coverage** from **shape coverage**. A request-body,
    response-body, parameter, or model fixture proves only the represented
    shapes within that surface. Every added implementation branch must have a

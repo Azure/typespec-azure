@@ -45,9 +45,13 @@ independent member conclusions and do not auto-add related validators.
      to its current owner or an evidenced gap under the
      [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract)
 4. Draft the [native rule contract](../typespec-lint-discovery/SKILL.md#native-rule-contract)
-   from that evidence. Separate the intended guideline from the Swagger
-   selector/emitted representation, and distinguish native violation coverage,
-   emitted-output equivalence, and diagnostic-count equivalence. Record a
+   from that evidence, following the
+   [native-authoring contract](../shared/native-migration-contract.md#native-authoring-not-swagger-reproduction).
+   Identify the original guideline and its similar semantic TypeSpec check;
+   never use raw `@extension` to force the Swagger effect. Separate the intended
+   guideline from the Swagger selector/emitted representation and distinguish
+   native violation coverage, emitted-output equivalence and diagnostic-count
+   equivalence. Record a
    supported TypeSpec example or rejection evidence for every material
    difference; an unexplained mismatch is still unresolved, not intentional.
 5. Decide the strongest currently supported status hypothesis:

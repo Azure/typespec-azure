@@ -17,6 +17,10 @@ A high-quality intake should account for all of these when they are available:
 
 ## Local migration evidence
 
+- original guideline mapped to a supported semantic TypeSpec check under the
+  [native-authoring contract](../shared/native-migration-contract.md#native-authoring-not-swagger-reproduction)
+- native violating/compliant examples without raw `@extension` workarounds;
+  emitter normalization and raw-extension bans are not semantic-check coverage
 - local `rule.md`
 - violating fixtures
 - compliant fixtures

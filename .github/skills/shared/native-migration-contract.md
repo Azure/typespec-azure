@@ -30,6 +30,42 @@ helpers. Equivalence analysis can use emitted artifacts in the external harness;
 those dependencies and comparison-only settings must not leak into the rule.
 One group has one native policy, not an arbitrary bundle hidden under one ID.
 
+### Native authoring, not Swagger reproduction
+
+First identify the original validator's intended guideline, material predicates,
+exceptions and diagnostic unit. Then define the similar check on supported
+TypeSpec authoring and semantic metadata. Do not transplant the emitted Swagger
+representation into the native contract.
+
+Never use raw `@extension` authoring to reproduce the same effect as Swagger or
+manufacture a migrated rule's violation, implementation, native test or
+documentation example. Suppressing the existing OpenAPI-authoring diagnostics
+does not make such a repro valid native acceptance evidence. Preserve original
+Swagger fixtures and historical receipts separately; they do not establish the
+native guideline or replace a supported semantic violating/compliant pair.
+
+Emitter normalization, omitted extensions or a rule banning raw extensions do
+not prove that the corresponding semantic authoring check is covered. Evaluate
+the supported TypeSpec construct itself. An emitter may produce compliant output
+while accepting the redundant or undesirable authoring that a native lint should
+check. Likewise, a raw-extension ban does not validate the semantic construct.
+Classify existing coverage or structural prevention only against the derived
+native guideline, with supported examples and activation evidence.
+
+For naming checks, distinguish a redundant semantic SDK-name override from an
+extension that would be redundant in Swagger. Compare the override's naming
+behavior with the native fallback without that override, in the same scope.
+Consider common/scoped fallback, friendly names and exact-name behavior.
+Different serialized wire names do not by themselves make an explicit SDK-name
+decorator necessary. Do not prove redundancy by resolving the same override on
+both sides of a comparison.
+
+Record intentional native scope, predicate and diagnostic differences from the
+original validator. If no supported semantic counterpart or distinguishing API
+is established, keep that question unresolved instead of inventing an extension
+adapter. Separate output/count comparison evidence from native lint acceptance;
+it must not dictate the native implementation.
+
 ## Completeness and test design
 
 Use the shared [analysis-first edit loop](analysis-first-lint-migration.md).
