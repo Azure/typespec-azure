@@ -19,6 +19,8 @@ import { isTemplatedInterfaceOperation } from "./utils.js";
 
 interface ResponsePolicy {
   readonly messageId: "get" | "deleteSync" | "deleteAsync" | "put" | "postSync" | "postAsync";
+  /** Message used instead of `messageId` when the operation declares no responses. */
+  readonly emptyMessageId?: "emptyGet";
   /** Matches any alternative, requiring every `required` code and allowing only `required` and `optional` codes. */
   readonly allowed: readonly {
     readonly required: readonly number[];
@@ -38,7 +40,11 @@ const responsePolicies: Partial<
 > = {
   get: {
     scope: "service",
-    policy: { messageId: "get", allowed: [{ required: [200], optional: [202] }] },
+    policy: {
+      messageId: "get",
+      emptyMessageId: "emptyGet",
+      allowed: [{ required: [200], optional: [202] }],
+    },
   },
   delete: {
     scope: "delete",
@@ -91,21 +97,15 @@ export const useStandardResponseCodesRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        resourceRoles ??= getResourceRoles(context.program);
-        const policy = getResponsePolicy(
-          context.program,
-          operation,
-          httpOperation,
-          resourceRoles.get(operation),
+        const policy = getResponsePolicy(context.program, operation, httpOperation, () =>
+          (resourceRoles ??= getResourceRoles(context.program)).get(operation),
         );
         if (policy) {
           if (!matchesPolicy(httpOperation.responses, policy)) {
             context.reportDiagnostic({
               target: operation,
               messageId:
-                policy === responsePolicies.get?.policy && httpOperation.responses.length === 0
-                  ? "emptyGet"
-                  : policy.messageId,
+                (httpOperation.responses.length === 0 && policy.emptyMessageId) || policy.messageId,
             });
           }
           return;
@@ -149,7 +149,7 @@ function getResponsePolicy(
   program: Program,
   operation: Operation,
   httpOperation: HttpOperation,
-  role: ResourceRole | undefined,
+  getRole: () => ResourceRole | undefined,
 ): ResponsePolicy | undefined {
   const entry = responsePolicies[httpOperation.verb];
   if (!entry) return undefined;
@@ -159,7 +159,7 @@ function getResponsePolicy(
     }
     return undefined;
   }
-  if (role === entry.scope) {
+  if (getRole() === entry.scope) {
     return entry.lro && getLroMetadata(program, operation) ? entry.lro : entry.policy;
   }
   return undefined;
