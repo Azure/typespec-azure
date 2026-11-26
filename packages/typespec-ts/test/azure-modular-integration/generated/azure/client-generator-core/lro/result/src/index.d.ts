@@ -12,11 +12,25 @@ export declare interface CreateDefaultOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
 
+export declare interface CreateDefaultWithFailureOptionalParams extends OperationOptions {
+    updateIntervalInMs?: number;
+}
+
 export declare interface CreateWithClientLroResultOptionalParams extends OperationOptions {
     updateIntervalInMs?: number;
 }
 
+export declare interface CreateWithClientLroResultWithFailureOptionalParams extends OperationOptions {
+    updateIntervalInMs?: number;
+}
+
+export declare interface GetClientResultFailureJobOptionalParams extends OperationOptions {
+}
+
 export declare interface GetClientResultJobOptionalParams extends OperationOptions {
+}
+
+export declare interface GetDefaultFailureJobOptionalParams extends OperationOptions {
 }
 
 export declare interface GetDefaultJobOptionalParams extends OperationOptions {
@@ -38,7 +52,13 @@ export declare enum KnownVersions {
     V20221201Preview = "2022-12-01-preview"
 }
 
+export declare interface PollClientResultFailureJobOptionalParams extends OperationOptions {
+}
+
 export declare interface PollClientResultJobOptionalParams extends OperationOptions {
+}
+
+export declare interface PollDefaultFailureJobOptionalParams extends OperationOptions {
 }
 
 export declare interface PollDefaultJobOptionalParams extends OperationOptions {
@@ -58,6 +78,12 @@ export declare class ResultClient {
     private _client;
     readonly pipeline: Pipeline;
     constructor(options?: ResultClientOptionalParams);
+    createWithClientLroResultWithFailure(id: string, resource: Job, options?: CreateWithClientLroResultWithFailureOptionalParams): PollerLike<OperationState<JobResult>, JobResult>;
+    pollClientResultFailureJob(id: string, options?: PollClientResultFailureJobOptionalParams): Promise<Job>;
+    getClientResultFailureJob(id: string, options?: GetClientResultFailureJobOptionalParams): Promise<Job>;
+    createDefaultWithFailure(id: string, resource: Job, options?: CreateDefaultWithFailureOptionalParams): PollerLike<OperationState<Job>, Job>;
+    pollDefaultFailureJob(id: string, options?: PollDefaultFailureJobOptionalParams): Promise<Job>;
+    getDefaultFailureJob(id: string, options?: GetDefaultFailureJobOptionalParams): Promise<Job>;
     createWithClientLroResult(id: string, resource: Job, options?: CreateWithClientLroResultOptionalParams): PollerLike<OperationState<JobResult>, JobResult>;
     pollClientResultJob(id: string, options?: PollClientResultJobOptionalParams): Promise<Job>;
     getClientResultJob(id: string, options?: GetClientResultJobOptionalParams): Promise<Job>;
