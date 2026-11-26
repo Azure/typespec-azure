@@ -90,14 +90,14 @@ covers both. It is not a repository-wide timeout default.
   failed-attempt history. A materially incompatible profile needs a new explicit
   decision, not a silent fallback to defaults or a larger timeout.
 - A profile does not authorize retrying a failed check. Preserve any finite
-  one-rerun authorization separately; reusing a setting is not renewing that
+  rerun authorization separately; reusing a setting is not renewing that
   attempt allowance. Hook failures remain excluded from the per-test diagnostic
   rerun; the separate queue-owned setup-hook procedure below has its own limit.
 
 ## Bounded setup-hook timeout recovery
 
-For a queue-owned rule task, allow **one instrumented diagnostic run and, only
-when it proves the cause, one corrective required-test run** across all phases,
+For a queue-owned rule task, allow **up to three instrumented diagnostic runs and,
+only when measurements prove the cause, up to three corrective required-test runs** across all phases,
 reviews and source-repair cycles. This allowance is separate from per-test
 timeout diagnosis, local draft corrections and native baseline comparison.
 Standalone skills do not inherit it. Record both counters and the failed
@@ -129,11 +129,13 @@ review fix agent; do not restart a worker or review pair.
    hook adjustment. A tracked hook change also invalidates affected formatting,
    lint and test evidence; complete those required checks. Verify the same
    population/skips, all tests passing, probe restoration, and clean intended
-   diff before publication. Preserve the initial and diagnostic failures. If
-   the run fails or its scope changes unexpectedly, stop rather than repeat it.
+   diff before publication. Preserve every initial, diagnostic and corrective
+   result. An unexpectedly changed scope stops recovery. A further diagnostic or
+   corrective run requires a fresh coordinator eligibility decision, remaining
+   budget, and new measurements justifying the next approach.
 
-This procedure does not authorize a global 30-second default, a second
-instrumented attempt, automatic retry of optional suites, or declaring other
+This procedure does not authorize a global 30-second default,
+automatic retry of optional suites, or declaring other
 hook failures environmental. Previously stopped tasks do not gain a fresh
 allowance retroactively; an explicit task resumption retains its old counters.
 
@@ -347,7 +349,8 @@ resumption; generic "continue" is not permission to create a follow-up PR.
 
 ## Bounded corrections and earlier regressions
 
-Keep existing three-attempt draft/command correction budgets and the separate
+Keep the queue's ten-attempt phase draft/command correction budget, the
+three-attempt review-round budget, and the separate
 coordinator-owned reserve below. Prefer tested
 helpers and executable invariants over giving each command a new retry budget.
 Corpus counts must distinguish source population, successfully compiled
@@ -367,10 +370,10 @@ matrix; its semantics still require evidence.
 
 ### Coordinator-owned local recovery reserve
 
-For queue tasks started under this contract, invocation also authorizes **three
+For queue tasks started under this contract, invocation also authorizes **ten
 additional local corrective attempts total per rule task**, shared across
 development, promotion, reviews and source-repair cycles. This is a finite
-reserve, not three more attempts per phase or failure. Standalone skills retain
+reserve, not ten more attempts per phase or failure. Standalone skills retain
 their existing budgets. A historical task stopped under an older contract does
 not gain this allowance merely because the skill file changed. Explicit user
 limits narrower than these defaults take precedence.
@@ -408,8 +411,8 @@ available, but is not needed for an eligible reserve attempt.
 
 ### Bounded local UTF-8 recovery
 
-For queue tasks started under this contract, invocation authorizes **one
-encoding-only local helper correction per rule task**, shared across phases,
+For queue tasks started under this contract, invocation authorizes **five
+encoding-only local helper corrections per rule task**, shared across phases,
 members and reviews. Prefer the ordinary draft allowance while available; after
 both ordinary and coordinator-reserve exhaustion, the coordinator may grant this allowance
 to the same owner without user input. Record the grant and debit before dispatch;
@@ -432,8 +435,9 @@ Correct the helper and rerun its original failed evidence-processing scope
 once, including invalidated checks. Reuse unchanged passing product receipts;
 do not rerun builds/corpus merely because their receipt reader failed. Retain
 the original exception, corrective diff, debit and complete rerun result.
-A second failure exhausts this allowance; any further action needs an already
-applicable remaining allowance or the normal precise blocker handoff.
+Each further correction requires a fresh coordinator grant, remaining budget,
+and evidence of a distinct or newly understood encoding defect. Do not repeat an
+unchanged correction. Exhaustion follows the normal precise blocker handoff.
 
 This never retries external side effects, publication, email, CI or failed
 product validation, and never authorizes unknown cleanup or skill edits during
@@ -444,7 +448,7 @@ Standalone skills receive no additional allowance from this queue policy.
 ### Bounded native baseline comparison
 
 For queue tasks under this contract, a naturally completed required native suite
-that still has **only per-test timeouts after the single reduced-concurrency
+that still has **only per-test timeouts after a reduced-concurrency
 diagnostic** may return `native-comparison-handoff`. The coordinator owns **one
 comparison allowance per rule task**, separate from the reserve and original
 diagnostic. The same prospective-task and explicit-user-limit rules as the
@@ -497,14 +501,14 @@ rerun, new allowance or test retry.
 
 ### Local recovery decision cases
 
-| Case                                                                                                   | Expected outcome                                                                                            |
-| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| Three local attempts used; new reproducer proves an in-scope metadata-filter defect; reserve available | Coordinator grants one recorded correction to the same owner, without user input.                           |
-| Formatter wrapper rejects an incorrect expected count before formatting                                | Verify side effects and exact path set; use ordinary correction or one reserve attempt, never a free retry. |
-| Same semantic patch failed again with no new causal evidence                                           | Do not grant reserve merely to repeat it.                                                                   |
-| Required suite retains only per-test timeouts after reduced concurrency                                | Consider the single baseline-comparison allowance; no timeout increase.                                     |
-| Baseline passes but draft focused run fails, or restored runtime cannot be verified                    | Stop comparison; no full rerun or success claim.                                                            |
-| Both focused runs pass but full scope fails or changes test IDs/skips                                  | Required gate remains blocked; no second comparison.                                                        |
-| Required native suite fails only setup hooks                                                           | Consider the separate bounded setup-hook recovery; neither local reserve nor native comparison applies.     |
-| Permission denial or indeterminate push                                                                | No timeout or local recovery allowance applies.                                                             |
-| Owner/phase changes or a historical task reloads newer skills                                          | Preserve counters; no replenishment or retroactive recovery grant.                                          |
+| Case                                                                                                      | Expected outcome                                                                                            |
+| --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Ordinary local attempts used; new reproducer proves an in-scope metadata-filter defect; reserve available | Coordinator grants one recorded correction to the same owner, without user input.                           |
+| Formatter wrapper rejects an incorrect expected count before formatting                                   | Verify side effects and exact path set; use ordinary correction or one reserve attempt, never a free retry. |
+| Same semantic patch failed again with no new causal evidence                                              | Do not grant reserve merely to repeat it.                                                                   |
+| Required suite retains only per-test timeouts after reduced concurrency                                   | Consider the single baseline-comparison allowance; no timeout increase.                                     |
+| Baseline passes but draft focused run fails, or restored runtime cannot be verified                       | Stop comparison; no full rerun or success claim.                                                            |
+| Both focused runs pass but full scope fails or changes test IDs/skips                                     | Required gate remains blocked; no second comparison.                                                        |
+| Required native suite fails only setup hooks                                                              | Consider the separate bounded setup-hook recovery; neither local reserve nor native comparison applies.     |
+| Permission denial or indeterminate push                                                                   | No timeout or local recovery allowance applies.                                                             |
+| Owner/phase changes or a historical task reloads newer skills                                             | Preserve counters; no replenishment or retroactive recovery grant.                                          |

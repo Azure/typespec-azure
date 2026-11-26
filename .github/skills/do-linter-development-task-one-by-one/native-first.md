@@ -317,11 +317,11 @@ original deadlines/dispatch IDs, recovery decisions and append-only history.
 Native-first tasks have no promotion PR or immutable temporary source.
 
 Preserve [task recovery](../shared/recovery-context.md#native-first-task-scope):
-initial cycle plus at most three task-wide semantic repair cycles; one eligible
-setup-only orchestration retry; three local draft corrections per phase/cycle
-and existing per-round review allowance; three coordinator reserve attempts;
-one native timeout diagnosis; one baseline comparison; the existing bounded
-setup-hook diagnostic/correction; and the prospective
+initial cycle plus at most three task-wide semantic repair cycles; three eligible
+setup-only orchestration retries; ten local draft corrections per phase/cycle
+and existing per-round review allowance; ten coordinator reserve attempts;
+three native timeout diagnoses; one baseline comparison; three setup-hook
+diagnostics and three corrective runs; and five prospective corrections under
 [local UTF-8 recovery](../shared/recovery-context.md#bounded-local-utf-8-recovery).
 Group size never multiplies allowances.
 Map development and promotion phase counters to development and readiness;

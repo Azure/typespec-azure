@@ -734,20 +734,25 @@ in durable evidence (redact credentials only).
    a closed/merged recorded PR, failed/incomplete query, or uncertain identity
    stops publication. Preserve unexpected PRs; do not silently close/retarget them.
 3. Only after a successful complete query POSITIVELY establishes absence, allow
-   at most ONE documented task-local configuration correction and ONE retry
+   at most ONE documented task-local configuration correction and, for queue
+   tasks, THREE retries
    through the REQUIRED creation tool, and only when evidence identifies a
    specific correctable configuration defect. Record original values, exact
-   causal defect, correction, verification and retry identity. A bare HTTP 422
+   causal defect, correction, verification and each retry identity. Standalone
+   publication retains one retry. A bare HTTP 422
    establishes no particular defect: do not blindly set upstream, pushRemote
    and gh-merge-base together. Git hints cannot repair wrong app binding.
 4. Unknown/ambiguous transport outcomes, API/auth/network failures, mismatched
-   identities, query failures and repeated creation failures remain blockers,
+   identities and query failures remain blockers,
    even if a later query is empty. Reconciliation may find a successful PR, but
    it does not authorize resending an indeterminate request. Never retry pushes
    or review requests under this exception. Recheck absence immediately before
-   an eligible retry and verify the actual PR afterward as above.
+   each eligible retry and verify the actual PR afterward as above. Further
+   queue retries require a determinate failure, fresh evidence that a relevant
+   precondition changed, and a new successful absence check. They do not grant
+   another configuration correction or retry an unchanged failure blindly.
 
-Keep this one-correction budget per task/publication identity across resumptions,
+Keep the one-correction and applicable retry budgets per task/publication identity across resumptions,
 separate from worker attempts, setup retries, source repairs, draft corrections
 and review rounds. Neither a fresh dispatch nor publication-only recovery resets
 it. If blocked, retain validated work and report the exact tuple, attempts,

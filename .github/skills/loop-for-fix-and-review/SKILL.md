@@ -727,10 +727,10 @@ parent approval is still required for publication, not for each local correction
 ### Bounded native-test timeout diagnosis
 
 A completed native unit-test run whose only failures are test-runner-reported
-per-test timeouts may receive **one diagnostic rerun with reduced concurrency**.
-In queue mode, the outer queue owns one allowance for the entire task, shared
+per-test timeouts may receive diagnostic reruns with reduced concurrency.
+In queue mode, the outer queue owns three reruns for the entire task, shared
 across phases, review rounds, and source-repair cycles. Outside queue mode, the
-invoking standalone workflow owns one allowance across its nested reviews.
+invoking standalone workflow owns one rerun across its nested reviews.
 Pass and preserve that ownership and usage in handoffs; a new agent, phase,
 review invocation, or resumption does not reset it.
 
@@ -749,13 +749,17 @@ review invocation, or resumption does not reset it.
    timeouts, add retries, or change production code for this diagnostic run.
 3. Run the original full validation scope once with only the concurrency change.
    Verify that the discovered test population and skip set match. A focused
-   subset cannot substitute for this rerun. Preserve both attempts.
+   subset cannot substitute for this rerun. Preserve every attempt.
 4. If it passes, record a recovered timeout with unproven cause, not proof of
    environmental contention, and complete the remaining required validation.
-   If it fails, do not repeat the diagnostic run. An understood defect in the
+   If it fails, queue mode may request another coordinator-granted diagnostic
+   only when the completed result again meets the timeout-only eligibility
+   conditions and task-wide budget remains. Standalone mode does not repeat it.
+   An understood defect in the
    agent's draft may still use the existing bounded draft-correction allowance,
    with concrete causal evidence and a full-scope passing rerun. An unexplained
-   timeout remains blocking unless the outer queue grants the shared
+   timeout remains blocking unless the outer queue grants another eligible
+   diagnostic or the shared
    [bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison).
    Return its nonterminal handoff with commands stopped; the review pair stays
    idle until that same-owner continuation. Standalone runs and ineligible
