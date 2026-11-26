@@ -14,8 +14,9 @@ completed external specs CI evidence. Support both public
 `Azure/azure-rest-api-specs-pr:typespec-next` as independent consumer targets;
 the private path supplements, not replaces, the public path. If source analysis
 confirms PR-caused compatibility diagnostics, create that consumer's companion
-without another proposal opt-in. Link public companions directly in the linter
-PR description; apply the private disclosure boundary below to private ones.
+without another proposal opt-in. Link verified public and private companions
+directly in the linter PR description; apply the private disclosure boundary
+below to all other private information.
 Do not wait for a user to request this first proposal. An authorized request for
 private validation permits the selected PR's latest code to execute against
 private specs, without a separate exact-revision approval question.
@@ -112,21 +113,27 @@ This procedure authorizes no dispatch in a skill-editing task itself.
 ### Private evidence and disclosure
 
 Keep private logs, artifacts, source excerpts, service/project names, diagnostic
-counts, attribution reports and consumer branch/PR identities in private storage
-and `Azure/azure-rest-api-specs-pr` only. Any local checkout, downloaded artifacts
-and private handoff/log files must use verified private-access storage within
-the selected `worktrees_folder`, separate from public/frozen worktrees.
+counts, attribution reports and consumer source-branch/commit identities in
+private storage and `Azure/azure-rest-api-specs-pr` only. Any local checkout,
+downloaded artifacts and private handoff/log files must use verified private-access
+storage within the selected `worktrees_folder`, separate from public/frozen worktrees.
 Do not put private payloads in the public linter worktree's `log.txt`, public
 evidence branches, `migration.md`, PR descriptions, comments or skill examples.
-Public logs/reports may contain only a generic private-proposal disposition.
+The verified private companion PR URL, including its repository and PR number,
+is the sole public-link exception. Public descriptions, reports and handoffs
+may include that direct link and proposal status; GitHub still enforces access
+to the private repository. Do not copy private PR titles or contents, report/run/
+artifact/source links or other private evidence into public content.
 Preflight report publication visibility before uploading anything; if the
 available evidence backend is public-only, retain the private report privately
 and report that publication limitation rather than weakening the boundary.
 
 The private companion links the public linter PR and its private causality
-report. The public linter PR and report must not link back to the private
-companion or expose its number/URL. Use only a generic private-proposal status
-under the shared PR description contract. Private proposals remain
+report. Link back to the verified private companion from the public linter
+description under the shared PR description contract, with a neutral label
+and an access-required note. Keep the report and diagnostics private; a link
+does not authorize copying their contents. Use a generic status only while
+the companion is not created or verified. Private proposals remain
 inspection-only: do not run local consumer validation, request CI for the
 suppression edits, or claim those edits passed validation. Normal PR-triggered
 CI may run independently; waiting for, rerunning or repairing it is out of scope.
@@ -189,14 +196,14 @@ lightweight checks on an independently requested skill update.
 
 Publish one suppression-only draft PR after the causality analysis. Its
 description links the linter PR and report, records source identities and edit
-counts, and says local validation was intentionally not run. For a public
-companion, add its verified URL in a peer `## Companion suppression PR` section
+counts, and says local validation was intentionally not run. For either consumer,
+add its verified PR URL in a peer `## Companion suppression PR` section
 after Migration report using the
 [description contract](../shared/migration-pr-description.md), preserving the
 original headings, source links and report URL. Link back in the companion's
 description and update report NOTES, subject to the private disclosure boundary.
-For a private companion, publish its URL/report only in private handoffs and use
-the generic public disposition instead. Verify actual pushed heads, file scope,
+For a private companion, the PR URL may be public, but its report and diagnostic
+evidence remain private. Verify actual pushed heads, file scope,
 descriptions and links; do not treat source/diff inspection as compilation proof.
 
 Stop when the analyzed proposal and links are published. Do not coordinate
@@ -292,6 +299,7 @@ proposal status (`published`, `not-needed`, `pending-evidence` or `blocked`).
 For private dispatch, also retain the authorizing request, attempt/run
 identity, workflow ref, actual candidate/specs/package identities, shard/artifact
 availability and private report location. Keep these records within the private
-disclosure boundary; shared public ledgers contain generic dispositions only.
+disclosure boundary; shared public ledgers may contain the verified companion
+PR URL and proposal status, but no other private evidence or identities.
 Carry existing task counters; refresh does not reset them or create a semantic
 repair cycle. Report proposal status separately from full linter readiness.

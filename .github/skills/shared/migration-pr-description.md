@@ -62,18 +62,26 @@ and all original source/report links. This limited
 addition is part of default initial delivery when attributable CI findings
 justify a companion; do not add a placeholder or imply its CI passed.
 
-Public and private consumer companions are independent. If the companion targets
-private `Azure/azure-rest-api-specs-pr`, do not publish its URL/number, private
-report link, diagnostics, counts or service details in this public PR or its
-public migration report. Keep those links in private handoffs and the private
-companion description. In the same peer `## Companion suppression PR` section,
-use only a truthful generic disposition, for example
-`Private consumer proposal: published; details retained privately.` or
-`Private consumer diagnostics: pending validation evidence.`
-This is the sole placeholder exception for a recorded private disposition,
-not permission to imply that a private PR exists before verification.
-When both companions apply, retain the verified public URL and put the generic
-private disposition alongside it without disclosing private identities.
+Public and private consumer companions are independent. For a verified companion
+in private `Azure/azure-rest-api-specs-pr`, add its direct PR link in the same peer
+`## Companion suppression PR` section, with a neutral label and access note:
+
+```markdown
+[Private consumer suppression PR](<verified private companion PR URL>) (private; access required)
+```
+
+GitHub still enforces private-repository permissions; linking does not grant
+access. The companion PR URL, including its repository and PR number, is the
+only private-link disclosure allowed here or in the public migration report.
+Keep private PR titles/contents, report/run/artifact/source links, diagnostics,
+counts, service details and other private identities in private handoffs and
+the private companion description.
+
+When both companions apply, preserve the verified public URL and add the private
+companion link alongside it. Use a truthful generic disposition such as
+`Private consumer diagnostics: pending validation evidence.` only when no
+companion has been created or verified, not instead of linking a verified PR.
+This placeholder exception does not imply a private PR exists before verification.
 
 Keep the branch and report path stable so later evidence commits appear through
 the same PR link. Do not replace the URL with a new commit permalink after each

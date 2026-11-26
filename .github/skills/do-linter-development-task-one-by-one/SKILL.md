@@ -20,10 +20,11 @@ Keep the public companion path and also assess private
 diagnostics through the documented experimental CI dispatch when private
 validation is authorized. Supply only the PR URL; the workflow resolves and pins
 its latest head. Do not request separate per-SHA approval. This does not authorize
-local consumer validation or CI for suppression edits. Keep private evidence and companion
-identities out of public reports, logs and PRs; use the companion contract's
-visibility-safe links/status instead. No rule queue or CI dispatch is implied
-by a request to edit this skill.
+local consumer validation or CI for suppression edits. Link verified private
+companion PRs directly in the public linter description; GitHub still enforces
+repository access. Keep private evidence and all other private identities out
+of public reports, logs and PRs under the companion contract's disclosure
+boundary. No rule queue or CI dispatch is implied by a request to edit this skill.
 
 Route the standalone `--refresh-suppression-pr <linter-pr-url>` mode before the
 flow/rule grammar below. It keeps the existing companion PR, recreates its
@@ -1153,8 +1154,10 @@ After the task sections, include the skill-update PR link and brief summary, or
 a publishing blocker, only when required by the shared policy's final handoff.
 Do not print a process-suggestions list or low-confidence observations.
 For each applicable public companion, also report its URL, pinned linter head,
-causality report and proposal status. Private URLs, identities and reports belong
-only in verified private handoffs; public results use a generic disposition.
+causality report and proposal status. For private companions, report the verified
+companion PR URL and proposal status, but keep reports and all other private
+identities in private handoffs. Use a generic disposition only when a companion
+has not been created or verified.
 Report actual access, authorization or organizational trust-policy restrictions
 as blockers, not as absent diagnostics. Do not introduce a separate per-SHA
 approval gate. Do not present proposal publication as green CI.

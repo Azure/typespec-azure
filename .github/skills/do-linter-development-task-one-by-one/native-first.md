@@ -224,13 +224,14 @@ consumer locally.
    persistent agents, verified review-specific collection and parent approval.
    Before the initial linter handoff, the coordinator prepares the default
    [CI-derived companion proposal](companion-suppressions.md#initial-delivery-by-default)
-   for each applicable consumer, links public proposals directly in the
-   description, and records pinned linter/consumer identities at their permitted
-   visibility. Private diagnostics may be acquired only through the documented
+   for each applicable consumer, links verified public and private proposals
+   directly in the description, and records pinned linter/consumer identities at
+   their permitted visibility. Private diagnostics may be acquired only through the documented
    authorized latest-head workflow without a separate per-SHA approval question;
-   private reports and companion links never enter public descriptions, logs
-   or evidence. Actual access/trust restrictions or missing evidence are disclosed, not
-   replaced by local validation or guessed suppressions. Existing companions
+   verified private companion PR URLs may enter public descriptions, but private
+   reports and all other private evidence/identities remain private under the
+   companion disclosure boundary. Actual access/trust restrictions or missing
+   evidence are disclosed, not replaced by local validation or guessed suppressions. Existing companions
    refresh only on explicit request; changed linter heads otherwise mark them stale.
 6. **Checkpoint B: release readiness.** Keep the same native publisher/PR.
    Apply the shared native contract's full package/docs/ruleset/integration
