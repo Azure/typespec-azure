@@ -344,19 +344,19 @@ Keep an ordered ledger with one entry per parsed queue entry:
   waiting phase, handoff artifact, and review invocation/agent IDs
 - local draft-correction counts, causal evidence and rerun results, separate
   from worker attempts, review rounds and source-repair cycles
-- native-test timeout-diagnosis usage (at most one per task across all phases
+- native-test timeout-diagnosis usage (at most three per task across all phases
   and cycles), eligibility evidence, concurrency change and full-scope results
-- setup-hook recovery usage (one timed diagnostic and at most one evidence-backed
-  hook-only corrective run per task), measurements, restoration and full-scope results
-- coordinator-owned local reserve usage (three total per task) and native
+- setup-hook recovery usage (three timed diagnostics and at most three evidence-backed
+  hook-only corrective runs per task), measurements, restoration and full-scope results
+- coordinator-owned local reserve usage (ten total per task) and native
   baseline-comparison usage (one per task), eligibility decisions, same-owner
   handoffs and required rerun results; preserve these across every phase/cycle
-- bounded local UTF-8 recovery usage (one prospective encoding-only correction
+- bounded local UTF-8 recovery usage (five prospective encoding-only corrections
   per task), eligibility evidence and same-owner grant; never reset ordinary counters
 - predeclared required/supplemental validation plan, authority and per-command
   disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
-  query evidence, and the separate one-correction publication budget
+  query evidence, and the separate one-correction, three-retry publication budget
 - companion proposal mode/status, linter/CI/specs identities, causal report,
   Azure head/base/PR binding and direct description links; for explicit refresh,
   retained old patch/head, fresh base, captured lease and rebuilt head
@@ -536,11 +536,11 @@ reused progress; they are not automatic retries.
 ## Bounded orchestration retry
 
 This setup-only retry is distinct from the source-repair loop below. Allow at
-most one orchestration retry for the entire task, not one per cycle, and use a
+most three orchestration retries for the entire task, not per cycle, and use a
 fresh top-level subagent for the explicit-target backend. App-session execution
 uses a new phase dispatch in the same verified owner, never another concurrent
 session on the same branch.
-Retry only when the first attempt proves an unambiguous defect in this outer
+Retry only when the preceding attempt proves an unambiguous defect in this outer
 skill's command parsing, worker prompt, worktree selection, log initialization,
 or skill-invocation mechanics before rule work begins. It may correct a dispatch
 of an already-successfully-prepared bundle, but must reuse that exact verified
@@ -565,7 +565,7 @@ review, network, credential, push or GitHub failures. First apply the recorded
 [validation gate levels](../shared/recovery-context.md#validation-gates-and-supplemental-checks):
 continuing after a disclosed supplemental limitation is not a worker restart
 or command retry. This does not prohibit an
-eligible in-place draft correction, the single
+eligible in-place draft correction, the bounded
 [native-test timeout diagnosis](#native-test-timeout-diagnosis) below, or the shared
 [single evidenced publication-configuration correction](app-session-execution.md#publication-recovery).
 That exception requires positive exact-PR absence and a specific proven defect,
@@ -575,8 +575,9 @@ An orchestration retry is forbidden
 after task-owned tracked edits (including dependency-manifest repair), a commit,
 push or PR. Only a confirmed source defect under the separate source-repair
 contract permits an automatic cycle restart after development work. If the
-orchestration retry fails, record the task's terminal result and continue only
-after verified quiescence.
+orchestration retry fails, retry again only if the new failure independently
+meets these conditions and the task-wide budget remains. Otherwise record the
+terminal result and continue only after verified quiescence.
 
 ### Local draft correction is not a worker restart
 
@@ -585,7 +586,7 @@ Apply the review skill's
 to agent-introduced errors in unpublished task-owned changes or validation
 commands. Review phases use that skill's three-attempt budget per backlog pass
 or round. Development and
-promotion preparation each allow three corrective attempts per phase per cycle
+promotion preparation each allow ten corrective attempts per phase per cycle
 under the same causal-evidence, scope, rerun and stop requirements. Track these
 budgets separately; returning to a phase does not reset its count.
 Agent-introduced setup draft/command mistakes debit that same phase's cycle-0
@@ -596,7 +597,7 @@ credential, network and other external failures remain outside draft correction.
 
 The active worker or fix agent corrects eligible compiler, lint, test, semantic
 regression or deterministic invocation failures in place and reruns the original
-intended required checks. Command corrections share the existing three-attempt
+intended required checks. Command corrections share the applicable phase or review
 budget and require verified argument semantics, validation population and
 side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
@@ -615,7 +616,7 @@ For a proven local encoding-only helper failure, also evaluate the separate
 before asking the user, including when both ordinary and reserve budgets are
 exhausted. It is not permission to retry a real failed test, CI or publication.
 Keep the task running during its nonterminal handoff. This queue invocation
-authorizes the coordinator, not the worker, to allocate up to three reserve
+authorizes the coordinator, not the worker, to allocate up to ten reserve
 attempts across the entire rule task. Continue the same owner without restarting
 its phase or review pair; retain ordinary counters and all failed attempts.
 Local-recovery, local-UTF-8, native-comparison and setup-hook handoffs are explicit exceptions
@@ -634,7 +635,7 @@ defaults, expand its scope, or increase it after a failure.
 Apply the review skill's
 [bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
 to completed native unit-test runs with only per-test timeout failures.
-The queue invocation authorizes at most one such diagnostic rerun per task,
+The queue invocation authorizes at most three such diagnostic reruns per task,
 shared across development, promotion, nested reviews, and source-repair cycles.
 The outer queue verifies eligibility and records usage before dispatching the
 same phase owner or fix agent; it does not restart a worker. Preserve the
@@ -646,10 +647,12 @@ and dispatches this allowance; a rejected handoff returns to the normal stop
 policy. This same-owner continuation does not consume an orchestration retry.
 
 This is not permission to retry a corpus, build, hung command, assertion failure,
-or external operation. After the diagnostic is used, only the shared
+or external operation. After an eligible diagnostic, the shared
 [bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison)
 may authorize a further timeout investigation and full rerun: one allowance per
 rule task, granted by the coordinator to the same owner without user input.
+Remaining diagnostic attempts require a fresh eligibility decision and do not
+renew the baseline-comparison allowance.
 Keep the task running during `native-comparison-handoff`. Ineligible or exhausted
 recovery still stops; a subsequent understood draft defect uses its own remaining
 correction allowance, never a fresh timeout allowance.
@@ -658,8 +661,8 @@ correction allowance, never a fresh timeout allowance.
 
 Apply the shared [bounded setup-hook timeout recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
 only to eligible required native test runs with setup/beforeEach hook timeouts.
-This queue invocation owns one timed diagnostic and at most one measured
-hook-only corrective run per rule task, across phases, reviews and repair cycles.
+This queue invocation owns three timed diagnostics and at most three measured
+hook-only corrective runs per rule task, across phases, reviews and repair cycles.
 The outer queue records eligibility and each debit before continuing the same
 phase owner or fix agent; the owner returns `setup-hook-recovery-handoff` with
 commands stopped and the original evidence instead of independently rerunning
@@ -919,7 +922,7 @@ one session to execute both publication phases.
 > draft-correction policy above. Record the causal evidence and attempt count, correct eligible failures
 > in place, and rerun the failed required command plus affected remaining checks.
 > For an eligible completed native-test timeout-only failure, report the evidence
-> and inherited task-wide allowance to the outer queue for the single diagnostic
+> and inherited task-wide allowance to the outer queue for an eligible diagnostic
 > rerun. Do not consume it independently or treat it as a new worker/cycle.
 > For a setup-hook timeout, return the shared `setup-hook-recovery-handoff`
 > instead; only a coordinator grant authorizes the timed diagnostic and any
@@ -1191,11 +1194,11 @@ Capture concrete suggestions for improving future queue runs, especially:
 - Never create or reuse task worktrees outside `worktrees_folder`. App-generated
   directory names are allowed only inside that folder; tool placement limitations
   are blockers, not permission to ignore the parameter.
-- Never exceed one setup-only orchestration retry or three source-repair cycles.
+- Never exceed three setup-only orchestration retries or three source-repair cycles.
   Do not apply orchestration retry after development begins or reinterpret
   operational failures as source defects.
-- Never exceed the separate three-attempt draft-correction budget for its
-  phase/backlog/round scope without a recorded coordinator grant from the shared
+- Never exceed ten development/readiness draft corrections per phase and cycle,
+  or three review corrections per backlog pass or round, without a recorded grant from the shared
   task-wide reserve. Never reset counters by relaunching agents or hide failed
   checks. Beyond the finite reserve/comparison allowances, retain the explicit
   authorization and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).

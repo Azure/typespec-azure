@@ -833,7 +833,7 @@ change configured timeouts. No profile grants an extra retry.
 For timeout-only native test failures, apply the shared
 [bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
 before declaring an unexplained terminal blocker. Queued promotion consumes the
-queue's single task-wide allowance; it does not receive a new allowance here.
+queue's shared task-wide allowance; it does not receive a new allowance here.
 If that reduced-concurrency diagnostic still has only per-test timeouts, return
 the shared [native comparison handoff](../shared/recovery-context.md#bounded-native-baseline-comparison)
 to the queue before a terminal stop. Only its recorded grant permits the bounded
@@ -843,8 +843,8 @@ This exception does not apply to the broad build or lintdiff corpus.
 For a required native run failing only setup/beforeEach hooks, queued promotion
 returns the shared [setup-hook recovery handoff](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
 to the coordinator before a terminal stop. Only its recorded task-wide grant
-permits one timed diagnostic and, if measured setup justifies it, one scoped
-hook-only corrective run. Do not use the per-test timeout allowance or infer a
+permits up to three timed diagnostics and, if measured setup justifies them, up
+to three scoped hook-only corrective runs per task. Do not use the per-test timeout allowance or infer a
 package-wide 30-second default; standalone promotion has no automatic grant.
 
 Do not manually build the website package or its dependency closure during local
