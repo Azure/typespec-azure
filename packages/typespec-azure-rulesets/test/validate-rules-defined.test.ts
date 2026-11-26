@@ -224,14 +224,6 @@ describe("expect all rules to be defined", () => {
     );
   });
 
-  it("enables ARM PATCH response guidance separately in the central ruleset", () => {
-    const ruleName =
-      "@azure-tools/typespec-azure-resource-manager/patch-operation-response-codes-validation";
-    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], true);
-    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
-    strictEqual(ResourceManagerLinter.ruleSets?.all.enable?.[ruleName], true);
-  });
-
   it("keeps combined ARM collection guidance opt-in and retires the old rule", () => {
     const name = "list-response-envelope";
     const fullName = `@azure-tools/typespec-azure-resource-manager/${name}` as const;
