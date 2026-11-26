@@ -69,7 +69,7 @@ public migration report. Keep those links in private handoffs and the private
 companion description. In the same peer `## Companion suppression PR` section,
 use only a truthful generic disposition, for example
 `Private consumer proposal: published; details retained privately.` or
-`Private consumer diagnostics: pending exact-SHA execution approval.`
+`Private consumer diagnostics: pending validation evidence.`
 This is the sole placeholder exception for a recorded private disposition,
 not permission to imply that a private PR exists before verification.
 When both companions apply, retain the verified public URL and put the generic

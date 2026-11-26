@@ -1,6 +1,6 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion. Include public and private CI-derived companion suppression proposals, with exact-SHA approval for private diagnostic dispatch; rebuild suppression branches only on explicit refresh.
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion. Include public and private CI-derived companion suppression proposals, with authorized latest-head private diagnostic dispatch; rebuild suppression branches only on explicit refresh.
 argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | --refresh-suppression-pr <linter-pr-url> | <legacy worker commands>"
 user-invocable: true
 ---
@@ -17,9 +17,10 @@ opt-in or create empty proposals. Consumer proposals use CI evidence only, not
 local validation, and do not require CI repair, landing or checkpoint B.
 Keep the public companion path and also assess private
 `Azure/azure-rest-api-specs-pr:typespec-next`. The private path may acquire
-diagnostics through the documented experimental CI dispatch only after explicit
-approval of the exact linter PR head SHA. It does not authorize local consumer
-validation or CI for suppression edits. Keep private evidence and companion
+diagnostics through the documented experimental CI dispatch when private
+validation is authorized. Supply only the PR URL; the workflow resolves and pins
+its latest head. Do not request separate per-SHA approval. This does not authorize
+local consumer validation or CI for suppression edits. Keep private evidence and companion
 identities out of public reports, logs and PRs; use the companion contract's
 visibility-safe links/status instead. No rule queue or CI dispatch is implied
 by a request to edit this skill.
@@ -446,7 +447,7 @@ For each successfully prepared command, in input order:
 Before the initial actual-linter PR handoff, the coordinator applies the
 [default companion proposal](companion-suppressions.md#initial-delivery-by-default)
 to each consumer's CI evidence, acquiring private evidence only through the
-approved exact-SHA dispatch when needed, with prior owners idle. This is separate
+authorized latest-head dispatch when needed, with prior owners idle. This is separate
 from native or promotion validation, not another native PR or permission to waive a failed
 required gate. Apply it also when an existing linter PR returns a CI-related
 partial stop; do not skip the proposal merely because checkpoint B cannot run.
@@ -1154,8 +1155,9 @@ Do not print a process-suggestions list or low-confidence observations.
 For each applicable public companion, also report its URL, pinned linter head,
 causality report and proposal status. Private URLs, identities and reports belong
 only in verified private handoffs; public results use a generic disposition.
-Report missing exact-SHA execution approval as pending approval, not as absent
-diagnostics. Do not present proposal publication as green CI.
+Report actual access, authorization or organizational trust-policy restrictions
+as blockers, not as absent diagnostics. Do not introduce a separate per-SHA
+approval gate. Do not present proposal publication as green CI.
 
 ## Post-run process review
 

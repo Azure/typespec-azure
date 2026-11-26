@@ -16,8 +16,9 @@ the private path supplements, not replaces, the public path. If source analysis
 confirms PR-caused compatibility diagnostics, create that consumer's companion
 without another proposal opt-in. Link public companions directly in the linter
 PR description; apply the private disclosure boundary below to private ones.
-Do not wait for a user to request this first proposal. Private execution still
-requires the separate exact-SHA approval below.
+Do not wait for a user to request this first proposal. An authorized request for
+private validation permits the selected PR's latest code to execute against
+private specs, without a separate exact-revision approval question.
 
 Reconcile each consumer's recorded companion binding and permitted links before creation.
 An existing companion is not another initial creation: retain it and report
@@ -28,7 +29,7 @@ No confirmed applicable diagnostics means no empty suppression PR. Missing,
 pending or stale CI evidence is not proof that no suppressions are needed:
 record that disposition and the missing evidence, without guessing annotations
 or launching local validation. Public evidence remains existing-CI-only.
-The approved private diagnostic dispatch below is the sole CI-request exception;
+The authorized private diagnostic dispatch below is the sole CI-request exception;
 it does not authorize public dispatches or suppression-validation CI.
 
 The coordinator owns the companion binding and publication. Keep the linter
@@ -51,29 +52,33 @@ Do not dispatch it for a temporary lintdiff-only PR.
 
 1. Verify private-repository access, the dispatcher's write permission, the
    current workflow and inputs on `experiment/typespec-azure-pr-validation`,
-   and the public linter PR's current full 40-character head SHA. Read current
+   and the selected public linter PR identity. Read current
    workflow instructions rather than assuming the experiment still exists.
    Record unavailable access/workflow capability as a private-target blocker;
    never fall back to a public workflow or upload private source elsewhere.
-2. Require explicit human approval of that exact revision for execution with
-   private specs. A queue invocation, proposal authorization, fetched SHA,
-   clean automated review or read-only token is not this attestation. Retain the
-   approval source and SHA; recheck the PR head immediately before dispatch.
-   If approval is absent or the head changed, do not dispatch. Record
-   `pending-approval` and hand off the required action without interrupting an
-   unattended queue with a question. Obtain a new exact-SHA approval before
-   any later dispatch of a changed head.
+2. Record the request authorizing private validation of this PR. It authorizes
+   execution of the selected PR's latest code with private-spec access; do not
+   pause to request a separate SHA approval or supply the removed approved-SHA
+   input. Dispatch only a trusted PR within the request's scope. Actual access
+   or organizational trust-policy restrictions remain blockers; a matching SHA
+   or read-only token is not proof of trust. Merely editing this skill does not
+   authorize a validation run.
 3. Reconcile recorded and existing runs before issuing one dispatch for the
-   approved identity. Use the verified inputs:
+   authorized PR. Reuse compatible evidence rather than duplicating a run.
+   The PR URL is the only required PR-mode input:
 
    ```powershell
-   gh workflow run typespec-validation-all.yaml --repo Azure/azure-rest-api-specs-pr --ref experiment/typespec-azure-pr-validation -f "typespec-azure-pr-url=$linterPrUrl" -f "typespec-azure-approved-sha=$approvedSha"
+   gh workflow run typespec-validation-all.yaml --repo Azure/azure-rest-api-specs-pr --ref experiment/typespec-azure-pr-validation -f "typespec-azure-pr-url=$linterPrUrl"
    ```
 
    Bind the resulting run to its actual workflow ref, inputs, actor and
    dispatch time; do not assume the latest run belongs to this task. Persist
    the dispatch attempt before execution. An uncertain dispatch is reconciled
    read-only, never blindly retried or duplicated.
+   The workflow resolves and pins the PR head when preparation starts. A SHA
+   fetched before dispatch is informational, not the authoritative tested
+   revision. If the PR advances, keep the run's pinned identity and disclose
+   any stale-head limitation; do not silently relabel evidence or auto-redispatch.
 
 4. Track only that run to completion within the recorded queue deadlines.
    Reuse existing completion notifications or bounded status checks, not an
@@ -84,7 +89,7 @@ Do not dispatch it for a temporary lintdiff-only PR.
    14-day expiry. Verify provenance and actual candidate package installation/
    content checks, and retain every available Ubuntu/Windows shard's diagnostics
    (three shards per OS). Missing evidence is an explicit assessment limitation,
-   not a zero-diagnostic result. Record the approved PR head separately from
+   not a zero-diagnostic result. Record the workflow-resolved PR head separately from
    pinned public main, the temporary merged build SHA and pinned private
    `typespec-next` SHA. The experiment branch supplies the workflow, not specs.
    Never merge `RPSaaSMaster`, move the linter branch or reproduce the candidate
@@ -99,8 +104,9 @@ Do not dispatch it for a temporary lintdiff-only PR.
    Repeated OS, shard, API-version and entrypoint occurrences must retain their
    provenance while mapping to unique authored targets.
 
-The workflow builds approved code with access to private specs. Verify the
-actual trust boundary; do not treat a matching SHA as proof that code is safe.
+The workflow builds the selected PR's latest code with access to private specs.
+Verify the actual trust boundary and retain the authorizing request and tested
+revision. There is no separate per-SHA approval gate.
 This procedure authorizes no dispatch in a skill-editing task itself.
 
 ### Private evidence and disclosure
@@ -241,7 +247,7 @@ silently create a replacement, retarget or close the old PR.
 2. Capture the remote suppression head SHA once, fetch current `typespec-next`,
    and redo the causality/report analysis against the current linter and
    compatible CI evidence. Private evidence acquisition, if needed, follows
-   the exact-SHA approval/dispatch rules above; public refresh uses existing
+   the authorized latest-head dispatch rules above; public refresh uses existing
    evidence only. Do not reuse the old suppression patch.
    If no annotations remain justified, report that the companion is no longer
    needed; do not invent an empty commit or automatically close/replace the PR
@@ -282,8 +288,8 @@ Record initial/default versus explicit-refresh mode, task/linter PR and head,
 CI/specs provenance, causality/exclusions, raw and unique counts, report identity,
 consumer base, companion PR/repository/source branch and head, description links,
 old/new identities and captured lease for refresh, publication attempts and
-proposal status (`published`, `not-needed`, `pending-approval`, `pending-evidence`
-or `blocked`). For private dispatch, also retain approval evidence, attempt/run
+proposal status (`published`, `not-needed`, `pending-evidence` or `blocked`).
+For private dispatch, also retain the authorizing request, attempt/run
 identity, workflow ref, actual candidate/specs/package identities, shard/artifact
 availability and private report location. Keep these records within the private
 disclosure boundary; shared public ledgers contain generic dispositions only.

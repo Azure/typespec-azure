@@ -142,7 +142,8 @@ extend cross-repository publication scope, or merge compatibility changes.
 The default [companion suppression proposal](companion-suppressions.md) is the
 narrowly authorized consumer scope when CI proves PR-caused findings. Preserve
 the public path and assess the private consumer separately; private diagnostic
-CI acquisition requires explicit approval of the exact native PR head SHA.
+CI acquisition uses the authorized native PR's latest head, pinned by the
+workflow rather than a separately approved agent-fetched SHA.
 Its checkout starts from current canonical `typespec-next`, not the frozen
 coverage source. It is not a new replay worktree or permission to validate the
 consumer locally.
@@ -226,8 +227,9 @@ consumer locally.
    for each applicable consumer, links public proposals directly in the
    description, and records pinned linter/consumer identities at their permitted
    visibility. Private diagnostics may be acquired only through the documented
-   exact-SHA-approved workflow; private reports and companion links never enter
-   public descriptions, logs or evidence. Missing approval/evidence is disclosed, not
+   authorized latest-head workflow without a separate per-SHA approval question;
+   private reports and companion links never enter public descriptions, logs
+   or evidence. Actual access/trust restrictions or missing evidence are disclosed, not
    replaced by local validation or guessed suppressions. Existing companions
    refresh only on explicit request; changed linter heads otherwise mark them stale.
 6. **Checkpoint B: release readiness.** Keep the same native publisher/PR.
