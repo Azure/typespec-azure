@@ -70,9 +70,9 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": true,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations": true,
     "@azure-tools/typespec-azure-resource-manager/use-relationship-required-properties": true,
-    "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": true,
-    "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": true,
-    "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": false,
+    "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": false,
+    "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": false,
     "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch": false,
     "@azure-tools/typespec-azure-resource-manager/use-standard-error": false,
     "@azure-tools/typespec-azure-resource-manager/require-error-decorator": false,
@@ -125,7 +125,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
     "@azure-tools/typespec-azure-resource-manager/use-model-request-body": true,
     "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": false,
-    "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes": false,
+    "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes": true,
     "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put": false,
 
     // TCGC rules

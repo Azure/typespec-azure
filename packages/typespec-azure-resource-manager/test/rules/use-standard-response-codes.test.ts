@@ -153,7 +153,12 @@ it("rejects an explicit error response on a standard ARM action", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("check", 404)]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
+      target: "check",
+    });
 });
 
 it("accepts a standard ARM action with the default error response", async () => {
@@ -181,7 +186,12 @@ it("rejects a redirect response on a standard ARM action", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("redirect", 302)]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
+      target: "redirect",
+    });
 });
 
 it("rejects a status range on a standard ARM action", async () => {
@@ -197,7 +207,12 @@ it("rejects a status range on a standard ARM action", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("redirect", "300-399")]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses.",
+      target: "redirect",
+    });
 });
 
 const examples = [
@@ -488,5 +503,52 @@ describe("ARM GET response codes", () => {
       `,
       )
       .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
+  });
+});
+
+describe("ARM resource response codes", () => {
+  const employee = `
+    @armProviderNamespace
+    namespace Microsoft.Contoso;
+    model Employee is ProxyResource<{}> { ...ResourceNameParameter<Employee>; }
+  `;
+
+  it("accepts a long-running POST whose 200 response has multiple content types", async () => {
+    await tester
+      .expect(
+        `${employee}
+        model PollingStatus { @Azure.Core.lroStatus statusValue: "Succeeded" | "Canceled" | "Failed"; }
+        @armResourceOperations
+        interface Employees {
+          @get getStatus(...KeysOf<Employee>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+          @Azure.Core.pollingOperation(Employees.getStatus, {employeeName: Azure.Core.RequestParameter<"employeeName">, statusId: Azure.Core.ResponseProperty<"operationId">})
+          @post @armResourceAction(Employee)
+          hire(...KeysOf<Employee>): {
+            @statusCode _: 202;
+            @header("x-ms-operation-id") operationId: string;
+          } | {
+            @statusCode _: 200;
+            @header contentType: "application/json" | "application/xml";
+            @body body: Employee;
+          } | ErrorResponse;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("accepts a single-value status code range on a resource DELETE", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations
+        interface Employees {
+          @armResourceDelete(Employee)
+          delete(...ApiVersionParameter): { @minValue(200) @maxValue(200) @statusCode _: int32; }
+            | { @statusCode _: 204; } | ErrorResponse;
+        }
+        `,
+      )
+      .toBeValid();
   });
 });
