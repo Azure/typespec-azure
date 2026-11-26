@@ -1,10 +1,37 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.49.2
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `35cd3c4f8`. Fix XML storage generation regressions ([microsoft/typespec#12635](https://github.com/microsoft/typespec/pull/12635)) and propagate synchronous ARM long-running operation failures ([microsoft/typespec#12633](https://github.com/microsoft/typespec/pull/12633)). Use JavaParser for unused-import cleanup ([microsoft/typespec#12622](https://github.com/microsoft/typespec/pull/12622)), reduce duplicate ARM implementations ([microsoft/typespec#12645](https://github.com/microsoft/typespec/pull/12645)), and generate ClientCore HTTP operations without requiring its annotation processor ([microsoft/typespec#12621](https://github.com/microsoft/typespec/pull/12621)).
+
+
+## 0.49.1
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `4a6bebe511` to support named JSON server-sent events (`SSEStream`) in data-plane convenience APIs ([microsoft/typespec#12312](https://github.com/microsoft/typespec/pull/12312)), initialize routing fields for retrieved create-only ARM resources ([microsoft/typespec#12593](https://github.com/microsoft/typespec/pull/12593)), and log generated `XmlSerializer` exceptions through `ClientLogger` ([microsoft/typespec#12598](https://github.com/microsoft/typespec/pull/12598)).
+
+
+## 0.49.0
+
+### Features
+
+- Support preview annotations for APIs marked with `@TypeSpec.HttpClient.experimental` through the `experimental-annotation` option ([microsoft/typespec#12409](https://github.com/microsoft/typespec/pull/12409)).
+- Support `@access(Access.internal)` for ARM operations, models, and enums ([microsoft/typespec#12488](https://github.com/microsoft/typespec/pull/12488)).
+- Prototype a TeaVM WebAssembly target for `@azure-tools/typespec-java` in the Azure playground, included by the normal build and PR previews. Building requires JDK 17; native CLI generation is unchanged.
+
+### Bug Fixes
+
+- Update the Java generator to TypeSpec core commit `ccde4f5b0` to fix base64 encoding of byte-valued headers and query parameters ([microsoft/typespec#12540](https://github.com/microsoft/typespec/pull/12540)).
+
+
 ## 0.48.6
 
 ### Bug Fixes
 
-- [#5692](https://github.com/Azure/typespec-azure/pull/5692) Remove dependencies on deprecated autorest packages
+- Remove dependencies on deprecated autorest packages
 
 
 ## 0.48.5

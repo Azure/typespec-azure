@@ -176,7 +176,20 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   }
-  if (format === "JSON" || format === "XML") {
+  if (
+    format === "JSON" &&
+    (type.kind === "slice" || type.kind === "map") &&
+    helpers.recursiveUnwrapMapSlice(type).kind === "interface"
+  ) {
+    unmarshallerText += `${indent.get()}body, err := runtime.Payload(resp)\n`;
+    unmarshallerText += `${indent.get()}if err != nil {\n`;
+    unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
+    unmarshallerText += `${indent.pop().get()}}\n`;
+    unmarshallerText += `${indent.get()}${unmarshalTarget}, err = ${helpers.getDiscriminatorUnmarshallerName(type)}(body)\n`;
+    unmarshallerText += `${indent.get()}if err != nil {\n`;
+    unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
+    unmarshallerText += `${indent.pop().get()}}\n`;
+  } else if (format === "JSON" || format === "XML") {
     if (type.kind === "rawJSON") {
       unmarshallerText += `${indent.get()}body, err := runtime.Payload(resp)\n`;
       unmarshallerText += `${indent.get()}if err != nil {\n`;

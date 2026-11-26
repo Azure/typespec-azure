@@ -90,6 +90,8 @@ export async function _createDeserialize(result: PathUncheckedResponse): Promise
 
   return result.body;
 }
+
+/** Performs the create operation. */
 export async function create(
   context: Client,
   options: CreateOptionalParams = { requestOptions: {} },
@@ -133,6 +135,8 @@ export async function _testQueryDeserialize(result: PathUncheckedResponse): Prom
 
   return configurationDeserializer(result.body);
 }
+
+/** Performs the testQuery operation. */
 export async function testQuery(
   context: Client,
   options: TestQueryOptionalParams = { requestOptions: {} },
@@ -217,6 +221,8 @@ export async function _createRequiredDeserialize(result: PathUncheckedResponse):
 
   return result.body;
 }
+
+/** Performs the createRequired operation. */
 export async function createRequired(
   context: Client,
   body: string,
@@ -263,6 +269,8 @@ export async function _testRequiredDeserialize(
 
   return configurationDeserializer(result.body);
 }
+
+/** Performs the testRequired operation. */
 export async function testRequired(
   context: Client,
   maxResults: number,

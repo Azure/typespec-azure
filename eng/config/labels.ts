@@ -127,6 +127,10 @@ export default defineConfig({
           color: "0e8a16",
           description: "Automatically merge the pull request after all requirements pass",
         },
+        "lintdiff-migration": {
+          color: "1d76db",
+          description: "Issues for Swagger lintdiff to TypeSpec lint rule migration",
+        },
       },
     },
     external: {

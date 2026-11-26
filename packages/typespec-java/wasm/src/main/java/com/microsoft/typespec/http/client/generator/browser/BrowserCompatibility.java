@@ -4,13 +4,11 @@
 package com.microsoft.typespec.http.client.generator.browser;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -45,9 +43,10 @@ public final class BrowserCompatibility {
         return stream.filter(visited::add);
     }
 
-    public static List<String> unformattedCode(Map<String, String> files) {
-        // Native formatting needs javac/Eclipse internals; browser import cleanup runs after generation.
-        return new ArrayList<>(files.values());
+    public static ParserConfiguration parserConfiguration() {
+        // RAW avoids reflection-dependent validation in TeaVM while retaining grammar and import checks.
+        return new ParserConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.RAW)
+            .setAttributeComments(false).setTabSize(1);
     }
 
     public static <T> Set<T> newKeySet() {

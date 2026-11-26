@@ -1,261 +1,516 @@
 import { Tester } from "#test/tester.js";
-import {
-  type LinterRuleTester,
-  type TesterInstance,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { getSourceLocation } from "@typespec/compiler";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { listResponseEnvelopeRule } from "../../src/rules/list-response-envelope.js";
 
-let runner: TesterInstance;
 let tester: LinterRuleTester;
-
 beforeEach(async () => {
-  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
-    runner,
+    await Tester.createInstance(),
     listResponseEnvelopeRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
-});
+}, 30_000);
+const code = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
+const missingList = { code, message: "Collection GET operations must use `@list`." };
+const invalidEnvelope = {
+  code,
+  message: "Collection response models must contain exactly `value` and `nextLink` properties.",
+};
+const valueArray = {
+  code,
+  message: "Collection responses must declare a 'value' property of array type.",
+};
+const pagingMetadata = {
+  code,
+  message:
+    "Collection responses must use JSON-named `value` and `nextLink` properties with `@pageItems` and `@nextLink` metadata.",
+};
 
-function armGet(route: string, response: string, models: string): string {
-  return `
-    @armProviderNamespace
-    namespace Microsoft.TestService;
-
-    ${models}
-
-    @route("${route}")
-    @get
-    op getCollection(): ${response};
-  `;
-}
-
-const widgetModel = `model Widget { name: string; }`;
-const diagnosticCode = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
-
-it("reports an extra property on a collection response", async () => {
-  await tester
-    .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult {
-           value: Widget[];
-           nextLink?: string;
-           totalCount?: int32;
-         }`,
-      ),
-    )
-    .toEmitDiagnostics({ code: diagnosticCode });
-});
-
-it("reports every extra property on a collection response", async () => {
-  await tester
-    .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult {
-           value: Widget[];
-           nextLink?: string;
-           totalCount?: int32;
-           metadata?: string;
-         }`,
-      ),
-    )
-    .toEmitDiagnostics([{ code: diagnosticCode }, { code: diagnosticCode }]);
-});
-
-it("does not report a redundant missing-property diagnostic when an extra property is reported", async () => {
-  await tester
-    .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult {
-           value: Widget[];
-           totalCount?: int32;
-         }`,
-      ),
-    )
-    .toEmitDiagnostics({ code: diagnosticCode });
-});
-
-it("reports a value-only response on an extension-scope collection path", async () => {
-  await tester
-    .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult { value: Widget[]; }`,
-      ),
-    )
-    .toEmitDiagnostics({ code: diagnosticCode });
-});
-
-it("reports operations in a nested provider namespace", async () => {
+it("recognizes provider and resource action paths and operations without provider metadata", async () => {
   await tester
     .expect(
       `
-        @armProviderNamespace
-        namespace Microsoft.TestService {
-          namespace V1 {
-            ${widgetModel}
-            model WidgetListResult { value: Widget[]; }
-
-            @route("/scope/providers/Microsoft.TestService/widgets")
-            @get
-            op getCollection(): WidgetListResult;
-          }
-        }
-      `,
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; extra: string; }
+    @get @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+    @get @route("/providers/Microsoft.Contoso/operations") op operations(): Page;
+    @get @route("/providers/Microsoft.Contoso/widgets/{name}/listThings") op action(@path name: string): Page;
+    @get @route("/providers/Microsoft.Contoso/listThings") op providerAction(): Page;
+  `,
     )
-    .toEmitDiagnostics({ code: diagnosticCode });
+    .toEmitDiagnostics([
+      missingList,
+      invalidEnvelope,
+      missingList,
+      invalidEnvelope,
+      missingList,
+      invalidEnvelope,
+      missingList,
+      invalidEnvelope,
+    ]);
 });
 
-it("ignores operations outside an ARM provider namespace", async () => {
+it("ignores non-list POSTs, point paths, default paths and uninstantiated templates", async () => {
   await tester
     .expect(
       `
-        namespace Contoso {
-          ${widgetModel}
-          model WidgetListResult { value: Widget[]; }
-
-          @route("/scope/providers/Contoso/widgets")
-          @get
-          op getCollection(): WidgetListResult;
-        }
-      `,
+    model Page { extra: string; }
+    @post @route("/providers/Microsoft.Contoso/widgets") op postWidgets(): Page;
+    @get @route("/providers/Microsoft.Contoso/widgets/{name}") op getWidget(@path name: string): Page;
+    @get @route("/providers/Microsoft.Contoso/widgets/default") op getDefault(): Page;
+    interface Generic<T> { @get @route("/providers/Microsoft.Contoso/widgets") op generic(): T; }
+  `,
     )
     .toBeValid();
 });
 
-it("accepts a response containing only value and nextLink", async () => {
+it("ignores headers, status codes and create-only properties in implicit response bodies", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult {
-           value: Widget[];
-           nextLink?: string;
-         }`,
-      ),
+      `
+    model Page { @statusCode status: 200; @header etag: string; @visibility(Lifecycle.Create) hidden: string; @pageItems value: string[]; @nextLink nextLink?: string; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
     )
     .toBeValid();
 });
 
-it("accepts a named array response body", async () => {
+it("checks an explicit response body rather than its HTTP wrapper", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets",
-        "WidgetCollection",
-        `${widgetModel}
-         model WidgetCollection is Widget[];`,
-      ),
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; extra: string; }
+    model WidgetResponse { @statusCode status: 200; @header etag: string; @body body: Page; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): WidgetResponse;
+  `,
     )
-    .toBeValid();
+    .toEmitDiagnostics(invalidEnvelope);
 });
 
-it("accepts a direct array response body", async () => {
-  await tester
-    .expect(armGet("/scope/providers/Microsoft.TestService/widgets", "Widget[]", widgetModel))
-    .toBeValid();
-});
-
-it("accepts a record response body", async () => {
-  await tester
-    .expect(armGet("/scope/providers/Microsoft.TestService/widgets", "Record<string>", ""))
-    .toBeValid();
-});
-
-it("accepts a file response body", async () => {
-  await tester
-    .expect(armGet("/scope/providers/Microsoft.TestService/widgetFiles", "Http.File", ""))
-    .toBeValid();
-});
-
-it("accepts a multipart response body", async () => {
+it("reports an invalid shared body only once across response media types", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgetArchives",
-        "{ @multipartBody fields: { archive: HttpPart<Http.File>; description: HttpPart<string>; }; }",
-        "",
-      ),
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; extra: string; }
+    model JsonResponse { @header contentType: "application/json"; @body body: Page; }
+    model XmlResponse { @header contentType: "application/xml"; @body body: Page; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): JsonResponse | XmlResponse;
+  `,
+    )
+    .toEmitDiagnostics(invalidEnvelope);
+});
+
+it("does not inspect non-200 responses", async () => {
+  await tester
+    .expect(
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model Created { @statusCode status: 201; @body body: { extra: string }; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page | Created;
+  `,
     )
     .toBeValid();
 });
 
-it("accepts an invalid collection shape on a point path with a query suffix", async () => {
+it("reports inherited extra properties but ignores hidden and HTTP metadata", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult { value: Widget[]; }`,
-      ),
+      `
+    model Base { extra: string; @header etag: string; @visibility(Lifecycle.Create) hidden: string; }
+    model Page extends Base { @pageItems value: string[]; @nextLink nextLink?: string; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics(invalidEnvelope);
+});
+
+it("reports missing @list for named arrays, direct arrays and scalar bodies", async () => {
+  await tester
+    .expect(
+      `
+    model NamedArray is string[];
+    @get @route("/providers/Microsoft.Contoso/named") op named(): NamedArray;
+    @get @route("/providers/Microsoft.Contoso/widgets") op widgets(): string[];
+    @get @route("/providers/Microsoft.Contoso/names") op names(): string;
+  `,
+    )
+    .toEmitDiagnostics([missingList, missingList, missingList]);
+});
+
+it("reports missing @list and invalid record, file and multipart bodies", async () => {
+  await tester
+    .expect(
+      `
+    @get @route("/providers/Microsoft.Contoso/records") op records(): Record<string>;
+    @get @route("/providers/Microsoft.Contoso/files") op files(): Http.File;
+    @get @route("/providers/Microsoft.Contoso/archives")
+    op archives(): { @multipartBody fields: { file: HttpPart<Http.File>; }; };
+  `,
+    )
+    .toEmitDiagnostics([missingList, invalidEnvelope, missingList, missingList]);
+});
+
+it("checks each variant of a plain 200 response union", async () => {
+  await tester
+    .expect(
+      `
+    model Good { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model Bad { value: string[]; nextLink?: string; extra: string; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, invalidEnvelope]);
+});
+
+it("does not apply sibling spread-clone paging metadata to another response variant", async () => {
+  await tester
+    .expect(
+      `
+    model Base { value: string[]; nextLink?: string; }
+    model Good { ...Base; }
+    model Bad { ...Base; }
+    @@pageItems(Good.value);
+    @@nextLink(Good.nextLink);
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
+});
+
+it("checks JSON wire names rather than TypeSpec property names", async () => {
+  await tester
+    .expect(
+      `
+    model Page {
+      @pageItems @encodedName("application/json", "items") value: string[];
+      @nextLink @encodedName("application/json", "continuation") nextLink?: string;
+    }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics([valueArray, invalidEnvelope, pagingMetadata, pagingMetadata]);
+});
+
+it("reports alternate TypeSpec names encoded as the standard JSON names", async () => {
+  await tester
+    .expect(
+      `
+    model Page {
+      @pageItems @encodedName("application/json", "value") items: string[];
+      @nextLink @encodedName("application/json", "nextLink") continuation?: string;
+    }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
+});
+
+it("reports paging defects for each sibling spread response variant", async () => {
+  await tester
+    .expect(
+      `
+    model Base {
+      @encodedName("application/json", "value") items: string[];
+      @encodedName("application/json", "nextLink") continuation?: string;
+    }
+    model Good { ...Base; }
+    model Bad { ...Base; }
+    @@pageItems(Good.items);
+    @@nextLink(Good.continuation);
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Good | Bad;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, pagingMetadata, pagingMetadata]);
+});
+
+it("targets only the paging property whose TypeSpec name differs from the JSON name", async () => {
+  await tester
+    .expect(
+      `
+    model Page {
+      @pageItems value: string[];
+      @nextLink @encodedName("application/json", "nextLink") /*wrong*/continuation?: string;
+    }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics(({ wrong }) => ({
+      ...pagingMetadata,
+      pos: getSourceLocation(wrong).pos,
+      end: getSourceLocation(wrong).end,
+    }));
+});
+
+it("reports encoded name mismatches only once in an implicit HTTP body", async () => {
+  await tester
+    .expect(
+      `
+    model Page {
+      @statusCode status: 200;
+      @header etag: string;
+      @pageItems @encodedName("application/json", "value") items: string[];
+      @nextLink @encodedName("application/json", "nextLink") continuation?: string;
+    }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata]);
+});
+
+it("accepts inherited alias properties in an explicit body and ignores invisible properties", async () => {
+  await tester
+    .expect(
+      `
+    model Base {
+      @pageItems @encodedName("application/xml", "items") value: string[];
+      @nextLink @encodedName("application/xml", "continuation") nextLink?: string;
+      @visibility(Lifecycle.Create) hidden: string;
+    }
+    model BaseAlias is Base;
+    model Page extends BaseAlias {}
+    model ResponseBody { @statusCode status: 200; @body body: Page; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): ResponseBody;
+  `,
     )
     .toBeValid();
 });
 
-it("accepts an invalid collection shape when the raw path ends with operations", async () => {
+it("accepts non-JSON encodings and paging markers in an implicit HTTP body", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/customoperations",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult { value: Widget[]; }`,
-      ),
+      `
+    model Page {
+      @statusCode status: 200;
+      @header etag: string;
+      @pageItems @encodedName("application/xml", "items") value: string[];
+      @nextLink @encodedName("application/xml", "continuation") nextLink?: string;
+      @visibility(Lifecycle.Create) hidden: string;
+    }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
     )
     .toBeValid();
 });
 
-it("reports an invalid collection shape when operations is followed by a query suffix", async () => {
+it("preserves augmented paging markers in an implicit HTTP body", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/customoperations?disambiguation_dummy",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult { value: Widget[]; }`,
-      ),
-    )
-    .toEmitDiagnostics({ code: diagnosticCode });
-});
-
-it("accepts an invalid collection shape when the raw path ends with default", async () => {
-  await tester
-    .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/customdefault",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult { value: Widget[]; }`,
-      ),
+      `
+    model Page { @statusCode status: 200; @header etag: string; value: string[]; nextLink?: string; }
+    @@pageItems(Page.value);
+    @@nextLink(Page.nextLink);
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
     )
     .toBeValid();
 });
 
-it("reports an invalid collection shape when default is followed by a query suffix", async () => {
+it("accepts paging decorators copied by a model spread", async () => {
   await tester
     .expect(
-      armGet(
-        "/scope/providers/Microsoft.TestService/customdefault?disambiguation_dummy",
-        "WidgetListResult",
-        `${widgetModel}
-         model WidgetListResult { value: Widget[]; }`,
-      ),
+      `
+    model Base { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model Page { ...Base; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
     )
-    .toEmitDiagnostics({ code: diagnosticCode });
+    .toBeValid();
+});
+
+it("rejects inherited indexers even on otherwise valid envelopes", async () => {
+  await tester
+    .expect(
+      `
+    model Page extends Record<unknown> {
+      @pageItems value: string[];
+      @nextLink nextLink?: string;
+    }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics(invalidEnvelope);
+});
+
+it("reports paging and envelope warnings for a missing nextLink and an indexer", async () => {
+  await tester
+    .expect(
+      `
+    model Page extends Record<unknown> { @pageItems value: string[]; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, invalidEnvelope]);
+});
+
+it("checks each variant of an explicit 200 body union", async () => {
+  await tester
+    .expect(
+      `
+    model Good { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model Bad { value: string[]; nextLink?: string; extra: string; }
+    model Result { @statusCode status: 200; @body body: Good | Bad; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Result;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, invalidEnvelope]);
+});
+
+it("reports a bodyless 200 even when the 201 response has paging metadata", async () => {
+  await tester
+    .expect(
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model Empty { @statusCode status: 200; }
+    model Created { @statusCode status: 201; @body body: Page; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Empty | Created;
+  `,
+    )
+    .toEmitDiagnostics(valueArray);
+});
+
+it("reports an empty model response", async () => {
+  await tester
+    .expect(
+      `
+    @get @route("/providers/Microsoft.Contoso/widgets") op widgets(): {};
+  `,
+    )
+    .toEmitDiagnostics(missingList);
+});
+
+it("reports an explicitly empty 200 body even with paging on the 201 response", async () => {
+  await tester
+    .expect(
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model EmptyBody {}
+    model Empty { @statusCode status: 200; @body body: EmptyBody; }
+    model Created { @statusCode status: 201; @body body: Page; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Empty | Created;
+  `,
+    )
+    .toEmitDiagnostics([valueArray, invalidEnvelope]);
+});
+
+it("reports an array variant alongside a compliant 200 envelope", async () => {
+  await tester
+    .expect(
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Page | string[];
+  `,
+    )
+    .toEmitDiagnostics(valueArray);
+});
+
+it("checks status ranges containing 200 but ignores ranges starting at 201", async () => {
+  await tester
+    .expect(
+      `
+    @minValue(200) @maxValue(202) scalar Includes200 extends int32;
+    @minValue(201) @maxValue(299) scalar LaterSuccess extends int32;
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    model InRange { @statusCode status: Includes200; @body body: { value: string[]; nextLink?: string; extra: string }; }
+    model Later { @statusCode status: LaterSuccess; @body body: { other: string }; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): InRange | Later | Page;
+  `,
+    )
+    .toEmitDiagnostics([pagingMetadata, pagingMetadata, invalidEnvelope]);
+});
+
+it("includes 200 at the upper boundary of a status range", async () => {
+  await tester
+    .expect(
+      `
+    @minValue(199) @maxValue(200) scalar EndingAt200 extends int32;
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; extra: string; }
+    model Result { @statusCode status: EndingAt200; @body body: Page; }
+    @get @list @route("/providers/Microsoft.Contoso/widgets") op widgets(): Result;
+  `,
+    )
+    .toEmitDiagnostics(invalidEnvelope);
+});
+
+it("targets the actual invalid value and extra properties", async () => {
+  await tester
+    .expect(
+      `
+    model /*Page*/Page { /*badValue*/value: string; @pageItems /*items*/items: string[]; @nextLink nextLink?: string; /*extra*/extra: string; }
+    @get @list @route("/widgets") op widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics(({ badValue, Page }) => [
+      { ...valueArray, pos: getSourceLocation(badValue).pos, end: getSourceLocation(badValue).end },
+      { ...invalidEnvelope, pos: getSourceLocation(Page).pos, end: getSourceLocation(Page).end },
+    ]);
+});
+
+it("targets the unmarked collection operation", async () => {
+  await tester
+    .expect(
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    @get @route("/providers/Microsoft.Contoso/widgets") op /*widgets*/widgets(): Page;
+  `,
+    )
+    .toEmitDiagnostics(({ widgets }) => ({
+      ...missingList,
+      pos: getSourceLocation(widgets).pos,
+      end: getSourceLocation(widgets).end,
+    }));
+});
+
+it("does not confuse a query suffix with a point route", async () => {
+  await tester
+    .expect(
+      `
+    @get @route("/providers/Microsoft.Contoso/widgets/example?disambiguation_dummy") op point(): { extra: string };
+  `,
+    )
+    .toBeValid();
+});
+
+it("checks extension-scope collections in nested provider namespaces", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace namespace Microsoft.Contoso {
+      namespace Inventory {
+        model Page { @pageItems value: string[]; @nextLink nextLink?: string; extra: string; }
+        @get @route("/{resourceUri}/providers/Microsoft.Contoso/widgets")
+        op list(@path resourceUri: string): Page;
+      }
+    }
+  `,
+    )
+    .toEmitDiagnostics([missingList, invalidEnvelope]);
+});
+
+it("ignores dynamic provider paths and provider-free noncollection GETs", async () => {
+  await tester
+    .expect(
+      `
+    model Page { extra: string; }
+    @get @route("/providers/{providerNamespace}/widgets")
+    op dynamicProvider(@path providerNamespace: string): Page;
+    @get @route("/widgets") op providerFree(): Page;
+  `,
+    )
+    .toBeValid();
+});
+
+it("classifies custom suffixes identically with or without query strings", async () => {
+  await tester
+    .expect(
+      `
+    model Page { @pageItems value: string[]; @nextLink nextLink?: string; }
+    @get @route("/providers/Microsoft.Contoso/customoperations") op a(): Page;
+    @get @route("/providers/Microsoft.Contoso/customoperations?disambiguation_dummy") op b(): Page;
+    @get @route("/providers/Microsoft.Contoso/customdefault") op c(): Page;
+    @get @route("/providers/Microsoft.Contoso/customdefault?disambiguation_dummy") op d(): Page;
+    @get @route("/providers/Microsoft.Contoso/widgets/default?disambiguation_dummy") op point(): Page;
+  `,
+    )
+    .toEmitDiagnostics([missingList, missingList, missingList, missingList]);
 });

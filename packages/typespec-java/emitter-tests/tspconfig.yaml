@@ -3,6 +3,10 @@
 # parent typespec-java package (name @azure-tools/typespec-java, with an exports field),
 # which resolves to the locally built emitter (dist/src/index.js). This makes
 # `npx tsp compile <target.tsp>` work directly, without a --emit argument.
+kind: project
+features:
+  - union-extends
+  - typeref
 emit:
   - "@azure-tools/typespec-java"
 options:
@@ -11,7 +15,6 @@ options:
     partial-update: true
     generate-samples: true
     generate-tests: true
-    examples-dir: "{project-root}/tsp/examples"
     dev-options:
       generate-code-model: true
       loglevel: info

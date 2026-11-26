@@ -327,6 +327,8 @@ interface LROMethodBase extends HttpMethodBase {
   finalStateVia?: FinalStateVia;
 
   operationLocationResultPath?: string;
+
+  finalResponseResultPath: string[];
 }
 
 interface HttpMethodBase extends method.Method<Client, result.ResponseEnvelope> {
@@ -475,6 +477,7 @@ export class LROMethod extends HttpMethodBase implements LROMethod {
   ) {
     super(name, client, httpPath, httpMethod, statusCodes, naming);
     this.kind = "lroMethod";
+    this.finalResponseResultPath = [];
   }
 }
 
@@ -490,6 +493,7 @@ export class LROPageableMethod extends HttpMethodBase implements LROPageableMeth
     super(name, client, httpPath, httpMethod, statusCodes, naming);
     this.kind = "lroPageableMethod";
     this.nextLinkVerb = "get";
+    this.finalResponseResultPath = [];
   }
 }
 

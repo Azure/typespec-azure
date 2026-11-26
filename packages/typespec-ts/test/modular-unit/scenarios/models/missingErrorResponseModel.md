@@ -131,6 +131,8 @@ export async function _getAssetChainSummaryDeserialize(
 
   return assetChainSummaryResultDeserializer(result.body);
 }
+
+/** Performs the getAssetChainSummary operation. */
 export async function getAssetChainSummary(
   context: Client,
   options: GetAssetChainSummaryOptionalParams = { requestOptions: {} },

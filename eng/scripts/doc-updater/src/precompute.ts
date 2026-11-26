@@ -81,6 +81,9 @@ export interface PrecomputedContext {
 
   /** The git commit hash at checkout time (before the agent runs) */
   checkoutCommit: string;
+
+  /** Latest merged automated doc-update PR number resolved on the host */
+  lastPrNumber?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -143,6 +146,8 @@ async function main(): Promise<void> {
   log(`Config: ${config.displayName} (${config.name})`);
   log(`Full rebuild: ${isFullMode}`);
 
+  const latestMergedPr = getLatestMergedAutomatedPr(config.name);
+
   const context: PrecomputedContext = {
     config: {
       name: config.name,
@@ -155,6 +160,7 @@ async function main(): Promise<void> {
     knowledgePath: getKnowledgeRelativePath(config.name),
     allowedPaths: config.allowedPaths ?? [],
     checkoutCommit: getCurrentCommit(),
+    lastPrNumber: latestMergedPr ?? meta?.lastPrNumber,
   };
 
   // --- Incremental change detection ---
@@ -178,8 +184,6 @@ async function main(): Promise<void> {
   // --- Human feedback detection ---
   // Learn once from the latest merged automated PR that hasn't been processed yet.
   if (!isFullMode) {
-    const latestMergedPr = getLatestMergedAutomatedPr(config.name);
-
     if (latestMergedPr && latestMergedPr !== meta?.lastPrNumber) {
       log(`Checking for human feedback on merged PR #${latestMergedPr}...`);
       const feedback = getHumanFeedback(latestMergedPr);
