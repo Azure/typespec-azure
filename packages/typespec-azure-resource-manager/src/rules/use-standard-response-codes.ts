@@ -14,7 +14,7 @@ import {
   type HttpOperationResponse,
   type HttpStatusCodeRange,
 } from "@typespec/http";
-import { getArmResourceOperationData } from "../operations.js";
+import { getArmResources } from "../resource.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 interface ResponsePolicy {
@@ -24,6 +24,8 @@ interface ResponsePolicy {
     readonly required: readonly number[];
     readonly optional?: readonly number[];
   }[];
+  /** Whether every variant of a declared response with the given code must (`true`) or must not (`false`) have a body. */
+  readonly body?: Readonly<Partial<Record<number, boolean>>>;
 }
 
 const servicePolicies: Partial<Record<HttpOperation["verb"], ResponsePolicy>> = {
@@ -33,18 +35,23 @@ const servicePolicies: Partial<Record<HttpOperation["verb"], ResponsePolicy>> = 
   },
 };
 
+type ResourceRole = "delete" | "write";
+
 const resourcePolicies: Partial<
-  Record<HttpOperation["verb"], { sync: ResponsePolicy; lro: ResponsePolicy }>
+  Record<HttpOperation["verb"], { role: ResourceRole; sync: ResponsePolicy; lro: ResponsePolicy }>
 > = {
   delete: {
+    role: "delete",
     sync: { messageId: "deleteSync", allowed: [{ required: [200, 204] }] },
     lro: { messageId: "deleteAsync", allowed: [{ required: [202, 204] }] },
   },
   put: {
+    role: "write",
     sync: { messageId: "put", allowed: [{ required: [200, 201] }] },
     lro: { messageId: "put", allowed: [{ required: [200, 201] }] },
   },
   post: {
+    role: "write",
     sync: { messageId: "postSync", allowed: [{ required: [200] }, { required: [204] }] },
     lro: {
       messageId: "postAsync",
@@ -64,7 +71,7 @@ export const useStandardResponseCodesRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-response-codes",
   messages: {
-    default: paramMessage`Operation '${"operationName"}' defines disallowed response status '${"statusCode"}'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.`,
+    default: paramMessage`Operation '${"operationName"}' defines disallowed response status '${"statusCode"}'. Use only 200, 201, 202, or 204 success responses.`,
     get: "GET operations must include a 200 response and may only use 202 as an additional success response code.",
     emptyGet: "GET operations must declare at least one response and include a 200 response.",
     deleteSync: `Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template.`,
@@ -74,6 +81,7 @@ export const useStandardResponseCodesRule = createRule({
     postAsync: `Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.`,
   },
   create(context) {
+    let resourceRoles: Map<Operation, ResourceRole> | undefined;
     return {
       operation: (operation) => {
         if (
@@ -84,7 +92,13 @@ export const useStandardResponseCodesRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        const policy = getResponsePolicy(context.program, operation, httpOperation);
+        resourceRoles ??= getResourceRoles(context.program);
+        const policy = getResponsePolicy(
+          context.program,
+          operation,
+          httpOperation,
+          resourceRoles.get(operation),
+        );
         if (policy) {
           if (!matchesPolicy(httpOperation.responses, policy)) {
             context.reportDiagnostic({
@@ -109,7 +123,6 @@ export const useStandardResponseCodesRule = createRule({
                 statusCode: formatStatusCode(response.statusCodes),
               },
             });
-            return;
           }
         }
       },
@@ -117,17 +130,31 @@ export const useStandardResponseCodesRule = createRule({
   },
 });
 
+/** Resource lifecycle and action operations, matching the scope of the legacy DELETE, PUT, and POST rules. */
+function getResourceRoles(program: Program): Map<Operation, ResourceRole> {
+  const roles = new Map<Operation, ResourceRole>();
+  for (const { operations } of getArmResources(program)) {
+    for (const op of [
+      operations.lifecycle.createOrUpdate,
+      operations.lifecycle.update,
+      ...Object.values(operations.actions),
+    ]) {
+      if (op) roles.set(op.operation, "write");
+    }
+    if (operations.lifecycle.delete) roles.set(operations.lifecycle.delete.operation, "delete");
+  }
+  return roles;
+}
+
 function getResponsePolicy(
   program: Program,
   operation: Operation,
   httpOperation: HttpOperation,
+  role: ResourceRole | undefined,
 ): ResponsePolicy | undefined {
-  const kind = getArmResourceOperationData(program, operation)?.kind;
-  if (kind === "delete" || kind === "createOrUpdate" || kind === "update" || kind === "action") {
-    const policies = resourcePolicies[httpOperation.verb];
-    if (policies && (kind !== "delete" || httpOperation.verb === "delete")) {
-      return getLroMetadata(program, operation) ? policies.lro : policies.sync;
-    }
+  const policies = resourcePolicies[httpOperation.verb];
+  if (policies && role === policies.role) {
+    return getLroMetadata(program, operation) ? policies.lro : policies.sync;
   }
   const policy = servicePolicies[httpOperation.verb];
   if (!policy) return undefined;
@@ -147,6 +174,13 @@ function matchesPolicy(
     const code = getStatusCode(response.statusCodes);
     if (code === undefined) return false;
     codes.add(code);
+    const bodyRequired = policy.body?.[code];
+    if (
+      bodyRequired !== undefined &&
+      response.responses.some((r) => (r.body !== undefined) !== bodyRequired)
+    ) {
+      return false;
+    }
   }
   return policy.allowed.some(
     ({ required, optional = [] }) =>

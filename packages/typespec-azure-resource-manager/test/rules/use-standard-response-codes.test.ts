@@ -36,7 +36,7 @@ const resource = `
 function diagnostic(operationName: string, statusCode: number | string) {
   return {
     code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
-    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.`,
+    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, or 204 success responses.`,
   };
 }
 
@@ -93,7 +93,7 @@ it("rejects a singleton disallowed range", async () => {
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
-it("reports at most one disallowed response code across body variants", async () => {
+it("reports each disallowed response code once across body variants", async () => {
   await tester
     .expect(
       `${header}
@@ -102,7 +102,7 @@ it("reports at most one disallowed response code across body variants", async ()
       @post op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
     `,
     )
-    .toEmitDiagnostics([diagnostic("read", 404)]);
+    .toEmitDiagnostics([diagnostic("read", 404), diagnostic("read", 500)]);
 });
 
 it("reports concrete endpoints, not the shared template instance", async () => {
@@ -406,7 +406,7 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({
         code: diagnosticCode,
         message:
-          "Operation 'rejected' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.",
+          "Operation 'rejected' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses.",
         target: "rejected",
       });
   });
@@ -448,7 +448,7 @@ describe("ARM GET response codes", () => {
         {
           code: diagnosticCode,
           message:
-            "Operation 'create' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses; error responses are validated by missing-error-response.",
+            "Operation 'create' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses.",
           target: "create",
         },
       ]);
@@ -513,24 +513,52 @@ describe("ARM resource response codes", () => {
     model Employee is ProxyResource<{}> { ...ResourceNameParameter<Employee>; }
   `;
 
-  it("accepts a long-running POST whose 200 response has multiple content types", async () => {
+  const lroPost = (finalResponse: string) => `${employee}
+    model PollingStatus { @Azure.Core.lroStatus statusValue: "Succeeded" | "Canceled" | "Failed"; }
+    @armResourceOperations
+    interface Employees {
+      @get getStatus(...KeysOf<Employee>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+      @Azure.Core.pollingOperation(Employees.getStatus, {employeeName: Azure.Core.RequestParameter<"employeeName">, statusId: Azure.Core.ResponseProperty<"operationId">})
+      @post @armResourceAction(Employee)
+      hire(...KeysOf<Employee>): {
+        @statusCode _: 202;
+        @header("x-ms-operation-id") operationId: string;
+      } | ${finalResponse};
+    }
+  `;
+
+  it("accepts a long-running POST whose 200 response has multiple content-type variants", async () => {
+    await tester
+      .expect(
+        lroPost(`{ @statusCode _: 200; @body body: Employee; }
+          | { @statusCode _: 200; @header contentType: "application/xml"; @body body: string; }`),
+      )
+      .toBeValid();
+  });
+
+  it("rejects a long-running POST mixing bodyless and bodyful 200 variants", async () => {
+    await tester
+      .expect(
+        lroPost(`{ @statusCode _: 200; @body body: Employee; }
+          | { @statusCode _: 200; @header("x-ms-marker") marker: string; }`),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.",
+        target: "hire",
+      });
+  });
+
+  it("applies the generic allowlist to a resource action using DELETE", async () => {
     await tester
       .expect(
         `${employee}
-        model PollingStatus { @Azure.Core.lroStatus statusValue: "Succeeded" | "Canceled" | "Failed"; }
         @armResourceOperations
         interface Employees {
-          @get getStatus(...KeysOf<Employee>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
-          @Azure.Core.pollingOperation(Employees.getStatus, {employeeName: Azure.Core.RequestParameter<"employeeName">, statusId: Azure.Core.ResponseProperty<"operationId">})
-          @post @armResourceAction(Employee)
-          hire(...KeysOf<Employee>): {
-            @statusCode _: 202;
-            @header("x-ms-operation-id") operationId: string;
-          } | {
-            @statusCode _: 200;
-            @header contentType: "application/json" | "application/xml";
-            @body body: Employee;
-          };
+          @delete @armResourceAction(Employee)
+          @segment("revoke")
+          revoke(...KeysOf<Employee>): { @statusCode _: 204; };
         }
         `,
       )
