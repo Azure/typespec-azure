@@ -1,6 +1,6 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion. Include CI-derived companion suppression proposals by default and rebuild their source branches only on explicit refresh.
+description: Run sequential Swagger-to-TypeSpec migration tasks with isolated worktrees and independent reviews. Default to native-first development on canonical main, with explicit many-to-one groups, reusable coverage baselines and fork-hosted evidence; preserve legacy development and promotion. Include public and private CI-derived companion suppression proposals, with exact-SHA approval for private diagnostic dispatch; rebuild suppression branches only on explicit refresh.
 argument-hint: "[--flow native-first|legacy] [--worktrees-folder <absolute-path>] <rule ID ...> | --task-file <absolute-json-path> | --refresh-suppression-pr <linter-pr-url> | <legacy worker commands>"
 user-invocable: true
 ---
@@ -15,11 +15,19 @@ a directly linked Azure-hosted suppression proposal when failed CI and source
 analysis establish PR-caused compatibility diagnostics; do not require a separate
 opt-in or create empty proposals. Consumer proposals use CI evidence only, not
 local validation, and do not require CI repair, landing or checkpoint B.
+Keep the public companion path and also assess private
+`Azure/azure-rest-api-specs-pr:typespec-next`. The private path may acquire
+diagnostics through the documented experimental CI dispatch only after explicit
+approval of the exact linter PR head SHA. It does not authorize local consumer
+validation or CI for suppression edits. Keep private evidence and companion
+identities out of public reports, logs and PRs; use the companion contract's
+visibility-safe links/status instead. No rule queue or CI dispatch is implied
+by a request to edit this skill.
 
 Route the standalone `--refresh-suppression-pr <linter-pr-url>` mode before the
 flow/rule grammar below. It keeps the existing companion PR, recreates its
-source branch from current `typespec-next`, and regenerates current justified
-suppressions rather than appending the old patch. Only explicit refresh grants
+source branch from that consumer's current `typespec-next`, and regenerates
+current justified suppressions rather than appending the old patch. Only explicit refresh grants
 the documented expected-SHA force-with-lease on that suppression source branch;
 it never authorizes force-pushing linter/base branches or replacing the PR.
 Do not run normal queue setup or restart a linter cycle for refresh mode.
@@ -357,7 +365,7 @@ Keep an ordered ledger with one entry per parsed queue entry:
   disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
   query evidence, and the separate one-correction, three-retry publication budget
-- companion proposal mode/status, linter/CI/specs identities, causal report,
+- per-consumer companion proposal mode/status, linter/CI/specs identities, causal report,
   Azure head/base/PR binding and direct description links; for explicit refresh,
   retained old patch/head, fresh base, captured lease and rebuilt head
 - original readiness/status/quiescence deadlines, last genuine progress,
@@ -437,8 +445,9 @@ For each successfully prepared command, in input order:
 
 Before the initial actual-linter PR handoff, the coordinator applies the
 [default companion proposal](companion-suppressions.md#initial-delivery-by-default)
-to existing CI evidence, with prior owners idle. This is separate from native
-or promotion validation, not another native PR or permission to waive a failed
+to each consumer's CI evidence, acquiring private evidence only through the
+approved exact-SHA dispatch when needed, with prior owners idle. This is separate
+from native or promotion validation, not another native PR or permission to waive a failed
 required gate. Apply it also when an existing linter PR returns a CI-related
 partial stop; do not skip the proposal merely because checkpoint B cannot run.
 Record a proposal-only outcome separately when that is the
@@ -817,7 +826,7 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   evidence; no secrets or generated corpus payloads
 - review owner and capability evidence, pending review phase, review invocation
   and agent IDs, and verified result when returning from an outer-owned review
-- companion proposal binding/status and report, pinned linter/CI/specs sources,
+- per-consumer companion proposal binding/status and report, pinned linter/CI/specs sources,
   description links and stale-head disposition; refresh requires explicit intent
 - worktree state manifest at handoff: branch/HEAD, tracked/staged/untracked
   task-owned paths, their diffs and content hashes, and the completed actions
@@ -1142,8 +1151,11 @@ Never omit failed input lines or stop the final report at the first failure.
 After the task sections, include the skill-update PR link and brief summary, or
 a publishing blocker, only when required by the shared policy's final handoff.
 Do not print a process-suggestions list or low-confidence observations.
-For an applicable companion, also report its URL, pinned linter head, causality
-report and proposal status. Do not present proposal publication as green CI.
+For each applicable public companion, also report its URL, pinned linter head,
+causality report and proposal status. Private URLs, identities and reports belong
+only in verified private handoffs; public results use a generic disposition.
+Report missing exact-SHA execution approval as pending approval, not as absent
+diagnostics. Do not present proposal publication as green CI.
 
 ## Post-run process review
 

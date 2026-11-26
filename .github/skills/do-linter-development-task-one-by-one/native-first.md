@@ -140,7 +140,9 @@ does not establish green integration against a different current consumer
 population. Do not silently disable the rule, upgrade published contracts,
 extend cross-repository publication scope, or merge compatibility changes.
 The default [companion suppression proposal](companion-suppressions.md) is the
-narrowly authorized consumer scope when existing CI proves PR-caused findings.
+narrowly authorized consumer scope when CI proves PR-caused findings. Preserve
+the public path and assess the private consumer separately; private diagnostic
+CI acquisition requires explicit approval of the exact native PR head SHA.
 Its checkout starts from current canonical `typespec-next`, not the frozen
 coverage source. It is not a new replay worktree or permission to validate the
 consumer locally.
@@ -221,8 +223,11 @@ consumer locally.
    persistent agents, verified review-specific collection and parent approval.
    Before the initial linter handoff, the coordinator prepares the default
    [CI-derived companion proposal](companion-suppressions.md#initial-delivery-by-default)
-   when applicable, links it directly in the description, and records its
-   pinned linter/consumer identities. Missing evidence is disclosed, not
+   for each applicable consumer, links public proposals directly in the
+   description, and records pinned linter/consumer identities at their permitted
+   visibility. Private diagnostics may be acquired only through the documented
+   exact-SHA-approved workflow; private reports and companion links never enter
+   public descriptions, logs or evidence. Missing approval/evidence is disclosed, not
    replaced by local validation or guessed suppressions. Existing companions
    refresh only on explicit request; changed linter heads otherwise mark them stale.
 6. **Checkpoint B: release readiness.** Keep the same native publisher/PR.

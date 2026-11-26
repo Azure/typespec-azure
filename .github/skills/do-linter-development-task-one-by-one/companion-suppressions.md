@@ -9,20 +9,27 @@ temporary lintdiff-only PR that the external suite does not consume.
 ## Initial delivery by default
 
 Before handing off the initial linter deliverable, inspect its existing,
-completed external specs CI evidence. If source analysis confirms PR-caused
-compatibility diagnostics, create the companion without another opt-in and
-link it directly in the linter PR description. Do not wait for a user to request
-this first proposal.
+completed external specs CI evidence. Support both public
+`Azure/azure-rest-api-specs:typespec-next` and private
+`Azure/azure-rest-api-specs-pr:typespec-next` as independent consumer targets;
+the private path supplements, not replaces, the public path. If source analysis
+confirms PR-caused compatibility diagnostics, create that consumer's companion
+without another proposal opt-in. Link public companions directly in the linter
+PR description; apply the private disclosure boundary below to private ones.
+Do not wait for a user to request this first proposal. Private execution still
+requires the separate exact-SHA approval below.
 
-Reconcile the recorded companion binding and description link before creation.
+Reconcile each consumer's recorded companion binding and permitted links before creation.
 An existing companion is not another initial creation: retain it and report
 whether its pinned evidence is current or stale. Only explicit refresh can
 replace its source history; ordinary resumption must not duplicate it.
 
 No confirmed applicable diagnostics means no empty suppression PR. Missing,
 pending or stale CI evidence is not proof that no suppressions are needed:
-record that disposition and the missing evidence, without guessing annotations,
-launching local validation, requesting a CI run or starting a polling loop.
+record that disposition and the missing evidence, without guessing annotations
+or launching local validation. Public evidence remains existing-CI-only.
+The approved private diagnostic dispatch below is the sole CI-request exception;
+it does not authorize public dispatches or suppression-validation CI.
 
 The coordinator owns the companion binding and publication. Keep the linter
 owner/review agents idle during companion writes, verify quiescence, and use
@@ -33,6 +40,90 @@ Preflight the consumer publication role before edits: the selected tool must
 explicitly target its repository/head/base or use a correctly bound consumer
 app owner. Changing cwd is not app ownership; unsupported controls remain a
 blocker, not permission to bypass the required publication tool.
+
+## Private diagnostic CI dispatch
+
+Follow the
+[maintainer procedure](https://github.com/Azure/typespec-azure/issues/6108#issuecomment-7183951654)
+for the experimental private path. This is diagnostic acquisition for the
+actual native or legacy promotion PR, not validation of suppression edits.
+Do not dispatch it for a temporary lintdiff-only PR.
+
+1. Verify private-repository access, the dispatcher's write permission, the
+   current workflow and inputs on `experiment/typespec-azure-pr-validation`,
+   and the public linter PR's current full 40-character head SHA. Read current
+   workflow instructions rather than assuming the experiment still exists.
+   Record unavailable access/workflow capability as a private-target blocker;
+   never fall back to a public workflow or upload private source elsewhere.
+2. Require explicit human approval of that exact revision for execution with
+   private specs. A queue invocation, proposal authorization, fetched SHA,
+   clean automated review or read-only token is not this attestation. Retain the
+   approval source and SHA; recheck the PR head immediately before dispatch.
+   If approval is absent or the head changed, do not dispatch. Record
+   `pending-approval` and hand off the required action without interrupting an
+   unattended queue with a question. Obtain a new exact-SHA approval before
+   any later dispatch of a changed head.
+3. Reconcile recorded and existing runs before issuing one dispatch for the
+   approved identity. Use the verified inputs:
+
+   ```powershell
+   gh workflow run typespec-validation-all.yaml --repo Azure/azure-rest-api-specs-pr --ref experiment/typespec-azure-pr-validation -f "typespec-azure-pr-url=$linterPrUrl" -f "typespec-azure-approved-sha=$approvedSha"
+   ```
+
+   Bind the resulting run to its actual workflow ref, inputs, actor and
+   dispatch time; do not assume the latest run belongs to this task. Persist
+   the dispatch attempt before execution. An uncertain dispatch is reconciled
+   read-only, never blindly retried or duplicated.
+
+4. Track only that run to completion within the recorded queue deadlines.
+   Reuse existing completion notifications or bounded status checks, not an
+   unbounded polling loop. Preserve failed, cancelled, pending or timed-out
+   dispositions; do not automatically rerun jobs. No worktree owner or command
+   may remain active when advancing the queue.
+5. Retrieve its private `typespec-pr-evidence-*` artifacts before the documented
+   14-day expiry. Verify provenance and actual candidate package installation/
+   content checks, and retain every available Ubuntu/Windows shard's diagnostics
+   (three shards per OS). Missing evidence is an explicit assessment limitation,
+   not a zero-diagnostic result. Record the approved PR head separately from
+   pinned public main, the temporary merged build SHA and pinned private
+   `typespec-next` SHA. The experiment branch supplies the workflow, not specs.
+   Never merge `RPSaaSMaster`, move the linter branch or reproduce the candidate
+   build locally as part of this proposal.
+6. Apply the causality analysis below. A red run or matching rule ID alone
+   does not establish a PR-caused diagnostic. A build/install failure without
+   usable diagnostic evidence is a blocker, not justification for annotations.
+   Attribute the PR's changes relative to the pinned public main used in the
+   candidate build, not only its older branch base; exclude diagnostics from
+   unrelated main changes or private ruleset configuration. Unresolved attribution
+   stays excluded without dispatching additional baseline runs.
+   Repeated OS, shard, API-version and entrypoint occurrences must retain their
+   provenance while mapping to unique authored targets.
+
+The workflow builds approved code with access to private specs. Verify the
+actual trust boundary; do not treat a matching SHA as proof that code is safe.
+This procedure authorizes no dispatch in a skill-editing task itself.
+
+### Private evidence and disclosure
+
+Keep private logs, artifacts, source excerpts, service/project names, diagnostic
+counts, attribution reports and consumer branch/PR identities in private storage
+and `Azure/azure-rest-api-specs-pr` only. Any local checkout, downloaded artifacts
+and private handoff/log files must use verified private-access storage within
+the selected `worktrees_folder`, separate from public/frozen worktrees.
+Do not put private payloads in the public linter worktree's `log.txt`, public
+evidence branches, `migration.md`, PR descriptions, comments or skill examples.
+Public logs/reports may contain only a generic private-proposal disposition.
+Preflight report publication visibility before uploading anything; if the
+available evidence backend is public-only, retain the private report privately
+and report that publication limitation rather than weakening the boundary.
+
+The private companion links the public linter PR and its private causality
+report. The public linter PR and report must not link back to the private
+companion or expose its number/URL. Use only a generic private-proposal status
+under the shared PR description contract. Private proposals remain
+inspection-only: do not run local consumer validation, request CI for the
+suppression edits, or claim those edits passed validation. Normal PR-triggered
+CI may run independently; waiting for, rerunning or repairing it is out of scope.
 
 ## Causality before edits or PR creation
 
@@ -58,9 +149,11 @@ blocker, not permission to bypass the required publication tool.
 
 ## Suppression-only proposal
 
-Fetch canonical Azure/azure-rest-api-specs:`typespec-next`. Create a new dedicated
-source branch **from that fetched commit in Azure/azure-rest-api-specs**, and
-target the same repository's `typespec-next` branch. Verify actual remote URLs,
+Fetch the selected canonical consumer's `typespec-next`: public
+`Azure/azure-rest-api-specs` or private `Azure/azure-rest-api-specs-pr`.
+Create a new dedicated source branch **from that fetched commit in that same
+Azure-owned repository**, and target its `typespec-next` branch. Never transfer
+private edits into the public consumer. Verify actual remote URLs,
 push permission, branch restrictions and head/base metadata; no personal fork
 fallback or direct push to `typespec-next` is authorized.
 
@@ -90,18 +183,23 @@ lightweight checks on an independently requested skill update.
 
 Publish one suppression-only draft PR after the causality analysis. Its
 description links the linter PR and report, records source identities and edit
-counts, and says local validation was intentionally not run. Add its verified
-URL in a peer `## Companion suppression PR` section after Migration report using the
+counts, and says local validation was intentionally not run. For a public
+companion, add its verified URL in a peer `## Companion suppression PR` section
+after Migration report using the
 [description contract](../shared/migration-pr-description.md), preserving the
 original headings, source links and report URL. Link back in the companion's
-description and update report NOTES. Verify actual pushed heads, file scope,
+description and update report NOTES, subject to the private disclosure boundary.
+For a private companion, publish its URL/report only in private handoffs and use
+the generic public disposition instead. Verify actual pushed heads, file scope,
 descriptions and links; do not treat source/diff inspection as compilation proof.
 
 Stop when the analyzed proposal and links are published. Do not coordinate
-landing, merge, request/rerun/wait for CI, or require checkpoint B to complete
-this proposal. Ordinary CI triggered by publication may run independently;
-do not claim it passed. A complete companion does not waive an existing failed
-gate or establish success of the full native/legacy linter task.
+landing, merge, request/rerun/wait for suppression CI, or require checkpoint B
+to complete this proposal. The private diagnostic acquisition above is a
+separate earlier step, not permission to validate the suppression edits.
+Ordinary CI triggered by publication may run independently; do not claim it
+passed. A complete companion does not waive an existing failed gate or
+establish success of the full native/legacy linter task.
 
 An explicitly requested heading or justification-only correction is not a
 diagnostic refresh. Keep the existing targets, PR and source branch, publish a
@@ -126,9 +224,13 @@ coverage, promotion or review loops for this standalone proposal refresh.
 /do-linter-development-task-one-by-one --refresh-suppression-pr https://github.com/Azure/typespec-azure/pull/6035
 ```
 
-Resolve the existing companion from the recorded binding and direct description
-link. Require one open task-owned PR with its head in Azure/azure-rest-api-specs
-and base `typespec-next`; disagreement, multiple candidates or a closed/merged PR
+Resolve the existing companion from its per-consumer recorded binding and
+permitted description links/private handoff. Require one open task-owned PR with
+head and base in the same selected consumer repository and base `typespec-next`.
+If both public and private companions exist, require an explicit consumer
+repository in the natural-language refresh request; a bare linter-URL command
+is ambiguous and blocks mutation. Do not add flags to the strict grammar above.
+Disagreement, multiple candidates within that consumer or a closed/merged PR
 blocks mutation. Preserve the same PR number and source branch name. Do not
 silently create a replacement, retarget or close the old PR.
 
@@ -138,7 +240,9 @@ silently create a replacement, retarget or close the old PR.
    changes must not be discarded.
 2. Capture the remote suppression head SHA once, fetch current `typespec-next`,
    and redo the causality/report analysis against the current linter and
-   compatible existing CI evidence. Do not reuse the old suppression patch.
+   compatible CI evidence. Private evidence acquisition, if needed, follows
+   the exact-SHA approval/dispatch rules above; public refresh uses existing
+   evidence only. Do not reuse the old suppression patch.
    If no annotations remain justified, report that the companion is no longer
    needed; do not invent an empty commit or automatically close/replace the PR
    or claim it was refreshed.
@@ -162,7 +266,8 @@ silently create a replacement, retarget or close the old PR.
 
 5. Verify the same PR now has the rebuilt head and no obsolete PR-added
    suppressions, refresh its description/report and the linter's existing link,
-   and return the new identities. No local validation or CI/merge work is added.
+   and return the new identities within their permitted visibility. No local
+   validation, suppression CI or merge work is added.
 
 If a linter edit makes a previously published companion stale, record that
 fact and its pinned source identity. Do not automatically refresh during a
@@ -170,10 +275,17 @@ review loop or claim an old proposal matches the new head.
 
 ## Ledger and handoff
 
+Key companion records by task/linter PR and consumer repository, not by the
+linter URL alone. Record each target independently so one public proposal
+cannot suppress or overwrite private acquisition/publication state.
 Record initial/default versus explicit-refresh mode, task/linter PR and head,
 CI/specs provenance, causality/exclusions, raw and unique counts, report identity,
 consumer base, companion PR/repository/source branch and head, description links,
 old/new identities and captured lease for refresh, publication attempts and
-proposal status (`published`, `not-needed`, `pending-evidence` or `blocked`).
+proposal status (`published`, `not-needed`, `pending-approval`, `pending-evidence`
+or `blocked`). For private dispatch, also retain approval evidence, attempt/run
+identity, workflow ref, actual candidate/specs/package identities, shard/artifact
+availability and private report location. Keep these records within the private
+disclosure boundary; shared public ledgers contain generic dispositions only.
 Carry existing task counters; refresh does not reset them or create a semantic
 repair cycle. Report proposal status separately from full linter readiness.

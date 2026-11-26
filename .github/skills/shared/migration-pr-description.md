@@ -16,7 +16,8 @@ for a guidance-only outcome. Preserve existing PR titles unless correction is
 requested.
 
 The PR body starts with these two required sections, in this order. Add the
-conditional companion section below only when a verified companion exists.
+conditional companion section below only when a verified companion exists or
+the private workflow has a recorded disposition as described below.
 
 ```markdown
 ## Original Swagger linter
@@ -60,6 +61,19 @@ not an inline label inside Migration report. Preserve both required headings
 and all original source/report links. This limited
 addition is part of default initial delivery when attributable CI findings
 justify a companion; do not add a placeholder or imply its CI passed.
+
+Public and private consumer companions are independent. If the companion targets
+private `Azure/azure-rest-api-specs-pr`, do not publish its URL/number, private
+report link, diagnostics, counts or service details in this public PR or its
+public migration report. Keep those links in private handoffs and the private
+companion description. In the same peer `## Companion suppression PR` section,
+use only a truthful generic disposition, for example
+`Private consumer proposal: published; details retained privately.` or
+`Private consumer diagnostics: pending exact-SHA execution approval.`
+This is the sole placeholder exception for a recorded private disposition,
+not permission to imply that a private PR exists before verification.
+When both companions apply, retain the verified public URL and put the generic
+private disposition alongside it without disclosing private identities.
 
 Keep the branch and report path stable so later evidence commits appear through
 the same PR link. Do not replace the URL with a new commit permalink after each
