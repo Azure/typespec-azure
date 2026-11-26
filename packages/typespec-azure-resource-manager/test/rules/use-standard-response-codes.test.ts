@@ -461,6 +461,17 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
   });
 
+  it("does not count a default response as the required 200", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Microsoft.Contoso;
+        @get op read(): ErrorResponse;
+      `,
+      )
+      .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
+  });
+
   it.each(["@statusCode @minValue(200) @maxValue(200) code: int32;", "@statusCode code: 200;"])(
     "accepts equivalent literal and singleton 200 responses: %s",
     async (status) => {
@@ -494,9 +505,9 @@ describe("ARM GET response codes", () => {
 describe("ARM PATCH response codes", () => {
   const code = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
   const syncMessage =
-    "Synchronous PATCH operations must have only a 200 response and a standard error response.";
+    "Synchronous PATCH operations must use 200 and no other numeric response codes.";
   const lroMessage =
-    "Long-running PATCH operations must have only 200, 202, and a standard error response.";
+    "Long-running PATCH operations must use 200 and 202 and no other numeric response codes.";
   const bodyMessage = "The 202 response of a long-running PATCH operation must not have a body.";
 
   function patch(returnType: string, declarations = ""): string {
@@ -532,15 +543,16 @@ describe("ARM PATCH response codes", () => {
     });
   });
 
-  it.each(["Ok | ErrorResponse", "Started | Accepted | ErrorResponse"])(
-    "accepts the standard response set %s",
-    async (returnType) => {
-      await tester.expect(patch(returnType)).toBeValid();
-    },
-  );
+  it.each([
+    ["sync with a standard error response", "Ok | ErrorResponse"],
+    ["sync without checking for a default response", "Ok"],
+    ["LRO with a standard error response", "Started | Accepted | ErrorResponse"],
+    ["LRO without checking for a default response", "Started | Accepted"],
+  ])("accepts PATCH %s", async (_, returnType) => {
+    await tester.expect(patch(returnType)).toBeValid();
+  });
 
   it.each([
-    ["a missing standard error response", "Ok"],
     ["a missing 200", "ErrorResponse"],
     ["an extra response outside the general allowlist", "Ok | NotFoundResponse | ErrorResponse"],
     ["a 202 without LRO metadata", "Ok | Accepted | ErrorResponse"],
@@ -551,7 +563,6 @@ describe("ARM PATCH response codes", () => {
   it.each([
     ["a missing 202 with native polling metadata", "Started | ErrorResponse"],
     ["a missing 200", "AcceptedLro | ErrorResponse"],
-    ["a missing standard error response", "Started | Accepted"],
     ["an extra response", "Started | Accepted | ArmNoContentResponse | ErrorResponse"],
   ])("rejects long-running PATCH with %s", async (_, returnType) => {
     await tester.expect(patch(returnType)).toEmitDiagnostics({ code, message: lroMessage });
@@ -626,10 +637,11 @@ describe("ARM PATCH response codes", () => {
         `
         @armProviderNamespace namespace Microsoft.Contoso;
         model Ok { @statusCode code: 200; @body value: string; }
+        model NoContent { @statusCode code: 204; }
         @route("/widgets") @patch
         op original(@body input: string | int32): Ok | ErrorResponse;
         @overload(original)
-        op /*specialized*/specialized(@body input: string): Ok;
+        op /*specialized*/specialized(@body input: string): Ok | NoContent;
       `,
       )
       .toEmitDiagnostics(({ specialized }) => {

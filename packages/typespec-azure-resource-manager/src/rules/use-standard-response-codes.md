@@ -4,11 +4,14 @@ status codes. A singleton status range is equivalent to its literal status;
 broader ranges are not substitutes for exact status codes.
 
 - **GET inside a service:** Include `200` and only add `202` or `default`.
-- **Synchronous PATCH in an ARM provider:** Return exactly `200` and the
-  standard error response (`default`).
-- **Long-running PATCH in an ARM provider:** Return exactly `200`, `202`, and
-  the standard error response (`default`). The `202` response must not have a
-  body. Define native polling metadata to identify the operation as long-running.
+- **Synchronous PATCH in an ARM provider:** Use `200` and no other numeric
+  response codes.
+- **Long-running PATCH in an ARM provider:** Use `200` and `202`, with no other
+  numeric response codes. The `202` response must not have a body. Define native
+  polling metadata to identify the operation as long-running.
+
+This rule ignores default (`*`) responses; their presence is handled by the
+separate default-response rule proposed in [#6038](https://github.com/Azure/typespec-azure/pull/6038).
 
 These requirements apply to concrete HTTP operations, including operations in
 nested namespaces and inherited interfaces. An invalid method-specific response
@@ -100,8 +103,8 @@ to the concrete operation, not its reusable template.
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | [NoErrorCodeResponses](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/no-error-code-responses.ts) | General allowlist of `200`, `201`, `202`, `204`, and `default` across HTTP methods, including operations outside services.         |
 | [GetResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/get-response-codes.md)                                              | GET operations inside services must include `200` and use only `200`, `202`, or `default`, with one warning per invalid operation. |
-| [PatchResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-response-codes.md)                                          | Exact response sets for synchronous and long-running ARM PATCH, and no body on a long-running `202`.                               |
-| [LroPatch202](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-patch202.md)                                                         | A long-running ARM PATCH must include `202`.                                                                                       |
+| [PatchResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-response-codes.md)                                          | Numeric response codes for synchronous and long-running ARM PATCH, and no body on a long-running `202`.                            |
+| [LroPatch202](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-patch202.md)                                                         | A long-running ARM PATCH must include `202`; default-response coverage is handled separately.                                      |
 
 The rule checks native HTTP endpoints without reproducing SDK-scoped emission
 or the general validator's omission of `x-ms-paths` responses. The temporary
