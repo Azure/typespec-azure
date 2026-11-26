@@ -40,18 +40,13 @@ function getOrCreatePathSet(pathsByNamespace: Map<string, Set<string>>, namespac
   return paths;
 }
 
-function isValidNestedResourcePath(resource: ResolvedResource, parent: ResolvedResource): boolean {
-  const parentPath = parent.resourceInstancePath.replace(/\/$/, "");
-  const resourcePath = resource.resourceInstancePath.replace(/\/$/, "");
-  if (!resourcePath.toLowerCase().startsWith(`${parentPath.toLowerCase()}/`)) return false;
-
-  const [childType, childName, ...extraSegments] = resourcePath
-    .slice(parentPath.length)
+function isValidNestedResourcePath(resource: ResolvedResource): boolean {
+  const [childType, childName] = resource.resourceInstancePath
     .split("/")
-    .filter((segment) => segment.length > 0);
+    .filter((segment) => segment.length > 0)
+    .slice(-2);
   const expectedChildType = resource.resourceType.types.at(-1);
   if (
-    extraSegments.length > 0 ||
     expectedChildType === undefined ||
     childType?.toLowerCase() !== expectedChildType.toLowerCase()
   ) {
@@ -74,10 +69,9 @@ function isResourceNameSegment(segment: string | undefined, resource: ResolvedRe
 function getNestedResourcePathValidity(resources: ResolvedResource[]) {
   const paths = new Map<string, boolean>();
   for (const resource of resources) {
-    const parent = resource.parent;
-    if (parent === undefined) continue;
+    if (resource.parent === undefined) continue;
 
-    const isValid = isValidNestedResourcePath(resource, parent);
+    const isValid = isValidNestedResourcePath(resource);
     paths.set(
       resource.resourceInstancePath,
       (paths.get(resource.resourceInstancePath) ?? true) && isValid,

@@ -91,7 +91,7 @@ it("uses the resolved parent relationship for nested resource paths", async () =
     .toBeValid();
 });
 
-it("accepts a subscription child when the parent also exists at tenant scope", async () => {
+it("uses the resolved parent relationship when parent path parameter names differ", async () => {
   await tester
     .expect(
       service(`
@@ -108,9 +108,9 @@ it("accepts a subscription child when the parent also exists at tenant scope", a
           op subscription(@path subscriptionId: string, @path eventId: string): Event;
         }
         interface ImpactedResources {
-          @route("/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/events/{eventId}/impactedResources/{impactedId}")
+          @route("/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/events/{parentEventName}/impactedResources/{impactedId}")
           @get @armResourceRead(ImpactedResource)
-          op get(@path subscriptionId: string, @path eventId: string, @path impactedId: string): ImpactedResource;
+          op get(@path subscriptionId: string, @path parentEventName: string, @path impactedId: string): ImpactedResource;
         }
       `),
     )
@@ -200,6 +200,7 @@ it("does not classify a proxy resource as tracked", async () => {
     .expect(
       service(`
         model Widget is ProxyResource<{}> {
+          location: string;
           ...ResourceNameParameter<Widget>;
         }
         @armResourceOperations

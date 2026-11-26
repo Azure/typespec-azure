@@ -1,6 +1,6 @@
 ARM HTTP paths must identify resource types consistently, use valid nested-resource paths, and identify the correct provider. Tracked resources must be routed under a subscription and resource group.
 
-The rule checks GET, PUT, PATCH, and DELETE paths for resource-type and nested-path requirements. Provider namespace casing and provider-to-service matching apply to all paths, regardless of HTTP method. For tracked-resource scope, the rule uses ARM resource metadata to identify tracked resource models and checks their GET and PUT operations.
+The rule checks GET, PUT, PATCH, and DELETE paths for resource-type and nested-path requirements. It identifies nested resources from the resolved ARM parent relationship (`resource.parent`), then validates that the child path ends with its resource-type/name pair. Tracked resources are identified by resolved ARM resource kind (`Tracked`); their GET and PUT lifecycle paths are checked for subscription and resource-group scope. Provider namespace casing and provider-to-service matching apply to all paths, regardless of HTTP method.
 
 ## Impact
 
