@@ -71,18 +71,65 @@ interface Parts {
 }
 ```
 
-If legacy routing must be retained, override the resource name on the operation definition so it matches the standard operations:
+Legacy interface templates are for older APIs that expose the same resource type at multiple fixed paths, with each path representing a distinct resource, or for non-standard resource paths. For example, a `Widget` resource model might be used in operations at the path `/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/locations/{location}/widgets/{widgetName}`, representing one resource, and might also be used in operations at the path `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/entities/{entityName}/widgets/{widgetName}`, representing a different resource. Use the legacy interface template for every operation using the resource type at that path.
+
+If an older API uses a non-standard operation pattern unrelated to the resource path, such as an optional request body for PUT or PATCH operations or a non-pageable response for list operations, use the operation templates in `Azure.ResourceManager.Legacy` instead. These operation templates may be freely mixed with standard operation templates for operations over the same resource. These operations are described in this table:
+
+| Template                                                       | Description                                                                                                        |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `CreateOrReplaceSync`, `CreateOrReplaceAsync`                  | Create or replace a resource; set `OptionalRequestBody = true` to make the request body optional.                  |
+| `CustomPatchSync`, `CustomPatchAsync`                          | Update a resource with a custom PATCH payload; set `OptionalRequestBody = true` to make the request body optional. |
+| `ArmListSinglePageByParent`, `ArmListSinglePageBySubscription` | List resources in a single page without a pageable response.                                                       |
+
+Make the `createOrUpdate` request body optional:
 
 ```typespec
 @armResourceOperations
 interface Parts {
   get is ArmResourceRead<Part>;
-  createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part, OverrideResourceName = "Part">;
+  createOrUpdate is Azure.ResourceManager.Legacy.CreateOrReplaceSync<
+    Part,
+    OptionalRequestBody = true
+  >;
   list is ArmResourceListByParent<Part>;
 }
 ```
 
-This example uses the `PartsLegacy` interface defined above. The override aligns the resource names without changing the HTTP path.
+If legacy routing must be retained, set the `ResourceName` parameter on the `LegacyOperations` interface template to the name of the resource model. Replace the `PartsLegacy` interface defined above with:
+
+```typespec
+@armResourceOperations
+interface PartsLegacy
+  extends Azure.ResourceManager.Legacy.LegacyOperations<
+      {
+        ...ApiVersionParameter,
+        ...SubscriptionIdParameter,
+        ...ResourceGroupParameter,
+        ...Azure.ResourceManager.Legacy.Provider,
+
+        @path
+        @segment("widgets")
+        @key
+        widgetName: string,
+      },
+      {
+        @path
+        @segment("parts")
+        @key
+        partName: string,
+      },
+      ResourceName = "Part"
+    > {}
+
+@armResourceOperations
+interface Parts {
+  get is ArmResourceRead<Part>;
+  createOrUpdate is PartsLegacy.CreateOrUpdateSync<Part>;
+  list is ArmResourceListByParent<Part>;
+}
+```
+
+This aligns the resource names without changing the HTTP path.
 
 ## Impact
 
