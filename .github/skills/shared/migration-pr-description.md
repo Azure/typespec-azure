@@ -16,7 +16,8 @@ for a guidance-only outcome. Preserve existing PR titles unless correction is
 requested.
 
 The PR body starts with these two required sections, in this order. Add the
-conditional companion section below only when a verified companion exists.
+conditional companion section below only when a verified companion exists or
+the private workflow has a recorded disposition as described below.
 
 ```markdown
 ## Original Swagger linter
@@ -60,6 +61,27 @@ not an inline label inside Migration report. Preserve both required headings
 and all original source/report links. This limited
 addition is part of default initial delivery when attributable CI findings
 justify a companion; do not add a placeholder or imply its CI passed.
+
+Public and private consumer companions are independent. For a verified companion
+in private `Azure/azure-rest-api-specs-pr`, add its direct PR link in the same peer
+`## Companion suppression PR` section, with a neutral label and access note:
+
+```markdown
+[Private consumer suppression PR](<verified private companion PR URL>) (private; access required)
+```
+
+GitHub still enforces private-repository permissions; linking does not grant
+access. The companion PR URL, including its repository and PR number, is the
+only private-link disclosure allowed here or in the public migration report.
+Keep private PR titles/contents, report/run/artifact/source links, diagnostics,
+counts, service details and other private identities in private handoffs and
+the private companion description.
+
+When both companions apply, preserve the verified public URL and add the private
+companion link alongside it. Use a truthful generic disposition such as
+`Private consumer diagnostics: pending validation evidence.` only when no
+companion has been created or verified, not instead of linking a verified PR.
+This placeholder exception does not imply a private PR exists before verification.
 
 Keep the branch and report path stable so later evidence commits appear through
 the same PR link. Do not replace the URL with a new commit permalink after each

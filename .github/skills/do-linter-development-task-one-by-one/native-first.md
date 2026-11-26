@@ -140,7 +140,10 @@ does not establish green integration against a different current consumer
 population. Do not silently disable the rule, upgrade published contracts,
 extend cross-repository publication scope, or merge compatibility changes.
 The default [companion suppression proposal](companion-suppressions.md) is the
-narrowly authorized consumer scope when existing CI proves PR-caused findings.
+narrowly authorized consumer scope when CI proves PR-caused findings. Preserve
+the public path and assess the private consumer separately; private diagnostic
+CI acquisition uses the authorized native PR's latest head, pinned by the
+workflow rather than a separately approved agent-fetched SHA.
 Its checkout starts from current canonical `typespec-next`, not the frozen
 coverage source. It is not a new replay worktree or permission to validate the
 consumer locally.
@@ -221,9 +224,14 @@ consumer locally.
    persistent agents, verified review-specific collection and parent approval.
    Before the initial linter handoff, the coordinator prepares the default
    [CI-derived companion proposal](companion-suppressions.md#initial-delivery-by-default)
-   when applicable, links it directly in the description, and records its
-   pinned linter/consumer identities. Missing evidence is disclosed, not
-   replaced by local validation or guessed suppressions. Existing companions
+   for each applicable consumer, links verified public and private proposals
+   directly in the description, and records pinned linter/consumer identities at
+   their permitted visibility. Private diagnostics may be acquired only through the documented
+   authorized latest-head workflow without a separate per-SHA approval question;
+   verified private companion PR URLs may enter public descriptions, but private
+   reports and all other private evidence/identities remain private under the
+   companion disclosure boundary. Actual access/trust restrictions or missing
+   evidence are disclosed, not replaced by local validation or guessed suppressions. Existing companions
    refresh only on explicit request; changed linter heads otherwise mark them stale.
 6. **Checkpoint B: release readiness.** Keep the same native publisher/PR.
    Apply the shared native contract's full package/docs/ruleset/integration
