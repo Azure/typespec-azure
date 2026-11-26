@@ -28,31 +28,30 @@ interface ResponsePolicy {
   readonly body?: Readonly<Partial<Record<number, boolean>>>;
 }
 
-const servicePolicies: Partial<Record<HttpOperation["verb"], ResponsePolicy>> = {
-  get: {
-    messageId: "get",
-    allowed: [{ required: [200], optional: [202] }],
-  },
-};
-
 type ResourceRole = "delete" | "write";
 
-const resourcePolicies: Partial<
-  Record<HttpOperation["verb"], { role: ResourceRole; sync: ResponsePolicy; lro: ResponsePolicy }>
+const responsePolicies: Partial<
+  Record<
+    HttpOperation["verb"],
+    { scope: "service" | ResourceRole; policy: ResponsePolicy; lro?: ResponsePolicy }
+  >
 > = {
+  get: {
+    scope: "service",
+    policy: { messageId: "get", allowed: [{ required: [200], optional: [202] }] },
+  },
   delete: {
-    role: "delete",
-    sync: { messageId: "deleteSync", allowed: [{ required: [200, 204] }] },
+    scope: "delete",
+    policy: { messageId: "deleteSync", allowed: [{ required: [200, 204] }] },
     lro: { messageId: "deleteAsync", allowed: [{ required: [202, 204] }] },
   },
   put: {
-    role: "write",
-    sync: { messageId: "put", allowed: [{ required: [200, 201] }] },
-    lro: { messageId: "put", allowed: [{ required: [200, 201] }] },
+    scope: "write",
+    policy: { messageId: "put", allowed: [{ required: [200, 201] }] },
   },
   post: {
-    role: "write",
-    sync: { messageId: "postSync", allowed: [{ required: [200] }, { required: [204] }] },
+    scope: "write",
+    policy: { messageId: "postSync", allowed: [{ required: [200] }, { required: [204] }] },
     lro: {
       messageId: "postAsync",
       allowed: [{ required: [202], optional: [200] }],
@@ -104,7 +103,7 @@ export const useStandardResponseCodesRule = createRule({
             context.reportDiagnostic({
               target: operation,
               messageId:
-                policy === servicePolicies.get && httpOperation.responses.length === 0
+                policy === responsePolicies.get?.policy && httpOperation.responses.length === 0
                   ? "emptyGet"
                   : policy.messageId,
             });
@@ -152,14 +151,16 @@ function getResponsePolicy(
   httpOperation: HttpOperation,
   role: ResourceRole | undefined,
 ): ResponsePolicy | undefined {
-  const policies = resourcePolicies[httpOperation.verb];
-  if (policies && role === policies.role) {
-    return getLroMetadata(program, operation) ? policies.lro : policies.sync;
+  const entry = responsePolicies[httpOperation.verb];
+  if (!entry) return undefined;
+  if (entry.scope === "service") {
+    for (let ns = operation.namespace; ns; ns = ns.namespace) {
+      if (getService(program, ns)) return entry.policy;
+    }
+    return undefined;
   }
-  const policy = servicePolicies[httpOperation.verb];
-  if (!policy) return undefined;
-  for (let ns = operation.namespace; ns; ns = ns.namespace) {
-    if (getService(program, ns)) return policy;
+  if (role === entry.scope) {
+    return entry.lro && getLroMetadata(program, operation) ? entry.lro : entry.policy;
   }
   return undefined;
 }
