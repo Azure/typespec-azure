@@ -2,8 +2,6 @@ ARM operations must define a response marked with `@error` and no explicit statu
 
 Add `CommonTypes.ErrorResponse` as a response to the operation. The standard ARM operation templates include this generic error response.
 
-This rule checks for a generic `@error` response, not its payload shape.
-
 ## Impact
 
 - **Area:** API design and generated SDKs
