@@ -43,12 +43,6 @@ model Widget is TrackedResource<{}> {
 tags?: Record<string>;
 ```
 
-The tags record may also be nullable:
-
-```typespec
-tags?: Record<string> | null;
-```
-
 ## Suppression
 
 Fix the resource model to follow the ARM resource property and tags requirements.

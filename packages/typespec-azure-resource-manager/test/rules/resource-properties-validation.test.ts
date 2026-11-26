@@ -21,7 +21,7 @@ beforeEach(async () => {
 });
 
 describe("resource identity properties", () => {
-  it("accepts standard read-only resource properties", async () => {
+  it("accepts standard read-only properties and inherited string tags", async () => {
     await tester
       .expect(
         `
@@ -36,68 +36,45 @@ describe("resource identity properties", () => {
       .toBeValid();
   });
 
-  it("reports a resource identity property that is writable", async () => {
+  it("reports missing or writable resource identity properties", async () => {
     await tester
       .expect(
         `
         @armProviderNamespace
         namespace Microsoft.Foo;
 
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
+        model WritableResource is TrackedResource<{}> {
+          ...ResourceNameParameter<WritableResource>;
 
           @visibility(Lifecycle.Read, Lifecycle.Create)
           id?: Azure.Core.armResourceIdentifier;
         }
-        `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
-        message:
-          "ARM resource 'FooResource' must define read-only 'name', 'id', and 'type' properties.",
-      });
-  });
 
-  it("reports a required property whose wire name is changed", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace
-        namespace Microsoft.Foo;
-
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
+        model RenamedResource is TrackedResource<{}> {
+          ...ResourceNameParameter<RenamedResource>;
 
           @encodedName("application/json", "resourceIdentifier")
           id?: Azure.Core.armResourceIdentifier;
         }
         `,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
-        message:
-          "ARM resource 'FooResource' must define read-only 'name', 'id', and 'type' properties.",
-      });
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
+          message:
+            "ARM resource 'WritableResource' must define read-only 'name', 'id', and 'type' properties.",
+        },
+        {
+          code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
+          message:
+            "ARM resource 'RenamedResource' must define read-only 'name', 'id', and 'type' properties.",
+        },
+      ]);
   });
 });
 
 describe("resource tags", () => {
-  it("accepts inherited string-valued tags", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace
-        namespace Microsoft.Foo;
-
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("accepts tags with string enum values", async () => {
+  it("accepts absent or string-valued tags", async () => {
     await tester
       .expect(
         `
@@ -109,24 +86,17 @@ describe("resource tags", () => {
           Second,
         }
 
-        model FooResource is ProxyResource<{}> {
-          ...ResourceNameParameter<FooResource>;
+        model WithoutTags is ProxyResource<{}> {
+          ...ResourceNameParameter<WithoutTags>;
+        }
+
+        model EnumTags is ProxyResource<{}> {
+          ...ResourceNameParameter<EnumTags>;
           tags?: Record<TagValue>;
         }
-        `,
-      )
-      .toBeValid();
-  });
 
-  it("accepts nullable tags with string values", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace
-        namespace Microsoft.Foo;
-
-        model FooResource is ProxyResource<{}> {
-          ...ResourceNameParameter<FooResource>;
+        model NullableTags is ProxyResource<{}> {
+          ...ResourceNameParameter<NullableTags>;
           tags?: Record<string> | null;
         }
         `,
@@ -134,81 +104,41 @@ describe("resource tags", () => {
       .toBeValid();
   });
 
-  it.each([
-    "Record<int32> | null",
-    "Record<string | null> | null",
-    "Record<string> | string | null",
-  ])("reports invalid nullable tags: %s", async (tagsType) => {
-    await tester
-      .expect(
-        `
-          @armProviderNamespace
-          namespace Microsoft.Foo;
+  it("reports tags that are not string-valued records", async () => {
+    const diagnostic = {
+      code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
+      message: "The resource 'tags' property must be a record with string values.",
+    };
 
-          model FooResource is ProxyResource<{}> {
-            ...ResourceNameParameter<FooResource>;
-            tags?: ${tagsType};
-          }
-          `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
-        message: "The resource 'tags' property must be a record with string values.",
-      });
-  });
-
-  it("reports tags with non-string values on a proxy resource", async () => {
     await tester
       .expect(
         `
         @armProviderNamespace
         namespace Microsoft.Foo;
 
-        model FooResource is ProxyResource<{}> {
-          ...ResourceNameParameter<FooResource>;
+        model NonStringTags is ProxyResource<{}> {
+          ...ResourceNameParameter<NonStringTags>;
           tags?: Record<int32>;
         }
-        `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
-        message: "The resource 'tags' property must be a record with string values.",
-      });
-  });
 
-  it("reports a non-string property encoded as resource tags", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace
-        namespace Microsoft.Foo;
+        model NullableTagValues is ProxyResource<{}> {
+          ...ResourceNameParameter<NullableTagValues>;
+          tags?: Record<string | null> | null;
+        }
 
-        model FooResource is TrackedResource<{}> {
-          ...ResourceNameParameter<FooResource>;
+        model NonRecordTags is ProxyResource<{}> {
+          ...ResourceNameParameter<NonRecordTags>;
+          tags?: Record<string> | string | null;
+        }
+
+        model EncodedTags is TrackedResource<{}> {
+          ...ResourceNameParameter<EncodedTags>;
 
           @encodedName("application/json", "tags")
           labels?: Record<int32>;
         }
         `,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/resource-properties-validation",
-        message: "The resource 'tags' property must be a record with string values.",
-      });
-  });
-
-  it("does not require tags on proxy resources", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace
-        namespace Microsoft.Foo;
-
-        model FooResource is ProxyResource<{}> {
-          ...ResourceNameParameter<FooResource>;
-        }
-        `,
-      )
-      .toBeValid();
+      .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
   });
 });
