@@ -3,6 +3,7 @@ import {
   fileRef,
   isTemplateDeclarationOrInstance,
   paramMessage,
+  type Interface,
   type Operation,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
@@ -127,7 +128,11 @@ export const resourcePathValidationRule = createRule({
     const checkedResourcePaths = new Map<string, Set<string>>();
     const checkedTrackedPaths = new Map<string, Set<string>>();
 
-    function checkProviderPath(target: Operation, path: string, serviceNamespace: string) {
+    function checkProviderPath(
+      target: Operation | Interface,
+      path: string,
+      serviceNamespace: string,
+    ) {
       if (!markPathSeen(checkedProviderPaths, serviceNamespace, path)) return;
 
       const providerNamespaces = Array.from(
@@ -161,7 +166,7 @@ export const resourcePathValidationRule = createRule({
     }
 
     function checkResourcePath(
-      target: Operation,
+      target: Operation | Interface,
       path: string,
       verb: string,
       serviceNamespace: string,
@@ -188,7 +193,7 @@ export const resourcePathValidationRule = createRule({
     }
 
     function checkTrackedResourcePath(
-      target: Operation,
+      target: Operation | Interface,
       path: string,
       verb: string,
       serviceNamespace: string,
@@ -217,7 +222,7 @@ export const resourcePathValidationRule = createRule({
         if (
           isTemplateDeclarationOrInstance(target) ||
           isTemplatedInterfaceOperation(target) ||
-          isInternalTypeSpec(program, target)
+          isInternalTypeSpec(program, target.interface ?? target)
         ) {
           return;
         }
@@ -230,10 +235,14 @@ export const resourcePathValidationRule = createRule({
 
         const [httpOperation] = getHttpOperation(program, target);
         const { path, verb } = httpOperation;
+        // Inherited operations retain library source namespaces, so report on their owning interface.
+        const diagnosticTarget = isInternalTypeSpec(program, target)
+          ? (target.interface ?? target)
+          : target;
 
-        checkProviderPath(target, path, serviceNamespace);
-        checkResourcePath(target, path, verb, serviceNamespace);
-        checkTrackedResourcePath(target, path, verb, serviceNamespace);
+        checkProviderPath(diagnosticTarget, path, serviceNamespace);
+        checkResourcePath(diagnosticTarget, path, verb, serviceNamespace);
+        checkTrackedResourcePath(diagnosticTarget, path, verb, serviceNamespace);
       },
     };
   },

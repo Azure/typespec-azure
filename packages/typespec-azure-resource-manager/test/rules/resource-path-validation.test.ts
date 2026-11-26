@@ -139,6 +139,23 @@ it("matches the last provider segment to the ARM service namespace on every path
     });
 });
 
+it("checks provider casing for operations inherited into service interfaces", async () => {
+  await tester
+    .expect(
+      `
+        @armProviderNamespace
+        namespace Microsoft.DBforPostgreSQL {
+          interface Operations extends Azure.ResourceManager.Legacy.Operations {}
+        }
+      `,
+    )
+    .toEmitDiagnostics(
+      diagnostic(
+        "Provider namespace 'Microsoft.DBforPostgreSQL' in path '/providers/Microsoft.DBforPostgreSQL/operations' must use PascalCase.",
+      ),
+    );
+});
+
 it("requires tracked resource operations to use subscription and resource-group scope", async () => {
   await tester
     .expect(
