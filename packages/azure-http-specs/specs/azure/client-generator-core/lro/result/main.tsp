@@ -91,3 +91,56 @@ op pollClientResultJob(@path id: string, ...global.Azure.Core.Foundations.ApiVer
 op createWithClientLroResult is Operations.LongRunningResourceCreateOrReplace<Job>;
 
 @@clientLroResult(createWithClientLroResult, Job.result);
+
+@route("/default-failure/jobs/{id}")
+@get
+op getDefaultFailureJob(
+  @path id: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): Job;
+
+@route("/default-failure/jobs/{id}/status")
+@get
+op pollDefaultFailureJob(
+  @path id: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): Job;
+
+@scenario
+@scenarioDoc("""
+  Verifies that a resource create-or-replace LRO surfaces an error when polling terminates with `Failed`.
+  PUT /default-failure/jobs/default-failure with api-version=2022-12-01-preview and body {"status": "Running"}.
+  Expect 201 with an Operation-Location pointing to /default-failure/jobs/default-failure/status.
+  Poll until status is Failed: {"id": "default-failure", "status": "Failed"}.
+  """)
+@pollingOperation(pollDefaultFailureJob)
+@route("/default-failure")
+op createDefaultWithFailure is Operations.LongRunningResourceCreateOrReplace<Job>;
+
+@route("/client-result-failure/jobs/{id}")
+@get
+op getClientResultFailureJob(
+  @path id: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): Job;
+
+@route("/client-result-failure/jobs/{id}/status")
+@get
+op pollClientResultFailureJob(
+  @path id: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): Job;
+
+#suppress "@azure-tools/typespec-client-generator-core/use-valid-client-lro-result" "Preserve the return type of an existing GA SDK."
+@scenario
+@scenarioDoc("""
+  Verifies that a `@clientLroResult` LRO surfaces an error when polling terminates with `Failed` and no `result` property is returned.
+  PUT /client-result-failure/jobs/client-result-failure with api-version=2022-12-01-preview and body {"status": "Running"}.
+  Expect 201 with an Operation-Location pointing to /client-result-failure/jobs/client-result-failure/status.
+  Poll until status is Failed: {"id": "client-result-failure", "status": "Failed"}.
+  """)
+@pollingOperation(pollClientResultFailureJob)
+@route("/client-result-failure")
+op createWithClientLroResultWithFailure is Operations.LongRunningResourceCreateOrReplace<Job>;
+
+@@clientLroResult(createWithClientLroResultWithFailure, Job.result);

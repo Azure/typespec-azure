@@ -6,7 +6,11 @@ package azure.clientgenerator.core.lro.result;
 import azure.clientgenerator.core.lro.result.models.Job;
 import azure.clientgenerator.core.lro.result.models.JobResult;
 import azure.clientgenerator.core.lro.result.models.JobStatus;
+import com.azure.core.exception.AzureException;
 import com.azure.core.util.polling.AsyncPollResponse;
+import com.azure.core.util.polling.LongRunningOperationStatus;
+import com.azure.core.util.polling.PollResponse;
+import com.azure.core.util.polling.SyncPoller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -50,5 +54,51 @@ public class LroResultTests {
         JobResult result = response.getFinalResult().block();
 
         Assertions.assertEquals("completed", result.getValue());
+    }
+
+    @Test
+    public void defaultResultWithFailure() {
+        SyncPoller<Job, Job> poller
+            = client.beginCreateDefaultWithFailure("default-failure", new Job(JobStatus.RUNNING));
+
+        PollResponse<Job> response = poller.waitForCompletion();
+        Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
+        Assertions.assertEquals("default-failure", response.getValue().getId());
+        Assertions.assertEquals(JobStatus.FAILED, response.getValue().getStatus());
+        Assertions.assertThrows(AzureException.class, poller::getFinalResult);
+    }
+
+    @Test
+    public void clientResultWithFailure() {
+        SyncPoller<Job, JobResult> poller
+            = client.beginCreateWithClientLroResultWithFailure("client-result-failure", new Job(JobStatus.RUNNING));
+
+        PollResponse<Job> response = poller.waitForCompletion();
+        Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
+        Assertions.assertEquals("client-result-failure", response.getValue().getId());
+        Assertions.assertEquals(JobStatus.FAILED, response.getValue().getStatus());
+        Assertions.assertThrows(AzureException.class, poller::getFinalResult);
+    }
+
+    @Test
+    public void defaultResultWithFailureAsync() {
+        AsyncPollResponse<Job, Job> response = asyncClient
+            .beginCreateDefaultWithFailure("default-failure", new Job(JobStatus.RUNNING))
+            .blockLast();
+
+        Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
+        Assertions.assertEquals(JobStatus.FAILED, response.getValue().getStatus());
+        Assertions.assertThrows(AzureException.class, () -> response.getFinalResult().block());
+    }
+
+    @Test
+    public void clientResultWithFailureAsync() {
+        AsyncPollResponse<Job, JobResult> response = asyncClient
+            .beginCreateWithClientLroResultWithFailure("client-result-failure", new Job(JobStatus.RUNNING))
+            .blockLast();
+
+        Assertions.assertEquals(LongRunningOperationStatus.FAILED, response.getStatus());
+        Assertions.assertEquals(JobStatus.FAILED, response.getValue().getStatus());
+        Assertions.assertThrows(AzureException.class, () -> response.getFinalResult().block());
     }
 }

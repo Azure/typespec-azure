@@ -36,4 +36,34 @@ describe("LRO result", () => {
 
     assert.deepEqual(await poller.pollUntilDone(), { value: "completed" });
   });
+
+  it("throws when default LRO fails", async () => {
+    const poller = client.createDefaultWithFailure(
+      "default-failure",
+      { id: "default-failure", status: "Running" },
+      { updateIntervalInMs: 0 },
+    );
+
+    try {
+      await poller.pollUntilDone();
+      assert.fail("Expected polling to fail");
+    } catch (error) {
+      assert.isDefined(error);
+    }
+  });
+
+  it("throws when client LRO result fails", async () => {
+    const poller = client.createWithClientLroResultWithFailure(
+      "client-result-failure",
+      { id: "client-result-failure", status: "Running" },
+      { updateIntervalInMs: 0 },
+    );
+
+    try {
+      await poller.pollUntilDone();
+      assert.fail("Expected polling to fail");
+    } catch (error) {
+      assert.isDefined(error);
+    }
+  });
 });
