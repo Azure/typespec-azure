@@ -1,6 +1,6 @@
 ARM HTTP paths must identify resource types consistently, use valid nested-resource paths, and identify the correct provider. Tracked resources must be routed under a subscription and resource group.
 
-The rule checks GET, PUT, PATCH, and DELETE paths for resource-type and nested-path requirements. It identifies nested resources from the resolved ARM parent relationship (`resource.parent`), then validates that the child path ends with its resource-type/name pair. Tracked resources are identified by resolved ARM resource kind (`Tracked`); their GET and PUT lifecycle paths are checked for subscription and resource-group scope. Provider namespace casing and provider-to-service matching apply to all paths, regardless of HTTP method.
+The rule checks GET, PUT, PATCH, and DELETE paths for resource-type and nested-path requirements. It identifies nested resources from the resolved ARM parent relationship (`resource.parent`), then validates that the child path ends with its resource-type/name pair. For tracked-resource scope, GET and PUT paths are checked when the first successful GET response or PUT request body has a direct or inherited JSON `location` property. Provider namespace casing and provider-to-service matching apply to all paths, regardless of HTTP method.
 
 ## Impact
 
@@ -92,4 +92,4 @@ Provider namespace casing follows the ARM path convention. Every provider segmen
 
 This rule covers [PathContainsResourceType](https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-contains-resource-type.md), [PathForNestedResource](https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-nested-resource.md), [PathForTrackedResourceTypes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-for-tracked-resource-types.md), [PathResourceProviderNamePascalCase](https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-resource-provider-name-pascal-case.md), and [PathResourceProviderMatchNamespace](https://github.com/Azure/azure-openapi-validator/blob/main/docs/path-resource-provider-match-namespace.md).
 
-Tracked resources are identified through TypeSpec ARM resource metadata, rather than inferring tracked status from a `location` property in an HTTP payload. Provider-to-service matching uses the declared ARM namespace rather than a Swagger source-file directory.
+The tracked-resource path check follows Swagger's `location`-property heuristic; it does not require the ARM resource kind to be `Tracked`. Provider-to-service matching uses the declared ARM namespace rather than a Swagger source-file directory.

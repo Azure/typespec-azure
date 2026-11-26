@@ -195,7 +195,7 @@ it("accepts a tracked resource path at resource-group scope", async () => {
     .toBeValid();
 });
 
-it("does not classify a proxy resource as tracked", async () => {
+it("checks a proxy resource with location using the Swagger heuristic", async () => {
   await tester
     .expect(
       service(`
@@ -212,5 +212,96 @@ it("does not classify a proxy resource as tracked", async () => {
         }
       `),
     )
+    .toEmitDiagnostics(
+      diagnostic(
+        "Tracked resources must use paths under /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}.",
+      ),
+    );
+});
+
+it("checks GET responses and PUT bodies with inherited or JSON-named location", async () => {
+  await tester
+    .expect(
+      service(`
+        model Base { location: string; }
+        model Response extends Base {}
+        model Request { @encodedName("application/json", "location") region: string; }
+        @route("/providers/Microsoft.Contoso/widgets/{name}") @get
+        op get(@path name: string): Response;
+        @route("/providers/Microsoft.Contoso/gadgets/{name}") @put
+        op put(@path name: string, @body body: Request): void;
+      `),
+    )
+    .toEmitDiagnostics([
+      diagnostic(
+        "Tracked resources must use paths under /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}.",
+      ),
+      diagnostic(
+        "Tracked resources must use paths under /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}.",
+      ),
+    ]);
+});
+
+it("does not treat non-payload or unsuccessful response location as tracked", async () => {
+  await tester
+    .expect(
+      service(`
+        model Failure { @statusCode statusCode: 400; location: string; }
+        model Success { @statusCode statusCode: 200; name: string; }
+        @route("/providers/Microsoft.Contoso/widgets/{name}") @get
+        op get(@path name: string): Success | Failure;
+        @route("/providers/Microsoft.Contoso/gadgets/{name}") @put
+        op put(@path name: string, @header location: string, @body body: { name: string }): void;
+        @route("/providers/Microsoft.Contoso/other/{name}") @post
+        op action(@path name: string, @body body: { location: string }): { location: string };
+      `),
+    )
     .toBeValid();
+});
+
+it("checks only the first successful GET response, in status-code order", async () => {
+  await tester
+    .expect(
+      service(`
+        model First { @statusCode statusCode: 200; name: string; }
+        model Later { @statusCode statusCode: 201; location: string; }
+        @route("/providers/Microsoft.Contoso/widgets/{name}") @get
+        op get(@path name: string): Later | First;
+      `),
+    )
+    .toBeValid();
+});
+
+it("reports once when GET and PUT on the same path both have location", async () => {
+  await tester
+    .expect(
+      service(`
+        @route("/providers/Microsoft.Contoso/widgets/{name}") @put
+        op put(@path name: string, @body body: { location: string }): void;
+        @route("/providers/Microsoft.Contoso/widgets/{name}") @get
+        op get(@path name: string): { location: string };
+      `),
+    )
+    .toEmitDiagnostics(
+      diagnostic(
+        "Tracked resources must use paths under /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}.",
+      ),
+    );
+});
+
+it("checks a location response at an invalid nested resource-group path", async () => {
+  await tester
+    .expect(
+      service(`
+        @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{name}/parts/action")
+        @get
+        op get(@path subscriptionId: string, @path resourceGroupName: string, @path name: string): { location: string };
+      `),
+    )
+    .toEmitDiagnostics([
+      diagnostic("The path for a nested resource must follow the resource type and name pattern."),
+      diagnostic(
+        "Tracked resources must use paths under /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}.",
+      ),
+    ]);
 });

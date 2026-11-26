@@ -6,9 +6,18 @@ import {
   type Interface,
   type Operation,
 } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
+import {
+  createMetadataInfo,
+  getHttpOperation,
+  resolveRequestVisibility,
+  Visibility,
+  type HttpOperation,
+  type HttpOperationResponse,
+  type HttpPayloadBody,
+} from "@typespec/http";
 import { getArmProviderNamespace } from "../namespace.js";
 import { resolveArmResources, type ResolvedResource } from "../resource.js";
+import { walkJsonProperties } from "./model-utils.js";
 import { isInternalTypeSpec, isTemplatedInterfaceOperation } from "./utils.js";
 
 const resourceTypePattern = /^.*\/providers\/\w+\.\w+\/\w+.*/i;
@@ -80,24 +89,24 @@ function getNestedResourcePathValidity(resources: ResolvedResource[]) {
   return paths;
 }
 
-function getTrackedResourcePathsByNamespace(resources: ResolvedResource[]) {
-  const pathsByNamespace = new Map<string, Set<string>>();
-
-  for (const resource of resources) {
-    if (resource.kind !== "Tracked") continue;
-
-    const paths = getOrCreatePathSet(pathsByNamespace, resource.providerNamespace);
-    for (const operations of Object.values(resource.operations.lifecycle)) {
-      for (const operation of operations ?? []) {
-        const { verb } = operation.httpOperation;
-        if (verb === "get" || verb === "put") {
-          paths.add(operation.path);
-        }
-      }
-    }
-  }
-
-  return pathsByNamespace;
+function firstSuccessfulResponse(responses: HttpOperationResponse[]) {
+  const numeric = responses
+    .filter(
+      (response) =>
+        typeof response.statusCodes === "number" &&
+        response.statusCodes >= 200 &&
+        response.statusCodes < 300,
+    )
+    .sort((a, b) => Number(a.statusCodes) - Number(b.statusCodes));
+  return (
+    numeric[0] ??
+    responses.find(
+      (response) =>
+        typeof response.statusCodes === "object" &&
+        response.statusCodes.start <= 299 &&
+        response.statusCodes.end >= 200,
+    )
+  );
 }
 
 export const resourcePathValidationRule = createRule({
@@ -117,7 +126,7 @@ export const resourcePathValidationRule = createRule({
   },
   create(context) {
     let nestedResourcePaths = new Map<string, boolean>();
-    let trackedPathsByNamespace = new Map<string, Set<string>>();
+    const metadata = createMetadataInfo(context.program);
     const checkedProviderPaths = new Map<string, Set<string>>();
     const checkedResourcePaths = new Map<string, Set<string>>();
     const checkedTrackedPaths = new Map<string, Set<string>>();
@@ -188,28 +197,52 @@ export const resourcePathValidationRule = createRule({
 
     function checkTrackedResourcePath(
       target: Operation | Interface,
-      path: string,
-      verb: string,
+      operation: HttpOperation,
       serviceNamespace: string,
     ) {
-      const trackedPaths = trackedPathsByNamespace.get(serviceNamespace);
+      const { path, verb } = operation;
       if (
         (verb !== "get" && verb !== "put") ||
-        !trackedPaths?.has(path) ||
-        resourceGroupScopePattern.test(path) ||
-        !markPathSeen(checkedTrackedPaths, serviceNamespace, path)
+        (resourceGroupScopePattern.test(path) &&
+          !invalidNestedPatterns.some((pattern) => pattern.test(path)))
       ) {
         return;
       }
 
-      context.reportDiagnostic({ target, messageId: "tracked" });
+      const response = verb === "get" ? firstSuccessfulResponse(operation.responses) : undefined;
+      const body =
+        verb === "put"
+          ? operation.parameters.body
+          : response?.responses.findLast((content) => content.body !== undefined)?.body;
+      const visibility =
+        verb === "put"
+          ? resolveRequestVisibility(context.program, operation.operation, verb)
+          : Visibility.Read;
+      if (
+        hasLocation(body, visibility) &&
+        markPathSeen(checkedTrackedPaths, serviceNamespace, path)
+      ) {
+        context.reportDiagnostic({ target, messageId: "tracked" });
+      }
+    }
+
+    function hasLocation(body: HttpPayloadBody | undefined, visibility: Visibility): boolean {
+      if (body?.bodyKind !== "single" || body.type.kind !== "Model") return false;
+      for (const [name, property] of walkJsonProperties(context.program, body.type)) {
+        if (
+          name === "location" &&
+          metadata.isPayloadProperty(property, visibility, body.isExplicit)
+        ) {
+          return true;
+        }
+      }
+      return false;
     }
 
     return {
       root(program) {
         const resources = resolveArmResources(program).resources ?? [];
         nestedResourcePaths = getNestedResourcePathValidity(resources);
-        trackedPathsByNamespace = getTrackedResourcePathsByNamespace(resources);
       },
       operation(target) {
         const program = context.program;
@@ -236,7 +269,7 @@ export const resourcePathValidationRule = createRule({
 
         checkProviderPath(diagnosticTarget, path, serviceNamespace);
         checkResourcePath(diagnosticTarget, path, verb, serviceNamespace);
-        checkTrackedResourcePath(diagnosticTarget, path, verb, serviceNamespace);
+        checkTrackedResourcePath(diagnosticTarget, httpOperation, serviceNamespace);
       },
     };
   },
