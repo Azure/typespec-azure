@@ -14,7 +14,7 @@ on:
         description: "Runner label (for stable runs prefer self-hosted or larger dedicated runner)"
         required: false
         type: string
-        default: "ubuntu-latest"
+        default: "ubuntu-24.04"
 
 permissions:
   contents: write
@@ -35,8 +35,8 @@ jobs:
       emitter-warmup: 1
       specs: ${{ inputs.specs || '' }}
       noise-cv: 0.1
-      rerun-iterations: 2
-      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
+      rerun-iterations: 10
+      runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-24.04' }}
     permissions:
       contents: write
     secrets: inherit

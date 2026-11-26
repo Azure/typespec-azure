@@ -178,6 +178,7 @@ export async function _updateBarDeserialize(result: PathUncheckedResponse): Prom
   return;
 }
 
+/** Performs the updateBar operation. */
 export async function updateBar(
   context: Client,
   body: PatchBarPropertiesUpdate,
@@ -208,6 +209,7 @@ export async function _updateFooDeserialize(result: PathUncheckedResponse): Prom
   return;
 }
 
+/** Performs the updateFoo operation. */
 export async function updateFoo(
   context: Client,
   body: PatchFooPropertiesUpdate,
@@ -360,6 +362,7 @@ export async function _createBatchDeserialize(result: PathUncheckedResponse): Pr
   return batchDeserializer(result.body);
 }
 
+/** Performs the createBatch operation. */
 export async function createBatch(
   context: Client,
   body: BatchCreate,
@@ -569,6 +572,7 @@ export async function _createContainerDeserialize(
   return containerDeserializer(result.body);
 }
 
+/** Performs the createContainer operation. */
 export async function createContainer(
   context: Client,
   body: ContainerCreate,
@@ -699,6 +703,7 @@ export async function _createItemMapDeserialize(result: PathUncheckedResponse): 
   return;
 }
 
+/** Performs the createItemMap operation. */
 export async function createItemMap(
   context: Client,
   body: Record<string, ItemCreate>,
@@ -729,6 +734,7 @@ export async function _createNullableItemDeserialize(result: PathUncheckedRespon
   return;
 }
 
+/** Performs the createNullableItem operation. */
 export async function createNullableItem(
   context: Client,
   body: ItemCreate | null,
@@ -759,6 +765,7 @@ export async function _createItemsDeserialize(result: PathUncheckedResponse): Pr
   return;
 }
 
+/** Performs the createItems operation. */
 export async function createItems(
   context: Client,
   body: ItemCreate[],
@@ -926,6 +933,7 @@ export async function _createContainerDeserialize(
   return containerDeserializer(result.body);
 }
 
+/** Performs the createContainer operation. */
 export async function createContainer(
   context: Client,
   title: string,
@@ -959,6 +967,7 @@ export async function _createWidgetDeserialize(result: PathUncheckedResponse): P
   return widgetDeserializer(result.body);
 }
 
+/** Performs the createWidget operation. */
 export async function createWidget(
   context: Client,
   displayName: string,
@@ -1076,6 +1085,7 @@ export async function _createNodeDeserialize(result: PathUncheckedResponse): Pro
   return nodeDeserializer(result.body);
 }
 
+/** Performs the createNode operation. */
 export async function createNode(
   context: Client,
   body: NodeCreate,
@@ -1217,6 +1227,7 @@ export async function _createItemsDeserialize(result: PathUncheckedResponse): Pr
   return itemMapDeserializer(result.body);
 }
 
+/** Performs the createItems operation. */
 export async function createItems(
   context: Client,
   body: ItemMapCreate,

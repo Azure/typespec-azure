@@ -220,20 +220,24 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for Testing. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the useDate operation. */
   useDate(body: Date, options: UseDateOptionalParams = { requestOptions: {} }): Promise<Date> {
     return useDate(this._client, body, options);
   }
 
+  /** Performs the nestedOperation operation. */
   nestedOperation(
     body: {
       "stop-parameters": StopParameters;
@@ -243,6 +247,7 @@ export class TestingClient {
     return nestedOperation(this._client, body, options);
   }
 
+  /** Performs the my_operation operation. */
   my_operation(
     my_parameter: string,
     endpoint: string,
@@ -314,6 +319,7 @@ export async function _$classDeserialize(result: PathUncheckedResponse): Promise
   return;
 }
 
+/** Performs the class operation. */
 export async function $class(
   context: Client,
   options: classOptionalParams = { requestOptions: {} },
@@ -338,6 +344,7 @@ export async function _my_operationDeserialize(result: PathUncheckedResponse): P
   return;
 }
 
+/** Performs the my_operation operation. */
 export async function my_operation(
   context: Client,
   options: my_operationOptionalParams = { requestOptions: {} },
@@ -355,11 +362,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for Testing. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -374,7 +383,9 @@ export class TestingClient {
 ```ts classicOperations interface my_groupOperations
 /** Interface representing a my_group operations. */
 export interface my_groupOperations {
+  /** Performs the class operation. */
   class: (options?: my_groupclassOptionalParams) => Promise<void>;
+  /** Performs the my_operation operation. */
   my_operation: (options?: my_operationOptionalParams) => Promise<void>;
 }
 ```
@@ -421,11 +432,13 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { TestingClientOptionalParams } from "./api/testingContext.js";
 
+/** Client for Testing. */
 export class TestingClient {
   private _client: TestingContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of TestingClient. */
   constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
     this._client = createTesting(endpointParam, options);
     this.pipeline = this._client.pipeline;
@@ -465,16 +478,19 @@ import { Pipeline } from "@azure/core-rest-pipeline";
 
 export type { my_clientOptionalParams } from "./api/myClientContext.js";
 
+/** Client for my_client. */
 export class my_client {
   private _client: my_clientContext;
   /** The pipeline used by this client to make requests */
   public readonly pipeline: Pipeline;
 
+  /** Creates an instance of my_client. */
   constructor(endpointParam: string, options: my_clientOptionalParams = {}) {
     this._client = createmy_client(endpointParam, options);
     this.pipeline = this._client.pipeline;
   }
 
+  /** Performs the test operation. */
   test(options: TestOptionalParams = { requestOptions: {} }): Promise<void> {
     return test(this._client, options);
   }

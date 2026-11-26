@@ -19,7 +19,11 @@ wrap-non-model-return: true
 ## Models
 
 ```ts models alias GetResponse
-export type GetResponse = { body: string };
+/** The response for the get operation. */
+export type GetResponse = {
+  /** The response body. */
+  body: string;
+};
 ```
 
 ## Operations
@@ -53,6 +57,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<Ge
 
   return { body: result.body };
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -79,7 +85,11 @@ wrap-non-model-return: true
 ## Models
 
 ```ts models alias ListDomainsResponse
-export type ListDomainsResponse = { body: string[] };
+/** The response for the listDomains operation. */
+export type ListDomainsResponse = {
+  /** The response body. */
+  body: string[];
+};
 ```
 
 ## Operations
@@ -119,6 +129,8 @@ export async function _listDomainsDeserialize(
     }),
   };
 }
+
+/** Performs the listDomains operation. */
 export async function listDomains(
   context: Client,
   options: ListDomainsOptionalParams = { requestOptions: {} },
@@ -148,6 +160,7 @@ wrap-non-model-return: true
 ## Models
 
 ```ts models alias GetLogsResponse
+/** The response for the getLogs operation. */
 export type GetLogsResponse = {
   /**
    * BROWSER ONLY
@@ -200,6 +213,8 @@ export async function _getLogsDeserialize(
 
   return { blobBody: result.blobBody, readableStreamBody: result.readableStreamBody };
 }
+
+/** Performs the getLogs operation. */
 export async function getLogs(
   context: Client,
   options: GetLogsOptionalParams = { requestOptions: {} },
@@ -258,6 +273,8 @@ export async function _getDeserialize(result: PathUncheckedResponse): Promise<st
 
   return result.body;
 }
+
+/** Performs the get operation. */
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
@@ -320,6 +337,8 @@ export async function _listDeserialize(result: PathUncheckedResponse): Promise<R
 
   return resourceArrayDeserializer(result.body);
 }
+
+/** Performs the list operation. */
 export async function list(
   context: Client,
   options: ListOptionalParams = { requestOptions: {} },
@@ -380,6 +399,8 @@ export async function _getModelDeserialize(result: PathUncheckedResponse): Promi
 
   return myModelDeserializer(result.body);
 }
+
+/** Performs the getModel operation. */
 export async function getModel(
   context: Client,
   options: GetModelOptionalParams = { requestOptions: {} },
@@ -887,7 +908,11 @@ withRawContent: true
 ## Models
 
 ```ts models alias GetIkeSasResponse
-export type GetIkeSasResponse = { body: string };
+/** The response for the getIkeSas operation. */
+export type GetIkeSasResponse = {
+  /** The response body. */
+  body: string;
+};
 ```
 
 ## Operations
@@ -980,6 +1005,8 @@ export async function _headResourceDeserialize(result: PathUncheckedResponse): P
 
   return;
 }
+
+/** Performs the headResource operation. */
 export async function headResource(
   context: Client,
   resourceName: string,
@@ -1042,6 +1069,8 @@ export async function _headResourceDeserialize(result: PathUncheckedResponse): P
 
   return;
 }
+
+/** Performs the headResource operation. */
 export async function headResource(
   context: Client,
   resourceName: string,
