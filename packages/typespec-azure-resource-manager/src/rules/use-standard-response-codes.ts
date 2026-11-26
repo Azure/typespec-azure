@@ -4,13 +4,36 @@ import {
   getService,
   isTemplateDeclarationOrInstance,
   paramMessage,
+  type Operation,
+  type Program,
 } from "@typespec/compiler";
-import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
-import { isStatusCodeAllowed, matchesStatusCode } from "./http-response-utils.js";
+import {
+  getHttpOperation,
+  type HttpOperation,
+  type HttpOperationResponse,
+  type HttpStatusCodeRange,
+} from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
-const allowedStatusCodes = new Set<number | "*">([200, 201, 202, 204, "*"]);
-const allowedGetStatusCodes = new Set<number | "*">([200, 202, "*"]);
+interface ResponsePolicy {
+  readonly messageId: "get";
+  /** Matches any alternative, requiring every `required` code and allowing only `required` and `optional` codes. */
+  readonly allowed: readonly {
+    readonly required: readonly number[];
+    readonly optional?: readonly number[];
+  }[];
+  /** Whether a declared response with the given code must (`true`) or must not (`false`) have a body. */
+  readonly body?: Readonly<Partial<Record<number, boolean>>>;
+}
+
+const servicePolicies: Partial<Record<HttpOperation["verb"], ResponsePolicy>> = {
+  get: {
+    messageId: "get",
+    allowed: [{ required: [200], optional: [202] }],
+  },
+};
+
+const allowedStatusCodes = new Set([200, 201, 202, 204]);
 
 export const useStandardResponseCodesRule = createRule({
   name: "use-standard-response-codes",
@@ -35,28 +58,24 @@ export const useStandardResponseCodesRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        let namespace = operation.namespace;
-        while (namespace && !getService(context.program, namespace)) {
-          namespace = namespace.namespace;
-        }
-        if (httpOperation.verb === "get" && namespace) {
-          const has200 = httpOperation.responses.some(({ statusCodes }) =>
-            matchesStatusCode(statusCodes, 200),
-          );
-          const hasOnlyAllowedCodes = httpOperation.responses.every(({ statusCodes }) =>
-            isStatusCodeAllowed(statusCodes, allowedGetStatusCodes),
-          );
-          if (!has200 || !hasOnlyAllowedCodes) {
+        const policy = getResponsePolicy(context.program, operation, httpOperation);
+        if (policy) {
+          if (!matchesPolicy(httpOperation.responses, policy)) {
             context.reportDiagnostic({
               target: operation,
-              messageId: httpOperation.responses.length === 0 ? "emptyGet" : "get",
+              messageId:
+                policy === servicePolicies.get && httpOperation.responses.length === 0
+                  ? "emptyGet"
+                  : policy.messageId,
             });
           }
           return;
         }
 
         for (const response of httpOperation.responses) {
-          if (!isStatusCodeAllowed(response.statusCodes, allowedStatusCodes)) {
+          if (response.statusCodes === "*") continue;
+          const code = getStatusCode(response.statusCodes);
+          if (code === undefined || !allowedStatusCodes.has(code)) {
             context.reportDiagnostic({
               target: operation,
               format: {
@@ -71,10 +90,49 @@ export const useStandardResponseCodesRule = createRule({
   },
 });
 
-function formatStatusCode(statusCode: number | "*" | HttpStatusCodeRange): string {
-  if (statusCode === "*") {
-    return "default";
+function getResponsePolicy(
+  program: Program,
+  operation: Operation,
+  httpOperation: HttpOperation,
+): ResponsePolicy | undefined {
+  for (let ns = operation.namespace; ns; ns = ns.namespace) {
+    if (getService(program, ns)) return servicePolicies[httpOperation.verb];
   }
+  return undefined;
+}
+
+function matchesPolicy(
+  responses: readonly HttpOperationResponse[],
+  policy: ResponsePolicy,
+): boolean {
+  const codes = new Set<number>();
+  for (const response of responses) {
+    if (response.statusCodes === "*") continue;
+    const code = getStatusCode(response.statusCodes);
+    if (code === undefined) return false;
+    codes.add(code);
+    const bodyRequired = policy.body?.[code];
+    if (
+      bodyRequired !== undefined &&
+      response.responses.some((r) => r.body !== undefined) !== bodyRequired
+    ) {
+      return false;
+    }
+  }
+  return policy.allowed.some(
+    ({ required, optional = [] }) =>
+      required.every((code) => codes.has(code)) &&
+      [...codes].every((code) => required.includes(code) || optional.includes(code)),
+  );
+}
+
+/** Returns the single status code, or `undefined` for a range that covers several codes. */
+function getStatusCode(statusCode: number | HttpStatusCodeRange): number | undefined {
+  if (typeof statusCode === "number") return statusCode;
+  return statusCode.start === statusCode.end ? statusCode.start : undefined;
+}
+
+function formatStatusCode(statusCode: number | HttpStatusCodeRange): string {
   if (typeof statusCode === "number") {
     return String(statusCode);
   }
