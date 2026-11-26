@@ -1371,6 +1371,15 @@ Expect 201 with an Operation-Location pointing to /default/jobs/default/status.
 Poll until status is Succeeded, then GET /default/jobs/default with the same api-version.
 Expect the complete Job: {"id": "default", "status": "Succeeded", "result": {"value": "completed"}}.
 
+### Azure_ClientGenerator_Core_Lro_Result_createDefaultWithFailure
+
+- Endpoint: `get /azure/client-generator-core/lro/result/default-failure`
+
+Verifies that a resource create-or-replace LRO surfaces an error when polling terminates with `Failed`.
+PUT /default-failure/jobs/default-failure with api-version=2022-12-01-preview and body {"status": "Running"}.
+Expect 201 with an Operation-Location pointing to /default-failure/jobs/default-failure/status.
+Poll until status is Failed: {"id": "default-failure", "status": "Failed"}.
+
 ### Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResult
 
 - Endpoint: `get /azure/client-generator-core/lro/result/client-result`
@@ -1380,6 +1389,15 @@ PUT /client-result/jobs/client-result with api-version=2022-12-01-preview and bo
 Expect 201 with an Operation-Location pointing to /client-result/jobs/client-result/status.
 Poll until status is Succeeded, then GET /client-result/jobs/client-result with the same api-version.
 Expect the selected JobResult: {"value": "completed"}, not the enclosing Job.
+
+### Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResultWithFailure
+
+- Endpoint: `get /azure/client-generator-core/lro/result/client-result-failure`
+
+Verifies that a `@clientLroResult` LRO surfaces an error when polling terminates with `Failed` and no `result` property is returned.
+PUT /client-result-failure/jobs/client-result-failure with api-version=2022-12-01-preview and body {"status": "Running"}.
+Expect 201 with an Operation-Location pointing to /client-result-failure/jobs/client-result-failure/status.
+Poll until status is Failed: {"id": "client-result-failure", "status": "Failed"}.
 
 ### Azure_ClientGenerator_Core_NextLinkVerb_listItems
 
