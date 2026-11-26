@@ -160,6 +160,17 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("keeps shared ARM standard-error response guidance opt-in", () => {
+    const name = "missing-error-response";
+    strictEqual(ResourceManagerLinter.rules.filter((rule) => rule.name === name).length, 1);
+    strictEqual(
+      $linter.ruleSets?.["resource-manager"].enable?.[
+        `@azure-tools/typespec-azure-resource-manager/${name}`
+      ],
+      false,
+    );
+  });
+
   it.each(["no-query-in-post", "use-model-request-body"])(
     "enables rolled-out ARM rule %s by default",
     (name) => {
