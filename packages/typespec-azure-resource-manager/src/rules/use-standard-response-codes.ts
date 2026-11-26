@@ -22,8 +22,6 @@ interface ResponsePolicy {
     readonly required: readonly number[];
     readonly optional?: readonly number[];
   }[];
-  /** Whether a declared response with the given code must (`true`) or must not (`false`) have a body. */
-  readonly body?: Readonly<Partial<Record<number, boolean>>>;
 }
 
 const servicePolicies: Partial<Record<HttpOperation["verb"], ResponsePolicy>> = {
@@ -95,8 +93,10 @@ function getResponsePolicy(
   operation: Operation,
   httpOperation: HttpOperation,
 ): ResponsePolicy | undefined {
+  const policy = servicePolicies[httpOperation.verb];
+  if (!policy) return undefined;
   for (let ns = operation.namespace; ns; ns = ns.namespace) {
-    if (getService(program, ns)) return servicePolicies[httpOperation.verb];
+    if (getService(program, ns)) return policy;
   }
   return undefined;
 }
@@ -111,13 +111,6 @@ function matchesPolicy(
     const code = getStatusCode(response.statusCodes);
     if (code === undefined) return false;
     codes.add(code);
-    const bodyRequired = policy.body?.[code];
-    if (
-      bodyRequired !== undefined &&
-      response.responses.some((r) => r.body !== undefined) !== bodyRequired
-    ) {
-      return false;
-    }
   }
   return policy.allowed.some(
     ({ required, optional = [] }) =>
