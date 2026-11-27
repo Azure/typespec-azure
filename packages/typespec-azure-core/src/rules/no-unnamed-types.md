@@ -1,5 +1,9 @@
 Azure services should not define anonymous models, union expressions, enum expressions, or scalar expressions inline. Instead, types must be defined as named declarations.
 
+Model response payloads must have a concrete model declaration or, for generic model instances, an explicit `@friendlyName`. A template declaration's name alone does not name its concrete instances. An alias does not introduce a model declaration, although an alias to an already named payload remains valid.
+
+Named generic response models declared by `@azure-tools/typespec-azure-core` or `@azure-tools/typespec-azure-resource-manager` are also accepted. These libraries provide reusable standard response models, including operation-status payloads. This exception is based on the declaring package recorded by the compiler, not the model's namespace or display name. Project-authored generic models, including models derived from standard models or placed in an Azure namespace, still require a concrete declaration or explicit nonempty `@friendlyName`.
+
 ## Impact
 
 - **Area:** SDK, API
@@ -16,7 +20,9 @@ Many target languages cannot represent inline union types or anonymous models di
 
 ## Examples
 
-#### ❌ Incorrect
+### ❌ Incorrect
+
+#### Property types
 
 Using inline union expressions:
 
@@ -36,6 +42,8 @@ model Outer {
 }
 ```
 
+#### Request bodies
+
 Using an anonymous request body as a template argument:
 
 ```tsp
@@ -45,7 +53,38 @@ op send is Send<{
 }>;
 ```
 
-#### ✅ Correct
+#### Response bodies
+
+The rule also checks anonymous implicit model response bodies, such as `@get op read(): { value: string };`. Generic payloads without a friendly name, including `Record<string>`, are checked in both implicit and explicit response bodies.
+
+Adding a payload property outside a named model creates an anonymous response shape. These excerpts assume an ARM provider context with `Widget` already declared and the HTTP and ARM namespaces in scope:
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<
+    Widget,
+    Response = {
+      @statusCode status: 200;
+      ...Widget;
+      etag: string;
+    }
+  >;
+}
+```
+
+A generic HTTP envelope does not name its payload. The following customization still returns an unnamed dictionary:
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  getSettings is ArmResourceRead<Widget, Response = ArmResponse<Record<string>>>;
+}
+```
+
+### ✅ Correct
+
+#### Property types
 
 Define unions as named types:
 
@@ -73,6 +112,8 @@ model Outer {
 }
 ```
 
+#### Request bodies
+
 Define a named request model before passing it to an operation template:
 
 ```tsp
@@ -83,6 +124,40 @@ model Request {
 @post op Send<T>(@body body: T): void;
 op send is Send<Request>;
 ```
+
+#### Response bodies
+
+Declare the customized payload as a named model:
+
+```tsp
+model WidgetResponse extends Widget {
+  etag: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<
+    Widget,
+    Response = {
+      @statusCode status: 200;
+      ...WidgetResponse;
+    }
+  >;
+}
+```
+
+For dictionaries, declare the concrete model rather than an alias:
+
+```tsp
+model Settings is Record<string>;
+
+@armResourceOperations
+interface Widgets {
+  getSettings is ArmResourceRead<Widget, Response = ArmResponse<Settings>>;
+}
+```
+
+Generic payloads with an explicit, nonempty `@friendlyName` are also accepted. This includes standard Core `Page<Widget>` and ARM `ResourceListResult<Widget>` payloads. HTTP envelopes such as `ArmResponse<Widget>` are checked through their actual payload (`Widget`), not through the envelope's template name.
 
 :::note
 Enums are also discouraged, see [no-enum rule](./no-enum.md) for more details.
@@ -95,15 +170,13 @@ The following patterns are **not** flagged:
 - Nullable unions (e.g. `MyModel | null`)
 - Status code unions (e.g. `@statusCode _: 200 | 400`)
 - Content-type header unions (e.g. `@header contentType: "application/json" | "text/plain"`)
-- HTTP response envelope models (containing `@statusCode`, `@body`, `@header`, etc.)
-- Anonymous models used as template arguments outside request bodies, such as OAuth2 flow configuration
-- Types defined inside standard library namespaces (`TypeSpec.*`, `Azure.*`)
+- HTTP response metadata and envelopes themselves; their actual payloads are still checked
+- Named generic response models declared by the Azure Core and Azure Resource Manager libraries; aliases to those models remain accepted
+- Anonymous models used as template arguments outside actual request or response bodies, such as OAuth2 flow configuration
+- Library declarations themselves; project operations using library response templates are still checked
 - Unions where all non-null variants are scalars (e.g. `string | int32`)
 
-The template-argument exception does not apply to nonempty anonymous models used as
-the actual request body through `@body` or `@bodyRoot`, including ARM action templates.
-This includes unnamed models composed with intersections or model spreads; define a
-named model for the composed request body.
+The template-argument exception does not apply to nonempty anonymous models used as the actual request body through `@body` or `@bodyRoot`, including ARM action templates. This includes unnamed models composed with intersections or model spreads; define a named model for the composed request body. The new response naming requirements do not change the existing request-body or nested-property policy for generic model instances.
 
 ## Suppression
 
@@ -113,6 +186,8 @@ Suppress only when required to match an existing API; otherwise define the type 
 
 The request-body check partially covers
 [AvoidAnonymousParameter](https://github.com/Azure/azure-openapi-validator/blob/main/docs/anonymous-body-parameter.md).
-This rule checks native TypeSpec names, not emitted schema names. Named dictionary
-types such as `Record<string>` remain valid even when an emitter inlines their schemas
-and the Swagger validator reports them.
+This request-body check uses native TypeSpec names, not emitted schema names. Generic dictionaries such as `Record<string>` remain valid in request bodies, even when an emitter inlines their schemas and the Swagger validator reports them.
+
+The response check partially covers
+[AvoidAnonymousTypes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/avoid-anonymous-types.md).
+It checks native payload declarations and explicit generic friendly names, not emitted Swagger schemas. Direct response dictionaries without a concrete declaration or friendly name are reported. Nested dictionaries and dictionary-valued properties are not newly checked; concrete named models and friendly-named generic instances can still differ from the Swagger validator's structural checks. Swagger schema overrides are not inspected.
