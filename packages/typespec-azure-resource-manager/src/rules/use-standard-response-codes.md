@@ -6,6 +6,11 @@ status codes. Other successful statuses and redirects are also outside the
 allowed sets. A singleton status range is equivalent to its literal status;
 broader ranges are not substitutes for the permitted exact codes.
 
+For PATCH operations in an ARM provider, synchronous operations must use `200`
+and no other numeric status codes. Long-running PATCH operations must use `200`
+and `202` and no other numeric status codes, and the `202` response must not
+have a body.
+
 This rule checks concrete HTTP endpoints across all HTTP methods, including
 operations in nested namespaces and inherited interfaces. An invalid GET inside
 a service produces one warning on the operation, even if multiple statuses are
@@ -23,8 +28,7 @@ the GET-specific requirement for `200`. The combined rule is registered as
 disabled in the Azure resource manager ruleset.
 
 A GET with only `200` is valid. A `202` response is allowed in addition to `200`
-without this rule requiring a `Location` header. Default-error-response and
-`Location`-header requirements are checked by their own rules.
+without requiring a `Location` header.
 
 ## Impact
 
@@ -47,12 +51,32 @@ interface Widgets {
 }
 ```
 
+### PATCH with a nonstandard response
+
+Assume `Widget` is an ARM resource and `WidgetPatch` is its patch model.
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchSync<Widget, Response = ArmNoContentResponse>;
+}
+```
+
 ## ✅ Correct
 
 ```tsp
 @armResourceOperations
 interface Widgets {
   read is ArmResourceRead<Widget>;
+}
+```
+
+### PATCH with the standard response
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchSync<Widget, WidgetPatch>;
 }
 ```
 
@@ -70,6 +94,8 @@ to the concrete operation, not its reusable template.
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | [NoErrorCodeResponses](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/no-error-code-responses.ts) | General allowlist of `200`, `201`, `202`, `204`, and `default` across HTTP methods, including operations outside services.         |
 | [GetResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/get-response-codes.md)                                              | GET operations inside services must include `200` and use only `200`, `202`, or `default`, with one warning per invalid operation. |
+| [PatchResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-response-codes.md)                                          | Numeric response codes for synchronous and long-running ARM PATCH, and no body on a long-running `202`.                            |
+| [LroPatch202](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-patch202.md)                                                         | A long-running ARM PATCH must include `202`.                                                                                       |
 
 The rule checks native HTTP endpoints without reproducing SDK-scoped emission
 or the general validator's omission of `x-ms-paths` responses. The temporary

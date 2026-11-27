@@ -461,6 +461,17 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
   });
 
+  it("does not count a default response as the required 200", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Microsoft.Contoso;
+        @get op read(): ErrorResponse;
+      `,
+      )
+      .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
+  });
+
   it.each(["@statusCode @minValue(200) @maxValue(200) code: int32;", "@statusCode code: 200;"])(
     "accepts equivalent literal and singleton 200 responses: %s",
     async (status) => {
@@ -488,5 +499,187 @@ describe("ARM GET response codes", () => {
       `,
       )
       .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
+  });
+});
+
+describe("ARM PATCH response codes", () => {
+  const code = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
+  const syncMessage =
+    "Synchronous PATCH operations must use 200 and no other numeric response codes.";
+  const lroMessage =
+    "Long-running PATCH operations must use 200 and 202 and no other numeric response codes.";
+  const bodyMessage = "The 202 response of a long-running PATCH operation must not have a body.";
+
+  function patchFixture(operations: string, declarations = ""): string {
+    return `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+      model Ok { @statusCode code: 200; @body value: string; }
+      model Status {
+        @Azure.Core.lroStatus status: "Succeeded" | "Failed" | "Canceled" | "Running";
+      }
+      model Started {
+        @statusCode code: 200;
+        @Azure.Core.pollingLocation @header("Operation-Location")
+        location: ResourceLocation<Status>;
+        @body value: string;
+      }
+      model AcceptedLro {
+        @statusCode code: 202;
+        @Azure.Core.pollingLocation @header("Operation-Location")
+        location: ResourceLocation<Status>;
+      }
+      model Accepted { @statusCode code: 202; @header location?: string; }
+      ${declarations}
+      ${operations}
+    `;
+  }
+
+  function patch(name: string, returnType: string): string {
+    return `@route("/${name}") @patch op ${name}(): ${returnType};`;
+  }
+
+  it("reports an empty response set", async () => {
+    await tester
+      .expect(patchFixture(patch("empty", "Empty"), "union Empty {}"))
+      .toEmitDiagnostics({ code, message: "PATCH operations must have at least one response." });
+  });
+
+  it("checks only the numeric response sets for sync and LRO PATCH", async () => {
+    await tester
+      .expect(
+        patchFixture(
+          [
+            patch("syncWithDefault", "Ok | ErrorResponse"),
+            patch("syncWithoutDefault", "Ok"),
+            patch("lroWithDefault", "Started | Accepted | ErrorResponse"),
+            patch("lroWithoutDefault", "Started | Accepted"),
+          ].join("\n"),
+        ),
+      )
+      .toBeValid();
+  });
+
+  it("rejects missing and extra numeric codes for sync and LRO PATCH", async () => {
+    await tester
+      .expect(
+        patchFixture(
+          [
+            patch("syncMissing200", "ErrorResponse"),
+            patch("syncExtra", "Ok | ArmNoContentResponse | ErrorResponse"),
+            patch("syncUnexpected202", "Ok | Accepted | ErrorResponse"),
+            patch("lroMissing202", "Started | ErrorResponse"),
+            patch("lroMissing200", "AcceptedLro | ErrorResponse"),
+            patch("lroExtra", "Started | Accepted | ArmNoContentResponse | ErrorResponse"),
+          ].join("\n"),
+        ),
+      )
+      .toEmitDiagnostics([
+        { code, message: syncMessage },
+        { code, message: syncMessage },
+        { code, message: syncMessage },
+        { code, message: lroMessage },
+        { code, message: lroMessage },
+        { code, message: lroMessage },
+      ]);
+  });
+
+  it("reports invalid response codes and a body on any 202 variant", async () => {
+    await tester
+      .expect(
+        patchFixture(
+          patch(
+            "bodyVariants",
+            "Started | Accepted | AcceptedWithBodyRange | Both | ArmNoContentResponse | ErrorResponse",
+          ),
+          `model AcceptedWithBodyRange {
+             @statusCode @minValue(202) @maxValue(202) code: int32;
+             @body value: string;
+           }
+           model Both {
+        @statusCode code: 200 | 202;
+        @Azure.Core.pollingLocation @header("Operation-Location")
+        location: ResourceLocation<Status>;
+        @body value: string;
+      }`,
+        ),
+      )
+      .toEmitDiagnostics([
+        { code, message: lroMessage },
+        { code, message: bodyMessage },
+      ]);
+  });
+
+  it("limits PATCH checks to ARM providers and retains the general allowlist elsewhere", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace namespace Microsoft.Contoso {
+          namespace Nested {
+            @route("/nested") @patch op nested(): { @statusCode code: 204; };
+          }
+        }
+        @service namespace Contoso {
+          @route("/allowed") @patch op allowed(): { @statusCode code: 204; };
+          @route("/rejected") @patch op rejected(): { @statusCode code: 404; };
+        }
+      `,
+      )
+      .toEmitDiagnostics([{ code, message: syncMessage }, diagnostic("rejected", 404)]);
+  });
+
+  it("checks an overload that inherits its PATCH method", async () => {
+    await tester
+      .expect(
+        patchFixture(
+          `
+        model NoContent { @statusCode code: 204; }
+        @route("/widgets") @patch
+        op original(@body input: string | int32): Ok | ErrorResponse;
+        @overload(original)
+        op /*specialized*/specialized(@body input: string): Ok | NoContent;
+      `,
+        ),
+      )
+      .toEmitDiagnostics(({ specialized }) => {
+        const { pos, end } = getSourceLocation(specialized);
+        return { code, message: syncMessage, pos, end };
+      });
+  });
+
+  it.each(["ArmCustomPatchSync", "ArmCustomPatchAsync"])(
+    "accepts the standard %s template",
+    async (template) => {
+      await tester
+        .expect(
+          `
+          ${resource}
+          @armResourceOperations interface Widgets {
+            update is ${template}<Widget>;
+          }
+        `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each([
+    ["synchronous", "ArmCustomPatchSync<Widget, Response = ArmNoContentResponse>", syncMessage],
+    [
+      "long-running",
+      'ArmCustomPatchAsync<Widget, Response = ArmAcceptedLroResponse<"Accepted", ArmLroLocationHeader<FinalResult = Widget>>>',
+      lroMessage,
+    ],
+  ])("rejects a customized %s PATCH template response", async (_, operation, message) => {
+    await tester
+      .expect(
+        `
+        ${resource}
+        @armResourceOperations interface Widgets {
+          update is ${operation};
+        }
+      `,
+      )
+      .toEmitDiagnostics({ code, message });
   });
 });
