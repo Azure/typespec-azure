@@ -1,45 +1,136 @@
 import {
-  type DiagnosticMessages,
-  type LinterRuleContext,
-  type Model,
-  type Operation,
   createRule,
   fileRef,
+  getDiscriminator,
   getEffectiveModelType,
-  isErrorType,
-  isType,
+  getLocationContext,
+  getProperty,
+  getTypeName,
+  isArrayModelType,
+  isVoidType,
+  paramMessage,
+  type Model,
+  type Operation,
+  type Program,
+  type Type,
 } from "@typespec/compiler";
+import { createMetadataInfo, resolveRequestVisibility, type HttpOperation } from "@typespec/http";
 
-import { type ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
-import { getArmResource } from "../resource.js";
+import { getArmProviderNamespace } from "../namespace.js";
+import type { ArmResourceOperation } from "../operations.js";
+import { isAzureResource } from "../private.decorators.js";
+import { isArmVirtualResource, isCustomAzureResource, resolveArmResources } from "../resource.js";
+import { containsStatusCode } from "./http-response-utils.js";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const armResourceOperationsRule = createRule({
   name: "arm-resource-operation-response",
   docs: fileRef.fromPackageRoot("src/rules/arm-resource-operation-response.md"),
   severity: "warning",
-  description: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+  description:
+    "[RPC 008]: Resource operations must use consistent resource schemas, and ARM PUT success responses must return a resource model.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-response",
   messages: {
     default: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    missingRequest: "ARM PUT operations must have a request body.",
+    requestMismatch: paramMessage`PUT request body must use resource model ${"resource"}. Found ${"request"}.`,
+    nonResourceResponse: "ARM PUT success responses must return a resource model.",
   },
   create(context) {
+    const metadata = createMetadataInfo(context.program);
     return {
-      model: (model: Model) => {
-        if (!isInternalTypeSpec(context.program, model)) {
-          const armResource = getArmResource(context.program, model);
-          if (armResource) {
-            const resourceOperations = resolveResourceOperations(context.program, model);
-            const kinds: ArmLifecycleOperationKind[] = ["read", "createOrUpdate", "update"];
-            kinds
-              .map((k) => resourceOperations.lifecycle[k])
-              .forEach(
-                (op) => op && checkArmResourceOperationReturnType(context, model, op.operation),
-              );
-            const lists = resourceOperations.lists;
-            for (const key in lists) {
-              checkArmResourceOperationReturnType(context, model, lists[key].operation);
+      exitNamespace(namespace) {
+        if (namespace !== context.program.getGlobalNamespaceType()) return;
+        const program = context.program;
+        const provider = resolveArmResources(program);
+        const resources = provider.resources ?? [];
+        const resourceModels = new Set(resources.map((resource) => resource.type));
+        const responseFailures = new Set<Operation>();
+        const checkedRequests = new Map<Operation, Set<Model>>();
+        for (const resource of resources) {
+          const model = resource.type;
+          if (isInternalTypeSpec(program, model)) continue;
+          const operations = [
+            ...(resource.operations.lifecycle.read ?? []),
+            ...(resource.operations.lifecycle.createOrUpdate ?? []),
+            ...(resource.operations.lifecycle.update ?? []),
+            ...resource.operations.lists,
+          ];
+          for (const { kind, operation, httpOperation } of operations) {
+            if (isInternalTypeSpec(program, operation)) continue;
+            if (kind === "createOrUpdate" && httpOperation.verb === "put") {
+              const models = checkedRequests.get(operation) ?? new Set<Model>();
+              checkedRequests.set(operation, models);
+              if (!models.has(model)) {
+                models.add(model);
+                const body = httpOperation.parameters.body;
+                if (body === undefined || isVoidType(body.type)) {
+                  context.reportDiagnostic({ target: operation, messageId: "missingRequest" });
+                } else if (body.bodyKind === "single") {
+                  const request = metadata.getEffectivePayloadType(
+                    body.type,
+                    resolveRequestVisibility(program, operation, httpOperation.verb),
+                  );
+                  if (request !== model) {
+                    context.reportDiagnostic({
+                      target: operation,
+                      messageId: "requestMismatch",
+                      format: { resource: getTypeName(model), request: getTypeName(request) },
+                    });
+                  }
+                }
+              }
             }
+            if (
+              !checkArmResourceOperationReturnType(
+                program,
+                model,
+                httpOperation,
+                kind === "list",
+              ) &&
+              !responseFailures.has(operation)
+            ) {
+              context.reportDiagnostic({ target: operation });
+              responseFailures.add(operation);
+            }
+          }
+        }
+        // Canonical comparisons run first so the same response is not diagnosed twice.
+        const operations: ArmResourceOperation[] = [
+          ...resources.flatMap((resource) => [
+            ...Object.values(resource.operations.lifecycle).flat(),
+            ...resource.operations.lists,
+            ...resource.operations.actions,
+            ...(resource.associatedOperations ?? []),
+          ]),
+          ...(provider.providerOperations ?? []),
+        ];
+        const checkedPuts = new Set<Operation>();
+        for (const { operation, httpOperation } of operations) {
+          if (
+            httpOperation.verb !== "put" ||
+            checkedPuts.has(operation) ||
+            responseFailures.has(operation) ||
+            getLocationContext(program, operation).type !== "project" ||
+            operation.namespace === undefined ||
+            getArmProviderNamespace(program, operation.namespace) === undefined
+          ) {
+            continue;
+          }
+          checkedPuts.add(operation);
+          const bodies = httpOperation.responses
+            .filter(
+              (response) =>
+                containsStatusCode(response.statusCodes, 200) ||
+                containsStatusCode(response.statusCodes, 201),
+            )
+            .flatMap((response) =>
+              response.responses.flatMap(({ body }) =>
+                body && !isVoidType(body.type) ? [body] : [],
+              ),
+            );
+          if (bodies.some((body) => !isResourceModel(program, body.type, resourceModels))) {
+            context.reportDiagnostic({ target: operation, messageId: "nonResourceResponse" });
           }
         }
       },
@@ -48,54 +139,68 @@ export const armResourceOperationsRule = createRule({
 });
 
 function checkArmResourceOperationReturnType(
-  context: LinterRuleContext<DiagnosticMessages>,
+  program: Program,
   model: Model,
-  operation: Operation,
-) {
-  if (!isInternalTypeSpec(context.program, operation)) {
-    const returnType = operation.returnType;
-    if (returnType.kind === "Model") {
-      throwIfNotMatchingArmModel(context, operation, model, returnType);
-    } else if (returnType.kind === "Union") {
-      for (const variant of returnType.variants.values()) {
-        if (!isErrorType(variant.type) && variant.type.kind === "Model") {
-          const modelCandidate = getEffectiveModelType(context.program, variant.type);
-          throwIfNotMatchingArmModel(context, operation, model, modelCandidate);
-          if (modelCandidate.templateMapper !== undefined) {
-            // ArmResponse<FooResource>
-            for (const arg of modelCandidate.templateMapper.args) {
-              if (isType(arg) && arg.kind === "Model") {
-                throwIfNotMatchingArmModel(context, operation, model, arg);
-                if (arg.templateMapper !== undefined) {
-                  const modelArgs = arg.templateMapper.args.filter(
-                    (a) => isType(a) && a.kind === "Model",
-                  );
-                  const resourceArgs = modelArgs.filter(
-                    (a) => getArmResource(context.program, a) !== undefined,
-                  );
-                  // if there is only one ARM resource argument, it must match the expected ARM resource
-                  if (resourceArgs.length === 1) {
-                    throwIfNotMatchingArmModel(context, operation, model, resourceArgs[0]);
-                  }
-                }
-              }
-            }
-          }
+  httpOperation: HttpOperation,
+  list = false,
+): boolean {
+  for (const response of httpOperation.responses) {
+    const status = response.statusCodes;
+    if (
+      status === "*" ||
+      (typeof status === "number"
+        ? status < 200 || status >= 300
+        : status.end < 200 || status.start >= 300)
+    ) {
+      continue;
+    }
+    for (const { body } of response.responses) {
+      if (body === undefined || isVoidType(body.type)) continue;
+      let payload = body.type;
+      if (list && payload.kind === "Model") {
+        const items = isArrayModelType(payload) ? payload : getProperty(payload, "value")?.type;
+        if (items?.kind === "Model" && isArrayModelType(items)) {
+          payload = items.indexer.value;
         }
+      }
+      const candidate =
+        payload.kind === "Model" ? getEffectiveModelType(program, payload) : undefined;
+      if (
+        candidate !== model &&
+        (candidate === undefined ||
+          (!isDiscriminatedAncestor(model, candidate) &&
+            !isDiscriminatedAncestor(candidate, model)))
+      ) {
+        return false;
       }
     }
   }
+  return true;
 
-  function throwIfNotMatchingArmModel(
-    context: LinterRuleContext<DiagnosticMessages>,
-    operation: Operation,
-    model: Model,
-    modelCandidate: Model,
+  function isDiscriminatedAncestor(ancestor: Model, descendant: Model): boolean {
+    if (getDiscriminator(program, ancestor) === undefined) return false;
+    for (let base = descendant.baseModel; base; base = base.baseModel) {
+      if (base === ancestor) return true;
+    }
+    return false;
+  }
+}
+
+function isResourceModel(program: Program, type: Type, resourceModels: Set<Model>): boolean {
+  if (type.kind !== "Model") return false;
+  for (
+    let model: Model | undefined = getEffectiveModelType(program, type);
+    model;
+    model = model.baseModel
   ) {
-    if (getArmResource(context.program, modelCandidate) !== undefined && modelCandidate !== model) {
-      context.reportDiagnostic({
-        target: operation,
-      });
+    if (
+      resourceModels.has(model) ||
+      isAzureResource(program, model) ||
+      isArmVirtualResource(program, model) ||
+      isCustomAzureResource(program, model)
+    ) {
+      return true;
     }
   }
+  return false;
 }
