@@ -81,14 +81,15 @@ export const useStandardResponseCodesRule = createRule({
       operation: (operation) => {
         if (
           isTemplateDeclarationOrInstance(operation) ||
-          isTemplatedInterfaceOperation(operation)
+          isTemplatedInterfaceOperation(operation) ||
+          !isInService(context.program, operation)
         ) {
           return;
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
         const entry = responsePolicies[httpOperation.verb];
-        if (entry && isInService(context.program, operation)) {
+        if (entry) {
           const policy =
             entry.lro && getLroMetadata(context.program, operation) ? entry.lro : entry.policy;
           if (!matchesPolicy(httpOperation.responses, policy)) {

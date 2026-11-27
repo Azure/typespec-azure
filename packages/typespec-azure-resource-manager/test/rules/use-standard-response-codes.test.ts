@@ -125,25 +125,27 @@ it("reports concrete endpoints, not the shared template instance", async () => {
     );
 });
 
-it("checks operations without service metadata", async () => {
-  await tester
-    .expect("@get op read(): { @statusCode status: 404; };")
-    .toEmitDiagnostics([diagnostic("read", 404)]);
-});
-
-it("checks operations outside a declared service", async () => {
+it("ignores operations outside a service", async () => {
   await tester
     .expect(
       `
         @service namespace Service {
-          @get op read(): { @statusCode status: 200; };
+          @get op read(): { @statusCode status: 404; };
         }
         namespace Outside {
           @get op readOutside(): { @statusCode status: 404; };
+          @patch op update(): { @statusCode status: 500; };
         }
+        op globalOp(): { @statusCode status: 404; };
       `,
     )
-    .toEmitDiagnostics([diagnostic("readOutside", 404)]);
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "GET operations must include a 200 response and may only use 202 as an additional success response code.",
+      },
+    ]);
 });
 
 it("rejects an explicit error response on a standard ARM action", async () => {
@@ -395,22 +397,6 @@ describe("ARM GET response codes", () => {
       `,
       )
       .toBeValid();
-  });
-
-  it("preserves the general allowlist for GET operations outside services", async () => {
-    await tester
-      .expect(
-        `
-      @route("/customization") @get op customization(): { @statusCode code: 204; };
-      @route("/rejected") @get op rejected(): { @statusCode code: 404; };
-    `,
-      )
-      .toEmitDiagnostics({
-        code: diagnosticCode,
-        message:
-          "Operation 'rejected' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses.",
-        target: "rejected",
-      });
   });
 
   it("reports one GET diagnostic for missing 200 and multiple disallowed codes", async () => {
@@ -717,13 +703,13 @@ describe("ARM resource response codes", () => {
       });
   });
 
-  it("applies only the general allowlist to DELETE, PUT, and POST outside services", async () => {
+  it("ignores DELETE, PUT, and POST outside services", async () => {
     await tester
       .expect(
         `
-        @route("/a") @delete op remove(): { @statusCode _: 204; };
+        @route("/a") @delete op remove(): { @statusCode _: 404; };
         @route("/b") @put op replace(): { @statusCode _: 201; };
-        @route("/c") @post op action(): { @statusCode _: 202; };
+        @route("/c") @post op action(): { @statusCode _: 500; };
         `,
       )
       .toBeValid();
