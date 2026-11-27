@@ -48,6 +48,7 @@ import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { privateEndpointApisMissingRule } from "./rules/private-endpoint-apis-missing.js";
+import { privateLinkResourceSchemaRule } from "./rules/private-link-resource-schema.js";
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -118,6 +119,7 @@ const rules = [
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   privateEndpointApisMissingRule,
+  privateLinkResourceSchemaRule,
   resourceNameRule,
   resourceMissingReadRule,
   retryAfterRule,
