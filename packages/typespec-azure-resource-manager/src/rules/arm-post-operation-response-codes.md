@@ -1,4 +1,4 @@
-This rule remains available for explicit configuration. The resource-manager and ARM library `all` rulesets disable it in favor of [`use-standard-response-codes`](../use-standard-response-codes), which includes the POST success-response checks but does not check error responses. The planned `missing-error-response` rule ([#6038](https://github.com/Azure/typespec-azure/pull/6038)) is expected to validate the error response; until it is available and enabled in the ARM rulesets, a missing default error response is not reported by these rulesets. Move existing suppressions to the combined rule ID.
+[`use-standard-response-codes`](../use-standard-response-codes) also includes these POST success-response checks, without requiring a default error response. The resource-manager ruleset still enables this rule and leaves `use-standard-response-codes` disabled.
 
 ## Impact
 

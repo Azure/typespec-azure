@@ -16,9 +16,9 @@ This rule checks concrete HTTP endpoints across all HTTP methods, including oper
 
 The rule is intended for ARM specifications and does not require `@service` or a provider namespace decorator for the general allowlist. It also checks operations outside declared services. The stricter GET contract applies only inside a service namespace or its descendants. Outside services, an SDK customization operation returning `204` is not subject to the GET-specific requirement for `200`. All checks treat a singleton status range as equivalent to its literal status; broader ranges are not substitutes for the permitted exact codes.
 
-A GET with only `200` is valid. A `202` response is allowed in addition to `200` without this rule requiring a `Location` header. Error responses are not checked by this rule. The planned `missing-error-response` rule ([#6038](https://github.com/Azure/typespec-azure/pull/6038)) is expected to validate the error response; until it is available and enabled in the ARM rulesets, a missing default error response is not reported by these rulesets. `Location`-header requirements are checked by their own rules.
+A GET with only `200` is valid. A `202` response is allowed in addition to `200` without this rule requiring a `Location` header. Error responses are not checked by this rule; use [`missing-error-response`](../missing-error-response) to require them. `Location`-header requirements are checked by their own rules.
 
-The combined rule is enabled in the Azure resource manager ruleset and the ARM library's `all` ruleset. Both rulesets disable the three older rules, which remain available for explicit configuration. Update suppressions for the old rule IDs to `@azure-tools/typespec-azure-resource-manager/use-standard-response-codes`; existing suppressions do not suppress the combined rule.
+This rule is disabled in the Azure resource-manager ruleset, which continues to enable `arm-delete-operation-response-codes`, `arm-put-operation-response-codes`, and `arm-post-operation-response-codes`. When you enable this rule alongside those rules, for example through the ARM library's `all` ruleset, the same DELETE, PUT, or POST violation can be reported by both. Suppressions of the older rule IDs do not suppress this rule.
 
 ## Impact
 
