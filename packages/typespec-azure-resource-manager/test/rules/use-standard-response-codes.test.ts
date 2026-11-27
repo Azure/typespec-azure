@@ -125,7 +125,7 @@ it("reports concrete endpoints, not the shared template instance", async () => {
     );
 });
 
-it("ignores operations outside a service", async () => {
+it("ignores operations outside a declared service", async () => {
   await tester
     .expect(
       `
@@ -145,6 +145,24 @@ it("ignores operations outside a service", async () => {
         message:
           "GET operations must include a 200 response and may only use 202 as an additional success response code.",
       },
+    ]);
+});
+
+it("checks global HTTP operations when no service is declared", async () => {
+  await tester
+    .expect(
+      `
+      @route("/read") @get op read(): { @statusCode _: 204; };
+      @route("/update") @patch op update(): { @statusCode _: 500; };
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "GET operations must include a 200 response and may only use 202 as an additional success response code.",
+      },
+      diagnostic("update", 500),
     ]);
 });
 
@@ -669,7 +687,7 @@ describe("ARM resource response codes", () => {
       .toBeValid();
   });
 
-  it("rejects a long-running POST mixing bodyless and bodyful 200 variants", async () => {
+  it("rejects a long-running POST mixing 200 variants with and without a body", async () => {
     await tester
       .expect(
         lroPost(`{ @statusCode _: 200; @body body: Employee; }
@@ -707,6 +725,7 @@ describe("ARM resource response codes", () => {
     await tester
       .expect(
         `
+        @service namespace Service {}
         @route("/a") @delete op remove(): { @statusCode _: 404; };
         @route("/b") @put op replace(): { @statusCode _: 201; };
         @route("/c") @post op action(): { @statusCode _: 500; };

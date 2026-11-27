@@ -10,11 +10,11 @@ ARM operations should use standard response codes. Use the standard ARM error re
 | Long-running POST   | `202`, optionally `200`. The `202` response must not have a body; a declared `200` response must have a body. No other codes are allowed. |
 | Any other operation | Only `200`, `201`, `202`, and `204`.                                                                                                      |
 
-The rule applies only to operations inside a service namespace or its descendants, whether or not they are registered resource operations. Every check, including the general allowlist, shares this scope; operations outside services, such as SDK customizations, are not checked. Unlike the older rules, which checked only registered resource lifecycle operations and actions, the DELETE, PUT, and POST checks also apply to custom operations in the service, for example an action using the DELETE verb. These checks preserve the old rules' numeric status matching and long-running detection. They take precedence over the general allowlist, so the same invalid response does not produce an additional generic warning.
+The rule checks operations returned by HTTP service discovery. Every check, including the general allowlist, shares this scope. When `@service` namespaces are declared, operations outside those services, such as global SDK customizations, are not checked. When no `@service` is declared, HTTP service discovery uses the global namespace instead. Unlike the older rules, which checked only registered resource lifecycle operations and actions, the DELETE, PUT, and POST checks also apply to custom HTTP operations in the service, for example an action using the DELETE verb. These checks preserve the old rules' numeric status matching and long-running detection. They take precedence over the general allowlist, so the same invalid response does not produce an additional generic warning.
 
 This rule checks concrete HTTP endpoints across all HTTP methods, including operations in nested namespaces and inherited interfaces. The GET, DELETE, PUT, and POST policies produce at most one warning on the operation, even if multiple statuses are invalid or a required code is also missing. The general allowlist reports one warning for each disallowed status. Distinct endpoints are not collapsed merely because they share a source location. Uninstantiated operation templates are not endpoints.
 
-The rule does not require a provider namespace decorator; `@service` alone defines the scope. All checks treat a singleton status range as equivalent to its literal status; broader ranges are not substitutes for the permitted exact codes.
+The rule does not require a provider namespace decorator. All checks treat a singleton status range as equivalent to its literal status; broader ranges are not substitutes for the permitted exact codes.
 
 A GET with only `200` is valid. A `202` response is allowed in addition to `200` without this rule requiring a `Location` header. Error responses are not checked by this rule; use [`missing-error-response`](../missing-error-response) to require them. `Location`-header requirements are checked by their own rules.
 
@@ -71,6 +71,6 @@ to the concrete operation, not its reusable template.
 The rule checks native HTTP endpoints without reproducing SDK-scoped emission
 or the general validator's omission of `x-ms-paths` responses. The temporary
 lintdiff GET rule uses provider namespace ancestry in its mixed ARM/data-plane
-runner; the official GET check uses service ancestry instead. The rule does not
+runner; this rule uses HTTP service discovery instead. The rule does not
 construct historical API-version projections or claim identical emitted
 diagnostic counts.

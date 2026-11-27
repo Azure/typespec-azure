@@ -1,20 +1,11 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import {
-  createRule,
-  fileRef,
-  getService,
-  isTemplateDeclarationOrInstance,
-  paramMessage,
-  type Operation,
-  type Program,
-} from "@typespec/compiler";
-import {
-  getHttpOperation,
+  getAllHttpServices,
   type HttpOperation,
   type HttpOperationResponse,
   type HttpStatusCodeRange,
 } from "@typespec/http";
-import { isTemplatedInterfaceOperation } from "./utils.js";
 
 interface ResponsePolicy {
   readonly messageId: "get" | "deleteSync" | "deleteAsync" | "put" | "postSync" | "postAsync";
@@ -78,54 +69,45 @@ export const useStandardResponseCodesRule = createRule({
   },
   create(context) {
     return {
-      operation: (operation) => {
-        if (
-          isTemplateDeclarationOrInstance(operation) ||
-          isTemplatedInterfaceOperation(operation) ||
-          !isInService(context.program, operation)
-        ) {
-          return;
-        }
+      root: (program) => {
+        const [services] = getAllHttpServices(program);
+        for (const service of services) {
+          for (const httpOperation of service.operations) {
+            const operation = httpOperation.operation;
+            const entry = responsePolicies[httpOperation.verb];
+            if (entry) {
+              const policy =
+                entry.lro && getLroMetadata(program, operation) ? entry.lro : entry.policy;
+              if (!matchesPolicy(httpOperation.responses, policy)) {
+                context.reportDiagnostic({
+                  target: operation,
+                  messageId:
+                    (httpOperation.responses.length === 0 && policy.emptyMessageId) ||
+                    policy.messageId,
+                });
+              }
+              continue;
+            }
 
-        const [httpOperation] = getHttpOperation(context.program, operation);
-        const entry = responsePolicies[httpOperation.verb];
-        if (entry) {
-          const policy =
-            entry.lro && getLroMetadata(context.program, operation) ? entry.lro : entry.policy;
-          if (!matchesPolicy(httpOperation.responses, policy)) {
-            context.reportDiagnostic({
-              target: operation,
-              messageId:
-                (httpOperation.responses.length === 0 && policy.emptyMessageId) || policy.messageId,
-            });
-          }
-          return;
-        }
-
-        for (const response of httpOperation.responses) {
-          if (response.statusCodes === "*") continue;
-          const code = getStatusCode(response.statusCodes);
-          if (code === undefined || !allowedStatusCodes.has(code)) {
-            context.reportDiagnostic({
-              target: operation,
-              format: {
-                operationName: operation.name,
-                statusCode: formatStatusCode(response.statusCodes),
-              },
-            });
+            for (const response of httpOperation.responses) {
+              if (response.statusCodes === "*") continue;
+              const code = getStatusCode(response.statusCodes);
+              if (code === undefined || !allowedStatusCodes.has(code)) {
+                context.reportDiagnostic({
+                  target: operation,
+                  format: {
+                    operationName: operation.name,
+                    statusCode: formatStatusCode(response.statusCodes),
+                  },
+                });
+              }
+            }
           }
         }
       },
     };
   },
 });
-
-function isInService(program: Program, operation: Operation): boolean {
-  for (let ns = operation.namespace; ns; ns = ns.namespace) {
-    if (getService(program, ns)) return true;
-  }
-  return false;
-}
 
 function matchesPolicy(
   responses: readonly HttpOperationResponse[],
