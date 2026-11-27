@@ -268,7 +268,7 @@ function emitType(context: SdkContext, type: SdkType, sourceFile: SourceFile) {
       type,
       isExtensibleEnum(context, type),
     );
-    if (enumType.name.startsWith("_")) {
+    if (enumType.name.startsWith("_") && !type.isExactName) {
       // skip enum generation for internal enums
       return;
     }
