@@ -224,6 +224,11 @@ export class ClientAdapter {
           go.newClientOptions(this.ta.getPkg(), this.ta.codeModel.type, clientName),
         );
       }
+      const adaptedServiceConfigs =
+        this.ta.codeModel.type !== "azure-arm"
+          ? this.adaptServiceConfigurations(sdkClient, constructable)
+          : undefined;
+
       for (const param of sdkClient.clientInitialization.parameters) {
         switch (param.kind) {
           case "credential":
@@ -261,6 +266,11 @@ export class ClientAdapter {
               // for ARM, the endpoint is handled via the azcore/arm.Client
               // so we don't need to adapt it.
               continue;
+            }
+
+            if (adaptedServiceConfigs?.usesCloudEndpoint) {
+              goClient.parameters.push(adaptedServiceConfigs.endpointFieldParam);
+              break;
             }
 
             let endpointType: tcgc.SdkEndpointType;
@@ -349,6 +359,17 @@ export class ClientAdapter {
 
       if (constructable) {
         goClient.instance = constructable;
+        if (adaptedServiceConfigs) {
+          constructable.serviceConfigurations = new go.ServiceConfigurations(
+            adaptedServiceConfigs.entries,
+            adaptedServiceConfigs.usesCloudEndpoint
+              ? new go.CloudEndpoint(
+                  adaptedServiceConfigs.endpointFieldParam,
+                  adaptedServiceConfigs.templateParams,
+                )
+              : undefined,
+          );
+        }
 
         // if no authentication type was specified, or the noAuth scheme was
         // explicitly specified, then include the WithNoCredential constructor
@@ -358,9 +379,16 @@ export class ClientAdapter {
           );
         }
 
-        // propagate ctor params to all client ctors
+        // propagate ctor params to all client ctors, omitting any cloud-resolved endpoint field
+        const cloudEndpoint = constructable.serviceConfigurations?.cloudEndpoint;
+        const cloudEndpointField = cloudEndpoint?.parameter;
+        const cloudTemplateCtorParams =
+          cloudEndpoint?.parameters.filter((param) => go.isRequiredParameter(param.style)) ?? [];
         for (const constructor of goClient.instance.constructors) {
-          constructor.parameters.push(...goClient.parameters);
+          constructor.parameters.push(
+            ...cloudTemplateCtorParams,
+            ...goClient.parameters.filter((param) => param !== cloudEndpointField),
+          );
         }
       }
     } else if (parent) {
@@ -409,6 +437,430 @@ export class ClientAdapter {
       this.ta.getPkg().clients.push(goClient);
     }
     return goClient;
+  }
+
+  /**
+   * adapts paired TCGC serviceConfigurations for cloud configuration and endpoint resolution
+   */
+  private adaptServiceConfigurations(
+    sdkClient: tcgc.SdkClientType<tcgc.SdkHttpOperation>,
+    constructable?: go.Constructable,
+  ):
+    | {
+        entries: Array<go.ServiceConfiguration>;
+        usesCloudEndpoint: false;
+      }
+    | {
+        entries: Array<go.ServiceConfiguration>;
+        usesCloudEndpoint: true;
+        endpointFieldParam: go.URIParameter;
+        templateParams: Array<go.URIParameter>;
+      }
+    | undefined {
+    const catalog = sdkClient.clientInitialization.serviceConfigurations;
+    if (!catalog || catalog.configurations.length === 0) {
+      return undefined;
+    }
+
+    const isCallerSuppliedEndpoint = (endpoint: tcgc.SdkEndpointType): boolean => {
+      if (endpoint.templateArguments.length === 0) {
+        return false;
+      }
+      const firstPlaceholder = `{${endpoint.templateArguments[0].serializedName}}`;
+      return (
+        endpoint.serverUrl === firstPlaceholder ||
+        endpoint.serverUrl.startsWith(`${firstPlaceholder}/`)
+      );
+    };
+
+    const defaultConfig = catalog.configurations[0];
+    const usesCloudEndpoint = !isCallerSuppliedEndpoint(defaultConfig.endpoint);
+
+    // verify that all configurations use a consistent endpoint mode
+    for (const config of catalog.configurations) {
+      if (!isCallerSuppliedEndpoint(config.endpoint) !== usesCloudEndpoint) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          "service configurations must consistently use either cloud endpoints or an explicit endpoint parameter",
+          sdkClient.__raw.type,
+        );
+      }
+    }
+
+    const areURIParamsEquivalent = (a: go.URIParameter, b: go.URIParameter): boolean => {
+      const sameDefault =
+        go.isClientSideDefault(a.style) && go.isClientSideDefault(b.style)
+          ? a.style.defaultValue === b.style.defaultValue
+          : a.style === b.style;
+      return (
+        a.name === b.name &&
+        a.uriPathSegment === b.uriPathSegment &&
+        a.isApiVersion === b.isApiVersion &&
+        a.type.kind === b.type.kind &&
+        go.getTypeDeclaration(a.type, this.ta.getPkg()) ===
+          go.getTypeDeclaration(b.type, this.ta.getPkg()) &&
+        sameDefault
+      );
+    };
+
+    if (!usesCloudEndpoint) {
+      const baseEndpoint = defaultConfig.endpoint;
+      for (const config of catalog.configurations.slice(1)) {
+        const candidate = config.endpoint;
+        if (
+          candidate.serverUrl !== baseEndpoint.serverUrl ||
+          candidate.templateArguments.length !== baseEndpoint.templateArguments.length
+        ) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            "caller-supplied endpoint service configurations must use an identical endpoint template and parameters across clouds",
+            sdkClient.__raw.type,
+          );
+        }
+        for (let i = 0; i < baseEndpoint.templateArguments.length; ++i) {
+          const baseParam = this.adaptURIParam(baseEndpoint.templateArguments[i], i === 0);
+          const candidateParam = this.adaptURIParam(candidate.templateArguments[i], i === 0);
+          if (!areURIParamsEquivalent(baseParam, candidateParam)) {
+            throw new AdapterError(
+              "UnsupportedTsp",
+              "caller-supplied endpoint service configurations must use an identical endpoint template and parameters across clouds",
+              sdkClient.__raw.type,
+            );
+          }
+        }
+      }
+    }
+
+    const entries = new Array<go.ServiceConfiguration>();
+    const dedupedConfigs = new Array<{
+      config: tcgc.SdkServiceConfiguration;
+      entry: go.ServiceConfiguration;
+    }>();
+    const seenTargets = new Map<
+      string,
+      { config: tcgc.SdkServiceConfiguration; entry: go.ServiceConfiguration }
+    >();
+    let sharedScopeSuffix: string | undefined;
+
+    for (const config of catalog.configurations) {
+      const oauth2Schemes = new Array<http.Oauth2Auth<http.OAuth2Flow[]>>();
+      for (const option of config.authentication.options) {
+        for (const scheme of option.schemes) {
+          if (scheme.type === "oauth2") {
+            oauth2Schemes.push(scheme);
+          }
+        }
+      }
+      if (oauth2Schemes.length === 0) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `service configuration "${config.name}" must define an OAuth2 authentication scheme`,
+          sdkClient.__raw.type,
+        );
+      }
+
+      let configAudience: string | undefined;
+      for (const scheme of oauth2Schemes) {
+        if (scheme.flows.length === 0) {
+          throw new AdapterError(
+            "InternalError",
+            `no flows defined for credential type ${scheme.type}`,
+            scheme.model,
+          );
+        } else if (scheme.flows[0].scopes.length === 0) {
+          throw new AdapterError(
+            "InternalError",
+            `no scopes defined for credential type ${scheme.type}`,
+            scheme.model,
+          );
+        } else if (scheme.flows[0].scopes.length > 1) {
+          throw new AdapterError(
+            "InternalError",
+            `too many scopes defined for credential type ${scheme.type}`,
+            scheme.model,
+          );
+        }
+        const rawScope = scheme.flows[0].scopes[0].value;
+        const lastSlash = rawScope.lastIndexOf("/");
+        const audience = lastSlash > 0 ? rawScope.substring(0, lastSlash) : "";
+        const scopeSuffix = lastSlash > 0 ? rawScope.substring(lastSlash) : "";
+        if (!audience || /^[a-z][a-z0-9+.-]*:\/$/i.test(audience) || scopeSuffix.length <= 1) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `OAuth2 scope "${rawScope}" must have the form "<audience>/<scope>"`,
+            scheme.model,
+          );
+        }
+        if (sharedScopeSuffix === undefined) {
+          sharedScopeSuffix = scopeSuffix;
+        } else if (sharedScopeSuffix !== scopeSuffix) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `service configurations must share a uniform OAuth2 scope suffix, got "${sharedScopeSuffix}" and "${scopeSuffix}"`,
+            scheme.model,
+          );
+        }
+        if (configAudience === undefined) {
+          configAudience = audience;
+        } else if (configAudience !== audience) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `service configuration "${config.name}" defines multiple conflicting OAuth2 audiences`,
+            scheme.model,
+          );
+        }
+      }
+
+      const target = this.resolveServiceConfigurationTarget(config.name);
+      const targetKey =
+        target.kind === "wellKnown"
+          ? `wellKnown:${target.cloudName}`
+          : `custom:${target.exportedVarName}`;
+      const entry: go.ServiceConfiguration = {
+        name: config.name,
+        target,
+        audience: configAudience!,
+        endpoint: usesCloudEndpoint ? config.endpoint.serverUrl : undefined,
+      };
+      const existing = seenTargets.get(targetKey);
+      if (existing) {
+        const sameTemplateArgs =
+          !usesCloudEndpoint ||
+          (existing.config.endpoint.templateArguments.length ===
+            config.endpoint.templateArguments.length &&
+            existing.config.endpoint.templateArguments.every((baseArg, idx) =>
+              areURIParamsEquivalent(
+                this.adaptURIParam(baseArg, false),
+                this.adaptURIParam(config.endpoint.templateArguments[idx], false),
+              ),
+            ));
+        if (
+          existing.entry.audience !== entry.audience ||
+          existing.entry.endpoint !== entry.endpoint ||
+          !sameTemplateArgs
+        ) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `service configurations "${existing.entry.name}" and "${entry.name}" map to the same Go cloud target with conflicting values`,
+            sdkClient.__raw.type,
+          );
+        }
+      } else {
+        const record = { config, entry };
+        seenTargets.set(targetKey, record);
+        entries.push(entry);
+        dedupedConfigs.push(record);
+      }
+    }
+
+    if (!usesCloudEndpoint) {
+      return {
+        entries,
+        usesCloudEndpoint: false,
+      };
+    }
+
+    interface AdaptedTemplateArgOccurrence {
+      rawArg: tcgc.SdkPathParameter;
+      param: go.URIParameter;
+      baseType: go.URIParameterWireType;
+      required: boolean;
+      defaultValue?: go.Literal;
+    }
+
+    const occurrencesByParam = new Map<string, Array<AdaptedTemplateArgOccurrence>>();
+    const perConfigOccurrences = new Array<{
+      entry: go.ServiceConfiguration;
+      occurrences: Array<AdaptedTemplateArgOccurrence>;
+    }>();
+
+    for (const { config, entry } of dedupedConfigs) {
+      const configOccurrences = new Array<AdaptedTemplateArgOccurrence>();
+      for (const templateArg of config.endpoint.templateArguments) {
+        const adapted = this.adaptURIParam(templateArg, false);
+        const unwrapped = go.unwrapPtr(adapted.type);
+        const occurrence: AdaptedTemplateArgOccurrence = {
+          rawArg: templateArg,
+          param: adapted,
+          baseType: unwrapped,
+          required: go.isRequiredParameter(adapted.style),
+          defaultValue: go.isClientSideDefault(adapted.style)
+            ? adapted.style.defaultValue
+            : undefined,
+        };
+        configOccurrences.push(occurrence);
+        let group = occurrencesByParam.get(adapted.name);
+        if (!group) {
+          group = new Array<AdaptedTemplateArgOccurrence>();
+          occurrencesByParam.set(adapted.name, group);
+        }
+        group.push(occurrence);
+      }
+      perConfigOccurrences.push({ entry, occurrences: configOccurrences });
+    }
+
+    const templateParams = new Array<go.URIParameter>();
+    const mergedParamByName = new Map<string, go.URIParameter>();
+    for (const [paramName, occurrences] of occurrencesByParam) {
+      const first = occurrences[0];
+      const firstTypeDecl = go.getTypeDeclaration(first.baseType, this.ta.getPkg());
+      for (const occ of occurrences.slice(1)) {
+        if (
+          occ.baseType.kind !== first.baseType.kind ||
+          go.getTypeDeclaration(occ.baseType, this.ta.getPkg()) !== firstTypeDecl ||
+          occ.param.isApiVersion !== first.param.isApiVersion
+        ) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `cloud endpoint parameter "${paramName}" has conflicting definitions across service configurations`,
+            occ.rawArg.__raw?.node ?? sdkClient.__raw.type,
+          );
+        }
+      }
+
+      const presentInAllConfigs = occurrences.length === dedupedConfigs.length;
+      let mergedStyle: go.ParameterStyle;
+      let mergedType: go.URIParameterType;
+      if (presentInAllConfigs && occurrences.every((occ) => occ.required)) {
+        mergedStyle = "required";
+        mergedType = first.baseType;
+      } else if (
+        presentInAllConfigs &&
+        first.defaultValue !== undefined &&
+        occurrences.every((occ) => occ.defaultValue === first.defaultValue)
+      ) {
+        mergedStyle = new go.ClientSideDefault(first.defaultValue);
+        mergedType = first.baseType;
+      } else {
+        mergedStyle = "optional";
+        mergedType = first.param.isApiVersion ? first.baseType : this.ta.getPtrType(first.baseType);
+      }
+
+      const mergedParam = new go.URIParameter(
+        paramName,
+        first.param.uriPathSegment,
+        mergedType,
+        mergedStyle,
+        "client",
+      );
+      mergedParam.docs.summary = occurrences.find((occ) => occ.rawArg.summary)?.rawArg.summary;
+      mergedParam.docs.description = occurrences.find((occ) => occ.rawArg.doc)?.rawArg.doc;
+      mergedParam.isApiVersion = first.param.isApiVersion;
+      templateParams.push(mergedParam);
+      mergedParamByName.set(paramName, mergedParam);
+
+      if (constructable && !go.isRequiredParameter(mergedParam.style)) {
+        if (constructable.options.kind === "clientOptions") {
+          constructable.options.parameters.push(mergedParam);
+        } else {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            "optional client parameters for ARM is not supported",
+            first.rawArg.__raw?.node,
+          );
+        }
+      }
+    }
+
+    for (const { entry, occurrences } of perConfigOccurrences) {
+      if (occurrences.length > 0) {
+        entry.templateBindings = occurrences.map((occ) => ({
+          parameter: mergedParamByName.get(occ.param.name)!,
+          uriPathSegment: occ.param.uriPathSegment,
+          required: occ.required,
+          defaultValue: occ.defaultValue,
+        }));
+      }
+    }
+
+    const reservedNames = new Set<string>([
+      "internal",
+      "options",
+      "c",
+      "ok",
+      "cl",
+      "err",
+      "client",
+      "credential",
+    ]);
+    for (const param of templateParams) {
+      reservedNames.add(param.name);
+    }
+    const collectClientReservedNames = (
+      client: tcgc.SdkClientType<tcgc.SdkHttpOperation>,
+    ): void => {
+      reservedNames.add(ensureNameCase(client.name, true));
+      for (const initParam of client.clientInitialization.parameters) {
+        if (initParam.kind === "method") {
+          reservedNames.add(initParam.name);
+          reservedNames.add(
+            getEscapedReservedName(helpers.getEffectiveName(initParam, true), "Param"),
+          );
+        }
+      }
+      for (const sdkMethod of client.methods) {
+        for (const opParam of sdkMethod.operation.parameters) {
+          if (opParam.onClient) {
+            reservedNames.add(opParam.name);
+            reservedNames.add(
+              getEscapedReservedName(helpers.getEffectiveName(opParam, true), "Param"),
+            );
+          }
+        }
+        if (sdkMethod.operation.bodyParam?.onClient) {
+          reservedNames.add(sdkMethod.operation.bodyParam.name);
+          reservedNames.add(
+            getEscapedReservedName(
+              helpers.getEffectiveName(sdkMethod.operation.bodyParam, true),
+              "Param",
+            ),
+          );
+        }
+      }
+      for (const child of client.children ?? []) {
+        collectClientReservedNames(child);
+      }
+    };
+    collectClientReservedNames(sdkClient);
+
+    let endpointFieldName = "endpoint";
+    if (reservedNames.has(endpointFieldName)) {
+      endpointFieldName = "hostEndpoint";
+      let suffix = 1;
+      while (reservedNames.has(endpointFieldName)) {
+        endpointFieldName = `hostEndpoint${suffix}`;
+        ++suffix;
+      }
+    }
+    const endpointFieldParam = new go.URIParameter(
+      endpointFieldName,
+      endpointFieldName,
+      this.ta.getStringType(),
+      "required",
+      "client",
+    );
+
+    return {
+      entries,
+      usesCloudEndpoint: true,
+      endpointFieldParam,
+      templateParams,
+    };
+  }
+
+  private resolveServiceConfigurationTarget(name: string): go.ServiceConfigurationTarget {
+    switch (name.toLowerCase()) {
+      case "public":
+        return { kind: "wellKnown", cloudName: "AzurePublic" };
+      // cspell:ignore usgovernment
+      case "government":
+      case "usgovernment":
+        return { kind: "wellKnown", cloudName: "AzureGovernment" };
+      case "china":
+        return { kind: "wellKnown", cloudName: "AzureChina" };
+      default:
+        return { kind: "custom", exportedVarName: `Cloud${ensureNameCase(name)}` };
+    }
   }
 
   /**
@@ -516,7 +968,9 @@ export class ClientAdapter {
       const uriParam = new go.URIParameter(
         sdkParam.name,
         sdkParam.serializedName,
-        sdkParam.optional ? this.ta.getPtrType(paramType) : paramType,
+        sdkParam.optional && !forceRequired && !go.isClientSideDefault(style)
+          ? this.ta.getPtrType(paramType)
+          : paramType,
         style,
         "client",
       );
