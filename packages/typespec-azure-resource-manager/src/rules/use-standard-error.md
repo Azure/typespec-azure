@@ -8,6 +8,9 @@ reference the standard `Azure.ResourceManager.CommonTypes.ErrorResponse` model.
 Error bodies must use the standard model directly, including through aliases or
 an explicit `@body` property.
 
+Unmarked response payloads are not checked and do not satisfy the requirement
+for an `@error` response.
+
 ## Impact
 
 - **Area:** API design and generated SDKs
@@ -51,3 +54,15 @@ interface Widgets {
 
 This rule promotes the LintDiff migration of the Swagger validator rule
 [LroErrorContent](https://github.com/Azure/azure-openapi-validator/blob/a970d991d2785184d2786b85e0a345dc3f37bc25/docs/lro-error-content.md).
+
+It also provides partial coverage of
+[DefaultErrorResponseSchema](https://github.com/Azure/azure-openapi-validator/blob/405e6f094fa8280e05af23327845f6202a8edc65/docs/default-error-response-schema.md)
+for default responses marked with `@error`. The Swagger rule checks only that an
+existing default response has a schema with `error.code` and `error.message`
+properties. This TypeSpec rule requires the standard model rather than a custom
+model with those properties. It also requires an `@error` response when none
+exists and checks marked responses with explicit or ranged status codes.
+
+The scopes are not equivalent: HEAD operations are excluded, and unmarked
+default payloads are not checked when another response satisfies the standard
+error requirement.
