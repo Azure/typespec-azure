@@ -36,17 +36,19 @@ const resource = `
 function diagnostic(operationName: string, statusCode: number | string) {
   return {
     code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
-    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, 204, or default responses.`,
+    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, or 204 success responses.`,
   };
 }
 
 it.each([200, 201, 202, 204])("accepts allowed status %s", async (status) => {
-  await tester.expect(`${header} @post op read(): { @statusCode status: ${status}; };`).toBeValid();
+  await tester
+    .expect(`${header} @patch op read(): { @statusCode status: ${status}; };`)
+    .toBeValid();
 });
 
 it.each([203, 206, 302, 400, 404, 500])("rejects disallowed status %s", async (status) => {
   await tester
-    .expect(`${header} @post op read(): { @statusCode status: ${status}; };`)
+    .expect(`${header} @patch op read(): { @statusCode status: ${status}; };`)
     .toEmitDiagnostics([diagnostic("read", status)]);
 });
 
@@ -65,7 +67,7 @@ it.each([
       model Response {
         @statusCode @minValue(${start}) @maxValue(${end}) status: int32;
       }
-      @post op read(): Response;
+      @patch op read(): Response;
     `,
     )
     .toEmitDiagnostics([diagnostic("read", `${start}-${end}`)]);
@@ -76,7 +78,7 @@ it("accepts a singleton allowed range", async () => {
     .expect(
       `${header}
       model Response { @statusCode @minValue(200) @maxValue(200) status: int32; }
-      @post op read(): Response;
+      @patch op read(): Response;
     `,
     )
     .toBeValid();
@@ -87,7 +89,7 @@ it("rejects a singleton disallowed range", async () => {
     .expect(
       `${header}
       model Response { @statusCode @minValue(404) @maxValue(404) status: int32; }
-      @post op read(): Response;
+      @patch op read(): Response;
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404)]);
@@ -99,7 +101,7 @@ it("reports each disallowed response code once across body variants", async () =
       `${header}
       model TextResponse { @statusCode status: 404; @body body: string; }
       model NumericResponse { @statusCode status: 404; @body body: int32; }
-      @post op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
+      @patch op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404), diagnostic("read", 500)]);
@@ -109,7 +111,7 @@ it("reports concrete endpoints, not the shared template instance", async () => {
   await tester
     .expect(
       `${header}
-      @post op Template<T>(): { @statusCode status: 404; @body body: T; };
+      @patch op Template<T>(): { @statusCode status: 404; @body body: T; };
       @route("/one") op /*read*/read is Template<string>;
       @route("/two") op /*readAgain*/readAgain is Template<string>;
     `,
@@ -123,25 +125,45 @@ it("reports concrete endpoints, not the shared template instance", async () => {
     );
 });
 
-it("checks operations without service metadata", async () => {
-  await tester
-    .expect("@get op read(): { @statusCode status: 404; };")
-    .toEmitDiagnostics([diagnostic("read", 404)]);
-});
-
-it("checks operations outside a declared service", async () => {
+it("ignores operations outside a declared service", async () => {
   await tester
     .expect(
       `
         @service namespace Service {
-          @get op read(): { @statusCode status: 200; };
+          @get op read(): { @statusCode status: 404; };
         }
         namespace Outside {
           @get op readOutside(): { @statusCode status: 404; };
+          @patch op update(): { @statusCode status: 500; };
         }
+        op globalOp(): { @statusCode status: 404; };
       `,
     )
-    .toEmitDiagnostics([diagnostic("readOutside", 404)]);
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "GET operations must include a 200 response and may only use 202 as an additional success response code.",
+      },
+    ]);
+});
+
+it("checks global HTTP operations when no service is declared", async () => {
+  await tester
+    .expect(
+      `
+      @route("/read") @get op read(): { @statusCode _: 204; };
+      @route("/update") @patch op update(): { @statusCode _: 500; };
+    `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "GET operations must include a 200 response and may only use 202 as an additional success response code.",
+      },
+      diagnostic("update", 500),
+    ]);
 });
 
 it("rejects an explicit error response on a standard ARM action", async () => {
@@ -153,7 +175,12 @@ it("rejects an explicit error response on a standard ARM action", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("check", 404)]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+      target: "check",
+    });
 });
 
 it("accepts a standard ARM action with the default error response", async () => {
@@ -181,7 +208,12 @@ it("rejects a redirect response on a standard ARM action", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("redirect", 302)]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+      target: "redirect",
+    });
 });
 
 it("rejects a status range on a standard ARM action", async () => {
@@ -197,7 +229,12 @@ it("rejects a status range on a standard ARM action", async () => {
       }
     `,
     )
-    .toEmitDiagnostics([diagnostic("redirect", "300-399")]);
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+      message:
+        "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+      target: "redirect",
+    });
 });
 
 const examples = [
@@ -256,7 +293,7 @@ it("diagnoses the incorrect template fixture", async () => {
     {
       code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
       message:
-        "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+        "GET operations must include a 200 response and may only use 202 as an additional success response code.",
     },
   ]);
 });
@@ -380,22 +417,6 @@ describe("ARM GET response codes", () => {
       .toBeValid();
   });
 
-  it("preserves the general allowlist for GET operations outside services", async () => {
-    await tester
-      .expect(
-        `
-      @route("/customization") @get op customization(): { @statusCode code: 204; };
-      @route("/rejected") @get op rejected(): { @statusCode code: 404; };
-    `,
-      )
-      .toEmitDiagnostics({
-        code: diagnosticCode,
-        message:
-          "Operation 'rejected' defines disallowed response status '404'. Use only 200, 201, 202, 204, or default responses.",
-        target: "rejected",
-      });
-  });
-
   it("reports one GET diagnostic for missing 200 and multiple disallowed codes", async () => {
     await tester
       .expect(
@@ -408,7 +429,7 @@ describe("ARM GET response codes", () => {
       .toEmitDiagnostics({
         code: diagnosticCode,
         message:
-          "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+          "GET operations must include a 200 response and may only use 202 as an additional success response code.",
         target: "read",
       });
   });
@@ -427,13 +448,13 @@ describe("ARM GET response codes", () => {
         {
           code: diagnosticCode,
           message:
-            "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
+            "GET operations must include a 200 response and may only use 202 as an additional success response code.",
           target: "read",
         },
         {
           code: diagnosticCode,
           message:
-            "Operation 'create' defines disallowed response status '404'. Use only 200, 201, 202, 204, or default responses.",
+            "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
           target: "create",
         },
       ]);
@@ -450,7 +471,7 @@ describe("ARM GET response codes", () => {
       .toBeValid();
   });
 
-  it("rejects a GET with only 202 and default responses", async () => {
+  it("rejects a GET with only a 202 success response", async () => {
     await tester
       .expect(
         `
@@ -488,5 +509,243 @@ describe("ARM GET response codes", () => {
       `,
       )
       .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
+  });
+});
+
+describe("ARM resource response codes", () => {
+  const diagnosticCode = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
+  const employee = `
+    @armProviderNamespace
+    namespace Microsoft.Contoso;
+    model Employee is ProxyResource<{}> { ...ResourceNameParameter<Employee>; }
+  `;
+
+  const lroPost = (finalResponse: string, acceptedBody = "") => `${employee}
+    model PollingStatus { @Azure.Core.lroStatus statusValue: "Succeeded" | "Canceled" | "Failed"; }
+    @armResourceOperations
+    interface Employees {
+      @get getStatus(...KeysOf<Employee>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
+      @Azure.Core.pollingOperation(Employees.getStatus, {employeeName: Azure.Core.RequestParameter<"employeeName">, statusId: Azure.Core.ResponseProperty<"operationId">})
+      @post @armResourceAction(Employee)
+      /*hire*/hire(...KeysOf<Employee>): {
+        @statusCode _: 202;
+        @header("x-ms-operation-id") operationId: string;
+        ${acceptedBody}
+      } | ${finalResponse};
+    }
+  `;
+
+  it("accepts synchronous DELETE, PUT, and POST responses without a default error", async () => {
+    await tester
+      .expect(
+        `${header}
+        @route("/delete") @delete op remove():
+          { @statusCode _: 200; } | { @statusCode _: 204; };
+        @route("/put") @put op replace():
+          { @statusCode _: 200; } | { @statusCode _: 201; };
+        @route("/post-with-body") @post op action(): { @statusCode _: 200; };
+        @route("/post-no-content") @post op actionWithoutContent(): { @statusCode _: 204; };
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects incomplete DELETE and PUT responses and mixed synchronous POST codes", async () => {
+    await tester
+      .expect(
+        `${header}
+        @route("/delete") @delete op /*remove*/remove(): { @statusCode _: 200; };
+        @route("/put") @put op /*replace*/replace(): { @statusCode _: 200; };
+        @route("/post") @post op /*action*/action():
+          { @statusCode _: 200; } | { @statusCode _: 204; };
+        `,
+      )
+      .toEmitDiagnostics(({ remove, replace, action }) => [
+        {
+          code: diagnosticCode,
+          message:
+            "Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template.",
+          pos: getSourceLocation(remove).pos,
+          end: getSourceLocation(remove).end,
+        },
+        {
+          code: diagnosticCode,
+          message:
+            "Put operations must have 200 and 201 responses. They must not have any other response codes.",
+          pos: getSourceLocation(replace).pos,
+          end: getSourceLocation(replace).end,
+        },
+        {
+          code: diagnosticCode,
+          message:
+            "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+          pos: getSourceLocation(action).pos,
+          end: getSourceLocation(action).end,
+        },
+      ]);
+  });
+
+  it.each([
+    ["delete", "ArmResourceDeleteSync"],
+    ["delete", "ArmResourceDeleteWithoutOkAsync"],
+    ["createOrUpdate", "ArmResourceCreateOrUpdateAsync"],
+    ["createOrUpdate", "ArmResourceCreateOrReplaceAsync"],
+    ["createOrUpdate", "ArmResourceCreateOrReplaceSync"],
+  ])("accepts the %s template %s", async (operation, template) => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations interface Employees {
+          ${operation} is ${template}<Employee>;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects a long-running DELETE with a nonstandard 200 response", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations interface Employees {
+          #suppress "deprecated" "test"
+          /*deleteOp*/delete is ArmResourceDeleteAsync<Employee>;
+        }
+        `,
+      )
+      .toEmitDiagnostics(({ deleteOp }) => ({
+        code: diagnosticCode,
+        message:
+          "Long-running delete operations must have 202 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
+        pos: getSourceLocation(deleteOp).pos,
+        end: getSourceLocation(deleteOp).end,
+      }));
+  });
+
+  it("accepts a long-running POST without a 200 response", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations interface Employees {
+          hire is ArmResourceActionNoResponseContentAsync<Employee, void>;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects a long-running POST whose 202 response has a body", async () => {
+    await tester
+      .expect(lroPost("{ @statusCode _: 200; @body body: Employee; }", "@body body: Employee;"))
+      .toEmitDiagnostics(({ hire }) => ({
+        code: diagnosticCode,
+        message:
+          "Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.",
+        pos: getSourceLocation(hire).pos,
+        end: getSourceLocation(hire).end,
+      }));
+  });
+
+  it("rejects an extra status on a long-running POST", async () => {
+    await tester
+      .expect(lroPost("{ @statusCode _: 203; @body body: Employee; }"))
+      .toEmitDiagnostics(({ hire }) => ({
+        code: diagnosticCode,
+        message:
+          "Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.",
+        pos: getSourceLocation(hire).pos,
+        end: getSourceLocation(hire).end,
+      }));
+  });
+
+  it("rejects an invalid multipart POST response", async () => {
+    await tester
+      .expect(
+        `${header}
+        @post op /*action*/action(): {
+          @statusCode _: 203;
+          @header contentType: "multipart/mixed";
+          @multipartBody result: [HttpPart<string>];
+        };
+        `,
+      )
+      .toEmitDiagnostics(({ action }) => ({
+        code: diagnosticCode,
+        message:
+          "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+        pos: getSourceLocation(action).pos,
+        end: getSourceLocation(action).end,
+      }));
+  });
+
+  it("accepts a long-running POST whose 200 response has multiple content-type variants", async () => {
+    await tester
+      .expect(
+        lroPost(`{ @statusCode _: 200; @body body: Employee; }
+          | { @statusCode _: 200; @header contentType: "application/xml"; @body body: string; }`),
+      )
+      .toBeValid();
+  });
+
+  it("rejects a long-running POST mixing 200 variants with and without a body", async () => {
+    await tester
+      .expect(
+        lroPost(`{ @statusCode _: 200; @body body: Employee; }
+          | { @statusCode _: 200; @header("x-ms-marker") marker: string; }`),
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.",
+        target: "hire",
+      });
+  });
+
+  it("applies the DELETE policy to any DELETE operation in a service", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations
+        interface Employees {
+          @delete @armResourceAction(Employee)
+          @segment("revoke")
+          revoke(...KeysOf<Employee>): { @statusCode _: 204; };
+        }
+        `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template.",
+        target: "revoke",
+      });
+  });
+
+  it("ignores DELETE, PUT, and POST outside services", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace Service {}
+        @route("/a") @delete op remove(): { @statusCode _: 404; };
+        @route("/b") @put op replace(): { @statusCode _: 201; };
+        @route("/c") @post op action(): { @statusCode _: 500; };
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("accepts a single-value status code range on a resource DELETE", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations
+        interface Employees {
+          @armResourceDelete(Employee)
+          delete(...ApiVersionParameter): { @minValue(200) @maxValue(200) @statusCode _: int32; }
+            | { @statusCode _: 204; };
+        }
+        `,
+      )
+      .toBeValid();
   });
 });

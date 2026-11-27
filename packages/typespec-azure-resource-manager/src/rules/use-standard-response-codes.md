@@ -1,30 +1,24 @@
-ARM operations should use only `200`, `201`, `202`, `204`, and `default`
-responses. **GET operations inside services must include `200` and may only add
-`202` or `default`; `201` and `204` are not allowed on these GET operations.**
-Use the standard ARM error response for errors rather than individual error
-status codes. Other successful statuses and redirects are also outside the
-allowed sets. A singleton status range is equivalent to its literal status;
-broader ranges are not substitutes for the permitted exact codes.
+ARM operations should use standard response codes. Use the standard ARM error response for errors rather than individual error status codes. The rule combines the GET policy and general status-code allowlist with the success-response checks from `arm-delete-operation-response-codes`, `arm-put-operation-response-codes`, and `arm-post-operation-response-codes`.
 
-This rule checks concrete HTTP endpoints across all HTTP methods, including
-operations in nested namespaces and inherited interfaces. An invalid GET inside
-a service produces one warning on the operation, even if multiple statuses are
-invalid or `200` is also missing. Other operations produce a warning for each
-disallowed response status. Distinct endpoints are not collapsed merely because
-they share a source location. Uninstantiated operation templates are not endpoints.
+| Operation           | Required responses                                                                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| GET                 | `200`, optionally `202`.                                                                                                                  |
+| Synchronous DELETE  | Exactly `200` and `204`.                                                                                                                  |
+| Long-running DELETE | Exactly `202` and `204`.                                                                                                                  |
+| PUT                 | Exactly `200` and `201`.                                                                                                                  |
+| Synchronous POST    | Exactly `200` or exactly `204`.                                                                                                           |
+| Long-running POST   | `202`, optionally `200`. The `202` response must not have a body; a declared `200` response must have a body. No other codes are allowed. |
+| Any other operation | Only `200`, `201`, `202`, and `204`.                                                                                                      |
 
-The rule is intended for ARM specifications and does not require `@service` or
-a provider namespace decorator when explicitly enabled. It also checks operations
-outside declared services. The stricter GET contract applies only inside a
-service namespace or its descendants, preserving the service boundary of the
-consolidated GET check. Outside services, only the general allowlist applies;
-for example, an SDK customization operation returning `204` is not subject to
-the GET-specific requirement for `200`. The combined rule is registered as
-disabled in the Azure resource manager ruleset.
+The rule checks operations returned by HTTP service discovery. Every check, including the general allowlist, shares this scope. When `@service` namespaces are declared, operations outside those services, such as global SDK customizations, are not checked. When no `@service` is declared, HTTP service discovery uses the global namespace instead. Unlike the older rules, which checked only registered resource lifecycle operations and actions, the DELETE, PUT, and POST checks also apply to custom HTTP operations in the service, for example an action using the DELETE verb. These checks preserve the old rules' numeric status matching and long-running detection. They take precedence over the general allowlist, so the same invalid response does not produce an additional generic warning.
 
-A GET with only `200` is valid. A `202` response is allowed in addition to `200`
-without this rule requiring a `Location` header. Default-error-response and
-`Location`-header requirements are checked by their own rules.
+This rule checks concrete HTTP endpoints across all HTTP methods, including operations in nested namespaces and inherited interfaces. The GET, DELETE, PUT, and POST policies produce at most one warning on the operation, even if multiple statuses are invalid or a required code is also missing. The general allowlist reports one warning for each disallowed status. Distinct endpoints are not collapsed merely because they share a source location. Uninstantiated operation templates are not endpoints.
+
+The rule does not require a provider namespace decorator. All checks treat a singleton status range as equivalent to its literal status; broader ranges are not substitutes for the permitted exact codes.
+
+A GET with only `200` is valid. A `202` response is allowed in addition to `200` without this rule requiring a `Location` header. Error responses are not checked by this rule; use [`missing-error-response`](../missing-error-response) to require them. `Location`-header requirements are checked by their own rules.
+
+This rule is disabled in the Azure resource-manager ruleset, which continues to enable `arm-delete-operation-response-codes`, `arm-put-operation-response-codes`, and `arm-post-operation-response-codes`. When you enable this rule alongside those rules, for example through the ARM library's `all` ruleset, the same DELETE, PUT, or POST violation can be reported by both. Suppressions of the older rule IDs do not suppress this rule.
 
 ## Impact
 
@@ -66,14 +60,17 @@ to the concrete operation, not its reusable template.
 
 ## LintDiff Equivalent
 
-| Swagger validator                                                                                                                                      | Combined native coverage                                                                                                           |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| [NoErrorCodeResponses](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/no-error-code-responses.ts) | General allowlist of `200`, `201`, `202`, `204`, and `default` across HTTP methods, including operations outside services.         |
-| [GetResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/get-response-codes.md)                                              | GET operations inside services must include `200` and use only `200`, `202`, or `default`, with one warning per invalid operation. |
+| Swagger validator                                                                                                                                      | Combined native coverage                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [NoErrorCodeResponses](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/no-error-code-responses.ts) | General allowlist of `200`, `201`, `202`, and `204` for other HTTP methods inside services; error responses are not checked.         |
+| [GetResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/get-response-codes.md)                                              | GET operations inside services must include `200` and use only `200` or `202` success codes, with one warning per invalid operation. |
+| [DeleteResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/delete-response-codes.md)                                        | Synchronous and long-running DELETE numeric (inside services) response checks; error responses are validated separately.             |
+| [PutResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-response-codes.md)                                              | PUT numeric (inside services) response checks; error responses are validated separately.                                             |
+| [PostResponseCodes](https://github.com/Azure/azure-openapi-validator/blob/main/docs/post-response-codes.md)                                            | Synchronous and long-running POST numeric (inside services) response and body checks; error responses are validated separately.      |
 
 The rule checks native HTTP endpoints without reproducing SDK-scoped emission
 or the general validator's omission of `x-ms-paths` responses. The temporary
 lintdiff GET rule uses provider namespace ancestry in its mixed ARM/data-plane
-runner; the official GET check uses service ancestry instead. The rule does not
+runner; this rule uses HTTP service discovery instead. The rule does not
 construct historical API-version projections or claim identical emitted
 diagnostic counts.
