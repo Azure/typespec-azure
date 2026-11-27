@@ -41,12 +41,14 @@ function diagnostic(operationName: string, statusCode: number | string) {
 }
 
 it.each([200, 201, 202, 204])("accepts allowed status %s", async (status) => {
-  await tester.expect(`${header} @post op read(): { @statusCode status: ${status}; };`).toBeValid();
+  await tester
+    .expect(`${header} @patch op read(): { @statusCode status: ${status}; };`)
+    .toBeValid();
 });
 
 it.each([203, 206, 302, 400, 404, 500])("rejects disallowed status %s", async (status) => {
   await tester
-    .expect(`${header} @post op read(): { @statusCode status: ${status}; };`)
+    .expect(`${header} @patch op read(): { @statusCode status: ${status}; };`)
     .toEmitDiagnostics([diagnostic("read", status)]);
 });
 
@@ -65,7 +67,7 @@ it.each([
       model Response {
         @statusCode @minValue(${start}) @maxValue(${end}) status: int32;
       }
-      @post op read(): Response;
+      @patch op read(): Response;
     `,
     )
     .toEmitDiagnostics([diagnostic("read", `${start}-${end}`)]);
@@ -76,7 +78,7 @@ it("accepts a singleton allowed range", async () => {
     .expect(
       `${header}
       model Response { @statusCode @minValue(200) @maxValue(200) status: int32; }
-      @post op read(): Response;
+      @patch op read(): Response;
     `,
     )
     .toBeValid();
@@ -87,7 +89,7 @@ it("rejects a singleton disallowed range", async () => {
     .expect(
       `${header}
       model Response { @statusCode @minValue(404) @maxValue(404) status: int32; }
-      @post op read(): Response;
+      @patch op read(): Response;
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404)]);
@@ -99,7 +101,7 @@ it("reports each disallowed response code once across body variants", async () =
       `${header}
       model TextResponse { @statusCode status: 404; @body body: string; }
       model NumericResponse { @statusCode status: 404; @body body: int32; }
-      @post op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
+      @patch op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404), diagnostic("read", 500)]);
@@ -109,7 +111,7 @@ it("reports concrete endpoints, not the shared template instance", async () => {
   await tester
     .expect(
       `${header}
-      @post op Template<T>(): { @statusCode status: 404; @body body: T; };
+      @patch op Template<T>(): { @statusCode status: 404; @body body: T; };
       @route("/one") op /*read*/read is Template<string>;
       @route("/two") op /*readAgain*/readAgain is Template<string>;
     `,
@@ -448,7 +450,7 @@ describe("ARM GET response codes", () => {
         {
           code: diagnosticCode,
           message:
-            "Operation 'create' defines disallowed response status '404'. Use only 200, 201, 202, or 204 success responses.",
+            "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
           target: "create",
         },
       ]);
@@ -550,7 +552,7 @@ describe("ARM resource response codes", () => {
       });
   });
 
-  it("applies the generic allowlist to a resource action using DELETE", async () => {
+  it("applies the DELETE policy to any DELETE operation in a service", async () => {
     await tester
       .expect(
         `${employee}
@@ -560,6 +562,23 @@ describe("ARM resource response codes", () => {
           @segment("revoke")
           revoke(...KeysOf<Employee>): { @statusCode _: 204; };
         }
+        `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes",
+        message:
+          "Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template.",
+        target: "revoke",
+      });
+  });
+
+  it("applies only the general allowlist to DELETE, PUT, and POST outside services", async () => {
+    await tester
+      .expect(
+        `
+        @route("/a") @delete op remove(): { @statusCode _: 204; };
+        @route("/b") @put op replace(): { @statusCode _: 201; };
+        @route("/c") @post op action(): { @statusCode _: 202; };
         `,
       )
       .toBeValid();

@@ -14,7 +14,6 @@ import {
   type HttpOperationResponse,
   type HttpStatusCodeRange,
 } from "@typespec/http";
-import { getArmResources } from "../resource.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 interface ResponsePolicy {
@@ -30,16 +29,11 @@ interface ResponsePolicy {
   readonly body?: Readonly<Partial<Record<number, boolean>>>;
 }
 
-type ResourceRole = "delete" | "write";
-
+/** Policies applied to operations inside a service namespace, keyed by HTTP verb. */
 const responsePolicies: Partial<
-  Record<
-    HttpOperation["verb"],
-    { scope: "service" | ResourceRole; policy: ResponsePolicy; lro?: ResponsePolicy }
-  >
+  Record<HttpOperation["verb"], { policy: ResponsePolicy; lro?: ResponsePolicy }>
 > = {
   get: {
-    scope: "service",
     policy: {
       messageId: "get",
       emptyMessageId: "emptyGet",
@@ -47,16 +41,13 @@ const responsePolicies: Partial<
     },
   },
   delete: {
-    scope: "delete",
     policy: { messageId: "deleteSync", allowed: [{ required: [200, 204] }] },
     lro: { messageId: "deleteAsync", allowed: [{ required: [202, 204] }] },
   },
   put: {
-    scope: "write",
     policy: { messageId: "put", allowed: [{ required: [200, 201] }] },
   },
   post: {
-    scope: "write",
     policy: { messageId: "postSync", allowed: [{ required: [200] }, { required: [204] }] },
     lro: {
       messageId: "postAsync",
@@ -86,7 +77,6 @@ export const useStandardResponseCodesRule = createRule({
     postAsync: `Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.`,
   },
   create(context) {
-    let resourceRoles: Map<Operation, ResourceRole> | undefined;
     return {
       operation: (operation) => {
         if (
@@ -98,22 +88,9 @@ export const useStandardResponseCodesRule = createRule({
 
         const [httpOperation] = getHttpOperation(context.program, operation);
         const entry = responsePolicies[httpOperation.verb];
-        let policy: ResponsePolicy | undefined;
-        if (entry?.scope === "service") {
-          for (let ns = operation.namespace; ns; ns = ns.namespace) {
-            if (getService(context.program, ns)) {
-              policy = entry.policy;
-              break;
-            }
-          }
-        } else if (entry) {
-          resourceRoles ??= getResourceRoles(context.program);
-          if (resourceRoles.get(operation) === entry.scope) {
-            policy =
-              entry.lro && getLroMetadata(context.program, operation) ? entry.lro : entry.policy;
-          }
-        }
-        if (policy) {
+        if (entry && isInService(context.program, operation)) {
+          const policy =
+            entry.lro && getLroMetadata(context.program, operation) ? entry.lro : entry.policy;
           if (!matchesPolicy(httpOperation.responses, policy)) {
             context.reportDiagnostic({
               target: operation,
@@ -142,20 +119,11 @@ export const useStandardResponseCodesRule = createRule({
   },
 });
 
-/** Resource lifecycle and action operations, matching the scope of the legacy DELETE, PUT, and POST rules. */
-function getResourceRoles(program: Program): Map<Operation, ResourceRole> {
-  const roles = new Map<Operation, ResourceRole>();
-  for (const { operations } of getArmResources(program)) {
-    for (const op of [
-      operations.lifecycle.createOrUpdate,
-      operations.lifecycle.update,
-      ...Object.values(operations.actions),
-    ]) {
-      if (op) roles.set(op.operation, "write");
-    }
-    if (operations.lifecycle.delete) roles.set(operations.lifecycle.delete.operation, "delete");
+function isInService(program: Program, operation: Operation): boolean {
+  for (let ns = operation.namespace; ns; ns = ns.namespace) {
+    if (getService(program, ns)) return true;
   }
-  return roles;
+  return false;
 }
 
 function matchesPolicy(
