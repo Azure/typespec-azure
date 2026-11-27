@@ -4,6 +4,7 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
+from azure.core.exceptions import HttpResponseError
 
 from specs.azure.clientgenerator.core.lro.result import ResultClient
 from specs.azure.clientgenerator.core.lro.result.models import Job, JobResult
@@ -39,3 +40,21 @@ def test_client_lro_result(client):
     ).result()
 
     assert result == JobResult(value="completed")
+
+
+def test_default_lro_result_failure(client):
+    with pytest.raises(HttpResponseError):
+        client.begin_create_default_failure(
+            id="default-failure",
+            resource=Job(status="Running"),
+            polling_interval=0,
+        ).result()
+
+
+def test_client_lro_result_failure(client):
+    with pytest.raises(HttpResponseError):
+        client.begin_create_client_result_failure(
+            id="client-result-failure",
+            resource=Job(status="Running"),
+            polling_interval=0,
+        ).result()

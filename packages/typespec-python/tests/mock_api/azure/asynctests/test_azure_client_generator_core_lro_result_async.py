@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------
 import pytest
 import pytest_asyncio
+from azure.core.exceptions import HttpResponseError
 
 from specs.azure.clientgenerator.core.lro.result.aio import ResultClient
 from specs.azure.clientgenerator.core.lro.result.models import Job, JobResult
@@ -44,3 +45,25 @@ async def test_client_lro_result(client):
     result = await poller.result()
 
     assert result == JobResult(value="completed")
+
+
+@pytest.mark.asyncio
+async def test_default_lro_result_failure(client):
+    poller = await client.begin_create_default_failure(
+        id="default-failure",
+        resource=Job(status="Running"),
+        polling_interval=0,
+    )
+    with pytest.raises(HttpResponseError):
+        await poller.result()
+
+
+@pytest.mark.asyncio
+async def test_client_lro_result_failure(client):
+    poller = await client.begin_create_client_result_failure(
+        id="client-result-failure",
+        resource=Job(status="Running"),
+        polling_interval=0,
+    )
+    with pytest.raises(HttpResponseError):
+        await poller.result()

@@ -11,32 +11,42 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 const apiVersion = "2022-12-01-preview";
 const jobResult = { value: "completed" };
-let defaultPollCount = 0;
-let clientResultPollCount = 0;
+const pollCounts: Record<string, number> = {
+  default: 0,
+  "client-result": 0,
+  "default-failure": 0,
+  "client-result-failure": 0,
+};
 
-function createPollHandler(counter: "default" | "client-result") {
+type ScenarioKind = keyof typeof pollCounts;
+
+function createPollHandler(kind: ScenarioKind, fails: boolean) {
   return (req: MockRequest) => {
     req.expect.containsQueryParam("api-version", apiVersion);
-    const pollCount = counter === "default" ? defaultPollCount++ : clientResultPollCount++;
+    const pollCount = pollCounts[kind]++;
     return {
       status: 200,
       body: json(
         pollCount === 0
-          ? { id: counter, status: "Running" }
-          : { id: counter, status: "Succeeded", result: jobResult },
+          ? { id: kind, status: "Running" }
+          : fails
+            ? { id: kind, status: "Failed" }
+            : { id: kind, status: "Succeeded", result: jobResult },
       ),
     };
   };
 }
 
-function createScenario(kind: "default" | "client-result"): ScenarioMockApi {
+function createScenario(kind: ScenarioKind, fails = false): ScenarioMockApi {
   const resourcePath = `/azure/client-generator-core/lro/result/${kind}/jobs/${kind}`;
   const pollingPath = `${resourcePath}/status`;
-  const pollHandler = createPollHandler(kind);
+  const pollHandler = createPollHandler(kind, fails);
   const initial = { id: kind, status: "Running" };
-  const completed = { id: kind, status: "Succeeded", result: jobResult };
+  const completed = fails
+    ? { id: kind, status: "Failed" }
+    : { id: kind, status: "Succeeded", result: jobResult };
 
-  return passOnSuccess([
+  const apis: ScenarioMockApi["apis"] = [
     {
       uri: resourcePath,
       method: "put",
@@ -56,11 +66,7 @@ function createScenario(kind: "default" | "client-result"): ScenarioMockApi {
       handler: (req: MockRequest) => {
         req.expect.containsQueryParam("api-version", apiVersion);
         req.expect.bodyEquals({ status: "Running" });
-        if (kind === "default") {
-          defaultPollCount = 0;
-        } else {
-          clientResultPollCount = 0;
-        }
+        pollCounts[kind] = 0;
         return {
           status: 201,
           headers: {
@@ -101,7 +107,10 @@ function createScenario(kind: "default" | "client-result"): ScenarioMockApi {
       handler: pollHandler,
       kind: "MockApiDefinition",
     },
-    {
+  ];
+
+  if (!fails) {
+    apis.push({
       uri: resourcePath,
       method: "get",
       request: {
@@ -114,10 +123,20 @@ function createScenario(kind: "default" | "client-result"): ScenarioMockApi {
         body: json(completed),
       },
       kind: "MockApiDefinition",
-    },
-  ]);
+    });
+  }
+
+  return passOnSuccess(apis);
 }
 
 Scenarios.Azure_ClientGenerator_Core_Lro_Result_createDefault = createScenario("default");
 Scenarios.Azure_ClientGenerator_Core_Lro_Result_createWithClientLroResult =
   createScenario("client-result");
+Scenarios.Azure_ClientGenerator_Core_Lro_Result_createDefaultFailure = createScenario(
+  "default-failure",
+  true,
+);
+Scenarios.Azure_ClientGenerator_Core_Lro_Result_createClientResultFailure = createScenario(
+  "client-result-failure",
+  true,
+);
