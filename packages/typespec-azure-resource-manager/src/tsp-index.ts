@@ -39,6 +39,7 @@ import {
 } from "./resource.js";
 
 export { $lib } from "./lib.js";
+export { $provideTypeInfo } from "./type-info.js";
 
 /** @internal */
 export const $decorators = {
