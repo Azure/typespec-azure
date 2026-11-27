@@ -187,6 +187,21 @@ describe("expect all rules to be defined", () => {
     }
   });
 
+  it("keeps Legacy GET LRO guidance opt-in in client-sdk", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/no-get-lro";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
+    for (const rulesetName of ["resource-manager", "data-plane"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], undefined);
+      strictEqual($linter.ruleSets?.[rulesetName].disable?.[ruleName], undefined);
+    }
+    for (const ruleset of Object.values($linter.ruleSets ?? {})) {
+      strictEqual(
+        ruleset.enable?.["@azure-tools/typespec-azure-resource-manager/no-get-lro"],
+        undefined,
+      );
+    }
+  });
+
   it("keeps extensible enum default guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-azure-core/use-known-enum-default";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
