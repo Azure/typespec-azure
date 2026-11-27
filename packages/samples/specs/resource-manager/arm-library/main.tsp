@@ -75,7 +75,7 @@ union SystemEnvelopeProvisioningState {
   string,
   ResourceProvisioningState,
 
-  @doc("Working")
+  @doc("The resource provisioning operation is in progress.")
   Working: "Working",
 }
 
