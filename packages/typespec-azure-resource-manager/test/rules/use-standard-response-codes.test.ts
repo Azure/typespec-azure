@@ -509,25 +509,170 @@ describe("ARM GET response codes", () => {
 });
 
 describe("ARM resource response codes", () => {
+  const diagnosticCode = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
   const employee = `
     @armProviderNamespace
     namespace Microsoft.Contoso;
     model Employee is ProxyResource<{}> { ...ResourceNameParameter<Employee>; }
   `;
 
-  const lroPost = (finalResponse: string) => `${employee}
+  const lroPost = (finalResponse: string, acceptedBody = "") => `${employee}
     model PollingStatus { @Azure.Core.lroStatus statusValue: "Succeeded" | "Canceled" | "Failed"; }
     @armResourceOperations
     interface Employees {
       @get getStatus(...KeysOf<Employee>, @path @segment("statuses") statusId: string): PollingStatus | ErrorResponse;
       @Azure.Core.pollingOperation(Employees.getStatus, {employeeName: Azure.Core.RequestParameter<"employeeName">, statusId: Azure.Core.ResponseProperty<"operationId">})
       @post @armResourceAction(Employee)
-      hire(...KeysOf<Employee>): {
+      /*hire*/hire(...KeysOf<Employee>): {
         @statusCode _: 202;
         @header("x-ms-operation-id") operationId: string;
+        ${acceptedBody}
       } | ${finalResponse};
     }
   `;
+
+  it("accepts synchronous DELETE, PUT, and POST responses without a default error", async () => {
+    await tester
+      .expect(
+        `${header}
+        @route("/delete") @delete op remove():
+          { @statusCode _: 200; } | { @statusCode _: 204; };
+        @route("/put") @put op replace():
+          { @statusCode _: 200; } | { @statusCode _: 201; };
+        @route("/post-with-body") @post op action(): { @statusCode _: 200; };
+        @route("/post-no-content") @post op actionWithoutContent(): { @statusCode _: 204; };
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects incomplete DELETE and PUT responses and mixed synchronous POST codes", async () => {
+    await tester
+      .expect(
+        `${header}
+        @route("/delete") @delete op /*remove*/remove(): { @statusCode _: 200; };
+        @route("/put") @put op /*replace*/replace(): { @statusCode _: 200; };
+        @route("/post") @post op /*action*/action():
+          { @statusCode _: 200; } | { @statusCode _: 204; };
+        `,
+      )
+      .toEmitDiagnostics(({ remove, replace, action }) => [
+        {
+          code: diagnosticCode,
+          message:
+            "Synchronous delete operations must have 200 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteSync' template.",
+          pos: getSourceLocation(remove).pos,
+          end: getSourceLocation(remove).end,
+        },
+        {
+          code: diagnosticCode,
+          message:
+            "Put operations must have 200 and 201 responses. They must not have any other response codes.",
+          pos: getSourceLocation(replace).pos,
+          end: getSourceLocation(replace).end,
+        },
+        {
+          code: diagnosticCode,
+          message:
+            "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+          pos: getSourceLocation(action).pos,
+          end: getSourceLocation(action).end,
+        },
+      ]);
+  });
+
+  it.each([
+    ["delete", "ArmResourceDeleteSync"],
+    ["delete", "ArmResourceDeleteWithoutOkAsync"],
+    ["createOrUpdate", "ArmResourceCreateOrUpdateAsync"],
+    ["createOrUpdate", "ArmResourceCreateOrReplaceAsync"],
+    ["createOrUpdate", "ArmResourceCreateOrReplaceSync"],
+  ])("accepts the %s template %s", async (operation, template) => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations interface Employees {
+          ${operation} is ${template}<Employee>;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects a long-running DELETE with a nonstandard 200 response", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations interface Employees {
+          #suppress "deprecated" "test"
+          /*deleteOp*/delete is ArmResourceDeleteAsync<Employee>;
+        }
+        `,
+      )
+      .toEmitDiagnostics(({ deleteOp }) => ({
+        code: diagnosticCode,
+        message:
+          "Long-running delete operations must have 202 and 204 responses. They must not have any other response codes. Consider using the 'ArmResourceDeleteWithoutOkAsync' template.",
+        pos: getSourceLocation(deleteOp).pos,
+        end: getSourceLocation(deleteOp).end,
+      }));
+  });
+
+  it("accepts a long-running POST without a 200 response", async () => {
+    await tester
+      .expect(
+        `${employee}
+        @armResourceOperations interface Employees {
+          hire is ArmResourceActionNoResponseContentAsync<Employee, void>;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects a long-running POST whose 202 response has a body", async () => {
+    await tester
+      .expect(lroPost("{ @statusCode _: 200; @body body: Employee; }", "@body body: Employee;"))
+      .toEmitDiagnostics(({ hire }) => ({
+        code: diagnosticCode,
+        message:
+          "Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.",
+        pos: getSourceLocation(hire).pos,
+        end: getSourceLocation(hire).end,
+      }));
+  });
+
+  it("rejects an extra status on a long-running POST", async () => {
+    await tester
+      .expect(lroPost("{ @statusCode _: 203; @body body: Employee; }"))
+      .toEmitDiagnostics(({ hire }) => ({
+        code: diagnosticCode,
+        message:
+          "Long-running post operations must have a 202 response without a body and may have a 200 response with a body. They must not have any other response codes.",
+        pos: getSourceLocation(hire).pos,
+        end: getSourceLocation(hire).end,
+      }));
+  });
+
+  it("rejects an invalid multipart POST response", async () => {
+    await tester
+      .expect(
+        `${header}
+        @post op /*action*/action(): {
+          @statusCode _: 203;
+          @header contentType: "multipart/mixed";
+          @multipartBody result: [HttpPart<string>];
+        };
+        `,
+      )
+      .toEmitDiagnostics(({ action }) => ({
+        code: diagnosticCode,
+        message:
+          "Synchronous post operations must have either a 200 or 204 response. They must not have any other response codes.",
+        pos: getSourceLocation(action).pos,
+        end: getSourceLocation(action).end,
+      }));
+  });
 
   it("accepts a long-running POST whose 200 response has multiple content-type variants", async () => {
     await tester

@@ -1,5 +1,3 @@
-[`use-standard-response-codes`](../use-standard-response-codes) also includes these DELETE success-response checks, without requiring a default error response. It applies them to every DELETE operation inside a service, not only to registered resource operations. The resource-manager ruleset still enables this rule and leaves `use-standard-response-codes` disabled.
-
 ## Impact
 
 - **Area:** API

@@ -4,24 +4,26 @@ import {
   type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 
 import { armPutResponseCodesRule } from "../../src/rules/arm-put-response-codes.js";
-import { useStandardResponseCodesRule } from "../../src/rules/use-standard-response-codes.js";
 
-describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", (rule) => {
-  let runner: TesterInstance;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await Tester.createInstance();
-    tester = createLinterRuleTester(runner, rule, "@azure-tools/typespec-azure-resource-manager");
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    armPutResponseCodesRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("Emits a warning for put operation that does not contain the appropriate response codes", async () => {
-    await tester
-      .expect(
-        `
+it("Emits a warning for put operation that does not contain the appropriate response codes", async () => {
+  await tester
+    .expect(
+      `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -39,16 +41,16 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         }
       }
       `,
-      )
-      .toEmitDiagnostics({
-        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
+    });
+});
 
-  it("Emits a warning for put action that does not contain the appropriate response codes", async () => {
-    await tester
-      .expect(
-        `
+it("Emits a warning for put action that does not contain the appropriate response codes", async () => {
+  await tester
+    .expect(
+      `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -66,16 +68,16 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         }
       }
       `,
-      )
-      .toEmitDiagnostics({
-        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
+    });
+});
 
-  it("Does not emit a warning for put operation that contains the appropriate response codes", async () => {
-    await tester
-      .expect(
-        `
+it("Does not emit a warning for put operation that contains the appropriate response codes", async () => {
+  await tester
+    .expect(
+      `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -96,43 +98,14 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         } | ErrorResponse;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("leaves missing default responses to the error response rule only in the combined rule", async () => {
-    const result = tester.expect(
+it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpdateAsync' template.", async () => {
+  await tester
+    .expect(
       `
-        @armProviderNamespace
-        namespace Microsoft.Contoso;
-        model Employee is ProxyResource<{}> {
-          ...ResourceNameParameter<Employee>;
-        }
-        @armResourceOperations
-        interface Employees {
-          @put @armResourceCreateOrUpdate(Employee)
-          createOrUpdate(...ApiVersionParameter):
-            { @statusCode code: 200; @body body: Employee; }
-            | { @statusCode code: 201; @body body: Employee; };
-        }
-      `,
-    );
-    if (rule === useStandardResponseCodesRule) {
-      await result.toBeValid();
-    } else {
-      await result.toEmitDiagnostics({
-        code: `@azure-tools/typespec-azure-resource-manager/${rule.name}`,
-        message:
-          "Put operations must have 200, 201 and default responses. They must not have any other responses.",
-        target: "createOrUpdate",
-      });
-    }
-  });
-
-  it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpdateAsync' template.", async () => {
-    await tester
-      .expect(
-        `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -145,14 +118,14 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         createOrUpdate is ArmResourceCreateOrUpdateAsync<Employee>;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrReplaceAsync' template.", async () => {
-    await tester
-      .expect(
-        `
+it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrReplaceAsync' template.", async () => {
+  await tester
+    .expect(
+      `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -165,14 +138,14 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrReplaceSync' template.", async () => {
-    await tester
-      .expect(
-        `
+it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrReplaceSync' template.", async () => {
+  await tester
+    .expect(
+      `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -185,14 +158,14 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         createOrReplace is ArmResourceCreateOrReplaceSync<Employee>;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("Does not emit a warning for put action that contains the appropriate response codes", async () => {
-    await tester
-      .expect(
-        `
+it("Does not emit a warning for put action that contains the appropriate response codes", async () => {
+  await tester
+    .expect(
+      `
       @armProviderNamespace
       namespace Microsoft.Contoso;
       
@@ -213,7 +186,6 @@ describe.each([armPutResponseCodesRule, useStandardResponseCodesRule])("$name", 
         } | ErrorResponse;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
 });
