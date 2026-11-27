@@ -356,6 +356,12 @@ const libDef = {
         default: paramMessage`Path contains parameter ${"param"} but wasn't found in given parameters`,
       },
     },
+    "invalid-lro-operation-id-path": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Cannot extract LRO operation ID '${"param"}' from the status-monitor path '${"path"}'. Only simple path parameter expansions are supported.`,
+      },
+    },
     "duplicate-body-types": {
       severity: "error",
       messages: {

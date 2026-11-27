@@ -23,6 +23,7 @@ import { getMediaTypeHint, NoTarget, type Program } from "@typespec/compiler";
 import { isHeader, isMetadata } from "@typespec/http";
 import {
   type FunctionDeclarationStructure,
+  type InterfaceDeclarationStructure,
   type OptionalKind,
   type ParameterDeclarationStructure,
   StructureKind,
@@ -40,6 +41,7 @@ import {
   formatOptionalPropertyAccess,
   formatPropertyAccess,
   NameType,
+  normalizeName,
   normalizeSdkName,
   normalizeSdkPropertyName,
 } from "../../utils/name-utils.js";
@@ -89,6 +91,7 @@ import {
 import { isExtensibleEnum } from "../type-expressions/get-enum-expression.js";
 import { emitInlineModel } from "../type-expressions/get-model-expression.js";
 import {
+  getModelPropertyName,
   getTypeExpression,
   normalizeModelPropertyName,
 } from "../type-expressions/get-type-expression.js";
@@ -903,6 +906,7 @@ export function getOperationFunction(
   propertyName?: string;
   isLro?: boolean;
   lroFinalReturnType?: string;
+  lroOperationStateType?: string;
   isLroPaging?: boolean;
   lropagingFinalReturnType?: string;
 } {
@@ -1628,6 +1632,186 @@ export function packageHasStructuredStreaming(context: SdkContext): boolean {
   return false;
 }
 
+interface LroOperationMetadataMember {
+  name: string;
+  type: string;
+  doc?: string;
+  value: string;
+}
+
+const operationStateMemberNames = new Set(["status", "result", "error", "config"]);
+
+export function hasLroOperationMetadata(operation: ServiceOperation): boolean {
+  return (
+    isLroOnlyOperation(operation) &&
+    ((operation.lroMetadata.statusMetadata?.length ?? 0) > 0 ||
+      (operation.lroMetadata.operationId?.length ?? 0) > 0)
+  );
+}
+
+function getLroOperationMetadataMembers(
+  context: SdkContext,
+  operation: SdkLroServiceMethod<SdkHttpOperation>,
+  useMonitorDeserializer: boolean,
+): LroOperationMetadataMember[] {
+  const { statusMetadata = [], operationId = [] } = operation.lroMetadata;
+  const members: LroOperationMetadataMember[] = [];
+  if (operationId.length > 0) {
+    // Prefer the value from the latest status-monitor response, then fall back to the polling URL.
+    const values = [...operationId].reverse().map((selection) => {
+      if (selection.kind === "property") {
+        return getLroStatusMonitorValue(
+          context,
+          selection.propertySegments,
+          useMonitorDeserializer,
+        );
+      }
+      const statusMonitorStep = operation.lroMetadata.statusMonitorStep;
+      const statusMonitorOperation =
+        statusMonitorStep?.kind === "nextOperationReference"
+          ? statusMonitorStep.target.operation
+          : statusMonitorStep?.operation;
+      const path = statusMonitorOperation?.path;
+      const uriTemplate = statusMonitorOperation?.uriTemplate;
+      const parameter = selection.pathParameter.serializedName;
+      if (!path || !path.includes(`{${parameter}}`) || (uriTemplate && /\{[+]/.test(uriTemplate))) {
+        reportDiagnostic(context.program, {
+          code: "invalid-lro-operation-id-path",
+          format: { param: parameter, path: uriTemplate ?? path ?? "" },
+          target: operation.__raw ?? NoTarget,
+        });
+      }
+      return `${resolveReference(PollingHelpers.GetPathParameterFromUrl)}(operationLocation, ${JSON.stringify(
+        path ?? "",
+      )}, ${JSON.stringify(parameter)})`;
+    });
+    members.push({
+      name: "operationId",
+      type: "string",
+      doc: "The service-issued identifier of the long-running operation.",
+      value: values.join(" ?? "),
+    });
+  }
+  const usedNames = new Set([...operationStateMemberNames, ...members.map((m) => m.name)]);
+  for (const { property, propertySegments } of statusMetadata) {
+    const propertyName = getModelPropertyName(context, property);
+    const name = generateLocallyUniqueName(
+      usedNames.has(propertyName) ? `${propertyName}Metadata` : propertyName,
+      usedNames,
+    );
+    usedNames.add(name);
+    members.push({
+      name,
+      type: getTypeExpression(context, property.type),
+      doc: property.doc ?? property.summary,
+      value: getLroStatusMonitorValue(context, propertySegments, useMonitorDeserializer),
+    });
+  }
+  return members;
+}
+
+function getLroStatusMonitorValue(
+  context: SdkContext,
+  propertySegments: SdkModelPropertyType[],
+  useMonitorDeserializer: boolean,
+): string {
+  if (useMonitorDeserializer) {
+    return propertySegments.reduce(
+      (value, property) =>
+        formatOptionalPropertyAccess(value, getModelPropertyName(context, property)),
+      "status",
+    );
+  }
+  const property = propertySegments[propertySegments.length - 1]!;
+  const restValue = `body?.${propertySegments
+    .map((p) => `[${JSON.stringify(getPropertySerializedName(p))}]`)
+    .join("?.")}`;
+  const deserializeFunctionName = buildModelDeserializer(
+    context,
+    getNullableValidType(property.type),
+    { nameOnly: true, skipDiscriminatedUnionSuffix: false },
+  );
+  if (deserializeFunctionName) {
+    return `!${restValue} ? ${restValue} : ${deserializeFunctionName}(${restValue})`;
+  }
+  if (isAzureCoreErrorType(context.program, property.type.__raw)) {
+    return restValue;
+  }
+  return deserializeResponseValue(
+    context,
+    property.type,
+    restValue,
+    false,
+    getEncodeForModelProperty(context, property),
+  );
+}
+
+export function getLroOperationMetadataDeclarations(
+  context: SdkContext,
+  method: [string[], ServiceOperation],
+):
+  | {
+      extractor: OptionalKind<FunctionDeclarationStructure>;
+      state: InterfaceDeclarationStructure;
+    }
+  | undefined {
+  const operation = method[1];
+  if (!isLroOnlyOperation(operation) || !hasLroOperationMetadata(operation)) {
+    return undefined;
+  }
+  const monitorDeserializer = buildModelDeserializer(
+    context,
+    operation.lroMetadata.pollingInfo.responseModel,
+    {
+      nameOnly: true,
+      skipDiscriminatedUnionSuffix: false,
+    },
+  );
+  const members = getLroOperationMetadataMembers(context, operation, !!monitorDeserializer);
+  const { name } = getOperationName(operation, context, method[0]);
+  const pathUncheckedResponseReference = resolveReference(useDependencies().PathUncheckedResponse);
+  const { shouldWrap } = checkWrapNonModelReturn(context, operation);
+  const resultType = shouldWrap
+    ? resolveReference(refkey(operation, "response"))
+    : buildLroReturnType(context, operation).type;
+  const bodyUsed = members.some((member) => member.value.includes("body?.["));
+  const statusUsed = members.some((member) => member.value.includes("status?."));
+  return {
+    extractor: {
+      isExported: true,
+      name: `_${name}GetOperationMetadata`,
+      parameters: [
+        { name: "statusMonitorResponse", type: `${pathUncheckedResponseReference} | undefined` },
+        { name: "operationLocation", type: "string | undefined" },
+      ],
+      returnType: `{ ${members.map((m) => `${JSON.stringify(m.name)}?: ${m.type}`).join("; ")} }`,
+      statements: [
+        ...(bodyUsed || statusUsed ? [`const body = statusMonitorResponse?.body;`] : []),
+        ...(statusUsed
+          ? [`const status = body == null ? undefined : ${monitorDeserializer}(body);`]
+          : []),
+        `return { ${members.map((m) => `${JSON.stringify(m.name)}: ${m.value}`).join(",\n")} };`,
+      ],
+    },
+    state: {
+      kind: StructureKind.Interface,
+      isExported: true,
+      name: `${normalizeName(name, NameType.Interface)}OperationState`,
+      extends: [`${resolveReference(AzurePollingDependencies.OperationState)}<${resultType}>`],
+      docs: [
+        "Metadata values are live, non-enumerable getters omitted by object spread, JSON serialization, and continuation tokens.",
+      ],
+      properties: members.map((member) => ({
+        name: JSON.stringify(member.name),
+        type: member.type,
+        isReadonly: true,
+        hasQuestionToken: true,
+        docs: member.doc ? [member.doc] : [],
+      })),
+    },
+  };
+}
+
 function getLroOnlyOperationFunction(
   context: SdkContext,
   method: [string[], SdkLroServiceMethod<SdkHttpOperation>],
@@ -1637,6 +1821,7 @@ function getLroOnlyOperationFunction(
   propertyName?: string;
   isLro?: boolean;
   lroFinalReturnType?: string;
+  lroOperationStateType?: string;
 } {
   const operation = method[1];
   // Extract required parameters
@@ -1648,7 +1833,6 @@ function getLroOnlyOperationFunction(
   const returnType = buildLroReturnType(context, operation);
   const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
   const pollerLikeReference = resolveReference(AzurePollingDependencies.PollerLike);
-  const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
 
   // When wrap-non-model-return is enabled and the LRO final result is a non-model type,
   // use the wrapper response type (e.g. GetIkeSasResponse) instead of the raw type (e.g. string).
@@ -1659,6 +1843,22 @@ function getLroOnlyOperationFunction(
   const effectiveReturnTypeName = shouldWrap
     ? getOperationResponseTypeName(method as [string[], ServiceOperation])
     : returnType.type;
+  const hasOperationMetadata = hasLroOperationMetadata(operation);
+  const operationStateType = hasOperationMetadata
+    ? resolveReference(refkey(operation, "lroOperationState"))
+    : `${resolveReference(AzurePollingDependencies.OperationState)}<${effectiveReturnTypeStr}>`;
+  const monitorModel = operation.lroMetadata.pollingInfo.responseModel;
+  const initialMonitorStatuses = operation.operation.responses
+    .filter(
+      (response) =>
+        typeof response.statusCodes === "number" &&
+        (response.type === monitorModel ||
+          (monitorModel.__raw !== undefined && response.type?.__raw === monitorModel.__raw)) &&
+        !operation.operation.responses.some(
+          (other) => other.statusCodes === response.statusCodes && other.type !== response.type,
+        ),
+    )
+    .map((response) => String(response.statusCodes));
 
   const functionStatement = {
     kind: StructureKind.Function,
@@ -1675,8 +1875,9 @@ function getLroOnlyOperationFunction(
     propertyName,
     isLro: true,
     lroFinalReturnType: effectiveReturnTypeName,
+    lroOperationStateType: operationStateType,
     parameters,
-    returnType: `${pollerLikeReference}<${operationStateReference}<${effectiveReturnTypeStr}>, ${effectiveReturnTypeStr}>`,
+    returnType: `${pollerLikeReference}<${operationStateType}, ${effectiveReturnTypeStr}>`,
   };
 
   const getLongRunningPollerReference = resolveReference(PollingHelpers.GetLongRunningPoller);
@@ -1704,8 +1905,10 @@ function getLroOnlyOperationFunction(
     abortSignal: ${optionalParamName}?.abortSignal,
     getInitialResponse: () => _${name}Send(${parameters.map((p) => p.name).join(", ")}),
     ${resourceLocationConfig}
-    ${apiVersion ? `apiVersion: ${apiVersion}` : ""}
-  }) as ${pollerLikeReference}<${operationStateReference}<${effectiveReturnTypeStr}>, ${effectiveReturnTypeStr}>;
+    ${apiVersion ? `apiVersion: ${apiVersion}${hasOperationMetadata ? "," : ""}` : ""}
+    ${hasOperationMetadata && initialMonitorStatuses.length > 0 ? `initialResponseStatusMonitorStatuses: ${JSON.stringify(initialMonitorStatuses)},` : ""}
+    ${hasOperationMetadata ? `getOperationMetadata: _${name}GetOperationMetadata,` : ""}
+  }) as ${pollerLikeReference}<${operationStateType}, ${effectiveReturnTypeStr}>;
   `);
 
   return {

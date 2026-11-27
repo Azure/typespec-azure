@@ -32,6 +32,7 @@ interface OperationDeclarationInfo {
   isLro?: boolean;
   // only set when isLro is true
   lroFinalReturnType?: string;
+  lroOperationStateType?: string;
   // set to true for LRO+Paging operations
   isLroPaging?: boolean;
   // only set when isLroPaging is true
@@ -88,6 +89,7 @@ export function getClassicalOperation(
         declarationRefKey: resolveReference(refkey(operation, "api")),
         isLro: declaration.isLro,
         lroFinalReturnType: declaration.lroFinalReturnType,
+        lroOperationStateType: declaration.lroOperationStateType,
         isLroPaging: declaration.isLroPaging,
         lropagingFinalReturnType: declaration.lropagingFinalReturnType,
       });
@@ -174,7 +176,7 @@ export function getClassicalOperation(
           properties.push({
             kind: StructureKind.PropertySignature,
             name: `${normalizeName(beginName, NameType.Method)}`,
-            type: `(${paramStr}) => Promise<${simplePollerLikeReference}<${operationStateReference}<${returnType}>, ${returnType}>>`,
+            type: `(${paramStr}) => Promise<${simplePollerLikeReference}<${operationInfo?.lroOperationStateType ?? `${operationStateReference}<${returnType}>`}, ${returnType}>>`,
             docs: [`@deprecated use ${getClassicalMethodName(d)} instead`],
           });
           properties.push({

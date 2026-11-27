@@ -4,9 +4,11 @@ import {
   getDeserializeHeadersPrivateFunction,
   getDeserializePrivateFunction,
   getExpectedStatuses,
+  getLroOperationMetadataDeclarations,
   getOperationFunction,
   getOperationOptionsName,
   getSendPrivateFunction,
+  hasLroOperationMetadata,
   isLroAndPagingOperation,
   isLroOnlyOperation,
 } from "./helpers/operation-helpers.js";
@@ -96,6 +98,18 @@ export function buildOperationFiles(
       }
       if (deserializeExceptionHeadersDeclaration) {
         functionsToAdd.push(deserializeExceptionHeadersDeclaration);
+      }
+      const lroOperationMetadataDeclarations = getLroOperationMetadataDeclarations(dpgContext, [
+        prefixes,
+        op,
+      ]);
+      if (lroOperationMetadataDeclarations) {
+        functionsToAdd.push(lroOperationMetadataDeclarations.extractor);
+        addDeclaration(
+          operationGroupFile,
+          lroOperationMetadataDeclarations.state,
+          refkey(op, "lroOperationState"),
+        );
       }
 
       operationGroupFile.addFunctions(functionsToAdd);
@@ -237,11 +251,22 @@ export function buildLroDeserDetailMap(
           renamedDeserName = `_${newName}`;
         }
         existingNames.add(deserName);
+        const operationMetadataName = hasLroOperationMetadata(o)
+          ? `_${name}GetOperationMetadata`
+          : undefined;
         return {
           path: `${o.operation.verb.toUpperCase()} ${o.operation.path}`,
           expectedStatusesExpression: getExpectedStatuses(o),
           deserName,
           renamedDeserName,
+          operationMetadataName,
+          renamedOperationMetadataName:
+            operationMetadataName && renamedDeserName
+              ? `_${name}GetOperationMetadata${normalizeName(
+                  operationFileName.split("/").slice(0, -1).join("_"),
+                  NameType.Interface,
+                )}`
+              : undefined,
         };
       }),
     );
