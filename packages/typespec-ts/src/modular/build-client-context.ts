@@ -5,6 +5,7 @@ import {
   getClientParameterName,
   getClientParameters,
   getClientParametersDeclaration,
+  getClientParameterTypeExpression,
 } from "./helpers/client-helpers.js";
 import type { ModularEmitterOptions } from "./interfaces.js";
 
@@ -17,7 +18,7 @@ import type {
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
 import { NoTarget } from "@typespec/compiler";
-import { SourceFile } from "ts-morph";
+import { SourceFile, VariableDeclarationKind } from "ts-morph";
 import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
@@ -29,6 +30,12 @@ import { NameType, normalizeName } from "../utils/name-utils.js";
 import { buildEnumTypes, getApiVersionEnum } from "./emit-models.js";
 import { getDocsFromDescription, getInputDocs } from "./helpers/docs-helpers.js";
 import { getClassicalClientName, getClientName } from "./helpers/naming-helpers.js";
+import {
+  buildConfigurationEndpointExpression,
+  collectServiceConfigurationTemplateParams,
+  getClientServiceConfigurations,
+  type ResolvedServiceConfigurations,
+} from "./helpers/service-configuration-helpers.js";
 import { CloudSettingHelpers } from "./static-helpers-metadata.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 
@@ -71,6 +78,20 @@ export function buildClientContext(
     getClientContextPath(clientMap, emitterOptions),
   );
 
+  const classicalClientName = getClassicalClientName(client);
+  const serviceConfigs = getClientServiceConfigurations(client);
+  const mergedTemplateTypes =
+    serviceConfigs?.endpointMode === "templated"
+      ? new Map(
+          collectServiceConfigurationTemplateParams(
+            dpgContext,
+            serviceConfigs,
+            getClientParameterName,
+            getClientParameterTypeExpression,
+          ).map((tp) => [tp.paramName, tp.typeExpression]),
+        )
+      : undefined;
+
   // Get all client parameters (both required and optional) for the interface
   const requiredInterfaceProperties = getClientParameters(client, dpgContext, {
     onClientOnly: false,
@@ -81,9 +102,10 @@ export function buildClientContext(
       return clientParamName !== "endpointParam" && clientParamName !== "credential";
     })
     .map((p) => {
+      const clientParamName = getClientParameterName(p);
       return {
-        name: getClientParameterName(p),
-        type: getTypeExpression(dpgContext, p.type),
+        name: clientParamName,
+        type: mergedTemplateTypes?.get(clientParamName) ?? getTypeExpression(dpgContext, p.type),
         hasQuestionToken: false,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -106,9 +128,10 @@ export function buildClientContext(
       );
     })
     .map((p) => {
+      const clientParamName = getClientParameterName(p);
       return {
-        name: getClientParameterName(p),
-        type: getTypeExpression(dpgContext, p.type),
+        name: clientParamName,
+        type: mergedTemplateTypes?.get(clientParamName) ?? getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -122,10 +145,46 @@ export function buildClientContext(
     properties: [...requiredInterfaceProperties, ...optionalInterfaceProperties],
   });
 
+  const credentialsEnabled = emitterOptions.options.addCredentials !== false;
+  if (serviceConfigs) {
+    clientContextFile.addTypeAlias({
+      isExported: true,
+      name: serviceConfigs.serviceConfigTypeName,
+      type: serviceConfigs.configurations.map((c) => JSON.stringify(c.name)).join(" | "),
+      docs: [`Supported service configuration names for {@link ${classicalClientName}}.`],
+    });
+    if (serviceConfigs.knownAudienceEnumName && credentialsEnabled) {
+      clientContextFile.addEnum({
+        isExported: true,
+        name: serviceConfigs.knownAudienceEnumName,
+        docs: [`Known Microsoft Entra audiences for {@link ${classicalClientName}}.`],
+        members: serviceConfigs.audienceMembers.map((member) => ({
+          name: member.memberName,
+          value: member.value,
+          docs: [
+            `Audience for the ${JSON.stringify(member.configurationName)} service configuration.`,
+          ],
+        })),
+      });
+    }
+    emitServiceConfigurationsLookup(
+      clientContextFile,
+      dpgContext,
+      serviceConfigs,
+      credentialsEnabled,
+    );
+  }
+
   const propertiesInOptions = getClientParameters(client, dpgContext, {
     optionalOnly: true,
   })
-    .filter((p) => getClientParameterName(p) !== "endpoint")
+    .filter(
+      (p) =>
+        getClientParameterName(p) !== "endpoint" &&
+        !(
+          serviceConfigs?.endpointMode === "fixed" && getClientParameterName(p) === "endpointParam"
+        ),
+    )
     .map((p) => {
       return {
         name: getClientParameterName(p),
@@ -155,8 +214,71 @@ export function buildClientContext(
     }
     existingOptionNames.add(property.name);
   }
+  let hasServiceConfigurationOption = false;
+  let hasAudienceOption = false;
+  if (serviceConfigs) {
+    if (serviceConfigs.endpointMode === "templated") {
+      const templateParams = collectServiceConfigurationTemplateParams(
+        dpgContext,
+        serviceConfigs,
+        getClientParameterName,
+        getClientParameterTypeExpression,
+      );
+      for (const tp of templateParams) {
+        if (!tp.optional || requiredParams.some((rp) => rp.name === tp.paramName)) {
+          continue;
+        }
+        const existingProp = propertiesInOptions.find((prop) => prop.name === tp.paramName);
+        if (existingProp) {
+          if (tp.paramName.toLowerCase() !== "apiversion") {
+            existingProp.type = tp.typeExpression;
+          }
+        } else if (!existingOptionNames.has(tp.paramName)) {
+          propertiesInOptions.push({
+            name: tp.paramName,
+            type: tp.typeExpression,
+            hasQuestionToken: true,
+            docs: [],
+          });
+          existingOptionNames.add(tp.paramName);
+        }
+      }
+    }
+    if (
+      !existingOptionNames.has("serviceConfiguration") &&
+      !requiredParams.some((rp) => rp.name === "serviceConfiguration")
+    ) {
+      propertiesInOptions.push({
+        name: "serviceConfiguration",
+        type: serviceConfigs.serviceConfigTypeName,
+        hasQuestionToken: true,
+        docs: [
+          `Service configuration name to use for default endpoint and authentication settings. Defaults to ${JSON.stringify(serviceConfigs.defaultConfiguration)}.`,
+        ],
+      });
+      existingOptionNames.add("serviceConfiguration");
+      hasServiceConfigurationOption = true;
+    }
+    if (
+      serviceConfigs.knownAudienceEnumName &&
+      credentialsEnabled &&
+      !existingOptionNames.has("audience") &&
+      !requiredParams.some((rp) => rp.name === "audience")
+    ) {
+      propertiesInOptions.push({
+        name: "audience",
+        type: "string",
+        hasQuestionToken: true,
+        docs: [
+          `The Microsoft Entra audience to use for authentication. {@link ${serviceConfigs.knownAudienceEnumName}} can be used interchangeably with audience.`,
+        ],
+      });
+      existingOptionNames.add("audience");
+      hasAudienceOption = true;
+    }
+  }
   clientContextFile.addInterface({
-    name: `${getClassicalClientName(client)}OptionalParams`,
+    name: `${classicalClientName}OptionalParams`,
     isExported: true,
     extends: [resolveReference(dependencies.ClientOptions)],
     properties: propertiesInOptions,
@@ -180,12 +302,35 @@ export function buildClientContext(
     isExported: true,
   });
 
+  if (serviceConfigs) {
+    const configSelectorExpr = hasServiceConfigurationOption
+      ? `options.serviceConfiguration ?? ${JSON.stringify(serviceConfigs.defaultConfiguration)}`
+      : JSON.stringify(serviceConfigs.defaultConfiguration);
+    factoryFunction.addStatements([
+      `const selectedConfigurationName = ${configSelectorExpr};`,
+      `const selectedConfiguration = serviceConfigurations[selectedConfigurationName];`,
+      `if (!selectedConfiguration) {
+        throw new Error(\`Unsupported serviceConfiguration "\${String(selectedConfigurationName)}".\`);
+      }`,
+    ]);
+  }
+
   const { endpointParamName: endpointParam, assignedOptionalParams } = buildGetClientEndpointParam(
     factoryFunction,
     dpgContext,
     client,
+    serviceConfigs,
   );
-  const credentialParam = buildGetClientCredentialParam(client, emitterOptions);
+  const isKeyCredentialExpr =
+    serviceConfigs?.hasCustomHttpAuth && credentialsEnabled
+      ? resolveReference(dependencies.isKeyCredential)
+      : undefined;
+  const credentialParam = buildGetClientCredentialParam(
+    client,
+    emitterOptions,
+    serviceConfigs,
+    isKeyCredentialExpr,
+  );
 
   // Get api version param early so we can use its name when building options
   const apiVersionParam = getClientParameters(client, dpgContext).find((x) => x.isApiVersionParam);
@@ -196,6 +341,13 @@ export function buildClientContext(
     emitterOptions,
     endpointParam,
     apiVersionParamName,
+    serviceConfigs
+      ? {
+          serviceConfigs,
+          hasServiceConfigurationOption,
+          hasAudienceOption,
+        }
+      : undefined,
   );
 
   factoryFunction.addStatements(
@@ -206,7 +358,29 @@ export function buildClientContext(
 
   const { customHttpAuthHeaderName, customHttpAuthSharedKeyPrefix } = emitterOptions.options;
 
-  if (customHttpAuthHeaderName && customHttpAuthSharedKeyPrefix) {
+  if (serviceConfigs && serviceConfigs.hasCustomHttpAuth && credentialsEnabled) {
+    const credParam = client.clientInitialization.parameters.find(
+      (x): x is SdkCredentialParameter => x.kind === "credential",
+    );
+    const credVarName = credParam ? getClientParameterName(credParam) : "credential";
+    factoryFunction.addStatements(`
+      if (
+        selectedConfiguration.customHttpAuthHeaderName &&
+        selectedConfiguration.customHttpAuthSharedKeyPrefix &&
+        ${resolveReference(dependencies.isKeyCredential)}(${credVarName})
+      ) {
+        const headerName = selectedConfiguration.customHttpAuthHeaderName;
+        const keyPrefix = selectedConfiguration.customHttpAuthSharedKeyPrefix;
+        clientContext.pipeline.addPolicy({
+          name: "customKeyCredentialPolicy",
+          sendRequest(request, next) {
+            request.headers.set(headerName, keyPrefix + " " + ${credVarName}.key);
+            return next(request);
+          }
+        });
+      }
+      `);
+  } else if (!serviceConfigs && customHttpAuthHeaderName && customHttpAuthSharedKeyPrefix) {
     factoryFunction.addStatements(`
       if(${resolveReference(dependencies.isKeyCredential)}(credential)) {
         clientContext.pipeline.addPolicy({ 
@@ -296,6 +470,121 @@ export function buildClientContext(
 
   clientContextFile.fixUnusedIdentifiers();
   return clientContextFile;
+}
+
+function emitServiceConfigurationsLookup(
+  clientContextFile: SourceFile,
+  dpgContext: SdkContext,
+  serviceConfigs: ResolvedServiceConfigurations,
+  credentialsEnabled: boolean,
+) {
+  const typeFields: string[] = [];
+  const templateParams =
+    serviceConfigs.endpointMode === "templated"
+      ? collectServiceConfigurationTemplateParams(
+          dpgContext,
+          serviceConfigs,
+          getClientParameterName,
+          getClientParameterTypeExpression,
+        )
+      : [];
+  const perConfigDefaultParams = templateParams.filter((tp) => tp.hasPerConfigDefaults);
+
+  if (serviceConfigs.endpointMode === "fixed") {
+    typeFields.push("endpoint: string");
+  } else if (serviceConfigs.endpointMode === "templated") {
+    if (perConfigDefaultParams.length > 0) {
+      typeFields.push(
+        `defaults: { ${perConfigDefaultParams.map((tp) => `${tp.paramName}?: ${tp.typeExpression}`).join("; ")} }`,
+      );
+    }
+    const paramTypeProps = templateParams
+      .map(
+        (tp) =>
+          `${tp.paramName}: ${tp.typeExpression}${tp.optional && tp.uniformDefault === undefined ? " | undefined" : ""}`,
+      )
+      .join("; ");
+    typeFields.push(`buildEndpoint: (params: { ${paramTypeProps} }) => string`);
+  }
+
+  const allHaveNonEmptyOAuth2Scopes =
+    credentialsEnabled &&
+    serviceConfigs.hasOAuth2 &&
+    serviceConfigs.configurations.every((c) => c.hasOAuth2 && c.oauth2Scopes.length > 0);
+  const allHaveApiKey =
+    credentialsEnabled &&
+    serviceConfigs.hasApiKeyAuth &&
+    serviceConfigs.configurations.every((c) => Boolean(c.apiKeyHeaderName));
+
+  if (credentialsEnabled && serviceConfigs.hasOAuth2) {
+    if (!allHaveNonEmptyOAuth2Scopes) {
+      typeFields.push("hasOAuth2: boolean");
+    }
+    typeFields.push("scopes: string[]");
+  }
+  if (credentialsEnabled && serviceConfigs.hasApiKeyAuth) {
+    typeFields.push(`apiKeyHeaderName${allHaveApiKey ? "" : "?"}: string`);
+  }
+  if (credentialsEnabled && serviceConfigs.hasCustomHttpAuth) {
+    typeFields.push("customHttpAuthHeaderName?: string");
+    typeFields.push("customHttpAuthSharedKeyPrefix?: string");
+  }
+
+  const templateParamByName = new Map(templateParams.map((tp) => [tp.paramName, tp]));
+  const entryObjectTexts = serviceConfigs.configurations.map((cfg) => {
+    const props: string[] = [];
+    if (serviceConfigs.endpointMode === "fixed") {
+      props.push(`endpoint: ${JSON.stringify(cfg.serverUrl)}`);
+    } else if (serviceConfigs.endpointMode === "templated") {
+      if (perConfigDefaultParams.length > 0) {
+        const defaultProps = perConfigDefaultParams
+          .map((tp) => {
+            const val = tp.perConfigDefaults.get(cfg.name);
+            return val !== undefined ? `${tp.paramName}: ${JSON.stringify(val)}` : undefined;
+          })
+          .filter((x): x is string => Boolean(x));
+        props.push(`defaults: { ${defaultProps.join(", ")} }`);
+      }
+      props.push(
+        `buildEndpoint: ${buildConfigurationEndpointExpression(cfg, templateParamByName, getClientParameterName)}`,
+      );
+    }
+
+    if (credentialsEnabled && serviceConfigs.hasOAuth2) {
+      if (!allHaveNonEmptyOAuth2Scopes) {
+        props.push(`hasOAuth2: ${cfg.hasOAuth2}`);
+      }
+      props.push(`scopes: [${cfg.oauth2Scopes.map((s) => JSON.stringify(s)).join(", ")}]`);
+    }
+    if (credentialsEnabled && serviceConfigs.hasApiKeyAuth && cfg.apiKeyHeaderName) {
+      props.push(`apiKeyHeaderName: ${JSON.stringify(cfg.apiKeyHeaderName)}`);
+    }
+    if (
+      credentialsEnabled &&
+      serviceConfigs.hasCustomHttpAuth &&
+      cfg.customHttpAuthHeaderName &&
+      cfg.customHttpAuthSharedKeyPrefix
+    ) {
+      props.push(`customHttpAuthHeaderName: ${JSON.stringify(cfg.customHttpAuthHeaderName)}`);
+      props.push(
+        `customHttpAuthSharedKeyPrefix: ${JSON.stringify(cfg.customHttpAuthSharedKeyPrefix)}`,
+      );
+    }
+
+    const key = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(cfg.name) ? cfg.name : JSON.stringify(cfg.name);
+    return `${key}: { ${props.join(", ")} }`;
+  });
+
+  clientContextFile.addVariableStatement({
+    declarationKind: VariableDeclarationKind.Const,
+    declarations: [
+      {
+        name: "serviceConfigurations",
+        type: `Record<${serviceConfigs.serviceConfigTypeName}, { ${typeFields.join("; ")} }>`,
+        initializer: `{ ${entryObjectTexts.join(", ")} }`,
+      },
+    ],
+  });
 }
 
 function getDocsWithKnownVersion(

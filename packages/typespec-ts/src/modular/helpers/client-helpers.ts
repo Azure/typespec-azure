@@ -20,6 +20,11 @@ import { NameType, normalizeSdkName } from "../../utils/name-utils.js";
 import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { getTypeExpression } from "../type-expressions/get-type-expression.js";
 import { getClassicalClientName } from "./naming-helpers.js";
+import {
+  collectServiceConfigurationTemplateParams,
+  getClientServiceConfigurations,
+  type ResolvedServiceConfigurations,
+} from "./service-configuration-helpers.js";
 import { isCredentialType } from "./type-helpers.js";
 
 interface ClientParameterOptions {
@@ -120,14 +125,28 @@ export function getClientParametersDeclaration(
     initializer: "{}",
   };
 
+  const serviceConfigs = getClientServiceConfigurations(client);
+  const mergedTemplateTypes =
+    serviceConfigs?.endpointMode === "templated"
+      ? new Map(
+          collectServiceConfigurationTemplateParams(
+            dpgContext,
+            serviceConfigs,
+            getClientParameterName,
+            getClientParameterTypeExpression,
+          ).map((tp) => [tp.paramName, tp.typeExpression]),
+        )
+      : undefined;
+
   const params: OptionalKind<ParameterDeclarationStructure>[] = [
     ...getClientParameters(client, dpgContext, options).map<
       OptionalKind<ParameterDeclarationStructure>
     >((p) => {
-      const typeExpression = getClientParameterTypeExpression(dpgContext, p);
-      const name = getClientParameterName(p);
+      const paramName = getClientParameterName(p);
+      const typeExpression =
+        mergedTemplateTypes?.get(paramName) ?? getClientParameterTypeExpression(dpgContext, p);
       return {
-        name,
+        name: paramName,
         type: typeExpression,
       };
     }),
@@ -137,7 +156,7 @@ export function getClientParametersDeclaration(
   return params;
 }
 
-function getClientParameterTypeExpression(context: SdkContext, parameter: SdkParameter) {
+export function getClientParameterTypeExpression(context: SdkContext, parameter: SdkParameter) {
   // Special handle to work around the fact that TCGC creates a union type for endpoint. The reason they do this
   // is to provide a way for users to either pass the value to fill in the template of the whole endpoint. Basically they are
   // inserting a variant with {endpoint}.
@@ -170,12 +189,54 @@ export function buildGetClientEndpointParam(
   context: StatementedNode,
   dpgContext: SdkContext,
   client: SdkClientType<SdkServiceOperation>,
+  serviceConfigs?: ResolvedServiceConfigurations,
 ): { endpointParamName: string; assignedOptionalParams?: Set<string> } {
   const assignedOptionalParams = new Set<string>();
   const cloudSettingSuffix = dpgContext.arm
     ? ` ?? ${resolveReference(CloudSettingHelpers.getArmEndpoint)}(options.cloudSetting)`
     : "";
   const coreEndpointParam = `options.endpoint${cloudSettingSuffix}`;
+
+  if (serviceConfigs && serviceConfigs.endpointMode === "fixed") {
+    context.addStatements(
+      `const endpointUrl = ${coreEndpointParam} ?? selectedConfiguration.endpoint;`,
+    );
+    return { endpointParamName: "endpointUrl" };
+  }
+
+  if (serviceConfigs && serviceConfigs.endpointMode === "templated") {
+    const templateParams = collectServiceConfigurationTemplateParams(
+      dpgContext,
+      serviceConfigs,
+      getClientParameterName,
+      getClientParameterTypeExpression,
+    );
+    for (const templateParam of templateParams) {
+      if (!templateParam.optional) {
+        continue;
+      }
+      if (templateParam.uniformDefault !== undefined) {
+        context.addStatements(
+          `const ${templateParam.paramName} = options.${templateParam.paramName} ?? ${JSON.stringify(templateParam.uniformDefault)};`,
+        );
+      } else if (templateParam.hasPerConfigDefaults) {
+        context.addStatements(
+          `const ${templateParam.paramName} = options.${templateParam.paramName} ?? selectedConfiguration.defaults.${templateParam.paramName};`,
+        );
+      } else {
+        context.addStatements(
+          `const ${templateParam.paramName} = options.${templateParam.paramName};`,
+        );
+      }
+      assignedOptionalParams.add(templateParam.paramName);
+    }
+    const argNames = templateParams.map((p) => p.paramName).join(", ");
+    context.addStatements(
+      `const endpointUrl = ${coreEndpointParam} ?? selectedConfiguration.buildEndpoint({ ${argNames} });`,
+    );
+    return { endpointParamName: "endpointUrl", assignedOptionalParams };
+  }
+
   // Special case: endpoint URL not defined
   const endpointParam = getClientParameters(client, dpgContext, {
     onClientOnly: true,
@@ -238,19 +299,40 @@ export function buildGetClientEndpointParam(
  * @param apiVersionParamName - the name of the api version parameter in options (e.g., "apiVersion" or "version")
  * @returns - an expression representing the options to be passed in to getClient
  */
+export interface BuildClientOptionsConfig {
+  serviceConfigs?: ResolvedServiceConfigurations;
+  hasServiceConfigurationOption?: boolean;
+  hasAudienceOption?: boolean;
+}
+
 export function buildGetClientOptionsParam(
   context: StatementedNode & Node,
   emitterOptions: ModularEmitterOptions,
   endpointParam: string,
   apiVersionParamName?: string,
+  config?: BuildClientOptionsConfig,
 ): string {
   const userAgentOptions = buildUserAgentOptions(context, emitterOptions);
   const loggingOptions = buildLoggingOptions();
-  const credentials = buildCredentials(emitterOptions, endpointParam);
+  const credentials = config?.serviceConfigs
+    ? buildServiceConfigurationCredentials(
+        emitterOptions,
+        endpointParam,
+        config.serviceConfigs,
+        Boolean(config.hasAudienceOption),
+      )
+    : buildCredentials(emitterOptions, endpointParam);
 
   // Use the actual api version parameter name for destructuring, defaulting to "apiVersion"
   const apiVersionDestructure = apiVersionParamName ?? "apiVersion";
-  let expr = `const { ${apiVersionDestructure}: _, ...updatedOptions } = {`;
+  const destructuredFields = [`${apiVersionDestructure}: _`];
+  if (config?.hasServiceConfigurationOption && apiVersionDestructure !== "serviceConfiguration") {
+    destructuredFields.push("serviceConfiguration: _serviceConfiguration");
+  }
+  if (config?.hasAudienceOption && apiVersionDestructure !== "audience") {
+    destructuredFields.push("audience: _audience");
+  }
+  let expr = `const { ${destructuredFields.join(", ")}, ...updatedOptions } = {`;
 
   expr += "...options,";
 
@@ -273,7 +355,30 @@ export function buildGetClientOptionsParam(
 export function buildGetClientCredentialParam(
   client: SdkClientType<SdkServiceOperation>,
   emitterOptions: ModularEmitterOptions,
+  serviceConfigs?: ResolvedServiceConfigurations,
+  isKeyCredentialExpr?: string,
 ): string {
+  if (
+    emitterOptions.options.addCredentials !== false &&
+    serviceConfigs &&
+    serviceConfigs.hasCredentials
+  ) {
+    const credParam = client.clientInitialization.parameters.find((x) => isCredentialType(x));
+    const credParamName = credParam ? getClientParameterName(credParam) : undefined;
+    if (!credParamName) {
+      return "undefined";
+    }
+    if (!serviceConfigs.hasOAuth2 && !serviceConfigs.hasApiKeyAuth) {
+      return "undefined";
+    }
+    if (serviceConfigs.hasCustomHttpAuth && isKeyCredentialExpr) {
+      const missingApiKeyGuard = serviceConfigs.hasApiKeyAuth
+        ? "!selectedConfiguration.apiKeyHeaderName && !options.credentials?.apiKeyHeaderName"
+        : "!options.credentials?.apiKeyHeaderName";
+      return `${isKeyCredentialExpr}(${credParamName}) && ${missingApiKeyGuard} ? undefined : ${credParamName}`;
+    }
+    return credParamName;
+  }
   if (
     emitterOptions.options.addCredentials &&
     (emitterOptions.options.credentialScopes || emitterOptions.options.credentialKeyHeaderName)
@@ -284,6 +389,47 @@ export function buildGetClientCredentialParam(
   } else {
     return "undefined";
   }
+}
+
+function buildServiceConfigurationCredentials(
+  emitterOptions: ModularEmitterOptions,
+  endpointParam: string,
+  serviceConfigs: ResolvedServiceConfigurations,
+  hasAudienceOption: boolean,
+): string | undefined {
+  if (emitterOptions.options.addCredentials === false) {
+    return undefined;
+  }
+
+  const allHaveNonEmptyOAuth2Scopes =
+    serviceConfigs.hasOAuth2 &&
+    serviceConfigs.configurations.every((c) => c.hasOAuth2 && c.oauth2Scopes.length > 0);
+
+  let scopes = "";
+  if (serviceConfigs.hasOAuth2) {
+    if (allHaveNonEmptyOAuth2Scopes) {
+      const defaultScopesExpr = hasAudienceOption
+        ? `(options.audience ? [\`\${options.audience.replace(/\\/+$/, "")}/.default\`] : selectedConfiguration.scopes)`
+        : `selectedConfiguration.scopes`;
+      scopes = `scopes: options.credentials?.scopes ?? ${defaultScopesExpr},`;
+    } else {
+      const selectedScopesExpr = `selectedConfiguration.hasOAuth2 ? (selectedConfiguration.scopes.length > 0 ? selectedConfiguration.scopes : [\`\${${endpointParam}}/.default\`]) : undefined`;
+      const defaultScopesExpr = hasAudienceOption
+        ? `(options.audience ? [\`\${options.audience.replace(/\\/+$/, "")}/.default\`] : ${selectedScopesExpr})`
+        : `(${selectedScopesExpr})`;
+      scopes = `scopes: options.credentials?.scopes ?? ${defaultScopesExpr},`;
+    }
+  }
+
+  const apiKeyHeaderName = serviceConfigs.hasApiKeyAuth
+    ? `apiKeyHeaderName: options.credentials?.apiKeyHeaderName ?? selectedConfiguration.apiKeyHeaderName,`
+    : "";
+
+  if (!scopes && !apiKeyHeaderName) {
+    return undefined;
+  }
+
+  return `{ ${scopes}${apiKeyHeaderName} }`;
 }
 
 function buildCredentials(
