@@ -878,15 +878,6 @@ export function normalizeModelName(
   return `${internalModelPrefix}${namespacePrefix}${modelName}${unionSuffix}`;
 }
 
-export function getExactModelNames(context: SdkContext): Set<string> {
-  const exactTypes = [
-    ...context.sdkPackage.models,
-    ...context.sdkPackage.enums,
-    ...context.sdkPackage.unions,
-  ].filter((type) => type.isExactName);
-  return new Set(exactTypes.map((type) => normalizeModelName(context, type)));
-}
-
 function buildModelPolymorphicType(context: SdkContext, type: SdkModelType) {
   // Only include direct subtypes in this union
   const directSubtypes = getDirectSubtypes(type);
