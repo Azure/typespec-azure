@@ -1176,11 +1176,18 @@ function getResourceParent(
   resourcesToProcess: StructuralResolvedResource[],
 ): StructuralResolvedResource | undefined {
   if (child.resourceType.types.length < 2) return undefined;
+  const parentPath = `/${child.resourceInstancePath
+    .split("/")
+    .filter((s) => s.length > 0)
+    .slice(0, -2)
+    .join("/")}`;
+  const normalizedParentPath = normalizePathForResourceIdentity(parentPath);
   for (const resource of knownResources) {
     if (
       resource.resourceType.types.length + 1 === child.resourceType.types.length &&
       resource.resourceType.provider === child.resourceType.provider &&
-      resource.resourceType.types.join("/") === child.resourceType.types.slice(0, -1).join("/")
+      resource.resourceType.types.join("/") === child.resourceType.types.slice(0, -1).join("/") &&
+      normalizePathForResourceIdentity(resource.resourceInstancePath) === normalizedParentPath
     ) {
       return resource;
     }
@@ -1197,11 +1204,7 @@ function getResourceParent(
     resourceName,
     resourceNameExpression: { kind: "literal", value: resourceName },
     resourceNameIsExplicit: false,
-    resourceInstancePath: `/${child.resourceInstancePath
-      .split("/")
-      .filter((s) => s.length > 0)
-      .slice(0, -2)
-      .join("/")}`,
+    resourceInstancePath: parentPath,
     operations: { lifecycle: {}, actions: [], lists: [] },
   };
   syntheticResources.add(parent);

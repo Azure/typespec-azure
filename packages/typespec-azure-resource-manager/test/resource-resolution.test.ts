@@ -657,6 +657,60 @@ describe("unit tests for resource manager helpers", () => {
   });
 });
 describe("end-to-end tests for resource manager helpers", () => {
+  it.each([
+    { description: "same path", parentName: "{eventId}", expectedName: "subscription" },
+    {
+      description: "different parameter names",
+      parentName: "{trackingId}",
+      expectedName: "subscription",
+    },
+    { description: "no same-scope parent", parentName: undefined, expectedName: undefined },
+    {
+      description: "different literal parent name",
+      parentName: "current",
+      expectedName: undefined,
+    },
+  ])(
+    "resolves a nested resource's parent at the same scope: $description",
+    async ({ parentName, expectedName }) => {
+      const parentParameter = parentName?.startsWith("{")
+        ? `, @path ${parentName.slice(1, -1)}: string`
+        : "";
+      const { program } = await Tester.compile(`
+        @armProviderNamespace namespace Microsoft.Test;
+        @subscriptionResource
+        model Event is ProxyResource<{}> { ...ResourceNameParameter<Event>; }
+        @subscriptionResource
+        @parentResource(Event)
+        model ImpactedResource is ProxyResource<{}> { ...ResourceNameParameter<ImpactedResource>; }
+
+        interface Events {
+          @route("/providers/Microsoft.Test/events/{eventId}") @get @armResourceRead(Event)
+          op tenant(@path eventId: string): Event;
+          ${
+            parentName
+              ? `@route("/subscriptions/{subscriptionId}/providers/Microsoft.Test/events/${parentName}")
+                 @get @armResourceRead(Event)
+                 op subscription(@path subscriptionId: string${parentParameter}): Event;`
+              : ""
+          }
+        }
+        interface ImpactedResources {
+          @route("/subscriptions/{subscriptionId}/providers/Microsoft.Test/events/{eventId}/impactedResources/{impactedId}")
+          @get @armResourceRead(ImpactedResource)
+          op get(@path subscriptionId: string, @path eventId: string, @path impactedId: string): ImpactedResource;
+        }
+      `);
+      const resources = resolveArmResources(program).resources!;
+      const child = resources.find((r) => r.type.name === "ImpactedResource" && r.parent);
+      ok(child);
+      expect(child.parent?.resourceInstancePath).toBe(
+        `/subscriptions/{subscriptionId}/providers/Microsoft.Test/events/${expectedName ? parentName : "{eventId}"}`,
+      );
+      expect(child.scope).toBe("Subscription");
+      expect(child.parent?.operations.lifecycle.read?.[0].name).toBe(expectedName);
+    },
+  );
   it("presents every resolved resource as tracked or proxy", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;

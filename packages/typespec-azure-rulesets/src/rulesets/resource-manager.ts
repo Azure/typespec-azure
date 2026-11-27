@@ -129,6 +129,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing": false,
     "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes": false,
     "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put": false,
+    "@azure-tools/typespec-azure-resource-manager/resource-path-validation": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
