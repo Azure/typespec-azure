@@ -10,6 +10,7 @@ import {
   normalizeName,
   normalizeSdkName,
   ReservedModelNames,
+  type SdkName,
 } from "../../utils/name-utils.js";
 import type { ServiceOperation } from "../../utils/operation-util.js";
 
@@ -32,7 +33,7 @@ export interface GuardedName {
 export function getOperationName(
   operation: ServiceOperation,
   dpgContext?: SdkContext,
-  prefixes: string[] = [],
+  prefixes: SdkName[] = [],
 ): GuardedName {
   const name = normalizeSdkName(operation, NameType.Method, { shouldGuard: true });
   const propertyName = normalizeSdkName(operation, NameType.Property);
@@ -81,13 +82,13 @@ export function getOperationName(
  * operation group it belongs to. The innermost operation group name is singularized
  * so that, for example, the `Conversations` group yields `Conversation`.
  */
-function getReservedNameGroupSuffix(prefixes: string[]): string | undefined {
-  const groups = prefixes.filter((prefix) => prefix && prefix.length > 0);
+function getReservedNameGroupSuffix(prefixes: SdkName[]): string | undefined {
+  const groups = prefixes.filter((prefix) => prefix.name.length > 0);
   const innermostGroup = groups[groups.length - 1];
   if (!innermostGroup) {
     return undefined;
   }
-  return pluralize.singular(normalizeName(innermostGroup, NameType.Interface));
+  return pluralize.singular(normalizeSdkName(innermostGroup, NameType.Interface));
 }
 
 export function isReservedName(name: string, nameType: NameType): boolean {
@@ -98,7 +99,7 @@ export function isReservedName(name: string, nameType: NameType): boolean {
 }
 
 export function getClassicalLayerPrefix(
-  prefixes: string[],
+  prefixes: SdkName[],
   nameType: NameType,
   separator: string = "",
   layer: number = prefixes.length - 1,
@@ -108,10 +109,10 @@ export function getClassicalLayerPrefix(
     return prefix.join(separator);
   }
   if (layer === 0) {
-    return normalizeName(prefixes[0] ?? "", nameType);
+    return normalizeSdkName(prefixes[0] ?? { name: "" }, nameType);
   }
   for (let i = 0; i <= layer; i++) {
-    prefix.push(normalizeName(prefixes[i] ?? "", nameType));
+    prefix.push(normalizeSdkName(prefixes[i] ?? { name: "" }, nameType));
   }
   return prefix.join(separator);
 }

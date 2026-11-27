@@ -42,6 +42,7 @@ import {
   NameType,
   normalizeSdkName,
   normalizeSdkPropertyName,
+  type SdkName,
 } from "../../utils/name-utils.js";
 import {
   getCollectionFormatFromArrayEncoding,
@@ -53,6 +54,7 @@ import {
   isMultipartPayload,
   isXmlPayload,
   KnownCollectionFormat,
+  type OperationWithHierarchy,
   type ServiceOperation,
 } from "../../utils/operation-util.js";
 import { AzureCoreDependencies, AzurePollingDependencies } from "../external-dependencies.js";
@@ -121,7 +123,7 @@ function shouldSkipHeaderSerialization(
 
 export function getSendPrivateFunction(
   dpgContext: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
   clientType: string,
   client?: SdkClientType<SdkHttpOperation>,
 ): OptionalKind<FunctionDeclarationStructure> {
@@ -181,7 +183,7 @@ export function getSendPrivateFunction(
 
 export function getDeserializePrivateFunction(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
 ): OptionalKind<FunctionDeclarationStructure> {
   const operation = method[1];
   const { name } = getOperationName(operation, context, method[0]);
@@ -481,7 +483,7 @@ export function getDeserializePrivateFunction(
  */
 export function getDeserializeHeadersPrivateFunction(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
   const operation = method[1];
   const responseHeaders = getResponseHeaders(operation.operation.responses);
@@ -636,7 +638,7 @@ function getExceptionResponseHeaders(
  */
 export function getDeserializeExceptionHeadersPrivateFunction(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
   const operation = method[1];
   const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
@@ -689,7 +691,7 @@ function getExceptionDeserializeExpr(exception: ExceptionThrowDetail): string {
   return `isXml ? ${exception.xmlDeserializer}(result.body) : ${exception.deserializer}(result.body)`;
 }
 
-function getExceptionThrowStatement(context: SdkContext, method: [string[], ServiceOperation]) {
+function getExceptionThrowStatement(context: SdkContext, method: OperationWithHierarchy) {
   const operation = method[1];
   const statements = [];
   const createRestErrorReference = resolveReference(useDependencies().createRestError);
@@ -844,7 +846,7 @@ function getOptionalParamsName(parameters: OptionalKind<ParameterDeclarationStru
 
 function getOperationSignatureParameters(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
   clientType: string,
 ): OptionalKind<ParameterDeclarationStructure>[] {
   const operation = method[1];
@@ -897,7 +899,7 @@ function getOperationSignatureParameters(
  */
 export function getOperationFunction(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
   clientType: string,
 ): FunctionDeclarationStructure & {
   propertyName?: string;
@@ -1391,7 +1393,7 @@ export function getStructuredStreamInfo(
  */
 function getStructuredStreamOperationFunction(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
   clientType: string,
   info: StructuredStreamInfo,
 ): FunctionDeclarationStructure & { propertyName?: string } {
@@ -1539,7 +1541,7 @@ function buildSseDescriptors(info: StructuredStreamInfo): string {
  */
 function getStructuredStreamDeserializeFunction(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
   info: StructuredStreamInfo,
 ): OptionalKind<FunctionDeclarationStructure> {
   const operation = method[1];
@@ -1630,7 +1632,7 @@ export function packageHasStructuredStreaming(context: SdkContext): boolean {
 
 function getLroOnlyOperationFunction(
   context: SdkContext,
-  method: [string[], SdkLroServiceMethod<SdkHttpOperation>],
+  method: [SdkName[], SdkLroServiceMethod<SdkHttpOperation>],
   clientType: string,
   optionalParamName: string = "options",
 ): FunctionDeclarationStructure & {
@@ -1657,7 +1659,7 @@ function getLroOnlyOperationFunction(
     ? (resolveReference(refkey(operation, "response")) as string)
     : returnType.type;
   const effectiveReturnTypeName = shouldWrap
-    ? getOperationResponseTypeName(method as [string[], ServiceOperation])
+    ? getOperationResponseTypeName(method)
     : returnType.type;
 
   const functionStatement = {
@@ -1716,7 +1718,7 @@ function getLroOnlyOperationFunction(
 
 function getLroAndPagingOperationFunction(
   context: SdkContext,
-  method: [string[], SdkLroPagingServiceMethod<SdkHttpOperation>],
+  method: [SdkName[], SdkLroPagingServiceMethod<SdkHttpOperation>],
   clientType: string,
   optionalParamName: string = "options",
 ): FunctionDeclarationStructure & {
@@ -1841,7 +1843,7 @@ function buildLroPagingReturnType(
 
 function getPagingOnlyOperationFunction(
   context: SdkContext,
-  method: [string[], SdkPagingServiceMethod<SdkHttpOperation>],
+  method: [SdkName[], SdkPagingServiceMethod<SdkHttpOperation>],
   clientType: string,
 ): FunctionDeclarationStructure & { propertyName?: string } {
   const operation = method[1];
@@ -1932,10 +1934,7 @@ function getPagingOnlyOperationFunction(
   } as FunctionDeclarationStructure & { propertyName?: string };
 }
 
-export function getOperationOptionsName(
-  method: [string[], ServiceOperation],
-  includeGroupName = false,
-) {
+export function getOperationOptionsName(method: OperationWithHierarchy, includeGroupName = false) {
   const prefixes = method[0];
   const operation = method[1];
   const prefix =
@@ -3439,7 +3438,7 @@ function buildHeaderOnlyResponseValue(
  * The name follows the pattern: {OperationGroupName}{MethodName}Response
  * @param method - The method tuple [prefixes, operation]
  */
-export function getOperationResponseTypeName(method: [string[], ServiceOperation]): string {
+export function getOperationResponseTypeName(method: OperationWithHierarchy): string {
   const prefixes = method[0];
   const operation = method[1];
   const prefix = !operation.name.includes("_")
@@ -3546,7 +3545,7 @@ export function checkWrapNonModelReturn(
  */
 export function buildNonModelResponseTypeDeclaration(
   context: SdkContext,
-  method: [string[], ServiceOperation],
+  method: OperationWithHierarchy,
   isBinary: boolean,
 ): TypeAliasDeclarationStructure {
   const typeName = getOperationResponseTypeName(method);

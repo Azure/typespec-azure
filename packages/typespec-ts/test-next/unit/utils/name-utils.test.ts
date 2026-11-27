@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getClassicalLayerPrefix } from "../../../src/modular/helpers/naming-helpers.js";
 import {
   formatPropertyName,
   isValidTypeScriptIdentifierName,
@@ -67,11 +68,13 @@ describe("#normalizeName", () => {
         );
       });
     });
-
-    describe("$DO_NOT_NORMALIZE", () => {
-      it("should keep the whole name if it starts with $DO_NOT_NORMALIZE$", () => {
+    describe("exact names", () => {
+      it("should keep the whole enum member name when isExactName is true", () => {
         expect(
-          normalizeName("$DO_NOT_NORMALIZE$VALIDATION_NOT_REQUIRED", NameType.EnumMemberName),
+          normalizeSdkName(
+            { name: "VALIDATION_NOT_REQUIRED", isExactName: true },
+            NameType.EnumMemberName,
+          ),
         ).to.equal("VALIDATION_NOT_REQUIRED");
       });
     });
@@ -125,9 +128,42 @@ describe("#normalizeName", () => {
   });
 });
 
+describe("#getClassicalLayerPrefix", () => {
+  const prefixes = [
+    { name: "parent_group" },
+    { name: "wCFRelays", isExactName: true },
+    { name: "child_group" },
+  ];
+
+  it("preserves exact names within nested group paths", () => {
+    expect(getClassicalLayerPrefix(prefixes, NameType.File, "/")).to.equal(
+      "parentGroup/wCFRelays/childGroup",
+    );
+    expect(getClassicalLayerPrefix(prefixes, NameType.Interface)).to.equal(
+      "ParentGroupwCFRelaysChildGroup",
+    );
+  });
+
+  it("preserves exact names when selecting a hierarchy layer", () => {
+    expect(getClassicalLayerPrefix(prefixes, NameType.Property, ".", 1)).to.equal(
+      "parentGroup.wCFRelays",
+    );
+    expect(getClassicalLayerPrefix([], NameType.Interface)).to.equal("");
+  });
+});
+
 describe("#normalizeSdkName", () => {
   it("normalizes non-exact names", () => {
     expect(normalizeSdkName({ name: "model_name" }, NameType.Interface)).to.equal("ModelName");
+  });
+
+  it("honors an explicit name override", () => {
+    expect(
+      normalizeSdkName({ name: "type" }, NameType.Parameter, {
+        nameOverride: "other_name",
+        shouldGuard: true,
+      }),
+    ).to.equal("otherName");
   });
 
   it("preserves exact names", () => {

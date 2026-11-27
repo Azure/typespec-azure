@@ -56,9 +56,8 @@ function buildExportsForMultiClient(
       const { subfolder } = getClientModuleInfo(flattenedClient);
       const client = flattenedClient[1];
       const methodMap = getMethodHierarchiesMap(context, client);
-      for (const [prefixKey, _] of methodMap) {
-        const prefixes = prefixKey.split("/");
-        if (prefixKey === "") {
+      for (const [prefixes, _] of methodMap) {
+        if (prefixes.length === 0) {
           continue;
         }
         const subApiPath = `api/${getClassicalLayerPrefix(prefixes, NameType.File, "/")}`;

@@ -1,4 +1,4 @@
-# should preserve $DO_NOT_NORMALIZE$ operation-group names in classical client
+# should preserve exact operation-group names in classical client
 
 ## TypeSpec
 
@@ -22,9 +22,14 @@ model RelayResource {
 interface WcfRelaysOps {
   @get
   get(@query id: string): RelayResource;
+
+  @get
+  @route("/all")
+  list(): RelayResource[];
 }
 
-@@clientLocation(WcfRelaysOps.get, "$DO_NOT_NORMALIZE$wCFRelays");
+#suppress "experimental-feature" "exact name test"
+@@clientName(WcfRelaysOps, exact("wCFRelays"));
 ```
 
 ```yaml
