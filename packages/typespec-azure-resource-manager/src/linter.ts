@@ -55,6 +55,7 @@ import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
 import { secretProprule } from "./rules/secret-prop.js";
+import { trackedResourceMissingOperationsRule } from "./rules/tracked-resource-missing-operations.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
@@ -122,6 +123,7 @@ const rules = [
   privateLinkResourceSchemaRule,
   resourceNameRule,
   resourceMissingReadRule,
+  trackedResourceMissingOperationsRule,
   retryAfterRule,
   unsupportedTypeRule,
   useModelRequestBodyRule,
