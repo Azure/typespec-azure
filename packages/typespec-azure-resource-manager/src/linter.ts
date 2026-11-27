@@ -52,6 +52,7 @@ import { privateLinkResourceSchemaRule } from "./rules/private-link-resource-sch
 import { requireErrorDecoratorRule } from "./rules/require-error-decorator.js";
 import { resourceMissingReadRule } from "./rules/resource-missing-read.js";
 import { resourceNameRule } from "./rules/resource-name.js";
+import { resourcePropertiesValidationRule } from "./rules/resource-properties-validation.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { scopePathSegmentCasingRule } from "./rules/scope-path-segment-casing.js";
 import { secretProprule } from "./rules/secret-prop.js";
@@ -121,6 +122,7 @@ const rules = [
   privateEndpointApisMissingRule,
   privateLinkResourceSchemaRule,
   resourceNameRule,
+  resourcePropertiesValidationRule,
   resourceMissingReadRule,
   retryAfterRule,
   unsupportedTypeRule,
