@@ -1,6 +1,7 @@
 import { defineLinter } from "@typespec/compiler";
 import { csharpModelSuffixRule } from "./rules/csharp-model-suffix.js";
 import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
+import { csharpUseBoolPrefixRule } from "./rules/csharp-use-bool-prefix.js";
 import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acronyms.js";
 import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
 import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-name-conflict.rule.js";
@@ -24,6 +25,7 @@ const rules = [
   useUnionHierarchyRule,
   useValidClientLroResultRule,
   noRepeatedClientNameRule,
+  csharpUseBoolPrefixRule,
   unsupportedScopeRule,
 ];
 
@@ -31,6 +33,7 @@ const csharpRules = [
   propertyNameConflictRule,
   csharpNoUrlSuffixRule,
   csharpModelSuffixRule,
+  csharpUseBoolPrefixRule,
   csharpUseStandardAcronymsRule,
 ];
 
