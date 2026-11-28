@@ -8,6 +8,21 @@ import {
   validateFinalState,
 } from "../state/final-state.js";
 
+const finalStateHeaders = {
+  [FinalStateValue.operationLocation]: {
+    headerName: "Operation-Location",
+    headerType: "Azure.Core.Foundations.LongRunningStatusLocation",
+  },
+  [FinalStateValue.location]: {
+    headerName: "Location",
+    headerType: "TypeSpec.Http.LocationHeader",
+  },
+  [FinalStateValue.azureAsyncOperation]: {
+    headerName: "Azure-AsyncOperation",
+    headerType: "Azure.ResourceManager.ArmAsyncOperationHeader",
+  },
+};
+
 /**
  * overrides the final state for an lro
  * @param context The execution context for the decorator
@@ -47,20 +62,13 @@ export const $useFinalStateVia: UseFinalStateViaDecorator = (context, entity, fi
       if (storedValue !== undefined || operation.verb === "put") {
         setFinalStateOverride(program, entity, finalStateVia);
       }
-      if (
-        storedValue === undefined &&
-        [
-          FinalStateValue.operationLocation,
-          FinalStateValue.location,
-          FinalStateValue.azureAsyncOperation,
-        ].includes(finalStateVia)
-      ) {
+      if (storedValue === undefined && finalStateVia !== FinalStateValue.originalUri) {
         return [
           createDiagnostic({
             code: "invalid-final-state",
             target: entity,
             messageId: "noHeader",
-            format: { finalStateValue: finalStateVia },
+            format: { finalStateValue: finalStateVia, ...finalStateHeaders[finalStateVia] },
           }),
         ];
       }
