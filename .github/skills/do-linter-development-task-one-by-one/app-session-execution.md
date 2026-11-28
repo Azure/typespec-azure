@@ -2,6 +2,14 @@
 
 ## Native-first publication
 
+For an explicitly selected private `RPSaaSMaster` corpus, apply the
+[private corpus contract](../analyze-native-lint-coverage/private-corpus.md)
+before resolving evidence/source publishers. Its authorized private destinations
+override the personal-fork evidence and specs-preservation defaults in this file.
+Canonical native/skill PR ownership stays unchanged and never permits private
+data in public PRs. Verify that the backend can keep those publication roles
+separate before setup.
+
 For recorded `flowVersion: native-first`, one native implementation publisher
 owns both development and release-readiness checkpoints on one canonical head,
 with base `Azure/typespec-azure:main`. Apply publication preflight, lifecycle,
